@@ -544,10 +544,9 @@ The following additional specs are available:
   :type 'hook
   :group 'gnus-article-various)
 
-(defcustom gnus-article-hide-pgp-hook nil
-  "*A hook called after successfully hiding a PGP signature."
-  :type 'hook
-  :group 'gnus-article-various)
+(defvar gnus-article-hide-pgp-hook nil)
+(make-obsolete-variable 'gnus-article-hide-pgp-hook 
+			"This variable is obsolete in Gnus 5.10.")
 
 (defcustom gnus-article-button-face 'bold
   "Face used for highlighting buttons in the article buffer.
@@ -966,13 +965,8 @@ See Info node `(gnus)Customizing Articles' for details."
   :link '(custom-manual "(gnus)Customizing Articles")
   :type gnus-article-treat-custom)
 
-(defcustom gnus-treat-strip-pgp t
-  "Strip PGP signatures.
-Valid values are nil, t, `head', `last', an integer or a predicate.
-See Info node `(gnus)Customizing Articles' for details."
-  :group 'gnus-article-treat
-  :link '(custom-manual "(gnus)Customizing Articles")
-  :type gnus-article-treat-custom)
+(make-obsolete-variable 'gnus-treat-strip-pgp 
+			"This option is obsolete in Gnus 5.10.")
 
 (defcustom gnus-treat-strip-pem nil
   "Strip PEM signatures.
@@ -1359,7 +1353,6 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-hide-signature gnus-article-hide-signature)
     (gnus-treat-strip-list-identifiers gnus-article-hide-list-identifiers)
     (gnus-treat-leading-whitespace gnus-article-remove-leading-whitespace)
-    (gnus-treat-strip-pgp gnus-article-hide-pgp)
     (gnus-treat-strip-pem gnus-article-hide-pem)
     (gnus-treat-from-picon gnus-treat-from-picon)
     (gnus-treat-mail-picon gnus-treat-mail-picon)
@@ -2311,42 +2304,6 @@ The `gnus-list-identifiers' variable specifies what to do."
 	  (when (re-search-forward
 		 "^Subject: +\\(\\(R[Ee]: +\\)+\\)R[Ee]: +" nil t)
 	    (delete-region (match-beginning 1) (match-end 1))))))))
-
-(defun article-hide-pgp ()
-  "Remove any PGP headers and signatures in the current article."
-  (interactive)
-  (save-excursion
-    (save-restriction
-      (let ((inhibit-point-motion-hooks t)
-	    buffer-read-only beg end)
-	(article-goto-body)
-	;; Hide the "header".
-	(when (re-search-forward "^-----BEGIN PGP SIGNED MESSAGE-----\n" nil t)
-	  (gnus-add-wash-type 'pgp)
-	  (delete-region (match-beginning 0) (match-end 0))
-	  ;; Remove armor headers (rfc2440 6.2)
-	  (delete-region (point) (or (re-search-forward "^[ \t]*\n" nil t)
-				     (point)))
-	  (setq beg (point))
-	  ;; Hide the actual signature.
-	  (and (search-forward "\n-----BEGIN PGP SIGNATURE-----\n" nil t)
-	       (setq end (1+ (match-beginning 0)))
-	       (delete-region
-		end
-		(if (search-forward "\n-----END PGP SIGNATURE-----\n" nil t)
-		    (match-end 0)
-		  ;; Perhaps we shouldn't hide to the end of the buffer
-		  ;; if there is no end to the signature?
-		  (point-max))))
-	  ;; Hide "- " PGP quotation markers.
-	  (when (and beg end)
-	    (narrow-to-region beg end)
-	    (goto-char (point-min))
-	    (while (re-search-forward "^- " nil t)
-	      (delete-region
-	       (match-beginning 0) (match-end 0)))
-	    (widen))
-	  (gnus-run-hooks 'gnus-article-hide-pgp-hook))))))
 
 (defun article-hide-pem (&optional arg)
   "Toggle hiding of any PEM headers and signatures in the current article.
@@ -3394,7 +3351,6 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-wash-html
      article-unsplit-urls
      article-hide-list-identifiers
-     article-hide-pgp
      article-strip-banner
      article-babel
      article-hide-pem
@@ -5032,13 +4988,12 @@ the entire article will be yanked."
 
 (defun gnus-article-hide (&optional arg force)
   "Hide all the gruft in the current article.
-This means that PGP stuff, signatures, cited text and (some)
-headers will be hidden.
+This means that signatures, cited text and (some) headers will be
+hidden.
 If given a prefix, show the hidden text instead."
   (interactive (append (gnus-article-hidden-arg) (list 'force)))
   (gnus-article-hide-headers arg)
   (gnus-article-hide-list-identifiers arg)
-  (gnus-article-hide-pgp arg)
   (gnus-article-hide-citation-maybe arg force)
   (gnus-article-hide-signature arg))
 
@@ -5783,8 +5738,8 @@ call it with the value of the `gnus-data' text property."
 If the text at point has a `gnus-callback' property,
 call it with the value of the `gnus-data' text property."
   (interactive)
-  (let* ((data (get-text-property (point) 'gnus-data))
-	 (fun (get-text-property (point) 'gnus-callback)))
+  (let ((data (get-text-property (point) 'gnus-data))
+	(fun (get-text-property (point) 'gnus-callback)))
     (when fun
       (funcall fun data))))
 
@@ -6501,42 +6456,45 @@ For example:
 
 (defun gnus-mime-security-show-details (handle)
   (let ((details (mm-handle-multipart-ctl-parameter handle 'gnus-details)))
-    (if details
-	(if gnus-mime-security-show-details-inline
-	    (let ((gnus-mime-security-button-pressed t)
-		  (gnus-mime-security-button-line-format
-		   (get-text-property (point) 'gnus-line-format))
+    (if (not details)
+	(gnus-message 5 "No details.")
+      (if gnus-mime-security-show-details-inline
+	  (let ((gnus-mime-security-button-pressed
+		 (not (get-text-property (point) 'gnus-mime-details)))
+		(gnus-mime-security-button-line-format
+		 (get-text-property (point) 'gnus-line-format))
 		buffer-read-only)
-	      (forward-char -1)
-	      (while (eq (get-text-property (point) 'gnus-line-format)
-			 gnus-mime-security-button-line-format)
-		(forward-char -1))
-	      (forward-char)
-	      (save-restriction
-		(narrow-to-region (point) (point))
-		(gnus-insert-mime-security-button handle))
-	      (delete-region (point)
-			     (or (text-property-not-all
-				  (point) (point-max)
-				  'gnus-line-format
-				  gnus-mime-security-button-line-format)
-				 (point-max))))
-	  (if (gnus-buffer-live-p gnus-mime-security-details-buffer)
-	      (with-current-buffer gnus-mime-security-details-buffer
-		(erase-buffer)
-		t)
-	    (setq gnus-mime-security-details-buffer
-		  (gnus-get-buffer-create "*MIME Security Details*")))
-	  (with-current-buffer gnus-mime-security-details-buffer
-	    (insert details)
-	    (goto-char (point-min)))
-	  (pop-to-buffer gnus-mime-security-details-buffer))
-      (gnus-message 5 "No details."))))
+	    (forward-char -1)
+	    (while (eq (get-text-property (point) 'gnus-line-format)
+		       gnus-mime-security-button-line-format)
+	      (forward-char -1))
+	    (forward-char)
+	    (save-restriction
+	      (narrow-to-region (point) (point))
+	      (gnus-insert-mime-security-button handle))
+	    (delete-region (point)
+			   (or (text-property-not-all
+				(point) (point-max)
+				'gnus-line-format
+				gnus-mime-security-button-line-format)
+			       (point-max))))
+	;; Not inlined.
+	(if (gnus-buffer-live-p gnus-mime-security-details-buffer)
+	    (with-current-buffer gnus-mime-security-details-buffer
+	      (erase-buffer)
+	      t)
+	  (setq gnus-mime-security-details-buffer
+		(gnus-get-buffer-create "*MIME Security Details*")))
+	(with-current-buffer gnus-mime-security-details-buffer
+	  (insert details)
+	  (goto-char (point-min)))
+	(pop-to-buffer gnus-mime-security-details-buffer)))))
 
 (defun gnus-mime-security-press-button (handle)
-  (if (mm-handle-multipart-ctl-parameter handle 'gnus-info)
-      (gnus-mime-security-show-details handle)
-    (gnus-mime-security-verify-or-decrypt handle)))
+  (save-excursion
+    (if (mm-handle-multipart-ctl-parameter handle 'gnus-info)
+	(gnus-mime-security-show-details handle)
+      (gnus-mime-security-verify-or-decrypt handle))))
 
 (defun gnus-insert-mime-security-button (handle &optional displayed)
   (let* ((protocol (mm-handle-multipart-ctl-parameter handle 'protocol))
@@ -6557,7 +6515,8 @@ For example:
 	 b e)
     (setq gnus-tmp-details
 	  (if gnus-tmp-details
-	      (concat "\n" gnus-tmp-details) ""))
+	      (concat "\n" gnus-tmp-details)
+	    ""))
     (setq gnus-tmp-pressed-details
 	  (if gnus-mime-security-button-pressed gnus-tmp-details ""))
     (unless (bolp)
@@ -6569,6 +6528,7 @@ For example:
      `(,@(gnus-local-map-property gnus-mime-security-button-map)
 	 gnus-callback gnus-mime-security-press-button
 	 gnus-line-format ,gnus-mime-security-button-line-format
+	 gnus-mime-details ,gnus-mime-security-button-pressed
 	 article-type annotation
 	 gnus-data ,handle))
     (setq e (point))
@@ -6581,8 +6541,8 @@ For example:
      (lambda (widget/window &optional overlay pos)
        ;; Needed to properly clear the message due to a bug in
        ;; wid-edit (XEmacs only).
-       (if (boundp 'help-echo-owns-message)
-	   (setq help-echo-owns-message t))
+       (when (boundp 'help-echo-owns-message)
+	 (setq help-echo-owns-message t))
        (format
 	"%S: show detail"
 	(aref gnus-mouse-2 0))))))

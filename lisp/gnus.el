@@ -282,7 +282,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.13"
+(defconst gnus-version-number "0.14"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Oort Gnus v%s" gnus-version-number)
@@ -2430,7 +2430,6 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-decode-HZ
       gnus-article-wash-html
       gnus-article-unsplit-urls
-      gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
       gnus-article-date-original gnus-article-date-lapsed

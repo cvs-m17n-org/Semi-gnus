@@ -33,7 +33,7 @@
 \makeindex
 \begin{document}
 
-\newcommand{\gnusversionname}{Oort Gnus v0.13}
+\newcommand{\gnusversionname}{Oort Gnus v0.14}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
 
@@ -385,7 +385,7 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-This manual corresponds to Oort Gnus v0.13.
+This manual corresponds to Oort Gnus v0.14.
 
 @end ifinfo
 
@@ -753,6 +753,7 @@ Gnus Unplugged
 * Agent Commands::              New commands for all the buffers.
 * Agent as Cache::              The Agent is a big cache too.
 * Agent Expiry::                How to make old articles go away.
+* Agent Regeneration::          How to recover from lost connections and other accidents.
 * Agent and IMAP::              How to use the Agent with IMAP.
 * Outgoing Messages::           What happens when you post/mail something?
 * Agent Variables::             Customizing is fun.
@@ -768,9 +769,9 @@ Agent Categories
 
 Agent Commands
 
-* Group Agent Commands::        
-* Summary Agent Commands::      
-* Server Agent Commands::       
+* Group Agent Commands::        Configure groups and fetch their contents.
+* Summary Agent Commands::      Manually select then fetch specific articles.
+* Server Agent Commands::       Select the servers that are supported by the agent.
 
 Scoring
 
@@ -843,16 +844,7 @@ Image Enhancements
 * Picons::                      How to display pictures of what you're reading.
 * Smileys::                     Show all those happy faces the way they were meant to be shown.
 * X-Face::                      Display a funky, teensy black-and-white image.
-* Toolbar::                     Click'n'drool.
 * XVarious::                    Other XEmacsy Gnusey variables.
-
-Picons
-
-* Picon Basics::                What are picons and How do I get them.
-* Picon Requirements::          Don't go further if you aren't using XEmacs.
-* Easy Picons::                 Displaying Picons---the easy way.
-* Hard Picons::                 The way you should do it.  You'll learn something.
-* Picon Useless Configuration::  Other variables you can trash/tweak/munge/play with.
 
 Thwarting Email Spam
 
@@ -5015,9 +5007,9 @@ the server and display it in the article buffer.
 @item gnus-select-article-hook
 @vindex gnus-select-article-hook
 This hook is called whenever an article is selected.  By default it
-exposes any threads hidden under the selected article.  If you wish
-that the Agent saves all articles you read, putting
-@code{gnus-agent-fetch-selected-article} on this hook should do it.
+exposes any threads hidden under the selected article.  If you would 
+like each article to be saved in the Agent as you read it, putting
+@code{gnus-agent-fetch-selected-article} on this hook will do so.
 
 @item gnus-mark-article-hook
 @vindex gnus-mark-article-hook
@@ -5760,12 +5752,20 @@ with a @samp{.} in the second column (@code{gnus-unseen-mark}).
 Compare with @code{gnus-recent-mark}.
 
 @item
+@vindex gnus-downloaded-mark
+When using the Gnus agent @pxref{Agent Basics}, articles may be
+downloaded for unplugged (offline) viewing.  If you are using the
+@samp{%O} spec, these articles get the @samp{+} mark in that spec.
+(The variable @code{gnus-downloaded-mark} controls which character to
+use.)
+
+@item
 @vindex gnus-undownloaded-mark
-When using the Gnus agent @pxref{Agent Basics}, some articles might not
-have been downloaded.  Such articles cannot be viewed while you are
-offline (unplugged).  These articles get the @samp{@@} mark in the
-first column.  (The variable @code{gnus-undownloaded-mark} controls
-which character to use.)
+When using the Gnus agent @pxref{Agent Basics}, some articles might
+not have been downloaded.  Such articles cannot be viewed while you
+are unplugged (offline).  If you are using the @samp{%O} spec, these
+articles get the @samp{-} mark in that spec.  (The variable
+@code{gnus-undownloaded-mark} controls which character to use.)
 
 @item
 @vindex gnus-downloadable-mark
@@ -8108,29 +8108,6 @@ A regular expression that matches list identifiers to be removed from
 subject.  This can also be a list of regular expressions.
 
 @end table
-
-@item W W p
-@kindex W W p (Summary)
-@findex gnus-article-hide-pgp
-@vindex gnus-article-hide-pgp-hook
-Hide @sc{pgp} signatures (@code{gnus-article-hide-pgp}).  The
-@code{gnus-article-hide-pgp-hook} hook will be run after a @sc{pgp}
-signature has been hidden.  For example, to automatically verify
-articles that have signatures in them do:
-@lisp
-;;; Hide pgp cruft if any.
-
-(setq gnus-treat-strip-pgp t)
-
-;;; After hiding pgp, verify the message;
-;;; only happens if pgp signature is found.
-
-(add-hook 'gnus-article-hide-pgp-hook
-          (lambda ()
-            (save-excursion
-              (set-buffer gnus-original-article-buffer)
-              (mc-verify))))
-@end lisp
 
 @item W W P
 @kindex W W P (Summary)
@@ -10769,7 +10746,6 @@ possible but those listed are probably sufficient for most people.
 @item gnus-treat-strip-leading-blank-lines (t, integer)
 @item gnus-treat-strip-multiple-blank-lines (t, integer)
 @item gnus-treat-strip-pem (t, last, integer)
-@item gnus-treat-strip-pgp (t, last, integer)
 @item gnus-treat-strip-trailing-blank-lines (t, last, integer)
 @item gnus-treat-unsplit-urls (t, integer)
 @item gnus-treat-wash-html (t, integer)
@@ -11580,6 +11556,9 @@ format or @sc{pgp/mime} or @sc{s/mime}.  For decoding such messages,
 see the @code{mm-verify-option} and @code{mm-decrypt-option} options
 (@pxref{Security}).
 
+@vindex gnus-message-replysign
+@vindex gnus-message-replyencrypt
+@vindex gnus-message-replysignencrypted
 Often, you would like to sign replies to people who send you signed
 messages.  Even more often, you might want to encrypt messages which
 are in reply to encrypted messages.  Gnus offers
@@ -12315,6 +12294,15 @@ inhibit Gnus to add a @code{Message-ID} header, you could say:
 
 Note that not all servers support the recommended ID.  This works for
 INN versions 2.3.0 and later, for instance.
+
+@item nntp-read-timeout
+@vindex nntp-read-timeout
+How long nntp should wait between checking for the end of output.
+Shorter values mean quicker response, but is more CPU intensive.  The
+default is 0.1 seconds.  If you have a slow line to the server (and
+don't like to see Emacs eat your available CPU power), you might set
+this to, say, 1.
+
 @end table
 
 @menu
@@ -15190,6 +15178,11 @@ need external programs and libraries, see below.)
                 (nnimap-stream ssl))))
 @end lisp
 
+After defining the new server, you can subscribe to groups on the
+server using normal Gnus commands such as @kbd{U} in the Group Buffer
+(@pxref{Subscription Commands}) or via the Server Buffer
+(@pxref{Server Buffer}).
+
 The following variables can be used to create a virtual @code{nnimap}
 server:
 
@@ -15592,16 +15585,17 @@ analyses the body to split the article.
 @subsection Expiring in IMAP
 @cindex expiring imap mail
 
-Even though @sc{nnimap} is not a proper @sc{nnmail} derived back end,
-it supports most features in regular expiring (@pxref{Expiring Mail}).
-Unlike splitting in IMAP (@pxref{Splitting in IMAP}) it do not clone
-the @sc{nnmail} variables (i.e., creating @var{nnimap-expiry-wait})
-but reuse the @sc{nnmail} variables.  What follows below are the
-variables used by the @sc{nnimap} expiry process.
+Even though @code{nnimap} is not a proper @code{nnmail} derived back
+end, it supports most features in regular expiring (@pxref{Expiring
+Mail}).  Unlike splitting in IMAP (@pxref{Splitting in IMAP}) it do
+not clone the @code{nnmail} variables (i.e., creating
+@var{nnimap-expiry-wait}) but reuse the @code{nnmail} variables.  What
+follows below are the variables used by the @code{nnimap} expiry
+process.
 
 A note on how the expire mark is stored on the @sc{imap} server is
 appropriate here as well.  The expire mark is translated into a
-@sc{imap} client specific mark, @code{gnus-expire}, and stored on the
+@code{imap} client specific mark, @code{gnus-expire}, and stored on the
 message.  This means that likely only Gnus will understand and treat
 the @code{gnus-expire} mark properly, although other clients may allow
 you to view client specific flags on the message.  It also means that
@@ -15619,7 +15613,7 @@ number, the symbol @var{immediate} or @var{never}.
 @item nnmail-expiry-target
 
 This variable is supported, and internally implemented by calling the
-@sc{nnmail} functions that handle this.  It contains an optimization
+@code{nnmail} functions that handle this.  It contains an optimization
 that if the destination is a IMAP group on the same server, the
 article is copied instead of appended (that is, uploaded again).
 
@@ -16616,6 +16610,7 @@ Of course, to use it as such, you have to learn a few new commands.
 * Agent Commands::              New commands for all the buffers.
 * Agent as Cache::              The Agent is a big cache too.
 * Agent Expiry::                How to make old articles go away.
+* Agent Regeneration::          How to recover from lost connections and other accidents.
 * Agent and IMAP::              How to use the Agent with IMAP.
 * Outgoing Messages::           What happens when you post/mail something?
 * Agent Variables::             Customizing is fun.
@@ -17101,9 +17096,9 @@ toggles the plugged/unplugged state of the Gnus Agent.
 
 
 @menu
-* Group Agent Commands::        
-* Summary Agent Commands::      
-* Server Agent Commands::       
+* Group Agent Commands::        Configure groups and fetch their contents.
+* Summary Agent Commands::      Manually select then fetch specific articles.
+* Server Agent Commands::       Select the servers that are supported by the agent.
 @end menu
 
 
@@ -17185,7 +17180,19 @@ default.
 @item J c
 @kindex J c (Agent Summary)
 @findex gnus-agent-catchup
-Mark all undownloaded articles as read (@code{gnus-agent-catchup}).
+Mark all articles as read (@code{gnus-agent-catchup}) that are neither cached, downloaded, nor downloadable.
+
+@item J S
+@kindex J S (Agent Summary)
+@findex gnus-agent-fetch-group
+Download all eligible (See @pxref{Agent Categories}) articles in this group.
+(@code{gnus-agent-fetch-group}).
+
+@item J s
+@kindex J s (Agent Summary)
+@findex gnus-agent-fetch-series
+Download all processable articles in this group.
+(@code{gnus-agent-fetch-series}).
 
 @item J u
 @kindex J u (Agent Summary)
@@ -17248,6 +17255,10 @@ whenever you feel that you're running out of space.  It's not
 particularly fast or efficient, and it's not a particularly good idea to
 interrupt it (with @kbd{C-g} or anything else) once you've started it.
 
+Note that other functions, e.g. @code{gnus-request-expire-articles},
+might run @code{gnus-agent-expire} for you to keep the agent 
+synchronized with the group.
+
 @code{gnus-agent-expire-days} can also be a list of regexp/day pairs.
 The regexps will be matched against group names to allow differing
 expiry in different groups.
@@ -17260,7 +17271,8 @@ expiry in different groups.
 @end lisp
 
 If you use the list form, the last element must always be the default
-method---it must always match all groups.
+method---it must always match all groups. Also, for a regexp to match,
+it must match from the beginning of the group's name.
 
 @vindex gnus-agent-expire-all
 If @code{gnus-agent-expire-all} is non-@code{nil}, this command will
@@ -17268,15 +17280,49 @@ expire all articles---unread, read, ticked and dormant.  If @code{nil}
 (which is the default), only read articles are eligible for expiry, and
 unread, ticked and dormant articles will be kept indefinitely.
 
-@findex gnus-agent-regenerate
 If you find that some articles eligible for expiry are never expired,
 perhaps some Gnus Agent files are corrupted.  There's a special
 @code{gnus-agent-regenerate} command to fix possible problems.
 
+@node Agent Regeneration
+@subsection Agent Regeneration
+
+@cindex Agent Regeneration
+@cindex Gnus Agent Regeneration
+@cindex regeneration
+
+The local data structures used by @code{nnagent} may become corrupted
+due to certain exceptional conditions.  When this happens,
+@code{nnagent} functionality may degrade or even fail.  The solution
+to this problem is to repair the local data structures by removing all
+internal inconsistencies.
+
+For example, if your connection to your server is lost while
+downloaded articles into the agent, the local data structures will not
+know about articles downloaded prior to the connection failure.
+Running @code{gnus-agent-regenerate} or
+@code{gnus-agent-regenerate-group} will update the data structures
+such that you don't need to download these articles a second time.
+
+@findex gnus-agent-regenerate
+@kindex M-x gnus-agent-regenerate
+The command @code{gnus-agent-regenerate} will perform
+@code{gnus-agent-regenerate-group} on every agentized group.  While
+you can run @code{gnus-agent-regenerate} in any buffer, it is strongly
+recommended that you first close all summary buffers.
+
+@findex gnus-agent-regenerate-group
+@kindex M-x gnus-agent-regenerate-group
+The command @code{gnus-agent-regenerate-group} uses the local copies
+of individual articles to repair the local NOV(header) database.  It
+then updates the internal data structures that document which articles
+are stored locally.  An optional argument will mark articles in the
+agent as unread.
+
 @node Agent and IMAP
 @subsection Agent and IMAP
 
-The Agent work with any Gnus back end, including nnimap.  However,
+The Agent works with any Gnus back end, including nnimap.  However,
 since there are some conceptual differences between @sc{nntp} and
 @sc{imap}, this section (should) provide you with some information to
 make Gnus Agent work smoother as a @sc{imap} Disconnected Mode client.
@@ -17383,6 +17429,30 @@ offline servers into online status when you re-connect.  If it has any
 other value, all offline servers will be automatically switched into
 online status.
 
+@item gnus-agent-mark-unread-after-downloaded
+@vindex gnus-agent-mark-unread-after-downloaded
+If @code{gnus-agent-mark-unread-after-downloaded} is non-@code{nil},
+mark articles as unread after downloading.  The default is t.
+
+@item gnus-agent-consider-all-articles
+@vindex gnus-agent-consider-all-articles
+If @code{gnus-agent-consider-all-articles} is non-@code{nil}, the
+agent will fetch all missing headers.  When @code{nil}, the agent will
+fetch only new headers. The default is @code{nil}.
+
+@item gnus-agent-max-fetch-size
+@vindex gnus-agent-max-fetch-size
+The agent fetches articles into a temporary buffer prior to parsing
+them into individual files.  To avoid exceeding the max. buffer size,
+the agent alternates between fetching and parsing until all articles
+have been fetched.  @code{gnus-agent-max-fetch-size} provides a size
+limit to control how often the cycling occurs.  A large value improves
+performance.  A small value minimizes the time lost should the
+connection be lost while fetching (You may need to run
+@code{gnus-agent-regenerate-group} to update the group's state.
+However, all articles parsed prior to loosing the connection will be
+available while unplugged).
+
 @item gnus-server-unopen-status
 @vindex gnus-server-unopen-status
 Perhaps not a Agent variable, but closely related to the Agent, this
@@ -17479,7 +17549,7 @@ may ask:
 @end table
 
 In short, when Gnus is unplugged, it only looks into the locally stored
-articles; when it's plugged, it only talks to your ISP and also uses the
+articles; when it's plugged, it talks to your ISP and may also use the
 locally stored articles.
 
 
@@ -20637,7 +20707,6 @@ Gnus has taken advantage of that.
 * Picons::                      How to display pictures of what you're reading.
 * Smileys::                     Show all those happy faces the way they were meant to be shown.
 * X-Face::                      Display a funky, teensy black-and-white image.
-* Toolbar::                     Click'n'drool.
 * XVarious::                    Other XEmacsy Gnusey variables.
 @end menu
 
@@ -20654,18 +20723,6 @@ Gnus has taken advantage of that.
 So@dots{}  You want to slow down your news reader even more!  This is a
 good way to do so.  Its also a great way to impress people staring
 over your shoulder as you read news.
-
-@menu
-* Picon Basics::                What are picons and How do I get them.
-* Picon Requirements::          Don't go further if you aren't using XEmacs.
-* Easy Picons::                 Displaying Picons---the easy way.
-* Hard Picons::                 The way you should do it.  You'll learn something.
-* Picon Useless Configuration::  Other variables you can trash/tweak/munge/play with.
-@end menu
-
-
-@node Picon Basics
-@subsubsection Picon Basics
 
 What are Picons?  To quote directly from the Picons Web site:
 
@@ -20685,228 +20742,49 @@ in either monochrome @code{XBM} format or color @code{XPM} and
 @code{GIF} formats.
 @end quotation
 
-@vindex gnus-picons-piconsearch-url
-If you have a permanent connection to the Internet you can use Steve
-Kinzler's Picons Search engine by setting
-@code{gnus-picons-piconsearch-url} to the string @*
-@uref{http://www.cs.indiana.edu/picons/search.html}.
-
-@vindex gnus-picons-database
-Otherwise you need a local copy of his database.  For instructions on
-obtaining and installing the picons databases, point your Web browser at @*
-@uref{http://www.cs.indiana.edu/picons/ftp/index.html}.  Gnus expects
-picons to be installed into a location pointed to by
-@code{gnus-picons-database}.
+@vindex gnus-picon-databases
+For instructions on obtaining and installing the picons databases,
+point your Web browser at
+@uref{http://www.cs.indiana.edu/picons/ftp/index.html}.
 
 If you are using Debian GNU/Linux, saying @samp{apt-get install
 picons.*} will install the picons where Gnus can find them.
 
+To enable displaying picons, simply make sure that
+@code{gnus-picon-databases} points to the directory containing the
+Picons databases.
 
-@node Picon Requirements
-@subsubsection Picon Requirements
-
-To have Gnus display Picons for you, you must have @code{x} support
-compiled into XEmacs.  To display color picons which are much nicer
-than the black & white one, you also need one of @code{xpm} or
-@code{gif} compiled into XEmacs.
-
-@vindex gnus-picons-convert-x-face
-If you want to display faces from @code{X-Face} headers, you should have
-the @code{xface} support compiled into XEmacs.  Otherwise you must have
-the @code{netpbm} utilities installed, or munge the
-@code{gnus-picons-convert-x-face} variable to use something else.
-(NOTE: @code{x-face} is used in the variable name, not @code{xface})
-
-@node Easy Picons
-@subsubsection Easy Picons
-
-To enable displaying picons, simply put the following line in your
-@file{~/.gnus} file and start Gnus.
-
-@lisp
-(setq gnus-use-picons t)
-(setq gnus-treat-display-picons t)
-@end lisp
-
-and make sure @code{gnus-picons-database} points to the directory
-containing the Picons databases.
-
-Alternatively if you want to use the web piconsearch engine add this:
-
-@lisp
-(setq gnus-picons-piconsearch-url
-      "http://www.cs.indiana.edu:800/piconsearch")
-@end lisp
-
-
-@node Hard Picons
-@subsubsection Hard Picons
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
-Gnus can display picons for you as you enter and leave groups and
-articles.  It knows how to interact with three sections of the picons
-database.  Namely, it can display the picons newsgroup pictures,
-author's face picture(s), and the authors domain.  To enable this
-feature, you need to select where to get the picons from, and where to
-display them.
+The following variables offer control over where things are located.
 
 @table @code
 
-@item gnus-picons-database
-@vindex gnus-picons-database
-The location of the picons database.  Should point to a directory
+@item gnus-picon-databases
+@vindex gnus-picon-databases
+The location of the picons database.  This is a list of directories
 containing the @file{news}, @file{domains}, @file{users} (and so on)
-subdirectories.  This is only useful if
-@code{gnus-picons-piconsearch-url} is @code{nil}.  Defaults to
-@file{/usr/local/faces/}.
+subdirectories.  Defaults to @code{("/usr/lib/picon"
+"/usr/local/faces")}.
 
-@item gnus-picons-piconsearch-url
-@vindex gnus-picons-piconsearch-url
-The URL for the web picons search engine.  The only currently known
-engine is @uref{http://www.cs.indiana.edu:800/piconsearch}.  To
-workaround network delays, icons will be fetched in the background.  If
-this is @code{nil} 'the default), then picons are fetched from local
-database indicated by @code{gnus-picons-database}.
-
-@item gnus-picons-display-where
-@vindex gnus-picons-display-where
-Where the picon images should be displayed.  It is @code{picons} by
-default (which by default maps to the buffer @samp{*Picons*}).  Other
-valid places could be @code{article}, @code{summary}, or
-@samp{*scratch*} for all I care.  Just make sure that you've made the
-buffer visible using the standard Gnus window configuration
-routines---@pxref{Window Layout}.
-
-@item gnus-picons-group-excluded-groups
-@vindex gnus-picons-group-excluded-groups
-Groups that are matched by this regexp won't have their group icons
-displayed.
-
-@end table
-
-Note: If you set @code{gnus-use-picons} to @code{t}, it will set up your
-window configuration for you to include the @code{picons} buffer.
-
-Now that you've made those decision, you need to add the following
-functions to the appropriate hooks so these pictures will get displayed
-at the right time.
-
-@vindex gnus-picons-display-where
-@table @code
-@item gnus-article-display-picons
-@findex gnus-article-display-picons
-Looks up and displays the picons for the author and the author's domain
-in the @code{gnus-picons-display-where} buffer.
-
-@item gnus-picons-article-display-x-face
-@findex gnus-picons-article-display-x-face
-Decodes and displays the X-Face header if present.
-(NOTE: @code{x-face} is used in the function name, not @code{xface})
-
-@end table
-
-
-
-@node Picon Useless Configuration
-@subsubsection Picon Useless Configuration
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
-The following variables offer further control over how things are
-done, where things are located, and other useless stuff you really
-don't need to worry about.
-
-@table @code
-
-@item gnus-picons-news-directories
-@vindex gnus-picons-news-directories
-List of subdirectories to search in @code{gnus-picons-database} for
+@item gnus-picon-news-directories
+@vindex gnus-picon-news-directories
+List of subdirectories to search in @code{gnus-picon-databases} for
 newsgroups faces.  @code{("news")} is the default.
 
-@item gnus-picons-user-directories
-@vindex gnus-picons-user-directories
-List of subdirectories to search in @code{gnus-picons-database} for user
-faces.  @code{("local" "users" "usenix" "misc")} is the default.
+@item gnus-picon-user-directories
+@vindex gnus-picon-user-directories
+List of subdirectories to search in @code{gnus-picon-databases} for user
+faces.  @code{("users" "usenix" "local" "misc")} is the default.
 
-@item gnus-picons-domain-directories
-@vindex gnus-picons-domain-directories
-List of subdirectories to search in @code{gnus-picons-database} for
+@item gnus-picon-domain-directories
+@vindex gnus-picon-domain-directories
+List of subdirectories to search in @code{gnus-picon-databases} for
 domain name faces.  Defaults to @code{("domains")}.  Some people may
 want to add @samp{"unknown"} to this list.
 
-@item gnus-picons-convert-x-face
-@vindex gnus-picons-convert-x-face
-If you don't have @code{xface} support builtin XEmacs, this is the
-command to use to convert the @code{X-Face} header to an X bitmap
-(@code{xbm}).  Defaults to @code{(format "@{ echo '/* Width=48,
-Height=48 */'; uncompface; @} | icontopbm | pbmtoxbm > %s"
-gnus-picons-x-face-file-name)}
-(NOTE: @code{x-face} is used in the variable name, not @code{xface})
-
-@item gnus-picons-x-face-file-name
-@vindex gnus-picons-x-face-file-name
-Names a temporary file to store the @code{X-Face} bitmap in.  Defaults
-to @code{(format "/tmp/picon-xface.%s.xbm" (user-login-name))}.
-(NOTE: @code{x-face} is used in the variable name, not @code{xface})
-
-@item gnus-picons-has-modeline-p
-@vindex gnus-picons-has-modeline-p
-If you have set @code{gnus-picons-display-where} to @code{picons}, your
-XEmacs frame will become really cluttered.  To alleviate this a bit you
-can set @code{gnus-picons-has-modeline-p} to @code{nil}; this will
-remove the mode line from the Picons buffer.  This is only useful if
-@code{gnus-picons-display-where} is @code{picons}.
-
-@item gnus-picons-refresh-before-display
-@vindex gnus-picons-refresh-before-display
-If non-nil, display the article buffer before computing the picons.
-Defaults to @code{nil}.
-
-@item gnus-picons-display-as-address
-@vindex gnus-picons-display-as-address
-If @code{t} display textual email addresses along with pictures.
-Defaults to @code{t}.
-
-@item gnus-picons-file-suffixes
-@vindex gnus-picons-file-suffixes
+@item gnus-picon-file-types
+@vindex gnus-picon-file-types
 Ordered list of suffixes on picon file names to try.  Defaults to
-@code{("xpm" "gif" "xbm")} minus those not builtin your XEmacs.
-
-@item gnus-picons-setup-hook
-@vindex gnus-picons-setup-hook
-Hook run in the picon buffer, if that is displayed.
-
-@item gnus-picons-display-article-move-p
-@vindex gnus-picons-display-article-move-p
-Whether to move point to first empty line when displaying picons.  This
-has only an effect if `gnus-picons-display-where' has value `article'.
-
-If @code{nil}, display the picons in the @code{From} and
-@code{Newsgroups} lines.  This is the default.
-
-@item gnus-picons-clear-cache-on-shutdown
-@vindex gnus-picons-clear-cache-on-shutdown
-Whether to clear the picons cache when exiting gnus.  Gnus caches every
-picons it finds while it is running.  This saves some time in the search
-process but eats some memory.  If this variable is set to @code{nil},
-Gnus will never clear the cache itself; you will have to manually call
-@code{gnus-picons-clear-cache} to clear it.  Otherwise the cache will be
-cleared every time you exit Gnus.  Defaults to @code{t}.
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
+@code{("xpm" "gif" "xbm")} minus those not builtin your Emacs.
 
 @end table
 
@@ -20931,27 +20809,20 @@ In short---to use Smiley in Gnus, put the following in your
 (setq gnus-treat-display-smileys t)
 @end lisp
 
-Smiley maps text smiley faces---@samp{:-)}, @samp{:-=}, @samp{:-(} and
+Smiley maps text smiley faces---@samp{:-)}, @samp{8-)}, @samp{:-(} and
 the like---to pictures and displays those instead of the text smiley
 faces.  The conversion is controlled by a list of regexps that matches
 text and maps that to file names.
 
-@vindex smiley-nosey-regexp-alist
-@vindex smiley-deformed-regexp-alist
-Smiley supplies two example conversion alists by default:
-@code{smiley-deformed-regexp-alist} (which matches @samp{:)}, @samp{:(}
-and so on), and @code{smiley-nosey-regexp-alist} (which matches
-@samp{:-)}, @samp{:-(} and so on).
-
-The alist used is specified by the @code{smiley-regexp-alist} variable,
-which defaults to the value of @code{smiley-deformed-regexp-alist}.
-
-The first item in each element is the regexp to be matched; the second
-element is the regexp match group that is to be replaced by the picture;
-and the third element is the name of the file to be displayed.
+@vindex smiley-regexp-alist
+The alist used is specified by the @code{smiley-regexp-alist}
+variable.  The first item in each element is the regexp to be matched;
+the second element is the regexp match group that is to be replaced by
+the picture; and the third element is the name of the file to be
+displayed.
 
 The following variables customize where Smiley will look for these
-files, as well as the color to be used and stuff:
+files:
 
 @table @code
 
@@ -20959,25 +20830,9 @@ files, as well as the color to be used and stuff:
 @vindex smiley-data-directory
 Where Smiley will look for smiley faces files.
 
-@item smiley-flesh-color
-@vindex smiley-flesh-color
-Skin color.  The default is @samp{yellow}, which is really racist.
-
-@item smiley-features-color
-@vindex smiley-features-color
-Color of the features of the face.  The default is @samp{black}.
-
-@item smiley-tongue-color
-@vindex smiley-tongue-color
-Color of the tongue.  The default is @samp{red}.
-
-@item smiley-circle-color
-@vindex smiley-circle-color
-Color of the circle around the face.  The default is @samp{black}.
-
-@item smiley-mouse-face
-@vindex smiley-mouse-face
-Face used for mouse highlighting over the smiley face.
+@item gnus-smiley-file-types
+@vindex gnus-smiley-file-types
+List of suffixes on smiley file names to try.
 
 @end table
 
@@ -21074,38 +20929,6 @@ Using the last function would be something like this:
 @end lisp
 
 
-@node Toolbar
-@subsection Toolbar
-
-@table @code
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
-@item gnus-use-toolbar
-@vindex gnus-use-toolbar
-If @code{nil}, don't display toolbars.  If non-@code{nil}, it should be
-one of @code{default-toolbar}, @code{top-toolbar}, @code{bottom-toolbar},
-@code{right-toolbar}, or @code{left-toolbar}.
-
-@item gnus-group-toolbar
-@vindex gnus-group-toolbar
-The toolbar in the group buffer.
-
-@item gnus-summary-toolbar
-@vindex gnus-summary-toolbar
-The toolbar in the summary buffer.
-
-@item gnus-summary-mail-toolbar
-@vindex gnus-summary-mail-toolbar
-The toolbar in the summary buffer of mail groups.
-
-@end table
-
-
 @node XVarious
 @subsection Various XEmacs Variables
 
@@ -21133,15 +20956,37 @@ Valid values include @code{flame}, @code{pine}, @code{moss},
 A glyph displayed in all Gnus mode lines.  It is a tiny gnu head by
 default.
 
+@end table
+
+@subsubsection Toolbar
+
+@table @code
+
+@item gnus-use-toolbar
+@vindex gnus-use-toolbar
+If @code{nil}, don't display toolbars.  If non-@code{nil}, it should be
+one of @code{default-toolbar}, @code{top-toolbar}, @code{bottom-toolbar},
+@code{right-toolbar}, or @code{left-toolbar}.
+
+@item gnus-group-toolbar
+@vindex gnus-group-toolbar
+The toolbar in the group buffer.
+
+@item gnus-summary-toolbar
+@vindex gnus-summary-toolbar
+The toolbar in the summary buffer.
+
+@item gnus-summary-mail-toolbar
+@vindex gnus-summary-mail-toolbar
+The toolbar in the summary buffer of mail groups.
+
+@end table
+
 @iftex
 @iflatex
 \margindex{}
 @end iflatex
 @end iftex
-
-@end table
-
-
 
 
 @node Fuzzy Matching
@@ -21665,6 +21510,7 @@ The following are the methods you can use to control the behavior of
 * Blacklists and Whitelists::   
 * BBDB Whitelists::             
 * Blackholes::                  
+* Regular Expressions Header Matching::  
 * Bogofilter::                  
 * ifile spam filtering::        
 * spam-stat spam filtering::    
@@ -21798,6 +21644,40 @@ The default setting of @code{t} is recommended.
 
 Blackhole checks are done only on incoming mail.  There is no spam or
 ham processor for blackholes.
+
+@node Regular Expressions Header Matching
+@subsubsection Regular Expressions Header Matching
+@cindex spam filtering
+@cindex regular expressions header matching, spam filtering
+@cindex spam
+
+@defvar spam-use-regex-headers
+
+This option is disabled by default.  You can let Gnus check the
+message headers against lists of regular expressions when you set this
+option.  The variables @code{spam-regex-headers-spam} and
+@code{spam-regex-headers-ham} hold the list of regular expressions.
+Gnus will check against the message headers to determine if the
+message is spam or ham, respectively.
+
+@end defvar
+
+@defvar spam-regex-headers-spam
+
+The list of regular expressions that, when matched in the headers of
+the message, positively identify it as spam.
+
+@end defvar
+
+@defvar spam-regex-headers-ham
+
+The list of regular expressions that, when matched in the headers of
+the message, positively identify it as ham.
+
+@end defvar
+
+Regular expression header checks are done only on incoming mail.
+There is no specific spam or ham processor for regular expressions.
 
 @node Bogofilter
 @subsubsection Bogofilter

@@ -6,11 +6,15 @@ To use Gnus you first have to unpack the files, which you've obviously
 done, because you are reading this.
 
 You should definitely byte-compile the source files. To do that, you
-can simply say "./configure && make" in this directory.  If you are
-using XEmacs, you *must* say "make EMACS=xemacs".  In that case you
-may also want to pull down the package of nice glyphs from
-<URL:http://www.gnus.org/dist/etc.tar.gz>.  It should be installed
-into the "gnus-5.6.53/etc" directory.
+can simply say "./configure && make" in this directory.
+
+Do not say "make install".  I repeat, do *NOT* say "make install".  If
+you say "make install" and then complain about things not working,
+I'll be very annoyed.  If you say "make install" and things happen to
+work, that's all fine and dandy for you, but it's quite likely that it
+won't.
+
+If you are using XEmacs, you *must* say "./configure && make EMACS=xemacs".
 
 Then you have to tell Emacs where Gnus is. You might put something
 like
@@ -39,7 +43,7 @@ in your Emacs, you should probably exit that Emacs and start a new one
 to fire up Gnus.
 
 Gnus does absolutely not work with anything older than Emacs 20.3 or
-XEmacs 20.0.  So you definitely need a new Emacs.  
+XEmacs 20.0.  You definitely need a relatively current Emacs.
 
 To compile the Gnus manual, you either need a pretty new Emacs, or a
 pretty new version of the texinfo tools.

@@ -1,3 +1,127 @@
+2003-01-24 20:32:44 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.14 is released.
+
+2003-01-24  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* gnus-sum.el (gnus-summary-prepare-threads): Reset state for %B
+	before beginning.  Trivial patch from Mark Thomas
+	<swoon@bellatlantic.net>.
+
+2003-01-24  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-check-blackholes, spam-split) 
+	(spam-mark-junk-as-spam-routine, spam-summary-prepare-exit): added
+	gnus-message calls to show to users what spam.el is doing
+
+2003-01-24  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-msg.el (gnus-message-replysign)
+	(gnus-message-replyencrypt): Fix typo.
+
+2003-01-24  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-mime-security-show-details): Toggle showing
+	details. 
+
+2003-01-23  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-article-press-button): let* -> let.
+	(gnus-mime-security-show-details): Cleaned up.
+	(gnus-mime-security-press-button): Save excursion.
+	(gnus-insert-mime-security-button): Clean up.
+
+	* gnus-sum.el (gnus-summary-force-verify-and-decrypt): Doc fix.
+
+	* gnus-async.el (gnus-async-wait-for-article): Don't use a
+	timeout. 
+
+	* nntp.el (nntp-accept-process-output): Removed timeout. 
+	(nntp-read-timeout): New variable.
+	(nntp-accept-process-output): Use it.
+
+	* gnus-sum.el (gnus-data-find-list): Remove *.
+
+2002-01-23  Kevin Greiner  <kgreiner@xpediantsolutions.com>
+
+	* gnus-sum.el (gnus-summary-first-subject): Fixed bug that I
+	introduced on 2002-01-22.
+	(gnus-summary-first-unseen-or-unread-subject): Ditto.
+
+2003-01-23  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-check-regex-headers, spam-list-of-checks) 
+	(spam-regex-headers-spam, spam-regex-headers-ham): added spam/ham
+	checks of incoming mail based on simple header regexp matching
+
+2003-01-22  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-sum.el (gnus-spam-mark): set to `$'
+
+2002-01-22  Kevin Greiner  <kgreiner@xpediantsolutions.com>
+
+	* gnus-agent.el (gnus-agent-get-undownloaded-list): Now computes
+	gnus-newsgroup-unfetched, the list of articles whose headers have
+	not been fetched from the server.
+
+	* gnus-sum.el (gnus-summary-find-next): Removed undownloaded
+	parameter as it never worked due to a bug.  Added check to prevent
+	selection of any article in the gnus-newsgroup-unfetched list.
+	(gnus-summary-find-prev): Added check to prevent selection of any
+	article in the gnus-newsgroup-unfetched list.
+	(gnus-summary-first-subject): Documented API. Modified
+	implementation so that constraints are handled independently.
+	Added check to prevent selection of any article in the
+	gnus-newsgroup-unfetched list.
+	(gnus-summary-first-unseen-subject): Updated parameters in
+	gnus-summary-first-subject call to match new API.
+	(gnus-summary-first-unseen-or-unread-subject): Ditto.
+	(gnus-summary-catchup): Do not mark unfetched articles as read.
+	
+2003-01-22  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-treat-strip-pgp, gnus-article-hide-pgp-hook):
+	make-obsolete-variable allows only two arguments in XEmacs and
+	Emacs 20.
+
+	* gnus-sum.el (gnus-summary-wash-hide-map): Remove
+	gnus-article-hide-pgp.
+	(gnus-summary-make-menu-bar): do.
+
+	* gnus-art.el (gnus-treat-strip-pgp): Make obsolete.
+	(gnus-treatment-function-alist): Remove gnus-treat-strip-pgp and
+	gnus-article-hide-pgp.
+	(article-hide-pgp): Remove.
+	(gnus-article-hide): Remove gnus-article-hide-pgp.
+
+	* gnus.el: Remove gnus-article-hide-pgp
+
+2003-01-21  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-required-headers): Doc fix.
+
+2003-01-21  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-group-ham-processor-bogofilter-p): fixed bug
+	(spam-ifile-register-ham-routine, spam-ifile-ham-category): new
+	option to make ifile a purely binary classifier
+
+2003-01-21  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mml-sec.el (mml-secure-sign-pgpauto): Renamed.
+	(mml-secure-encrypt-pgpmime): Removed double.
+
+	* gnus-sum.el (gnus-summary-mark-article-as-replied): Added
+	debugging statements.
+
+2003-01-21  Andreas Fuchs  <asf@void.at>
+
+	* mml-sec.el (mml-sign-alist): Added pgpauto.
+
+2003-01-21  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bumped version number.
+
 2003-01-21 07:15:41 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
 	* gnus.el: Oort Gnus v0.13 is released.
