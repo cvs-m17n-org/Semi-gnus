@@ -46,7 +46,8 @@
 		     rmail-summary-exists rmail-select-summary
 		     rmail-update-summary url-retrieve
 		     temp-directory babel-fetch babel-wash
-		     find-coding-systems-for-charsets sc-cite-regexp))
+		     find-coding-systems-for-charsets sc-cite-regexp
+		     make-symbolic-link))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table
@@ -96,7 +97,7 @@
 		 url-generic-parse-url valid-image-instantiator-format-p
 		 babel-fetch babel-wash find-coding-systems-for-charsets
 		 sc-cite-regexp smiley-encode-buffer function-max-args
-		 map-extents)))
+		 map-extents make-symbolic-link)))
 
 (setq load-path (cons "." load-path))
 (require 'custom)
