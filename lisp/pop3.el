@@ -193,7 +193,8 @@ Return the response string if optional second argument is non-nil."
 
 (defun pop3-munge-message-separator (start end)
   "Check to see if a message separator exists.  If not, generate one."
-  (if (not (fboundp 'message-make-date)) (autoload 'message-make-date "message"))
+  (if (not (fboundp 'parse-time-string))
+      (autoload 'parse-time-string "parse-time"))
   (save-excursion
     (save-restriction
       (narrow-to-region start end)
@@ -203,26 +204,18 @@ Return the response string if optional second argument is non-nil."
 		   (looking-at "BABYL OPTIONS:") ; Babyl
 		   ))
 	  (let ((from (mail-strip-quoted-names (mail-fetch-field "From")))
-		(date (split-string (or (mail-fetch-field "Date")
-					(message-make-date))))
+		(date (mail-fetch-field "Date"))
 		(From_))
 	    ;; sample date formats I have seen
 	    ;; Date: Tue, 9 Jul 1996 09:04:21 -0400 (EDT)
 	    ;; Date: 08 Jul 1996 23:22:24 -0400
 	    ;; should be
 	    ;; Tue Jul 9 09:04:21 1996
-	    (setq date
-		  (cond ((string-match "[A-Z]" (nth 0 date))
-			 (format "%s %s %s %s %s"
-				 (nth 0 date) (nth 2 date) (nth 1 date)
-				 (nth 4 date) (nth 3 date)))
-			(t
-			 ;; this really needs to be better but I don't feel
-			 ;; like writing a date to day converter.
-			 (format "Sun %s %s %s %s"
-				 (nth 1 date) (nth 0 date)
-				 (nth 3 date) (nth 2 date)))
-			))
+	    (setq date (format-time-string
+			"%a %b %e %T %Y"
+			(if date
+			    (apply 'encode-time (parse-time-string date))
+			  (current-time))))
 	    (setq From_ (format "\nFrom %s  %s\n" from date))
 	    (while (string-match "," From_)
 	      (setq From_ (concat (substring From_ 0 (match-beginning 0))
