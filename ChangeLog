@@ -1,3 +1,15 @@
+1999-08-30  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/lpath.el (babel-as-string): Bind it.
+
+	* lisp/gnus-sum.el (gnus-summary-search-article): Keep the
+	original X-Face field while searching.  It is done for only FSF
+	Emacsen.
+	(gnus-summary-search-article-highlight-matched-text): Ditto.
+	(gnus-summary-search-article-matched-data): Bind it explicitly.
+
 1999-08-29  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.1.
