@@ -11,6 +11,13 @@
 ac_help=
 ac_default_prefix=/usr/local
 # Any additions from configure.in:
+ac_help="$ac_help
+  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, xemacs...]"
+ac_help="$ac_help
+  --with-lispdir=DIR      emacs lisp files go to DIR [guessed]"
+ac_help="$ac_help
+  --with-addpath=PATH     search Emacs-Lisp libraries with PATH
+                          use colons to separate directory names"
 
 # Initialize some variables set by options.
 # The variables have the same names as the options, with
@@ -522,7 +529,7 @@ fi
 
 
 echo $ac_n "checking whether ${MAKE-make} sets \${MAKE}""... $ac_c" 1>&6
-echo "configure:526: checking whether ${MAKE-make} sets \${MAKE}" >&5
+echo "configure:533: checking whether ${MAKE-make} sets \${MAKE}" >&5
 set dummy ${MAKE-make}; ac_make=`echo "$2" | sed 'y%./+-%__p_%'`
 if eval "test \"\${ac_cv_prog_make_${ac_make}_set+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -579,7 +586,7 @@ ac_configure="$SHELL $ac_aux_dir/configure" # This should be Cygnus configure.
 # SVR4 /usr/ucb/install, which tries to use the nonexistent group "staff"
 # ./install, which can be erroneously created by make from ./install.sh.
 echo $ac_n "checking for a BSD compatible install""... $ac_c" 1>&6
-echo "configure:583: checking for a BSD compatible install" >&5
+echo "configure:590: checking for a BSD compatible install" >&5
 if test -z "$INSTALL"; then
 if eval "test \"\${ac_cv_path_install+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -635,15 +642,25 @@ test -z "$INSTALL_SCRIPT" && INSTALL_SCRIPT='${INSTALL}'
 
 test -z "$INSTALL_DATA" && INSTALL_DATA='${INSTALL} -m 644'
 
-# If set to t, that means we are running in a shell under Emacs.
-  # If you have an Emacs named "t", then use the full path.
-  test "$EMACS" = t && EMACS=
-  for ac_prog in emacs xemacs
+      # Check whether --with-emacs or --without-emacs was given.
+if test "${with_emacs+set}" = set; then
+  withval="$with_emacs"
+  case "${withval}" in
+       yes)	EMACS= ;;
+       no)	{ echo "configure: error: emacs is not available" 1>&2; exit 1; } ;;
+       *)	EMACS=${withval} ;;
+     esac
+else
+  EMACS=
+fi
+
+  if test "x$EMACS" = "xt" -o "x$EMACS" = x; then
+    for ac_prog in emacs xemacs mule
 do
 # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:647: checking for $ac_word" >&5
+echo "configure:664: checking for $ac_word" >&5
 if eval "test \"\${ac_cv_path_EMACS+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -679,34 +696,84 @@ test -n "$EMACS" && break
 done
 test -n "$EMACS" || EMACS="no"
 
-  if test $EMACS != "no"; then
-    echo $ac_n "checking where .elc files should go""... $ac_c" 1>&6
-echo "configure:685: checking where .elc files should go" >&5
-        lispdir="\$(datadir)/emacs/site-lisp/gnus"
-    if test "x$prefix" = "xNONE"; then
-      if test -d $ac_default_prefix/share/emacs/site-lisp; then
-	lispdir="\$(prefix)/share/emacs/site-lisp/gnus"
-      else
-	if test -d $ac_default_prefix/lib/emacs/site-lisp; then
-	  lispdir="\$(prefix)/lib/emacs/site-lisp/gnus"
-	fi
-      fi
-    else
-      if test -d $prefix/share/emacs/site-lisp; then
-	lispdir="\$(prefix)/share/emacs/site-lisp/gnus"
-      else
-	if test -d $prefix/lib/emacs/site-lisp; then
-	  lispdir="\$(prefix)/lib/emacs/site-lisp/gnus"
-	fi
-      fi
+    if test $EMACS = no; then
+      { echo "configure: error: you should install Emacs first" 1>&2; exit 1; }
     fi
-    echo "$ac_t""$lispdir" 1>&6
   fi
+        echo $ac_n "checking where emacs files are in""... $ac_c" 1>&6
+echo "configure:705: checking where emacs files are in" >&5
+  EMACS_BASENAME="`echo x$EMACS | sed -e 's/x//' -e 's/^.*\///'`"
+  if test "x$emacsdir" = x; then
+    if test "x$prefix" = "xNONE"; then
+      prefix=$ac_default_prefix
+    fi
+    emacsdir="\$(datadir)/emacs"
+    case "$EMACS_BASENAME" in
+    emacs|emacs-*)
+      if test -d $prefix/lib/emacs; then
+	emacsdir="$prefix/lib/emacs"
+      fi
+      if test -d $prefix/share/emacs; then
+	emacsdir="$prefix/share/emacs"
+      fi
+      ;;
+    xemacs|xemacs-*)
+      if test -d $prefix/lib/xemacs; then
+	emacsdir="$prefix/lib/xemacs"
+      fi
+      if test -d $prefix/share/xemacs; then
+	emacsdir="$prefix/share/xemacs"
+      fi
+      ;;
+    mule|mule-*)
+      if test -d $prefix/lib/emacs; then
+	emacsdir="$prefix/lib/emacs"
+      fi
+      if test -d $prefix/share/emacs; then
+	emacsdir="$prefix/share/emacs"
+      fi
+      if test -d $prefix/lib/mule; then
+	emacsdir="$prefix/lib/mule"
+      fi
+      if test -d $prefix/share/mule; then
+	emacsdir="$prefix/share/mule"
+      fi
+      ;;
+    esac
+  fi
+  echo "$ac_t""$emacsdir" 1>&6
+  
+        # Check whether --with-lispdir or --without-lispdir was given.
+if test "${with_lispdir+set}" = set; then
+  withval="$with_lispdir"
+  case "${withval}" in
+       yes)	lispdir= ;;
+       no)	{ echo "configure: error: lispdir is not available" 1>&2; exit 1; } ;;
+       *)	lispdir=${withval} ;;
+     esac
+else
+  lispdir=
+fi
+
+  echo $ac_n "checking where .elc files should go""... $ac_c" 1>&6
+echo "configure:760: checking where .elc files should go" >&5
+  if test "x$lispdir" = x; then
+    lispdir="$emacsdir/site-lisp"
+    if test -d $emacsdir/lisp; then
+      lispdir="$emacsdir/lisp"
+    fi
+    case "$EMACS_BASENAME" in
+    xemacs|xemacs-*)
+      lispdir="$lispdir/lookup"
+      ;;
+    esac
+  fi
+  echo "$ac_t""$lispdir" 1>&6
   
 # Extract the first word of "makeinfo", so it can be a program name with args.
 set dummy makeinfo; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
-echo "configure:710: checking for $ac_word" >&5
+echo "configure:777: checking for $ac_word" >&5
 if eval "test \"\${ac_cv_path_MAKEINFO+set}\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
 else
@@ -738,6 +805,16 @@ if test -n "$MAKEINFO"; then
 else
   echo "$ac_t""no" 1>&6
 fi
+
+
+ADDITIONAL_LOAD_PATH="NONE"
+# Check whether --with-addpath or --without-addpath was given.
+if test "${with_addpath+set}" = set; then
+  withval="$with_addpath"
+  ADDITIONAL_LOAD_PATH=$with_addpath
+fi
+
+
 
 trap '' 1 2 15
 cat > confcache <<\EOF
@@ -852,7 +929,7 @@ done
 ac_given_srcdir=$srcdir
 ac_given_INSTALL="$INSTALL"
 
-trap 'rm -fr `echo "Makefile lisp/Makefile texi/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
+trap 'rm -fr `echo "Makefile lisp/Makefile lisp/paths.el texi/Makefile" | sed "s/:[^ ]*//g"` conftest*; exit 1' 1 2 15
 EOF
 cat >> $CONFIG_STATUS <<EOF
 
@@ -889,8 +966,10 @@ s%@INSTALL_PROGRAM@%$INSTALL_PROGRAM%g
 s%@INSTALL_SCRIPT@%$INSTALL_SCRIPT%g
 s%@INSTALL_DATA@%$INSTALL_DATA%g
 s%@EMACS@%$EMACS%g
+s%@emacsdir@%$emacsdir%g
 s%@lispdir@%$lispdir%g
 s%@MAKEINFO@%$MAKEINFO%g
+s%@ADDITIONAL_LOAD_PATH@%$ADDITIONAL_LOAD_PATH%g
 
 CEOF
 EOF
@@ -932,7 +1011,7 @@ EOF
 
 cat >> $CONFIG_STATUS <<EOF
 
-CONFIG_FILES=\${CONFIG_FILES-"Makefile lisp/Makefile texi/Makefile"}
+CONFIG_FILES=\${CONFIG_FILES-"Makefile lisp/Makefile lisp/paths.el texi/Makefile"}
 EOF
 cat >> $CONFIG_STATUS <<\EOF
 for ac_file in .. $CONFIG_FILES; do if test "x$ac_file" != x..; then
