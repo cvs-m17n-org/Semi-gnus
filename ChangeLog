@@ -1,3 +1,25 @@
+1998-10-06  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-parameter-alist): New variable.
+	(message-startup-parameter-alist):  New variable.
+	(message-fetch-reply-field): Get reply buffer with
+	`message-get-reply-buffer()'.
+	(message-yank-original): Ditto.
+	(message-eval-parameter): New function.
+	(message-get-reply-buffer): Ditto.
+	(message-get-original-reply-buffer): Ditto.
+	(message-mode): New buffer local variable
+	`message-parameter-alist'.
+	(message-setup): Set up `message-reply-buffer' from
+	`message-parameter-alist'.
+	(message-mime-insert-article): Get `Original message buffer' with
+	`message-get-original-reply-buffer' instead of
+	`gnus-original-article-buffer'.
+	Remove bogus header fields for forwarding message.
+
+	* lisp/gnus-msg.el (gnus-setup-message): Setup
+	`message-startup-parameter-alist'.
+
 1998-09-30  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Sync up with Semi-gnus 6.8.19.
