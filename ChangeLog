@@ -1,3 +1,12 @@
+1999-03-02  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-sum.el (gnus-select-newsgroup): Examine cached articles
+	with `gnus-cache-articles-in-group' if the current group is not
+	a virtual group.
+	(TopLevel): Autoload `gnus-cache-articles-in-group'
+
 1999-03-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
