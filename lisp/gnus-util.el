@@ -41,7 +41,6 @@
   (defvar nnmail-pathname-coding-system))
 (eval-when-compile (require 'static))
 
-(require 'custom)
 (require 'time-date)
 (require 'netrc)
 
