@@ -1,6 +1,6 @@
 ;;; gnus-vers.el --- Declare gnus version.
 
-;; Copyright (C) 2000 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Keiichi Suzuki <keiichi@nanap.org>
 ;;         Katsumi Yamaoka <yamaoka@jpl.org>
@@ -34,7 +34,7 @@
 (require 'product)
 (provide 'gnus-vers)
 
-(defconst gnus-revision-number "08"
+(defconst gnus-revision-number "09"
   "Revision number for this version of gnus.")
 
 ;; Product information of this gnus.

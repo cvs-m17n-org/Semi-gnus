@@ -882,13 +882,16 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	  (funcall func))))))
 
 (defun gnus-offline-get-menu-items (list)
-  (mapcar
-   #'(lambda (el)
-       (if (listp el)
-	   (apply 'vector
-		  (cons (gnus-offline-gettext (car el)) (cdr el)))
-	 el))
-   list))
+  (let (result)
+    (dolist (elem list)
+      (setq result
+	    (nconc result
+		   (list (if (listp elem)
+			     (progn
+			       (setcar elem (gnus-offline-gettext (car elem)))
+			       (vconcat elem))
+			   elem)))))
+    result))
 
 (defvar gnus-offline-menu
   (gnus-offline-get-menu-items

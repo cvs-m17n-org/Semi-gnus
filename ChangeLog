@@ -1,3 +1,15 @@
+2001-03-01  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 09.
+
+	* lisp/gnus-offline.el (gnus-offline-get-menu-items): Rewrite using
+	`dolist'.
+
+	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Simplified.
+
+	* lisp/dgnushack.el: Load cl-macs to ensure that the macro `dolist'
+	is defined properly.
+
 2001-02-28  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnwfm.el: Require `gnus-clfns' when compiling.
