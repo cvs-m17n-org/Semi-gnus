@@ -290,6 +290,7 @@ from the document.")
       (setq nndoc-dissection-alist nil)
       (save-excursion
 	(set-buffer nndoc-current-buffer)
+	(mm-enable-multibyte)
 	(erase-buffer)
 	(if (stringp nndoc-address)
 	    (nnheader-insert-file-contents nndoc-address)
