@@ -1,5 +1,13 @@
 1998-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/message.el: Require smtp.el when compile.
+
+	* lisp/message.el (message-send-mail-with-smtp): Use
+	`(current-buffer)' instead of `tembuf'; rename
+	`smtp-recipient-address-list' -> `recipient-address-list'.
+
+1998-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/smtp.el (smtp-deduce-address-list): Don't use
  	`smtp-recipient-address-list' as global variable.
 
