@@ -17436,7 +17436,7 @@ them into individual files.  To avoid exceeding the max. buffer size,
 the agent alternates between fetching and parsing until all articles
 have been fetched.  @code{gnus-agent-max-fetch-size} provides a size
 limit to control how often the cycling occurs.  A large value improves
-performance.  A small value minimizes the time lost if the
+performance.  A small value minimizes the time lost should the
 connection be lost while fetching (You may need to run
 @code{gnus-agent-regenerate-group} to update the group's state.
 However, all articles parsed prior to loosing the connection will be
