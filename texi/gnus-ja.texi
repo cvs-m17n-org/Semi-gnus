@@ -17445,9 +17445,6 @@ GoupLens (@uref{http://www.cs.umn.edu/Research/GroupLens/}) は、毎日作成
 れば、予言の形で、それらの人が記事をどう思うかをあなたに告げます。あなた
 はこの予言を記事を読みたいかどうかを決定するのに役立てる事ができます。
 
-@sc{Note:} Unfortunately the GroupLens system seems to have shut down,
-so this section is mostly of historical interest.
-
 @sc{注意:} 残念なことに GroupLens 機構は閉鎖されているようなので、この項
 は主として歴史的な興趣のために書かれています。
 
