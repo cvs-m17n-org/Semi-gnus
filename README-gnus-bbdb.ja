@@ -25,6 +25,12 @@ bbdb-auto-notes-hook を使用していない方には不要ですが、使用している方
 ;(setq mime-bbdb/use-mail-extr nil)
 ;(eval-after-load "mail-extr" '(require 'mime-bbdb))
 
+;; T-gnus では伝統的に defcustom で定義する hook に有意なデフォルト値
+;; を持たせることが行なわれているので、以下の設定は .emacs などではな
+;; く .gnus ファイルで行なうのが安全です。ただし T-gnus 以外でも BBDB
+;; を使う場合は、(require 'bbdb) の行は .emacs ファイルなどに記入する
+;; のが良いでしょう。
+
 (require 'bbdb)
 (require 'gnus-bbdb)
 (bbdb-initialize 'sc)  ;; 'gnus / 'Gnus ははずしてください。

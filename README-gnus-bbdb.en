@@ -24,6 +24,12 @@ of this file should be applied. If not, it might not.
 ;(setq mime-bbdb/use-mail-extr nil)
 ;(eval-after-load "mail-extr" '(require 'mime-bbdb))
 
+;; Some hooks defined by defcustom might have significant values by
+;; default in the T-gnus' tradition.  It is safe to add the following
+;; settings in .gnus file rather than .emacs (or equivalent) file.
+;; Exceptionally, it may be better to put the line (require 'bbdb) in
+;; .emacs file if you would like to use BBDB not only for T-gnus.
+
 (require 'bbdb)
 (require 'gnus-bbdb)
 (bbdb-initialize 'sc)  ;; 'Gnus or 'gnus should be deleted.
