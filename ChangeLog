@@ -1,3 +1,11 @@
+1999-12-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/message.el (message-yank-add-new-references): Fix doc string.
+
+	* texi/{message-ja.texi, message.texi}
+	(message-list-references-add-position,
+	message-yank-add-new-references): Add documentations.
+
 1999-12-07  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-gettext): Rename from
