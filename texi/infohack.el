@@ -90,6 +90,8 @@ Both characters must have the same length of multi-byte form."
   (setq command-line-args-left nil))
 
 
+(require 'bytecomp)
+
 (defun infohack-texi-format (file &optional addsuffix)
   (let ((auto-save-default nil)
 	(find-file-run-dired nil)
