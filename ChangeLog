@@ -1,3 +1,11 @@
+2002-09-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+	* lisp/gnus-msg.el (gnus-copy-article-buffer): Set a copy buffer
+	mutibyte; remove invisible and intangible test properties from a
+	copied article.
+
 2002-09-05  TAKAHASHI Kaoru  <kaoru@kaisei.org>
 
 	* texi/ptexinfmt.el: discard @documentdescription.  Support
