@@ -271,9 +271,6 @@ This can also be a list of the above values."
 	    (gnus-image-type-available-p 'pbm))
 	'gnus-display-x-face-in-from
       "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | ee -"))
-   ((and (fboundp 'image-type-available-p)
-	 (module-installed-p 'x-face-e21))
-    'x-face-decode-message-header)
    ((gnus-image-type-available-p 'pbm)
     'gnus-display-x-face-in-from)
    ((and window-system
@@ -286,22 +283,15 @@ display -"))
 If it is a string, the command will be executed in a sub-shell
 asynchronously.	 The compressed face will be piped to this command."
   :type `(choice
-	  ,@(let (x-face-e21 x-face-mule)
-	      (if (featurep 'xemacs)
-		  nil
-		(setq x-face-e21 (module-installed-p 'x-face-e21)
-		      x-face-mule (module-installed-p 'x-face-mule)))
+	  ,@(let ((x-face-mule (if (featurep 'xemacs)
+				   nil
+				 (module-installed-p 'x-face-mule))))
 	      (delq nil
 		    (list
 		     'string
 		     (if (or (gnus-image-type-available-p 'xface)
 			     (gnus-image-type-available-p 'pbm))
 			 '(function-item gnus-display-x-face-in-from))
-		     (if (and x-face-e21
-			      (fboundp 'image-type-available-p))
-			 '(function-item
-			   :tag "x-face-decode-message-header (x-face-e21)"
-			   x-face-decode-message-header))
 		     (if x-face-mule
 			 '(function-item
 			   x-face-mule-gnus-article-display-x-face))
@@ -1219,9 +1209,8 @@ See Info node `(gnus)Customizing Articles' for details."
 
 (defcustom gnus-treat-display-x-face
   (and (not noninteractive)
-       (or (memq gnus-article-x-face-command
-		 '(x-face-decode-message-header
-		   x-face-mule-gnus-article-display-x-face))
+       (or (eq gnus-article-x-face-command
+	       'x-face-mule-gnus-article-display-x-face)
 	   (and (fboundp 'image-type-available-p)
 		(image-type-available-p 'xbm)
 		(string-match "^0x" (shell-command-to-string "uncompface"))
@@ -1285,9 +1274,6 @@ smiley functions are not overridden by `smiley').")
 
 (defcustom gnus-treat-display-face
   (and (not noninteractive)
-       ;; x-face-e21 handles both X-Face and Face headers.
-       (not (and (eq gnus-article-x-face-command 'x-face-decode-message-header)
-		 (module-installed-p 'x-face-e21)))
        (or (and (fboundp 'image-type-available-p)
 		(image-type-available-p 'png))
 	   (and (featurep 'xemacs)

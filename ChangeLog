@@ -1,3 +1,13 @@
+2004-08-27  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus.el: Don't autoload x-face-e21.
+
+	* lisp/gnus-art.el (gnus-article-x-face-command): Discard
+	x-face-e21.
+	(gnus-article-x-face-command): Ditto.
+	(gnus-treat-display-x-face): Ditto.
+	(gnus-treat-display-face): Ditto.
+
 2004-08-02  TAKAHASHI Kaoru  <kaoru@kaisei.org>
 
 	* texi/ptexinfmt.el (slanted): Rename @s to @slanted.
