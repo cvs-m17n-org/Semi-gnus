@@ -1,7 +1,10 @@
 2001-06-12  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/nnshimbun.el (nnshimbun-retrieve-headers-with-nov): Remove
-	a redundant check that I made.
+	* lisp/nnshimbun.el (Gnus-p): Use `file-exists-p' instead of
+	`locate-library' to check for the existence of mailcap.el in the
+	same directory of gnus.el.
+	(nnshimbun-retrieve-headers-with-nov): Remove a redundant check
+	that I made.
 
 2001-06-11  Katsumi Yamaoka <yamaoka@jpl.org>
 

@@ -173,12 +173,12 @@
 (eval-and-compile
   (let ((Gnus-p
 	 (eval-when-compile
-	   (let ((gnus (locate-library "gnus"))
-		 ;; Gnus has mailcap.el in the same directory of gnus.el.
-		 (mailcap (locate-library "mailcap")))
-	     (and gnus mailcap
-		  (string-equal (file-name-directory gnus)
-				(file-name-directory mailcap)))))))
+	   (let ((gnus (locate-library "gnus")))
+	     (and gnus
+		  ;; Gnus has mailcap.el in the same directory of gnus.el.
+		  (file-exists-p (expand-file-name
+				  "mailcap.el"
+				  (file-name-directory gnus))))))))
     (if Gnus-p
 	(progn
 	  (defmacro nnshimbun-mail-header-subject (header)
