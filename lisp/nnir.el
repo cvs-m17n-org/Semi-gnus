@@ -1217,7 +1217,7 @@ Tested with Namazu 2.0.6 on a GNU/Linux system."
                  ,nnir-namazu-index-directory ; index directory
                  ))
              (exitstatus
-	      (let ((process-environement process-environment))
+	      (let ((process-environment process-environment))
 		;; Disable locale of Namazu.
 		(dolist (env process-environment)
 		  (when (string-match "\
