@@ -2346,7 +2346,9 @@ STRINGS will be evaluated in normal `or' order."
 	     (or gnus-info-filename
 		 (get-language-info current-language-environment 'gnus-info)
 		 "gnus")
-	     (cadr (assq major-mode gnus-info-nodes))))
+	     (or (cadr (assq major-mode gnus-info-nodes))
+		 (and (eq (current-buffer) (get-buffer gnus-article-buffer))
+		      (cadr (assq 'gnus-article-mode gnus-info-nodes))))))
     (setq gnus-info-buffer (current-buffer))
     (gnus-configure-windows 'info)))
 
