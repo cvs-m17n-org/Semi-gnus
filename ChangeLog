@@ -1,3 +1,12 @@
+1999-08-27  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-agent-automatic-expire):
+	Fix typo.
+
+	* lisp/gnus-ofsetup.el : Remove gnus-cus from compile time
+	requirements; Enclose the autoload for `gnus-custom-mode' with
+	`eval-and-compile'.
+
 1999-08-27  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 15.
