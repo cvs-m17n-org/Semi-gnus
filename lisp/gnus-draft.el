@@ -1,5 +1,5 @@
 ;;; gnus-draft.el --- draft message support for Semi-gnus
-;; Copyright (C) 1997 Free Software Foundation, Inc.
+;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -57,7 +57,8 @@
        ["Toggle whether to send" gnus-draft-toggle-sending t]
        ["Edit" gnus-draft-edit-message t]
        ["Send selected message(s)" gnus-draft-send-message t]
-       ["Send all messages" gnus-draft-send-all-messages t]))))
+       ["Send all messages" gnus-draft-send-all-messages t]
+       ["Delete draft" gnus-summary-delete-article t]))))
 
 (defun gnus-draft-mode (&optional arg)
   "Minor mode for providing a draft summary buffers.
@@ -72,7 +73,7 @@
       (when (gnus-visual-p 'draft-menu 'menu)
 	(gnus-draft-make-menu-bar))
       (gnus-add-minor-mode 'gnus-draft-mode " Draft" gnus-draft-mode-map)
-      (run-hooks 'gnus-draft-mode-hook))))
+      (gnus-run-hooks 'gnus-draft-mode-hook))))
 
 ;;; Commands
 
@@ -149,7 +150,7 @@
      (mime-edit-decode-buffer nil)
      (eword-decode-header)
      ))
-  "Function called to decode the message from network representation."
+  "*Function called to decode the message from network representation."
   :group 'gnus-agent
   :type 'function)
 
