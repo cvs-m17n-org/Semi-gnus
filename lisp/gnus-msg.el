@@ -196,7 +196,7 @@ Thank you for your help in stamping out bugs.
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
-  (setq message-user-agent (gnus-extended-version))
+  (setq message-newsreader (setq message-mailer (gnus-extended-version)))
   (message-add-action
    `(set-window-configuration ,winconf) 'exit 'postpone 'kill)
   (message-add-action

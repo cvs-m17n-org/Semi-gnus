@@ -620,6 +620,8 @@ If stringp, use this; if non-nil, use no host name (user name only)."
 
 (defvar message-reply-buffer nil)
 (defvar message-reply-headers nil)
+(defvar message-newsreader nil)
+(defvar message-mailer nil)
 (defvar message-sent-message-via nil)
 (defvar message-checksum nil)
 (defvar message-send-actions nil
@@ -1420,7 +1422,8 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (setq paragraph-separate paragraph-start)
   (make-local-variable 'message-reply-headers)
   (setq message-reply-headers nil)
-  (make-local-variable 'message-user-agent)
+  (make-local-variable 'message-newsreader)
+  (make-local-variable 'message-mailer)
   (make-local-variable 'message-post-method)
   (make-local-variable 'message-sent-message-via)
   (setq message-sent-message-via nil)

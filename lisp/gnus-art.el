@@ -1497,6 +1497,7 @@ This format is defined by the `gnus-article-time-format' variable."
 	     (gnus-number-of-articles-to-be-saved
 	      (when (eq gnus-prompt-before-saving t)
 		num)))			; Magic
+	(set-buffer gnus-original-article-buffer)
 	(set-buffer gnus-article-current-summary)
 	(funcall gnus-default-article-saver filename)))))
 
