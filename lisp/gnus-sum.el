@@ -6727,13 +6727,15 @@ If FORCE (the prefix), also save the .newsrc file(s)."
       (set-buffer gnus-group-buffer)
       (if quit-config
 	  (gnus-handle-ephemeral-exit quit-config)
-	(goto-char group-point)
 	(unless leave-hidden
 	  (gnus-configure-windows 'group 'force))
+	;; Move point after calling gnus-configure-windows to make sure it
+	;; moves the window's point as well.
+	(goto-char group-point)
 	(unless (pos-visible-in-window-p)
 	  (forward-line (/ (static-if (featurep 'xemacs)
-				      (window-displayed-height)
-				      (1- (window-height)))
+			       (window-displayed-height)
+			     (1- (window-height)))
 			   -2))
 	  (set-window-start (selected-window) (point))
 	  (goto-char group-point)))
