@@ -625,7 +625,7 @@ sure of changing the value of `foo'."
       (message "imap: Opening SSL connection with `%s'..." cmd)
       (erase-buffer)
       (let ((port (or port imap-default-ssl-port))
-	    (process-connection-type nil)
+	    (process-connection-type imap-process-connection-type)
 	    process)
 	(when (prog1
 		  (setq process (as-binary-process
