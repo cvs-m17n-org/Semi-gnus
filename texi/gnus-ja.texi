@@ -12192,6 +12192,15 @@ Emacs のセッション全体をラップして、ディフォルトのメソッドを使うというの
 @vindex nntp-via-shell-prompt
 中間のホストでのシェルのプロンプトに合致する正規表現です。ディフォルト
 は @samp{bash\\|\$ *\r?$\\|> *\r?} です。
+
+@item nntp-marks-is-evil
+@vindex nntp-marks-is-evil
+非-@code{nil} だったら、このバックエンドは @sc{marks} ファイルを無視しま
+す。ディフォルトは @code{nil} です。
+
+@item nntp-marks-directory
+@vindex nntp-marks-directory
+@acronym{NNTP} グループの @sc{marks} が格納されるディレクトリです。
 @end table
 
 @code{nntp-end-of-line} の値を @samp{\n} に変更する必要があるであろうこ

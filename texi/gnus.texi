@@ -12964,6 +12964,15 @@ login name.  This works for Solaris @code{telnet}, for instance.
 Regexp matching the shell prompt on the intermediate host.  The default
 is @samp{bash\\|\$ *\r?$\\|> *\r?}.
 
+@item nntp-marks-is-evil
+@vindex nntp-marks-is-evil
+If non-@code{nil}, this back end will ignore any @sc{marks} files.  The
+default is @code{nil}.
+
+@item nntp-marks-directory
+@vindex nntp-marks-directory
+The directory where @sc{marks} for nntp groups will be stored.
+
 @end table
 
 Note that you may want to change the value for @code{nntp-end-of-line}
