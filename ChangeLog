@@ -1,5 +1,12 @@
 1999-02-18  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 09.
+
+	* lisp/gnus-start.el (save-buffers-kill-emacs): Rewrite the
+	advice. Call `gnus-offer-save-summaries'.
+
+1999-02-18  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 08.
 
 	* lisp/gnus-start.el (save-buffers-kill-emacs): Advice. Call
