@@ -3952,6 +3952,7 @@ Gnus
 $B$k$+$bCN$l$J$$$1$I!"$=$l$O$4<+M3$K(B)$B!#(B
 
 @example
+@group
 Gnus
   Emacs
      3: comp.emacs
@@ -3964,6 +3965,7 @@ Gnus
      8: comp.binaries.fractals
     13: comp.sources.unix
    452: alt.sex.emacs
+@end group
 @end example
 
 @samp{Emacs} $B%H%T%C%/$O%H%T%C%/%Q%i%a!<(B
@@ -14760,8 +14762,8 @@ Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
 
 @code{nnslashdot} $B%3%a%s%H$K%U%)%m!<%"%C%W(B ($B$^$?$O?7$7$$%3%a%s%H$NEj9F(B)
 $B$r$9$k$H$-$O!">/$7(B @acronym{HTML} $B$KJQ49$5$l$^$9!#FC$K!"(B@samp{> } $B$G0zMQ(B
-$B$5$l$?%F%-%9%H$O$=$NBe$o$j$K(B @code{blockquote} $B$G0zMQ$5$l!"=pL>$K$O$=$l(B
-$B$>$l$N9T$N:G8e$K(B @code{br} $B$,DI2C$5$l$^$9!#$=$l0J30$O!"%a%C%;!<%8%P%C%U%!(B
+$B$5$l$?%F%-%9%H$O$=$NBe$o$j$K(B @samp{blockquote} $B$G0zMQ$5$l!"=pL>$K$O$=$l(B
+$B$>$l$N9T$N:G8e$K(B @samp{br} $B$,DI2C$5$l$^$9!#$=$l0J30$O!"%a%C%;!<%8%P%C%U%!(B
 $B$KD>@\(B @acronym{HTML} $B$r=q$/$3$H$,$G$-$^$9!#(BSlashdot $B$O$$$/$D(B
 $B$+(B @acronym{HTML} $B$rA*JL$9$k$3$H$K5$$r$D$1$F$/$@$5$$!#(B
 
@@ -14797,7 +14799,7 @@ Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
 @item nnslashdot-comments-url
 @vindex nnslashdot-comments-url
 $B%3%a%s%H$r<hF@$9$k$?$a$K;HMQ$5$l$k(B @sc{url} $BJ8;zNs$G$9!#=i4|CM(B
-$B$O(B @samp{http://slashdot.org/comments.pl?sid=%s&threshold=%d&commentsort=%d&mode=flat&startat=%d} $B$G(B
+$B$O(B @samp{http://slashdot.org/comments.pl?sid=%s&threshold=%d&commentsort=@/%d&mode=flat&startat=%d} $B$G(B
 $B$9!#(B
 
 @item nnslashdot-article-url
@@ -18343,12 +18345,13 @@ gnus $B$K5-;vA4BN$r<hF@$7$F(B,$B5-;v$N$h$jBg$-$JItJ,$G9gCW$r9T$&$h$&$K$9$k;0$
 $BI8=`$N(B overview $B%X%C%@!<$NJ8;zNs$HF1MM!"(B@code{gnus-extra-headers} $B$r;H$C(B
 $B$F$$$k$H!"$=$l$i$N%X%C%@!<$NCM$K%9%3%"$rIU$1$k$3$H$,$G$-$^$9!#$3$N>l9g%9(B
 $B%3%"EPO?$N(B 5 $BHVL\$NMWAG$,%9%3%"$rIU$1$k%X%C%@!<$NL>A0$K$J$j$^$9!#(B
-@acronym{NNTP} $B%5!<%P!<$,(B overview $B$K(B NNTP-Posting-Host $B$r5-O?$7$F$$$k$J(B
-$B$i$P!"(B@file{all.SCORE} $B%U%!%$%k$N0J2<$NEPO?$O!"C10l$N%[%9%H$+$i(B spam $B$N(B
-$B967b$,$"$k>l9g$KM-8z$G$9!#(B
+@acronym{NNTP} $B%5!<%P!<$,(B overview $B$K(B @samp{NNTP-Posting-Host} $B$r5-O?$7(B
+$B$F$$$k$J$i$P!"(B@file{all.SCORE} $B%U%!%$%k$N0J2<$NEPO?$O!"C10l$N%[%9%H$+(B
+$B$i(B spam $B$N967b$,$"$k>l9g$KM-8z$G$9!#(B
 
 @lisp
-("111.222.333.444" -1000 nil s "NNTP-Posting-Host")
+("111.222.333.444" -1000 nil s
+ "NNTP-Posting-Host")
 @end lisp
 
 @item Lines, Chars
@@ -21254,14 +21257,12 @@ Spam $B$KBP=h$9$k0l$D$NJ}K!$O!"(Bgnus $B$KA4$F$N(B spam $B$r(B @samp{spam}
 $B$9(B (@pxref{Fancy Mail Splitting})$B!#(B
 
 @lisp
-(
- ...
+(...
  (to "larsi@@trym.ifi.uio.no"
-      (| ("subject" "re:.*" "misc")
-         ("references" ".*@@.*" "misc")
-         "spam"))
- ...
-)
+     (| ("subject" "re:.*" "misc")
+        ("references" ".*@@.*" "misc")
+        "spam"))
+ ...)
 @end lisp
 
 $B$3$N0UL#$O!"$3$N%"%I%l%9$KFO$$$?A4$F$N%a!<%k$r$^$:5?$$$^$9$,!"(B
@@ -21318,7 +21319,8 @@ Spam $B$rHr$1$k$?$a$NA09`$N%R%s%H$,==J,$@$C$?F|!9$O2a$.5n$j$^$7$?!#:#$G$O(B
       '((file :prescript "formail -bs spamassassin < /var/mail/%u")
         (pop :user "jrl"
              :server "pophost"
-             :postscript "mv %t /tmp/foo; formail -bs spamc < /tmp/foo > %t")))
+             :postscript
+             "mv %t /tmp/foo; formail -bs spamc < /tmp/foo > %t")))
 @end lisp
 
 $B$$$C$?$s!"%a!<%k$r<u$1$k%9%W!<%k$r$I$&$K$+$7$F=hM}$9$k!"Nc$($P(B@: $B%a!<%k(B
@@ -21352,8 +21354,8 @@ Spam $B$rHr$1$k$?$a$NA09`$N%R%s%H$,==J,$@$C$?F|!9$O2a$.5n$j$^$7$?!#:#$G$O(B
   (save-excursion
     (widen)
     (if (eq 1 (call-process-region (point-min) (point-max)
-				   "spamc" nil nil nil "-c"))
-	"spam")))
+                                   "spamc" nil nil nil "-c"))
+        "spam")))
 @end lisp
 
 $B$5$i$K(B nnimap $B%P%C%/%(%s%I$N>l9g!"%G%#%U%)%k%H$G$O5-;v$N%\%G%#$,%@%&%s%m!<(B
@@ -21639,10 +21641,10 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 
 @example
  nnimap-split-fancy '(|
-		      (any "ding" "ding")
-		      (: spam-split)
-		      ;; default mailbox
-		      "mail")
+                      (any "ding" "ding")
+                      (: spam-split)
+                      ;; default mailbox
+                      "mail")
 @end example
 
 $B$5$F!"LdBj$O(B ding $B08$F$N%a%C%;!<%8$r$9$Y$F(B ding $B%U%)%k%@!<$KF~$l$h$&$H$7(B
@@ -21659,12 +21661,12 @@ SpamAssassin $B%X%C%@!<$K(B ding $B$N5,B'$rCV$-49$($5$;$k$3$H$O$G$-$^$9$,!"B>
 @example
  nnimap-split-fancy '(|
 ;;; spam-use-regex-headers $B$G8!=P$5$l$?$9$Y$F$N(B spam $B$O(B "regex-spam" $B$X!#(B
-		      (: spam-split "regex-spam" 'spam-use-regex-headers)
-		      (any "ding" "ding")
+                      (: spam-split "regex-spam" 'spam-use-regex-headers)
+                      (any "ding" "ding")
 ;;; spam-split $B$G8!=P$5$l$?B>$N$9$Y$F$N(B spam $B$O(B spam-split-group $B$X!#(B
-		      (: spam-split)
-		      ;; default mailbox
-		      "mail")
+                      (: spam-split)
+                      ;; default mailbox
+                      "mail")
 @end example
 
 $B4pK\E*$K!"$3$l$OFC$K$"$J$?$NI,MW$K0MB8$7$?FCDj$N(B @code{spam-split} $B8!(B
@@ -22296,7 +22298,7 @@ Spam $B$G$O$J$$(B ($BL$J,N`$^$?$O(B ham) $B%0%k!<%W$@$1$KE,MQ$5$l$k!#(B")
    (lambda (article)
      (let ((from (spam-fetch-field-from-fast article)))
        (when (stringp from)
-	   (blackbox-do-something-with-this-spammer from))))
+           (blackbox-do-something-with-this-spammer from))))
    ;; @r{ham $BMQ$N4X?t(B}
    nil))
 
@@ -22308,7 +22310,7 @@ Spam $B$G$O$J$$(B ($BL$J,N`$^$?$O(B ham) $B%0%k!<%W$@$1$KE,MQ$5$l$k!#(B")
    (lambda (article)
      (let ((from (spam-fetch-field-from-fast article)))
        (when (stringp from)
-	   (blackbox-do-something-with-this-ham-sender from))))))
+           (blackbox-do-something-with-this-ham-sender from))))))
 @end lisp
 
 $B4X?t(B @code{blackbox-do-something-with-this-ham-sender} $B$*$h(B
@@ -22456,7 +22458,7 @@ nnml $B%P%C%/%(%s%I$O0lDL$N%a!<%k$K$D$-0l$D$N%U%!%$%k$G!"$9$Y$F$N%a!<%k$r(B
 @lisp
 (setq nnmail-split-fancy
       `(| (: spam-stat-split-fancy)
-	  "mail.misc"))
+          "mail.misc"))
 @end lisp
 
 @defvar spam-stat-split-fancy-spam-group
@@ -22470,8 +22472,8 @@ Spam $BMQ$N%0%k!<%W$G$9!#%G%#%U%)%k%H$O(B @samp{mail.spam} $B$G$9!#(B
 @lisp
 (setq nnmail-split-fancy
       `(| ("Subject" "\\bspam-stat\\b" "mail.emacs")
-	  (: spam-stat-split-fancy)
-	  "mail.misc"))
+          (: spam-stat-split-fancy)
+          "mail.misc"))
 @end lisp
 
 $B:G=i$K(B spam $B$N_I2a$r$7$?$$>l9g!"<-=q$r:n$k$H$-$K==J,$KCm0U$7$J$1$l$P$J$j(B
@@ -22485,7 +22487,7 @@ Spam $BMQ$N%0%k!<%W$G$9!#%G%#%U%)%k%H$O(B @samp{mail.spam} $B$G$9!#(B
 (setq nnmail-split-fancy
       `(| (: spam-stat-split-fancy)
           ("Subject" "\\bspam-stat\\b" "mail.emacs")
-	  "mail.misc"))
+          "mail.misc"))
 @end lisp
 
 $B$3$l$rEAE}E*$J_I2a$HAH$_9g$o$;$k$3$H$b$G$-$^$9!#$3$3$G$O2f!9$O$9$Y$F(B
@@ -22497,9 +22499,9 @@ Spam $BMQ$N%0%k!<%W$G$9!#%G%#%U%)%k%H$O(B @samp{mail.spam} $B$G$9!#(B
 @lisp
 (setq nnmail-split-fancy
       `(| ("Content-Type" "text/html" "mail.spam.filtered")
-	  (: spam-stat-split-fancy)
+          (: spam-stat-split-fancy)
           ("Subject" "\\bspam-stat\\b" "mail.emacs")
-	  "mail.misc"))
+          "mail.misc"))
 @end lisp
 
 @node Low-level interface to the spam-stat dictionary
@@ -24380,10 +24382,10 @@ Message $B$O(B From:, To: $B$*$h$S(B Cc: $B$K$"$kHs(B-@acronym{ASCII} $B%
 @lisp
 (setq gnus-parameters
       '(("mail\\..*"
-	 (gnus-show-threads nil)
-	 (gnus-use-scoring nil))
-	("^nnimap:\\(foo.bar\\)$"
-	 (to-group . "\\1"))))
+         (gnus-show-threads nil)
+         (gnus-use-scoring nil))
+        ("^nnimap:\\(foo.bar\\)$"
+         (to-group . "\\1"))))
 @end lisp
 
 @item
@@ -24580,7 +24582,7 @@ Gnus $B%(!<%8%'%s%H$OBg5,LO$J99?7$r7P$F!":#$d%G%#%U%)%k%H$G3h@-2=$5$l$^$9!#(B
 $B2<5-$N$h$&$J8E$$MM<0$O;~BeCY$l$K$J$j$^$7$?$,!"$^$@<u$1F~$l$i$l$^$9!#(B
 @lisp
 (header "to" "larsi.*org"
-	(Organization "Somewhere, Inc."))
+        (Organization "Somewhere, Inc."))
 @end lisp
 
 @item
