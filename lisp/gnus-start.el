@@ -49,6 +49,24 @@
   :group 'gnus-start
   :type '(choice directory (const nil)))
 
+(defcustom gnus-backup-startup-file 'never
+  "Whether to create backup files.
+This variable takes the same values as the `version-control'
+variable."
+  :group 'gnus-start
+  :type '(choice (const :tag "Never" never)
+		 (const :tag "If existing" nil)
+		 (other :tag "Always" t)))
+
+(defcustom gnus-save-startup-file-via-temp-buffer t
+  "Whether to write the startup file contents to a buffer then save
+the buffer or write directly to the file.  The buffer is faster
+because all of the contents are written at once.  The direct write
+uses considerably less memory."
+  :group 'gnus-start
+  :type '(choice (const :tag "Write via buffer" t)
+                 (const :tag "Write directly to file" nil)))
+
 (defcustom gnus-init-file (nnheader-concat gnus-home-directory ".gnus")
   "Your Gnus Emacs-Lisp startup file name.
 If a file with the `.el' or `.elc' suffixes exists, it will be read instead."
@@ -377,6 +395,11 @@ This hook is called as the first thing when Gnus is started."
   :group 'gnus-start
   :type 'hook)
 
+(defcustom gnus-get-top-new-news-hook nil
+  "A hook run just before Gnus checks for new news globally."
+  :group 'gnus-group-new
+  :type 'hook)
+
 (defcustom gnus-get-new-news-hook nil
   "A hook run just before Gnus checks for new news."
   :group 'gnus-group-new
@@ -604,16 +627,21 @@ the first newsgroup."
 ;;; General various misc type functions.
 
 ;; Silence byte-compiler.
-(defvar gnus-current-headers)
-(defvar gnus-thread-indent-array)
-(defvar gnus-newsgroup-name)
-(defvar gnus-newsgroup-headers)
-(defvar gnus-group-list-mode)
-(defvar gnus-group-mark-positions)
-(defvar gnus-newsgroup-data)
-(defvar gnus-newsgroup-unreads)
-(defvar nnoo-state-alist)
-(defvar gnus-current-select-method)
+(eval-when-compile
+  (defvar gnus-current-headers)
+  (defvar gnus-thread-indent-array)
+  (defvar gnus-newsgroup-name)
+  (defvar gnus-newsgroup-headers)
+  (defvar gnus-group-list-mode)
+  (defvar gnus-group-mark-positions)
+  (defvar gnus-newsgroup-data)
+  (defvar gnus-newsgroup-unreads)
+  (defvar nnoo-state-alist)
+  (defvar gnus-current-select-method)
+  (defvar mail-sources)
+  (defvar nnmail-scan-directory-mail-source-once)
+  (defvar nnmail-split-history)
+  (defvar nnmail-spool-file))
 
 (defun gnus-clear-quick-file-variables ()
   "Clear all variables in quick startup files."
@@ -1477,7 +1505,7 @@ newsgroup."
 	   t)
 	 (if (or debug-on-error debug-on-quit)
 	     (inline (gnus-request-group group dont-check method))
-	   (condition-case ()
+	   (condition-case nil
 	       (inline (gnus-request-group group dont-check method))
 	     ;;(error nil)
 	     (quit
@@ -1578,7 +1606,8 @@ newsgroup."
 	  (setq range (cdr range)))
 	(setq num (max 0 (- (cdr active) num)))))
       ;; Set the number of unread articles.
-      (when info
+      (when (and info
+		 (gnus-gethash (gnus-info-group info) gnus-newsrc-hashtb))
 	(setcar (gnus-gethash (gnus-info-group info) gnus-newsrc-hashtb) num))
       num)))
 
@@ -2585,6 +2614,12 @@ If FORCE is non-nil, the .newsrc file is read."
 
       (setq gnus-newsrc-options-n out))))
 
+(eval-and-compile
+  (defalias 'gnus-long-file-names
+    (if (fboundp 'msdos-long-file-names)
+      'msdos-long-file-names
+      (lambda () t))))
+
 (defun gnus-save-newsrc-file (&optional force)
   "Save .newsrc file."
   ;; Note: We cannot save .newsrc file if all newsgroups are removed
@@ -2611,16 +2646,64 @@ If FORCE is non-nil, the .newsrc file is read."
 	  ;; Save .newsrc.eld.
 	  (set-buffer (gnus-get-buffer-create " *Gnus-newsrc*"))
 	  (make-local-variable 'version-control)
-	  (setq version-control 'never)
+	  (setq version-control gnus-backup-startup-file)
 	  (setq buffer-file-name
 		(concat gnus-current-startup-file ".eld"))
 	  (setq default-directory (file-name-directory buffer-file-name))
 	  (buffer-disable-undo)
 	  (erase-buffer)
-	  (gnus-message 5 "Saving %s.eld..." gnus-current-startup-file)
-	  (gnus-gnus-to-quick-newsrc-format)
-	  (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
-	  (save-buffer-as-coding-system gnus-ding-file-coding-system)
+          (gnus-message 5 "Saving %s.eld..." gnus-current-startup-file)
+
+          (if gnus-save-startup-file-via-temp-buffer
+              (let ((coding-system-for-write gnus-ding-file-coding-system)
+		    (output-coding-system gnus-ding-file-coding-system)
+                    (standard-output (current-buffer)))
+                (gnus-gnus-to-quick-newsrc-format)
+                (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
+                (save-buffer))
+            (let ((coding-system-for-write gnus-ding-file-coding-system)
+		  (output-coding-system gnus-ding-file-coding-system)
+                  (version-control gnus-backup-startup-file)
+                  (startup-file (concat gnus-current-startup-file ".eld"))
+                  (working-dir (file-name-directory gnus-current-startup-file))
+                  working-file
+                  (i -1))
+              ;; Generate the name of a non-existent file.
+              (while (progn (setq working-file
+                                  (format
+                                   (if (and (eq system-type 'ms-dos)
+                                            (not (gnus-long-file-names)))
+                                       "%s#%d.tm#" ; MSDOS limits files to 8+3
+                                     (if (memq system-type '(vax-vms axp-vms))
+                                         "%s$tmp$%d"
+                                       "%s#tmp#%d"))
+                                   working-dir (setq i (1+ i))))
+                            (file-exists-p working-file)))
+
+              (unwind-protect
+                  (progn
+                    (gnus-with-output-to-file
+                     working-file
+                     (gnus-gnus-to-quick-newsrc-format)
+                     (gnus-run-hooks 'gnus-save-quick-newsrc-hook))
+
+                    ;; These bindings will mislead the current buffer
+                    ;; into thinking that it is visiting the startup
+                    ;; file.
+                    (let ((buffer-backed-up nil)
+                          (buffer-file-name startup-file)
+                          (file-precious-flag t)
+                          (setmodes (file-modes startup-file)))
+                      ;; Backup the current version of the startup file.
+                      (backup-buffer)
+
+                      ;; Replace the existing startup file with the temp file.
+                      (rename-file working-file startup-file t)
+                      (set-file-modes startup-file setmodes)))
+                (condition-case nil
+                    (delete-file working-file)
+                  (file-error nil)))))
+
 	  (gnus-kill-buffer (current-buffer))
 	  (gnus-message
 	   5 "Saving %s.eld...done" gnus-current-startup-file))
@@ -2639,17 +2722,15 @@ If FORCE is non-nil, the .newsrc file is read."
     (gnus-save-newsrc-file)))
 
 (defun gnus-gnus-to-quick-newsrc-format ()
-  "Insert Gnus variables such as gnus-newsrc-alist in lisp format."
-  (let ((print-quoted t)
-	(print-escape-newlines t))
-
-    (insert ";; -*- emacs-lisp -*-\n")
-    (insert ";; Gnus startup file.\n")
-    (insert "\
+  "Print Gnus variables such as gnus-newsrc-alist in lisp format."
+    (princ ";; -*- emacs-lisp -*-\n")
+    (princ ";; Gnus startup file.\n")
+    (princ "\
 ;; Never delete this file -- if you want to force Gnus to read the
 ;; .newsrc file (if you have one), touch .newsrc instead.\n")
-    (insert "(setq gnus-newsrc-file-version "
-	    (gnus-prin1-to-string gnus-version) ")\n")
+    (princ "(setq gnus-newsrc-file-version ")
+    (princ (gnus-prin1-to-string gnus-version))
+    (princ ")\n")
     (let* ((gnus-killed-list
 	    (if (and gnus-save-killed-list
 		     (stringp gnus-save-killed-list))
@@ -2667,9 +2748,11 @@ If FORCE is non-nil, the .newsrc file is read."
       (while variables
 	(when (and (boundp (setq variable (pop variables)))
 		   (symbol-value variable))
-	  (insert "(setq " (symbol-name variable) " '")
-	  (gnus-prin1 (symbol-value variable))
-	  (insert ")\n"))))))
+	  (princ "(setq ")
+          (princ (symbol-name variable))
+          (princ " '")
+	  (prin1 (symbol-value variable))
+	  (princ ")\n")))))
 
 (defun gnus-product-variable-touch (&rest variables)
   (while variables
@@ -2991,10 +3074,12 @@ If this variable is nil, don't do anything."
 	    (file-name-as-directory (expand-file-name gnus-default-directory))
 	  default-directory)))
 
-(defun gnus-display-time-event-handler ()
-  "Like `display-time-event-handler', but test `display-time-timer'."
-  (when (gnus-boundp 'display-time-timer)
-    (display-time-event-handler)))
+(eval-and-compile
+(defalias 'gnus-display-time-event-handler 
+  (if (gnus-boundp 'display-time-timer)
+      'display-time-event-handler
+    (lambda () "Does nothing as `display-time-timer' is not bound.
+Would otherwise be an alias for `display-time-event-handler'." nil))))
 
 ;;;###autoload
 (defun gnus-fixup-nnimap-unread-after-getting-new-news ()

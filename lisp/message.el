@@ -792,6 +792,15 @@ Doing so would be even more evil than leaving it out."
   :group 'message-sending
   :type 'boolean)
 
+(defcustom message-sendmail-envelope-from nil
+  "*Envelope-from when sending mail with sendmail.
+If this is nil, use `user-mail-address'.  If it is the symbol
+`header', use the From: header of the message."
+  :type '(choice (string :tag "From name")
+		 (const :tag "Use From: header from message" header)
+		 (const :tag "Use `user-mail-address'" nil))
+  :group 'message-sending)
+
 ;; qmail-related stuff
 (defcustom message-qmail-inject-program "/var/qmail/bin/qmail-inject"
   "Location of the qmail-inject program."
@@ -1489,6 +1498,12 @@ no, only reply back to the author."
   :group 'message-headers
   :type 'boolean)
 
+(defcustom message-user-fqdn nil
+  "*Domain part of Messsage-Ids."
+  :group 'message-headers
+  :link '(custom-manual "(message)News Headers")
+  :type 'string)
+
 ;;; Internal variables.
 
 (defvar message-sending-message "Sending...")
@@ -1535,7 +1550,7 @@ no, only reply back to the author."
      ;; We want to match the results of any of these manglings.
      ;; The following regexp rejects names whose first characters are
      ;; obviously bogus, but after that anything goes.
-     "\\([^\0-\b\n-\r\^?].*\\)? "
+     "\\([^\0-\b\n-\r\^?].*\\)?"
 
      ;; The time the message was sent.
      "\\([^\0-\r \^?]+\\) +"		; day of the week
@@ -1596,6 +1611,19 @@ no, only reply back to the author."
 
 (defvar message-bogus-system-names "^localhost\\."
   "The regexp of bogus system names.")
+
+(defcustom message-valid-fqdn-regexp
+  (concat "[a-z0-9][-.a-z0-9]+\\." ;; [hostname.subdomain.]domain.
+	  ;; valid TLDs:
+	  "\\([a-z][a-z]" ;; two letter country TDLs
+	  "\\|biz\\|com\\|edu\\|gov\\|int\\|mil\\|net\\|org"
+	  "\\|aero\\|coop\\|info\\|name\\|museum"
+	  "\\|arpa\\|pro\\|uucp\\|bitnet\\|bofh" ;; old style?
+	  "\\)")
+  "Regular expression that matches a valid FQDN."
+  ;; see also: gnus-button-valid-fqdn-regexp
+  :group 'message-headers
+  :type 'regexp)
 
 (eval-and-compile
   (autoload 'message-setup-toolbar "messagexmas")
@@ -1945,7 +1973,7 @@ With prefix-argument just set Follow-Up, don't cross-post."
 	      (not (string-match (regexp-quote target-group)
 				 (message-fetch-field "Newsgroups"))))
 	 (end-of-line)
-	 (insert-string (concat "," target-group))))
+	 (insert (concat "," target-group))))
   (end-of-line) ; ensure Followup: comes after Newsgroups:
   ;; unless new followup would be identical to Newsgroups line
   ;; make a new Followup-To line
@@ -2514,6 +2542,11 @@ M-RET    `message-newline-and-reformat' (break the line and reformat)."
   (setq message-parameter-alist
 	(copy-sequence message-startup-parameter-alist))
   (message-setup-fill-variables)
+  (set
+   (make-local-variable 'paragraph-separate)
+   (format "\\(%s\\)\\|\\(%s\\)"
+	   paragraph-separate
+	   "<#!*/?\\(multipart\\|part\\|external\\|mml\\|secure\\)"))
   ;; Allow using comment commands to add/remove quoting.
   (set (make-local-variable 'comment-start) message-yank-prefix)
   (if (featurep 'xemacs)
@@ -3695,13 +3728,17 @@ used to distinguish whether the invisible text is a MIME part or not."
 						  'mime-edit-invisible t))
 	  (when (> mime-from mime-to)
 	    (setq hidden-start (or hidden-start mime-to))
-	    (put-text-property mime-to mime-from 'invisible nil))
+	    (add-text-properties mime-to mime-from
+				 '(invisible nil face highlight
+					     font-lock-face highlight)))
 	  (setq mime-to (or (text-property-not-all mime-from to
 						   'mime-edit-invisible t)
 			    to)))
 	(when (< mime-to to)
 	  (setq hidden-start (or hidden-start mime-to))
-	  (put-text-property mime-to to 'invisible nil)))
+	  (add-text-properties mime-to to
+			       '(invisible nil face highlight
+					   font-lock-face highlight))))
       (when hidden-start
 	(goto-char hidden-start)
 	(set-window-start (selected-window) (gnus-point-at-bol))
@@ -3720,14 +3757,15 @@ used to distinguish whether the invisible text is a MIME part or not."
 			 (memq (char-charset char)
 			       '(eight-bit-control eight-bit-graphic
 						   control-1)))))
-	  (add-text-properties (point) (1+ (point)) '(highlight t))
+	  (add-text-properties (point) (1+ (point))
+			       '(font-lock-face highlight face highlight))
 	  (setq found t))
 	(forward-char)
 	(skip-chars-forward mm-7bit-chars))
       (when found
 	(setq choice
 	      (gnus-multiple-choice
-	       "Illegible text found. Continue posting? "
+	       "Illegible text found.  Continue posting?"
 	       '((?d "Remove and continue posting")
 		 (?r "Replace with dots and continue posting")
 		 (?i "Ignore and continue posting")
@@ -3744,10 +3782,11 @@ used to distinguish whether the invisible text is a MIME part or not."
 				 '(eight-bit-control eight-bit-graphic
 						     control-1)))))
 	    (if (eq choice ?i)
-		(remove-text-properties (point) (1+ (point)) '(highlight t))
+		(remove-text-properties (point) (1+ (point))
+					'(font-lock-face highlight face highlight))
 	      (delete-char 1)
-	      (if (eq choice ?r)
-		  (insert "."))))
+	      (when (eq choice ?r)
+		(insert "."))))
 	  (forward-char)
 	  (skip-chars-forward mm-7bit-chars))))))
 
@@ -3873,7 +3912,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	      (message-remove-header "Lines")
 	      (goto-char (point-max))
 	      (insert "Mime-Version: 1.0\n")
-	      (setq header (buffer-substring (point-min) (point-max))))
+	      (setq header (buffer-string)))
 	    (goto-char (point-max))
 	    (insert (format "Content-Type: message/partial; id=\"%s\"; number=%d; total=%d\n\n"
 			    id n total))
@@ -3951,6 +3990,7 @@ This sub function is for exclusive use of `message-send-mail'."
 		  (message-narrow-to-headers)
 		  (and news
 		       (or (message-fetch-field "cc")
+			   (message-fetch-field "bcc")
 			   (message-fetch-field "to"))
 		       (let ((ct (mime-read-Content-Type)))
 			 (or (not ct)
@@ -4011,7 +4051,7 @@ This sub function is for exclusive use of `message-send-mail'."
 			 ;; But some systems are more broken with -f, so
 			 ;; we'll let users override this.
 			 (if (null message-sendmail-f-is-evil)
-			     (list "-f" (message-make-address)))
+			     (list "-f" (message-sendmail-envelope-from)))
 			 ;; These mean "report errors by mail"
 			 ;; and "deliver in background".
 			 (if (null message-interactive) '("-oem" "-odb"))
@@ -4033,7 +4073,7 @@ This sub function is for exclusive use of `message-send-mail'."
 		(replace-match "; "))
 	      (if (not (zerop (buffer-size)))
 		  (error "Sending...failed to %s"
-			 (buffer-substring (point-min) (point-max)))))))
+			 (buffer-string))))))
       (when (bufferp errbuf)
 	(kill-buffer errbuf)))))
 
@@ -4459,8 +4499,9 @@ Otherwise, generate and save a value for `canlock-password' first."
 		     (gnus-groups-from-server method)))
 	    errors)
        (while groups
-	 (unless (or (equal (car groups) "poster")
-		     (member (car groups) known-groups))
+	 (when (and (not (equal (car groups) "poster"))
+		    (not (member (car groups) known-groups))
+		    (not (member (car groups) errors)))
 	   (push (car groups) errors))
 	 (pop groups))
        (cond
@@ -5072,30 +5113,53 @@ give as trustworthy answer as possible."
 
 (defun message-user-mail-address ()
   "Return the pertinent part of `user-mail-address'."
-  (when user-mail-address
+  (when (and user-mail-address
+	     (string-match "@.*\\." user-mail-address))
     (if (string-match " " user-mail-address)
 	(nth 1 (std11-extract-address-components user-mail-address))
       user-mail-address)))
 
+(defun message-sendmail-envelope-from ()
+  "Return the envelope from."
+  (cond ((eq message-sendmail-envelope-from 'header)
+	 (nth 1 (mail-extract-address-components
+		 (message-fetch-field "from"))))
+	((stringp message-sendmail-envelope-from)
+	 message-sendmail-envelope-from)
+	(t
+	 (message-make-address))))
+
 (defun message-make-fqdn ()
   "Return user's fully qualified domain name."
-  (let ((system-name (system-name))
-	(user-mail (message-user-mail-address)))
+  (let* ((system-name (system-name))
+	 (user-mail (message-user-mail-address))
+	 (user-domain
+	  (if (and user-mail
+		   (string-match "@\\(.*\\)\\'" user-mail))
+	      (match-string 1 user-mail))))
     (cond
-     ((and (string-match "[^.]\\.[^.]" system-name)
+     ((and message-user-fqdn
+	   (stringp message-user-fqdn)
+	   (string-match message-valid-fqdn-regexp message-user-fqdn)
+	   (not (string-match message-bogus-system-names message-user-fqdn)))
+      message-user-fqdn)
+     ;; `message-user-fqdn' seems to be valid
+     ((and (string-match message-valid-fqdn-regexp system-name)
 	   (not (string-match message-bogus-system-names system-name)))
       ;; `system-name' returned the right result.
       system-name)
      ;; Try `mail-host-address'.
      ((and (boundp 'mail-host-address)
 	   (stringp mail-host-address)
-	   (string-match "\\." mail-host-address))
+	   (string-match message-valid-fqdn-regexp mail-host-address)
+	   (not (string-match message-bogus-system-names mail-host-address)))
       mail-host-address)
      ;; We try `user-mail-address' as a backup.
-     ((and user-mail
-	   (string-match "\\." user-mail)
-	   (string-match "@\\(.*\\)\\'" user-mail))
-      (match-string 1 user-mail))
+     ((and user-domain
+	   (stringp user-domain)
+	   (string-match message-valid-fqdn-regexp user-domain)
+	   (not (string-match message-bogus-system-names user-domain)))
+      user-domain)
      ;; Default to this bogus thing.
      (t
       (concat system-name ".i-did-not-set--mail-host-address--so-tickle-me")))))
@@ -6526,15 +6590,17 @@ Optional NEWS will use news to forward instead of mail."
       ;; We first set up a normal mail buffer.
       (unless (message-mail-user-agent)
 	(set-buffer (get-buffer-create " *message resend*"))
-	(erase-buffer)
-	(let ((message-this-is-mail t)
-	      ;; avoid to turn-on-mime-edit
-	      message-setup-hook)
-	  (message-setup `((To . ,address)))))
+	(erase-buffer))
+      (let ((message-this-is-mail t)
+	    message-setup-hook)
+	(message-setup `((To . ,address))))
       ;; Insert our usual headers.
       (message-generate-headers '(From Date To))
       (message-narrow-to-headers)
+      ;; Remove X-Draft-From header etc.
+      (message-remove-header message-ignored-mail-headers t)
       ;; Rename them all to "Resent-*".
+      (goto-char (point-min))
       (while (re-search-forward "^[A-Za-z]" nil t)
 	(forward-char -1)
 	(insert "Resent-"))

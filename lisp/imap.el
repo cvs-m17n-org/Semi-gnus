@@ -1,5 +1,5 @@
 ;;; imap.el --- imap library
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <jas@pdc.kth.se>
@@ -142,7 +142,6 @@
 (require 'base64)
 
 (eval-and-compile
-  (autoload 'open-ssl-stream "ssl")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls")
   (autoload 'rfc2104-hash "rfc2104")
@@ -409,22 +408,6 @@ sure of changing the value of `foo'."
       (setcdr alist (imap-remassoc key (cdr alist)))
       alist)))
 
-(defun imap-read-passwd (prompt &rest args)
-  "Read a password using PROMPT.
-If ARGS, PROMPT is used as an argument to `format'."
-  (let ((prompt (if args
-		    (apply 'format prompt args)
-		  prompt)))
-    (funcall (if (or (fboundp 'read-passwd)
-		     (and (load "subr" t)
-			  (fboundp 'read-passwd))
-		     (and (load "passwd" t)
-			  (fboundp 'read-passwd)))
-		 'read-passwd
-	       (autoload 'ange-ftp-read-passwd "ange-ftp")
-	       'ange-ftp-read-passwd)
-	     prompt)))
-
 (defsubst imap-utf7-encode (string)
   (if imap-use-utf7
       (and string
@@ -589,24 +572,21 @@ If ARGS, PROMPT is used as an argument to `format'."
   (let ((cmds (if (listp imap-ssl-program) imap-ssl-program
 		(list imap-ssl-program)))
 	cmd done)
-    (condition-case ()
-	(require 'ssl)
-      (error))
     (while (and (not done) (setq cmd (pop cmds)))
       (message "imap: Opening SSL connection with `%s'..." cmd)
-      (let* ((port (or port imap-default-ssl-port))
-	     (ssl-program-name shell-file-name)
-	     (ssl-program-arguments
-	      (list shell-command-switch
-		    (format-spec cmd (format-spec-make
-				      ?s server
-				      ?p (number-to-string port)))))
-	     process)
-	(when (setq process
-		    (condition-case nil
-			(as-binary-process
-			 (open-ssl-stream name buffer server port))
-		      (error nil)))
+      (let ((port (or port imap-default-ssl-port))
+	    (process-connection-type nil)
+	    process)
+	(when (prog1
+		  (setq process (as-binary-process
+				 (start-process
+				  name buffer shell-file-name
+				  shell-command-switch
+				  (format-spec cmd
+					       (format-spec-make
+						?s server
+						?p (number-to-string port))))))
+		(process-kill-without-query process))
 	  (with-current-buffer buffer
 	    (goto-char (point-min))
 	    (while (and (memq (process-status process) '(open run))
@@ -754,7 +734,7 @@ Returns t if login was successful, nil otherwise."
 				"'): ")
 			(or user imap-default-user))))
 	(setq passwd (or imap-password
-			 (imap-read-passwd
+			 (read-passwd
 			  (concat "IMAP password for " user "@"
 				  imap-server " (using authenticator `"
 				  (symbol-name imap-auth) "'): "))))
@@ -1287,7 +1267,7 @@ Returns non-nil if successful."
 ITEMS can be a symbol or a list of symbols, valid symbols are one of
 the STATUS data items -- ie 'messages, 'recent, 'uidnext, 'uidvalidity
 or 'unseen.  If ITEMS is a list of symbols, a list of values is
-returned, if ITEMS is a symbol only it's value is returned."
+returned, if ITEMS is a symbol only its value is returned."
   (with-current-buffer (or buffer (current-buffer))
     (when (imap-ok-p
 	   (imap-send-command-wait (list "STATUS \""
@@ -2626,7 +2606,6 @@ Return nil if no complete line has arrived."
   (buffer-disable-undo (get-buffer-create imap-debug-buffer))
   (mapcar (lambda (f) (trace-function-background f imap-debug-buffer))
 	  '(
-	    imap-read-passwd
 	    imap-utf7-encode
 	    imap-utf7-decode
 	    imap-error-text

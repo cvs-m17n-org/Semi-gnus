@@ -705,7 +705,7 @@ MFT $B$rB:=E$9$k$3$H$ONI$$%M%A%1%C%H(B (nettiquette) $B$G$"$k$H9M$($i$l$F$$$^
 @findex message-change-subject
 @cindex Subject
 $B8=:_$N(B @samp{Subject} $B%X%C%@!<$rJQ99$7$^$9!#?7$7$$(B @samp{Subject} $B$r?R$M(B
-$B$F(B @code{(was: <$B8E$$BjL>(B>)} $B$rDI2C$7$^$9!#8E$$BjL>$OJV?.$9$k$H$-$K:o=|$9(B
+$B$F(B @samp{(was: <$B8E$$BjL>(B>)} $B$rDI2C$7$^$9!#8E$$BjL>$OJV?.$9$k$H$-$K:o=|$9(B
 $B$k$3$H$,$G$-$^$9!#(B@code{message-subject-trailing-was-query}
 (@pxref{Message Headers}) $B$r8+$F2<$5$$!#(B
 
@@ -923,10 +923,10 @@ message a single part tag will be used.  This way, message mode will
 do the Right Thing (TM) with signed/encrypted multipart messages.
 
 @vindex mml-signencrypt-style-alist
-By default, when encrypting a message, Gnus will use the "signencrypt"
+By default, when encrypting a message, Gnus will use the ``signencrypt''
 mode.  If you would like to disable this for a particular message,
-give the mml-secure-message-encrypt-* command a prefix argument. (for
-example, C-u C-c C-m c p).  Additionally, by default Gnus will
+give the @code{mml-secure-message-encrypt-* command a prefix argument}. (for
+example, @kbd{C-u C-c C-m c p}).  Additionally, by default Gnus will
 separately sign, then encrypt a message which has the mode
 signencrypt.  If you would like to change this behavior you can
 customize the @code{mml-signencrypt-style-alist} variable.  For
@@ -1423,6 +1423,13 @@ qmail-inject $B%W%m%0%i%`$KEO$90z?t$G$9!#$3$l$OJ8;zNs$N%j%9%H$G!"$=$l$>$l(B
 $BHs(B-@code{nil} $B$G(B sendmail $B$N%3%^%s%I9T$K(B @samp{-f username} $B$rIU2C$7$^$;(B
 $B$s!#$=$&$9$k$3$H$O!"IU2C$7$J$$$h$j<Y0-$G$9$i$"$k$G$7$g$&!#(B
 
+@item message-sendmail-envelope-from
+@vindex message-sendmail-envelope-from
+@code{message-sendmail-f-is-evil} $B$,(B @code{nil} $B$N$H$-!"$3$l$G(B SMTP $B%(%s(B
+$B%Y%m!<%W$G;H$&%"%I%l%9$r;XDj$7$^$9!#(B@code{nil} $B$@$C$?(B
+$B$i(B @code{user-mail-address} $B$r;H$$$^$9!#%7%s%\%k(B @code{header} $B$@$C$?$i!"(B
+$B%a%C%;!<%8$N(B @samp{From} $B%X%C%@!<$r;H$$$^$9!#(B
+
 @item message-mailer-swallows-blank-line
 @vindex message-mailer-swallows-blank-line
 $B%7%9%F%`$N%a%$%i!<$,%X%C%@!<$HK\J8$r0l=o$K$7$F$7$^$&>l9g$O!"(B
@@ -1481,15 +1488,18 @@ qmail-inject $B%W%m%0%i%`$KEO$90z?t$G$9!#$3$l$OJ8;zNs$N%j%9%H$G!"$=$l$>$l(B
 
 @item Message-ID
 @cindex Message-ID
+@vindex message-user-fqdn
 @vindex mail-host-address
+@vindex user-mail-address
 @findex system-name
 @cindex Sun
+@cindex i-did-not-set--mail-host-address--so-tickle-me
 $B$3$NI,MW$J%X%C%@!<$O(B Message $B$K$h$j:n@.$5$l$^$9!#F|IU!";~4V!"MxMQ<TL>!"(B
-$B%7%9%F%`L>$K4p$E$$$?B>$KL5$$(B ID $B$,:n@.$5$l$^$9!#(B
-Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$3(B
-$B$l$,(B fully qualified domain name (FQDN) ($B40A4$K>r7o$rK~$?$7$?%I%a%$%s(B
-$BL>(B) $B$G$J$$$J$i(B $B$P!"(BMessage $B$O(B @code{mail-host-address} $B$r(B FQDN $B$H$7$F;H(B
-$B$$$^$9!#(B
+$B%7%9%F%`L>$K4p$E$$$?B>$KL5$$(B ID $B$,:n@.$5$l$^$9!#%I%a%$%s$N9`$K$D$$$F$O!"(B
+$BM-8z$J(B FQDN ($B40A4$K>r7o$rK~$?$7$?%I%a%$%sL>(B) $B$i$7$$$b$N$,8+$D$+$i$J$$>l(B
+$B9g!"(Bmessage $B$O(B @code{message-user-fqdn}, @code{system-name},
+@code{mail-host-address} $B$*$h$S(B @code{message-user-mail-address} ($B$9$J$o(B
+$B$A(B @code{user-mail-address}) $B$r(B ($B$3$N=g$G(B) $BC5$7$^$9!#(B
 
 @item User-Agent
 @cindex User-Agent

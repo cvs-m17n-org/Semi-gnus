@@ -35,8 +35,6 @@
 
 (eval-when-compile (require 'cl))
 
-(require 'read-passwd)
-
 (eval-and-compile
   (defvar gnus-offline-lang
     (cond ((and (featurep 'meadow)
@@ -753,8 +751,6 @@ mail source specifier とか上記のようなキーワードについてもっとよく
   '(add-hook 'gnus-after-getting-new-news-hook 'gnus-offline-after-get-new-news))
 (eval-after-load "message"
   '(add-hook 'message-send-hook 'gnus-offline-message-add-header))
-(setq mail-source-read-passwd 'read-pw-read-passwd)
-(add-hook 'gnus-setup-news-hook 'read-pw-set-mail-source-passwd-cache)
 
 (provide 'gnus-ofsetup)
 

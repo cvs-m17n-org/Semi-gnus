@@ -38,6 +38,7 @@
 (require 'gnus-ems)
 (require 'message)
 (require 'gnus-art)
+(require 'gnus-util)
 
 (defcustom gnus-post-method 'current
   "*Preferred method for posting USENET news.
@@ -309,11 +310,23 @@ If nil, the address field will always be empty after invoking
   :group 'gnus-message
   :type 'boolean)
 
-(defcustom gnus-version-expose-system nil
-  "If non-nil, `system-configuration' is exposed in `gnus-extended-version'.
-Note that this variable is ineffective in T-gnus."
+(defcustom gnus-user-agent 'emacs-gnus-type
+  "Which information should be exposed in the User-Agent header.
+
+It can be one of the symbols `gnus' \(show only Gnus version\), `emacs-gnus'
+\(show only Emacs and Gnus versions\), `emacs-gnus-config' \(same as
+`emacs-gnus' plus system configuration\), `emacs-gnus-type' \(same as
+`emacs-gnus' plus system type\) or a custom string.  If you set it to a
+string, be sure to use a valid format, see RFC 2616."
   :group 'gnus-message
-  :type 'boolean)
+  :type '(choice
+	  (item :tag "Show Gnus and Emacs versions and system type"
+		emacs-gnus-type)
+	  (item :tag "Show Gnus and Emacs versions and system configuration"
+		emacs-gnus-config)
+	  (item :tag "Show Gnus and Emacs versions" emacs-gnus)
+	  (item :tag "Show only Gnus version" gnus)
+	  (string :tag "Other")))
 
 ;;; Internal variables.
 
@@ -548,9 +561,11 @@ Gcc: header for archiving purposes."
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
   (setq message-user-agent (gnus-extended-version))
-  (when (not message-use-multi-frames)
+  (unless message-use-multi-frames
     (message-add-action
-     `(set-window-configuration ,winconf) 'exit 'postpone 'kill))
+     `(if (gnus-buffer-exists-p ,buffer)
+	  (set-window-configuration ,winconf))
+     'exit 'postpone 'kill))
   (let ((to-be-marked (cond
 		       (yanked yanked)
 		       (article (if (listp article) article (list article)))
@@ -933,7 +948,9 @@ header line with the old Message-ID."
 	      (forward-line 1))
 	    (let ((mail-header-separator ""))
 	      (setq beg (point)
-		    end (or (message-goto-body) beg)))
+		    end (or (message-goto-body)
+			    ;; There may be just a header.
+			    (point-max))))
 	    ;; Delete the headers from the displayed articles.
 	    (set-buffer gnus-article-copy)
 	    (let ((mail-header-separator ""))
@@ -1941,9 +1958,7 @@ this is a reply."
 		     group)))
 		(if (not (eq gcc-self-val 'none))
 		    (insert "\n")
-		  (progn
-		    (beginning-of-line)
-		    (kill-line))))
+		  (gnus-delete-line)))
 	    ;; Use the list of groups.
 	    (while (setq name (pop groups))
 	      (let ((str (if (string-match ":" name)
@@ -1956,6 +1971,16 @@ this is a reply."
 	      (when groups
 		(insert " ")))
 	    (insert "\n")))))))
+
+(defun gnus-mailing-list-followup-to ()
+  "Look at the headers in the current buffer and return a Mail-Followup-To address."
+  (let ((x-been-there (gnus-fetch-original-field "x-beenthere"))
+	(list-post (gnus-fetch-original-field "list-post")))
+    (when (and list-post
+	       (string-match "mailto:\\([^>]+\\)" list-post))
+      (setq list-post (match-string 1 list-post)))
+    (or list-post
+	x-been-there)))
 
 ;;; Posting styles.
 

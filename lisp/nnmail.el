@@ -35,7 +35,8 @@
 (require 'mail-source)
 
 (eval-and-compile
-  (autoload 'gnus-add-buffer "gnus"))
+  (autoload 'gnus-add-buffer "gnus")
+  (autoload 'gnus-kill-buffer "gnus"))
 
 (defgroup nnmail nil
   "Reading mail with Gnus."
@@ -1038,7 +1039,7 @@ FUNC will be called with the group name to determine the article number."
 	(while (not (eobp))
 	  (unless (< (move-to-column nnmail-split-header-length-limit)
 		     nnmail-split-header-length-limit)
-	    (delete-region (point) (progn (end-of-line) (point))))
+	    (delete-region (point) (gnus-point-at-eol)))
 	  (forward-line 1))
 	;; Allow washing.
 	(goto-char (point-min))
@@ -1511,12 +1512,16 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 (defun nnmail-cache-primary-mail-backend ()
   (let ((be-list (cons gnus-select-method gnus-secondary-select-methods))
 	(be nil)
-	(res nil))
+	(res nil)
+        (get-new-mail nil))
     (while (and (null res) be-list)
       (setq be (car be-list))
       (setq be-list (cdr be-list))
       (when (and (gnus-method-option-p be 'respool)
-		 (eval (intern (format "%s-get-new-mail" (car be)))))
+                 (setq get-new-mail
+                       (intern (format "%s-get-new-mail" (car be))))
+                 (boundp get-new-mail)
+		 (symbol-value get-new-mail))
 	(setq res be)))
     res))
 
@@ -1532,8 +1537,7 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 	(skip-chars-forward "^\n\r\t")
 	(unless (looking-at "[\r\n]")
 	  (forward-char 1)
-	  (buffer-substring (point)
-			    (progn (end-of-line) (point))))))))
+	  (buffer-substring (point) (gnus-point-at-eol)))))))
 
 ;; Function for nnmail-split-fancy: look up all references in the
 ;; cache and if a match is found, return that group.

@@ -753,7 +753,7 @@ articles in the topic and its subtopics."
 		    (not (gnus-topic-goto-topic (caaar tp))))
 	  (pop tp))
 	(if tp
-	    (gnus-topic-forward-topic 1)
+	    (forward-line 1)
 	  (gnus-topic-goto-missing-topic (caadr top)))))
     nil))
 
@@ -1104,7 +1104,7 @@ articles in the topic and its subtopics."
 	["Move..." gnus-topic-move-group t]
 	["Remove" gnus-topic-remove-group t]
 	["Copy matching..." gnus-topic-copy-matching t]
-	["Move matching" gnus-topic-move-matching t])
+	["Move matching..." gnus-topic-move-matching t])
        ("Topics"
 	["Goto..." gnus-topic-jump-to-topic t]
 	["Show" gnus-topic-show-topic t]
@@ -1181,6 +1181,8 @@ If ALL is a number, fetch this number of articles.
 
 If performed over a topic line, toggle folding the topic."
   (interactive "P")
+  (when (and (eobp) (not (gnus-group-group-name)))
+    (forward-line -1))
   (if (gnus-group-topic-p)
       (let ((gnus-group-list-mode
 	     (if all (cons (if (numberp all) all 7) t) gnus-group-list-mode)))
@@ -1203,7 +1205,8 @@ If performed over a topic line, toggle folding the topic."
       (gnus-message 5 "Expiring groups in %s..." topic)
       (let ((gnus-group-marked
 	     (mapcar (lambda (entry) (car (nth 2 entry)))
-		     (gnus-topic-find-groups topic gnus-level-killed t))))
+		     (gnus-topic-find-groups topic gnus-level-killed t
+					     nil t))))
 	(gnus-group-expire-articles nil))
       (gnus-message 5 "Expiring groups in %s...done" topic))))
 
@@ -1216,7 +1219,8 @@ Also see `gnus-group-catchup'."
     (save-excursion
       (let* ((groups
 	     (mapcar (lambda (entry) (car (nth 2 entry)))
-		     (gnus-topic-find-groups topic gnus-level-killed t)))
+		     (gnus-topic-find-groups topic gnus-level-killed t
+					     nil t)))
 	     (buffer-read-only nil)
 	     (gnus-group-marked groups))
 	(gnus-group-catchup-current)
@@ -1425,9 +1429,9 @@ If PERMANENT, make it stay shown in subsequent sessions as well."
 	(setcar (cdr (cadr topic)) 'visible)
 	(gnus-group-list-groups)))))
 
-(defun gnus-topic-mark-topic (topic &optional unmark recursive)
+(defun gnus-topic-mark-topic (topic &optional unmark non-recursive)
   "Mark all groups in the TOPIC with the process mark.
-If RECURSIVE is t, mark its subtopics too."
+If NON-RECURSIVE (which is the prefix) is t, don't mark its subtopics."
   (interactive (list (gnus-group-topic-name)
 		     nil
 		     (and current-prefix-arg t)))
@@ -1435,20 +1439,20 @@ If RECURSIVE is t, mark its subtopics too."
       (call-interactively 'gnus-group-mark-group)
     (save-excursion
       (let ((groups (gnus-topic-find-groups topic gnus-level-killed t nil
-					    recursive)))
+					    (not non-recursive))))
 	(while groups
 	  (funcall (if unmark 'gnus-group-remove-mark 'gnus-group-set-mark)
 		   (gnus-info-group (nth 2 (pop groups)))))))))
 
-(defun gnus-topic-unmark-topic (topic &optional dummy recursive)
+(defun gnus-topic-unmark-topic (topic &optional dummy non-recursive)
   "Remove the process mark from all groups in the TOPIC.
-If RECURSIVE is t, unmark its subtopics too."
+If NON-RECURSIVE (which is the prefix) is t, don't unmark its subtopics."
   (interactive (list (gnus-group-topic-name)
 		     nil
 		     (and current-prefix-arg t)))
   (if (not topic)
       (call-interactively 'gnus-group-unmark-group)
-    (gnus-topic-mark-topic topic t recursive)))
+    (gnus-topic-mark-topic topic t non-recursive)))
 
 (defun gnus-topic-get-new-news-this-topic (&optional n)
   "Check for new news in the current topic."

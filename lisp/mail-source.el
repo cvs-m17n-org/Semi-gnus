@@ -263,7 +263,23 @@ If non-nil, this maildrop will be checked periodically for new mail."
   :type 'integer)
 
 (defcustom mail-source-delete-incoming nil
-  "*If non-nil, delete incoming files after handling."
+  "*If non-nil, delete incoming files after handling.
+If t, delete immediately, if nil, never delete.  If a positive number, delete
+files older than number of days."
+  ;; Note: The removing happens in `mail-source-callback', i.e. no old
+  ;; incoming files will be deleted, unless you receive new mail.
+  ;;
+  ;; You may also set this to `nil' and call `mail-source-delete-old-incoming'
+  ;; from a hook or interactively.
+  :group 'mail-source
+  :type '(choice (const :tag "immediately" t)
+		 (const :tag "never" nil)
+		 (integer :tag "days")))
+
+(defcustom mail-source-delete-old-incoming-confirm t
+  "*If non-nil, ask for for confirmation before deleting old incoming files.
+This variable only applies when `mail-source-delete-incoming' is a positive
+number."
   :group 'mail-source
   :type 'boolean)
 
@@ -484,15 +500,16 @@ Return the number of files that were found."
 		     (funcall function source callback)
 		   (error
 		    (if (and (not mail-source-ignore-errors)
-			     (yes-or-no-p
-			      (format "Mail source %s error (%s).  Continue? "
-				      (if (memq ':password source)
-					  (let ((s (copy-sequence source)))
-					    (setcar (cdr (memq ':password s)) 
-						    "********")
-					    s)
-					source)
-				      (cadr err))))
+			     (not
+			      (yes-or-no-p
+			       (format "Mail source %s error (%s).  Continue? "
+				       (if (memq ':password source)
+					   (let ((s (copy-sequence source)))
+					     (setcar (cdr (memq ':password s)) 
+						     "********")
+					     s)
+					 source)
+				       (cadr err)))))
 		      (error "Cannot get new mail"))
 		    0)))))))))
 
@@ -507,6 +524,34 @@ Return the number of files that were found."
 	  (setq newname (make-temp-name newprefix)))
 	newname))))
 
+(defun mail-source-delete-old-incoming (&optional age confirm)
+  "Remove incoming files older than AGE days.
+If CONFIRM is non-nil, ask for confirmation before removing a file."
+  (interactive "P")
+  (let* ((high2days (/ 65536.0 60 60 24));; convert high bits to days
+	 (low2days  (/ 1.0 65536.0))     ;; convert low bits to days
+	 (diff (if (natnump age) age 30));; fallback, if no valid AGE given
+	 currday files)
+    (setq files (directory-files
+		 mail-source-directory t
+		 (concat mail-source-incoming-file-prefix "*"))
+	  currday (* (car (current-time)) high2days)
+	  currday (+ currday (* low2days (nth 1 (current-time)))))
+    (while files
+      (let* ((ffile (car files))
+	     (bfile (gnus-replace-in-string
+		     ffile "\\`.*/\\([^/]+\\)\\'" "\\1"))
+	     (filetime (nth 5 (file-attributes ffile)))
+	     (fileday (* (car filetime) high2days))
+	     (fileday (+ fileday (* low2days (nth 1 filetime)))))
+	(setq files (cdr files))
+	(when (and (> (- currday fileday) diff)
+		   (gnus-message 8 "File `%s' is older than %s day(s)"
+				 bfile diff)
+		   (or (not confirm)
+		       (y-or-n-p (concat "Remove file `" bfile "'? "))))
+	  (delete-file ffile))))))
+
 (defun mail-source-callback (callback info)
   "Call CALLBACK on the mail file, and then remove the mail file.
 Pass INFO on to CALLBACK."
@@ -520,7 +565,7 @@ Pass INFO on to CALLBACK."
 	(funcall callback mail-source-crash-box info)
       (when (file-exists-p mail-source-crash-box)
 	;; Delete or move the incoming mail out of the way.
-	(if mail-source-delete-incoming
+	(if (eq mail-source-delete-incoming t)
 	    (delete-file mail-source-crash-box)
 	  (let ((incoming
 		 (mail-source-make-complex-temp-name
@@ -529,7 +574,12 @@ Pass INFO on to CALLBACK."
 		   mail-source-directory))))
 	    (unless (file-exists-p (file-name-directory incoming))
 	      (make-directory (file-name-directory incoming) t))
-	    (rename-file mail-source-crash-box incoming t)))))))
+	    (rename-file mail-source-crash-box incoming t)
+	    ;; remove old incoming files?
+	    (when (natnump mail-source-delete-incoming)
+	      (mail-source-delete-old-incoming
+	       mail-source-delete-incoming
+	       mail-source-delete-old-incoming-confirm))))))))
 
 (defun mail-source-movemail (from to)
   "Move FROM to TO using movemail."
@@ -606,22 +656,6 @@ Pass INFO on to CALLBACK."
       (not (zerop (nth 7 (file-attributes from))))
       (delete-file from)))
 
-(defvar mail-source-read-passwd nil)
-(defun mail-source-read-passwd (prompt &rest args)
-  "Read a password using PROMPT.
-If ARGS, PROMPT is used as an argument to `format'."
-  (let ((prompt
-	 (if args
-	     (apply 'format prompt args)
-	   prompt)))
-    (unless mail-source-read-passwd
-      (if (or (fboundp 'read-passwd) (load "passwd" t))
-	  (setq mail-source-read-passwd 'read-passwd)
-	(unless (fboundp 'ange-ftp-read-passwd)
-	  (autoload 'ange-ftp-read-passwd "ange-ftp"))
-	(setq mail-source-read-passwd 'ange-ftp-read-passwd)))
-    (funcall mail-source-read-passwd prompt)))
-
 (defun mail-source-fetch-with-program (program)
   (zerop (call-process shell-file-name nil nil nil
 		       shell-command-switch program)))
@@ -665,8 +699,7 @@ If ARGS, PROMPT is used as an argument to `format'."
   "Fetcher for directory sources."
   (mail-source-bind (directory source)
     (mail-source-run-script
-     prescript (format-spec-make ?t path)
-     prescript-delay)
+     prescript (format-spec-make ?t path) prescript-delay)
     (let ((found 0)
 	  (mail-source-string (format "directory:%s" path)))
       (dolist (file (directory-files
@@ -675,8 +708,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 		   (funcall predicate file)
 		   (mail-source-movemail file mail-source-crash-box))
 	  (incf found (mail-source-callback callback file))))
-      (mail-source-run-script
-       postscript (format-spec-make ?t path))
+      (mail-source-run-script postscript (format-spec-make ?t path))
       found)))
 
 (defun mail-source-fetch-pop (source callback)
@@ -694,7 +726,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(setq password
 	      (or password
 		  (cdr (assoc from mail-source-password-cache))
-		  (mail-source-read-passwd
+		  (read-passwd
 		   (format "Password for %s at %s: " user server)))))
       (when server
 	(setenv "MAILHOST" server))
@@ -763,7 +795,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(setq password
 	      (or password
 		  (cdr (assoc from mail-source-password-cache))
-		  (mail-source-read-passwd
+		  (read-passwd
 		   (format "Password for %s at %s: " user server))))
 	(unless (assoc from mail-source-password-cache)
 	  (push (cons from password) mail-source-password-cache)))
@@ -954,14 +986,14 @@ This only works when `display-time' is enabled."
 (defun mail-source-fetch-imap (source callback)
   "Fetcher for imap sources."
   (mail-source-bind (imap source)
-    (let ((from (format "%s:%s:%s" server user port))
-	  (found 0)
-	  (buf (get-buffer-create
-		(format " *imap source %s:%s:%s *" server user mailbox)))
-	  (mail-source-string (format "imap:%s:%s" server mailbox))
-	  (imap-shell-program (or (list program) imap-shell-program))
-	  remove)
-      (if (and (imap-open server port stream authentication buf)
+    (let* ((from (format "%s:%s:%s" server user port))
+	   (found 0)
+	   (buffer-name " *imap source*")
+	   (buf (get-buffer-create (generate-new-buffer-name buffer-name)))
+	   (mail-source-string (format "imap:%s:%s" server mailbox))
+	   (imap-shell-program (or (list program) imap-shell-program))
+	   remove)
+      (if (and (imap-open server port stream authentication buffer-name)
 	       (imap-authenticate
 		user (or (cdr (assoc from mail-source-password-cache))
 			 password) buf)
@@ -1026,7 +1058,7 @@ This only works when `display-time' is enabled."
 	      (or password
 		  (cdr (assoc (format "webmail:%s:%s" subtype user)
 			      mail-source-password-cache))
-		  (mail-source-read-passwd
+		  (read-passwd
 		   (format "Password for %s at %s: " user subtype))))
 	(when (and password
 		   (not (assoc (format "webmail:%s:%s" subtype user)

@@ -80,6 +80,21 @@ other directory), and byte-compile it as follows:
    % mule -batch -q -no-site-file -f batch-byte-compile regexp-opt.el
 
 
+INSTALL passwd.el
+=================
+
+This module provide the `read-passwd' function.  You have to install
+it if you don't have that function.  To do this:
+
+   % cp -p contrib/passwd.el /usr/local/share/mule/site-lisp
+   % cd /usr/local/share/mule/site-lisp/
+   % mule -batch -q -no-site-file -f batch-byte-compile passwd.el
+
+And add the following line in your .emacs file:
+
+   (autoload 'read-passwd "passwd")
+
+
 INSTALL T-gnus
 ==============
 

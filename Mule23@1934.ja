@@ -82,6 +82,21 @@ T-gnus $B$N$$$/$D$+$N%b%8%e!<%k$O(B `regexp-opt' $B$J$I$N4X?t$r;H$$$^$9!#$=(
    % mule -batch -q -no-site-file -f batch-byte-compile regexp-opt.el
 
 
+INSTALL passwd.el
+=================
+
+$B$3$N%b%8%e!<%k$O(B `read-passwd' $B4X?t$rDs6!$7$^$9!#L5$$>l9g$O%$%s%9%H!<(B
+$B%k$7$J$1$l$P$J$j$^$;$s!#$=$l$K$O$3$&$7$F2<$5$$!#(B
+
+   % cp -p contrib/passwd.el /usr/local/share/mule/site-lisp
+   % cd /usr/local/share/mule/site-lisp/
+   % mule -batch -q -no-site-file -f batch-byte-compile passwd.el
+
+$B$=$7$F(B .emacs $B%U%!%$%k$K0J2<$N9T$rDI2C$7$F2<$5$$!#(B
+
+   (autoload 'read-passwd "passwd")
+
+
 INSTALL T-gnus
 ==============
 

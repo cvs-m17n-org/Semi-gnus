@@ -194,6 +194,8 @@ Possible values in this list are:
   'empty       Headers with no content.
   'newsgroups  Newsgroup identical to Gnus group.
   'to-address  To identical to To-address.
+  'to-list     To identical to To-list.
+  'cc-list     CC identical to To-list.
   'followup-to Followup-to identical to Newsgroups.
   'reply-to    Reply-to identical to From.
   'date        Date less than four days old.
@@ -202,11 +204,22 @@ Possible values in this list are:
   :type '(set (const :tag "Headers with no content." empty)
 	      (const :tag "Newsgroups identical to Gnus group." newsgroups)
 	      (const :tag "To identical to To-address." to-address)
+	      (const :tag "To identical to To-list." to-list)
+	      (const :tag "CC identical to To-list." cc-list)
 	      (const :tag "Followup-to identical to Newsgroups." followup-to)
 	      (const :tag "Reply-to identical to From." reply-to)
 	      (const :tag "Date less than four days old." date)
 	      (const :tag "To and/or Cc longer than 1024 characters." long-to)
 	      (const :tag "Multiple To and/or Cc headers." many-to))
+  :group 'gnus-article-hiding)
+
+(defcustom gnus-article-skip-boring nil
+  "Skip over text that is not worth reading.
+By default, if you set this t, then Gnus will display citations and
+signatures, but will never scroll down to show you a page consisting
+only of boring text.  Boring text is controlled by
+`gnus-article-boring-faces'."
+  :type 'boolean
   :group 'gnus-article-hiding)
 
 (defcustom gnus-signature-separator '("^-- $" "^-- *$")
@@ -853,6 +866,7 @@ used."
 (defcustom gnus-mime-action-alist
   '(("save to file" . gnus-mime-save-part)
     ("save and strip" . gnus-mime-save-part-and-strip)
+    ("delete part" . gnus-mime-delete-part)
     ("display as text" . gnus-mime-inline-part)
     ("view the part" . gnus-mime-view-part)
     ("pipe to command" . gnus-mime-pipe-part)
@@ -1691,7 +1705,7 @@ always hide."
 	      (while (re-search-forward "^[^: \t]+:[ \t]*\n[^ \t]" nil t)
 		(forward-line -1)
 		(gnus-article-hide-text-type
-		 (progn (beginning-of-line) (point))
+		 (gnus-point-at-bol)
 		 (progn
 		   (end-of-line)
 		   (if (re-search-forward "^[^ \t]" nil t)
@@ -1720,6 +1734,32 @@ always hide."
 			      (nth 1 (mail-extract-address-components to))
 			      to-address)))
 		  (gnus-article-hide-header "to"))))
+	     ((eq elem 'to-list)
+	      (let ((to (message-fetch-field "to"))
+		    (to-list
+		     (gnus-parameter-to-list
+		      (if (boundp 'gnus-newsgroup-name)
+			  gnus-newsgroup-name ""))))
+		(when (and to to-list
+			   (ignore-errors
+			     (gnus-string-equal
+			      ;; only one address in To
+			      (nth 1 (mail-extract-address-components to))
+			      to-list)))
+		  (gnus-article-hide-header "to"))))
+	     ((eq elem 'cc-list)
+	      (let ((cc (message-fetch-field "cc"))
+		    (to-list
+		     (gnus-parameter-to-list
+		      (if (boundp 'gnus-newsgroup-name)
+			  gnus-newsgroup-name ""))))
+		(when (and cc to-list
+			   (ignore-errors
+			     (gnus-string-equal
+			      ;; only one address in CC
+			      (nth 1 (mail-extract-address-components cc))
+			      to-list)))
+		  (gnus-article-hide-header "cc"))))
 	     ((eq elem 'followup-to)
 	      (when (gnus-string-equal
 		     (message-fetch-field "followup-to")
@@ -1781,7 +1821,7 @@ always hide."
     (goto-char (point-min))
     (when (re-search-forward (concat "^" header ":") nil t)
       (gnus-article-hide-text-type
-       (progn (beginning-of-line) (point))
+       (gnus-point-at-bol)
        (progn
 	 (end-of-line)
 	 (if (re-search-forward "^[^ \t]" nil t)
@@ -1903,7 +1943,7 @@ unfolded."
       (while (not (eobp))
 	(save-restriction
 	  (mail-header-narrow-to-field)
-	  (let ((header (buffer-substring (point-min) (point-max))))
+	  (let ((header (buffer-string)))
 	    (with-temp-buffer
 	      (insert header)
 	      (goto-char (point-min))
@@ -2182,7 +2222,7 @@ If PROMPT (the prefix), prompt for a coding system to use."
 	  (mm-decode-body
 	   charset (and cte (intern (downcase
 				     (gnus-strip-whitespace cte))))
-	   (car ctl)))))))
+	   (car ctl) prompt))))))
 
 (defun article-decode-encoded-words ()
   "Remove encoded-word encoding from headers."
@@ -2417,43 +2457,50 @@ always hide."
 	     (match-beginning 0) (match-end 0) 'pem)))))))
 
 (defun article-strip-banner ()
-  "Strip the banner specified by the `banner' group parameter."
+  "Strip the banners specified by the `banner' group parameter and by
+`gnus-article-address-banner-alist'."
   (interactive)
   (save-excursion
     (save-restriction
+      (let ((inhibit-point-motion-hooks t))
+	(when (gnus-parameter-banner gnus-newsgroup-name)
+	  (article-really-strip-banner
+	   (gnus-parameter-banner gnus-newsgroup-name)))
+	(when gnus-article-address-banner-alist
+	  (article-really-strip-banner
+	   (let ((from (save-restriction
+			 (widen)
+			 (article-narrow-to-head)
+			 (mail-fetch-field "from"))))
+	     (when (and from
+			(setq from
+			      (caar (mail-header-parse-addresses from))))
+	       (catch 'found
+		 (dolist (pair gnus-article-address-banner-alist)
+		   (when (string-match (car pair) from)
+		     (throw 'found (cdr pair)))))))))))))
+
+(defun article-really-strip-banner (banner)
+  "Strip the banner specified by the argument."
+  (save-excursion
+    (save-restriction
       (let ((inhibit-point-motion-hooks t)
-	    (banner (gnus-parameter-banner gnus-newsgroup-name))
 	    (gnus-signature-limit nil)
-	    buffer-read-only beg end)
-	(when (and gnus-article-address-banner-alist
-		   (not banner))
-	  (setq banner
-		(let ((from (save-restriction
-			      (widen)
-			      (article-narrow-to-head)
-			      (mail-fetch-field "from"))))
-		  (when (and from
-			     (setq from
-				   (caar (mail-header-parse-addresses from))))
-		    (catch 'found
-		      (dolist (pair gnus-article-address-banner-alist)
-			(when (string-match (car pair) from)
-			  (throw 'found (cdr pair)))))))))
-	(when banner
-	  (article-goto-body)
-	  (cond
-	   ((eq banner 'signature)
-	    (when (gnus-article-narrow-to-signature)
-	      (widen)
-	      (forward-line -1)
-	      (delete-region (point) (point-max))))
-	   ((symbolp banner)
-	    (if (setq banner (cdr (assq banner gnus-article-banner-alist)))
-		(while (re-search-forward banner nil t)
-		  (delete-region (match-beginning 0) (match-end 0)))))
-	   ((stringp banner)
-	    (while (re-search-forward banner nil t)
-	      (delete-region (match-beginning 0) (match-end 0))))))))))
+	    buffer-read-only)
+	(article-goto-body)
+	(cond
+	 ((eq banner 'signature)
+	  (when (gnus-article-narrow-to-signature)
+	    (widen)
+	    (forward-line -1)
+	    (delete-region (point) (point-max))))
+	 ((symbolp banner)
+	  (if (setq banner (cdr (assq banner gnus-article-banner-alist)))
+	      (while (re-search-forward banner nil t)
+		(delete-region (match-beginning 0) (match-end 0)))))
+	 ((stringp banner)
+	  (while (re-search-forward banner nil t)
+	    (delete-region (match-beginning 0) (match-end 0)))))))))
 
 (defun article-babel ()
   "Translate article using an online translation service."
@@ -3804,7 +3851,9 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (cons gnus-newsgroup-name article))
 		(set-buffer gnus-summary-buffer)
 		(setq gnus-current-article article)
-		(if (memq article gnus-newsgroup-undownloaded)
+		(if (and (memq article gnus-newsgroup-undownloaded)
+			 (not (gnus-online (gnus-find-method-for-group
+					    gnus-newsgroup-name))))
 		    (progn
 		      (gnus-summary-set-agent-mark article)
 		      (message "Message marked for downloading"))
@@ -4050,13 +4099,14 @@ General format specifiers can also be used.  See Info node
     (gnus-mime-view-part-as-charset "C" "View As charset...")
     (gnus-mime-save-part "o" "Save...")
     (gnus-mime-save-part-and-strip "\C-o" "Save and Strip")
+    (gnus-mime-delete-part "d" "Delete part")
     (gnus-mime-copy-part "c" "View As Text, In Other Buffer")
     (gnus-mime-inline-part "i" "View As Text, In This Buffer")
     (gnus-mime-view-part-internally "E" "View Internally")
     (gnus-mime-view-part-externally "e" "View Externally")
     (gnus-mime-print-part "p" "Print")
     (gnus-mime-pipe-part "|" "Pipe To Command...")
-    (gnus-mime-action-on-part "." "Take action on the part")))
+    (gnus-mime-action-on-part "." "Take action on the part...")))
 
 (defun gnus-article-mime-part-status ()
   (with-current-buffer gnus-article-buffer
@@ -4081,21 +4131,36 @@ General format specifiers can also be used.  See Info node
       (define-key map (cadr c) (car c)))
     map))
 
-(defun gnus-mime-button-menu (event)
-  "Construct a context-sensitive menu of MIME commands."
-  (interactive "e")
-  (save-window-excursion
-    (let ((pos (event-start event)))
-      (select-window (posn-window pos))
-      (goto-char (posn-point pos))
-      (gnus-article-check-buffer)
-      (let ((response (x-popup-menu
-		       t `("MIME Part"
-			   ("" ,@(mapcar (lambda (c)
-					   (cons (caddr c) (car c)))
-					 gnus-mime-button-commands))))))
-	(if response
-	    (call-interactively response))))))
+(easy-menu-define gnus-mime-button-menu gnus-mime-button-map "MIME button menu."
+  `("MIME Part"
+    ,@(mapcar (lambda (c)
+		(vector (caddr c) (car c) :enable t)) gnus-mime-button-commands)))
+
+(eval-when-compile
+  (define-compiler-macro popup-menu (&whole form
+					    menu &optional position prefix)
+    (if (and (fboundp 'popup-menu)
+	     (not (memq 'popup-menu (assoc "lmenu" load-history))))
+	form
+      ;; Gnus is probably running under Emacs 20.
+      `(let* ((menu (cdr ,menu))
+	      (response (x-popup-menu
+			 t (list (car menu)
+				 (cons "" (mapcar (lambda (c)
+						    (cons (caddr c) (car c)))
+						  (cdr menu)))))))
+	 (if response
+	     (call-interactively (nth 3 (assq response menu))))))))
+
+(defun gnus-mime-button-menu (event prefix)
+ "Construct a context-sensitive menu of MIME commands."
+ (interactive "e\nP")
+ (save-window-excursion
+   (let ((pos (event-start event)))
+     (select-window (posn-window pos))
+     (goto-char (posn-point pos))
+     (gnus-article-check-buffer)
+     (popup-menu gnus-mime-button-menu nil prefix))))
 
 (defun gnus-mime-view-all-parts (&optional handles)
   "View all the MIME parts."
@@ -4178,6 +4243,87 @@ General format specifiers can also be used.  See Info node
 	   ,(or (mail-header-references gnus-current-headers) "")
 	   ,(gnus-group-read-only-p)
 	   ,gnus-summary-buffer no-highlight))))))
+
+(defun gnus-mime-delete-part ()
+  "Delete the MIME part under point.
+Replace it with some information about the removed part."
+  (interactive)
+  (gnus-article-check-buffer)
+  (let* ((data (get-text-property (point) 'gnus-data))
+	 (handles gnus-article-mime-handles)
+	 (none "(none)")
+	 (description
+	  (or
+	   (mail-decode-encoded-word-string (or (mm-handle-description data)
+						none))))
+	 (filename
+	  (or (mail-content-type-get (mm-handle-disposition data) 'filename)
+	      none))
+	 (type (mm-handle-media-type data)))
+    (if (mm-multiple-handles gnus-article-mime-handles)
+	(error "This function is not implemented"))
+    (with-current-buffer (mm-handle-buffer data)
+      (let ((bsize (format "%s" (buffer-size))))
+	(erase-buffer)
+	(insert
+	 (concat
+	  "<#part type=text/plain nofile=yes disposition=attachment"
+	  " description=\"Deleted attachment (" bsize " Byte)\">"
+	  ",----\n"
+	  "| The following attachment has been deleted:\n"
+	  "|\n"
+	  "| Type:           " type "\n"
+	  "| Filename:       " filename "\n"
+	  "| Size (encoded): " bsize " Byte\n"
+	  "| Description:    " description "\n"
+	  "`----\n"
+	  "<#/part>"))
+	(setcdr data
+		(cdr (mm-make-handle nil `("text/plain"))))))
+    (set-buffer gnus-summary-buffer)
+    ;; FIXME: maybe some of the following code (borrowed from
+    ;; `gnus-mime-save-part-and-strip') isn't necessary?
+    (gnus-article-edit-article
+     `(lambda ()
+	(erase-buffer)
+	(let ((mail-parse-charset (or gnus-article-charset
+				      ',gnus-newsgroup-charset))
+	      (mail-parse-ignored-charsets
+	       (or gnus-article-ignored-charsets
+		   ',gnus-newsgroup-ignored-charsets))
+	      (mbl mml-buffer-list))
+	  (setq mml-buffer-list nil)
+	  (insert-buffer gnus-original-article-buffer)
+	  (mime-to-mml ',handles)
+	  (setq gnus-article-mime-handles nil)
+	  (let ((mbl1 mml-buffer-list))
+	    (setq mml-buffer-list mbl)
+	    (set (make-local-variable 'mml-buffer-list) mbl1))
+	  ;; LOCAL argument of add-hook differs between GNU Emacs
+	  ;; and XEmacs. make-local-hook makes sure they are local.
+	  (make-local-hook 'kill-buffer-hook)
+	  (add-hook 'kill-buffer-hook 'mml-destroy-buffers t t)))
+     `(lambda (no-highlight)
+	(let ((mail-parse-charset (or gnus-article-charset
+				      ',gnus-newsgroup-charset))
+	      (message-options message-options)
+	      (message-options-set-recipient)
+	      (mail-parse-ignored-charsets
+	       (or gnus-article-ignored-charsets
+		   ',gnus-newsgroup-ignored-charsets)))
+	  (mml-to-mime)
+	  (mml-destroy-buffers)
+	  (remove-hook 'kill-buffer-hook
+		       'mml-destroy-buffers t)
+	  (kill-local-variable 'mml-buffer-list))
+	(gnus-summary-edit-article-done
+	 ,(or (mail-header-references gnus-current-headers) "")
+	 ,(gnus-group-read-only-p)
+	 ,gnus-summary-buffer no-highlight))))
+  ;; Not in `gnus-mime-save-part-and-strip':
+  (gnus-article-edit-done)
+  (gnus-summary-expand-window)
+  (gnus-summary-show-article))
 
 (defun gnus-mime-save-part ()
   "Save the MIME part under point."
@@ -4412,7 +4558,7 @@ If no internal viewer is available, use an external viewer."
 (defun gnus-mime-action-on-part (&optional action)
   "Do something with the MIME attachment at \(point\)."
   (interactive
-   (list (completing-read "Action: " gnus-mime-action-alist)))
+   (list (completing-read "Action: " gnus-mime-action-alist nil t)))
   (gnus-article-check-buffer)
   (let ((action-pair (assoc action gnus-mime-action-alist)))
     (if action-pair
@@ -4545,16 +4691,14 @@ If no internal viewer is available, use an external viewer."
 	      (if (window-live-p window)
 		  (select-window window)))))
       (goto-char point)
-      (delete-region (gnus-point-at-bol) (progn (forward-line 1) (point)))
+      (gnus-delete-line)
       (gnus-insert-mime-button
        handle id (list (mm-handle-displayed-p handle)))
       (goto-char point))))
 
 (defun gnus-article-goto-part (n)
   "Go to MIME part N."
-  (let ((point (text-property-any (point-min) (point-max) 'gnus-part n)))
-    (when point
-      (goto-char point))))
+  (gnus-goto-char (text-property-any (point-min) (point-max) 'gnus-part n)))
 
 (defun gnus-insert-mime-button (handle gnus-tmp-id &optional displayed)
   (let ((gnus-tmp-name
@@ -4590,7 +4734,10 @@ If no internal viewer is available, use an external viewer."
 	 gnus-part ,gnus-tmp-id
 	 article-type annotation
 	 gnus-data ,handle))
-    (setq e (point))
+    (setq e (if (bolp)
+		;; Exclude a newline.
+		(1- (point))
+	      (point)))
     (widget-convert-button
      'link b e
      :mime-handle handle
@@ -5050,15 +5197,14 @@ If given a numerical ARG, move forward ARG pages."
 (defun gnus-article-goto-next-page ()
   "Show the next page of the article."
   (interactive)
-  (when (gnus-article-next-page)
-    (goto-char (point-min))
-    (gnus-article-read-summary-keys nil (gnus-character-to-event ?n))))
+  (gnus-eval-in-buffer-window gnus-summary-buffer
+    (gnus-summary-next-page)))
 
 (defun gnus-article-goto-prev-page ()
   "Show the next page of the article."
   (interactive)
-  (if (bobp) (gnus-article-read-summary-keys nil (gnus-character-to-event ?p))
-    (gnus-article-prev-page nil)))
+  (gnus-eval-in-buffer-window gnus-summary-buffer
+    (gnus-summary-prev-page)))
 
 (defun gnus-article-next-page (&optional lines)
   "Show the next page of the current article.
@@ -5116,17 +5262,33 @@ Argument LINES specifies lines to be scrolled down."
 	     (beginning-of-buffer
 	      (goto-char (point-min))))))))
 
+(defun gnus-article-only-boring-p ()
+  "Decide whether there is only boring text remaining in the article.
+Something \"interesting\" is a word of at least two letters that does
+not have a face in `gnus-article-boring-faces'."
+  (when (and gnus-article-skip-boring
+	     (boundp 'gnus-article-boring-faces)
+	     (symbol-value 'gnus-article-boring-faces))
+    (save-excursion
+      (catch 'only-boring
+	(while (re-search-forward "\\b\\w\\w" nil t)
+	  (forward-char -1)
+	  (when (not (gnus-intersection
+		      (gnus-faces-at (point))
+		      (symbol-value 'gnus-article-boring-faces)))
+	    (throw 'only-boring nil)))
+	(throw 'only-boring t)))))
+
 (defun gnus-article-refer-article ()
   "Read article specified by message-id around point."
   (interactive)
-  (let ((point (point)))
-    (search-forward ">" nil t)		;Move point to end of "<....>".
-    (if (re-search-backward "\\(<[^<> \t\n]+>\\)" nil t)
-	(let ((message-id (gnus-replace-in-string (match-string 1) "<news:" "<" )))
-	  (goto-char point)
+  (save-excursion
+    (re-search-backward "[ \t]\\|^" (gnus-point-at-bol) t)
+    (re-search-forward "<?news:<?\\|<" (gnus-point-at-eol) t)
+    (if (re-search-forward "[^@ ]+@[^ \t>]+" (gnus-point-at-eol) t)
+	(let ((msg-id (concat "<" (match-string 0) ">")))
 	  (set-buffer gnus-summary-buffer)
-	  (gnus-summary-refer-article message-id))
-      (goto-char (point))
+	  (gnus-summary-refer-article msg-id))
       (error "No references around point"))))
 
 (defun gnus-article-show-summary ()
@@ -5444,9 +5606,7 @@ If given a prefix, show the hidden text instead."
 		 (gnus-cache-request-article article group))
 	    'article)
 	   ;; Check the agent cache.
-	   ((and gnus-agent gnus-agent-cache gnus-plugged
-		 (numberp article)
-		 (gnus-agent-request-article article group))
+	   ((gnus-agent-request-article article group)
 	    'article)
 	   ;; Get the article and put into the article buffer.
 	   ((or (stringp article)
@@ -5850,8 +6010,8 @@ after replacing with the original article."
 
 (defcustom gnus-button-url-regexp
   (if (string-match "[[:digit:]]" "1") ;; support POSIX?
-      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~`%&*+\\/:;.,[:word:]]+[-a-z0-9_=#$@~`%&*+\\/[:word:]]\\)"
-    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~`%&*+\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~`%&*+\\/]\\|\\w\\)\\)")
+      "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?[-a-z0-9_=!?#$@~%&*+\\/:;.,[:word:]]+[-a-z0-9_=#$@~%&*+\\/[:word:]]\\)"
+    "\\b\\(\\(www\\.\\|\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\|info\\):\\)\\(//[-a-z0-9_.]+:[0-9]*\\)?\\([-a-z0-9_=!?#$@~%&*+\\/:;.,]\\|\\w\\)+\\([-a-z0-9_=#$@~%&*+\\/]\\|\\w\\)\\)")
   "Regular expression that matches URLs."
   :group 'gnus-article-buttons
   :type 'regexp)
@@ -5910,57 +6070,173 @@ The function must take one argument, the string naming the URL."
   :group 'gnus-article-buttons
   :type 'regexp)
 
-(defcustom gnus-button-prefer-mid-or-mail 'guess
-  "What to do when the button on a string as \"foo123@bar.com\" is pushed.
-Strings like this can be either a message ID or a mail address.  If the
-variable is set to the symbol `ask', query the user what do do.  If it is the
-symbol `guess', Gnus will do a guess and query the user what do do if it is
-ambiguous.  See the variable `gnus-button-guessed-mid-regexp' for details
-concerning the guessing.  If it is one of the sybols `mid' or `mail', Gnus
-will always assume that the string is a message ID or a mail address,
-respectivly."
-  ;; FIXME: doc-string could/should be improved.
+(defcustom gnus-button-prefer-mid-or-mail 'gnus-button-mid-or-mail-heuristic
+  "What to do when the button on a string as \"foo123@bar.invalid\" is pushed.
+Strings like this can be either a message ID or a mail address.  If it is one
+of the symbols `mid' or `mail', Gnus will always assume that the string is a
+message ID or a mail address, respectivly.  If this variable is set to the
+symbol `ask', always query the user what do do.  If it is a function, this
+function will be called with the string as it's only argument.  The function
+must return `mid', `mail', `invalid' or `ask'."
   :group 'gnus-article-buttons
-  :type '(choice (const ask)
-		 (const guess)
+  :type '(choice (function-item :tag "Heuristic function"
+				gnus-button-mid-or-mail-heuristic)
+		 (const ask)
 		 (const mid)
 		 (const mail)))
 
-(defcustom gnus-button-guessed-mid-regexp
-  (concat
-   "^<?\\(slrn\\|Pine\\.\\)"
-   "\\|\\.fsf@\\|\\.fsf_-_@\\|\\.ln@"
-   "\\|@4ax\\.com\\|@ID-[0-9]+\\.[a-zA-Z]+\\.dfncis\\.de"
-	  "\\|^<?.*[0-9].*[0-9].*[0-9].*[0-9].*[0-9].*[0-9].*@")
-  "Regular expression that matches message IDs and not mail addresses."
-  ;; TODO: Incorporate more matches from
-  ;; <URL:http://piology.org/perl/id-or-mail.pl.html>. I.e. translate the
-  ;; Perl-REs to Elisp-REs.
+(defcustom gnus-button-mid-or-mail-heuristic-alist
+  '((-10.0 . ".+\\$.+@")
+    (-10.0 . "#")
+    (-10.0 . "\\*")
+    (-5.0  . "\\+[^+]*\\+.*@") ;; # two plus signs
+    (-5.0  . "@[Nn][Ee][Ww][Ss]") ;; /\@news/i
+    (-5.0  . "@.*[Dd][Ii][Aa][Ll][Uu][Pp]") ;; /\@.*dialup/i;
+    (-1.0  . "^[^a-z]+@")
+   
+    (-5.0  . "\\.[0-9][0-9]+.*@") ;; "\.[0-9]{2,}.*\@"
+    (-5.0  . "[a-z].*[A-Z].*[a-z].*[A-Z].*@") ;; "([a-z].*[A-Z].*){2,}\@"
+    (-3.0  . "[A-Z][A-Z][a-z][a-z].*@")
+    (-5.0  . "\\...?.?@") ;; (-5.0 . "\..{1,3}\@")
+   
+    (-2.0  . "^[0-9]")
+    (-1.0  . "^[0-9][0-9]")
+    ;;
+    ;; -3.0 /^[0-9][0-9a-fA-F]{2,2}/;
+    (-3.0  . "^[0-9][0-9a-fA-F][0-9a-fA-F][^0-9a-fA-F]")
+    ;; -5.0 /^[0-9][0-9a-fA-F]{3,3}/;
+    (-5.0  . "^[0-9][0-9a-fA-F][0-9a-fA-F][0-9a-fA-F][^0-9a-fA-F]")
+    ;;
+    (-3.0  .  "[0-9][0-9][0-9][0-9][0-9][^0-9].*@") ;; "[0-9]{5,}.*\@"
+    (-3.0  .  "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][^0-9].*@")
+    ;;       "[0-9]{8,}.*\@"
+    (-3.0
+     . "[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9].*@")
+    ;; "[0-9]{12,}.*\@"
+    ;; compensation for TDMA dated mail addresses:
+    (25.0  . "-dated-[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]+.*@")
+    ;;
+    (-20.0 . "\\.fsf@")	;; Gnus
+    (-20.0 . "^slrn")
+    (-20.0 . "^Pine")
+    (-20.0 . "_-_") ;; Subject change in thread
+    ;;
+    (-20.0 . "\\.ln@") ;; leafnode
+    (-30.0 . "@ID-[0-9]+\\.[a-zA-Z]+\\.dfncis\\.de")
+    (-30.0 . "@4[Aa][Xx]\\.com") ;; Forte Agent
+    ;;
+    ;; (5.0 . "") ;; $local_part_len <= 7
+    (10.0  . "^[^0-9]+@")
+    (3.0   . "^[^0-9]+[0-9][0-9]?[0-9]?@")
+    ;;      ^[^0-9]+[0-9]{1,3}\@ digits only at end of local part
+    (3.0   . "\@stud")
+    ;;
+    (2.0   . "[a-z][a-z][._-][A-Z][a-z].*@")
+    ;;
+    (0.5   . "^[A-Z][a-z]")
+    (0.5   . "^[A-Z][a-z][a-z]")
+    (1.5   . "^[A-Z][a-z][A-Z][a-z][^a-z]") ;; ^[A-Z][a-z]{3,3}
+    (2.0   . "^[A-Z][a-z][A-Z][a-z][a-z][^a-z]")) ;; ^[A-Z][a-z]{4,4}
+  "An alist of \(RATE . REGEXP\) pairs for `gnus-button-mid-or-mail-heuristic'.
+
+A negative RATE indicates a message IDs, whereas a positive indicates a mail
+address.  The REGEXP is processed with `case-fold-search' set to `nil'."
   :group 'gnus-article-buttons
-  :type 'regexp)
+  :type '(repeat (cons (number :tag "Rate")
+		       (regexp :tag "Regexp"))))
+
+(defun gnus-button-mid-or-mail-heuristic (mid-or-mail)
+  "Guess whether MID-OR-MAIL is a message ID or a mail address.
+Returns `mid' if MID-OR-MAIL is a message IDs, `mail' if it's a mail
+address, `ask' if unsure and `invalid' if the string is invalid."
+  (let ((case-fold-search nil)
+	(list gnus-button-mid-or-mail-heuristic-alist)
+	(result 0) rate regexp lpartlen elem)
+    (setq lpartlen
+	  (length (gnus-replace-in-string mid-or-mail "^\\(.*\\)@.*$" "\\1")))
+    (gnus-message 8 "`%s', length of local part=`%s'." mid-or-mail lpartlen)
+    ;; Certain special cases...
+    (when (string-match
+	   (concat
+	    "^0[0-9]+-[0-9][0-9][0-9][0-9]@t-online\\.de$" "\\|"
+	    "^[0-9]+\.[0-9]+\@compuserve")
+	   mid-or-mail)
+      (gnus-message 8 "`%s' is a known mail address.")
+      (setq result 'mail))
+    (when (string-match "@.*@\\| " mid-or-mail)
+      (gnus-message 8 "`%s' is invalid.")
+      (setq result 'invalid))
+    ;; Nothing more to do, if result is not a number here...
+    (when (numberp result)
+      (while list
+	(setq elem (car list)
+	      rate (car elem)
+	      regexp (cdr elem)
+	      list (cdr list))
+	(when (string-match regexp mid-or-mail)
+	  (setq result (+ result rate))
+	  (gnus-message
+	   9 "`%s' matched `%s', rate `%s', result `%s'."
+	   mid-or-mail regexp rate result)))
+      (when (<= lpartlen 7)
+	(setq result (+ result 5.0))
+	(gnus-message 9 "`%s' matched (<= lpartlen 7), result `%s'."
+		      mid-or-mail result))
+      (when (>= lpartlen 12)
+	(gnus-message 9 "`%s' matched (>= lpartlen 12)" mid-or-mail)
+	(cond
+	 ((string-match "[0-9][^0-9]+[0-9].*@" mid-or-mail)
+	  ;; Long local part should contain realname if e-mail address,
+	  ;; too many digits: message-id.
+	  ;; $score -= 5.0 + 0.1 * $local_part_len;
+	  (setq rate (* -1.0 (+ 5.0 (* 0.1 lpartlen))))
+	  (setq result (+ result rate))
+	  (gnus-message
+	   9 "Many digits in `%s', rate `%s', result `%s'."
+	   mid-or-mail rate result))
+	 ((string-match "[^aeiouy][^aeiouy][^aeiouy][^aeiouy]+.*\@"
+			mid-or-mail)
+	  ;; Too few vowels [^aeiouy]{4,}.*\@
+	  (setq result (+ result -5.0))
+	  (gnus-message
+	   9 "Few vowels in `%s', rate `%s', result `%s'."
+	   mid-or-mail -5.0 result))
+	 (t
+	  (setq result (+ result 5.0))
+	  (gnus-message
+	   9 "`%s', rate `%s', result `%s'." mid-or-mail 5.0 result)))))
+    (gnus-message 8 "`%s': Final rate is `%s'." mid-or-mail result)
+    (cond
+     ;; Maybe we should make this a customizable alist: (condition . 'result)
+     ((< result -10.0) 'mid)
+     ((> result  10.0) 'mail)
+     (t 'ask))))
 
 (defun gnus-button-handle-mid-or-mail (mid-or-mail)
-  (let* ((pref gnus-button-prefer-mid-or-mail)
+  (let* ((pref gnus-button-prefer-mid-or-mail) guessed
 	 (url-mid (concat "news" ":" mid-or-mail))
 	 (url-mailto (concat "mailto" ":" mid-or-mail)))
     (gnus-message 9 "mid-or-mail=%s" mid-or-mail)
-    ;; If it looks like a MID (well known readers or servers) use 'mid,
-    ;; otherwise 'ask the user.
-    (if (eq pref 'guess)
-	(if (string-match gnus-button-guessed-mid-regexp mid-or-mail)
-	    (setq pref 'mid)
-	  (setq pref 'ask)))
+    (when (fboundp pref)
+      (setq guessed
+	    ;; get rid of surrounding angles...
+	    (funcall pref
+		     (gnus-replace-in-string mid-or-mail "^<\\|>$" "")))
+      (if (or (eq 'mid guessed) (eq 'mail guessed))
+	  (setq pref guessed)
+	(setq pref 'ask)))
     (if (eq pref 'ask)
 	(save-window-excursion
 	  (if (y-or-n-p (concat "Is <" mid-or-mail "> a mail address? "))
 	      (setq pref 'mail)
 	    (setq pref 'mid))))
     (cond ((eq pref 'mid)
-	   (gnus-message 9 "calling `gnus-button-handle-news' %s" url-mid)
+	   (gnus-message 8 "calling `gnus-button-handle-news' %s" url-mid)
 	   (gnus-button-handle-news url-mid))
 	  ((eq pref 'mail)
-	   (gnus-message 9 "calling `gnus-url-mailto'  %s" url-mailto)
-	   (gnus-url-mailto url-mailto)))))
+	   (gnus-message 8 "calling `gnus-url-mailto'  %s" url-mailto)
+	   (gnus-url-mailto url-mailto))
+	  (t (gnus-message 3 "Invalid string.")))))
 
 (defun gnus-button-handle-custom (url)
   "Follow a Custom URL."
@@ -6656,7 +6932,10 @@ specified by `gnus-button-alist'."
 	 article-type annotation
 	 mime-view-situation ,situation))
     (widget-convert-button
-     'link b (point)
+     'link b (if (bolp)
+		 ;; Exclude a newline.
+		 (1- (point))
+	       (point))
      :action 'gnus-button-prev-page
      :button-keymap gnus-prev-page-map)))
 
@@ -6696,7 +6975,10 @@ specified by `gnus-button-alist'."
 			  article-type annotation
 			  mime-view-situation ,situation))
     (widget-convert-button
-     'link b (point)
+     'link b (if (bolp)
+		 ;; Exclude a newline.
+		 (1- (point))
+	       (point))
      :action 'gnus-button-next-page
      :button-keymap gnus-next-page-map)))
 
@@ -6887,7 +7169,7 @@ For example:
 				   (search-forward field nil t))
 				 (prog2
 				     (message-narrow-to-field)
-				     (buffer-substring (point-min) (point-max))
+				     (buffer-string)
 				   (delete-region (point-min) (point-max))
 				   (widen))))
 			  '("Content-Type:" "Content-Transfer-Encoding:"
@@ -7056,7 +7338,10 @@ For example:
 	 gnus-mime-details ,gnus-mime-security-button-pressed
 	 article-type annotation
 	 gnus-data ,handle))
-    (setq e (point))
+    (setq e (if (bolp)
+		;; Exclude a newline.
+		(1- (point))
+	      (point)))
     (widget-convert-button
      'link b e
      :mime-handle handle

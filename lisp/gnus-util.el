@@ -131,13 +131,6 @@
        (funcall (if (stringp buffer) 'get-buffer 'buffer-name)
 		buffer))))
 
-(defmacro gnus-kill-buffer (buffer)
-  `(let ((buf ,buffer))
-     (when (gnus-buffer-exists-p buf)
-       (when (boundp 'gnus-buffers)
-	 (setq gnus-buffers (delete (get-buffer buf) gnus-buffers)))
-       (kill-buffer buf))))
-
 (static-cond
  ((fboundp 'point-at-bol)
   (defalias 'gnus-point-at-bol 'point-at-bol))
@@ -181,7 +174,7 @@
 
 ;; Delete the current line (and the next N lines).
 (defmacro gnus-delete-line (&optional n)
-  `(delete-region (progn (beginning-of-line) (point))
+  `(delete-region (gnus-point-at-bol)
 		  (progn (forward-line ,(or n 1)) (point))))
 
 (defun gnus-byte-code (func)
@@ -230,6 +223,12 @@
 	    (inhibit-point-motion-hooks t))
 	(nnheader-narrow-to-headers)
 	(message-fetch-field field)))))
+
+(defun gnus-fetch-original-field (field)
+  "Fetch FIELD from the original version of the current article."
+  (with-current-buffer gnus-original-article-buffer
+    (gnus-fetch-field field)))
+
 
 (defun gnus-goto-colon ()
   (beginning-of-line)
@@ -751,6 +750,19 @@ and `print-level' to nil."
 	   b (setq b (next-single-property-change b 'gnus-face nil end))
 	   prop val))))))
 
+(defmacro gnus-faces-at (position)
+  "Return a list of faces at POSITION."
+  (if (featurep 'xemacs)
+      `(let ((pos ,position))
+	 (mapcar-extents 'extent-face
+			 nil (current-buffer) pos pos nil 'face))
+    `(let ((pos ,position))
+       (delq nil (cons (get-text-property pos 'face)
+		       (mapcar
+			(lambda (overlay)
+			  (overlay-get overlay 'face))
+			(overlays-at pos)))))))
+
 ;;; Protected and atomic operations.  dmoore@ucsd.edu 21.11.1996
 ;;; The primary idea here is to try to protect internal datastructures
 ;;; from becoming corrupted when the user hits C-g, or if a hook or
@@ -1066,6 +1078,32 @@ Return the modified alist."
       (while (search-backward "\\." nil t)
 	(delete-char 1)))))
 
+(defmacro gnus-with-output-to-file (file &rest body)
+  (let ((buffer (make-symbol "output-buffer"))
+        (size (make-symbol "output-buffer-size"))
+        (leng (make-symbol "output-buffer-length")))
+    `(let* ((print-quoted t)
+            (print-readably t)
+            (print-escape-multibyte nil)
+            print-level 
+            print-length
+            (,size 131072)
+            (,buffer (make-string ,size 0))
+            (,leng 0)
+            (append nil)
+            (standard-output (lambda (c)
+                               (aset ,buffer ,leng c)
+                               (if (= ,size (setq ,leng (1+ ,leng)))
+                                   (progn (write-region ,buffer nil ,file append 'no-msg)
+                                          (setq ,leng 0
+                                                append t))))))
+       ,@body
+       (if (> ,leng 0)
+           (write-region (substring ,buffer 0 ,leng) nil ,file append 'no-msg)))))
+
+(put 'gnus-with-output-to-file 'lisp-indent-function 1)
+(put 'gnus-with-output-to-file 'edebug-form-spec '(form body))
+
 (if (fboundp 'union)
     (defalias 'gnus-union 'union)
   (defun gnus-union (l1 l2)
@@ -1283,10 +1321,10 @@ CHOICE is a list of the choice char and help message at IDX."
     (save-window-excursion
       (save-excursion
 	(while (not tchar)
-	  (message "%s (%s?): "
+	  (message "%s (%s): "
 		   prompt
 		   (mapconcat (lambda (s) (char-to-string (car s)))
-			      choice ""))
+			      choice ", "))
 	  (setq tchar (read-char))
 	  (when (not (assq tchar choice))
 	    (setq tchar nil)
@@ -1374,5 +1412,39 @@ Return nil otherwise."
 	      display)))))
 
 (provide 'gnus-util)
+
+(defmacro gnus-mapcar (function seq1 &rest seqs2_n)
+  "Apply FUNCTION to each element of the sequences, and make a list of the results.
+If there are several sequences, FUNCTION is called with that many arguments,
+and mapping stops as soon as the shortest sequence runs out.  With just one
+sequence, this is like `mapcar'.  With several, it is like the Common Lisp
+`mapcar' function extended to arbitrary sequence types."
+
+  (if seqs2_n
+      (let* ((seqs (cons seq1 seqs2_n))
+	     (cnt 0)
+	     (heads (mapcar (lambda (seq)
+			      (make-symbol (concat "head"
+						   (int-to-string
+						    (setq cnt (1+ cnt))))))
+			    seqs))
+	     (result (make-symbol "result"))
+	     (result-tail (make-symbol "result-tail")))
+	`(let* ,(let* ((bindings (cons nil nil))
+		       (heads heads))
+		  (nconc bindings (list (list result '(cons nil nil))))
+		  (nconc bindings (list (list result-tail result)))
+		  (while heads
+		    (nconc bindings (list (list (pop heads) (pop seqs)))))
+		  (cdr bindings))
+	   (while (and ,@heads)
+	     (setcdr ,result-tail (cons (funcall ,function
+						 ,@(mapcar (lambda (h) (list 'car h))
+							   heads))
+					nil))
+	     (setq ,result-tail (cdr ,result-tail)
+		   ,@(apply 'nconc (mapcar (lambda (h) (list h (list 'cdr h))) heads))))
+	   (cdr ,result)))
+    `(mapcar ,function ,seq1)))
 
 ;;; gnus-util.el ends here

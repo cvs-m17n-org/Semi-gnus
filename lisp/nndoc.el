@@ -58,9 +58,6 @@ from the document.")
   `((mmdf
      (article-begin .  "^\^A\^A\^A\^A\n")
      (body-end .  "^\^A\^A\^A\^A\n"))
-    (exim-bounce
-     (article-begin . "^------ This is a copy of the message, including all the headers. ------\n\n")
-     (body-end-function . nndoc-exim-bounce-body-end-function))
     (nsmail
      (article-begin .  "^From - "))
     (news
@@ -76,6 +73,9 @@ from the document.")
      (body-end . "\^_")
      (body-begin-function . nndoc-babyl-body-begin)
      (head-begin-function . nndoc-babyl-head-begin))
+    (exim-bounce
+     (article-begin . "^------ This is a copy of the message, including all the headers. ------\n\n")
+     (body-end-function . nndoc-exim-bounce-body-end-function))
     (rfc934
      (article-begin . "^--.*\n+")
      (body-end . "^--.*$")
@@ -630,7 +630,7 @@ from the document.")
 	  (setq subject (concat " (" (match-string 1) ")"))
 	  (when (re-search-forward "^From: \\(.*\\)" nil t)
 	    (setq from (concat "<"
-			       (cadr (funcall gnus-extract-address-components 
+			       (cadr (funcall gnus-extract-address-components
 					      (match-string 1))) ">")))
 	  (if (re-search-forward "^Date: +\\([^(]*\\)" nil t)
 	      (setq date (match-string 1))
@@ -890,7 +890,7 @@ PARENT is the message-ID of the parent summary line, or nil for none."
 	    subtype "plain"))
     ;; Prepare the article and summary inserts.
     (unless article-insert
-      (setq article-insert (buffer-substring (point-min) (point-max))
+      (setq article-insert (buffer-string)
 	    head-end head-begin))
     ;; Fix MIME-Version
     (unless (string-match "MIME-Version:" article-insert)

@@ -880,7 +880,7 @@ the line could be found."
 	(prev (point-min))
 	num found)
     (while (not found)
-      (goto-char (/ (+ max min) 2))
+      (goto-char (+ min (/ (- max min) 2)))
       (beginning-of-line)
       (if (or (= (point) prev)
 	      (eobp))
@@ -888,8 +888,7 @@ the line could be found."
 	(setq prev (point))
 	(while (and (not (numberp (setq num (read cur))))
 		    (not (eobp)))
-	  (delete-region (progn (beginning-of-line) (point))
-			 (progn (forward-line 1) (point))))
+	  (gnus-delete-line))
 	(cond ((> num article)
 	       (setq max (point)))
 	      ((< num article)
@@ -1176,7 +1175,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
       ;; This is invalid, but not all articles have Message-IDs.
       ()
     (mail-position-on-field "References")
-    (let ((begin (save-excursion (beginning-of-line) (point)))
+    (let ((begin (gnus-point-at-bol))
 	  (fill-column 78)
 	  (fill-prefix "\t"))
       (when references
@@ -1303,7 +1302,8 @@ If FULL, translate everything."
 	;; We translate -- but only the file name.  We leave the directory
 	;; alone.
 	(if (and (featurep 'xemacs)
-		 (memq system-type '(cygwin32 win32 w32 mswindows windows-nt)))
+		 (memq system-type '(cygwin32 win32 w32 mswindows windows-nt
+					      cygwin)))
 	    ;; This is needed on NT and stuff, because
 	    ;; file-name-nondirectory is not enough to split
 	    ;; file names, containing ':', e.g.
@@ -1454,7 +1454,9 @@ without formatting."
   (or (nth 7 (file-attributes file)) 0))
 
 (defun nnheader-find-etc-directory (package &optional file)
-  "Go through the path and find the \".../etc/PACKAGE\" directory.
+  "Go through `load-path' and find the \"../etc/PACKAGE\" directory.
+This function will look in the parent directory of each `load-path'
+entry, and look for the \"etc\" directory there.
 If FILE, find the \".../etc/PACKAGE\" file instead."
   (let ((path load-path)
 	dir result)

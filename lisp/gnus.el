@@ -674,9 +674,9 @@ be set in `.emacs' instead."
 (defface gnus-summary-high-undownloaded-face
    '((((class color)
        (background light))
-      (:bold t :foreground "cyan4" :bold nil))
+      (:bold t :foreground "cyan4"))
      (((class color) (background dark))
-      (:bold t :foreground "LightGray" :bold nil))
+      (:bold t :foreground "LightGray"))
      (t (:inverse-video t :bold t)))
   "Face used for high interest uncached articles.")
 
@@ -770,6 +770,13 @@ be set in `.emacs' instead."
 (defun gnus-add-buffer ()
   "Add the current buffer to the list of Gnus buffers."
   (push (current-buffer) gnus-buffers))
+
+(defmacro gnus-kill-buffer (buffer)
+  "Kill BUFFER and remove from the list of Gnus buffers."
+  `(let ((buf ,buffer))
+     (when (gnus-buffer-exists-p buf)
+       (setq gnus-buffers (delete (get-buffer buf) gnus-buffers))
+       (kill-buffer buf))))
 
 (defun gnus-buffers ()
   "Return a list of live Gnus buffers."
@@ -1516,7 +1523,7 @@ slower, and `std11-extract-address-components'."
   :type 'boolean)
 
 (defcustom gnus-shell-command-separator ";"
-  "String used to separate to shell commands."
+  "String used to separate shell commands."
   :group 'gnus-files
   :type 'string)
 
@@ -1614,7 +1621,7 @@ to be desirable; see the manual for further details."
 
 ;; There should be special validation for this.
 (define-widget 'gnus-email-address 'string
-  "An email address")
+  "An email address.")
 
 (gnus-define-group-parameter
  to-address
@@ -1872,6 +1879,10 @@ Only applicable to non-spam (unclassified and ham) groups.")
     "The BBDB summary exit ham processor.
 Only applicable to non-spam (unclassified and ham) groups.")
 
+  (defvar gnus-group-ham-exit-processor-copy "copy"
+    "The ham copy exit ham processor.
+Only applicable to non-spam (unclassified and ham) groups.")
+
   (gnus-define-group-parameter
    spam-process
    :type list
@@ -1887,7 +1898,8 @@ Only applicable to non-spam (unclassified and ham) groups.")
 				   (variable-item gnus-group-ham-exit-processor-ifile)
 				   (variable-item gnus-group-ham-exit-processor-stat)
 				   (variable-item gnus-group-ham-exit-processor-whitelist)
-				   (variable-item gnus-group-ham-exit-processor-BBDB))))
+				   (variable-item gnus-group-ham-exit-processor-BBDB)
+				   (variable-item gnus-group-ham-exit-processor-copy))))
    :function-document
    "Which spam or ham processors will be applied to the GROUP articles at summary exit."
    :variable gnus-spam-process-newsgroups
@@ -1911,7 +1923,8 @@ for mail groups."
 				      (variable-item gnus-group-ham-exit-processor-ifile)
 				      (variable-item gnus-group-ham-exit-processor-stat)
 				      (variable-item gnus-group-ham-exit-processor-whitelist)
-				      (variable-item gnus-group-ham-exit-processor-BBDB))))
+				      (variable-item gnus-group-ham-exit-processor-BBDB)
+				      (variable-item gnus-group-ham-exit-processor-copy))))
    :parameter-document
    "Which spam processors will be applied to the spam or ham GROUP articles at summary exit.")
 
@@ -2096,8 +2109,9 @@ face."
   "Whether Gnus is plugged or not.")
 
 (defcustom gnus-agent-cache t
-  "Whether Gnus use agent cache.
-You also need to enable `gnus-agent'."
+  "Controls use of the agent cache while plugged.  When set, Gnus will prefer
+using the locally stored content rather than re-fetching it from the server.
+You also need to enable `gnus-agent' for this to have any affect."
   :version "21.3"
   :group 'gnus-agent
   :type 'boolean)
@@ -2105,7 +2119,7 @@ You also need to enable `gnus-agent'."
 (defcustom gnus-default-charset 'iso-8859-1
   "Default charset assumed to be used when viewing non-ASCII characters.
 This variable is overridden on a group-to-group basis by the
-gnus-group-charset-alist variable and is only used on groups not
+`gnus-group-charset-alist' variable and is only used on groups not
 covered by that variable."
   :type 'symbol
   :group 'gnus-charset)
@@ -2127,7 +2141,7 @@ Putting (gnus-agentize) in ~/.gnus is obsolete by (setq gnus-agent t)."
 
 (defcustom gnus-other-frame-parameters nil
   "Frame parameters used by `gnus-other-frame' to create a Gnus frame.
-This should be an alist for FSF Emacs, or a plist for XEmacs."
+This should be an alist for Emacs, or a plist for XEmacs."
   :group 'gnus-start
   :type (if (featurep 'xemacs)
 	    '(repeat (list :inline t :format "%v"
@@ -2142,6 +2156,7 @@ This should be an alist for FSF Emacs, or a plist for XEmacs."
 
 (defvar gnus-agent-gcc-header "X-Gnus-Agent-Gcc")
 (defvar gnus-agent-meta-information-header "X-Gnus-Agent-Meta-Information")
+(defvar gnus-agent-target-move-group-header "X-Gnus-Agent-Move-To")
 (defvar gnus-draft-meta-information-header "X-Draft-From")
 (defvar gnus-group-get-parameter-function 'gnus-group-get-parameter)
 (defvar gnus-original-article-buffer " *Original Article*")
@@ -3229,6 +3244,10 @@ native."
   (if (string-match "^[^:]+:" group)
       (substring group 0 (match-end 0))
     ""))
+
+(defun gnus-summary-buffer-name (group)
+  "Return the summary buffer name of GROUP."
+  (concat "*Summary " (gnus-group-decoded-name group) "*"))
 
 (defun gnus-group-method (group)
   "Return the server or method used for selecting GROUP.
