@@ -1,3 +1,16 @@
+2001-06-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Use
+	`nnshimbun-find-parameter'.
+	(nnshimbun-generate-nov-database): Bind a full group name while
+	processing.
+	(nnshimbun-find-parameter): New implementation to refer to the
+	nnshimbun group parameters.
+	(nnshimbun-index-range): Add a document that it's just a default.
+	(nnshimbun-pre-fetch-article): Ditto.
+	(nnshimbun-group-parameters): Specify a parameter type as `list'.
+	(TopLevel): Remove the local variable "-*- coding: junet; -*-".
+
 2001-06-13  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (nnshimbun-group-parameters): New group

@@ -1,4 +1,4 @@
-;;; nnshimbun.el --- interfacing with web newspapers -*- coding: junet; -*-
+;;; nnshimbun.el --- interfacing with web newspapers
 
 ;; Authors: TSUCHIYA Masatoshi <tsuchiya@namazu.org>,
 ;;          Akihiro Arisawa    <ari@atesoft.advantest.co.jp>,
@@ -84,23 +84,20 @@
 		 (list :inline t :format "%v"
 		       (symbol :tag "Keyword")
 		       (sexp :tag "Value"))))
-  "A type definition for customizing `nnshimbun-group-parameters'.")
+  "A type definition for customizing the nnshimbun group parameters.")
 
 ;; The following definition provides the group parameter
 ;; `nnshimbun-group-parameters', the user option
 ;; `nnshimbun-group-parameters-alist' and the function
 ;; `nnshimbun-find-group-parameters'.
-;;
-;; Note that the group parameter `nnshimbun-group-parameters' will
-;; have a property list like the following:
+;; The group parameter `nnshimbun-group-parameters' will have a
+;; property list like the following:
 ;;
 ;; '(index-range all prefetch-articles t expiry-wait 6)
-;;
-;; So the third argument of the function `gnus-group-find-parameter'
-;; should be non-nil to get the value of the group parameter.
 
 (gnus-define-group-parameter
  nnshimbun-group-parameters
+ :type list
  :function nnshimbun-find-group-parameters
  :function-document "\
 Return a nnshimbun GROUP's group parameters."
@@ -108,10 +105,21 @@ Return a nnshimbun GROUP's group parameters."
  :variable-default nil
  :variable-document "\
 Alist of nnshimbun group parameters.  Each element should be a cons of
-group name regexp and a plist which consists of a keyword and a value
+a group name regexp and a plist which consists of a keyword and a value
 pairs like the following:
 
-'(\"^nnshimbun\\\\+asahi:\" index-range all prefetch-articles t expiry-wait 6)"
+'(\"^nnshimbun\\\\+asahi:\" index-range all prefetch-articles t expiry-wait 6)
+
+`index-range' specifies a range of header indices as described below:
+      all: Retrieve all header indices.
+     last: Retrieve the last header index.
+integer N: Retrieve N pages of header indices.
+
+`prefetch-articles' specifies whether to pre-fetch the unread articles
+when scanning the group.
+
+`expiry-wait' is similar to the generic group parameter `expiry-wait',
+but it has a preference."
  :variable-group shimbun
  :variable-type `(repeat (cons :format "%v" (regexp :tag "Group name regexp"
 						    :value "^nnshimbun\\+")
@@ -150,10 +158,15 @@ but it has a preference.")
 (defvoo nnshimbun-nov-file-name ".overview")
 
 (defvoo nnshimbun-pre-fetch-article nil
-  "*Non nil means that nnshimbun fetch unread articles when scanning groups.")
+  "*Non nil means that nnshimbun fetch unread articles when scanning
+groups.  Note that this variable has just a default value for all the
+nnshimbun groups.  You can specify the nnshimbun group parameter
+`prefecth-articles' for each nnshimbun group.")
 
 (defvoo nnshimbun-index-range nil
-  "*Range of indecis to detect new pages.")
+  "*Range of indecis to detect new pages.  Note that this variable has
+just a default value for all the nnshimbun groups.  You can specify
+the nnshimbun group parameter `index-range' for each nnshimbun group.")
 
 ;; set by nnshimbun-possibly-change-group
 (defvoo nnshimbun-buffer nil)
@@ -483,34 +496,55 @@ also be nil."
       (insert " "))
     (forward-line 1)))
 
-(defmacro nnshimbun-find-parameter (group variable)
-  `(or (let ((v (gnus-group-find-parameter
-		 (concat "nnshimbun+"
-			 (nnoo-current-server 'nnshimbun)
-			 ":" ,group)
-		 (quote ,variable)
-		 'allow-list)))
-	 (if (listp v) (car v) v))
-       ,variable))
+(defmacro nnshimbun-find-parameter (group symbol &optional full-name-p)
+  "Return the value of a nnshimbun group parameter for GROUP which is
+associated with SYMBOL.  If FULL-NAME-P is non-nil, it treats that
+GROUP has a full name."
+  (let ((name (if full-name-p
+		  group
+		`(concat "nnshimbun+" (nnoo-current-server 'nnshimbun)
+			 ":" ,group))))
+    (cond ((eq 'index-range (eval symbol))
+	   `(or (plist-get (nnshimbun-find-group-parameters ,name)
+			   'index-range)
+		;; For the backward compatibility.
+		nnshimbun-index-range))
+	  ((eq 'prefetch-articles (eval symbol))
+	   `(or (plist-get (nnshimbun-find-group-parameters ,name)
+			   'prefetch-articles)
+		;; For the backward compatibility.
+		nnshimbun-pre-fetch-article))
+	  ((eq 'expiry-wait (eval symbol))
+	   (if full-name-p
+	       `(or (plist-get (nnshimbun-find-group-parameters ,group)
+			       'expiry-wait)
+		    (gnus-group-find-parameter ,group 'expiry-wait))
+	     `(let ((name ,name))
+		(or (plist-get (nnshimbun-find-group-parameters name)
+			       'expiry-wait)
+		    (gnus-group-find-parameter name 'expiry-wait)))))
+	  (t
+	   `(plist-get (nnshimbun-find-group-parameters ,name) ,symbol)))))
 
 (defun nnshimbun-generate-nov-database (group)
   (nnshimbun-possibly-change-group group)
   (with-current-buffer (nnshimbun-open-nov group)
     (goto-char (point-max))
     (forward-line -1)
-    (let ((i (or (ignore-errors (read (current-buffer))) 0))
-	  (pre-fetch
-	   (nnshimbun-find-parameter group nnshimbun-pre-fetch-article)))
+    (let* ((i (or (ignore-errors (read (current-buffer))) 0))
+	   (name (concat "nnshimbun+" (nnoo-current-server 'nnshimbun)
+			 ":" group))
+	   (pre-fetch (nnshimbun-find-parameter name 'prefetch-articles t)))
       (dolist (header
 	       (shimbun-headers
 		nnshimbun-shimbun
-		(nnshimbun-find-parameter group nnshimbun-index-range)))
+		(nnshimbun-find-parameter name 'index-range t)))
 	(unless (nnshimbun-search-id group (shimbun-header-id header))
 	  (goto-char (point-max))
 	  (nnshimbun-insert-nov (setq i (1+ i)) header)
 	  (when pre-fetch
 	    (nnshimbun-request-article-1 i group nil nnshimbun-buffer)))))
-  (nnshimbun-write-nov group)))
+    (nnshimbun-write-nov group)))
 
 (defun nnshimbun-replace-nov-entry (group article header &optional id)
   (with-current-buffer (nnshimbun-open-nov group)
@@ -607,7 +641,7 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 	       ;; Prefer the shimbun's default to `nnmail-expiry-wait'
 	       ;; only when the group's parameter is nil.
 	       (nnmail-expiry-wait
-		(or (gnus-group-find-parameter name 'expiry-wait)
+		(or (nnshimbun-find-parameter name 'expiry-wait t)
 		    (shimbun-article-expiration-days nnshimbun-shimbun)
 		    nnmail-expiry-wait))
 	       article end time)
