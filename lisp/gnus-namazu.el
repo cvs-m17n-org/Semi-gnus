@@ -537,7 +537,8 @@ generate possible group names from it."
 
 (defun gnus-namazu/truncate-article-list (articles)
   (let ((hit (length articles)))
-    (when (> hit gnus-large-newsgroup)
+    (when (and (integerp gnus-large-newsgroup)
+	       (> hit gnus-large-newsgroup))
       (let* ((cursor-in-echo-area nil)
 	     (input
 	      (when (> hit gnus-large-newsgroup)

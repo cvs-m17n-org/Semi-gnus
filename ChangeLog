@@ -1,3 +1,9 @@
+2002-06-25  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/truncate-article-list): When
+	`gnus-large-newsgroup' is equal to nil, no confirmation is
+	required.
+
 2002-06-23  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
 
 	* lisp/pop3.el (pop3-open-ssl-stream): Do away with w32-related
