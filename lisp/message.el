@@ -1868,20 +1868,27 @@ be added to \"References\" field."
   (interactive "P")
   (let ((modified (buffer-modified-p))
 	(buffer (message-eval-parameter message-reply-buffer))
-	refs)
+	start end refs)
     (when (and buffer
 	       message-cite-function)
       (delete-windows-on buffer t)
       (insert-buffer buffer) ; mark will be set at the end of article.
+      (setq start (point)
+	    end (mark t))
 
       ;; Add new IDs to References field.
       (when (and message-yank-add-new-references (interactive-p))
 	(save-excursion
 	  (save-restriction
-	    (narrow-to-region (point) (mark t))
+	    (message-narrow-to-headers)
+	    (setq refs (message-list-references
+			nil
+			(message-fetch-field "References")))
+	    (widen)
+	    (narrow-to-region start end)
 	    (std11-narrow-to-header)
 	    (when (setq refs (message-list-references
-			      '()
+			      refs
 			      (or (message-fetch-field "References")
 				  (message-fetch-field "In-Reply-To"))
 			      (message-fetch-field "Message-ID")))
