@@ -1,3 +1,15 @@
+1999-10-24  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 12.
+	(TopLevel): Add and delete autoloads for functions defined in
+	"gnus-cus", "gnus-offline", "miee", "pop3-fma" and "mw32misc".
+
+	* lisp/gnus-offline.el (TopLevel): Do not consider the functions
+	defined in "miee".
+
+	* lisp/gnus-ofsetup.el (TopLEvel): Do not autoload
+	`gnus-custom-mode' defined in "gnus-cus".
+
 1999-10-21  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 11.
