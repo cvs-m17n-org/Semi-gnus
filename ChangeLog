@@ -1,4 +1,54 @@
-1999-03-27  MORIOKA Tomohiko  <tomo@etl.go.jp>
+1999-05-31  MORIOKA Tomohiko  <tomo@m17n.org>
+
+	* lisp/nnheader.el: Require `mmgnus'.
+	(mail-header-subject): Now an alias for
+	`mime-gnus-entity-subject-internal'.
+	(mail-header-set-subject): Now an alias for
+	`mime-gnus-entity-set-subject-internal)'.
+	(mail-header-from): Now an alias for
+	`mime-gnus-entity-from-internal'.
+	(mail-header-set-from): Now an alias for
+	`mime-gnus-entity-set-from-internal'.
+	(mail-header-date): Now an alias for
+	`mime-gnus-entity-date-internal'.
+	(mail-header-set-date): Now an alias for
+	`mime-gnus-entity-set-date-internal'.
+	(mail-header-message-id): Now an alias for
+	`mime-gnus-entity-id-internal'.
+	(mail-header-id): Likewise.
+	(mail-header-set-message-id): Now an alias for
+	`mime-gnus-entity-set-id-internal'.
+	(mail-header-set-id): Likewise.
+	(mail-header-references): Now an alias for
+	`mime-gnus-entity-references-internal'.
+	(mail-header-set-references): Now an alias for
+	`mime-gnus-entity-set-references-internal'.
+	(mail-header-chars): Now an alias for
+	`mime-gnus-entity-chars-internal.
+	(mail-header-set-chars): Now an alias for
+	`mime-gnus-entity-set-chars-internal.
+	(mail-header-lines): Now an alias for
+	`mime-gnus-entity-lines-internal'.
+	(mail-header-set-lines): Now an alias for
+	`mime-gnus-entity-set-lines-internal'.
+	(mail-header-xref): Now an alias for
+	`mime-gnus-entity-xref-internal'.
+	(mail-header-set-xref): Now an alias for
+	`mime-gnus-entity-set-xref-internal'.
+	(make-full-mail-header): New implementation [use
+	`luna-make-entity'].
+	(make-full-mail-header-from-decoded-header): Likewise.
+
+	* lisp/mmgnus.el (mime-gnus-entity): New definition of luna-class.
+	(mime-entity-buffer): Abolished.
+	(initialize-instance): New method.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Change
+	representation-type of `mime-message-structure'.
+	(gnus-article-header-presentation-method): Use
+	`mime-insert-header'.
+
+1999-03-27  MORIOKA Tomohiko  <tomo@m17n.org>
 
 	* lisp/gnus-art.el (gnus-following-method): Use
 	`gnus-group-find-parameter' to detect the current message is news
@@ -7,7 +57,7 @@
 	* lisp/gnus-art.el (gnus-following-method): Use
 	`message-wide-reply' for mail.
 
-1999-03-27  MORIOKA Tomohiko  <tomo@etl.go.jp>
+1999-03-27  MORIOKA Tomohiko  <tomo@m17n.org>
 
 	* lisp/message.el (message-yank-original): Don't call
 	`gnus-copy-article-buffer' to avoid problem to yank assembled
