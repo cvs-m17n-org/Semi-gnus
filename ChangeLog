@@ -1,3 +1,13 @@
+1998-08-24  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-setup): Bug fix and version 
+	changed to 1.53.
+
+	* lisp/gnus-util.el (gnus-write-buffer): Write file in raw-text coding 
+	system.
+
+	* lisp/gnus-util.el (gnus-write-file-coding-system): New variable.
+
 1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/message.el: Suppress some byte-compile warnings.

@@ -6,7 +6,7 @@
 ;;;         Yukihiro Ito <ito@rs.civil.tohoku.ac.jp>
 ;;;         Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
-;;; Version: 1.52
+;;; Version: 1.53
 ;;; Keywords: news , mail , offline , gnus
 ;;;
 ;;; SPECIAL THANKS
@@ -114,7 +114,7 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "1.52")
+(defconst gnus-offline-version-number "1.53")
 (defconst gnus-offline-codename
 ;;  "You may be right"		; 1.40
 ;;  "Chilstie Lee"		; 1.45
@@ -123,8 +123,8 @@
 ;;  "An Innocent man"		; 1.48
 ;;  "Tell her about it"		; 1.50
 ;;  "This night"		; 1.51
-  "Movin'out"			; 1.52
-;;  "Longest night"
+;;  "Movin'out"			; 1.52
+  "Longest night"		; 1.53
 ;;  "Leave a tender moment alone"
 ;;  "Back in the U.S.S.R"
 ;;  "Running on ice"
@@ -328,13 +328,11 @@ If value is nil , dialup line is disconnected status.")
   (if (eq gnus-offline-drafts-queue-type 'miee)
       (progn
 	(if (not (file-exists-p gnus-offline-mail-spool-directory))
-	    (progn
-	      (make-directory gnus-offline-mail-spool-directory t)
-	      (setq sendmail-to-spool-directory gnus-offline-mail-spool-directory)))
+	    (make-directory gnus-offline-mail-spool-directory t))
+	(setq sendmail-to-spool-directory gnus-offline-mail-spool-directory)
 	(if (not (file-exists-p gnus-offline-news-spool-directory))
-	    (progn
-	      (make-directory gnus-offline-news-spool-directory t)
-	      (setq news-spool-request-post-directory gnus-offline-news-spool-directory)))))
+	    (make-directory gnus-offline-news-spool-directory t))
+	(setq news-spool-request-post-directory gnus-offline-news-spool-directory)))
   
   ;; When startup ... state is offline.
   (setq gnus-nntp-service nil
