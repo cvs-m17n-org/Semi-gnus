@@ -1,9 +1,14 @@
 1998-08-28  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
+	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Try
+	"qualified" newsgroup name first.
+
+1998-08-28  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
 	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Match
 	"real" newsgroup name; strip "backend+server" prefix.
 
-	* lisp/message.el (message-make-in-reply-to): 
+	* lisp/message.el (message-make-in-reply-to):
 	Use `std11-extract-address-components'.
 	(message-use-mail-reply-to): Doc fix.
 
