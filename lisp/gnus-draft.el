@@ -2,8 +2,8 @@
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
-;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
+;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;; Keywords: mail, news, MIME, offline
 
 ;; This file is part of GNU Emacs.

@@ -2,6 +2,7 @@
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify

@@ -2,6 +2,7 @@
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -207,12 +208,8 @@ it's not cached."
 	      ;; [number subject from date id references chars lines xref]
 	      (insert (format "%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t%s\t\n"
 			      (mail-header-number headers)
-			      (let ((subject (mail-header-subject headers)))
-				(or (get-text-property 0 'raw-text subject)
-				    subject))
-			      (let ((from (mail-header-from headers)))
-				(or (get-text-property 0 'raw-text from)
-				    from))
+			      (mime-fetch-field 'Subject headers)
+			      (mime-fetch-field 'From headers)
 			      (mail-header-date headers)
 			      (mail-header-id headers)
 			      (or (mail-header-references headers) "")

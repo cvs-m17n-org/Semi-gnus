@@ -3,6 +3,8 @@
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
+;;	Yoshiki Hayashi <g740685@komaba.ecc.u-tokyo.ac.jp>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -253,17 +255,17 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.025"
+(defconst gnus-version-number "6.10.026"
   "Version number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.36"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
-    "Version number for this version of Gnus.")
+  "Product name of the original version of Gnus.")
 
 (defconst gnus-version
-  (format "%s %s (based on %s %s ; for SEMI 1.8-1.10, FLIM 1.8-1.11)"
+  (format "%s %s (based on %s %s ; for SEMI 1.10, FLIM 1.11)"
 	  gnus-product-name gnus-version-number
 	  gnus-original-product-name gnus-original-version-number)
   "Version string for this version of gnus.")
@@ -1205,10 +1207,10 @@ commands will still require prompting."
 
 (defcustom gnus-extract-address-components 'gnus-extract-address-components
   "*Function for extracting address components from a From header.
-
-`gnus-extract-address-components' is a quite fast, and too simplistic.
-`mail-extract-address-components' works much better, but is slower.
-`std11-extract-address-components' also works better, and less slower."
+Two pre-defined function exist: `gnus-extract-address-components',
+which is the default, quite fast, and too simplistic solution, and
+`mail-extract-address-components', which works much better, but is
+slower."
   :group 'gnus-summary-format
   :type '(radio (function-item gnus-extract-address-components)
 		(function-item mail-extract-address-components)

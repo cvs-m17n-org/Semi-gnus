@@ -2,7 +2,8 @@
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;;	Katsumi Yamaoka <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -379,13 +380,6 @@ be used as possible file names."
 (defcustom gnus-article-display-method-for-mime
   'gnus-article-display-mime-message
   "Function to display a MIME message.
-The function is called from the article buffer."
-  :group 'gnus-article-mime
-  :type 'function)
-
-(defcustom gnus-article-display-method-for-encoded-word
-  'gnus-article-display-message-with-encoded-word
-  "*Function to display a message with MIME encoded-words.
 The function is called from the article buffer."
   :group 'gnus-article-mime
   :type 'function)
@@ -2021,7 +2015,6 @@ commands:
 			 (substring name (match-end 0))))))
     (setq gnus-article-buffer name)
     (setq gnus-original-article-buffer original)
-    (setq gnus-article-mime-handle-alist nil)
     ;; This might be a variable local to the summary buffer.
     (unless gnus-single-article-buffer
       (save-excursion
@@ -2070,11 +2063,15 @@ commands:
 (defun gnus-article-display-mime-message ()
   "Article display method for MIME message."
   ;; called from `gnus-original-article-buffer'.
-  (let ((default-mime-charset (save-excursion
-				(set-buffer gnus-summary-buffer)
-				default-mime-charset)))
+  (let ((charset (with-current-buffer gnus-summary-buffer
+		   default-mime-charset)))
+    (make-local-variable 'default-mime-charset)
+    (setq default-mime-charset charset)
     (mime-display-message mime-message-structure
-			  gnus-article-buffer nil gnus-article-mode-map))
+			  gnus-article-buffer nil gnus-article-mode-map)
+    (make-local-variable 'default-mime-charset)
+    (setq default-mime-charset charset)
+    )
   ;; `mime-display-message' changes current buffer to `gnus-article-buffer'.
   (make-local-variable 'mime-button-mother-dispatcher)
   (setq mime-button-mother-dispatcher
@@ -2087,20 +2084,6 @@ commands:
   (let (buffer-read-only)
     (erase-buffer)
     (insert-buffer-substring gnus-original-article-buffer)))
-
-(defun gnus-article-display-message-with-encoded-word ()
-  "Article display method for message with encoded-words."
-  (let ((charset (save-excursion
-		   (set-buffer gnus-summary-buffer)
-		   default-mime-charset)))
-    (gnus-article-display-traditional-message)
-    (let (buffer-read-only)
-      (eword-decode-header charset)
-      (goto-char (point-min))
-      (if (search-forward "\n\n" nil t)
-	  (decode-mime-charset-region (match-end 0) (point-max) charset)))
-    (mime-maybe-hide-echo-buffer))
-  (gnus-run-hooks 'gnus-mime-article-prepare-hook))
 
 (defun gnus-article-prepare (article &optional all-headers header)
   "Prepare ARTICLE in article mode buffer.
@@ -2211,13 +2194,12 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 
 (defun gnus-article-prepare-display ()
   "Make the current buffer look like a nice article."
-  (let ((method (if gnus-show-mime
-		    (progn
-		      (mime-parse-buffer)
-		      gnus-article-display-method-for-mime)
-		  gnus-article-display-method-for-traditional)))
-    ;; Hooks for getting information from the article.
-    ;; This hook must be called before being narrowed.
+  (let ((method
+	 (if gnus-show-mime
+	     (progn
+	       (setq mime-message-structure gnus-current-headers)
+	       gnus-article-display-method-for-mime)
+	   gnus-article-display-method-for-traditional)))
     (gnus-run-hooks 'gnus-tmp-internal-hook)
     (gnus-run-hooks 'gnus-article-prepare-hook)
     ;; Display message.

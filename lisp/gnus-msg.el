@@ -190,52 +190,6 @@ Thank you for your help in stamping out bugs.
 
 ;;; Internal functions.
 
-(defun gnus-extended-version ()
-  "Stringified gnus version."
-  (concat gnus-product-name "/" gnus-version-number " (based on "
-	  gnus-original-product-name " " gnus-original-version-number ")"))
-
-(defun gnus-message-make-user-agent (&optional include-mime-info max-column)
-  "Return user-agent info.
-INCLUDE-MIME-INFO the optional first argument if it is non-nil and the variable
-  `mime-edit-user-agent-value' exists, the return value will include it.
-MAX-COLUMN the optional second argument if it is specified, the return value
-  will be folded up in the proper way."
-  (let ((user-agent (if (and include-mime-info
-			     (boundp 'mime-edit-user-agent-value))
-			(concat (gnus-extended-version)
-				" "
-				mime-edit-user-agent-value)
-		      (gnus-extended-version))))
-    (if max-column
-	(let (boundary)
-	  (unless (natnump max-column) (setq max-column 76))
-	  (with-temp-buffer
-	    (insert "            " user-agent)
-	    (goto-char 13)
-	    (while (re-search-forward "[\n\t ]+" nil t)
-	      (replace-match " "))
-	    (goto-char 13)
-	    (while (re-search-forward "[^ ()/]+\\(/[^ ()/]+\\)? ?" nil t)
-	      (while (eq ?\( (char-after (point)))
-		(forward-list)
-		(skip-chars-forward " "))
-	      (skip-chars-backward " ")
-	      (if (> (current-column) max-column)
-		  (progn
-		    (if (or (not boundary) (eq ?\n (char-after boundary)))
-			(progn
-			  (setq boundary (point))
-			  (unless (eobp)
-			    (delete-char 1)
-			    (insert "\n ")))
-		      (goto-char boundary)
-		      (delete-char 1)
-		      (insert "\n ")))
-		(setq boundary (point))))
-	    (buffer-substring 13 (point-max))))
-      user-agent)))
-
 (defvar gnus-article-reply nil)
 (defmacro gnus-setup-message (config &rest forms)
   (let ((winconf (make-symbol "gnus-setup-message-winconf"))
@@ -256,9 +210,6 @@ MAX-COLUMN the optional second argument if it is specified, the return value
        (add-hook 'message-header-setup-hook 'gnus-inews-insert-gcc)
        (add-hook 'message-header-setup-hook 'gnus-inews-insert-archive-gcc)
        (add-hook 'message-mode-hook 'gnus-configure-posting-styles)
-       (add-hook 'message-mode-hook
-		 (lambda ()
-		   (setq message-user-agent (gnus-extended-version))))
        (unwind-protect
 	   (progn
 	     ,@forms)
@@ -278,6 +229,7 @@ MAX-COLUMN the optional second argument if it is specified, the return value
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
+  (setq message-user-agent (gnus-extended-version))
   (message-add-action
    `(set-window-configuration ,winconf) 'exit 'postpone 'kill)
   (message-add-action
@@ -599,6 +551,54 @@ If SILENT, don't prompt the user."
      (t gnus-select-method))))
 
 
+
+(defun gnus-extended-version ()
+  "Stringified gnus version."
+  (concat gnus-product-name "/" gnus-version-number " (based on "
+	  gnus-original-product-name " " gnus-original-version-number ")"))
+
+(defun gnus-message-make-user-agent (&optional include-mime-info max-column)
+  "Return user-agent info.
+INCLUDE-MIME-INFO the optional first argument if it is non-nil and the variable
+  `mime-edit-user-agent-value' exists, the return value will include it.
+MAX-COLUMN the optional second argument if it is specified, the return value
+  will be folded up in the proper way."
+  (let ((user-agent (if (and include-mime-info
+			     (boundp 'mime-edit-user-agent-value))
+			(concat (gnus-extended-version)
+				" "
+				mime-edit-user-agent-value)
+		      (gnus-extended-version))))
+    (if max-column
+	(let (boundary)
+	  (unless (natnump max-column) (setq max-column 76))
+	  (with-temp-buffer
+	    (insert "            " user-agent)
+	    (goto-char 13)
+	    (while (re-search-forward "[\n\t ]+" nil t)
+	      (replace-match " "))
+	    (goto-char 13)
+	    (while (re-search-forward "[^ ()/]+\\(/[^ ()/]+\\)? ?" nil t)
+	      (while (eq ?\( (char-after (point)))
+		(forward-list)
+		(skip-chars-forward " "))
+	      (skip-chars-backward " ")
+	      (if (> (current-column) max-column)
+		  (progn
+		    (if (or (not boundary) (eq ?\n (char-after boundary)))
+			(progn
+			  (setq boundary (point))
+			  (unless (eobp)
+			    (delete-char 1)
+			    (insert "\n ")))
+		      (goto-char boundary)
+		      (delete-char 1)
+		      (insert "\n ")))
+		(setq boundary (point))))
+	    (buffer-substring 13 (point-max))))
+      user-agent)))
+
+
 ;;;
 ;;; Gnus Mail Functions
 ;;;
@@ -660,12 +660,6 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
 	   (if full-headers "" message-included-forward-headers)))
       (message-forward post))))
 
-(defun gnus-summary-post-forward (&optional full-headers)
-  "Forward the current article to a newsgroup.
-If FULL-HEADERS (the prefix), include full headers when forwarding."
-  (interactive "P")
-  (gnus-summary-mail-forward full-headers t))
-
 ;;; XXX: generate Subject and ``Topics''?
 (defun gnus-summary-mail-digest (&optional n post)
   "Digests and forwards all articles in this series."
@@ -703,6 +697,12 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
       (save-excursion
 	(set-buffer gnus-original-article-buffer)
 	(message-resend address)))))
+
+(defun gnus-summary-post-forward (&optional full-headers)
+  "Forward the current article to a newsgroup.
+If FULL-HEADERS (the prefix), include full headers when forwarding."
+  (interactive "P")
+  (gnus-summary-mail-forward full-headers t))
 
 (defvar gnus-nastygram-message
   "The following article was inappropriately posted to %s.\n\n"

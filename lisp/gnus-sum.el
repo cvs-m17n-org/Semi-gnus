@@ -674,24 +674,7 @@ is not run if `gnus-visual' is nil."
   :group 'gnus-summary-visual
   :type 'hook)
 
-(defcustom gnus-structured-field-decoder
-  #'eword-decode-and-unfold-structured-field
-  "Function to decode non-ASCII characters in structured field for summary."
-  :group 'gnus-various
-  :type 'function)
-
-(defcustom gnus-unstructured-field-decoder
-  (function
-   (lambda (string)
-     (eword-decode-unstructured-field-body
-      (std11-unfold-string string) 'must-unfold)
-     ))
-  "Function to decode non-ASCII characters in unstructured field for summary."
-  :group 'gnus-various
-  :type 'function)
-
-(defcustom gnus-parse-headers-hook
-  '(gnus-set-summary-default-charset)
+(defcustom gnus-parse-headers-hook '(gnus-set-summary-default-charset)
   "*A hook called before parsing the headers."
   :group 'gnus-various
   :type 'hook)
@@ -829,9 +812,10 @@ which it may alter in any way.")
     (?S ,(macroexpand '(mail-header-subject gnus-tmp-header)) ?s)
     (?s gnus-tmp-subject-or-nil ?s)
     (?n gnus-tmp-name ?s)
-    (?A (car (cdr (funcall gnus-extract-address-components gnus-tmp-from)))
-	?s)
-    (?a (or (car (funcall gnus-extract-address-components gnus-tmp-from))
+    (?A (std11-address-string
+	 (car (mime-read-field 'From gnus-tmp-header))) ?s)
+    (?a (or (std11-full-name-string
+	     (car (mime-read-field 'From gnus-tmp-header)))
 	    gnus-tmp-from) ?s)
     (?F gnus-tmp-from ?s)
     (?x ,(macroexpand '(mail-header-xref gnus-tmp-header)) ?s)
@@ -1016,25 +1000,6 @@ variable (string, integer, character, etc).")
 
 ;; Byte-compiler warning.
 (defvar gnus-article-mode-map)
-
-;; MIME stuff.
-
-(defvar gnus-encoded-word-method-alist
-  '(("chinese" mail-decode-encoded-word-string rfc1843-decode-string)
-    (".*" mail-decode-encoded-word-string))
-  "Alist of regexps (to match group names) and lists of functions to be applied.")
-
-(defun gnus-multi-decode-encoded-word-string (string)
-  "Apply the functions from `gnus-encoded-word-method-alist' that match."
-  (let ((alist gnus-encoded-word-method-alist)
-	elem)
-    (while (setq elem (pop alist))
-      (when (string-match (car elem) gnus-newsgroup-name)
-	(pop elem)
-	(while elem
-	  (setq string (funcall (pop elem) string)))
-	(setq alist nil)))
-    string))
 
 ;; Subject simplification.
 
@@ -1274,7 +1239,6 @@ increase the score of each group you read."
     "L" gnus-summary-lower-score
     "\M-i" gnus-symbolic-argument
     "h" gnus-summary-select-article-buffer
-    "b" gnus-article-view-part
     
     "V" gnus-summary-score-map
     "X" gnus-uu-extract-map
@@ -2399,7 +2363,8 @@ marks of articles."
 	(let ((gnus-summary-line-format-spec spec)
 	      (gnus-newsgroup-downloadable '((0 . t))))
 	  (gnus-summary-insert-line
-	   [0 "" "" "" "" "" 0 0 ""]  0 nil 128 t nil "" nil 1)
+	   (make-full-mail-header 0 "" "" "" "" "" 0 0 "")
+	   0 nil 128 t nil "" nil 1)
 	  (goto-char (point-min))
 	  (setq pos (list (cons 'unread (and (search-forward "\200" nil t)
 					     (- (point) 2)))))
@@ -2469,7 +2434,7 @@ marks of articles."
       (setq gnus-tmp-name gnus-tmp-from))
     (unless (numberp gnus-tmp-lines)
       (setq gnus-tmp-lines 0))
-    (gnus-put-text-property
+    (gnus-put-text-property-excluding-characters-with-faces
      (point)
      (progn (eval gnus-summary-line-format-spec) (point))
      'gnus-number gnus-tmp-number)
@@ -3092,7 +3057,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 (defsubst gnus-nov-parse-line (number dependencies &optional force-new)
   (let ((eol (gnus-point-at-eol))
 	(buffer (current-buffer))
-	header rawtext decoded)
+	header)
 
     ;; overview: [num subject from date id refs chars lines misc]
     (unwind-protect
@@ -3104,22 +3069,8 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	  (setq header
 		(make-full-mail-header
 		 number			; number
-		 (progn
-		   (setq rawtext (gnus-nov-field) ; subject
-			 decoded (funcall
-				  gnus-unstructured-field-decoder rawtext))
-		   (if (string= rawtext decoded)
-		       rawtext
-		     (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
-		     decoded))
-		 (progn
-		   (setq rawtext (gnus-nov-field) ; from
-			 decoded (funcall
-				  gnus-structured-field-decoder rawtext))
-		   (if (string= rawtext decoded)
-		       rawtext
-		     (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
-		     decoded))
+		 (gnus-nov-field)	; subject
+		 (gnus-nov-field)	; from
 		 (gnus-nov-field)	; date
 		 (or (gnus-nov-field)
 		     (nnheader-generate-fake-message-id)) ; id
@@ -3515,14 +3466,15 @@ If LINE, insert the rebuilt thread starting on line LINE."
 (defsubst gnus-article-sort-by-author (h1 h2)
   "Sort articles by root author."
   (string-lessp
-   (let ((extract (funcall
-		   gnus-extract-address-components
-		   (mail-header-from h1))))
-     (or (car extract) (cadr extract) ""))
-   (let ((extract (funcall
-		   gnus-extract-address-components
-		   (mail-header-from h2))))
-     (or (car extract) (cadr extract) ""))))
+   (let ((addr (mime-read-field 'From h1)))
+     (or (std11-full-name-string addr)
+	 (std11-address-string addr)
+	 ""))
+   (let ((addr (mime-read-field 'From h2)))
+     (or (std11-full-name-string addr)
+	 (std11-address-string addr)
+	 ""))
+   ))
 
 (defun gnus-thread-sort-by-author (h1 h2)
   "Sort threads by root author."
@@ -4434,8 +4386,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
       (subst-char-in-region (point-min) (point-max) ?\t ?  t)
       (gnus-run-hooks 'gnus-parse-headers-hook)
       (let ((case-fold-search t)
-	    rawtext decoded
-	    in-reply-to header p lines chars)
+	    in-reply-to header p lines chars ctype)
 	(goto-char (point-min))
 	;; Search to the beginning of the next header.	Error messages
 	;; do not begin with 2 or 3.
@@ -4450,7 +4401,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	  ;; doesn't always go hand in hand.
 	  (setq
 	   header
-	   (vector
+	   (make-full-mail-header
 	    ;; Number.
 	    (prog1
 		(read cur)
@@ -4464,27 +4415,13 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nsubject: " nil t)
-		  (progn
-		    (setq rawtext (nnheader-header-value)
-			  decoded (funcall
-				   gnus-unstructured-field-decoder rawtext))
-		    (if (string-equal rawtext decoded)
-			rawtext
-		      (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
-		      decoded))
+		  (nnheader-header-value)
 		"(none)"))
 	    ;; From.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nfrom: " nil t)
-		  (progn
-		    (setq rawtext (nnheader-header-value)
-			  decoded (funcall
-				   gnus-structured-field-decoder rawtext))
-		    (if (string-equal rawtext decoded)
-			rawtext
-		      (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
-		      decoded))
+		  (nnheader-header-value)
 		"(nobody)"))
 	    ;; Date.
 	    (progn
@@ -4555,6 +4492,11 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	      (goto-char p)
 	      (and (search-forward "\nxref: " nil t)
 		   (nnheader-header-value)))))
+	  (goto-char p)
+	  (if (and (search-forward "\ncontent-type: " nil t)
+		   (setq ctype (nnheader-header-value)))
+	      (mime-entity-set-content-type-internal
+	       header (mime-parse-Content-Type ctype)))
 	  (when (equal id ref)
 	    (setq ref nil))
 

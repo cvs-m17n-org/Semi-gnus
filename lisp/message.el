@@ -5,6 +5,8 @@
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;;	Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;;	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
+;;	Katsumi Yamaoka <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -1060,7 +1062,6 @@ The cdr of ech entry is a function for applying the face to a region.")
     (Lines)
     (Expires)
     (Message-ID)
-    ;; (References . message-shorten-references)
     (References . message-fill-header)
     (User-Agent))
   "Alist used for formatting headers.")
@@ -2307,12 +2308,11 @@ the user from the mailer."
   (let ((errbuf (if message-interactive
 		    (generate-new-buffer " sendmail errors")
 		  0))
-	resend-addresses delimline)
+	resend-to-addresses delimline)
     (let ((case-fold-search t))
       (save-restriction
 	(message-narrow-to-headers)
-	;; XXX: We need to handle Resent-CC/Resent-BCC, too.
-	(setq resend-addresses (message-fetch-field "resent-to")))
+	(setq resend-to-addresses (message-fetch-field "resent-to")))
       ;; Change header-delimiter to be what sendmail expects.
       (goto-char (point-min))
       (re-search-forward
@@ -2352,8 +2352,8 @@ the user from the mailer."
 		     ;; We must not do that for a resend
 		     ;; because we would find the original addresses.
 		     ;; For a resend, include the specific addresses.
-		     (if resend-addresses
-			 (list resend-addresses)
+		     (if resend-to-addresses
+			 (list resend-to-addresses)
 		       '("-t")))))
     (when message-interactive
       (save-excursion
@@ -2371,7 +2371,7 @@ the user from the mailer."
   "Pass the prepared message buffer to qmail-inject.
 Refer to the documentation for the variable `message-send-mail-function'
 to find out how to use this."
-  ;; replace the header delimiter with a blank line.
+  ;; replace the header delimiter with a blank line
   (goto-char (point-min))
   (re-search-forward
    (concat "^" (regexp-quote mail-header-separator) "\n"))
@@ -3362,7 +3362,8 @@ Headers already prepared in the buffer are not modified."
 	(if (or (= (following-char) ?,)
 		(eobp))
 	    (when (not quoted)
-	      (if last
+	      (if (and (> (current-column) 78)
+		       last)
                   (save-excursion
                     (goto-char last)
 		    (looking-at "[ \t]*")
@@ -3522,7 +3523,6 @@ Headers already prepared in the buffer are not modified."
 	  (nconc message-buffer-list (list (current-buffer))))))
 
 (defvar mc-modes-alist)
-(defvar message-get-reply-buffer-function nil)
 (defun message-setup (headers &optional replybuffer actions)
   (when (and (boundp 'mc-modes-alist)
 	     (not (assq 'message-mode mc-modes-alist)))
@@ -3636,10 +3636,10 @@ OTHER-HEADERS is an alist of header/value pairs."
   "Start editing a reply to the article in the current buffer."
   (interactive)
   (let ((cur (current-buffer))
+	from subject date to cc
+	references message-id follow-to
 	(inhibit-point-motion-hooks t)
-	from date subject mct mft mrt
-        never-mct to cc
-	references message-id follow-to gnus-warning)
+	mct never-mct mft mrt gnus-warning)
     (save-restriction
       (message-narrow-to-head)
       ;; Allow customizations to have their say.
@@ -3776,7 +3776,8 @@ that further discussion should take place only in "
 			    (if wide to-address nil)))
 
     (setq message-reply-headers
-	  (vector 0 subject from date message-id references 0 0 ""))
+	  (make-full-mail-header-from-decoded-header
+	   0 subject from date message-id references 0 0 ""))
 
     (message-setup
      `((Subject . ,subject)
@@ -3794,22 +3795,20 @@ that further discussion should take place only in "
 
 ;;;###autoload
 (defun message-followup (&optional to-newsgroups)
-  "Follow up to the message in the current buffer."
+  "Follow up to the message in the current buffer.
+If TO-NEWSGROUPS, use that as the new Newsgroups line."
   (interactive)
   (let ((cur (current-buffer))
+	from subject date mct
+	references message-id follow-to
 	(inhibit-point-motion-hooks t)
-	from date subject mct mft mrt
 	(message-this-is-news t)
-	followup-to distribution newsgroups posted-to
-	references message-id follow-to gnus-warning)
+	followup-to distribution newsgroups gnus-warning posted-to mft mrt)
     (save-restriction
       (message-narrow-to-head)
-      ;; Allow customizations to have their say.
-      ;; This is a followup.
       (when (message-functionp message-followup-to-function)
 	(setq follow-to
 	      (funcall message-followup-to-function)))
-      ;; Find all relevant headers we need.
       (setq from (message-fetch-field "from")
 	    date (message-fetch-field "date" t)
 	    subject (or (message-fetch-field "subject") "none")
@@ -3944,7 +3943,8 @@ that further discussion should take place only in "
     (message-pop-to-buffer (message-buffer-name "followup" from newsgroups))
 
     (setq message-reply-headers
-	  (vector 0 subject from date message-id references 0 0 ""))
+	  (make-full-mail-header-from-decoded-header
+	   0 subject from date message-id references 0 0 ""))
 
     (message-setup
      `((Subject . ,subject)
