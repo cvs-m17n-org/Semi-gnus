@@ -1,4 +1,4 @@
-;;; gnus-agent.el --- unplugged support for Gnus
+;;; gnus-agent.el --- unplugged support for Semi-gnus
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
@@ -258,6 +258,13 @@
   "Start Gnus unplugged."
   (interactive)
   (setq gnus-plugged nil)
+  (gnus))
+
+;;;###autoload
+(defun gnus-plugged ()
+  "Start Gnus plugged."
+  (interactive)
+  (setq gnus-plugged t)
   (gnus))
 
 ;;;###autoload
