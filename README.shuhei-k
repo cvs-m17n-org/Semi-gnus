@@ -1,0 +1,56 @@
+========================================================================
+Branch Tag:	shuhei-k
+Branch Owner:	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
+Branch Goal:	Implement latest proposals for message header fields.
+		Test for overview hack (avoid corrupting overview data).
+Branch Policy:	(not defined yet)
+========================================================================
+NEWS:
+
+* overview hack
+
+  Preserve undecoded form of Subject: and From: fields as well as
+  decoded ones in overview information, and use undecoded versions when
+  saving overview cache files.  This prevents corruption of summary
+  lines of cached messages.
+  (Without this hack, Subject: and From: fields of cached messages will
+  be over-decoded.)
+
+* Mail-Followup-To:, Mail-Reply-To:
+
+  Use Mail-Followup-To: and Mail-Reply-To: if exists. [1][2]
+  Generating reasonable values for Mail-Followup-To: is not supported yet.
+
+  New commands: `message-goto-mail-(copies|followup|reply)-to'.
+  New user options: `message-use-mail-(copies|followup|reply)-to'.
+
+* User-Agent:
+
+  Use User-Agent: instead of X-Mailer/X-Newsreader. [3]
+
+* In-Reply-To:
+
+  Changed format of In-Reply-To. [4]
+
+* References:
+
+  Fold long(> 76 chars) lines.
+
+TODO:
+
+* Completion for Mail-Followup-To:.  Use `to-list' info?
+
+* Don't insert Sender: for most cases?
+
+* Cleanup smtp.el? (-> public branches?)
+
+References:
+
+[1] Jacob Palme, The "Mail-Followup-To" header,
+    draft-ietf-drums-mail-followup-to-00.txt, November 1997.
+[2] Daniel J. Bernstein, Mail-Followup-To and Mail-Reply-To,
+    ftp://koobera.math.uic.edu/www/proto/replyto.html, 1998.
+[3] USEFOR Working Group, News Article Format,
+    draft-ietf-usefor-article-00.txt, May 1998.
+[4] P. Resnick (editor), Internet Message Format Standard,
+    draft-ietf-drums-msg-fmt-04.txt, March 1998.
