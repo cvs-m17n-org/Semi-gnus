@@ -1,3 +1,18 @@
+2000-03-05  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.11 (This is alpha status.)
+	Fix bugs.
+
+	* lisp/gnus-spec.el (gnus-update-format-specifications): Force
+	update format specifications, when differ `gnus-version' and
+	`gnus-newsrc-file-version' instead of `gnus-version' and
+	`gnus-vertsion' in `gnus-format-specs'.
+	Do not add `gnus-version' into `gnus-format-specs'.
+	(gnus-compile): Remove `gnus-version' from `gnus-format-specs'.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.11.
+	(gnus-continuum-version): Return version number of based Gnus.
+
 2000-03-04  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.10 (This is alpha status.)
