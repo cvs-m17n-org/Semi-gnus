@@ -1,7 +1,7 @@
 ;;; gnus-draft.el --- draft message support for Semi-gnus
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: mail, news, MIME, offline
 
