@@ -68,10 +68,10 @@ install-package-lisp:
 	else \
 	  package_dir="$(PACKAGEDIR)"; \
 	fi; \
-	echo "cd lisp && $(MAKE)" \
+	echo "cd lisp && $(MAKE) EMACS=$(XEMACS)" \
 		"lispdir=$$package_dir""/lisp/$(GNUS_PRODUCT_NAME)" \
 		"install-lisp"; \
-	cd lisp && $(MAKE) \
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" \
 		lispdir="$$package_dir""/lisp/$(GNUS_PRODUCT_NAME)" \
 		install-lisp
 
