@@ -48,6 +48,8 @@
 
 (defvar nnshimbun-default-type 'asahi)
 
+(defvar nnshimbun-check-interval 300)
+
 (defvar nnshimbun-type-definition
   `((asahi
      (address . "asahi")
@@ -77,6 +79,13 @@
      (coding-system . ,(if (boundp 'MULE) '*euc-japan* 'euc-jp))
      (generate-nov  . nnshimbun-wired-generate-nov-database)
      (make-contents . nnshimbun-wired-make-contents))
+    (yomiuri
+     (address . "yomiuri")
+     (url . "http://www.yomiuri.co.jp/")
+     (groups "shakai" "sports" "seiji" "keizai" "kokusai" "fuho")
+     (coding-system . ,(if (boundp 'MULE) '*sjis* 'shift_jis))
+     (generate-nov  . nnshimbun-yomiuri-generate-nov-database)
+     (make-contents . nnshimbun-yomiuri-make-contents))
     ))
 
 (defvoo nnshimbun-directory (nnheader-concat gnus-directory "shimbun/")
@@ -496,6 +505,16 @@
 	  year
 	  (or time "00:00")))
 
+(if (fboundp 'regexp-opt)
+    (defalias 'nnshimbun-regexp-opt 'regexp-opt)
+  (defun nnshimbun-regexp-opt (strings &optional paren)
+    "Return a regexp to match a string in STRINGS.
+Each string should be unique in STRINGS and should not contain any regexps,
+quoted or not.  If optional PAREN is non-nil, ensure that the returned regexp
+is enclosed by at least one regexp grouping construct."
+    (let ((open-paren (if paren "\\(" "")) (close-paren (if paren "\\)" "")))
+      (concat open-paren (mapconcat 'regexp-quote strings "\\|") close-paren))))
+
 
 ;; Fast fill-region function
 
@@ -783,7 +802,7 @@
 
 ;;; Wired
 
-(defun nnshimbun-wired-get-headers ()
+(defun nnshimbun-wired-get-all-headers ()
   (save-excursion
     (set-buffer nnshimbun-buffer)
     (let ((group-header-alist (mapcar (lambda (g) (cons g nil)) nnshimbun-groups))
@@ -791,7 +810,7 @@
 	  (regexp (format
 		   "<a href=\"\\(%s\\|/\\)\\(news/news/\\(%s\\)/story/\\(\\([0-9][0-9][0-9][0-9]\\)\\([0-9][0-9]\\)\\([0-9][0-9]\\)[0-9]+\\)\\.html\\)\"><b>"
 		   (regexp-quote nnshimbun-url)
-		   (regexp-opt nnshimbun-groups))))
+		   (nnshimbun-regexp-opt nnshimbun-groups))))
       (dolist (xover (list (concat nnshimbun-url "news/news/index.html")
 			   (concat nnshimbun-url "news/news/last_seven.html")))
 	(erase-buffer)
@@ -822,14 +841,13 @@
       group-header-alist)))
 
 (defvar nnshimbun-wired-last-check nil)
-(defvar nnshimbun-wired-check-interval 300)
 
 (defun nnshimbun-wired-generate-nov-database (&rest args)
   (unless (and nnshimbun-wired-last-check
 	       (< (nnshimbun-lapse-seconds nnshimbun-wired-last-check)
-		  nnshimbun-wired-check-interval))
+		  nnshimbun-check-interval))
     (save-excursion
-      (dolist (list (nnshimbun-wired-get-headers))
+      (dolist (list (nnshimbun-wired-get-all-headers))
 	(let ((group (car list)))
 	  (nnshimbun-possibly-change-server group)
 	  (when (cdr list)
@@ -874,6 +892,116 @@
 	    "; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
     (encode-coding-string (buffer-string)
 			  (mime-charset-to-coding-system "ISO-2022-JP"))))
+
+
+
+;;; www.yomiuri.co.jp
+
+(defun nnshimbun-yomiuri-get-all-headers ()
+  (save-excursion
+    (set-buffer nnshimbun-buffer)
+    (erase-buffer)
+    (nnshimbun-retrieve-url (concat nnshimbun-url "main.htm") t)
+    (let ((group-header-alist (mapcar (lambda (g) (cons g nil)) nnshimbun-groups)))
+      (dolist (group nnshimbun-groups)
+	(let (start)
+	  (when (and (search-forward (format "\n<!-- /news/%s=start -->\n" group) nil t)
+		     (setq start (point))
+		     (search-forward (format "\n<!-- /news/%s=end -->\n" group) nil t))
+	    (forward-line -1)
+	    (save-restriction
+	      (narrow-to-region start (point))
+	      (goto-char start)
+	      (while (re-search-forward
+		      "<a href=\"/\\([0-9]+\\)/\\(\\(\\([0-9][0-9][0-9][0-9]\\)\\([0-9][0-9]\\)\\([0-9][0-9]\\)[A-z0-9]+\\)\\.htm\\)\"[^>]*>"
+		      nil t)
+		(let ((url   (concat (match-string 1) "a/" (match-string 2)))
+		      (id    (format "<%s%s%%%s>"
+				     (match-string 1)
+				     (match-string 3)
+				     group))
+		      (year  (string-to-number (match-string 4)))
+		      (month (string-to-number (match-string 5)))
+		      (day   (string-to-number (match-string 6)))
+		      (subject (mapconcat
+				'identity
+				(split-string
+				 (buffer-substring
+				  (match-end 0)
+				  (progn (search-forward "<br>" nil t) (point)))
+				 "<[^>]+>")
+				""))
+		      date x)
+		  (when (string-match "^◆" subject)
+		    (setq subject (substring subject (match-end 0))))
+		  (if (string-match "(\\([0-9][0-9]:[0-9][0-9]\\))$" subject)
+		      (setq date (nnshimbun-make-date-string
+				  year month day (match-string 1 subject))
+			    subject (substring subject 0 (match-beginning 0)))
+		    (setq date (nnshimbun-make-date-string year month day)))
+		  (setcdr (setq x (assoc group group-header-alist))
+			  (cons (make-full-mail-header
+				 0
+				 (nnshimbun-mime-encode-string subject)
+				 "webmaster@www.yomiuri.co.jp"
+				 date id "" 0 0 (concat nnshimbun-url url))
+				(cdr x)))))))))
+      group-header-alist)))
+
+(defvar nnshimbun-yomiuri-last-check nil)
+
+(defun nnshimbun-yomiuri-generate-nov-database (&rest args)
+  (unless (and nnshimbun-yomiuri-last-check
+	       (< (nnshimbun-lapse-seconds nnshimbun-yomiuri-last-check)
+		  nnshimbun-check-interval))
+    (save-excursion
+      (dolist (list (nnshimbun-yomiuri-get-all-headers))
+	(let ((group (car list)))
+	  (nnshimbun-possibly-change-server group)
+	  (when (cdr list)
+	    (set-buffer (nnshimbun-open-nov group))
+	    (let (i)
+	      (goto-char (point-max))
+	      (forward-line -1)
+	      (setq i (or (ignore-errors (read (current-buffer))) 0))
+	      (goto-char (point-max))
+	      (dolist (header (cdr list))
+		(unless (nnshimbun-search-id group (mail-header-id header))
+		  (mail-header-set-number header (setq i (1+ i)))
+		  (nnheader-insert-nov header)))))))
+      (nnshimbun-save-nov)
+      (setq nnshimbun-yomiuri-last-check (current-time)))))
+
+(defun nnshimbun-yomiuri-make-contents (header)
+  (goto-char (point-min))
+  (let (start (html t))
+    (when (and (search-forward "\n<!--  honbun start  -->\n" nil t)
+	       (setq start (point))
+	       (search-forward "\n<!--  honbun end  -->\n" nil t))
+      (delete-region (point-min) start)
+      (forward-line -2)
+      (delete-region (point) (point-max))
+      (goto-char (point-min))
+      (while (search-forward "<p>" nil t)
+	(insert "\n\n"))
+      (nnweb-remove-markup)
+      (nnweb-decode-entities)
+      (goto-char (point-min))
+      (when (skip-chars-forward "\n")
+	(delete-region (point-min) (point)))
+      (while (not (eobp))
+	(nnshimbun-fill-line))
+      (goto-char (point-max))
+      (when (skip-chars-backward "\n")
+	(delete-region (1+ (point)) (point-max)))
+      (setq html nil))
+    (goto-char (point-min))
+    (nnshimbun-insert-header header)
+    (insert "Content-Type: " (if html "text/html" "text/plain")
+	    "; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
+    (encode-coding-string (buffer-string)
+			  (mime-charset-to-coding-system "ISO-2022-JP"))))
+
 
 
 
