@@ -1,3 +1,8 @@
+1998-09-23  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-make-user-agent): Add extended version
+	number to Emacs/{VERSION} (e.g. "Emacs/20.3.90").
+
 1998-09-22  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-agent.el (gnus-agent-expire): Bug fix when variable

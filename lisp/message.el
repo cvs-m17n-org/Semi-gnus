@@ -3184,7 +3184,13 @@ give as trustworthy answer as possible."
 		)
 	     ;; not XEmacs
 	     (concat
-	      (format "Emacs/%d.%d" emacs-major-version emacs-minor-version)
+	      "Emacs/"
+	      (let ((versions (split-string emacs-version "\\.")))
+		(mapconcat 'identity
+			   (if (> (length versions) 2)
+			       (nreverse (cdr (nreverse versions)))
+			     versions)
+			   "."))
 	      (if (>= emacs-major-version 20)
 		  (if (and (boundp 'enable-multibyte-characters)
 			   enable-multibyte-characters)
