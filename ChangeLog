@@ -1,5 +1,55 @@
 1999-06-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* sample.lpath.el: New file. It is supposed to be used for telling
+	old Emacsen where EMU, APEL or CUSTOM packages have already
+	installed.
+
+	* lisp/score-mode.el (score-mode-coding-system): Default to
+	`*ctext*' under Mule 2.
+
+	* lisp/nnmail.el (nnmail-save-active): Bind `output-coding-system'
+	to the value of `nnmail-active-file-coding-system'.
+
+	* lisp/message.el (message-set-auto-save-file-name): Use
+	`set-file-coding-system' statically under Mule 2.
+	(message-do-fcc): Bind `output-coding-system' to `raw-text'.
+	(message-draft-coding-system): Default to `*junet*' under Mule 2.
+	(TopLevel): Require `static'.
+
+	* lisp/gnus-util.el (gnus-point-at-eol): Defun statically for the
+	various Emacsen.
+	(gnus-point-at-bol): Ditto.
+	(TopLevel): Require `static'.
+
+	* lisp/gnus-start.el (gnus-startup-file-coding-system): Default to
+	`*ctext*' under Mule 2.
+
+	* lisp/gnus-msg.el (gnus-inews-do-gcc): Bind `output-coding-system'
+	to `raw-text'.
+
+	* lisp/gnus-ems.el (language-info-alist): Defvar-maybe for old
+	Emacsen.
+	(current-language-environment): Ditto.
+	(set-language-info): Defun-maybe for old Emacsen.
+	(get-language-info): Ditto.
+	(assoc-ignore-case): Ditto.
+
+	* lisp/gnus-cite.el (gnus-cite-parse): Bind `mc-flag' to nil.
+
+	* lisp/dgnushack.el (TopLevel): Define some unknown functions for
+	avoiding byte compile warnings.
+	(TopLevel): Require `emu' for picking up some macros, bind some
+	colon keywords, bind functions defined by `defun-maybe', bind
+	defcustom'ed variables and optimize byte code for `char-after' and
+	`char-before' for old Emacsen.
+	(TopLevel): Attempt to load ~/.lpath.el.
+
+	* configure: Regenerate by autoconf 2.14.1.
+
+1999-06-11  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
 
 	* lisp/gnus-art.el (gnus-article-display-x-face-with-x-face-mule):
