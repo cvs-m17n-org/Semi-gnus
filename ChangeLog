@@ -1,3 +1,9 @@
+2002-02-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+	Suggested by Kenichi OKADA <okada@opaopa.org>
+
+	* lisp/message.el (message-save-drafts): Override
+	`mime-header-encode-method-alist'.
+
 2002-01-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-cite-prefix-regexp): Fix the regexp.

@@ -6310,7 +6310,9 @@ regexp varstr."
       (insert-buffer buffer)
       (setq message-reply-headers reply-headers)
       (message-generate-headers '((optional . In-Reply-To)))
-      (mime-edit-translate-buffer))
+      (let ((mime-header-encode-method-alist
+	     '((eword-encode-unstructured-field-body))))
+	(mime-edit-translate-buffer)))
     (set-buffer-modified-p nil))
   (message "Saving %s...done" buffer-file-name))
 
