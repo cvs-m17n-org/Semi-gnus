@@ -11505,7 +11505,8 @@ If ALL is a number, fetch this number of articles."
 ;;;	      (gnus-sorted-difference
 ;;;	       (gnus-uncompress-range (list gnus-newsgroup-active))
 ;;;	       old)
-	      (gnus-remove-from-range (list gnus-newsgroup-active) old)
+	      (gnus-range-difference
+	       (gnus-remove-from-range (list gnus-newsgroup-active) old))
 )
 	(setq len (gnus-range-length older))
 	(cond
