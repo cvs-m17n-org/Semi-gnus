@@ -226,6 +226,10 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
 (when (boundp 'MULE)
+  ;; Bind the function `base64-encode-string' before loading canlock.
+  ;; Since canlock will bind it as an autoloaded function, it causes
+  ;; damage to define the function by MEL.
+  (load (expand-file-name "base64.el" srcdir) nil t t)
   ;; Load special macros for compiling canlock.el.
   (load (expand-file-name "canlock-om.el" srcdir) nil t t))
 

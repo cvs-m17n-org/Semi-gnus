@@ -42,7 +42,9 @@
   (defvar gnus-list-identifiers)) ; gnus-sum is required where necessary
 (eval-and-compile
   (if (boundp 'MULE)
-      (require 'canlock-om)
+      (progn
+	(require 'base64)
+	(require 'canlock-om))
     (require 'canlock)))
 (require 'mailheader)
 (require 'nnheader)
