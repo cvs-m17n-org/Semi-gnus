@@ -80,18 +80,8 @@ For more detailed information, please read README.branch.
 How to get? (via ftp)
 =====================
 
-  The stable version of T-gnus is available from
+  T-gnus 6.14 is available from
 
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/
-
-  and the experimental version of T-gnus is available from
-
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.14/
-
-  In addition, semi-daily snapshots are also available from
-
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/snapshots/
-  or
     ftp://ftp.jpl.org/pub/elisp/t-gnus-6.14/snapshots/
 
   NOTE: These snapshots are manually created when the urge takes the

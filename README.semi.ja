@@ -82,21 +82,9 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 取得方法 (ftp)
 ==============
 
-  安定版は
+  T-gnus 6.14 は以下の場所から取得可能です。
 
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/
-
-  から、そして開発版は
-
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.14/
-
-  から、それぞれ取得可能です。そしてほぼ毎日の snapshot が
-
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.12/snapshots/
-  または
     ftp://ftp.jpl.org/pub/elisp/t-gnus-6.14/snapshots/
-
-  から取得可能です。
 
   注意: これらの snapshot は a-ftp site の管理者の気が向いたときに手動
   で作成され、普通はテストされていません。
