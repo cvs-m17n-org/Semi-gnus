@@ -24,7 +24,7 @@ How to get? (via CVS)
 (1) checkout
 
     % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	checkout [-r semi-gnus] gnus
+	checkout [-r TAG] gnus
 
 (2) compile
 
@@ -33,9 +33,28 @@ How to get? (via CVS)
 
 (3) update
 
-    % cvs update [-r semi-gnus]
+    % cvs update [-r TAG]
 
-The ``semi-gnus'' CVS tag is assigned to the latest stable version.
+Major tags are following:
+
+    semi-gnus		assigned to the latest stable version.  It is
+			very conservative.
+
+    for-semi-N1_N2	assigned to the latest stable version for SEMI 
+			API N1.N2 (N1 and N2 are natural number).
+			(e.g. `for-semi-1_3' is for SEMI API 1.3)
+
+    gnus-N1_N2_N3	assigned to gnus(Gnus) N1.N2.N3
+			(e.g. `gnus-6_2_1' means gnus 6.2.1).
+
+    larsi		Original Gnus
+
+    himi		himi branch
+
+    ichikawa		ichikawa branch
+
+    akr			akr branch
+
 
 How to get? (via ftp)
 =====================
