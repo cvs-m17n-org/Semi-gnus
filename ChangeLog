@@ -14,7 +14,7 @@
 2000-11-21  KANEMATSU Daiji <kanematu@sra.co.jp>
 
 	* lisp/gnus-art.el (gnus-treat-display-xface): Default to `head'
-	when Emacs 21 is running and compface command is available.
+	when Emacs 21 is running and uncompface command is available.
 
 2000-11-21  Katsumi Yamaoka <yamaoka@jpl.org>
 
