@@ -1,3 +1,14 @@
+2004-01-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/canlock.el: Reload sha1-el provided by FLIM when an old
+	version (maybe provided by the XEmacs ecrypt package) was loaded.
+
+	* lisp/dgnushack.el (max-specpdl-size): Don't modify the value.
+	(byte-optimize-form-code-walker): Simplify the test form; doc fix.
+	(char-after): Don't byte-optimize it.
+	(char-before): Ditto.
+	(dgnushack-bind-colon-keywords): Remove.
+
 2004-01-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/smime.el: Remove.

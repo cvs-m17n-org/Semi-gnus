@@ -865,16 +865,8 @@ Scoring
 * Global Score Files::          $BCO$r$D$+$_!"<*$r@Z$jNv$/%9%3%"%U%!%$%k(B
 * Kill Files::                  $B$=$l$i$O$^$@$3$3$K$"$k$,!"L5;k$9$k;v$,$G$-$k(B
 * Converting Kill Files::       $B>C5n%U%!%$%k$r%9%3%"%U%!%$%k$KJQ49$9$k(B
-* GroupLens::                   $B$I$l$rFI$`$N$,9%$-$+$NM=8@$rF@$k(B
 * Advanced Scoring::            $B%9%3%"$NK!B'$r:n$k$?$a$KO@M}I=8=$r;H$&(B
 * Score Decays::                $B%9%3%"$r8O$l$F$$$+$;$k$N$OLr$KN)$D;v$b$"$k(B
-
-GroupLens
-
-* Using GroupLens::             $B$I$N$h$&$K(B gnus $B$K(B GroupLens $B$r;H$o$;$k$h$&$K$9$k$+(B
-* Rating Articles::             GropLens $B$K$"$J$?$,$I$N$h$&$KCM$rIU$1$k$+$rCN$i$;$k(B
-* Displaying Predictions::      GropuLens $B$K$h$C$FM?$($i$l$?M=8@$rI=<($9$k(B
-* GroupLens Variables::         GoupLens $B$r%+%9%?%^%$%:$9$k(B
 
 Advanced Scoring
 
@@ -17981,7 +17973,6 @@ Gnus $B$O35N,%P%C%U%!$r:n@.$9$kA0$K!"8=:_$N%0%k!<%W$KE,MQ$5$l$k$I$s(B
 * Global Score Files::          $BCO$r$D$+$_!"<*$r@Z$jNv$/%9%3%"%U%!%$%k(B
 * Kill Files::                  $B$=$l$i$O$^$@$3$3$K$"$k$,!"L5;k$9$k;v$,$G$-$k(B
 * Converting Kill Files::       $B>C5n%U%!%$%k$r%9%3%"%U%!%$%k$KJQ49$9$k(B
-* GroupLens::                   $B$I$l$rFI$`$N$,9%$-$+$NM=8@$rF@$k(B
 * Advanced Scoring::            $B%9%3%"$NK!B'$r:n$k$?$a$KO@M}I=8=$r;H$&(B
 * Score Decays::                $B%9%3%"$r8O$l$F$$$+$;$k$N$OLr$KN)$D;v$b$"$k(B
 @end menu
@@ -19335,183 +19326,6 @@ Gnus $B$O$^$@!"$"$N$&$6$C$?$$8E$$>C5n%U%!%$%k$r%5%]!<%H$7$F$$$^$9!#<B:]>C(B
 $B$K(B @code{gnus-kill} $B7A<00J30$N$b$N$,$?$/$5$s4^$^$l$F$$$l$P!"$=$l$i$r<j$G(B
 $BJQ49$7$J$1$l$P$J$j$^$;$s!#$"$k$$$OC1$K$=$l$i$r!"$=$N$^$^$K$7$F$*$$$F$/$@(B
 $B$5$$!#(BGnus $B$O0JA0F1MM$K$=$l$i$r;H$C$F$/$l$k$G$7$g$&!#(B
-
-@node GroupLens
-@section GroupLens
-@cindex GroupLens
-
-@sc{$BCm0U(B:} $B;DG0$J$3$H$K(B GroupLens $B5!9=$OJD:?$5$l$F$$$k$h$&$J$N$G!"$3$N9`(B
-$B$O<g$H$7$FNr;KE*$J6=<q$N$?$a$K=q$+$l$F$$$^$9!#(B
-
-@uref{http://www.cs.umn.edu/Research/GroupLens/, GroupLens} $B$O!"KhF|:n@.(B
-$B$5$l$kB?$/$NNL$N%K%e!<%95-;v$+$i<A$NNI$$5-;v$rB>$N?M$H6&$K8+$D$1$k$N$r=u(B
-$B$1$k$?$a$N6&F1A*JL5!9=$G$9!#(B
-
-$B$3$l$rC#@.$9$k$?$a$K!"(BGroupLens $B5!9=$O$"$J$?$,4{$KFI$s$@5-;v$KBP$9$k0U8+(B
-$B$r!"F1$8$h$&$J;v$r$7$?B>$N?M$N0U8+$H7k9g$7$F!"$=$l$>$l$NL$FI%K%e!<%95-;v(B
-$B$K8D?M2=$5$l$?M=8@$rM?$($^$9!#(BGroupLens $B$rCg?M$N$h$&$J$b$N$@$H8+$J$7$F$/(B
-$B$@$5$$!#(BGroupLens $B$O$"$J$?$,$I$N$h$&$K5-;v$N2ACM$rIU$1$k$+$r8+$F!"F1$8$h(B
-$B$&$K5-;v$N2ACM$rIU$1$k?M$rC5$7$^$9!#0lEY$"$J$?$N0U8+$H0lCW$9$k?M$rH/8+$9(B
-$B$l$P!"M=8@$N7A$G!"$=$l$i$N?M$,5-;v$r$I$&;W$&$+$r$"$J$?$K9p$2$^$9!#$"$J$?(B
-$B$O$3$NM=8@$r5-;v$rFI$_$?$$$+$I$&$+$r7hDj$9$k$N$KLrN)$F$k;v$,$G$-$^$9!#(B
-
-@menu
-* Using GroupLens::             $B$I$N$h$&$K(B gnus $B$K(B GroupLens $B$r;H$o$;$k$h$&$K$9$k$+(B
-* Rating Articles::             GropLens $B$K$"$J$?$,$I$N$h$&$KCM$rIU$1$k$+$rCN$i$;$k(B
-* Displaying Predictions::      GropuLens $B$K$h$C$FM?$($i$l$?M=8@$rI=<($9$k(B
-* GroupLens Variables::         GoupLens $B$r%+%9%?%^%$%:$9$k(B
-@end menu
-
-@node Using GroupLens
-@subsection GroupLens $B$r;H$&(B
-
-GroupLens $B$r;H$&$?$a$K$O!"8=:_$A$^$?$KB8:_$9$kM#0l$N(B better bit $B$G$"(B
-$B$k(B @uref{http://www.cs.umn.edu/Research/GroupLens/bbb.html, Better Bit
-Bureau (BBB)} $B$KI.L>(B (pseudonym) $B$rEPO?$7$J$1$l$P$J$j$^$;$s!#(B
-
-$BEPO?$7$?8e$G!"$$$/$D$+$NJQ?t$r@_Dj$9$kI,MW$,$"$j$^$9!#(B
-
-@table @code
-@item gnus-use-grouplens
-@vindex gnus-use-grouplens
-$B$3$NJQ?t$r(B @code{nil} $B$G$J$$CM$K@_Dj$9$k$H!"(BGnus $B$,A4$F$N(B GroupLens $B4XO"(B
-$B4X?t$r%U%C%/$9$k$h$&$K$J$j$^$9!#(B
-
-@item grouplens-pseudonym
-@vindex grouplens-pseudonym
-$B$3$NJQ?t$O(B Better Bit Bureau $B$KEPO?$7$?$H$-$K$b$i$C$?I.L>$K@_Dj$5$l$k$Y(B
-$B$-$G$9!#(B
-
-@item grouplens-newsgroups
-@vindex grouplens-newsgroups
-GroupLens $B$NM=8@$rF@$?$$$H;W$&%0%k!<%W$N%j%9%H$G$9!#(B
-@end table
-
-$B$3$l$,5/$->e$,$C$F(B GroupLens $B$r<B9T$9$k$?$a$KI,MW$J:GDc8B$N@_Dj$G$9!#0l(B
-$BEYEPO?$9$k$H!"(BGroupLens $B$O$"$J$?$KB>$N?M$,9M$($kJ?6Q$K4p$E$$$?%9%3%"$r$"(B
-$B$J$?$KDs6!$9$k$3$H$r;O$a$^$9!#$7$+$7!"(BGroupLens $B$NK\Ev$NMx1W$r<u$1$k$?$a(B
-$B$K$O!"<+J,<+?H$G5-;v$NCMIU$1$r;O$a$J$1$l$P$J$j$^$;$s!#$=$&$9$k$H!"(B
-GroupLens $B$,$"$J$?$KDs6!$9$k%9%3%"$O$"$J$?$,IaCJG<F@$9$k$h$&$J0U8+$r;}$C(B
-$B$??M$,4{$KCM$rIU$1$?4p$E$$$F8D?M2=$5$l$^$9!#(B
-
-@node Rating Articles
-@subsection Rating Articles
-
-GroupLens $B$G$O!"5-;v$O(B 1 $B$+$i(B 5 $B$^$G$G$=$l$r4^$s$@HO0O$GCM$rIU$1$i$l$^$9!#(B
-1 $B$OBS0h$NL5BL8/$$$N$h$&$J$b$N$@$H9M$($i$l!"(B5 $B$O5-;v$,K\Ev$KNI$$$H9M$($i(B
-$B$l$k$$$&;v$r0UL#$7$^$9!#$"$J$?$,<+J,<+?H$K?R$M$k4pK\E*$J<ALd$O!"(B
-``1 $B$+$i(B 5 $B$NHO0O$NCf$G!"$3$l$HF1$8$h$&$J5-;v$r$b$C$HFI$_$?$$$@$m$&(B
-$B$+(B?'' $B$G$9!#(B
-
-GroupLens $B$G!"5-;v$NCM$rEPO?$9$k$?$a$N;M$D$NJ}K!$,$"$j$^$9!#(B
-
-@table @kbd
-@item r
-@kindex r (GroupLens)
-@findex bbb-summary-rate-article
-$B$3$N4X?t$O(B 1 $B$+$i(B 5 $B$NHO0O$NCMIU$1$NF~NO$rB%?J$7$^$9!#(B
-
-@item k
-@kindex k (GroupLens)
-@findex grouplens-score-thread
-$B$3$N4X?t$OCMIU$1$NF~NO$rB%?J$7!"%9%l%C%I$NA4$F$N5-;v$rCMIU$1$^$9!#$3$l(B
-$B$O(B rec.humor $B$K$"$k$h$&$J$"$ND9$$4VB3$/%9%l%C%I$KBP$7$FHs>o$KLr$KN)$A$^(B
-$B$9!#(B
-@end table
-
-$B<!$NFs$D$NL?Na!"(B@kbd{n} $B$H(B @kbd{,} $B$O!"$"$J$?$,FI$s$G$$$k5-;v$N%9%3%"$K(B
-$B$J$k?tCM@\F,0z?t$r$H$j$^$9!#(B
-
-@table @kbd
-@item 1-5 n
-@kindex n (GroupLens)
-@findex grouplens-next-unread-article
-$B5-;v$NCM$rIU$1$F!"<!$NL$FI5-;v$K0\F0$7$^$9!#(B
-
-@item 1-5 ,
-@kindex , (GroupLens)
-@findex grouplens-best-unread-article
-$B5-;v$NCM$rIU$1$F<!$N0lHV9b$$%9%3%"$NL$FI5-;v$K0\F0$7$^$9!#(B
-@end table
-
-$B$b$78=:_$N5-;v$K%9%3%"(B 4 $B$rIU$1!"<!$N5-;v$K0\F0$7$?$$$N$G$"$l$P!"(B
-@kbd{4 n} $B$HC!$$$F$/$@$5$$!#(B
-
-@node Displaying Predictions
-@subsection $BM=8@I=<((B
-
-GroupLens $B$O$"$J$?$,%K%e!<%95-;v$r$I$l$/$i$$5$$KF~$k$+$NM=8@$r$7$^$9!#(B
-GroupLens $B$+$i$NM=8@$O(B 1 $B$+$i(B 5 $B$NHO0O$K$"$j!"(B1 $B$,:G0-$G(B 5 $B$,:GNI$G$9!#(B
-GroupLens $B$+$i$NM=8@$rJQ?t(B @code{gnus-grouplens-override-scoring} $B$K$h$C(B
-$B$F@)8f$5$l$k;0$D$NFb$N0l$D$K$h$C$F;H$&;v$,$G$-$^$9!#(B
-
-@vindex gnus-grouplens-override-scoring
-grouplens $B$GM=8@$rI=<($9$k$?$a$K;0$D$NJ}K!$,$"$j$^$9!#(BGroupLens $B$N%9%3%"(B
-$B$rIaDL$N(B gnus $B%9%3%"5!9=$K9W8%$9$k$+!">e=q$-$9$k$+$rA*$V;v$,$G$-$^$9!#>e(B
-$B=q$-$,=i4|@_Dj$G$9!#$7$+$7!"(Bgnus $B$N%9%3%"$r(B grouplens $B$N%9%3%"$KB-$9$N$r(B
-$B9%$`?M$b$$$^$9!#J,N%%9%3%"$N?6$kIq$$$rF@$k$?$a$K$O!"(B
-@code{gnus-grouplens-override-scoring} $B$r(B @code{'separate} $B$K@_Dj$9$kI,(B
-$BMW$,$"$j$^$9!#(BGroupLens $B$NM=8@$H(B grouplens $B%9%3%"$r7k9g$9$k$?$a$K$O$=$l(B
-$B$r(B @code{'override} $B$K@_Dj$7!"%9%3%"$r7k9g$9$k$?$a$K(B
-$B$O(B @code{gnus-grouplens-override-scoring} $B$r(B @code{'combine} $B$K@_Dj$7$^(B
-$B$9!#7k9gIU2C5!G=$rMQ$$$k$H$-$O!"(B
-@code{grouplens-prediction-offset} $B$*$h(B
-$B$S(B @code{grouplens-score-scale-factor} $B$NCM$r@_Dj$7$?$$$H;W$&$G$7$g$&!#(B
-
-@vindex grouplens-prediction-display
-$B$I$A$i$N>l9g$G$b!"(BGroupLens $B$OFs!";0$NM=8@$,$I$N$h$&I=<($5$l$?$$$+$NA*Br(B
-$B$rM?$($^$9!#M=8@$NI=<($OJQ?t(B @code{grouplens-prediction-display} $B$K$h$C(B
-$B$F@)8f$5$l$^$9!#(B
-
-$B0J2<$N$b$N$,$=$NJQ?t$GM-8z$JCM$G$9!#(B
-
-@table @code
-@item prediction-spot
-$BM=8@$,9b$$$[$I!"1&$NJ}$K(B @samp{*} $B$,I=<($5$l$^$9!#(B
-
-@item confidence-interval
-$B?t;z$N3N?.(B (confidence) $B4V3V$G$9!#(B
-
-@item prediction-bar
-$BM=8@$,9b$$$[$I!"K@$,D9$/$J$j$^$9!#(B
-
-@item confidence-bar
-$B?t;z3N?.$G$9!#(B
-
-@item confidence-spot
-$B3N?.$,9b$$$[$IE@$,Bg$-$/$J$j$^$9!#(B
-
-@item prediction-num
-$BIaDL$N@N$J$,$i$N?tCM$G$9!#(B
-
-@item confidence-plus-minus
-$BM=8@$N(B +/- $B3N?.$G$9!#(B
-@end table
-
-@node GroupLens Variables
-@subsection GroupLens $BJQ?t(B
-
-@table @code
-@item gnus-summary-grouplens-line-format
-GropuLens $B3HD%$N35N,%P%C%U%!$G;H$o$l$k35N,9TMM<0$G$9!#IaDL$N35N,9TMM<0$,(B
-$B<u$1IU$1$k$b$N$HF1$8;XDj$r<u$1IU$1$^$9(B (@pxref{Summary Buffer Lines})$B!#(B
-$B=i4|@_Dj$O(B@samp{%U%R%z%l%I%(%[%4L: %-23,23n%]%) %s\n} $B$G$9!#(B
-
-@item grouplens-bbb-host
-bbbd $B%5!<%P!<$,<B9T$5$l$F$$$k%[%9%H$G$9!#(B@samp{goruplens.cs.umn.edu} $B$,(B
-$B=i4|@_Dj$G$9!#(B
-
-@item grouplens-bbb-port
-bbbd $B%5!<%P!<$,<B9T$5$l$F$$$k%[%9%H$N%]!<%H$G$9!#=i4|CM$O(B 9000 $B$G$9!#(B
-
-@item grouplens-score-offset
-$BM=8@$+$i:9$70z$-$5$l$kCM$G$9!#$D$^$j!"0UL#$N$"$k%9%3%"$K$9$k$?$a$KM=8@$N(B
-$BCM$+$i$3$N?t;z$r0z$-;;$7$^$9!#=i4|CM$O(B 0 $B$G$9!#(B
-
-@item grouplens-score-scale-factor
-$BMxMQ<T$O$3$NJQ?t$r;H$C$F(B GroupLens $B$N%9%3%"$r3HBg$9$k;v$,$G$-$^$9!#3]$1(B
-$B;;$NMWAG$O:9$70z$-$N8e$KE,MQ$5$l$^$9!#=i4|CM$O(B 1 $B$G$9!#(B
-@end table
 
 @node Advanced Scoring
 @section $B>e5i%9%3%"IU$1(B
@@ -23846,8 +23660,7 @@ Wes Hardaker---@file{gnus-picon.el} $B$H(B @dfn{picon} $B$NItJ,$N%^%K%e%"(B
 Kim-Minh Kaplan---picon $B%3!<%I$KCV$1$k99$J$k:n6H!#(B
 
 @item
-Brad Miller---@file{gnus-gl.el} $B$H(B Grouplens $B$NItJ,$N%^%K%e%"(B
-$B%k(B (@pxref{GroupLens})$B!#(B
+Brad Miller---@file{gnus-gl.el} $B$H(B Grouplens $B$NItJ,$N%^%K%e%"%k!#(B
 
 @item
 Sudish Joseph---$B?t$(@Z$l$J$$$[$I$N%P%0$N=$@5!#(B
@@ -24289,8 +24102,7 @@ Gnus $B$O(B @dfn{$B$^$P$i(B} $B%9%l%C%I$r:n@.$9$k;v$,$G$-$k$h$&$K$J$j$^$7$?
 $B5-;v$,;2>H$5$l$?$H$-$K!"%9%l%C%I$NItJ,:n@.$,5/$3$k$h$&$K$J$j$^$7$?!#(B
 
 @item
-Gnus $B$O(B GroupLens $B$NM=8@$r;H$&;v$,$G$-$k$h$&$K$J$j$^$7(B
-$B$?(B (@pxref{GroupLens})$B!#(B
+Gnus $B$O(B GroupLens $B$NM=8@$r;H$&;v$,$G$-$k$h$&$K$J$j$^$7$?!#(B
 
 @item
 Picons (personal icons) ($B8D?M%"%$%3%s(B) $B$,(B XEmacs $B$GI=<($G$-$k$h$&$K$J$j(B
