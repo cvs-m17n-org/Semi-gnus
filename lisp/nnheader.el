@@ -1183,6 +1183,7 @@ find-file-hooks, etc.
       (message "%s(Y/n) Yes" prompt)
       t)))
 
+;; mm- stuff.
 (unless (featurep 'mm-util)
   (defun nnheader-image-load-path (&optional package)
     (let (dir result)
@@ -1207,6 +1208,34 @@ find-file-hooks, etc.
     (if (fboundp 'multibyte-string-p)
 	'multibyte-string-p
       'ignore)))
+
+;; rfc-2047 stuff.
+(unless (featurep 'mail-parse)
+  (defun-maybe std11-narrow-to-field ()
+    "Narrow the buffer to the header on the current line."
+    (forward-line 0)
+    (narrow-to-region (point)
+		      (progn
+			(std11-field-end)
+			(when (eolp) (forward-line 1))
+			(point)))
+    (goto-char (point-min)))
+
+  (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
+
+  (defalias 'mail-narrow-to-head 'std11-narrow-to-header)
+
+  (defun-maybe std11-fold-field ()
+    "Fold the current line."
+    (save-excursion
+      (save-restriction
+	(std11-narrow-to-field)
+	(let ((str (std11-unfold-string
+		    (buffer-substring (point-min) (point-max)))))
+	  (delete-region (point-min) (point-max))
+	  (insert str)))))
+
+  (defalias 'mail-header-fold-field 'std11-fold-field))
 
 (when (featurep 'xemacs)
   (require 'nnheaderxm))

@@ -1,10 +1,21 @@
 2002-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-picon.el: Don't require `mail-parse'.
+
+2002-01-07  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnheader.el (mail-header-fold-field): Alias to
+	`std11-fold-field'.
+	(std11-fold-field): New function.
+	(mail-narrow-to-head): Alias to `std11-narrow-to-header'.
+	(mail-header-narrow-to-field): Alias to `std11-narrow-to-field'.
+	(std11-narrow-to-field): New function.
+
+2002-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 10.
 
 	* lisp/gnus-picon.el: Require `mail-parse'.
-
-	* lisp/gnus-fun.el: Autoload "compface" for `uncompface'.
 
 	* lisp/sha1-el.el (sha1-use-external): Replace `executable-find'
 	with `exec-installed-p'.

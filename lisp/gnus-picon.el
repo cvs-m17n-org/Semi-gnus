@@ -43,7 +43,6 @@
 (require 'gnus)
 (require 'custom)
 (require 'gnus-art)
-(require 'mail-parse)
 
 ;;; User variables:
 

@@ -25,9 +25,6 @@
 
 ;;; Code:
 
-(eval-and-compile
-  (autoload 'uncompface "compface"))
-
 (defcustom gnus-x-face-directory (expand-file-name "x-faces" gnus-directory)
   "*Directory where X-Face PBM files are stored."
   :group 'gnus-fun
