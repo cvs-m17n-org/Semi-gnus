@@ -4465,19 +4465,6 @@ regexp varstr."
 ;;; @ for MIME Edit mode
 ;;;
 
-(defun message-maybe-setup-default-charset ()
-  (let ((charset
-	 (and (boundp 'gnus-summary-buffer)
-              (buffer-live-p gnus-summary-buffer)
-	      (save-excursion
-		(set-buffer gnus-summary-buffer)
-		default-mime-charset))))
-    (if charset
-	(progn
-	  (make-local-variable 'default-mime-charset)
-	  (setq default-mime-charset charset)
-	  ))))
-
 (defun message-maybe-encode ()
   (when message-mime-mode
     (run-hooks 'mime-edit-translate-hook)
