@@ -1,5 +1,11 @@
 1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus-sum.el (gnus-summary-move-article): Use
+	`gnus-request-original-article' instead of
+	`gnus-request-article-this-buffer'.
+
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* texi/gnus-ja.texi, texi/gnus.texi (Using MIME): Modify
 	description about new display mechanism.
 
