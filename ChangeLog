@@ -1,3 +1,8 @@
+2001-08-18  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el (gnus-group-make-shimbun-group): Call
+	`shimbun-groups' to detect avaiable groups of specified server.
+
 2001-08-17  KANEMATSU Daiji  <kanematu@sra.co.jp>
 
 	* lisp/message.el (message-signature-separator-for-insertion): New
