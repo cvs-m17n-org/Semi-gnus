@@ -1,3 +1,119 @@
+2001-04-01 00:37:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-score.el (gnus-score-orphans): Clean up.
+
+	* gnus-win.el (gnus-remove-some-windows): Leave one Gnus window. 
+
+	* gnus-sum.el (gnus-summary-exit): Kill the summary buffer a bit
+	later. 
+
+	* gnus-start.el (gnus-close-all-servers): Find the right items to
+	close. 
+
+	* qp.el (quoted-printable-decode-region): Just message
+	malformation; don't quit.
+
+2001-03-31 21:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Gerd Moellmann <gerd@gnu.org>.
+
+	* gnus.el (gnus-interactive): A typo.
+
+2001-03-26  Juanma Barranquero  <lektu@uol.com.br>
+	Committed by ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-util.el (gnus-delete-alist): Declare it as an alias of
+	`assq-delete-all', if that function exists; otherwise use the old
+	definition. Documentation changed to match the one in
+	`assq-delete-all'.
+	
+2001-04-01 00:37:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-start.el (gnus-close-all-servers): New function.
+
+	* gnus-srvr.el (gnus-server-close-all-servers): Clean up.
+	(gnus-server-remove-denials): Clean up.
+
+	* gnus-sum.el (gnus-summary-sort-by-original): New command and
+	keystroke. 
+
+2001-03-31 02:56:55  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-send-news): Message where we are sending.
+	(message-send-mail): Ditto.
+
+	* gnus.el (gnus-server-string): New function.
+
+	* gnus-sum.el (gnus-summary-up-thread): Doc fix.
+
+	* mm-decode.el (mm-default-directory): Customized.
+	(mm-tmp-directory): Ditto.
+
+	* gnus-sum.el (gnus-summary-catchup-and-exit): Doc fix. 
+	(gnus-get-newsgroup-headers): Return -1 for articles without Lines
+	or Chars. 
+	(gnus-summary-line-format-alist): ?l is now a string.
+	(gnus-summary-prepare-threads): Output ? for unknown lines.
+	(gnus-summary-insert-line): Ditto.
+	(gnus-summary-print-article): Unbalanced parentheses.
+
+	* gnus-msg.el (gnus-inews-do-gcc): Check group to allow it to find
+	out whether new stuff has arrived.
+
+2001-03-31 02:14:38  Alan Shutko  <ats@acm.org>
+
+	* gnus-sum.el: Let printing work on ttys on Emacs.
+
+2001-03-31 01:11:14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-post-news): Add an empty Newsgroups header
+	when forcing news.
+
+	* gnus-sum.el (gnus-summary-mark-article-as-replied): Make into a
+	command. 
+
+2001-03-31 01:04:54  Francis Litterio  <franl-removethis@world.omitthis.std.com>
+
+	* message.el (message-set-auto-save-file-name): Don't use
+	asterisks under nt.
+
+2001-03-31 00:03:42  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-inews-insert-draft-meta-information): Allow
+	lists of articles.
+
+	* gnus-uu.el (gnus-uu-digest-mail-forward): Mark as forwarded.
+
+	* gnus-msg.el (gnus-put-message): Clean up.
+	(gnus-summary-reply): Mark all replied-to articles as replied to.
+	(gnus-inews-add-send-actions): Also mark as forwarded.
+	(gnus-summary-mail-forward): Mark as forwarded.  
+
+	* gnus-sum.el (gnus-summary-mark-article-as-replied): Take a list
+	of articles. 
+	(gnus-summary-mark-article-as-forwarded): Ditto.
+
+	* gnus-msg.el (gnus-summary-resend-message): Mark article as
+	forwarded. 
+	(gnus-summary-mail-forward): Clean up.
+
+	* gnus.el (gnus-article-mark-lists): Added forward.
+
+	* gnus-sum.el (gnus-forwarded-mark): New variable.
+	(gnus-summary-prepare-threads): Use it.
+	(gnus-summary-update-secondary-mark): Ditto.
+	(gnus-newsgroup-forwarded): New variable.
+
+2001-03-30 23:13:37  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-summary-reply): Allow very wide replies.
+	(gnus-summary-very-wide-reply): New command and keystroke.
+	(gnus-summary-very-wide-reply-with-original): Ditto.
+
+	* gnus-score.el (gnus-adaptive-word-length-limit): New variable. 
+	(gnus-score-adaptive): Use it.
+
+	* gnus-start.el (gnus-get-unread-articles): Clean up.
+
 2001-03-21 20:00:43  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* nnultimate.el (nnultimate-retrieve-headers): Work for other

@@ -458,9 +458,9 @@ Emacs $B$,J8>O$rJT=8$9$k?M$KNO$rM?$($k$h$&$K!"(Bgnus $B$O%K%e!<%9$rFI$`?M$KNO
 
 @menu
 * Starting Up::        $B%K%e!<%9$r8+$D$1$k$N$K$O6lO+$,H<$&$+$bCN$l$J$$(B
-* The Group Buffer::   $B%0%k!<%W$rA*Br$7!"9XFI$7!":o=|$9$k(B
-* The Summary Buffer:: $B5-;v$rFI$_!"J]B8$7!"Ej9F$9$k(B
-* The Article Buffer:: $B5-;v$rI=<($7!"07$&(B
+* Group Buffer::       $B%0%k!<%W$rA*Br$7!"9XFI$7!":o=|$9$k(B
+* Summary Buffer::     $B5-;v$rFI$_!"J]B8$7!"Ej9F$9$k(B
+* Article Buffer::     $B5-;v$rI=<($7!"07$&(B
 * Composing Messages:: $B%a!<%k$H%K%e!<%9$rAw$k$?$a$N>pJs(B
 * Select Methods::     Gnus $B$OA4$F$N%a%C%;!<%8$r$$$m$$$m$JA*BrJ}K!$GFI$`(B
 * Scoring::            $B5-;v$KCM$r$D$1$k(B
@@ -545,7 +545,7 @@ The Summary Buffer
 * Marking Articles::           $B5-;v$K4{FI$d4|8B@Z$l:o=|2DG=Ey$N0u$rIU$1$k(B
 * Limiting::                   $B35N,%P%C%U%!$K@)8B$r2C$($k$3$H$,$G$-$k(B
 * Threading::                  $B%9%l%C%I$,$I$N$h$&$K:n$i$l$k$+(B
-* Sorting::                    $B%9%l%C%I$H5-;v$,$I$N$h$&$KJB$S$+$($i$l$k$+(B
+* Sorting the Summary Buffer:: $B%9%l%C%I$H5-;v$,$I$N$h$&$KJB$S$+$($i$l$k$+(B
 * Asynchronous Fetching::      Gnus $B$O5-;v$r@h$K<hF@$9$k$3$H$,$G$-$k(B
 * Article Caching::            $B%-%c%C%7%e$K5-;v$rCy$a$F$*$1$k(B
 * Persistent Articles::        $B5-;v$r4|8B@Z$l>C5n$7$J$/$5$;$k(B
@@ -669,7 +669,7 @@ Composing Messages
 
 Select Methods
 
-* The Server Buffer:: $B;v<B>e$N%5!<%P!<$r:n$C$FJT=8$9$k(B
+* Server Buffer::     $B;v<B>e$N%5!<%P!<$r:n$C$FJT=8$9$k(B
 * Getting News::      USENET $B%K%e!<%9$r(B gnus $B$GFI$`(B
 * Getting Mail::      $B8D?ME*$J%a!<%k$r(B gnus $B$GFI$`(B
 * Browsing the Web::  $B2a>j$J%&%'%V$N;q8;$+$i%a%C%;!<%8$r<hF@$9$k(B
@@ -784,9 +784,9 @@ Gnus Unplugged
 
 Agent Categories
 
-* Category Syntax::     $BJ,N`$H$O$I$s$J$b$N$+(B
-* The Category Buffer:: $BJ,N`$r4IM}$9$k%P%C%U%!!<(B
-* Category Variables::  $B%+%9%?%^%$%6(B"$B$i(B"$B%9(B
+* Category Syntax::    $BJ,N`$H$O$I$s$J$b$N$+(B
+* Category Buffer::    $BJ,N`$r4IM}$9$k%P%C%U%!!<(B
+* Category Variables:: $B%+%9%?%^%$%6(B"$B$i(B"$B%9(B
 
 Agent Commands
 
@@ -1636,7 +1636,7 @@ Gnus $B$N5/F0$K@.8y$7$?8e$K!"0lHV:G8e$K<B9T$5$l$k%U%C%/$G$9!#(B
 
 @end table
 
-@node The Group Buffer
+@node Group Buffer
 @chapter $B%0%k!<%W%P%C%U%!(B
 @cindex group buffer
 
@@ -3646,7 +3646,7 @@ Gnus
 @kindex ^ (Group)
 @findex gnus-group-enter-server-mode
 $B%5!<%P%P%C%U%!%b!<%I$KF~$k(B (@code{gnus-group-enter-server-mode})$B!#(B
-@xref{The Server Buffer}$B!#(B
+@xref{Server Buffer}$B!#(B
 
 @item a
 @kindex a (Group)
@@ -3893,7 +3893,7 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 
 @end table
 
-@node The Summary Buffer
+@node Summary Buffer
 @chapter $B35N,%P%C%U%!(B
 @cindex summary buffer
 
@@ -3914,7 +3914,7 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 * Marking Articles::           $B5-;v$K4{FI$d4|8B@Z$l:o=|2DG=Ey$N0u$rIU$1$k(B
 * Limiting::                   $B35N,%P%C%U%!$K@)8B$r2C$($k$3$H$,$G$-$k(B
 * Threading::                  $B%9%l%C%I$,$I$N$h$&$K:n$i$l$k$+(B
-* Sorting::                    $B%9%l%C%I$H5-;v$,$I$N$h$&$KJB$S$+$($i$l$k$+(B
+* Sorting the Summary Buffer:: $B%9%l%C%I$H5-;v$,$I$N$h$&$KJB$S$+$($i$l$k$+(B
 * Asynchronous Fetching::      Gnus $B$O5-;v$r@h$K<hF@$9$k$3$H$,$G$-$k(B
 * Article Caching::            $B%-%c%C%7%e$K5-;v$rCy$a$F$*$1$k(B
 * Persistent Articles::        $B5-;v$r4|8B@Z$l>C5n$7$J$/$5$;$k(B
@@ -4608,6 +4608,22 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 $B$9(B (@code{gnus-summary-wide-reply-with-original})$B!#$3$NL?Na$O%W%m%;%9(B/$B@\(B
 $BF,0z?t$N=,47$r;H$$$^$9!#(B
 
+@item S v
+@kindex S v (Summary)
+@findex gnus-summary-very-wide-reply
+$B8=:_$N5-;v$r=q$$$??M$KBP$7$F!"Hs>o$K9-$$JVEz(B (very wide reply) $B$r$7$^(B
+$B$9(B (@code{gnus-summary-very-wide-reply})$B!#(B@dfn{$BHs>o$K9-$$JVEz(B} $B$H$O!"%W(B
+$B%m%;%9(B/$B@\F,0z?t$G;XDj$5$l$?$9$Y$F$N5-;v$N%X%C%@!<$N(B @code{To},
+@code{From}, ($B$b$7$/$O(B @code{Reply-to}) $B$H(B @code{Cc}) $B$N$9$Y$F$N?M$KJVEz(B
+$B$r$9$k$3$H$G$9!#$3$NL?Na$O%W%m%;%9(B/$B@\F,0z?t$N=,47$r;H$$$^$9!#(B
+
+@item S V
+@kindex S V (Summary)
+@findex gnus-summary-very-wide-reply-with-original
+$B8=:_$N5-;v$KK\5-;v$r4^$s$@Hs>o$K9-$$JVEz$N%a!<%k$rAw$j$^(B
+$B$9(B (@code{gnus-summary-very-wide-reply-with-original})$B!#$3$NL?Na$O%W%m%;(B
+$B%9(B/$B@\F,0z?t$N=,47$r;H$$$^$9!#(B
+
 @item S o m
 @itemx C-c C-f
 @kindex S o m ($B35N,(B)
@@ -4989,6 +5005,10 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 @vindex gnus-replied-mark
 $BJVEz$r$7$?$+!"%U%)%m!<%"%C%W$r$7$?(B ($BNc$($P!"Ez$($?(B) $B5-;v$O$9$Y$FFs7eL\(B
 $B$K(B @samp{A} $B$N0u$,$D$-$^$9(B (@code{gnus-replied-mark})$B!#(B
+
+@vindex gnus-forwarded-mark
+$BE>Aw$7$?5-;v$O$9$Y$FFs7eL\$K(B @samp{O} $B$N0u$,$D$-$^(B
+$B$9(B (@code{gnus-forwarded-mark})$B!#(B
 
 @item
 @vindex gnus-cached-mark
@@ -5922,7 +5942,7 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 $B9T$7$F$$$k$H$-$KI=Bj$OL5;k$5$l$^$9!#$3$NJQ?t$,(B @code{fuzzy} $B$G$"$k$H!"$"(B
 $B$$$^$$$KEy$7$$I=Bj$r;}$D5-;v$@$1$,4^$^$l$^$9(B (@pxref{Fuzzy Matching})$B!#(B
 
-@node Sorting
+@node Sorting the Summary Buffer
 @section $BJB$SBX$((B
 
 @findex gnus-thread-sort-by-total-score
@@ -7756,6 +7776,11 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 @kindex C-c C-s C-i ($B35N,(B)
 @findex gnus-summary-sort-by-score
 $B%9%3%"$K$h$C$FJB$SBX$($^$9(B (@code{gnus-summary-sort-by-score})$B!#(B
+
+@item C-c C-s C-o
+@kindex C-c C-s C-o (Summary)
+@findex gnus-summary-sort-by-original
+$B%G%#%U%)%k%H$NJ}K!$GJB$SBX$($^$9(B (@code{gnus-summary-sort-by-original})$B!#(B
 @end table
 
 $B$3$l$i$N4X?t$O%9%l%C%I$r;H$C$F$$$k$H$-$H;H$C$F$$$J$$$H$-$NN>J}$GF0:n$7$^(B
@@ -8725,7 +8750,7 @@ protocols. Otherwise, ask user.
 @end table
 @end ignore
 
-@node The Article Buffer
+@node Article Buffer
 @chapter $B5-;v%P%C%U%!(B
 @cindex article buffer
 
@@ -9681,7 +9706,7 @@ you've typed it correctly.
 
 $BA*BrJ}K!$O(B @dfn{$B;v<B>e$N%5!<%P!<(B} $B$rDj5A$9$k$H8@$&$3$H$,$G$-$k$+$b$7$l$^(B
 $B$;$s(B---$B$G$9$+$i;d$?$A$O$A$g$&$I$=$l$r$7$^$7(B
-$B$?(B (@pxref{The Server Buffer})$B!#(B
+$B$?(B (@pxref{Server Buffer})$B!#(B
 
 $B%0%k!<%W$N(B @dfn{$BL>A0(B} $B$O%P%C%/%(%s%I$,%0%k!<%W$rG'<1$9$kL>A0$G$9!#(B
 
@@ -9694,16 +9719,16 @@ you've typed it correctly.
 $B$b$A$m$s!"0c$C$?J}K!$OA4$F$=$lFCM-$N$b$N$,$"$j$^$9!#(B
 
 @menu
-* The Server Buffer:: $B;v<B>e$N%5!<%P!<$r:n$C$FJT=8$9$k(B
-* Getting News::      USENET $B%K%e!<%9$r(B gnus $B$GFI$`(B
-* Getting Mail::      $B8D?ME*$J%a!<%k$r(B gnus $B$GFI$`(B
-* Browsing the Web::  $B2a>j$J%&%'%V$N;q8;$+$i%a%C%;!<%8$r<hF@$9$k(B
-* Other Sources::     $B%G%#%l%/%H%j!<!"%U%!%$%k!"(BSOUP $B%Q%1%C%H$rFI$`(B
-* Combined Groups::   $BJ#?t$N%0%k!<%W$r0l$D$N%0%k!<%W$K7k9g$9$k(B
-* Gnus Unplugged::    $B%K%e!<%9$H%a!<%k$r%*%U%i%$%s$GFI$`(B
+* Server Buffer::    $B;v<B>e$N%5!<%P!<$r:n$C$FJT=8$9$k(B
+* Getting News::     USENET $B%K%e!<%9$r(B gnus $B$GFI$`(B
+* Getting Mail::     $B8D?ME*$J%a!<%k$r(B gnus $B$GFI$`(B
+* Browsing the Web:: $B2a>j$J%&%'%V$N;q8;$+$i%a%C%;!<%8$r<hF@$9$k(B
+* Other Sources::    $B%G%#%l%/%H%j!<!"%U%!%$%k!"(BSOUP $B%Q%1%C%H$rFI$`(B
+* Combined Groups::  $BJ#?t$N%0%k!<%W$r0l$D$N%0%k!<%W$K7k9g$9$k(B
+* Gnus Unplugged::   $B%K%e!<%9$H%a!<%k$r%*%U%i%$%s$GFI$`(B
 @end menu
 
-@node The Server Buffer
+@node Server Buffer
 @section $B%5!<%P!<%P%C%U%!(B
 
 $BEAE}E*$K!"(B@dfn{$B%5!<%P!<(B} $B$O$=$l$K@\B3$7$F!"$=$l$+$i>pJs$rMW5a$9$k%^%7%s(B
@@ -10024,8 +10049,8 @@ you've typed it correctly.
 $B$=$l$G!"0l;~E*$K$=$N%^%7%s$N5!7y$,0-$$$@$1$@$H2?$,5/$3$k$N$G$7$g$&(B? $B$I$&(B
 $B$d$C$F%^%7%s$,La$C$F$-$F$$$k$+$I$&$+$C$r:F$SD4$Y$k;v$,$G$-$k$G$N$7$g$&(B?
 
-$B%5!<%P!<%P%C%U%!$KHt$S0\$C$F(B (@pxref{The Server Buffer})$B!"0J2<$NL?Na$G(B
-$B$D$D$/$@$1$G$G$-$^$9(B:
+$B%5!<%P!<%P%C%U%!$KHt$S0\$C$F(B (@pxref{Server Buffer})$B!"0J2<$NL?Na$G$D$D$/(B
+$B$@$1$G$G$-$^$9(B:
 
 @table @kbd
 
@@ -14054,9 +14079,9 @@ PPP $B4X78(B($B$J$I(B)$B$rJD$8$^$9!#$=$&$7$F%K%e!<%9$r%*%U%i%$%s$GFI$`$3$H$
 $B@.$H4IM}$N$?$a$NFH<+$N%P%C%U%!!<$r;}$C$F$$$^$9!#(B
 
 @menu
-* Category Syntax::     $BJ,N`$H$O$I$s$J$b$N$+(B
-* The Category Buffer:: $BJ,N`$r4IM}$9$k%P%C%U%!!<(B
-* Category Variables::  $B%+%9%?%^%$%6(B"$B$i(B"$B%9(B
+* Category Syntax::    $BJ,N`$H$O$I$s$J$b$N$+(B
+* Category Buffer::    $BJ,N`$r4IM}$9$k%P%C%U%!!<(B
+* Category Variables:: $B%+%9%?%^%$%6(B"$B$i(B"$B%9(B
 @end menu
 
 @node Category Syntax
@@ -14318,7 +14343,7 @@ file
 @end itemize
 @end enumerate
 
-@node The Category Buffer
+@node Category Buffer
 @subsubsection $BJ,N`%P%C%U%!!<(B
 
 $BDL>o$OA4$F$NJ,N`$OJ,N`%P%C%U%!!<$+$i4IM}$7$^$9!#(B($B%0%k!<%W%P%C%U%!!<(B
@@ -15701,6 +15726,12 @@ gnus $B$K$O$3$l$i$rA4$F<+F0E*$K(B --- $B$^$k$GKbK!$G$b;H$C$?$h$&$K:n@.(B
 @code{gnus-default-ignored-adaptive-words} $B$N%j%9%H$K8=$l$kC18l$OL5;k$5(B
 $B$l$^$9!#L5;k$7$?$$C18l$rDI2C$7$?$$$H$-$O!"$3$NJQ?t$G$O$J(B
 $B$/(B @code{gnus-ignored-adaptive-words} $B%j%9%H$NJ}$r;H$C$F$/$@$5$$!#(B
+
+@vindex gnus-adaptive-word-length-limit
+$BC;$$C18l$G$OE,1~@-%9%3%"$r:nF0$5$;$k$Y$-$G$O$J$$$H;W$&?M$b$$$k$G$7$g$&!#(B
+$B$b$7$=$&$J$i(B @code{gnus-adaptive-word-length-limit} $B$K@0?t$r@_Dj$9$k$3$H(B
+$B$,$G$-!"$3$N?tCM$h$jC;$$C18l$OL5;k$5$l$^$9!#$3$NJQ?t$N=i4|@_DjCM(B
+$B$O(B @code{nil} $B$G$9!#(B
 
 @vindex gnus-adaptive-word-syntax-table
 $B%9%3%"IU$1$,=*N;$7$?$H$-!"(B@code{gnus-adaptive-word-syntax-table} $B$NJ8K!(B

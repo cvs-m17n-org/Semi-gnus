@@ -233,6 +233,11 @@ This variable allows the same syntax as `gnus-home-score-file'."
 					     (symbol :tag "other"))
 				     (integer :tag "Score"))))))
 
+(defcustom gnus-adaptive-word-length-limit nil
+  "*Words of a length lesser than this limit will be ignored when doing adaptive scoring."
+  :group 'gnus-score-adapt
+  :type 'integer)
+
 (defcustom gnus-ignored-adaptive-words nil
   "List of words to be ignored when doing adaptive word scoring."
   :group 'gnus-score-adapt
@@ -1551,21 +1556,19 @@ A root is an article with no references.  An orphan is an article
 which has references, but is not connected via its references to a
 root article.  This function finds all the orphans, and adjusts their
 score in GNUS-NEWSGROUP-SCORED by SCORE."
-  (let ((threads (gnus-make-threads)))
-    ;; gnus-make-threads produces a list, where each entry is a "thread"
-    ;; as described in the gnus-score-lower-thread docs.  This function
-    ;; will be called again (after limiting has been done) if the display
-    ;; is threaded.  It would be nice to somehow save this info and use
-    ;; it later.
-    (while threads
-      (let* ((thread (car threads))
-	     (id (aref (car thread) gnus-score-index)))
-	;; If the parent of the thread is not a root, lower the score of
-	;; it and its descendants.  Note that some roots seem to satisfy
-	;; (eq id nil) and some (eq id "");  not sure why.
-	(if (and id (not (string= id "")))
-	    (gnus-score-lower-thread thread score)))
-      (setq threads (cdr threads)))))
+  ;; gnus-make-threads produces a list, where each entry is a "thread"
+  ;; as described in the gnus-score-lower-thread docs.  This function
+  ;; will be called again (after limiting has been done) if the display
+  ;; is threaded.  It would be nice to somehow save this info and use
+  ;; it later.
+  (dolist (thread (gnus-make-threads))
+    (let ((id (aref (car thread) gnus-score-index)))
+      ;; If the parent of the thread is not a root, lower the score of
+      ;; it and its descendants.  Note that some roots seem to satisfy
+      ;; (eq id nil) and some (eq id "");  not sure why.
+      (when (and id
+		 (not (string= id "")))
+	(gnus-score-lower-thread thread score)))))
 
 (defun gnus-score-integer (scores header now expire &optional trace)
   (let ((gnus-score-index (nth 1 (assoc header gnus-header-index)))
@@ -2310,11 +2313,14 @@ score in GNUS-NEWSGROUP-SCORED by SCORE."
 		      ;; Put the word and score into the hashtb.
 		      (setq val (gnus-gethash (setq word (match-string 0))
 					      hashtb))
-		      (setq val (+ score (or val 0)))
-		      (if (and gnus-adaptive-word-minimum
-			       (< val gnus-adaptive-word-minimum))
-			  (setq val gnus-adaptive-word-minimum))
-		      (gnus-sethash word val hashtb))
+		      (when (or (not gnus-adaptive-word-length-limit)
+				(> (length word)
+				   gnus-adaptive-word-length-limit))
+			(setq val (+ score (or val 0)))
+			(if (and gnus-adaptive-word-minimum
+				 (< val gnus-adaptive-word-minimum))
+			    (setq val gnus-adaptive-word-minimum))
+			(gnus-sethash word val hashtb)))
 		    (erase-buffer))))
 	    (set-syntax-table syntab))
 	  ;; Make all the ignorable words ignored.

@@ -1453,6 +1453,7 @@ Except if it is nil, use Gnus native MUA; if it is t, use
   (autoload 'gnus-request-post "gnus-int")
   (autoload 'gnus-copy-article-buffer "gnus-msg")
   (autoload 'gnus-alive-p "gnus-util")
+  (autoload 'gnus-server-string "gnus")
   (autoload 'gnus-group-name-charset "gnus-group")
   (autoload 'rmail-output "rmailout")
   (autoload 'mu-cite-original "mu-cite"))
@@ -3424,6 +3425,7 @@ This sub function is for exclusive use of `message-send-news'."
     (backward-char 1)
     (run-hooks 'message-send-news-hook)
     (gnus-open-server method)
+    (message "Sending news with %s..." (gnus-server-string method))
     (gnus-request-post method)
     ))
 
@@ -4672,8 +4674,11 @@ than 988 characters long, and if they are not, trim them until they are."
     (if (gnus-alive-p)
 	(setq message-draft-article
 	      (nndraft-request-associate-buffer "drafts"))
-      (setq buffer-file-name (expand-file-name "*message*"
-					       message-auto-save-directory))
+      (setq buffer-file-name (expand-file-name
+			      (if (eq system-type 'windows-nt)
+				  "message"
+				"*message*")
+			      message-auto-save-directory))
       (setq buffer-auto-save-file-name (make-auto-save-file-name)))
     (clear-visited-file-modtime)
     (static-if (boundp 'MULE)

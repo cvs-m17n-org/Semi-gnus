@@ -1,3 +1,18 @@
+2001-04-01 00:32:46  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (S): Renamed.
+	(Summary Sorting): Addition.
+
+2001-03-31 00:40:44  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Other Marks): Additon.
+	(The End): Remove "The" from menus.
+
+2001-03-30 23:34:02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Adaptive Scoring): Addition.
+	(Summary Mail Commands): Addition.
+
 2001-03-17  Matthias Wiehl  <mwiehl@gmx.de>
 
 	* message.texi (Security): Typos.

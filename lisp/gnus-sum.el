@@ -425,7 +425,7 @@ this variable specifies group names."
   :type 'character)
 
 (defcustom gnus-souped-mark ?F
-  "*Mark used for killed articles."
+  "*Mark used for souped articles."
   :group 'gnus-summary-marks
   :type 'character)
 
@@ -446,6 +446,11 @@ this variable specifies group names."
 
 (defcustom gnus-replied-mark ?A
   "*Mark used for articles that have been replied to."
+  :group 'gnus-summary-marks
+  :type 'character)
+
+(defcustom gnus-forwarded-mark ?O
+  "*Mark used for articles that have been forwarded."
   :group 'gnus-summary-marks
   :type 'character)
 
@@ -1060,7 +1065,7 @@ when prompting the user for which type of files to save."
     (?M ,(macroexpand '(mail-header-id gnus-tmp-header)) ?s)
     (?r ,(macroexpand '(mail-header-references gnus-tmp-header)) ?s)
     (?c (or (mail-header-chars gnus-tmp-header) 0) ?d)
-    (?L gnus-tmp-lines ?d)
+    (?L gnus-tmp-lines ?s)
     (?I gnus-tmp-indentation ?s)
     (?T (if (= gnus-tmp-level 0) "" (make-string (frame-width) ? )) ?s)
     (?R gnus-tmp-replied ?c)
@@ -1162,6 +1167,9 @@ end position and text.")
 (defvar gnus-newsgroup-replied nil
   "List of articles that have been replied to in the current newsgroup.")
 
+(defvar gnus-newsgroup-forwarded nil
+  "List of articles that have been forwarded in the current newsgroup.")
+
 (defvar gnus-newsgroup-expirable nil
   "List of articles in the current newsgroup that can be expired.")
 
@@ -1222,7 +1230,8 @@ end position and text.")
     gnus-newsgroup-auto-expire gnus-newsgroup-unreads
     gnus-newsgroup-unselected gnus-newsgroup-marked
     gnus-newsgroup-reads gnus-newsgroup-saved
-    gnus-newsgroup-replied gnus-newsgroup-expirable
+    gnus-newsgroup-replied gnus-newsgroup-forwarded
+    gnus-newsgroup-expirable
     gnus-newsgroup-processable gnus-newsgroup-killed
     gnus-newsgroup-downloadable gnus-newsgroup-undownloaded
     gnus-newsgroup-unsendable
@@ -1456,6 +1465,7 @@ increase the score of each group you read."
     "\C-c\C-s\C-s" gnus-summary-sort-by-subject
     "\C-c\C-s\C-d" gnus-summary-sort-by-date
     "\C-c\C-s\C-i" gnus-summary-sort-by-score
+    "\C-c\C-s\C-o" gnus-summary-sort-by-original
     "=" gnus-summary-expand-window
     "\C-x\C-s" gnus-summary-reselect-current-group
     "\M-g" gnus-summary-rescan-group
@@ -2064,7 +2074,8 @@ increase the score of each group you read."
 	["Sort by date" gnus-summary-sort-by-date t]
 	["Sort by score" gnus-summary-sort-by-score t]
 	["Sort by lines" gnus-summary-sort-by-lines t]
-	["Sort by characters" gnus-summary-sort-by-chars t])
+	["Sort by characters" gnus-summary-sort-by-chars t]
+	["Original sort" gnus-summary-sort-by-original t])
        ("Help"
 	["Fetch group FAQ" gnus-summary-fetch-faq t]
 	["Describe group" gnus-summary-describe-group t]
@@ -2888,7 +2899,9 @@ buffer that was in action when the last article was fetched."
     (when (string= gnus-tmp-name "")
       (setq gnus-tmp-name gnus-tmp-from))
     (unless (numberp gnus-tmp-lines)
-      (setq gnus-tmp-lines 0))
+      (setq gnus-tmp-lines -1))
+    (when (= gnus-tmp-lines -1)
+      (setq gnus-tmp-lines "?"))
     (gnus-put-text-property-excluding-characters-with-faces
      (point)
      (progn (eval gnus-summary-line-format-spec) (point))
@@ -4256,6 +4269,8 @@ or a straight list of headers."
 		    gnus-cached-mark)
 		   ((memq number gnus-newsgroup-replied)
 		    gnus-replied-mark)
+		   ((memq number gnus-newsgroup-forwarded)
+		    gnus-forwarded-mark)
 		   ((memq number gnus-newsgroup-saved)
 		    gnus-saved-mark)
 		   (t gnus-no-mark))
@@ -4274,7 +4289,9 @@ or a straight list of headers."
 	    (when (string= gnus-tmp-name "")
 	      (setq gnus-tmp-name gnus-tmp-from))
 	    (unless (numberp gnus-tmp-lines)
-	      (setq gnus-tmp-lines 0))
+	      (setq gnus-tmp-lines -1))
+	    (when (= gnus-tmp-lines -1)
+	      (setq gnus-tmp-lines "?"))
 	    (gnus-put-text-property
 	     (point)
 	     (progn (eval gnus-summary-line-format-spec) (point))
@@ -5061,15 +5078,15 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	      (goto-char p)
 	      (if (search-forward "\nchars: " nil t)
 		  (if (numberp (setq chars (ignore-errors (read cur))))
-		      chars 0)
-		0))
+		      chars -1)
+		-1))
 	    ;; Lines.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nlines: " nil t)
 		  (if (numberp (setq lines (ignore-errors (read cur))))
-		      lines 0)
-		0))
+		      lines -1)
+		-1))
 	    ;; Xref.
 	    (progn
 	      (goto-char p)
@@ -5735,7 +5752,9 @@ If FORCE (the prefix), also save the .newsrc file(s)."
 	(setq gnus-article-current nil))
       (set-buffer buf)
       (if (not gnus-kill-summary-on-exit)
-	  (gnus-deaden-summary)
+	  (progn
+	    (gnus-deaden-summary)
+	    (setq mode nil))
 	;; We set all buffer-local variables to nil.  It is unclear why
 	;; this is needed, but if we don't, buffer-local variables are
 	;; not garbage-collected, it seems.  This would the lead to en
@@ -5750,10 +5769,7 @@ If FORCE (the prefix), also save the .newsrc file(s)."
 	(set-buffer gnus-group-buffer)
 	(gnus-summary-clear-local-variables)
 	(let ((gnus-summary-local-variables gnus-newsgroup-variables))
-	  (gnus-summary-clear-local-variables))
-	;; Return to group mode buffer.
-	(when (eq mode 'gnus-summary-mode)
-	  (gnus-kill-buffer buf)))
+	  (gnus-summary-clear-local-variables)))
       (setq gnus-current-select-method gnus-select-method)
       (pop-to-buffer gnus-group-buffer)
       (if (not quit-config)
@@ -5768,6 +5784,9 @@ If FORCE (the prefix), also save the .newsrc file(s)."
 	      (set-window-start (selected-window) (point))
 	      (goto-char group-point)))
 	(gnus-handle-ephemeral-exit quit-config))
+      ;; Return to group mode buffer.
+      (when (eq mode 'gnus-summary-mode)
+	(gnus-kill-buffer buf))
       ;; Clear the current group name.
       (unless quit-config
 	(setq gnus-newsgroup-name nil)))))
@@ -7655,7 +7674,9 @@ to save in."
 			      (mail-header-date gnus-current-headers) ")"))))
 		(gnus-run-hooks 'gnus-ps-print-hook)
 		(save-excursion
-		  (ps-spool-buffer-with-faces))))
+		  (if window-system
+		      (ps-spool-buffer-with-faces)
+		    (ps-spool-buffer)))))
 	  (kill-buffer buffer))))
     (gnus-summary-remove-process-mark article))
   (ps-despool filename))
@@ -8546,7 +8567,7 @@ the actual number of articles unmarked is returned."
 	(error "No such mark type: %s" type)
       (setq var (intern (format "gnus-newsgroup-%s" type)))
       (set var (cons article (symbol-value var)))
-      (if (memq type '(processable cached replied saved))
+      (if (memq type '(processable cached replied forwarded saved))
 	  (gnus-summary-update-secondary-mark article)
 	;;; !!! This is bobus.  We should find out what primary
 	;;; !!! mark we want to set.
@@ -8560,11 +8581,25 @@ the actual number of articles marked is returned."
   (gnus-summary-mark-forward n gnus-expirable-mark))
 
 (defun gnus-summary-mark-article-as-replied (article)
-  "Mark ARTICLE replied and update the summary line."
-  (push article gnus-newsgroup-replied)
-  (let ((buffer-read-only nil))
-    (when (gnus-summary-goto-subject article nil t)
-      (gnus-summary-update-secondary-mark article))))
+  "Mark ARTICLE as replied to and update the summary line.
+ARTICLE can also be a list of articles."
+  (interactive (list (gnus-summary-article-number)))
+  (let ((articles (if (listp article) article (list article))))
+    (dolist (article articles)
+      (push article gnus-newsgroup-replied)
+      (let ((buffer-read-only nil))
+	(when (gnus-summary-goto-subject article nil t)
+	  (gnus-summary-update-secondary-mark article))))))
+
+(defun gnus-summary-mark-article-as-forwarded (article)
+  "Mark ARTICLE as forwarded and update the summary line.
+ARTICLE can also be a list of articles."
+  (let ((articles (if (listp article) article (list article))))
+    (dolist (article articles)
+      (push article gnus-newsgroup-forwarded)
+      (let ((buffer-read-only nil))
+	(when (gnus-summary-goto-subject article nil t)
+	  (gnus-summary-update-secondary-mark article))))))
 
 (defun gnus-summary-set-bookmark (article)
   "Set a bookmark in current article."
@@ -8790,6 +8825,8 @@ Iff NO-EXPIRE, auto-expiry will be inhibited."
 	  gnus-cached-mark)
 	 ((memq article gnus-newsgroup-replied)
 	  gnus-replied-mark)
+	 ((memq article gnus-newsgroup-forwarded)
+	  gnus-forwarded-mark)
 	 ((memq article gnus-newsgroup-saved)
 	  gnus-saved-mark)
 	 (t gnus-no-mark))
@@ -9095,7 +9132,8 @@ If ALL is non-nil, also mark ticked and dormant articles as read."
 
 (defun gnus-summary-catchup-and-exit (&optional all quietly)
   "Mark all unread articles in this group as read, then exit.
-If prefix argument ALL is non-nil, all articles are marked as read."
+If prefix argument ALL is non-nil, all articles are marked as read.
+If QUIETLY is non-nil, no questions will be asked."
   (interactive "P")
   (when (gnus-summary-catchup all quietly nil 'fast)
     ;; Select next newsgroup or exit.
@@ -9390,7 +9428,7 @@ taken."
 
 (defun gnus-summary-up-thread (n)
   "Go up thread N steps.
-If N is negative, go up instead.
+If N is negative, go down instead.
 Returns the difference between N and how many steps down that were
 taken."
   (interactive "p")
@@ -9478,6 +9516,18 @@ Argument REVERSE means reverse order."
 Argument REVERSE means reverse order."
   (interactive "P")
   (gnus-summary-sort 'chars reverse))
+
+(defun gnus-summary-sort-by-original (&optional reverse)
+  "Sort the summary buffer using the default sorting method.
+Argument REVERSE means reverse order."
+  (interactive "P")
+  (let* ((buffer-read-only)
+	 (gnus-summary-prepare-hook nil))
+    ;; We do the sorting by regenerating the threads.
+    (gnus-summary-prepare)
+    ;; Hide subthreads if needed.
+    (when (and gnus-show-threads gnus-thread-hide-subtree)
+      (gnus-summary-hide-all-threads))))
 
 (defun gnus-summary-sort (predicate reverse)
   "Sort summary buffer by PREDICATE.  REVERSE means reverse order."

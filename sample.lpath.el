@@ -26,7 +26,7 @@
 	    ;; uncomment and edit the following line appropriately.
 	    ;; "/usr/local/share/mule/site-lisp/w3/"
 	    )))
-      ;; No user servicable parts beyond this point.
+      ;; No user serviceable parts beyond this point.
 
       (let ((i (length additional-load-path))
 	    p)
