@@ -1,3 +1,52 @@
+1998-12-10  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-movemail): Use `write-region-as-binary'
+	instead of `append-to-file'.
+	(pop3-movemail-file-coding-system): Abolished.
+
+	* lisp/nnheader.el (nnheader-find-file-noselect): Use
+	`find-file-noselect-as-specified-coding-system' instead of
+	`find-file-noselect'.
+
+	* lisp/nnmail.el (nnmail-find-file): Use
+	`insert-file-contents-as-specified-coding-system' instead of
+	`insert-file-contents'.
+	* lisp/nnheader.el (nnheader-insert-file-contents): Likewise.
+
+	* lisp/message.el (message-send-mail-with-qmail): Enclose
+	`call-process-region' with `as-binary-process'.
+	(message-send-mail-with-sendmail): Likewise.
+	(message-send-coding-system): Abolished.
+
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Emulate
+	`save-buffer' with `write-region-as-specified-coding-system'.
+	(gnus-read-newsrc-el-file): Emulate `load' with
+	`insert-file-contents-as-specified-coding-system' and
+	`eval-region'.
+
+	* lisp/gnus-cache.el (gnus-cache-save-buffers): Use
+	`gnus-write-buffer-as-specified-coding-system' instead of
+	`gnus-write-buffer'.
+
+	* lisp/gnus-util.el (gnus-output-to-mail): Use
+	`write-region-as-binary' instead of `append-to-file'.
+	(gnus-output-to-mail): Use `gnus-write-buffer-as-binary' instead
+	of `gnus-write-buffer'.
+	(gnus-write-buffer-as-specified-coding-system): New function.
+	(gnus-write-buffer-as-binary): New function.
+
+	* lisp/nnmail.el (nnmail-write-region): Use
+	`write-region-as-specified-coding-system' instead of
+	`write-region'.
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Likewise.
+	* lisp/gnus-agent.el (gnus-agent-expire): Likewise.
+	(gnus-agent-fetch-headers): Likewise.
+	(gnus-agent-flush-cache): Likewise.
+	(gnus-agent-fetch-articles): Likewise.
+	(gnus-agent-save-history): Likewise.
+	(gnus-agent-save-groups): Likewise.
+	(gnus-agent-save-active): Likewise.
+
 1998-12-08  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/smtp.el (smtp-via-smtp): Use `open-network-stream-as-binary'
