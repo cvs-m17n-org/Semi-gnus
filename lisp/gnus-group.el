@@ -2426,42 +2426,8 @@ If SOLID (the prefix), create a solid group."
 		       (nnwarchive-login ,login))))
     (gnus-group-make-group group method)))
 
-(defvar gnus-group-shimbun-server-history nil)
-
-(defun gnus-group-make-shimbun-group ()
-  "Create a nnshimbun group."
-  (interactive)
-  (require 'nnshimbun)
-  (let* ((minibuffer-setup-hook
-	  (append minibuffer-setup-hook '(beginning-of-line)))
-	 (alist
-	  (apply 'nconc
-		 (mapcar
-		  (lambda (d)
-		    (and (stringp d)
-			 (file-directory-p d)
-			 (delq nil
-			       (mapcar
-				(lambda (f)
-				  (and (string-match "^sb-\\(.*\\)\\.el$" f)
-				       (list (match-string 1 f))))
-				(directory-files d)))))
-		  load-path)))
-	 (server (completing-read
-		  "Shimbun address: " 
-		  alist nil t
-		  (or (car gnus-group-shimbun-server-history)
-		      (caar alist))
-		  'gnus-group-shimbun-server-history))
-	 (groups)
-	 (nnshimbun-pre-fetch-article))
-    (require (intern (concat "sb-" server)))
-    (when (setq groups (intern-soft (concat "shimbun-" server "-groups")))
-      (gnus-group-make-group
-       (completing-read "Group name: "
-			(mapcar 'list (symbol-value groups))
-			nil t nil)
-       (list 'nnshimbun server)))))
+(autoload 'gnus-group-make-shimbun-group
+  "nnshimbun" "Create a nnshimbun group." t)
 
 (defun gnus-group-make-archive-group (&optional all)
   "Create the (ding) Gnus archive group of the most recent articles.

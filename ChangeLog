@@ -1,3 +1,19 @@
+2001-06-09  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (top-level): Updated comments.
+	(nnshimbun): New customize group.
+	(nnshimbun-keep-last-article): Defined as customize variable.
+	(nnshimbun-keep-unparsable-dated-articles): Ditto.
+	(nnshimbun-insert-nov): Use `when' instead of `if'.
+	(gnus-group-shimbun-server-history): Imported from
+	`gnus-group.el'.
+	(gnus-group-make-shimbun-group): Ditto.
+
+	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Its real
+	definition is moved to `nnshimbun.el' and autload code is added.
+	(gnus-group-shimbun-server-history): Its definition is moved to
+	`nnshimbun.el'.
+
 2001-06-08  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el (nnshimbun-use-entire-index): Removed.

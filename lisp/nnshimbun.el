@@ -35,23 +35,16 @@
 ;;	http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
 ;; If you would like to use this module in Gnus (not T-gnus), put this
-;; file into the lisp/ directory in the Gnus source tree and run
-;; `make install'.  And then, copy the function definition of
-;; `gnus-group-make-shimbun-group' from the file gnus-group.el of
-;; T-gnus to somewhere else, for example .gnus file as follows:
-;;
-;;(eval-after-load "gnus-group"
-;;  '(if (not (fboundp 'gnus-group-make-shimbun-group))
-;;       (defun gnus-group-make-shimbun-group ()
-;;         "Create a nnshimbun group."
-;;         [...a function definition...])))
+;; file into the lisp/ directory in the Gnus source tree and run `make
+;; install'.  And then, put the following expression into your ~/.gnus.
+
+;; (autoload 'gnus-group-make-shimbun-group
+;;   "nnshimbun" "Create a nnshimbun group." t)
+
 
 ;;; Definitions:
 
-(gnus-declare-backend "nnshimbun" 'address)
-
 (eval-when-compile (require 'cl))
-
 (require 'nnheader)
 (require 'nnmail)
 (require 'nnoo)
@@ -60,6 +53,26 @@
 (require 'message)
 
 
+;; Customize variables
+(defgroup nnshimbun nil
+  "Reading Web Newspapers with Gnus."
+  :group 'gnus)
+
+(defcustom nnshimbun-keep-last-article t
+  "*If non-nil, nnshimbun will never delete a group's last article.
+It can be marked expirable, so it will be deleted when it is no
+longer last."
+  :group 'nnshimbun
+  :type 'boolean)
+
+(defcustom nnshimbun-keep-unparsable-dated-articles t
+  "*If non-nil, nnshimbun will never delete articles whose NOV date is unparsable."
+  :group 'nnshimbun
+  :type 'boolean)
+
+
+;; Define baekend
+(gnus-declare-backend "nnshimbun" 'address)
 (nnoo-declare nnshimbun)
 
 (defvoo nnshimbun-directory (nnheader-concat gnus-directory "shimbun/")
@@ -394,11 +407,11 @@ also be nil."
 	  (insert "Xref: " xref "\t")
 	  (when id
 	    (insert "X-Nnshimbun-Id: " id "\t")))
-      (if id
-	  (insert "\tX-Nnshimbun-Id: " id "\t")))
+      (when id
+	(insert "\tX-Nnshimbun-Id: " id "\t")))
     ;; Replace newlines with spaces in the current NOV line.
     (while (progn
-	     (beginning-of-line)
+	     (forward-line 0)
 	     (> (point) start))
       (backward-delete-char 1)
       (insert " "))
@@ -452,11 +465,11 @@ also be nil."
 	      (forward-line 1)
 	    (forward-line 0)
 	    (setq found t))))
-      (if found
-	  (if nov
-	      (nnheader-parse-nov)
-	    ;; We return the article number.
-	    (ignore-errors (read (current-buffer))))))))
+      (when found
+	(if nov
+	    (nnheader-parse-nov)
+	  ;; We return the article number.
+	  (ignore-errors (read (current-buffer))))))))
 
 (defun nnshimbun-open-nov (group)
   (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist))))
@@ -498,15 +511,6 @@ also be nil."
 	(set-buffer-modified-p nil)
 	(kill-buffer (current-buffer)))
       (setq nnshimbun-nov-buffer-alist (cdr nnshimbun-nov-buffer-alist)))))
-
-(defvar nnshimbun-keep-last-article t
-  "*If non-nil, nnshimbun will never delete a group's last article.  It
-can be marked expirable, so it will be deleted when it is no longer
-last.")
-
-(defvar nnshimbun-keep-unparsable-dated-articles t
-  "*If non-nil, nnshimbun will never delete articles whose NOV date is
-unparsable.")
 
 (deffoo nnshimbun-request-expire-articles (articles group
 						    &optional server force)
@@ -613,6 +617,48 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
   (nnshimbun-search-id
    (shimbun-current-group-internal (shimbun-mua-shimbun-internal mua))
    id))
+
+
+
+;;; Command to create nnshimbun group
+
+(defvar gnus-group-shimbun-server-history nil)
+
+;;;###autoload
+(defun gnus-group-make-shimbun-group ()
+  "Create a nnshimbun group."
+  (interactive)
+  (require 'nnshimbun)
+  (let* ((minibuffer-setup-hook
+	  (append minibuffer-setup-hook '(beginning-of-line)))
+	 (alist
+	  (apply 'nconc
+		 (mapcar
+		  (lambda (d)
+		    (and (stringp d)
+			 (file-directory-p d)
+			 (delq nil
+			       (mapcar
+				(lambda (f)
+				  (and (string-match "^sb-\\(.*\\)\\.el$" f)
+				       (list (match-string 1 f))))
+				(directory-files d)))))
+		  load-path)))
+	 (server (completing-read
+		  "Shimbun address: " 
+		  alist nil t
+		  (or (car gnus-group-shimbun-server-history)
+		      (caar alist))
+		  'gnus-group-shimbun-server-history))
+	 (groups)
+	 (nnshimbun-pre-fetch-article))
+    (require (intern (concat "sb-" server)))
+    (when (setq groups (intern-soft (concat "shimbun-" server "-groups")))
+      (gnus-group-make-group
+       (completing-read "Group name: "
+			(mapcar 'list (symbol-value groups))
+			nil t nil)
+       (list 'nnshimbun server)))))
 
 
 (provide 'nnshimbun)
