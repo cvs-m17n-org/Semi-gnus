@@ -127,7 +127,8 @@
     "^X-Sun-Charset:" "^X-Accept-Language:" "^X-Envelope-Sender:"
     "^List-[A-Za-z]+:" "^X-Listprocessor-Version:"
     "^X-Received:" "^X-Distribute:" "^X-Sequence:" "^X-Juno-Line-Breaks:"
-    "^X-Notes-Item:" "^X-MS-TNEF-Correlator:" "^x-uunet-gateway:")
+    "^X-Notes-Item:" "^X-MS-TNEF-Correlator:" "^x-uunet-gateway:"
+    "^X-Received:" "^Content-length:" "X-precedence:")
   "*All headers that start with this regexp will be hidden.
 This variable can also be a list of regexps of headers to be ignored.
 If `gnus-visible-headers' is non-nil, this variable will be ignored."
@@ -2724,9 +2725,9 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     (setq buffer-read-only nil
 	  gnus-article-wash-types nil)
     (gnus-run-hooks 'gnus-tmp-internal-hook)
-    (gnus-run-hooks 'gnus-article-prepare-hook)
     (when gnus-display-mime-function
-      (funcall gnus-display-mime-function))))
+      (funcall gnus-display-mime-function))
+    (gnus-run-hooks 'gnus-article-prepare-hook)))
 
 ;;;
 ;;; Gnus MIME viewing functions
@@ -4390,10 +4391,7 @@ forbidden in URL encoding."
 
 (defun gnus-button-embedded-url (address)
   "Browse ADDRESS."
-  ;; In Emacs 20, `browse-url-browser-function' may be an alist.
-  (if (listp browse-url-browser-function)
-      (browse-url (gnus-strip-whitespace address))
-    (funcall browse-url-browser-function (gnus-strip-whitespace address))))
+  (browse-url (gnus-strip-whitespace address)))
 
 ;;; Next/prev buttons in the article buffer.
 

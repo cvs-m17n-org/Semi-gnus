@@ -260,10 +260,10 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.99"
+(defconst gnus-version-number "5.8.2"
   "Version number for this version of Gnus.")
 
-(defconst gnus-version (format "Pterodactyl Gnus v%s" gnus-version-number)
+(defconst gnus-version (format "Gnus v%s" gnus-version-number)
   "Version string for this version of Gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -2743,6 +2743,8 @@ If NEWSGROUP is nil, return the global kill file name instead."
   (or gnus-override-method
       (and (not group)
 	   gnus-select-method)
+      (and (not (gnus-group-entry group)) ;; a new group
+	   (gnus-group-name-to-method group))
       (let ((info (or info (gnus-get-info group)))
 	    method)
 	(if (or (not info)

@@ -113,9 +113,10 @@ and `altavista'.")
     (set-buffer nntp-server-buffer)
     (erase-buffer)
     (let (article header)
-      (while (setq article (pop articles))
-	(when (setq header (cadr (assq article nnweb-articles)))
-	  (nnheader-insert-nov header)))
+      (mm-with-unibyte-current-buffer
+	(while (setq article (pop articles))
+	  (when (setq header (cadr (assq article nnweb-articles)))
+	    (nnheader-insert-nov header))))
       'nov)))
 
 (deffoo nnweb-request-scan (&optional group server)
@@ -169,7 +170,8 @@ and `altavista'.")
     (let* ((header (cadr (assq article nnweb-articles)))
 	   (url (and header (mail-header-xref header))))
       (when (or (and url
-		     (nnweb-fetch-url url))
+		     (mm-with-unibyte-current-buffer
+		       (nnweb-fetch-url url)))
 		(and (stringp article)
 		     (nnweb-definition 'id t)
 		     (let ((fetch (nnweb-definition 'id))
@@ -178,8 +180,9 @@ and `altavista'.")
 			 (setq art (match-string 1 article)))
 		       (and fetch
 			    art
-			    (nnweb-fetch-url
-			     (format fetch article))))))
+			    (mm-with-unibyte-current-buffer
+			      (nnweb-fetch-url
+			       (format fetch article)))))))
 	(unless nnheader-callback-function
 	  (funcall (nnweb-definition 'article))
 	  (nnweb-decode-entities))
@@ -231,7 +234,7 @@ and `altavista'.")
 (defun nnweb-read-overview (group)
   "Read the overview of GROUP and build the map."
   (when (file-exists-p (nnweb-overview-file group))
-    (with-temp-buffer
+    (mm-with-unibyte-buffer
       (nnheader-insert-file-contents (nnweb-overview-file group))
       (goto-char (point-min))
       (let (header)
@@ -299,22 +302,34 @@ and `altavista'.")
   (unless (gnus-buffer-live-p nnweb-buffer)
     (setq nnweb-buffer
 	  (save-excursion
-	    (nnheader-set-temp-buffer
-	     (format " *nnweb %s %s %s*" nnweb-type nnweb-search server))))))
+	    (let ((multibyte (default-value 'enable-multibyte-characters)))
+	      (unwind-protect
+		  (progn
+		    (setq-default enable-multibyte-characters nil)
+		    (nnheader-set-temp-buffer
+		     (format " *nnweb %s %s %s*"
+			     nnweb-type nnweb-search server)))
+		(setq-default enable-multibyte-characters multibyte))
+	      (current-buffer))))))
 
 (defun nnweb-fetch-url (url)
-  (save-excursion
-    (if (not nnheader-callback-function)
-	(let ((buf (current-buffer)))
-	  (save-excursion
-	    (set-buffer nnweb-buffer)
+  (let (buf)
+    (save-excursion
+      (if (not nnheader-callback-function)
+	  (progn
+	    (with-temp-buffer
+	      (mm-enable-multibyte)
+	      (let ((coding-system-for-read 'binary)
+		    (coding-system-for-write 'binary)
+		    (default-process-coding-system 'binary))
+		(nnweb-insert url))
+	      (setq buf (buffer-string)))
 	    (erase-buffer)
-	    (url-insert-file-contents url)
-	    (copy-to-buffer buf (point-min) (point-max))
-	    t))
-      (nnweb-url-retrieve-asynch
-       url 'nnweb-callback (current-buffer) nnheader-callback-function)
-      t)))
+	    (insert buf)
+	    t)
+	(nnweb-url-retrieve-asynch
+	 url 'nnweb-callback (current-buffer) nnheader-callback-function)
+	t))))
 
 (defun nnweb-callback (buffer callback)
   (when (gnus-buffer-live-p url-working-buffer)
@@ -368,18 +383,20 @@ and `altavista'.")
 	  (dolist (row (nth 2 (car (nth 2 table))))
 	    (setq a (nnweb-parse-find 'a row)
 		  url (cdr (assq 'href (nth 1 a)))
-		  text (nnweb-text row))
+		  text (nreverse (nnweb-text row)))
 	    (when a
-	      (setq subject (nth 2 text)
-		    group (nth 4 text)
-		    date (nth 5 text)
-		    from (nth 6 text))
-	      (string-match "\\([0-9]+\\)/\\([0-9]+\\)/\\([0-9]+\\)" date)
-	      (setq date (format "%s %s %s"
-				 (car (rassq (string-to-number
-					      (match-string 2 date))
-					     parse-time-months))
-				 (match-string 3 date) (match-string 1 date)))
+	      (setq subject (nth 4 text)
+		    group (nth 2 text)
+		    date (nth 1 text)
+		    from (nth 0 text))
+	      (if (string-match "\\([0-9]+\\)/\\([0-9]+\\)/\\([0-9]+\\)" date)
+		  (setq date (format "%s %s 00:00:00 %s"
+				     (car (rassq (string-to-number
+						  (match-string 2 date))
+						 parse-time-months))
+				     (match-string 3 date) 
+				     (match-string 1 date)))
+		(setq date "Jan 1 00:00:00 0000"))
 	      (incf i)
 	      (setq url (concat url "&fmt=text"))
 	      (unless (nnweb-get-hashtb url)

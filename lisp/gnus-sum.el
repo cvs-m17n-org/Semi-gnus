@@ -849,6 +849,17 @@ This variable uses the same syntax as `gnus-emphasis-alist'."
 					     gnus-emphasis-highlight-words)))))
   :group 'gnus-summary-visual)
 
+(defcustom gnus-summary-show-article-charset-alist
+  nil
+  "Alist of number and charset.
+The article will be shown with the charset corresponding to the
+numbered argument.
+For example: ((1 . cn-gb-2312) (2 . big5))."
+  :type '(repeat (cons (number :tag "Argument" 1)
+		       (symbol :tag "Charset")))
+  :group 'gnus-charset)
+
+
 ;;; Internal variables
 
 (defvar gnus-article-mime-handles nil)
@@ -6801,8 +6812,14 @@ to guess what the document format is."
 			   (list (cons 'save-article-group ogroup))))
 	   (case-fold-search t)
 	   (buf (current-buffer))
-	   dig)
+	   dig to-address)
       (save-excursion
+	(set-buffer gnus-original-article-buffer)
+	;; Have the digest group inherit the main mail address of
+	;; the parent article.
+	(when (setq to-address (or (message-fetch-field "reply-to")
+				   (message-fetch-field "from")))
+	  (setq params (append (list (cons 'to-address to-address)))))
 	(setq dig (nnheader-set-temp-buffer " *gnus digest buffer*"))
 	(insert-buffer-substring gnus-original-article-buffer)
 	;; Remove lines that may lead nndoc to misinterpret the
@@ -7110,12 +7127,23 @@ to save in."
 
 (defun gnus-summary-show-article (&optional arg)
   "Force re-fetching of the current article.
-If ARG (the prefix) is non-nil, show the raw article without any
-article massaging functions being run."
+If ARG (the prefix) is a number, show the article with the charset 
+defined in `gnus-summary-show-article-charset-alist', or the charset
+inputed.
+If ARG (the prefix) is non-nil and not a number, show the raw article 
+without any article massaging functions being run."
   (interactive "P")
-  (if (not arg)
-      ;; Select the article the normal way.
-      (gnus-summary-select-article nil 'force)
+  (cond 
+   ((numberp arg)
+    (let ((gnus-newsgroup-charset 
+	   (or (cdr (assq arg gnus-summary-show-article-charset-alist))
+	       (read-coding-system "Charset: ")))
+	  (gnus-newsgroup-ignored-charsets 'gnus-all))
+      (gnus-summary-select-article nil 'force)))
+   ((not arg)
+    ;; Select the article the normal way.
+    (gnus-summary-select-article nil 'force))
+   (t
     ;; We have to require this here to make sure that the following
     ;; dynamic binding isn't shadowed by autoloading.
     (require 'gnus-async)
@@ -7125,14 +7153,13 @@ article massaging functions being run."
 	  gnus-article-prepare-hook
 	  gnus-article-decode-hook
 	  gnus-display-mime-function
-	  gnus-break-pages
-	  gnus-visual)
+	  gnus-break-pages)
       ;; Destroy any MIME parts.
       (when (gnus-buffer-live-p gnus-article-buffer)
 	(save-excursion
 	  (set-buffer gnus-article-buffer)
 	  (mm-destroy-parts gnus-article-mime-handles)))
-      (gnus-summary-select-article nil 'force)))
+      (gnus-summary-select-article nil 'force))))
   (gnus-summary-goto-subject gnus-current-article)
   (gnus-summary-position-point))
 
@@ -9375,10 +9402,9 @@ If REVERSE, save parts that do not match TYPE."
     (setq gnus-newsgroup-charset
 	  (or gnus-newsgroup-ephemeral-charset
 	      (and gnus-newsgroup-name
-		   (or (gnus-group-find-parameter gnus-newsgroup-name
-						  'charset)
+		   (or (gnus-group-find-parameter gnus-newsgroup-name 'charset)
 		       (let ((alist gnus-group-charset-alist)
-			     elem (charset nil))
+			     elem charset)
 			 (while (setq elem (pop alist))
 			   (when (and name
 				      (string-match (car elem) name))

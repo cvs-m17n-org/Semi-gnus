@@ -114,7 +114,7 @@
 	    (set-buffer nntp-server-buffer)
 	    (erase-buffer))
 	(setq nnultimate-articles nil)
-	(with-temp-buffer
+	(mm-with-unibyte-buffer
 	  (dolist (elem fetchers)
 	    (setq pages 1
 		  current-page 1
@@ -197,9 +197,10 @@
 	(setq nnultimate-headers (sort headers 'car-less-than-car))
 	(save-excursion
 	  (set-buffer nntp-server-buffer)
-	  (erase-buffer)
-	  (dolist (header nnultimate-headers)
-	    (nnheader-insert-nov (cdr header)))))
+	  (mm-with-unibyte-current-buffer
+	    (erase-buffer)
+	    (dolist (header nnultimate-headers)
+	      (nnheader-insert-nov (cdr header))))))
       'nov)))
 
 (deffoo nnultimate-request-group (group &optional server dont-check)
@@ -230,13 +231,14 @@
 	(goto-char (point-min))
 	(insert "Content-Type: text/html\nMIME-Version: 1.0\n")
 	(let ((header (cdr (assq article nnultimate-headers))))
-	  (nnheader-insert-header header))
+	  (mm-with-unibyte-current-buffer
+	    (nnheader-insert-header header)))
 	(nnheader-report 'nnultimate "Fetched article %s" article)
 	(cons group article)))))
 
 (deffoo nnultimate-request-list (&optional server)
   (nnultimate-possibly-change-server nil server)
-  (with-temp-buffer
+  (mm-with-unibyte-buffer
     (nnweb-insert
      (if (string-match "/$" nnultimate-address)
 	 (concat nnultimate-address "Ultimate.cgi")
@@ -299,7 +301,7 @@
 	 (furls (list (concat nnultimate-address (format furl sid))))
 	 contents forum-contents furl-fetched a subject href
 	 garticles topic tinfo old-max inc parse)
-    (with-temp-buffer
+    (mm-with-unibyte-buffer
       (while furls
 	(erase-buffer)
 	(nnweb-insert (pop furls))
@@ -387,7 +389,7 @@
   (setq nnultimate-groups-alist nil)
   (let ((file (expand-file-name "groups" nnultimate-directory)))
     (when (file-exists-p file)
-      (with-temp-buffer
+      (mm-with-unibyte-buffer
 	(insert-file-contents file)
 	(goto-char (point-min))
 	(setq nnultimate-groups-alist (read (current-buffer)))))))
