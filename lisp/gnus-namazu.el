@@ -438,6 +438,7 @@ options make any sense in this context."
 		  nil))))
     articles))
 
+;;;###autoload
 (defun gnus-namazu-search (groups query)
   "Search QUERY through GROUPS with Namazu,
 and make a virtual group contains its results."
@@ -454,8 +455,7 @@ and make a virtual group contains its results."
 		      "nnvirtual:namazu-search?query=%s&groups=%s&id=%d%d%d"
 		      query
 		      (if groups (mapconcat 'identity groups ",") "ALL")
-		      (current-time))
-	       gnus-namazu-coding-system))
+		      (current-time))))
 	  (gnus-namazu/truncate-article-list articles)
 	  (unless real-groups
 	    (dolist (a articles)
