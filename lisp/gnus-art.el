@@ -3252,7 +3252,7 @@ It is registered to variable `mime-view-content-header-filter-alist'."
 
 (defun mime-view-quitting-method-for-gnus ()
   (if (not gnus-show-mime)
-      (mime-view-kill-buffer))
+      (mime-preview-kill-buffer))
   (delete-other-windows)
   (gnus-article-show-summary)
   (if (or (not gnus-show-mime)
