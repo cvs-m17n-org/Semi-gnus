@@ -2677,11 +2677,6 @@ M-RET    `message-newline-and-reformat' (break the line and reformat)."
   (setq message-parameter-alist
 	(copy-sequence message-startup-parameter-alist))
   (message-setup-fill-variables)
-  (set
-   (make-local-variable 'paragraph-separate)
-   (format "\\(%s\\)\\|\\(%s\\)"
-	   paragraph-separate
-	   "<#!*/?\\(multipart\\|part\\|external\\|mml\\|secure\\)"))
   ;; Allow using comment commands to add/remove quoting.
   (set (make-local-variable 'comment-start) message-yank-prefix)
   (if (featurep 'xemacs)
@@ -2728,7 +2723,8 @@ M-RET    `message-newline-and-reformat' (break the line and reformat)."
 	   "---+$\\|"                   ; delimiters for forwarded messages
 	   page-delimiter "$\\|"        ; spoiler warnings
 	   ".*wrote:$\\|"               ; attribution lines
-	   quote-prefix-regexp "$"))    ; empty lines in quoted text
+	   quote-prefix-regexp "$\\|"   ; empty lines in quoted text
+	   mime-edit-tag-regexp))       ; MIME-Edit tags
     (setq paragraph-separate paragraph-start)
     (setq adaptive-fill-regexp
 	  (concat quote-prefix-regexp "\\|" adaptive-fill-regexp))
