@@ -147,11 +147,12 @@ it's not cached."
       (setq gnus-cache-buffer nil))))
 
 (defun gnus-cache-possibly-enter-article
-  (group article ticked dormant unread &optional force)
+  (group article headers ticked dormant unread &optional force)
   (when (and (or force (not (eq gnus-use-cache 'passive)))
 	     (numberp article)
-	     (> article 0))		; This might be a dummy article.
-    (let ((number article) file headers)
+	     (> article 0)
+	     (vectorp headers))		; This might be a dummy article.
+    (let ((number article) file)
       ;; If this is a virtual group, we find the real group.
       (when (gnus-virtual-group-p group)
 	(let ((result (nnvirtual-find-group-art
@@ -389,6 +390,7 @@ Returns the list of articles entered."
       (if (natnump article)
 	  (when (gnus-cache-possibly-enter-article
 		 gnus-newsgroup-name article
+		 (gnus-summary-article-header article)
 		 nil nil nil t)
 	    (push article out))
 	(gnus-message 2 "Can't cache article %d" article))
@@ -484,7 +486,7 @@ Returns the list of articles removed."
   (when (gnus-cache-possibly-remove-article article nil nil nil t)
     (let ((gnus-use-cache nil))
       (gnus-cache-possibly-enter-article
-       gnus-newsgroup-name article
+       gnus-newsgroup-name article (gnus-summary-article-header article)
        nil nil nil t))))
 
 (defun gnus-cache-possibly-remove-article (article ticked dormant unread
