@@ -1,5 +1,17 @@
 1999-12-24  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* lisp/nnheader.el (make-full-mail-header): If field decoder does
+	not found, then do not decode field body.
+
+	* lisp/mm-mailcap.el (mm-mailcap-mime-info): If `string' is
+	invalid content type format, use `string' as major content type.
+
+	* lisp/mm-decode.el (mm-dissect-buffer): Use `result' instead of
+	`parent'.
+
+	* lisp/gnus-art.el (gnus-mime-view-all-parts): Correspondence with
+	FLIM.
+
 	* lisp/mail-parse.el (mail-decode-encoded-word-region): Use
 	`mime-decode-header-in-region'.
 
