@@ -1771,8 +1771,6 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      (article-fill . gnus-article-word-wrap)
      article-remove-cr
      article-display-x-face
-     article-de-quoted-unreadable
-     article-mime-decode-quoted-printable
      article-hide-pgp
      article-hide-pem
      article-hide-signature
@@ -1960,16 +1958,14 @@ commands:
 	    default-mime-charset))
 	)
     (save-excursion
-      (mime-view-mode nil nil nil gnus-original-article-buffer
-		      gnus-article-buffer
-		      gnus-article-mode-map)
+      (mime-view-buffer gnus-original-article-buffer gnus-article-buffer
+			nil gnus-article-mode-map)
       ))
   (run-hooks 'gnus-mime-article-prepare-hook)
   )
 
 (defun gnus-article-decode-encoded-word ()
-  "Header filter for gnus-article-mode.
-It is registered to variable `mime-view-content-header-filter-alist'."
+  "Header filter for gnus-article-mode."
   (let ((charset (save-excursion
 		   (set-buffer gnus-summary-buffer)
 		   default-mime-charset)))
@@ -3239,10 +3235,13 @@ forbidden in URL encoding."
 ;;; @ for mime-view
 ;;;
 
-(defun gnus-content-header-filter ()
-  "Header filter for mime-view.
-It is registered to variable `mime-view-content-header-filter-alist'."
-  (eword-decode-header default-mime-charset))
+(defun gnus-article-header-presentation-method (entity situation)
+  (mime-insert-decoded-header entity nil nil default-mime-charset)
+  )
+
+(set-alist 'mime-header-presentation-method-alist
+	   'gnus-original-article-mode
+	   #'gnus-article-header-presentation-method)
 
 (defun mime-preview-quitting-method-for-gnus ()
   (if (not gnus-show-mime)
@@ -3253,10 +3252,6 @@ It is registered to variable `mime-view-content-header-filter-alist'."
 	  (null gnus-have-all-headers))
       (gnus-summary-select-article nil t)
     ))
-
-(set-alist 'mime-view-content-header-filter-alist
-	   'gnus-original-article-mode
-	   #'gnus-content-header-filter)
 
 (set-alist 'mime-raw-representation-type-alist
 	   'gnus-original-article-mode 'binary)
@@ -3277,9 +3272,8 @@ It is registered to variable `mime-view-content-header-filter-alist'."
   (goto-char (point-min))
   )
 
-(set-alist 'mime-view-following-method-alist
-	   'gnus-original-article-mode
-	   #'gnus-following-method)
+(set-alist 'mime-preview-following-method-alist
+	   'gnus-original-article-mode #'gnus-following-method)
 
 
 ;;; @ end

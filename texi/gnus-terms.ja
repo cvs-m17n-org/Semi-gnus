@@ -7,6 +7,7 @@ active				作動する、作動している
 active file			現状ファイル、アクティブファイル
 adapt				適用
 address				アドレス
+agent				エージェント
 alist				連想リスト
 alternate			代替
 anything group			なんでもグループ
@@ -14,10 +15,12 @@ archive				アーカイブ
 asterisk			アスタリスク
 auto-save file			自動保存ファイル
 backend				バックエンド
+batch				一括
 bogus group			偽グループ
 browse				ブラウズ、参照、概観
 buffer				バッファ
 buggy				故障がち
+category			分類
 collapsed group	name		短縮グループ名
 combined groups			結合グループ
 command				命令
@@ -25,10 +28,12 @@ configure (shell script)	環境設定
 copy				コピー、複写
 crosspost			相互投稿、クロスポスト
 customize			カスタマイズ
+download			ダウンロード
 default				初期設定/初期設定値 (ディフォルト)?
 directory			ディレクトリー
 dormant article			保留記事
 dotted pair			ドットペア、ドット対
+draft				下書き
 dribble file			ドリブルファイル
 duplicate suppression		重複抑制
 expire				期限切れ消去、期限切れ削除
@@ -43,6 +48,7 @@ group buffer			グループバッファ
 header				ヘッダー
 highlight			ハイライト
 history				履歴
+hook				フック
 inbox				インボックス
 indentation			字下げ
 interactive command		対話命令
@@ -70,9 +76,11 @@ news				ニュース (ニューズ)
 newsgroup			ニュースグループ (ニューズグループ)
 news reader			ニュースリーダ
 numeric prefix			数字接頭引数
+outgoing			差出用
 overview			概観ファイル
 pack				梱包する
 parameter			パラメータ
+plugged				差し込み
 point				ポイント、カーソル位置
 predicate function		述語関数
 prefix				接頭引数
@@ -107,6 +115,7 @@ ticked article			(印付き記事)
 toggle				トグル 切り替え
 token
 topic				トピック
+unplugged			切り離し
 unsubscribe			非購読
 user				利用者
 value (alist)			値
