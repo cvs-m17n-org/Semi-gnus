@@ -102,14 +102,7 @@ on your system, you could say something like:
 (defalias 'mail-header-xref 'mime-entity-xref-internal)
 (defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
 
-;;(defmacro mail-header-extra (entity)
-;;  "Return the extra headers in ENTITY."
-;;  `(aref ,entity 23))
 (defalias 'mail-header-extra 'ignore)
-
-;;(defmacro mail-header-set-extra (entity extra)
-;;  "Set the extra headers in ENTITY to EXTRA."
-;;  `(aset ,entity 23 ',extra))
 (defalias 'mail-header-set-extra 'ignore)
 
 (defsubst make-full-mail-header
