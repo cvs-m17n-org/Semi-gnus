@@ -39,7 +39,7 @@
 		     url-view-url w3-prepare-buffer
 		     set-buffer-multibyte
 		     find-non-ascii-charset-region char-charset
-		     find-charset-region subst-char-in-string
+		     find-charset-region
 		     find-coding-systems-region get-charset-property
 		     coding-system-get w3-region
 		     w3-coding-system-for-mime-charset
@@ -109,7 +109,7 @@
 		 find-coding-systems-for-charsets find-coding-systems-region
 		 font-lock-set-defaults function-max-args get-charset-property
 		 make-symbolic-link map-extents smiley-encode-buffer
-		 toolbar-gnus subst-char-in-string)))
+		 toolbar-gnus)))
 
 (setq load-path (cons "." load-path))
 (require 'custom)

@@ -1,3 +1,8 @@
+2000-08-21  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* nnheader.el (nnheader-replace-chars-in-string): Use `static-if'.
+	* message.el (message-replace-chars-in-string): Ditto.
+
 2000-08-19  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* nnshimbun.el (nnshimbun-type-definition): Follow changes of ZDNet.

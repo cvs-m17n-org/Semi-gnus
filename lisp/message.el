@@ -5362,7 +5362,7 @@ regexp varstr."
 ;;; Miscellaneous functions
 
 ;; stolen (and renamed) from nnheader.el
-(if (fboundp 'subst-char-in-string)
+(static-if (fboundp 'subst-char-in-string)
     (defsubst message-replace-chars-in-string (string from to)
       (subst-char-in-string from to string))
   (defun message-replace-chars-in-string (string from to)

@@ -32,6 +32,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'static))
 
 (require 'mail-utils)
 (require 'mime)
@@ -876,7 +877,7 @@ without formatting."
       (apply 'insert format args))
     t))
 
-(if (fboundp 'subst-char-in-string)
+(static-if (fboundp 'subst-char-in-string)
     (defsubst nnheader-replace-chars-in-string (string from to)
       (subst-char-in-string from to string))
   (defun nnheader-replace-chars-in-string (string from to)
