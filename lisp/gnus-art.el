@@ -1193,13 +1193,15 @@ See Info node `(gnus)Customizing Articles' for details."
 
 (defcustom gnus-treat-display-xface
   (and (not noninteractive)
-       (or (and (fboundp 'image-type-available-p)
+       (or (memq gnus-article-x-face-command
+		 '(x-face-decode-message-header
+		   x-face-mule-gnus-article-display-x-face))
+	   (and (fboundp 'image-type-available-p)
 		(image-type-available-p 'xbm)
-		(string-match "^0x" (shell-command-to-string "uncompface")))
+		(string-match "^0x" (shell-command-to-string "uncompface"))
+		(executable-find "icontopbm"))
 	   (and (featurep 'xemacs)
-		(featurep 'xface))
-	   (eq 'x-face-mule-gnus-article-display-x-face
-	       gnus-article-x-face-command))
+		(featurep 'xface)))
        'head)
   "Display X-Face headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
@@ -2249,20 +2251,24 @@ If PROMPT (the prefix), prompt for a coding system to use."
     (when (and (or gnus-group-name-charset-method-alist
 		   gnus-group-name-charset-group-alist)
 	       (gnus-buffer-live-p gnus-original-article-buffer))
-      (when (nnmail-fetch-field "Newsgroups")
-	(nnheader-replace-header "Newsgroups"
-				 (gnus-decode-newsgroups
-				  (with-current-buffer
-				      gnus-original-article-buffer
-				    (nnmail-fetch-field "Newsgroups"))
-				  gnus-newsgroup-name method)))
-      (when (nnmail-fetch-field "Followup-To")
-	(nnheader-replace-header "Followup-To"
-				 (gnus-decode-newsgroups
-				  (with-current-buffer
-				      gnus-original-article-buffer
-				    (nnmail-fetch-field "Followup-To"))
-				  gnus-newsgroup-name method))))))
+      (save-restriction
+	(goto-char (point-min))
+	(article-narrow-to-head)
+	(while (re-search-forward (concat "^\\(Newsgroups\\|Followup-To\\): "
+					  "\\(\\(.\\|\n[\t ]\\)*\\)\n[^\t ]")
+				  nil t)
+	  (replace-match (save-match-data
+			   (gnus-decode-newsgroups
+			    ;; XXX how to use data in this buffer?
+			    (with-current-buffer gnus-original-article-buffer
+			      (goto-char (point-min))
+			      (re-search-forward
+			       (concat "^\\(Newsgroups\\|Followup-To\\): "
+				       "\\(\\(.\\|\n[\t ]\\)*\\)\n[^\t ]")
+			       nil t)
+			      (match-string 2))
+			    gnus-newsgroup-name method))
+			 t t nil 2))))))
 
 (autoload 'idna-to-unicode "idna")
 
