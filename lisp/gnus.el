@@ -30,9 +30,8 @@
 
 (eval '(run-hooks 'gnus-load-hook))
 
-(eval-when-compile
-  (require 'cl)
-  (require 'static))
+(eval-when-compile (require 'cl))
+(eval-when-compile (require 'static))
 
 (require 'custom)
 (eval-and-compile
@@ -269,7 +268,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.13.3"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "01"
+(defconst gnus-revision-number "02"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.98"
@@ -901,20 +900,18 @@ used to 899, you would say something along these lines:
 		 (kill-buffer (current-buffer))))))))
 
 (defcustom gnus-select-method
-  (condition-case nil
-      (nconc
-       (list 'nntp (or (condition-case nil
-			   (gnus-getenv-nntpserver)
-			 (error nil))
-		       (when (and gnus-default-nntp-server
-				  (not (string= gnus-default-nntp-server "")))
-			 gnus-default-nntp-server)
-		       "news"))
-       (if (or (null gnus-nntp-service)
-	       (equal gnus-nntp-service "nntp"))
-	   nil
-	 (list gnus-nntp-service)))
-    (error nil))
+  (ignore-errors
+    (nconc
+     (list 'nntp (or (ignore-errors
+		       (gnus-getenv-nntpserver))
+		     (when (and gnus-default-nntp-server
+				(not (string= gnus-default-nntp-server "")))
+		       gnus-default-nntp-server)
+		     "news"))
+     (if (or (null gnus-nntp-service)
+	     (equal gnus-nntp-service "nntp"))
+	 nil
+       (list gnus-nntp-service))))
   "*Default method for selecting a newsgroup.
 This variable should be a list, where the first element is how the
 news is to be fetched, the second is the address.
