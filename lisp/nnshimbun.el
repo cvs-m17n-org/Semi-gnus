@@ -668,15 +668,20 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 	(let* ((expirable (copy-sequence articles))
 	       (name (concat "nnshimbun+" server ":" group))
 	       ;; If the group's parameter `expiry-wait' is non-nil,
-	       ;; `nnmail-expiry-wait' is bound to that value, and
-	       ;; `nnmail-expiry-wait-function' is bound to nil.
-	       ;; See the source code of `gnus-summary-expire-articles'.
-	       ;; Prefer the shimbun's default to `nnmail-expiry-wait'
-	       ;; only when the group's parameter is nil.
+	       ;; the value of the option `nnmail-expiry-wait' will be
+	       ;; bound to that value, and the value of the option
+	       ;; `nnmail-expiry-wait-function' will be bound to nil.
+	       ;; See the source code of `gnus-summary-expire-articles'
+	       ;; how does it work.  If the group's parameter is not
+	       ;; specified by user, the shimbun's default value will
+	       ;; be used.
 	       (nnmail-expiry-wait
 		(or (nnshimbun-find-parameter name 'expiry-wait t)
 		    (shimbun-article-expiration-days nnshimbun-shimbun)
 		    nnmail-expiry-wait))
+	       (nnmail-expiry-wait-function (if nnmail-expiry-wait
+						nil
+					      nnmail-expiry-wait-function))
 	       article end time)
 	  (save-excursion
 	    (set-buffer buffer)
