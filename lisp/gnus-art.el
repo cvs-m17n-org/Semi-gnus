@@ -1294,17 +1294,26 @@ how much time has lapsed since DATE."
      ;; functions since they aren't particularly resistant to
      ;; buggy dates.
      ((eq type 'local)
-      (concat "Date: " (current-time-string time)))
+      (let ((tz (car (current-time-zone))))
+	(format "Date: %s %s%04d" (current-time-string time)
+		(if (> tz 0) "+" "-") (abs (/ tz 36)))))
      ;; Convert to Universal Time.
      ((eq type 'ut)
       (concat "Date: "
 	      (current-time-string
-	       (let ((e (parse-time-string date)))
-		 (setcar (last e) 0)
-		 (apply 'encode-time e)))))
+	       (let* ((e (parse-time-string date))
+		     (tm (apply 'encode-time e))
+		     (ms (car tm))
+		     (ls (- (cadr tm) (car (current-time-zone)))))
+		 (cond ((< ls 0) (list (1- ms) (+ ls 65536)))
+		       ((> ls 65535) (list (1+ ms) (- ls 65536)))
+		       (t (list ms ls)))))
+	      " UT"))
      ;; Get the original date from the article.
      ((eq type 'original)
-      (concat "Date: " date))
+      (concat "Date: " (if (string-match "\n+$" date)
+			   (substring date 0 (match-beginning 0))
+			 date)))
      ;; Let the user define the format.
      ((eq type 'user)
       (if (gnus-functionp gnus-article-time-format)
