@@ -403,21 +403,22 @@ ticked: The number of ticked articles."
   :type '(repeat (cons (sexp :tag "Form") file)))
 
 (defcustom gnus-group-name-charset-method-alist nil
-  "*Alist of method and the charset for group names.
+  "Alist of method and the charset for group names.
 
 For example:
-    (((nntp \"news.com.cn\") . cn-gb-2312))
-"
+    (((nntp \"news.com.cn\") . cn-gb-2312))"
   :version "21.1"
   :group 'gnus-charset
   :type '(repeat (cons (sexp :tag "Method") (symbol :tag "Charset"))))
 
-(defcustom gnus-group-name-charset-group-alist nil
-  "*Alist of group regexp and the charset for group names.
+(defcustom gnus-group-name-charset-group-alist 
+  (if (and (fboundp 'coding-system-p) (coding-system-p 'utf-8))
+      '((".*" . utf-8))
+    nil)
+  "Alist of group regexp and the charset for group names.
 
 For example:
-    ((\"\\.com\\.cn:\" . cn-gb-2312))
-"
+    ((\"\\.com\\.cn:\" . cn-gb-2312))"
   :group 'gnus-charset
   :type '(repeat (cons (regexp :tag "Group") (symbol :tag "Charset"))))
 
@@ -1349,7 +1350,9 @@ if it is a string, only list groups matching REGEXP."
      (point)
      (prog1 (1+ (point))
        ;; Insert the text.
-       (eval gnus-group-line-format-spec))
+       (let ((gnus-tmp-group (gnus-group-name-decode
+			      gnus-tmp-group group-name-charset)))
+	 (eval gnus-group-line-format-spec)))
      `(gnus-group ,(gnus-intern-safe gnus-tmp-group gnus-active-hashtb)
 		  gnus-unread ,(if (numberp number)
 				   (string-to-int gnus-tmp-number-of-unread)

@@ -686,7 +686,7 @@ displayed by the first non-nil matching CONTENT face."
 			       (item :tag "skip" nil)
 			       (face :value default)))))
 
-(defcustom gnus-article-decode-hook nil
+(defcustom gnus-article-decode-hook '(article-decode-group-name)
   "*Hook run to decode charsets in articles."
   :group 'gnus-article-headers
   :type 'hook)
@@ -1916,8 +1916,30 @@ If PROMPT (the prefix), prompt for a coding system to use."
     (let ((charset (save-excursion
 		     (set-buffer gnus-summary-buffer)
 		     default-mime-charset)))
-      (mime-decode-header-in-buffer charset)
-      )))
+      (mime-decode-header-in-buffer charset))))
+
+(defun article-decode-group-name ()
+  "Decode group names in `Newsgroups:'."
+  (let ((inhibit-point-motion-hooks t)
+	buffer-read-only
+	(method (gnus-find-method-for-group gnus-newsgroup-name)))
+    (when (and (or gnus-group-name-charset-method-alist
+		   gnus-group-name-charset-group-alist)
+	       (gnus-buffer-live-p gnus-original-article-buffer))
+      (when (mail-fetch-field "Newsgroups")
+	(nnheader-replace-header "Newsgroups"
+				 (gnus-decode-newsgroups
+				  (with-current-buffer
+				      gnus-original-article-buffer
+				    (mail-fetch-field "Newsgroups"))
+				  gnus-newsgroup-name method)))
+      (when (mail-fetch-field "Followup-To")
+	(nnheader-replace-header "Followup-To"
+				 (gnus-decode-newsgroups
+				  (with-current-buffer
+				      gnus-original-article-buffer
+				    (mail-fetch-field "Followup-To"))
+				  gnus-newsgroup-name method))))))
 
 (defun article-de-quoted-unreadable (&optional force read-charset)
   "Translate a quoted-printable-encoded article.

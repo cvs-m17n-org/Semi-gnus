@@ -98,7 +98,7 @@ separately:
 pot:
 	xpot -drgnus -r`cat ./version` *.el > rgnus.pot
 
-gnus-load.elc:
+gnus-load.el gnus-load.elc:
 	$(EMACS_COMP) -f dgnushack-make-cus-load $(srcdir)
 	$(EMACS_COMP) -f dgnushack-make-auto-load $(srcdir)
 	$(EMACS_COMP) -f dgnushack-make-load

@@ -631,7 +631,13 @@ header line with the old Message-ID."
 			   (or (message-goto-body) (point-max)))
 	    ;; Insert the original article headers.
 	    (insert-buffer-substring gnus-original-article-buffer beg end)
-	    (article-decode-encoded-words))))
+	    ;; Decode charsets.
+	    (let ((gnus-article-decode-hook
+		   (delq 'article-decode-charset gnus-article-decode-hook)))
+	      ;; Needed for T-gnus.
+	      (add-hook 'gnus-article-decode-hook
+			'article-decode-encoded-words)
+	      (run-hooks 'gnus-article-decode-hook)))))
       gnus-article-copy)))
 
 (defun gnus-post-news (post &optional group header article-buffer yank subject

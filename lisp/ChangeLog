@@ -1,3 +1,74 @@
+2001-10-07 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in (install-el): Depend on gnus-load.el.
+
+2001-10-07 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in (install-el): Use -f.
+	From: Amos Gouaux <amos+lists.ding@utdallas.edu>
+
+2001-10-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* message.el (message-send-news): Don't encode Followups-To when
+	gnus-group-name-charset-group-alist is ".*".  [Yuck]
+
+	* gnus-util.el (gnus-decode-newsgroups): No space in newsgroup
+	header. 
+
+	* gnus-art.el (article-decode-group-name): Also decode
+	"Followup-To". 
+
+	* rfc2047.el (rfc2047-encode-message-header): Encode without
+	asking for null methods.
+
+	* gnus-group.el (gnus-group-name-charset-group-alist): Make utf-8
+	default charset for newsgroup names in accordance with USEFOR.
+
+	* gnus-group.el (gnus-group-name-charset-method-alist,
+	gnus-group-name-charset-group-alist): Removed "*" from doc
+	strings, "*" should not be used for complex variables.
+	
+2001-10-06  Simon Josefsson  <jas@extundo.com>
+
+	Support UTF-8 group names better.
+	
+	* message.el (message-check-news-header-syntax): Encode group
+	names before comparison.
+
+	* gnus-msg.el (gnus-copy-article-buffer): Run all
+	`gnus-article-decode-hook's except `article-decode-charset'
+	instead of hardcoding call to one of them.
+
+	* gnus-art.el (gnus-article-decode-hook): Add
+	`article-decode-group-name'.
+	(article-decode-group-name): New function, use `g-d-n'.
+
+	* gnus-group.el (gnus-group-insert-group-line): Decode
+	gnus-tmp-group using `g-d-n'.
+
+	* gnus-util.el (gnus-decode-newsgroups): New function.
+
+2001-10-06  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnus-srvr.el (gnus-browse-foreign-server): Fixed bug non-nil
+	'gnus-group-name-charset-group-alist'. 
+
+2001-10-06 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* Makefile.in: Install el in install. Add uninstall.
+
+2001-10-05  Simon Josefsson  <jas@extundo.com>
+
+	* nnheader.el (gnus-verbose-backends, gnus-nov-is-evil): Custom.
+
+	* gnus-sum.el (gnus-summary-move-article): Also activate new groups.
+
+	* nnfolder.el (nnfolder-normalize-buffer): Don't insert \n\n in
+	empty folders.
+
+	* gnus-sum.el (gnus-select-newsgroup): Don't enable `display'
+	limiting if read-all (C-u RET) was used.
+
 2001-10-04  Simon Josefsson  <jas@extundo.com>
 
 	* mail-source.el (mail-source-movemail-program): New variable.

@@ -145,6 +145,11 @@ xinfo:
 xinfo-ja:
 	cd texi && $(MAKE) EMACS="$(XEMACS)" ja-info
 
+uninstall:
+	cd lisp && $(MAKE) lispdir="$(lispdir)" uninstall
+	cd texi && $(MAKE) uninstall
+	cd etc && $(MAKE) uninstall
+
 # Rule for Lars and nobody else.
 some:
 	cd lisp && $(MAKE) EMACS="$(EMACS)" some
