@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.7.2 Manual
+@settitle Semi-gnus 6.7.4 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -316,7 +316,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.7.2 Manual
+@title Semi-gnus 6.7.4 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -359,7 +359,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.7.2.
+This manual corresponds to Semi-gnus 6.7.4.
 
 @end ifinfo
 
@@ -1258,7 +1258,7 @@ group, or a bogus native group.
 
 @vindex gnus-group-mode-line-format
 The mode line can be changed by setting
-@code{gnus-group-mode-line-format} (@pxref{Formatting Variables}).  It
+@code{gnus-group-mode-line-format} (@pxref{Mode Line Formatting}).  It
 doesn't understand that many format specifiers:
 
 @table @samp
@@ -3291,7 +3291,7 @@ Score as a number (@pxref{Scoring}).
 @vindex gnus-summary-zcore-fuzz
 Zcore, @samp{+} if above the default level and @samp{-} if below the
 default level.  If the difference between
-@code{gnus-summary-default-level} and the score is less than
+@code{gnus-summary-default-score} and the score is less than
 @code{gnus-summary-zcore-fuzz}, this spec will not be used.
 @item V
 Total thread score.
@@ -3343,9 +3343,9 @@ This restriction may disappear in later versions of gnus.
 @subsection Summary Buffer Mode Line
 
 @vindex gnus-summary-mode-line-format
-You can also change the format of the summary mode bar.  Set
-@code{gnus-summary-mode-line-format} to whatever you like.  The default
-is @samp{Gnus: %%b [%A] %Z}.
+You can also change the format of the summary mode bar (@pxref{Mode Line
+Formatting}).  Set @code{gnus-summary-mode-line-format} to whatever you
+like.  The default is @samp{Gnus: %%b [%A] %Z}.
 
 Here are the elements you can play with:
 
@@ -3356,6 +3356,8 @@ Group name.
 Unprefixed group name.
 @item A
 Current article number.
+@item z
+Current article score.
 @item V
 Gnus version.
 @item U
@@ -6325,7 +6327,8 @@ Cleaner, perhaps.
 @kindex W l (Summary)
 @findex gnus-summary-stop-page-breaking
 Remove page breaks from the current article
-(@code{gnus-summary-stop-page-breaking}).
+(@code{gnus-summary-stop-page-breaking}).  @xref{Misc Article} for page
+delimiters. 
 
 @item W r
 @kindex W r (Summary)
@@ -6995,9 +6998,9 @@ A hook called in all tree mode buffers.
 
 @item gnus-tree-mode-line-format
 @vindex gnus-tree-mode-line-format
-A format string for the mode bar in the tree mode buffers.  The default
-is @samp{Gnus: %%b %S %Z}.  For a list of valid specs, @pxref{Summary
-Buffer Mode Line}.
+A format string for the mode bar in the tree mode buffers (@pxref{Mode
+Line Formatting}).  The default is @samp{Gnus: %%b %S %Z}.  For a list
+of valid specs, @pxref{Summary Buffer Mode Line}.
 
 @item gnus-selected-tree-face
 @vindex gnus-selected-tree-face
@@ -7983,8 +7986,9 @@ Syntax table used in article buffers.  It is initialized from
 @vindex gnus-article-mode-line-format
 @item gnus-article-mode-line-format
 This variable is a format string along the same lines as
-@code{gnus-summary-mode-line-format}.  It accepts the same
-format specifications as that variable, with one extension:
+@code{gnus-summary-mode-line-format} (@pxref{Mode Line Formatting}).  It
+accepts the same format specifications as that variable, with one
+extension:
 
 @table @samp
 @item w
@@ -8564,8 +8568,8 @@ The opened/closed/denied status of the server.
 
 @vindex gnus-server-mode-line-format
 The mode line can also be customized by using the
-@code{gnus-server-mode-line-format} variable.  The following specs are
-understood:
+@code{gnus-server-mode-line-format} variable (@pxref{Mode Line
+Formatting}).  The following specs are understood:
 
 @table @samp
 @item S
@@ -11068,7 +11072,16 @@ Creates a @code{To} header that looks like
 
 @item nngateway-mail2news-header-transformation
 Creates a @code{To} header that looks like
-@samp{mail2news}@@@code{nngateway-address}.
+@code{nngateway-address}.
+
+Here's an example:
+
+@lisp
+(setq gnus-post-method
+      '(nngateway "mail2news@@replay.com"
+                  (nngateway-header-transformation
+                   nngateway-mail2news-header-transformation)))
+@end lisp
 
 @end table
 
@@ -11529,7 +11542,7 @@ The number of groups in the category.
 
 @item gnus-category-mode-line-format
 @vindex gnus-category-mode-line-format
-Format of the category mode line.
+Format of the category mode line (@pxref{Mode Line Formatting}).
 
 @item gnus-agent-short-article
 @vindex gnus-agent-short-article
@@ -12345,11 +12358,31 @@ instead, if you feel like.
 
 @item Lines, Chars
 These two headers use different match types: @code{<}, @code{>},
-@code{=}, @code{>=} and @code{<=}.  When matching on @code{Lines}, be
-careful because some backends (like @code{nndir}) do not generate
-@code{Lines} header, so every article ends up being marked as having 0
-lines.  This can lead to strange results if you happen to lower score of
-the articles with few lines.
+@code{=}, @code{>=} and @code{<=}.
+
+These predicates are true if
+
+@example
+(PREDICATE HEADER MATCH)
+@end example
+
+evaluates to non-@code{nil}.  For instance, the advanced match
+@code{("lines" 4 <)} (@pxref{Advanced Scoring}) will result in the
+following form:
+
+@lisp
+(< header-value 4)
+@end lisp
+
+Or to put it another way: When using @code{<} on @code{Lines} with 4 as
+the match, we get the score added if the article has less than 4 lines.
+(It's easy to get confused and think it's the other way around.  But
+it's not.  I think.)
+
+When matching on @code{Lines}, be careful because some backends (like
+@code{nndir}) do not generate @code{Lines} header, so every article ends
+up being marked as having 0 lines.  This can lead to strange results if
+you happen to lower score of the articles with few lines.
 
 @item Date
 For the Date header we have three kinda silly match types:
@@ -13644,7 +13677,8 @@ Interactive}.
 @section Formatting Variables
 @cindex formatting variables
 
-Throughout this manual you've probably noticed lots of variables called things like @code{gnus-group-line-format} and
+Throughout this manual you've probably noticed lots of variables called
+things like @code{gnus-group-line-format} and
 @code{gnus-summary-mode-line-format}.  These control how Gnus is to
 output lines in the various buffers.  There's quite a lot of them.
 Fortunately, they all use the same syntax, so there's not that much to
@@ -13656,6 +13690,7 @@ lots of percentages everywhere.
 
 @menu
 * Formatting Basics::     A formatting variable is basically a format string.
+* Mode Line Formatting::  Some rules about mode line formatting variables.
 * Advanced Formatting::   Modifying output in various ways.
 * User-Defined Specs::    Having Gnus call your own functions.
 * Formatting Fonts::      Making the formatting look colorful and nice.
@@ -13700,6 +13735,31 @@ You may also wish to limit the length of the field to protect against
 particularly wide values.  For that you can say @samp{%4,6y}, which
 means that the field will never be more than 6 characters wide and never
 less than 4 characters wide.
+
+
+@node Mode Line Formatting
+@subsection Mode Line Formatting
+
+Mode line formatting variables (e.g.,
+@code{gnus-summary-mode-line-format}) follow the same rules as other,
+buffer line oriented formatting variables (@pxref{Formatting Basics})
+with the following two differences:
+
+@enumerate
+
+@item
+There must be no newline (@samp{\n}) at the end.
+
+@item
+The special @samp{%%b} spec can be used to display the buffer name.
+Well, it's no spec at all, really---@samp{%%} is just a way to quote
+@samp{%} to allow it to pass through the formatting machinery unmangled,
+so that Emacs receives @samp{%b}, which is something the Emacs mode line
+display interprets to mean ``show the buffer name''.  For a full list of
+mode line specs Emacs understands, see the documentation of the
+@code{mode-line-format} variable.
+
+@end enumerate
 
 
 @node Advanced Formatting
@@ -15607,6 +15667,7 @@ Also thanks to the following for patches and stuff:
 
 Jari Aalto,
 Adrian Aichner,
+Vladimir Alexiev,
 Russ Allbery,
 Peter Arius,
 Matt Armstrong,
@@ -15625,7 +15686,9 @@ Alastair Burt,
 Joao Cachopo,
 Zlatko Calusic,
 Massimo Campostrini,
+Castor,
 Dan Christensen,
+Kevin Christian,
 Michael R. Cook,
 Glenn Coombs,
 Frank D. Cringle,
@@ -15644,6 +15707,7 @@ Luc Van Eycken,
 Sam Falkner,
 Nelson Jose dos Santos Ferreira,
 Sigbjorn Finne,
+Decklin Foster,
 Gary D. Foster,
 Paul Franklin,
 Guy Geens,
@@ -15726,6 +15790,7 @@ Loren Schall,
 Dan Schmidt,
 Ralph Schleicher,
 Philippe Schnoebelen,
+Andreas Schwab,
 Randal L. Schwartz,
 Justin Sheehy,
 Danny Siu,
@@ -15737,6 +15802,7 @@ Michael Sperber,
 Darren Stalder,
 Richard Stallman,
 Greg Stark,
+Sam Steingold,
 Paul Stodghill,
 Kurt Swanson,
 Samuel Tardieu,
@@ -15776,7 +15842,7 @@ actually are people who are using Gnus.  Who'd'a thunk it!
 * ding Gnus::          New things in Gnus 5.0/5.1, the first new Gnus.
 * September Gnus::     The Thing Formally Known As Gnus 5.3/5.3.
 * Red Gnus::           Third time best---Gnus 5.4/5.5.
-* Quassia Gnus::       Two times two is four, or Gnus 5.6.15.
+* Quassia Gnus::       Two times two is four, or Gnus 5.6.21.
 @end menu
 
 These lists are, of course, just @emph{short} overviews of the
@@ -16311,7 +16377,7 @@ Emphasized text can be properly fontisized:
 @node Quassia Gnus
 @subsubsection Quassia Gnus
 
-New features in Gnus 5.6.15:
+New features in Gnus 5.6.21:
 
 @itemize @bullet
 

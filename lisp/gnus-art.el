@@ -2020,9 +2020,9 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	(when (and (boundp 'transient-mark-mode)
 		   transient-mark-mode)
 	  (setq mark-active nil))
-	(if (not (setq result
-		       (let ((buffer-read-only nil))
-			 (gnus-request-original-article article group))))
+	(if (not (setq result (let ((buffer-read-only nil))
+				(gnus-request-article-this-buffer
+				 article group))))
 	    ;; There is no such article.
 	    (save-excursion
 	      (when (and (numberp article)
@@ -2397,149 +2397,6 @@ If given a prefix, show the hidden text instead."
 
 (defun gnus-request-article-this-buffer (article group)
   "Get an article and insert it into this buffer."
-  (let (do-update-line)
-    (prog1
-	(save-excursion
-	  (erase-buffer)
-	  (gnus-kill-all-overlays)
-	  (setq group (or group gnus-newsgroup-name))
-
-	  ;; Using `gnus-request-article' directly will insert the article into
-	  ;; `nntp-server-buffer' - so we'll save some time by not having to
-	  ;; copy it from the server buffer into the article buffer.
-
-	  ;; We only request an article by message-id when we do not have the
-	  ;; headers for it, so we'll have to get those.
-	  (when (stringp article)
-	    (let ((gnus-override-method gnus-refer-article-method))
-	      (gnus-read-header article)))
-
-	  ;; If the article number is negative, that means that this article
-	  ;; doesn't belong in this newsgroup (possibly), so we find its
-	  ;; message-id and request it by id instead of number.
-	  (when (and (numberp article)
-		     gnus-summary-buffer
-		     (get-buffer gnus-summary-buffer)
-		     (gnus-buffer-exists-p gnus-summary-buffer))
-	    (save-excursion
-	      (set-buffer gnus-summary-buffer)
-	      (let ((header (gnus-summary-article-header article)))
-		(when (< article 0)
-		  (cond
-		   ((memq article gnus-newsgroup-sparse)
-		    ;; This is a sparse gap article.
-		    (setq do-update-line article)
-		    (setq article (mail-header-id header))
-		    (let ((gnus-override-method gnus-refer-article-method))
-		      (gnus-read-header article))
-		    (setq gnus-newsgroup-sparse
-			  (delq article gnus-newsgroup-sparse)))
-		   ((vectorp header)
-		    ;; It's a real article.
-		    (setq article (mail-header-id header)))
-		   (t
-		    ;; It is an extracted pseudo-article.
-		    (setq article 'pseudo)
-		    (gnus-request-pseudo-article header))))
-
-		(let ((method (gnus-find-method-for-group
-			       gnus-newsgroup-name)))
-		  (when (and (eq (car method) 'nneething)
-			     (vectorp header))
-		    (let ((dir (concat (file-name-as-directory (nth 1 method))
-				       (mail-header-subject header))))
-		      (when (file-directory-p dir)
-			(setq article 'nneething)
-			(gnus-group-enter-directory dir))))))))
-
-	  (cond
-	   ;; Refuse to select canceled articles.
-	   ((and (numberp article)
-		 gnus-summary-buffer
-		 (get-buffer gnus-summary-buffer)
-		 (gnus-buffer-exists-p gnus-summary-buffer)
-		 (eq (cdr (save-excursion
-			    (set-buffer gnus-summary-buffer)
-			    (assq article gnus-newsgroup-reads)))
-		     gnus-canceled-mark))
-	    nil)
-	   ;; We first check `gnus-original-article-buffer'.
-	   ((and (get-buffer gnus-original-article-buffer)
-		 (numberp article)
-		 (save-excursion
-		   (set-buffer gnus-original-article-buffer)
-		   (and (equal (car gnus-original-article) group)
-			(eq (cdr gnus-original-article) article))))
-	    (insert-buffer-substring gnus-original-article-buffer)
-	    'article)
-	   ;; Check the backlog.
-	   ((and gnus-keep-backlog
-		 (gnus-backlog-request-article group article (current-buffer)))
-	    'article)
-	   ;; Check asynchronous pre-fetch.
-	   ((gnus-async-request-fetched-article group article (current-buffer))
-	    (gnus-async-prefetch-next group article gnus-summary-buffer)
-	    (when (and (numberp article) gnus-keep-backlog)
-	      (gnus-backlog-enter-article group article (current-buffer)))
-	    'article)
-	   ;; Check the cache.
-	   ((and gnus-use-cache
-		 (numberp article)
-		 (gnus-cache-request-article article group))
-	    'article)
-	   ;; Get the article and put into the article buffer.
-	   ((or (stringp article) (numberp article))
-	    (let ((gnus-override-method
-		   (and (stringp article) gnus-refer-article-method))
-		  (buffer-read-only nil))
-	      (erase-buffer)
-	      (gnus-kill-all-overlays)
-	      (gnus-check-group-server)
-	      (when (gnus-request-article article group (current-buffer))
-		(when (numberp article)
-		  (gnus-async-prefetch-next group article gnus-summary-buffer)
-		  (when gnus-keep-backlog
-		    (gnus-backlog-enter-article
-		     group article (current-buffer))))
-		'article)))
-	   ;; It was a pseudo.
-	   (t article)))
-
-      ;; Associate this article with the current summary buffer.
-      (setq gnus-article-current-summary gnus-summary-buffer)
-      
-      ;; Take the article from the original article buffer
-      ;; and place it in the buffer it's supposed to be in.
-      (when (and (get-buffer gnus-article-buffer)
-		 (equal (buffer-name (current-buffer))
-			(buffer-name (get-buffer gnus-article-buffer))))
-	(save-excursion
-	  (if (get-buffer gnus-original-article-buffer)
-	      (set-buffer gnus-original-article-buffer)
-	    (set-buffer (get-buffer-create gnus-original-article-buffer))
-	    (buffer-disable-undo (current-buffer))
-	    (setq major-mode 'gnus-original-article-mode)
-	    (setq buffer-read-only t)
-	    (gnus-add-current-to-buffer-list))
-	  (let (buffer-read-only)
-	    (erase-buffer)
-	    (insert-buffer-substring gnus-article-buffer))
-	  (setq gnus-original-article (cons group article))))
-
-      ;; Update sparse articles.
-      (when (and do-update-line
-		 (or (numberp article)
-		     (stringp article)))
-	(let ((buf (current-buffer)))
-	  (set-buffer gnus-summary-buffer)
-	  (gnus-summary-update-article do-update-line)
-	  (gnus-summary-goto-subject do-update-line nil t)
-	  (set-window-point (get-buffer-window (current-buffer) t)
-			    (point))
-	  (set-buffer buf))))))
-
-(defun gnus-request-original-article (article group)
-  "Get an article and insert it into original article buffer."
   (let (do-update-line)
     (prog1
 	(save-excursion
@@ -3203,14 +3060,6 @@ specified by `gnus-button-alist'."
 				     (match-string 3 address)
 				   "nntp")))))))
 
-(defun gnus-split-string (string pattern)
-  "Return a list of substrings of STRING which are separated by PATTERN."
-  (let (parts (start 0))
-    (while (string-match pattern string start)
-      (setq parts (cons (substring string start (match-beginning 0)) parts)
-	    start (match-end 0)))
-    (nreverse (cons (substring string start) parts))))
-
 (defun gnus-url-parse-query-string (query &optional downcase)
   (let (retval pairs cur key val)
     (setq pairs (gnus-split-string query "&"))
@@ -3398,10 +3247,6 @@ forbidden in URL encoding."
 	   'gnus-original-article-mode 'binary)
 
 (set-alist 'mime-preview-quitting-method-alist
-	   'gnus-original-article-mode
-	   #'mime-preview-quitting-method-for-gnus)
-
-(set-alist 'mime-view-show-summary-method
 	   'gnus-original-article-mode
 	   #'mime-preview-quitting-method-for-gnus)
 

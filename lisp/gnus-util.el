@@ -603,14 +603,6 @@ Bind `print-quoted' and `print-readably' to t while printing."
   ;; Write the buffer.
   (write-region (point-min) (point-max) file nil 'quietly))
 
-(defmacro gnus-delete-assq (key list)
-  `(let ((listval (eval ,list)))
-     (setq ,list (delq (assq ,key listval) listval))))
-
-(defmacro gnus-delete-assoc (key list)
-  `(let ((listval ,list))
-     (setq ,list (delq (assoc ,key listval) listval))))
-
 (defun gnus-delete-file (file)
   "Delete FILE if it exists."
   (when (file-exists-p file)
@@ -629,10 +621,22 @@ Bind `print-quoted' and `print-readably' to t while printing."
       (save-restriction
 	(goto-char beg)
 	(while (re-search-forward "[ \t]*\n" end 'move)
-	  (put-text-property beg (match-beginning 0) prop val)
+	  (gnus-put-text-property beg (match-beginning 0) prop val)
 	  (setq beg (point)))
-	(put-text-property beg (point) prop val)))))
+	(gnus-put-text-property beg (point) prop val)))))
 
+(defun gnus-put-text-property-excluding-characters-with-faces (beg end
+								   prop val)
+  "The same as `put-text-property', but don't put props on characters with the `gnus-face' property."
+  (let ((b beg))
+    (while (/= b end)
+      (when (get-text-property b 'gnus-face)
+	(setq b (next-single-property-change b 'gnus-face nil end)))
+      (when (/= b end)
+	(gnus-put-text-property
+	 b (setq b (next-single-property-change b 'gnus-face nil end))
+	 prop val)))))
+  
 ;;; Protected and atomic operations.  dmoore@ucsd.edu 21.11.1996
 ;;; The primary idea here is to try to protect internal datastructures
 ;;; from becoming corrupted when the user hits C-g, or if a hook or
@@ -933,6 +937,35 @@ ARG is passed to the first function."
 	 (set-buffer gnus-group-buffer)
 	 (eq major-mode 'gnus-group-mode))))
 
+(defun gnus-remove-duplicates (list)
+  (let (new (tail list))
+    (while tail
+      (or (member (car tail) new)
+	  (setq new (cons (car tail) new)))
+      (setq tail (cdr tail)))
+    (nreverse new)))
+
+(defun gnus-delete-if (predicate list)
+  "Delete elements from LIST that satisfy PREDICATE."
+  (let (out)
+    (while list
+      (when (funcall predicate (car list))
+	(push (car list) out))
+      (pop list))
+    (nreverse out)))
+
+(defun gnus-delete-alist (key alist)
+  "Delete all entries in ALIST that have a key eq to KEY."
+  (let (entry)
+    (while (setq entry (assq key alist))
+      (setq alist (delq entry alist)))
+    alist))
+
+(defmacro gnus-pull (key alist)
+  "Modify ALIST to be without KEY."
+  (unless (symbolp alist)
+    (error "Not a symbol: %s" alist))
+  `(setq ,alist (delq (assq ,key ,alist) ,alist)))
 
 (provide 'gnus-util)
 

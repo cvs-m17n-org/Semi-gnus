@@ -1127,7 +1127,7 @@ If REGEXP, only list groups matching REGEXP."
       (setq list (cdr list)))
     (let ((face (cdar list)))
       (unless (eq face (get-text-property beg 'face))
-	(gnus-put-text-property
+	(gnus-put-text-property-excluding-characters-with-faces
 	 beg end 'face
 	 (setq face (if (boundp face) (symbol-value face) face)))
 	(gnus-extent-start-open beg)))
@@ -3333,7 +3333,7 @@ and the second element is the address."
 	(if force
 	    (if (null articles)
 		(setcar (nthcdr 3 info)
-			(delq (assq type (car marked)) (car marked)))
+			(gnus-delete-alist type (car marked)))
 	      (setcdr m (gnus-compress-sequence articles t)))
 	  (setcdr m (gnus-compress-sequence
 		     (sort (nconc (gnus-uncompress-range (cdr m))

@@ -513,6 +513,7 @@ with some simple extensions:
 %G  Group name
 %p  Unprefixed group name
 %A  Current article number
+%z  Current article score
 %V  Gnus version
 %U  Number of unread articles in the group
 %e  Number of unselected articles in the group
@@ -874,6 +875,7 @@ variable (string, integer, character, etc).")
     (?d (length gnus-newsgroup-dormant) ?d)
     (?t (length gnus-newsgroup-marked) ?d)
     (?r (length gnus-newsgroup-reads) ?d)
+    (?z (gnus-summary-article-score gnus-tmp-article-number) ?d)
     (?E gnus-newsgroup-expunged-tally ?d)
     (?s (gnus-current-score-file-nondirectory) ?s)))
 
@@ -2423,7 +2425,7 @@ marks of articles."
       (setq gnus-tmp-name gnus-tmp-from))
     (unless (numberp gnus-tmp-lines)
       (setq gnus-tmp-lines 0))
-    (gnus-put-text-property
+    (gnus-put-text-property-excluding-characters-with-faces
      (point)
      (progn (eval gnus-summary-line-format-spec) (point))
      'gnus-number gnus-tmp-number)
@@ -3278,13 +3280,13 @@ If LINE, insert the rebuilt thread starting on line LINE."
 	(headers in-headers)
 	references)
     (while (and parent
-		headers
 		(not (zerop generation))
 		(setq references (mail-header-references headers)))
-      (when (and references
-		 (setq parent (gnus-parent-id references))
-		 (setq headers (car (gnus-id-to-thread parent))))
-	(decf generation)))
+      (setq headers (if (and references
+			     (setq parent (gnus-parent-id references)))
+			(car (gnus-id-to-thread parent))
+		      nil))
+      (decf generation))
     (and (not (eq headers in-headers))
 	 headers)))
 
@@ -3772,7 +3774,7 @@ or a straight list of headers."
 	      (setq gnus-tmp-name gnus-tmp-from))
 	    (unless (numberp gnus-tmp-lines)
 	      (setq gnus-tmp-lines 0))
-	    (gnus-put-text-property
+	    (gnus-put-text-property-excluding-characters-with-faces
 	     (point)
 	     (progn (eval gnus-summary-line-format-spec) (point))
 	     'gnus-number number)
@@ -4371,8 +4373,8 @@ The resulting hash table is returned, or nil if no Xrefs were found."
       (subst-char-in-region (point-min) (point-max) ?\t ?  t)
       (gnus-run-hooks 'gnus-parse-headers-hook)
       (let ((case-fold-search t)
-	    in-reply-to header p lines
-	    rawtext decoded)
+	    rawtext decoded
+	    in-reply-to header p lines chars)
 	(goto-char (point-min))
 	;; Search to the beginning of the next header.	Error messages
 	;; do not begin with 2 or 3.
@@ -4473,7 +4475,12 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 			  (setq ref ref2))))
 		  (setq ref nil))))
 	    ;; Chars.
-	    0
+	    (progn
+	      (goto-char p)
+	      (if (search-forward "\nchars: " nil t)
+		  (if (numberp (setq chars (ignore-errors (read cur))))
+		      chars 0)
+		0))
 	    ;; Lines.
 	    (progn
 	      (goto-char p)
@@ -5465,6 +5472,7 @@ If FORCE, also allow jumping to articles not currently shown."
 	    (gnus-message 3 "Can't find article %d" article))
 	  nil)
       (goto-char (gnus-data-pos data))
+      (gnus-summary-position-point)
       article)))
 
 ;; Walking around summary lines with displaying articles.
@@ -6946,7 +6954,7 @@ and `request-accept' functions."
 	((eq action 'copy)
 	 (save-excursion
 	   (set-buffer copy-buf)
-	   (when (gnus-request-original-article article gnus-newsgroup-name)
+	   (when (gnus-request-article-this-buffer article gnus-newsgroup-name)
 	     (gnus-request-accept-article
 	      to-newsgroup select-method (not articles)))))
 	;; Crosspost the article.
@@ -6967,7 +6975,7 @@ and `request-accept' functions."
 	   (save-excursion
 	     (set-buffer copy-buf)
 	     ;; First put the article in the destination group.
-	     (gnus-request-original-article article gnus-newsgroup-name)
+	     (gnus-request-article-this-buffer article gnus-newsgroup-name)
 	     (when (consp (setq art-group
 				(gnus-request-accept-article
 				 to-newsgroup select-method (not articles))))
@@ -7060,7 +7068,7 @@ and `request-accept' functions."
 	  (when (eq action 'crosspost)
 	    (save-excursion
 	      (set-buffer copy-buf)
-	      (gnus-request-original-article article gnus-newsgroup-name)
+	      (gnus-request-article-this-buffer article gnus-newsgroup-name)
 	      (nnheader-replace-header "Xref" new-xref)
 	      (gnus-request-replace-article
 	       article gnus-newsgroup-name (current-buffer)))))
@@ -7324,55 +7332,58 @@ groups."
   "Make edits to the current article permanent."
   (interactive)
   ;; Replace the article.
-  (if (and (not read-only)
-	   (not (gnus-request-replace-article
-		 (cdr gnus-article-current) (car gnus-article-current)
-		 (current-buffer))))
-      (error "Couldn't replace article")
-    ;; Update the summary buffer.
-    (if (and references
-	     (equal (message-tokenize-header references " ")
-		    (message-tokenize-header
-		     (or (message-fetch-field "references") "") " ")))
-	;; We only have to update this line.
-	(save-excursion
-	  (save-restriction
-	    (message-narrow-to-head)
-	    (let ((head (buffer-string))
-		  header)
-	      (nnheader-temp-write nil
-		(insert (format "211 %d Article retrieved.\n"
-				(cdr gnus-article-current)))
-		(insert head)
-		(insert ".\n")
-		(let ((nntp-server-buffer (current-buffer)))
-		  (setq header (car (gnus-get-newsgroup-headers
-				     (save-excursion
-				       (set-buffer gnus-summary-buffer)
-				       gnus-newsgroup-dependencies)
-				     t))))
-		(save-excursion
-		  (set-buffer gnus-summary-buffer)
-		  (gnus-data-set-header
-		   (gnus-data-find (cdr gnus-article-current))
-		   header)
-		  (gnus-summary-update-article-line
-		   (cdr gnus-article-current) header))))))
-      ;; Update threads.
-      (set-buffer (or buffer gnus-summary-buffer))
-      (gnus-summary-update-article (cdr gnus-article-current)))
-    ;; Prettify the article buffer again.
-    (unless no-highlight
-      (save-excursion
-	(set-buffer gnus-article-buffer)
-	(gnus-run-hooks 'gnus-article-display-hook)
-	(set-buffer gnus-original-article-buffer)
-	(gnus-request-article
-	 (cdr gnus-article-current)
-	 (car gnus-article-current) (current-buffer))))
-    ;; Prettify the summary buffer line.
-    (when (gnus-visual-p 'summary-highlight 'highlight)
-      (gnus-run-hooks 'gnus-visual-mark-article-hook))))
+  (let ((buf (current-buffer)))
+    (nnheader-temp-write nil
+      (insert-buffer buf)
+      (if (and (not read-only)
+	       (not (gnus-request-replace-article
+		     (cdr gnus-article-current) (car gnus-article-current)
+		     (current-buffer))))
+	  (error "Couldn't replace article")
+	;; Update the summary buffer.
+	(if (and references
+		 (equal (message-tokenize-header references " ")
+			(message-tokenize-header
+			 (or (message-fetch-field "references") "") " ")))
+	    ;; We only have to update this line.
+	    (save-excursion
+	      (save-restriction
+		(message-narrow-to-head)
+		(let ((head (buffer-string))
+		      header)
+		  (nnheader-temp-write nil
+		    (insert (format "211 %d Article retrieved.\n"
+				    (cdr gnus-article-current)))
+		    (insert head)
+		    (insert ".\n")
+		    (let ((nntp-server-buffer (current-buffer)))
+		      (setq header (car (gnus-get-newsgroup-headers
+					 (save-excursion
+					   (set-buffer gnus-summary-buffer)
+					   gnus-newsgroup-dependencies)
+					 t))))
+		    (save-excursion
+		      (set-buffer gnus-summary-buffer)
+		      (gnus-data-set-header
+		       (gnus-data-find (cdr gnus-article-current))
+		       header)
+		      (gnus-summary-update-article-line
+		       (cdr gnus-article-current) header))))))
+	  ;; Update threads.
+	  (set-buffer (or buffer gnus-summary-buffer))
+	  (gnus-summary-update-article (cdr gnus-article-current)))
+	;; Prettify the article buffer again.
+	(unless no-highlight
+	  (save-excursion
+	    (set-buffer gnus-article-buffer)
+	    (gnus-run-hooks 'gnus-article-display-hook)
+	    (set-buffer gnus-original-article-buffer)
+	    (gnus-request-article
+	     (cdr gnus-article-current)
+	     (car gnus-article-current) (current-buffer))))
+	;; Prettify the summary buffer line.
+	(when (gnus-visual-p 'summary-highlight 'highlight)
+	  (gnus-run-hooks 'gnus-visual-mark-article-hook))))))
 
 (defun gnus-summary-edit-wash (key)
   "Perform editing command KEY in the article buffer."
@@ -7670,9 +7681,7 @@ returned."
 	       (push article gnus-newsgroup-dormant))
 	      (t
 	       (push article gnus-newsgroup-unreads)))
-	(setq gnus-newsgroup-reads
-	      (delq (assq article gnus-newsgroup-reads)
-		    gnus-newsgroup-reads))
+	(gnus-pull article gnus-newsgroup-reads)
 
 	;; See whether the article is to be put in the cache.
 	(and gnus-use-cache
@@ -7813,9 +7822,7 @@ marked."
 	     (push article gnus-newsgroup-dormant))
 	    (t
 	     (push article gnus-newsgroup-unreads)))
-      (setq gnus-newsgroup-reads
-	    (delq (assq article gnus-newsgroup-reads)
-		  gnus-newsgroup-reads))
+      (gnus-pull article gnus-newsgroup-reads)
       t)))
 
 (defalias 'gnus-summary-mark-as-unread-forward
@@ -8874,7 +8881,7 @@ save those articles instead."
 	(setq list (cdr list))))
     (let ((face (cdar list)))
       (unless (eq face (get-text-property beg 'face))
-	(gnus-put-text-property
+	(gnus-put-text-property-excluding-characters-with-faces
 	 beg end 'face
 	 (setq face (if (boundp face) (symbol-value face) face)))
 	(when gnus-summary-highlight-line-function
@@ -8970,7 +8977,7 @@ save those articles instead."
       (set-buffer (get-buffer-create " *Partial Article*"))
       (erase-buffer)
       (setq mime-preview-buffer mother)
-      (gnus-request-original-article number group)
+      (gnus-request-article-this-buffer number group)
       (mime-parse-buffer)
       )))
 

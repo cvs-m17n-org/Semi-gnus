@@ -32,6 +32,7 @@
 (require 'nnheader)
 (require 'nntp)
 (require 'nnmail)
+(require 'gnus-util)
 (eval-and-compile
   (if (string-match "XEmacs" (emacs-version))
       (require 'itimer)
@@ -97,9 +98,7 @@ time Emacs has been idle for IDLE `gnus-demon-timestep's."
 
 (defun gnus-demon-remove-handler (function &optional no-init)
   "Remove the handler FUNCTION from the list of handlers."
-  (setq gnus-demon-handlers
-	(delq (assq function gnus-demon-handlers)
-	      gnus-demon-handlers))
+  (gnus-pull function gnus-demon-handlers)
   (unless no-init
     (gnus-demon-init)))
 

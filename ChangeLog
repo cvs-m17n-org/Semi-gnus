@@ -1,3 +1,18 @@
+1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.7.3.
+
+	* lisp/gnus-sum.el (gnus-summary-move-article): Use
+	`gnus-request-article-this-buffer'.
+	(gnus-request-partial-message): Likewise.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Use
+	`gnus-request-article-this-buffer'.
+	(gnus-request-article-this-buffer): Renamed from
+	`gnus-request-original-article'; abolish conventional
+	implementation.
+	- Abolish unused setting for `mime-view-show-summary-method'.
+
 1998-06-26  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/messge.el (message-use-followup-to): Change menu tag.
