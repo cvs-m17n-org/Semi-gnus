@@ -1,3 +1,45 @@
+1998-03-15  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-agent.el (gnus-agent-crosspost): Use
+	`nnheader-insert-file-contents'.
+	(gnus-agent-braid-nov): Ditto.
+	(gnus-agent-expire): Ditto.
+	
+	* lisp/gnus-cache.el (gnus-cache-request-article): Ditto.
+	(gnus-cache-retrieve-headers): Ditto.
+	(gnus-cache-change-buffer): Ditto.
+	(gnus-cache-braid-nov): Ditto.
+	
+	* lisp/gnus-sum.el (gnus-summary-import-article): Ditto.
+	
+	* lisp/nnkiboze.el (nnkiboze-retrieve-headers): Ditto.
+
+	* lisp/message.el (message-generate-headers): Fix regexp.
+	(cf. [semi-gnus-ja:107])
+
+1998-03-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el: Add setting for
+ 	`mime-raw-buffer-coding-system-alist'.
+
+1998-03-13  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el: Rename `mime-view-quitting-method-for-gnus' ->
+ 	`mime-preview-quitting-method-for-gnus'.
+
+	* lisp/gnus-art.el: Rename `mime-view-quitting-method-alist' ->
+ 	`mime-preview-quitting-method-alist'.
+
+	* lisp/gnus-art.el: Rename `mime-view-kill-buffer' ->
+ 	`mime-preview-kill-buffer'.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.10.
+
+	* lisp/gnus-sum.el: Add code to check latest SEMI.
+	(mime-acting-condition): Separate type and subtype; rename
+ 	`mime-combine-message/partials-automatically' ->
+ 	`mime-method-to-combine-message/partial-pieces'.
+
 1998-03-08  Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.0.9.
