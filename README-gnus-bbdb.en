@@ -1,8 +1,5 @@
 -*- mode: text; fill-column: 70; -*-
 
-  **  This document is copied from keiichi branch. **
-  **  We thank Keiichi Suzuki a lot.               **
-
 ---
  If BBDB is used then, bbdb-gnus.elc can't be shared with them before
 Semi-gnus 6.8.X. It is necessary to byte-compile it again.
@@ -13,11 +10,10 @@ Semi-gnus 6.8.X. It is necessary to byte-compile it again.
 ---
 gnus-bbdb.el
 
- This is the BBDB API module for Semi-gnus, which includes Chao-gnus
-6.9. `mime-bbdb' should not be necessary for Semi-gnus, if that module
-were used.
+ This is the BBDB API module for Semi-gnus. `mime-bbdb' should not be
+necessary for Semi-gnus, if that module were used.
 
- You need FLIM after 1.11.3.
+ You need FLIM 1.11.3 or later.
 
  If you are using bbdb-auto-notes-hook, the patch listed at the end
 of this file should be applied. If not, it might not.

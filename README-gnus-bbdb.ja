@@ -1,7 +1,5 @@
 -*- mode: text; fill-column: 70; -*-
 
-  ** $BNkLZ7=0l$5$s$N$48|0U$K$h$j(B keiichi branch $B$+$i(B copy $B$7$^$7$?!#(B**
-
 ---
 BBDB $B$r;HMQ$5$l$F$$$kJ}$O!"(B bbdb-gnus.elc $B$r(B Semi-gnus 6.8.X $B0JA0$N$b(B
 $B$N$H6&M-$9$k$3$H$O$G$-$^$;$s!#I,$:!"(B byte-compile $B$7D>$7$F$/$@$5$$!#(B
@@ -12,10 +10,8 @@ BBDB $B$r;HMQ$5$l$F$$$kJ}$O!"(B bbdb-gnus.elc $B$r(B Semi-gnus 6.8.X $B0JA0
 ---
 gnus-bbdb.el
 
-Chao-gnus 6.9 $B$r<h$j9~$s$@(B Semi-gnus $B$KFC2=$7$?(B BBDB API $B%b%8%e!<%k$G(B
-$B$9!#(B 
-$B$3$N%b%8%e!<%k$r;HMQ$9$k$3$H$K$h$C$F!"(B Semi-gnus $B$G;HMQ$9$k>l9g$K$O(B
-mime-bbdb $B$,ITMW$K$J$j$^$9!#(B
+Semi-gnus $B$KFC2=$7$?(B BBDB API $B%b%8%e!<%k$G$9!#$3$N%b%8%e!<%k$r;HMQ$9$k(B
+$B$3$H$K$h$C$F!"(B Semi-gnus $B$G;HMQ$9$k>l9g$K$O(B mime-bbdb $B$,ITMW$K$J$j$^$9!#(B
 
 1.11.3 $B0J9_$N(B FLIM $B$,I,MW$G$9!#(B
 
