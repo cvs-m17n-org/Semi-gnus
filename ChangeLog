@@ -1,3 +1,13 @@
+2000-12-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (article-treat-dumbquotes): Quote backslashes in
+	doc-string.
+
+	* lisp/dgnushack.el
+	(byte-compile-file-form-custom-declare-variable): Use `defvar'
+	instead of `custom-declare-variable' to make the variable
+	uncustomizable if the arguments has the keyword `:version'.
+
 2000-12-22  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
 	* README.semi.ja: Fix typo.

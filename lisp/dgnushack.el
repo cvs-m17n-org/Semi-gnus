@@ -202,18 +202,18 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
   (put 'custom-declare-group 'byte-optimizer
        'byte-optimize-ignore-unsupported-custom-keywords)
   (defun byte-optimize-ignore-unsupported-custom-keywords (form)
-    (let ((args (nthcdr 4 form)))
-      (if (or (memq ':version args)
-	      (memq ':set-after args))
-	  (let ((newform (list (car form) (nth 1 form)
-			       (nth 2 form) (nth 3 form))))
-	    (while args
-	      (or (memq (car args) '(:version :set-after))
-		  (setq newform (nconc newform (list (car args)
-						     (car (cdr args))))))
-	      (setq args (cdr (cdr args))))
-	    newform)
-	form)))
+    (if (or (memq ':version (nthcdr 4 form))
+	    (memq ':set-after (nthcdr 4 form)))
+	(let ((newform (list (car form) (nth 1 form)
+			     (nth 2 form) (nth 3 form)))
+	      (args (nthcdr 4 form)))
+	  (while args
+	    (or (memq (car args) '(:version :set-after))
+		(setq newform (nconc newform (list (car args)
+						   (car (cdr args))))))
+	    (setq args (cdr (cdr args))))
+	  newform)
+      form))
 
   (put 'custom-declare-variable 'byte-hunk-handler
        'byte-compile-file-form-custom-declare-variable)
@@ -222,7 +222,24 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (if (memq 'free-vars byte-compile-warnings)
 	(setq byte-compile-bound-variables
 	      (cons (nth 1 (nth 1 form)) byte-compile-bound-variables)))
-    (byte-optimize-ignore-unsupported-custom-keywords form)))
+    (if (memq ':version (nthcdr 4 form))
+	;; Make the variable uncustomizable.
+	`(defvar ,(nth 1 (nth 1 form)) ,(nth 1 (nth 2 form))
+	   ,(substring (nth 3 form) (if (string-match "^[\t *]+" (nth 3 form))
+					(match-end 0)
+				      0)))
+      ;; Ignore unsupported keyword(s).
+      (if (memq ':set-after (nthcdr 4 form))
+	  (let ((newform (list (car form) (nth 1 form)
+			       (nth 2 form) (nth 3 form)))
+		(args (nthcdr 4 form)))
+	    (while args
+	      (or (eq (car args) ':set-after)
+		  (setq newform (nconc newform (list (car args)
+						     (car (cdr args))))))
+	      (setq args (cdr (cdr args))))
+	    newform)
+	form))))
 
 ;; Unknown variables and functions.
 (unless (boundp 'buffer-file-coding-system)
