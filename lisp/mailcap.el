@@ -1,5 +1,5 @@
 ;;; mailcap.el --- Functions for displaying MIME parts
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: William M. Perry <wmperry@aventail.com>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -672,6 +672,7 @@ this type is returned."
 	    (setq viewers (cdr viewers)))
 	  (setq passed (sort (nreverse passed) 'mailcap-viewer-lessp))
 	  (setq viewer (car passed))))
+      (setq passed (nreverse passed))
       (when (and (stringp (cdr (assq 'viewer viewer)))
 		 passed)
 	(setq viewer (car passed)))
@@ -713,6 +714,7 @@ this type is returned."
     (".cdf"      . "application/x-netcdr")
     (".cpio"     . "application/x-cpio")
     (".csh"      . "application/x-csh")
+    (".css"      . "text/css")
     (".dvi"      . "application/x-dvi")
     (".diff"     . "text/x-patch")
     (".el"       . "application/emacs-lisp")

@@ -1,5 +1,5 @@
 ;;; gnus-art.el --- article mode commands for Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -169,8 +169,8 @@ Possible values in this list are `empty', `newsgroups', `followup-to',
 	      (const :tag "Followup-to identical to newsgroups." followup-to)
 	      (const :tag "Reply-to identical to from." reply-to)
 	      (const :tag "Date less than four days old." date)
-	      (const :tag "Very long To header." long-to)
-	      (const :tag "Multiple To headers." many-to))
+	      (const :tag "Very long To and/or Cc header." long-to)
+	      (const :tag "Multiple To and/or Cc headers." many-to))
   :group 'gnus-article-hiding)
 
 (defcustom gnus-signature-separator '("^-- $" "^-- *$")
@@ -1168,11 +1168,15 @@ always hide."
 			      4))
 		  (gnus-article-hide-header "date"))))
 	     ((eq elem 'long-to)
-	      (let ((to (message-fetch-field "to")))
+	      (let ((to (message-fetch-field "to"))
+		    (cc (message-fetch-field "cc")))
 		(when (> (length to) 1024)
-		  (gnus-article-hide-header "to"))))
+		  (gnus-article-hide-header "to"))
+		(when (> (length cc) 1024)
+		  (gnus-article-hide-header "cc"))))
 	     ((eq elem 'many-to)
-	      (let ((to-count 0))
+	      (let ((to-count 0)
+		    (cc-count 0))
 		(goto-char (point-min))
 		(while (re-search-forward "^to:" nil t)
 		  (setq to-count (1+ to-count)))
@@ -1184,7 +1188,19 @@ always hide."
 		      (forward-line -1)
 		      (narrow-to-region (point) (point-max))
 		      (gnus-article-hide-header "to"))
-		    (setq to-count (1- to-count)))))))))))))
+		    (setq to-count (1- to-count))))
+		(goto-char (point-min))
+		(while (re-search-forward "^cc:" nil t)
+		  (setq cc-count (1+ cc-count)))
+		(when (> cc-count 1)
+		  (while (> cc-count 0)
+		    (goto-char (point-min))
+		    (save-restriction
+		      (re-search-forward "^cc:" nil nil cc-count)
+		      (forward-line -1)
+		      (narrow-to-region (point) (point-max))
+		      (gnus-article-hide-header "cc"))
+		    (setq cc-count (1- cc-count)))))))))))))
 
 (defun gnus-article-hide-header (header)
   (save-excursion
@@ -2550,7 +2566,7 @@ commands:
   (make-local-variable 'gnus-article-mime-handles)
   (make-local-variable 'gnus-article-decoded-p)
   (make-local-variable 'gnus-article-mime-handle-alist)
-  (make-local-variable 'gnus-article-washed-types)
+  (make-local-variable 'gnus-article-wash-types)
   (gnus-set-default-directory)
   (buffer-disable-undo)
   (setq buffer-read-only t)
@@ -2586,9 +2602,8 @@ commands:
     (if (get-buffer name)
 	(save-excursion
 	  (set-buffer name)
-	  (if gnus-article-mime-handles
-	      (mm-destroy-parts gnus-article-mime-handles))
-	  (kill-all-local-variables)
+	  (when gnus-article-mime-handles
+	    (mm-destroy-parts gnus-article-mime-handles))
 	  (buffer-disable-undo)
 	  (setq buffer-read-only t)
 	  (unless (eq major-mode 'gnus-article-mode)
@@ -2655,8 +2670,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (message "Message marked for downloading"))
 		  (gnus-summary-mark-article article gnus-canceled-mark)
 		  (unless (memq article gnus-newsgroup-sparse)
-		    (gnus-error 1
-				"No such article (may have expired or been canceled)")))))
+		    (gnus-error 1 "No such article (may have expired or been canceled)")))))
 	  (if (or (eq result 'pseudo)
 		  (eq result 'nneething))
 	      (progn
@@ -2840,14 +2854,33 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (let ((data (get-text-property (point) 'gnus-data)))
     (mm-interactively-view-part data)))
 
-(defun gnus-mime-view-part-as-type ()
+(defun gnus-mime-view-part-as-type-internal ()
+  (gnus-article-check-buffer)
+  (let* ((name (mail-content-type-get
+		(mm-handle-type (get-text-property (point) 'gnus-data))
+		'name))
+	 (def-type (and name (mm-default-file-encoding name))))
+    (and def-type (cons def-type 0))))
+
+(defun gnus-mime-view-part-as-type (mime-type)
   "Choose a MIME media type, and view the part as such."
   (interactive
-   (list (completing-read "View as MIME type: "
-			  (mapcar 'list (mailcap-mime-types)))))
+   (list (completing-read
+	  "View as MIME type: "
+	  (mapcar (lambda (i) (list i i)) (mailcap-mime-types))
+	  nil nil
+	  (gnus-mime-view-part-as-type-internal))))
   (gnus-article-check-buffer)
   (let ((handle (get-text-property (point) 'gnus-data)))
-    (gnus-mm-display-part handle)))
+    (gnus-mm-display-part
+     (mm-make-handle (mm-handle-buffer handle)
+		     (cons mime-type (cdr (mm-handle-type handle)))
+		     (mm-handle-encoding handle)
+		     (mm-handle-undisplayer handle)
+		     (mm-handle-disposition handle)
+		     (mm-handle-description handle)
+		     (mm-handle-cache handle)
+		     (mm-handle-id handle)))))
 
 (defun gnus-mime-copy-part (&optional handle)
   "Put the the MIME part under point into a new buffer."
@@ -3583,7 +3616,8 @@ Argument LINES specifies lines to be scrolled down."
             ;; We disable the pick minor mode commands.
             (let (gnus-pick-mode)
               (setq func (lookup-key (current-local-map) keys))))
-          (if (not func)
+          (if (or (not func)
+		  (numberp func))
               (ding)
             (unless (member keys nosave-in-article)
               (set-buffer gnus-article-current-summary))
@@ -3741,7 +3775,8 @@ If given a prefix, show the hidden text instead."
 		 (gnus-cache-request-article article group))
 	    'article)
 	   ;; Get the article and put into the article buffer.
-	   ((or (stringp article) (numberp article))
+	   ((or (stringp article)
+		(numberp article))
 	    (let ((gnus-override-method gnus-override-method)
 		  (methods (and (stringp article) 
 				gnus-refer-article-method))
@@ -3749,11 +3784,14 @@ If given a prefix, show the hidden text instead."
 		  (buffer-read-only nil))
 	      (setq methods
 		    (if (listp methods)
-			(delq 'current methods)
+			methods
 		      (list methods)))
-	      (if (and (null gnus-override-method) methods)
-		  (setq gnus-override-method (pop methods)))
+	      (when (and (null gnus-override-method)
+			 methods)
+		(setq gnus-override-method (pop methods)))
 	      (while (not result)
+		(when (eq gnus-override-method 'current)
+		  (setq gnus-override-method gnus-current-select-method))
 		(erase-buffer)
 		(gnus-kill-all-overlays)
 		(let ((gnus-newsgroup-name group))
@@ -3966,7 +4004,7 @@ groups."
 
 ;;; Internal Variables:
 
-(defcustom gnus-button-url-regexp "\\b\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\):\\(//[-a-zA-Z0-9_.]+:[0-9]*\\)?\\([-a-zA-Z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-zA-Z0-9_=#$@~`%&*+|\\/]\\|\\w\\)"
+(defcustom gnus-button-url-regexp "\\b\\(\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\):\\(//[-a-zA-Z0-9_.]+:[0-9]*\\)?\\([-a-zA-Z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-zA-Z0-9_=#$@~`%&*+|\\/]\\|\\w\\)\\)\\|[-a-zA-Z0-9_]+\\.[-a-zA-Z0-9_]+\\(\\.[-a-zA-Z0-9_]+[-a-zA-Z0-9_/]+\\)+"
   "Regular expression that matches URLs."
   :group 'gnus-article-buttons
   :type 'regexp)
@@ -4541,7 +4579,10 @@ For example:
 	val elem)
     (gnus-run-hooks 'gnus-part-display-hook)
     (while (setq elem (pop alist))
-      (setq val (symbol-value (car elem)))
+      (setq val
+	    (save-excursion
+	      (set-buffer gnus-summary-buffer)
+	      (symbol-value (car elem))))
       (when (and (or (consp val)
 		     treated-type)
 		 (gnus-treat-predicate val)

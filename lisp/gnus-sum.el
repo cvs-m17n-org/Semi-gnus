@@ -1,5 +1,6 @@
 ;;; gnus-sum.el --- summary mode commands for Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -172,9 +173,11 @@ This variable will only be used if the value of
 This applies to marking commands as well as other commands that
 \"naturally\" select the next article, like, for instance, `SPC' at
 the end of an article.
-If nil, only the marking commands will go to the next (un)read article.
-If `never', commands that usually go to the next unread article, will
-go to the next article, whether it is read or not."
+
+If nil, the marking commands do NOT go to the next unread article
+(they go to the next article instead).  If `never', commands that
+usually go to the next unread article, will go to the next article,
+whether it is read or not."
   :group 'gnus-summary-marks
   :link '(custom-manual "(gnus)Setting Marks")
   :type '(choice (const :tag "off" nil)
@@ -871,6 +874,11 @@ For example: ((1 . cn-gb-2312) (2 . big5))."
   :type 'boolean
   :group 'gnus-summary-marks)
 
+(defcustom gnus-alter-articles-to-read-function nil
+  "Function to be called to alter the list of articles to be selected."
+  :type 'function
+  :group 'gnus-summary)
+
 ;;; Internal variables
 
 (defvar gnus-article-mime-handles nil)
@@ -1322,6 +1330,8 @@ increase the score of each group you read."
     "\M-\C-h" gnus-summary-hide-thread
     "\M-\C-f" gnus-summary-next-thread
     "\M-\C-b" gnus-summary-prev-thread
+    [(meta down)] gnus-summary-next-thread
+    [(meta up)] gnus-summary-prev-thread
     "\M-\C-u" gnus-summary-up-thread
     "\M-\C-d" gnus-summary-down-thread
     "&" gnus-summary-execute-command
@@ -3370,17 +3380,19 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
        (memq article gnus-newsgroup-expirable)
        ;; Only insert the Subject string when it's different
        ;; from the previous Subject string.
-       (if (gnus-subject-equal
-	    (condition-case ()
-		(mail-header-subject
-		 (gnus-data-header
-		  (cadr
-		   (gnus-data-find-list
-		    article
-		    (gnus-data-list t)))))
-	      ;; Error on the side of excessive subjects.
-	      (error ""))
-	    (mail-header-subject header))
+       (if (and
+	    gnus-show-threads
+	    (gnus-subject-equal
+	     (condition-case ()
+		 (mail-header-subject
+		  (gnus-data-header
+		   (cadr
+		    (gnus-data-find-list
+		     article
+		     (gnus-data-list t)))))
+	       ;; Error on the side of excessive subjects.
+	       (error ""))
+	     (mail-header-subject header)))
 	   ""
 	 (mail-header-subject header))
        nil (cdr (assq article gnus-newsgroup-scored))
@@ -3594,7 +3606,6 @@ If LINE, insert the rebuilt thread starting on line LINE."
 		  (while thread
 		    (gnus-remove-thread-1 (car thread))
 		    (setq thread (cdr thread))))
-	      (gnus-summary-show-all-threads)
 	      (gnus-remove-thread-1 thread))))))))
 
 (defun gnus-remove-thread-1 (thread)
@@ -3606,6 +3617,7 @@ If LINE, insert the rebuilt thread starting on line LINE."
       (gnus-remove-thread-1 (pop thread)))
     (when (setq d (gnus-data-find number))
       (goto-char (gnus-data-pos d))
+      (gnus-summary-show-thread)
       (gnus-data-remove
        number
        (- (gnus-point-at-bol)
@@ -4270,6 +4282,12 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	    (gnus-sorted-intersection
 	     gnus-newsgroup-unreads
 	     (gnus-sorted-complement gnus-newsgroup-unreads articles)))
+      (when gnus-alter-articles-to-read-function
+	(setq gnus-newsgroup-unreads
+	      (sort 
+	       (funcall gnus-alter-articles-to-read-function
+			gnus-newsgroup-name gnus-newsgroup-unreads)
+	       '<)))
       articles)))
 
 (defun gnus-killed-articles (killed articles)
@@ -5099,7 +5117,8 @@ articles with that subject.  If BACKWARD, search backward instead."
   "Center point in window and redisplay frame.
 Also do horizontal recentering."
   (interactive "P")
-  (when (and gnus-auto-center-summary
+  (when (and nil
+	     gnus-auto-center-summary
 	     (not (eq gnus-auto-center-summary 'vertical)))
     (gnus-horizontal-recenter))
   (recenter n))
@@ -5110,6 +5129,7 @@ If `gnus-auto-center-summary' is nil, or the article buffer isn't
 displayed, no centering will be performed."
   ;; Suggested by earle@mahendo.JPL.NASA.GOV (Greg Earle).
   ;; Recenter only when requested.  Suggested by popovich@park.cs.columbia.edu.
+  (interactive)
   (let* ((top (cond ((< (window-height) 4) 0)
 		    ((< (window-height) 7) 1)
 		    (t (if (numberp gnus-auto-center-summary)
@@ -7329,7 +7349,8 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
 	     articles prefix))
       (set (intern (format "gnus-current-%s-group" action)) to-newsgroup))
     (setq to-method (or select-method
-			(gnus-group-name-to-method to-newsgroup)))
+			(gnus-server-to-method
+			 (gnus-group-method to-newsgroup))))
     ;; Check the method we are to move this article to...
     (unless (gnus-check-backend-function
 	     'request-accept-article (car to-method))
@@ -9026,7 +9047,8 @@ save those articles instead."
 				  (mapcar (lambda (el) (list el))
 					  (nreverse split-name))
 				  nil nil nil
-				  'gnus-group-history)))))
+				  'gnus-group-history))))
+         (to-method (gnus-server-to-method (gnus-group-method to-newsgroup))))
     (when to-newsgroup
       (if (or (string= to-newsgroup "")
 	      (string= to-newsgroup prefix))
@@ -9034,14 +9056,12 @@ save those articles instead."
       (unless to-newsgroup
 	(error "No group name entered"))
       (or (gnus-active to-newsgroup)
-	  (gnus-activate-group to-newsgroup)
+	  (gnus-activate-group to-newsgroup nil nil to-method)
 	  (if (gnus-y-or-n-p (format "No such group: %s.  Create it? "
 				     to-newsgroup))
-	      (or (and (gnus-request-create-group
-			to-newsgroup (gnus-group-name-to-method to-newsgroup))
+	      (or (and (gnus-request-create-group to-newsgroup to-method)
 		       (gnus-activate-group
-			to-newsgroup nil nil
-			(gnus-group-name-to-method to-newsgroup))
+			to-newsgroup nil nil to-method)
 		       (gnus-subscribe-group to-newsgroup))
 		  (error "Couldn't create group %s" to-newsgroup)))
 	  (error "No such group: %s" to-newsgroup)))

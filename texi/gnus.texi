@@ -355,7 +355,7 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-This manual corresponds to Gnus 5.8.4.
+This manual corresponds to Gnus 5.8.5.
 
 @end ifinfo
 
@@ -2766,6 +2766,11 @@ List all groups that have names that match a regexp
 List all groups that have names or descriptions that match a regexp
 (@code{gnus-group-description-apropos}).
 
+@item A c
+@kindex A c (Group)
+@findex gnus-group-list-cached
+List all groups with cached articles (@code{gnus-group-list-cached}).
+
 @end table
 
 @vindex gnus-permanently-visible-groups
@@ -3858,7 +3863,8 @@ the @code{a} spec.
 @item L
 Number of lines in the article.
 @item c
-Number of characters in the article.
+Number of characters in the article. This specifier is not supported in some
+methods (like nnfolder).
 @item I
 Indentation based on thread level (@pxref{Customizing Threading}).
 @item T
@@ -5231,7 +5237,7 @@ Limit the summary buffer to articles that match some author
 @findex gnus-summary-limit-to-extra
 Limit the summary buffer to articles that match one of the ``extra''
 headers (@pxref{To From Newsgroups})
-(@code{gnus-summary-limit-to-author}).
+(@code{gnus-summary-limit-to-extra}).
 
 @item / u
 @itemx x
@@ -5253,7 +5259,7 @@ with that mark (@code{gnus-summary-limit-to-marks}).
 @kindex / t (Summary)
 @findex gnus-summary-limit-to-age
 Ask for a number and then limit the summary buffer to articles older than (or equal to) that number of days
-(@code{gnus-summary-limit-to-marks}).  If given a prefix, limit to
+(@code{gnus-summary-limit-to-age}).  If given a prefix, limit to
 articles younger than that number of days.
 
 @item / n
@@ -5793,11 +5799,19 @@ understand the numeric prefix.
 
 @item T n
 @kindex T n (Summary)
+@itemx M-C-n
+@kindex M-C-n (Summary)
+@itemx M-down
+@kindex M-down (Summary)
 @findex gnus-summary-next-thread
 Go to the next thread (@code{gnus-summary-next-thread}).
 
 @item T p
 @kindex T p (Summary)
+@itemx M-C-p
+@kindex M-C-p (Summary)
+@itemx M-up
+@kindex M-up (Summary)
 @findex gnus-summary-prev-thread
 Go to the previous thread (@code{gnus-summary-prev-thread}).
 
@@ -6743,7 +6757,7 @@ content type based on the file name.  The result will be fed to
 Non-@code{nil} means that @code{gnus-uu}, when asked to save without
 decoding, will save in digests.  If this variable is @code{nil},
 @code{gnus-uu} will just save everything in a file without any
-embellishments.  The digesting almost conforms to RFC1153---no easy way
+embellishments.  The digesting almost conforms to RFC 1153---no easy way
 to specify any meaningful volume and issue numbers were found, so I
 simply dropped them.
 
@@ -7677,7 +7691,9 @@ the same manner:
 @table @kbd
 @item K b
 @kindex K b (Summary)
-Make all the @sc{mime} parts have buttons in from of them.
+Make all the @sc{mime} parts have buttons in from of them.  This is
+mostly useful if you wish to save (or perform other actions) on inlined
+parts.
 
 @item K m
 @kindex K m (Summary)
@@ -7702,7 +7718,7 @@ Toggle the buttonized display of the article buffer
 
 @item W M w
 @kindex W M w (Summary)
-Decode RFC2047-encoded words in the article headers
+Decode RFC 2047-encoded words in the article headers
 (@code{gnus-article-decode-mime-words}).
 
 @item W M c
@@ -7811,8 +7827,7 @@ for posting.  Each element of the alist has the form @code{(}@var{test
 header body-list}@code{)}, where:
 
 @table @var
-@item 
-test
+@item test
 is either a regular expression matching the newsgroup header or a
 variable to query,
 @item header
@@ -8463,6 +8478,22 @@ If it is @code{nil} (which is the default), Gnus will rename the
 @code{Message-ID} (for display purposes only) and display the article as
 any other article.  If this variable is @code{t}, it won't display the
 article---it'll be as if it never existed.
+
+@vindex gnus-alter-articles-to-read-function
+@item gnus-alter-articles-to-read-function
+This function, which takes two parameters (the group name and the list
+of articles to be selected), is called to allow the user to alter the
+list of articles to be selected.
+
+For instance, the following function adds the list of cached articles to
+the list in one particular group:
+
+@lisp
+(defun my-add-cached-articles (group articles)
+  (if (string= group "some.group")
+      (append gnus-newsgroup-cached articles)
+    articles))
+@end lisp
 
 @end table
 
@@ -10286,8 +10317,8 @@ The file contains one or more line, each of which define one server.
 @item
 Each line may contain an arbitrary number of token/value pairs.  The
 valid tokens include @samp{machine}, @samp{login}, @samp{password},
-@samp{default} and @samp{force}.  (The latter is not a valid
-@file{.netrc}/@code{ftp} token, which is the only way the
+@samp{default}, @samp{port} and @samp{force}.  (The latter is not a
+valid @file{.netrc}/@code{ftp} token, which is almost the only way the
 @file{.authinfo} file format deviates from the @file{.netrc} file
 format.)
 
@@ -11141,13 +11172,13 @@ UNDELETED}, is probably the best choice for most people, but if you
 sometimes peek in your mailbox with a @sc{imap} client and mark some
 articles as read (or; SEEN) you might want to set this to @samp{nil}.
 Then all articles in the mailbox is fetched, no matter what.  For a
-complete list of predicates, see RFC2060 §6.4.4.
+complete list of predicates, see RFC 2060 §6.4.4.
 
 @item :fetchflag
 How to flag fetched articles on the server, the default @samp{Deleted}
 will mark them as deleted, an alternative would be @samp{Seen} which
 would simply mark them as read.  These are the two most likely choices,
-but more flags are defined in RFC2060 §2.3.2.
+but more flags are defined in RFC 2060 §2.3.2.
 
 @item :dontexpunge
 If non-nil, don't remove all articles marked as deleted in the mailbox
@@ -11206,7 +11237,18 @@ Keywords:
 
 @table @code
 @item :plugged
-If non-nil, fetch the mail even when Gnus is unplugged.
+If non-nil, fetch the mail even when Gnus is unplugged.  If you use
+directory source to get mail, you can specify it as in this example:
+
+@lisp
+(setq mail-sources
+      '((directory :path "/home/pavel/.Spool/" 
+                   :suffix ""
+                   :plugged t)))
+@end lisp
+
+Gnus will then fetch your mail even when you are unplugged.  This is
+useful when you use local mail and news.
 
 @end table
 @end table
@@ -11301,8 +11343,8 @@ use this hook to notify any mail watch programs, if you want to.
 @vindex nnmail-split-hook
 @item nnmail-split-hook
 @findex article-decode-encoded-words
-@findex RFC1522 decoding
-@findex RFC2047 decoding
+@findex RFC 1522 decoding
+@findex RFC 2047 decoding
 Hook run in the buffer where the mail headers of each message is kept
 just before the splitting based on these headers is done.  The hook is
 free to modify the buffer contents in any way it sees fit---the buffer
@@ -11755,6 +11797,18 @@ necessarily an integer) or one of the symbols @code{immediate} or
 You can also use the @code{expiry-wait} group parameter to selectively
 change the expiry period (@pxref{Group Parameters}).
 
+@vindex nnmail-expiry-target
+The normal action taken when expiring articles is to delete them.
+However, in some circumstances it might make more sense to move them to
+other groups instead of deleting them.  The @code{nnmail-expiry-target}
+(and the @code{expiry-target} group parameter) controls this.  The
+default value is @code{delete}, but this can also be a string (which
+should be the name of the group the message should be moved to), or a
+function (which will be called in a buffer narrowed to the message in
+question, and with the name of the group being moved from as its
+parameter) which should return a target -- either a group name or
+@code{delete}. 
+
 @vindex nnmail-keep-last-article
 If @code{nnmail-keep-last-article} is non-@code{nil}, Gnus will never
 expire the final article in a mail newsgroup.  This is to make life
@@ -11790,10 +11844,10 @@ auto-expire turned on.
 @cindex incoming mail treatment
 
 Mailers and list servers are notorious for doing all sorts of really,
-really stupid things with mail.  ``Hey, RFC822 doesn't explicitly
+really stupid things with mail.  ``Hey, RFC 822 doesn't explicitly
 prohibit us from adding the string @code{wE aRe ElItE!!!!!1!!} to the
 end of all lines passing through our server, so let's do that!!!!1!''
-Yes, but RFC822 wasn't designed to be read by morons.  Things that were
+Yes, but RFC 822 wasn't designed to be read by morons.  Things that were
 considered to be self-evident were not discussed.  So.  Here we are.
 
 Case in point:  The German version of Microsoft Exchange adds @samp{AW:
@@ -12603,7 +12657,7 @@ groups updated.
 
 The easiest way to get started with @code{nnwarchive} is to say
 something like the following in the group buffer: @kbd{M-x
-gnus-group-make-nnwarchive-group RET an_egroup RET egroups RET
+gnus-group-make-warchive-group RET an_egroup RET egroups RET
 www.egroups.com RET your@@email.address RET}.  (Substitute the
 @sc{an_egroup} with the mailing list you subscribed, the
 @sc{your@@email.address} with your email address.), or to browse the
@@ -20742,6 +20796,15 @@ into [-] buttons.  (If I click on one of the [+] buttons, it does
 turn into a [-] button.)
 
 @item
+Perhaps there should be a command to "attach" a buffer of comments to
+a message?  That is, `B WHATEVER', you're popped into a buffer, write
+something, end with `C-c C-c', and then the thing you've written gets
+to be the child of the message you're commenting.
+
+@item
+Handle external-body parts.
+
+@item
 Solve the halting problem.
 
 @c TODO
@@ -21017,7 +21080,7 @@ An article that responds to a different article---its parent.
 @item digest
 @cindex digest
 A collection of messages in one file.  The most common digest format is
-specified by RFC1153.
+specified by RFC 1153.
 
 @end table
 
@@ -22269,7 +22332,7 @@ almost suspect that the author looked at the @sc{nov} specification and
 just shamelessly @emph{stole} the entire thing, and one would be right.
 
 @dfn{Header} is a severely overloaded term.  ``Header'' is used in
-RFC1036 to talk about lines in the head of an article (e.g.,
+RFC 1036 to talk about lines in the head of an article (e.g.,
 @code{From}).  It is used by many people as a synonym for
 ``head''---``the header and the body''.  (That should be avoided, in my
 opinion.)  And Gnus uses a format internally that it calls ``header'',

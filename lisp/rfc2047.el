@@ -1,5 +1,5 @@
 ;;; rfc2047.el --- Functions for encoding and decoding rfc2047 messages
-;; Copyright (C) 1998,99 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -46,7 +46,7 @@ The values can be:
 
 1) nil, in which case no encoding is done;
 2) `mime', in which case the header will be encoded according to RFC2047;
-3) a charset, in which case it will be encoded as that charse;
+3) a charset, in which case it will be encoded as that charset;
 4) `default', in which case the field will be encoded as the rest
    of the article.")
 
@@ -266,7 +266,8 @@ Should be called narrowed to the head of the message."
 	 ((and (not break)
 	       (looking-at "=\\?"))
 	  (setq break (point)))
-	 ((and (looking-at "\\?=")
+	 ((and break
+	       (looking-at "\\?=")
 	       (> (- (point) (save-excursion (beginning-of-line) (point))) 76))
 	  (goto-char break)
 	  (setq break nil)

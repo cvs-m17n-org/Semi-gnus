@@ -1,5 +1,6 @@
 ;;; gnus-win.el --- window configuration functions for Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -446,11 +447,11 @@ See the Gnus manual for an explanation of the syntax used.")
 		    (gnus-delete-windows-in-gnusey-frames))
 		;; Just remove some windows.
 		(gnus-remove-some-windows)
-		(set-buffer nntp-server-buffer))
+		(switch-to-buffer nntp-server-buffer))
 	    (select-frame frame)))
 
 	(let (gnus-window-frame-focus)
-	  (set-buffer nntp-server-buffer)
+	  (switch-to-buffer nntp-server-buffer)
 	  (gnus-configure-frame split)
 	  (when gnus-window-frame-focus
 	    (select-frame (window-frame gnus-window-frame-focus))))))))

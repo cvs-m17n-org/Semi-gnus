@@ -1,5 +1,6 @@
 ;;; gnus-draft.el --- draft message support for Gnus
-;; Copyright (C) 1997,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -129,6 +130,7 @@
 					   message-inhibit-body-encoding))
 	(message-send-hook (and group (not (equal group "nndraft:queue"))
 				message-send-hook))
+	(message-setup-hook nil)
 	type method)
     ;; We read the meta-information that says how and where
     ;; this message is to be sent.
@@ -193,6 +195,8 @@
 	(if (not (gnus-request-restore-buffer article group))
 	    (error "Couldn't restore the article")
 	  ;; Insert the separator.
+	  (if (equal group "nndraft:queue")
+	      (mime-to-mml))
 	  (goto-char (point-min))
 	  (search-forward "\n\n")
 	  (forward-char -1)

@@ -1,5 +1,6 @@
 ;;; gnus-msg.el --- mail and post interface for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -1051,6 +1052,7 @@ this is a reply."
 	 (group (or group gnus-newsgroup-name ""))
 	 (gcc-self-val
 	  (and gnus-newsgroup-name
+	       (not (equal gnus-newsgroup-name ""))
 	       (gnus-group-find-parameter
 		gnus-newsgroup-name 'gcc-self)))
 	 result
@@ -1203,36 +1205,35 @@ this is a reply."
       (setq results (delq name (delq address results)))
       (make-local-variable 'message-setup-hook)
       (dolist (result results)
-	(when (cdr result)
-	  (add-hook 'message-setup-hook
-		    (cond
-		     ((eq 'eval (car result))
-		      'ignore)
-		     ((eq 'body (car result))
+	(add-hook 'message-setup-hook
+		  (cond
+		   ((eq 'eval (car result))
+		    'ignore)
+		   ((eq 'body (car result))
+		    `(lambda ()
+		       (save-excursion
+			 (message-goto-body)
+			 (insert ,(cdr result)))))
+		   ((eq 'signature (car result))
+		    (set (make-local-variable 'message-signature) nil)
+		    (set (make-local-variable 'message-signature-file) nil)
+		    (if (not (cdr result))
+			'ignore
 		      `(lambda ()
 			 (save-excursion
-			   (message-goto-body)
-			   (insert ,(cdr result)))))
-		     ((eq 'signature (car result))
-		      (set (make-local-variable 'message-signature) nil)
-		      (set (make-local-variable 'message-signature-file) nil)
-		      (if (not (cdr result))
-			  'ignore
-			`(lambda ()
-			   (save-excursion
-			     (let ((message-signature ,(cdr result)))
-			       (when message-signature
-				 (message-insert-signature)))))))
-		     (t
-		      (let ((header
-			     (if (symbolp (car result))
-				 (capitalize (symbol-name (car result)))
-			       (car result))))
-			`(lambda ()
-			   (save-excursion
-			     (message-remove-header ,header)
-			     (message-goto-eoh)
-			     (insert ,header ": " ,(cdr result) "\n")))))))))
+			   (let ((message-signature ,(cdr result)))
+			     (when message-signature
+			       (message-insert-signature)))))))
+		   (t
+		    (let ((header
+			   (if (symbolp (car result))
+			       (capitalize (symbol-name (car result)))
+			     (car result))))
+		      `(lambda ()
+			 (save-excursion
+			   (message-remove-header ,header)
+			   (message-goto-eoh)
+			   (insert ,header ": " ,(cdr result) "\n"))))))))
       (when (or name address)
 	(add-hook 'message-setup-hook
 		  `(lambda ()

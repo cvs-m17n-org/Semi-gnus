@@ -1,5 +1,6 @@
 ;;; gnus-util.el --- utility functions for Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -805,7 +806,8 @@ ARG is passed to the first function."
   (when (file-exists-p file)
     (with-temp-buffer
       (let ((tokens '("machine" "default" "login"
-		      "password" "account" "macdef" "force"))
+		      "password" "account" "macdef" "force"
+		      "port"))
 	    alist elem result pair)
 	(insert-file-contents file)
 	(goto-char (point-min))
@@ -853,16 +855,27 @@ ARG is passed to the first function."
 	  (forward-line 1))
 	(nreverse result)))))
 
-(defun gnus-netrc-machine (list machine)
+(defun gnus-netrc-machine (list machine &optional port)
   "Return the netrc values from LIST for MACHINE or for the default entry."
-  (let ((rest list))
-    (while (and list
-		(not (equal (cdr (assoc "machine" (car list))) machine)))
+  (let ((rest list)
+	result)
+    (while list
+      (when (equal (cdr (assoc "machine" (car list))) machine)
+	(push (car list) result))
       (pop list))
-    (car (or list
-	     (progn (while (and rest (not (assoc "default" (car rest))))
-		      (pop rest))
-		    rest)))))
+    (unless result
+      ;; No machine name matches, so we look for default entries.
+      (while rest
+	(when (assoc "default" (car rest))
+	  (push (car rest) result))
+	(pop rest)))
+    (when result
+      (setq result (nreverse result))
+      (while (and result
+		  (not (equal (or port "nntp")
+			      (gnus-netrc-get (car result) "port"))))
+	(pop result))
+      (car result))))
 
 (defun gnus-netrc-get (alist type)
   "Return the value of token TYPE from ALIST."
