@@ -351,7 +351,8 @@ post using the current select method."
 This is done simply by taking the old article and adding a Supersedes
 header line with the old Message-ID."
   (interactive)
-  (let ((article (gnus-summary-article-number)))
+  (let ((article (gnus-summary-article-number))
+	gnus-message-setup-hook)
     (gnus-setup-message 'reply-yank
       (gnus-summary-select-article t)
       (set-buffer gnus-original-article-buffer)

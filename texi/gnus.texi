@@ -1,12 +1,12 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.7.8 Manual
+@settitle Semi-gnus 6.8.20 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
 @c @direntry
-@c * Gnus: (gnus).         The news reader gnus.
+@c * Gnus: (gnus).         The newsreader Gnus.
 @c @end direntry
 @iftex
 @finalout
@@ -62,6 +62,8 @@
 \newcommand{\gnustilde}{\symbol{"7E}}
 \newcommand{\gnusless}{{$<$}}
 \newcommand{\gnusgreater}{{$>$}}
+\newcommand{\gnusbraceleft}{{$>$}}
+\newcommand{\gnusbraceright}{{$>$}}
 
 \newcommand{\gnushead}{\raisebox{-1cm}{\epsfig{figure=ps/gnus-head.eps,height=1cm}}}
 \newcommand{\gnusinteresting}{
@@ -316,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.7.8 Manual
+@title Semi-gnus 6.8.20 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -352,14 +354,14 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-Semi-gnus provides MIME features based on SEMI API.  So Semi-gnus
+<<<<Semi-gnus provides MIME features based on SEMI API.  So Semi-gnus
 supports your right to read strange messages including big images or
 other various kinds of formats.  Semi-gnus also supports
 internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-Gnus 6.7.8
+This manual corresponds to Semi-gnus 6.8.20.
 
 @end ifinfo
 
@@ -1284,11 +1286,16 @@ Here's an example value for this variable that might look nice if the
 background is dark:
 
 @lisp
-(face-spec-set 'my-group-face-1 '((t (:foreground "Red" :bold t))))
-(face-spec-set 'my-group-face-2 '((t (:foreground "SeaGreen" :bold t))))
-(face-spec-set 'my-group-face-3 '((t (:foreground "SpringGreen" :bold t))))
-(face-spec-set 'my-group-face-4 '((t (:foreground "SteelBlue" :bold t))))
-(face-spec-set 'my-group-face-5 '((t (:foreground "SkyBlue" :bold t))))
+(face-spec-set 'my-group-face-1
+               '((t (:foreground "Red" :bold t))))
+(face-spec-set 'my-group-face-2
+               '((t (:foreground "SeaGreen" :bold t))))
+(face-spec-set 'my-group-face-3
+               '((t (:foreground "SpringGreen" :bold t))))
+(face-spec-set 'my-group-face-4
+               '((t (:foreground "SteelBlue" :bold t))))
+(face-spec-set 'my-group-face-5
+               '((t (:foreground "SkyBlue" :bold t))))
 
 (setq gnus-group-highlight
       '(((> unread 200) . my-group-face-1)
@@ -1904,6 +1911,13 @@ Currently supported types are @code{babyl}, @code{mbox}, @code{digest},
 this command without a prefix, gnus will guess at the file type.
 @xref{Document Groups}.
 
+@item G u
+@kindex G u (Group)
+@vindex gnus-useful-groups
+@findex gnus-group-make-useful-group
+Create one of the groups mentioned in @code{gnus-useful-groups}
+(@code{gnus-group-make-useful-group}).
+
 @item G w
 @kindex G w (Group)
 @findex gnus-group-make-web-group
@@ -2390,8 +2404,10 @@ Find bogus groups and delete them
 @kindex F (Group)
 @findex gnus-group-find-new-groups
 Find new groups and process them (@code{gnus-group-find-new-groups}).
-If given a prefix, use the @code{ask-server} method to query the server
-for new groups.
+With 1 @kbd{C-u}, use the @code{ask-server} method to query the server
+for new groups.  With 2 @kbd{C-u}'s, use most complete method possible
+to query the server for new groups, and subscribe the new groups as
+zombies.
 
 @item C-c C-x
 @kindex C-c C-x (Group)
@@ -2662,8 +2678,13 @@ convention (@pxref{Process/Prefix}).
 @findex gnus-topic-remove-group
 Remove a group from the current topic (@code{gnus-topic-remove-group}).
 This command is mainly useful if you have the same group in several
-topics and wish to remove it from one of the topics.
-The command uses the process/prefix convention
+topics and wish to remove it from one of the topics.  You may also
+remove a group from all topics, but in that case, Gnus will add it to
+the root topic the next time you start Gnus.  In fact, all new groups
+(which, naturally, don't belong to any topic) will show up in the root
+topic. 
+
+This command uses the process/prefix convention
 (@pxref{Process/Prefix}).
 
 @item T M
@@ -2678,8 +2699,8 @@ Move all groups that match some regular expression to a topic
 Copy all groups that match some regular expression to a topic
 (@code{gnus-topic-copy-matching}).
 
-@item T h
-@kindex T h (Topic)
+@item T H
+@kindex T H (Topic)
 @findex gnus-topic-toggle-display-empty-topics
 Toggle hiding empty topics
 (@code{gnus-topic-toggle-display-empty-topics}).
@@ -2708,11 +2729,19 @@ toggling command on topics.  In addition, if you give a numerical
 prefix, group on that level (and lower) will be displayed.
 
 @item T TAB
+@itemx TAB
 @kindex T TAB (Topic)
+@kindex TAB (Topic)
 @findex gnus-topic-indent
 ``Indent'' the current topic so that it becomes a sub-topic of the
 previous topic (@code{gnus-topic-indent}).  If given a prefix,
 ``un-indent'' the topic instead.
+
+@item M-TAB
+@kindex M-TAB (Topic)
+@findex gnus-topic-unindent
+``Un-indent'' the current topic so that it becomes a sub-topic of the
+parent of its current parent (@code{gnus-topic-unindent}).  
 
 @item C-k
 @kindex C-k (Topic)
@@ -2881,7 +2910,7 @@ The @samp{Emacs} topic has the topic parameter @code{(score-file
 . "emacs.SCORE")}; the @samp{Relief} topic has the topic parameter
 @code{(score-file . "relief.SCORE")}; and the @samp{Misc} topic has the
 topic parameter @code{(score-file . "emacs.SCORE")}.  In addition,
-@samp{alt.religion.emacs} has the group parameter @code{(score-file
+@* @samp{alt.religion.emacs} has the group parameter @code{(score-file
 . "religion.SCORE")}.
 
 Now, when you enter @samp{alt.sex.emacs} in the @samp{Relief} topic, you
@@ -3498,8 +3527,10 @@ without confirmation.  Also @pxref{Group Levels}.
 If non-@code{nil}, all the movement commands will try to go to the next
 article with the same subject as the current.  (@dfn{Same} here might
 mean @dfn{roughly equal}.  See @code{gnus-summary-gather-subject-limit}
-for details (@pxref{Customizing Threading}).)  This variable is not
-particularly useful if you use a threaded display.
+for details (@pxref{Customizing Threading}).)  If there are no more
+articles with the same subject, go to the first unread article.
+
+This variable is not particularly useful if you use a threaded display.
 
 @item gnus-summary-check-current
 @vindex gnus-summary-check-current
@@ -3681,6 +3712,12 @@ Scroll the current article back one page (@code{gnus-summary-prev-page}).
 Scroll the current article one line forward
 (@code{gnus-summary-scroll-up}).
 
+@item M-RET
+@kindex M-RET (Summary)
+@findex gnus-summary-scroll-down
+Scroll the current article one line backward
+(@code{gnus-summary-scroll-down}).
+
 @item A g
 @itemx g
 @kindex A g (Summary)
@@ -3821,7 +3858,7 @@ This command is mainly used if you have several accounts and want to
 ship a mail to a different account of yours.  (If you're both
 @code{root} and @code{postmaster} and get a mail for @code{postmaster}
 to the @code{root} account, you may want to resend it to
-@code{postmaster}.  Ordnung mu(I_(B sein!
+@code{postmaster}.  Ordnung mu,A_(B sein!
 
 This command understands the process/prefix convention
 (@pxref{Process/Prefix}).
@@ -5220,9 +5257,9 @@ Remove articles when exiting the group.
 
 The default value is @code{(read exit)}.
 
-@vindex gnus-use-header-prefetch
-If @code{gnus-use-header-prefetch} is non-@code{nil}, prefetch articles
-from the next group.
+@c @vindex gnus-use-header-prefetch
+@c If @code{gnus-use-header-prefetch} is non-@code{nil}, prefetch articles
+@c from the next group.
 
 
 @node Article Caching
@@ -5278,13 +5315,17 @@ to score unwanted articles down and have them marked as read.  They will
 not then be downloaded by this command.
 
 @vindex gnus-uncacheable-groups
-It is likely that you do not want caching on some groups.  For instance,
+@vindex gnus-cacheable-groups
+It is likely that you do not want caching on all groups.  For instance,
 if your @code{nnml} mail is located under your home directory, it makes no
 sense to cache it somewhere else under your home directory.  Unless you
-feel that it's neat to use twice as much space.  To limit the caching,
-you could set the @code{gnus-uncacheable-groups} regexp to
-@samp{^nnml}, for instance.  This variable is @code{nil} by
-default.
+feel that it's neat to use twice as much space.  
+
+To limit the caching, you could set @code{gnus-cacheable-groups} to a
+regexp of groups to cache, @samp{^nntp} for instance, or set the
+@code{gnus-uncacheable-groups} regexp to @samp{^nnml}, for instance.
+Both variables are @code{nil} by default. If a group matches both
+variables, the group is not cached.
 
 @findex gnus-cache-generate-nov-databases
 @findex gnus-cache-generate-active
@@ -6058,17 +6099,25 @@ these articles easier.
 
 @node Article Highlighting
 @subsection Article Highlighting
-@cindex highlight
+@cindex highlighting
 
 Not only do you want your article buffer to look like fruit salad, but
-you want it to look like technicolor fruit salad.
+you want it to look like technicolor fruit salad.  
 
 @table @kbd
 
 @item W H a
 @kindex W H a (Summary)
 @findex gnus-article-highlight
-Highlight the current article (@code{gnus-article-highlight}).
+@findex gnus-article-maybe-highlight
+Do much highlighting of the current article
+(@code{gnus-article-highlight}).  This function highlights header, cited
+text, the signature, and adds buttons to the body and the head.
+
+Most users would prefer using @code{gnus-article-maybe-highlight} in
+@code{gnus-article-display-hook} (@pxref{Customizing Articles}) instead.
+This is a bit less agressive---it highlights only the headers, the
+signature and adds buttons.
 
 @item W H h
 @kindex W H h (Summary)
@@ -6154,6 +6203,8 @@ default.
 
 @end table
 
+@xref{Customizing Articles} for how to highlight articles automatically.
+
 
 @node Article Fontisizing
 @subsection Article Fontisizing
@@ -6167,9 +6218,9 @@ like @samp{_this_} or @samp{*this*}.  Gnus can make this look nicer by
 running the article through the @kbd{W e}
 (@code{gnus-article-emphasize}) command.
 
-@vindex gnus-article-emphasis
+@vindex gnus-emphasis-alist
 How the emphasis is computed is controlled by the
-@code{gnus-article-emphasis} variable.  This is an alist where the first
+@code{gnus-emphasis-alist} variable.  This is an alist where the first
 element is a regular expression to be matched.  The second is a number
 that says what regular expression grouping is used to find the entire
 emphasized word.  The third is a number that says what regexp grouping
@@ -6206,6 +6257,8 @@ say something like:
 (copy-face 'red 'gnus-emphasis-italic)
 @end lisp
 
+@xref{Customizing Articles} for how to fontize articles automatically.
+
 
 @node Article Hiding
 @subsection Article Hiding
@@ -6219,7 +6272,9 @@ too much cruft in most articles.
 @item W W a
 @kindex W W a (Summary)
 @findex gnus-article-hide
-Do maximum hiding on the summary buffer (@kbd{gnus-article-hide}).
+Do quite a lot of hiding on the article buffer
+(@kbd{gnus-article-hide}).  In particular, this function will hide
+headers, PGP, cited text and the signature.  
 
 @item W W h
 @kindex W W h (Summary)
@@ -6261,6 +6316,40 @@ customizing the hiding:
 
 @table @code
 
+@item gnus-cited-opened-text-button-line-format
+@itemx gnus-cited-closed-text-button-line-format
+@vindex gnus-cited-closed-text-button-line-format
+@vindex gnus-cited-opened-text-button-line-format
+Gnus adds buttons to show where the cited text has been hidden, and to
+allow toggle hiding the text.  The format of the variable is specified
+by these format-like variable (@pxref{Formatting Variables}).  These
+specs are valid:
+
+@table @samp
+@item b
+Starting point of the hidden text.
+@item e
+Ending point of the hidden text.
+@item l
+Number of characters in the hidden region.
+@item n
+Number of lines of hidden text.
+@end table
+
+@item gnus-cited-lines-visible
+@vindex gnus-cited-lines-visible
+The number of lines at the beginning of the cited text to leave shown.
+
+@end table
+
+@item W W C-c
+@kindex W W C-c (Summary)
+@findex gnus-article-hide-citation-maybe
+
+Hide citation (@code{gnus-article-hide-citation-maybe}) depending on the
+following two variables:
+
+@table @code
 @item gnus-cite-hide-percentage
 @vindex gnus-cite-hide-percentage
 If the cited text is of a bigger percentage than this variable (default
@@ -6270,27 +6359,6 @@ If the cited text is of a bigger percentage than this variable (default
 @vindex gnus-cite-hide-absolute
 The cited text must have at least this length (default 10) before it
 is hidden.
-
-@item gnus-cited-text-button-line-format
-@vindex gnus-cited-text-button-line-format
-Gnus adds buttons to show where the cited text has been hidden, and to
-allow toggle hiding the text.  The format of the variable is specified
-by this format-like variable (@pxref{Formatting Variables}).  These
-specs are valid:
-
-@table @samp
-@item b
-Start point of the hidden text.
-@item e
-End point of the hidden text.
-@item l
-Length of the hidden text.
-@end table
-
-@item gnus-cited-lines-visible
-@vindex gnus-cited-lines-visible
-The number of lines at the beginning of the cited text to leave shown.
-
 @end table
 
 @item W W C
@@ -6309,6 +6377,9 @@ hidden.  If you give a positive prefix, they will always hide.
 
 Also @pxref{Article Highlighting} for further variables for
 citation customization.
+
+@xref{Customizing Articles} for how to hide article elements
+automatically.
 
 
 @node Article Washing
@@ -6469,6 +6540,8 @@ body (@code{gnus-article-strip-leading-space}).
 
 @end table
 
+@xref{Customizing Articles} for how to wash articles automatically.
+
 
 @node Article Buttons
 @subsection Article Buttons
@@ -6553,6 +6626,8 @@ Face used when the mouse cursor is over a button.
 
 @end table
 
+@xref{Customizing Articles} for how to buttonize articles automatically.
+
 
 @node Article Date
 @subsection Article Date
@@ -6619,6 +6694,9 @@ that the article was posted in 1854.  Although something like that is
 @emph{totally} impossible.  Don't you trust me? *titter*
 
 @end table
+
+@xref{Customizing Articles} for how to display the date in your
+preferred format automatically.
 
 
 @node Article Signature
@@ -6864,10 +6942,13 @@ Here are the available keystrokes when using pick mode:
 @table @kbd
 @item .
 @kindex . (Pick)
-@findex gnus-summary-mark-as-processable
-Pick the article on the current line
-(@code{gnus-summary-mark-as-processable}).  If given a numerical prefix,
-go to that article and pick it.  (The line number is normally displayed
+@findex gnus-pick-article-or-thread
+Pick the article or thread on the current line
+(@code{gnus-pick-article-or-thread}).  If the variable
+@code{gnus-thread-hide-subtree} is true, then this key selects the
+entire thread when used at the first article of the thread.  Otherwise,
+it selects just the article. If given a numerical prefix, go to that
+thread or article and pick it.  (The line number is normally displayed
 at the beginning of the summary pick lines.)
 
 @item SPACE
@@ -6878,53 +6959,13 @@ at the end of the buffer, start reading the picked articles.
 
 @item u
 @kindex u (Pick)
-@findex gnus-summary-unmark-as-processable
-Unpick the article (@code{gnus-summary-unmark-as-processable}).
-
-@item U
-@kindex U (Pick)
-@findex gnus-summary-unmark-all-processable
-Unpick all articles (@code{gnus-summary-unmark-all-processable}).
-
-@item t
-@kindex t (Pick)
-@findex gnus-uu-mark-thread
-Pick the thread (@code{gnus-uu-mark-thread}).
-
-@item T
-@kindex T (Pick)
-@findex gnus-uu-unmark-thread
-Unpick the thread (@code{gnus-uu-unmark-thread}).
-
-@item r
-@kindex r (Pick)
-@findex gnus-uu-mark-region
-Pick the region (@code{gnus-uu-mark-region}).
-
-@item R
-@kindex R (Pick)
-@findex gnus-uu-unmark-region
-Unpick the region (@code{gnus-uu-unmark-region}).
-
-@item e
-@kindex e (Pick)
-@findex gnus-uu-mark-by-regexp
-Pick articles that match a regexp (@code{gnus-uu-mark-by-regexp}).
-
-@item E
-@kindex E (Pick)
-@findex gnus-uu-unmark-by-regexp
-Unpick articles that match a regexp (@code{gnus-uu-unmark-by-regexp}).
-
-@item b
-@kindex b (Pick)
-@findex gnus-uu-mark-buffer
-Pick the buffer (@code{gnus-uu-mark-buffer}).
-
-@item B
-@kindex B (Pick)
-@findex gnus-uu-unmark-buffer
-Unpick the buffer (@code{gnus-uu-unmark-buffer}).
+@findex gnus-pick-unmark-article-or-thread.
+Unpick the thread or article
+(@code{gnus-pick-unmark-article-or-thread}).  If the variable
+@code{gnus-thread-hide-subtree} is true, then this key unpicks the
+thread if used at the first article of the thread.  Otherwise it unpicks 
+just the article.  You can give this key a numerical prefix to unpick
+the thread or article at that line.
 
 @item RET
 @kindex RET (Pick)
@@ -6936,6 +6977,11 @@ given a prefix, mark all unpicked articles as read first.  If
 will still be visible when you are reading.
 
 @end table
+
+All the normal summary mode commands are still available in the
+pick-mode, with the exception of @kbd{u}.  However @kbd{!} is available
+which is mapped to the same function
+@code{gnus-summary-tick-article-forward}.
 
 If this sounds like a good idea to you, you could say:
 
@@ -7188,7 +7234,7 @@ name, a @code{From} header and a @code{Subject} header.
 @item B r
 @kindex B r (Summary)
 @findex gnus-summary-respool-article
-Respool the mail article (@code{gnus-summary-move-article}).
+Respool the mail article (@code{gnus-summary-respool-article}).
 @code{gnus-summary-respool-default-method} will be used as the default
 select method when respooling.  This variable is @code{nil} by default,
 which means that the current group select method will be used instead.
@@ -7210,6 +7256,12 @@ editing and make the changes permanent, type @kbd{C-c C-c}
 If you want to re-spool an article, you might be curious as to what group
 the article will end up in before you do the re-spooling.  This command
 will tell you (@code{gnus-summary-respool-query}).
+
+@item B t
+@kindex B t (Summary)
+@findex gnus-summary-respool-trace
+Similarly, this command will display all fancy splitting patterns used
+when repooling, if any (@code{gnus-summary-respool-trace}).
 
 @item B p
 @kindex B p (Summary)
@@ -7785,15 +7837,15 @@ These conditions are:
 @table @code
 @item empty
 Remove all empty headers.
-@item newsgroups
-Remove the @code{Newsgroups} header if it only contains the current group
-name.
 @item followup-to
 Remove the @code{Followup-To} header if it is identical to the
 @code{Newsgroups} header.
 @item reply-to
 Remove the @code{Reply-To} header if it lists the same address as the
 @code{From} header.
+@item newsgroups
+Remove the @code{Newsgroups} header if it only contains the current group
+name.
 @item date
 Remove the @code{Date} header if the article is less than three days
 old.
@@ -7803,11 +7855,11 @@ Remove the @code{To} header if it is very long.
 Remove all @code{To} headers if there are more than one.
 @end table
 
-To include the four first elements, you could say something like;
+To include the four three elements, you could say something like;
 
 @lisp
 (setq gnus-boring-article-headers
-      '(empty newsgroups followup-to reply-to))
+      '(empty followup-to reply-to))
 @end lisp
 
 This is also the default value for this variable.
@@ -7874,9 +7926,12 @@ been inserted into the article buffer.  It is meant to handle all
 treatment of the article before it is displayed.
 
 @findex gnus-article-maybe-highlight
-By default this hook just contains @code{gnus-article-hide-headers},
-@code{gnus-article-treat-overstrike}, and
-@code{gnus-article-maybe-highlight}, but there are thousands, nay
+@findex gnus-article-maybe-hide-headers
+By default this hook just contains
+@code{gnus-article-maybe-hide-headers},
+@code{gnus-hide-boring-headers}, @code{gnus-article-treat-overstrike},
+and @code{gnus-article-maybe-highlight} (and under XEmacs,
+@code{gnus-article-display-x-face}), but there are thousands, nay
 millions, of functions you can put in this hook.  For an overview of
 functions @pxref{Article Highlighting}, @pxref{Article Hiding},
 @pxref{Article Washing}, @pxref{Article Buttons} and @pxref{Article
@@ -8038,6 +8093,7 @@ to make gnus try to post using the foreign server.
 * Posting Server::       What server should you post via?
 * Mail and Post::        Mailing and posting at the same time.
 * Archived Messages::    Where gnus stores the messages you've sent.
+* Posting Styles::       An easier way to specify who you are.
 * Drafts::               Postponing messages and rejected messages.
 * Rejected Articles::    What happens if the server doesn't like your article?
 @end menu
@@ -8293,83 +8349,96 @@ but the latter is the preferred method.
 @end table
 
 
-@c @node Posting Styles
-@c @section Posting Styles
-@c @cindex posting styles
-@c @cindex styles
-@c
-@c All them variables, they make my head swim.
-@c
-@c So what if you want a different @code{Organization} and signature based
-@c on what groups you post to?  And you post both from your home machine
-@c and your work machine, and you want different @code{From} lines, and so
-@c on?
-@c
-@c @vindex gnus-posting-styles
-@c One way to do stuff like that is to write clever hooks that change the
-@c variables you need to have changed.  That's a bit boring, so somebody
-@c came up with the bright idea of letting the user specify these things in
-@c a handy alist.  Here's an example of a @code{gnus-posting-styles}
-@c variable:
-@c
-@c @lisp
-@c ((".*"
-@c   (signature . "Peace and happiness")
-@c   (organization . "What me?"))
-@c  ("^comp"
-@c   (signature . "Death to everybody"))
-@c  ("comp.emacs.i-love-it"
-@c   (organization . "Emacs is it")))
-@c @end lisp
-@c
-@c As you might surmise from this example, this alist consists of several
-@c @dfn{styles}.  Each style will be applicable if the first element
-@c ``matches'', in some form or other.  The entire alist will be iterated
-@c over, from the beginning towards the end, and each match will be
-@c applied, which means that attributes in later styles that match override
-@c the same attributes in earlier matching styles.  So
-@c @samp{comp.programming.literate} will have the @samp{Death to everybody}
-@c signature and the @samp{What me?} @code{Organization} header.
-@c
-@c The first element in each style is called the @code{match}.  If it's a
-@c string, then Gnus will try to regexp match it against the group name.
-@c If it's a function symbol, that function will be called with no
-@c arguments.  If it's a variable symbol, then the variable will be
-@c referenced.  If it's a list, then that list will be @code{eval}ed.  In
-@c any case, if this returns a non-@code{nil} value, then the style is said
-@c to @dfn{match}.
-@c
-@c Each style may contain a arbitrary amount of @dfn{attributes}.  Each
-@c attribute consists of a @var{(name . value)} pair.  The attribute name
-@c can be one of @code{signature}, @code{organization} or @code{from}.  The
-@c attribute name can also be a string.  In that case, this will be used as
-@c a header name, and the value will be inserted in the headers of the
-@c article.
-@c
-@c The attribute value can be a string (used verbatim), a function (the
-@c return value will be used), a variable (its value will be used) or a
-@c list (it will be @code{eval}ed and the return value will be used).
-@c
-@c So here's a new example:
-@c
-@c @lisp
-@c (setq gnus-posting-styles
-@c       '((".*"
-@c           (signature . "~/.signature")
-@c           (from . "user@@foo (user)")
-@c           ("X-Home-Page" . (getenv "WWW_HOME"))
-@c           (organization . "People's Front Against MWM"))
-@c         ("^rec.humor"
-@c           (signature . my-funny-signature-randomizer))
-@c         ((equal (system-name) "gnarly")
-@c           (signature . my-quote-randomizer))
-@c         (posting-from-work-p
-@c           (signature . "~/.work-signature")
-@c           (from . "user@@bar.foo (user)")
-@c           (organization . "Important Work, Inc"))
-@c         ("^nn.+:"
-@c           (signature . "~/.mail-signature"))))
-@c @end lisp
+@node Posting Styles
+@section Posting Styles
+@cindex posting styles
+@cindex styles
+
+All them variables, they make my head swim.
+
+So what if you want a different @code{Organization} and signature based
+on what groups you post to?  And you post both from your home machine
+and your work machine, and you want different @code{From} lines, and so
+on?
+
+@vindex gnus-posting-styles
+One way to do stuff like that is to write clever hooks that change the
+variables you need to have changed.  That's a bit boring, so somebody
+came up with the bright idea of letting the user specify these things in
+a handy alist.  Here's an example of a @code{gnus-posting-styles}
+variable:
+
+@lisp
+((".*"
+  (signature "Peace and happiness")
+  (organization "What me?"))
+ ("^comp"
+  (signature "Death to everybody"))
+ ("comp.emacs.i-love-it"
+  (organization "Emacs is it")))
+@end lisp
+
+As you might surmise from this example, this alist consists of several
+@dfn{styles}.  Each style will be applicable if the first element
+``matches'', in some form or other.  The entire alist will be iterated
+over, from the beginning towards the end, and each match will be
+applied, which means that attributes in later styles that match override
+the same attributes in earlier matching styles.  So
+@samp{comp.programming.literate} will have the @samp{Death to everybody}
+signature and the @samp{What me?} @code{Organization} header.
+
+The first element in each style is called the @code{match}.  If it's a
+string, then Gnus will try to regexp match it against the group name.
+If it's a function symbol, that function will be called with no
+arguments.  If it's a variable symbol, then the variable will be
+referenced.  If it's a list, then that list will be @code{eval}ed.  In
+any case, if this returns a non-@code{nil} value, then the style is said
+to @dfn{match}.
+
+Each style may contain a arbitrary amount of @dfn{attributes}.  Each
+attribute consists of a @var{(name . value)} pair.  The attribute name
+can be one of @code{signature}, @code{signature-file},
+@code{organization}, @code{address}, @code{name} or @code{body}.  The
+attribute name can also be a string.  In that case, this will be used as
+a header name, and the value will be inserted in the headers of the
+article.
+
+The attribute value can be a string (used verbatim), a function (the
+return value will be used), a variable (its value will be used) or a
+list (it will be @code{eval}ed and the return value will be used).
+
+If you wish to check whether the message you are about to compose is
+meant to be a news article or a mail message, you can check the values
+of the two dynamically bound variables @code{message-this-is-news} and
+@code{message-this-is-mail}.
+
+@vindex message-this-is-mail
+@vindex message-this-is-news
+
+So here's a new example:
+
+@lisp
+(setq gnus-posting-styles
+      '((".*"
+         (signature-file "~/.signature")
+         (name "User Name")
+         ("X-Home-Page" (getenv "WWW_HOME"))
+         (organization "People's Front Against MWM"))
+        ("^rec.humor"
+         (signature my-funny-signature-randomizer))
+        ((equal (system-name) "gnarly")
+         (signature my-quote-randomizer))
+        (message-this-is-news
+         (signature my-news-signature))
+        (posting-from-work-p
+         (signature-file "~/.work-signature")
+         (address "user@@bar.foo")
+         (body "You are fired.\n\nSincerely, your boss.")
+         (organization "Important Work, Inc"))
+        ("^nn.+:"
+         (signature-file "~/.mail-signature"))))
+@end lisp
+
 
 @node Drafts
 @section Drafts
@@ -8942,10 +9011,11 @@ The file contains one or more line, each of which define one server.
 
 @item
 Each line may contain an arbitrary number of token/value pairs.  The
-valid tokens include @samp{machine}, @samp{login}, @samp{password}, and
-@samp{force}.  (The latter is not a valid @file{.netrc}/@code{ftp}
-token, which is the only way the @file{.authinfo} file format deviates
-from the @file{.netrc} file format.)
+valid tokens include @samp{machine}, @samp{login}, @samp{password},
+@samp{default} and @samp{force}.  (The latter is not a valid
+@file{.netrc}/@code{ftp} token, which is the only way the
+@file{.authinfo} file format deviates from the @file{.netrc} file
+format.)
 
 @end enumerate
 
@@ -8966,6 +9036,16 @@ user will be prompted for the password.  The latter also has the
 @var{nntp} server upon connection; the default (i.e., when there is not
 @samp{force} tag) is to not send authinfo to the @var{nntp} server
 until the @var{nntp} server asks for it.
+
+You can also add @samp{default} lines that will apply to all servers
+that don't have matching @samp{machine} lines.
+
+@example
+default force yes
+@end example
+
+This will force sending @samp{AUTHINFO} commands to all servers not
+previously mentioned.
 
 Remember to not leave the @file{~/.authinfo} file world-readable.
 
@@ -9001,17 +9081,17 @@ waiting for reply, and then reads all the replies.  This is controlled
 by the @code{nntp-maximum-request} variable, and is 400 by default.  If
 your network is buggy, you should set this to 1.
 
-@c @item nntp-connection-timeout
-@c @vindex nntp-connection-timeout
-@c If you have lots of foreign @code{nntp} groups that you connect to
-@c regularly, you're sure to have problems with @sc{nntp} servers not
-@c responding properly, or being too loaded to reply within reasonable
-@c time.  This is can lead to awkward problems, which can be helped
-@c somewhat by setting @code{nntp-connection-timeout}.  This is an integer
-@c that says how many seconds the @code{nntp} backend should wait for a
-@c connection before giving up.  If it is @code{nil}, which is the default,
-@c no timeouts are done.
-@c 
+@item nntp-connection-timeout
+@vindex nntp-connection-timeout
+If you have lots of foreign @code{nntp} groups that you connect to
+regularly, you're sure to have problems with @sc{nntp} servers not
+responding properly, or being too loaded to reply within reasonable
+time.  This is can lead to awkward problems, which can be helped
+somewhat by setting @code{nntp-connection-timeout}.  This is an integer
+that says how many seconds the @code{nntp} backend should wait for a
+connection before giving up.  If it is @code{nil}, which is the default,
+no timeouts are done.
+
 @c @item nntp-command-timeout
 @c @vindex nntp-command-timeout
 @c @cindex PPP connections
@@ -9370,10 +9450,6 @@ insert sub-expressions from the matched text.  For instance:
 ("list.\\1" "From:.*\\(.*\\)-list@@majordomo.com")
 @end lisp
 
-If the first element is the special symbol @code{junk}, then messages
-that match the regexp will disappear into the aether.  Use with
-extreme caution.
-
 The second element can also be a function.  In that case, it will be
 called narrowed to the headers with the first element of the rule as the
 argument.  It should return a non-@code{nil} value if it thinks that the
@@ -9645,13 +9721,16 @@ be stored in one or more groups.
 
 @item
 @code{junk}: If the split is the symbol @code{junk}, then don't save
-this message.
+this message. Use with extreme caution.
 
 @item
 @var{(: function arg1 arg2 ...)}:  If the split is a list, and the first
 element is @code{:}, then the second element will be called as a
 function with @var{args} given as arguments.  The function should return
 a SPLIT.
+
+@item
+@code{nil}: If the split is @code{nil}, it is ignored.
 
 @end enumerate
 
@@ -9677,12 +9756,12 @@ information in the headers (i.e., do @code{replace-match}-like
 substitutions in the group names), you can say things like:
 
 @example
-(any "debian-\\(\\w*\\)@@lists.debian.org" "mail.debian.\\1")
+(any "debian-\\b\\(\\w+\\)@@lists.debian.org" "mail.debian.\\1")
 @end example
 
 If the string contains the element @samp{\&}, then the previously
-matched string will be substituted.  Similarly, the elements @samp{\1}
-up to @samp{\9} will be substituted with the text matched by the
+matched string will be substituted.  Similarly, the elements @samp{\\1}
+up to @samp{\\9} will be substituted with the text matched by the
 groupings 1 through 9.
 
 
@@ -10325,6 +10404,22 @@ The name of the group descriptions file.  @xref{Newsgroups File Format}.
 @item nnfolder-get-new-mail
 @vindex nnfolder-get-new-mail
 If non-@code{nil}, @code{nnfolder} will read incoming mail.
+
+@item nnfolder-save-buffer-hook
+@vindex nnfolder-save-buffer-hook
+@cindex backup files
+Hook run before saving the folders.  Note that Emacs does the normal
+backup renaming of files even with the @code{nnfolder} buffers.  If you
+wish to switch this off, you could say something like the following in
+your @file{.emacs} file:
+
+@lisp
+(defun turn-off-backup ()
+  (set (make-local-variable 'backup-inhibited) t))
+
+(add-hook 'nnfolder-save-buffer-hook 'turn-off-backup)
+@end lisp
+
 @end table
 
 @findex nnfolder-generate-active-file
@@ -10475,6 +10570,9 @@ The rnews batch transport format.
 @item forward
 Forwarded articles.
 
+@item mime-parts
+MIME multipart messages, besides digests.
+
 @item mime-digest
 @cindex digest
 @cindex MIME digest
@@ -10517,8 +10615,9 @@ Virtual server variables:
 @vindex nndoc-article-type
 This should be one of @code{mbox}, @code{babyl}, @code{digest},
 @code{news}, @code{rnews}, @code{mmdf}, @code{forward}, @code{rfc934},
-@code{rfc822-forward}, @code{mime-digest}, @code{standard-digest},
-@code{slack-digest}, @code{clari-briefs} or @code{guess}.
+@code{rfc822-forward}, @code{mime-parts}, @code{mime-digest},
+@code{standard-digest}, @code{slack-digest}, @code{clari-briefs} or
+@code{guess}.
 
 @item nndoc-post-type
 @vindex nndoc-post-type
@@ -10972,7 +11071,7 @@ group as read.
 
 If the search engine changes its output substantially, @code{nnweb}
 won't be able to parse it and will fail.  One could hardly fault the Web
-providers if they were to do this---their @emph{raison d'$BsU(Bre} is to
+providers if they were to do this---their @emph{raison d',Aj(Btre} is to
 make money off of advertisements, not to provide services to the
 community.  Since @code{nnweb} washes the ads off all the articles, one
 might think that the providers might be somewhat miffed.  We'll see.
@@ -11121,6 +11220,7 @@ groups.
 @subsection Virtual Groups
 @cindex nnvirtual
 @cindex virtual groups
+@cindex merging groups
 
 An @dfn{nnvirtual group} is really nothing more than a collection of
 other groups.
@@ -11154,7 +11254,7 @@ If you would like to read @samp{soc.motss} both from a server in Japan
 and a server in Norway, you could use the following as the group regexp:
 
 @example
-"^nntp\\+some\\.server\\.jp:soc\\.motss$\\|^nntp\\+some\\.server\\.no:soc\\.motss$"
+"^nntp\\+server\\.jp:soc\\.motss$\\|^nntp\\+server\\.no:soc\\.motss$"
 @end example
 
 (Remember, though, that if you're creating the group with @kbd{G m}, you
@@ -11182,6 +11282,18 @@ effect if you have two virtual groups that have a component group in
 common.  If that's the case, you should set this variable to @code{t}.
 Or you can just tap @code{M-g} on the virtual group every time before
 you enter it---it'll have much the same effect.
+
+@code{nnvirtual} can have both mail and news groups as component groups.
+When responding to articles in @code{nnvirtual} groups, @code{nnvirtual}
+has to ask the backend of the component group the article comes from
+whether it is a news or mail backend.  However, when you do a @kbd{^},
+there is typically no sure way for the component backend to know this,
+and in that case @code{nnvirtual} tells Gnus that the article came from a
+not-news backend.  (Just to be on the safe side.)
+
+@kbd{C-c C-t} in the message buffer will insert the @code{Newsgroups}
+line from the article you respond to in these cases.
+
 
 
 @node Kibozed Groups
@@ -11540,7 +11652,7 @@ Hook run in category buffers.
 @item gnus-category-line-format
 @vindex gnus-category-line-format
 Format of the lines in the category buffer (@pxref{Formatting
-Variables}).  Legal elements are:
+Variables}).  Valid elements are:
 
 @table @samp
 @item c
@@ -11624,7 +11736,7 @@ Fetch all eligible articles in all groups
 @kindex J S (Agent Group)
 @findex gnus-group-send-drafts
 Send all sendable messages in the draft group
-(@code{gnus-agent-fetch-session}).  @xref{Drafts}
+(@code{gnus-agent-send-draft}).  @xref{Drafts}
 
 @item J a
 @kindex J a (Agent Group)
@@ -11650,7 +11762,7 @@ Mark the article for downloading (@code{gnus-agent-mark-article}).
 Remove the downloading mark from the article
 (@code{gnus-agent-unmark-article}).
 
-@item @@
+@item @@ 
 @kindex @@ (Agent Summary)
 @findex gnus-agent-toggle-mark
 Toggle whether to download the article (@code{gnus-agent-toggle-mark}).
@@ -11685,16 +11797,16 @@ Agent (@code{gnus-agent-remove-server}).
 @node Agent Expiry
 @subsection Agent Expiry
 
-@vindex gnus-agent-expiry-days
-@findex gnus-agent-expiry
-@kindex M-x gnus-agent-expiry
-@cindex Agent expiry
-@cindex Gnus Agent expiry
+@vindex gnus-agent-expire-days
+@findex gnus-agent-expire
+@kindex M-x gnus-agent-expire
+@cindex Agent expire
+@cindex Gnus Agent expire
 @cindex expiry
 
 @code{nnagent} doesn't handle expiry.  Instead, there's a special
-@code{gnus-agent-expiry} command that will expire all read articles that
-are older than @code{gnus-agent-expiry-days} days.  It can be run
+@code{gnus-agent-expire} command that will expire all read articles that
+are older than @code{gnus-agent-expire-days} days.  It can be run
 whenever you feel that you're running out of space.  It's not
 particularly fast or efficient, and it's not a particularly good idea to
 interrupt it (with @kbd{C-g} or anything else) once you've started it.
@@ -11974,8 +12086,8 @@ Score on the subject line.
 @item x
 Score on the Xref line---i.e., the cross-posting line.
 
-@item t
-Score on thread---the References line.
+@item r
+Score on the References line.
 
 @item d
 Score on the date.
@@ -11994,6 +12106,10 @@ Score on the body.
 
 @item h
 Score on the head.
+
+@item t
+Score on thread.
+
 @end table
 
 @item
@@ -12786,12 +12902,22 @@ So, if you want to use just a single score file, you could say:
 If you want to use @file{gnu.SCORE} for all @samp{gnu} groups and
 @file{rec.SCORE} for all @samp{rec} groups (and so on), you can say:
 
+@findex gnus-hierarchial-home-score-file
 @lisp
 (setq gnus-home-score-file
       'gnus-hierarchial-home-score-file)
 @end lisp
 
 This is a ready-made function provided for your convenience.
+Other functions include
+
+@table @code
+@item gnus-current-home-score-file
+@findex gnus-current-home-score-file
+Return the ``current'' regular score file.  This will make scoring
+commands add entry to the ``innermost'' matching score file.
+
+@end table
 
 If you want to have one score file for the @samp{emacs} groups and
 another for the @samp{comp} groups, while letting all other groups use
@@ -13369,7 +13495,7 @@ then this operator will return @code{false}.
 
 @item !
 @itemx not
-@itemx (I,(B
+@itemx ,A,(B
 This logical operator only takes a single argument.  It returns the
 logical negation of the value of its argument.
 
@@ -13499,18 +13625,20 @@ use them in any sensible way.
 
 @vindex gnus-decay-scores
 @findex gnus-decay-score
-@vindex gnus-score-decay-function
+@vindex gnus-decay-score-function
 Gnus provides a mechanism for decaying scores to help with this problem.
 When score files are loaded and @code{gnus-decay-scores} is
 non-@code{nil}, Gnus will run the score files through the decaying
 mechanism thereby lowering the scores of all non-permanent score rules.
-The decay itself if performed by the @code{gnus-score-decay-function}
+The decay itself if performed by the @code{gnus-decay-score-function}
 function, which is @code{gnus-decay-score} by default.  Here's the
 definition of that function:
 
 @lisp
 (defun gnus-decay-score (score)
-  "Decay SCORE according to `gnus-score-decay-constant' and `gnus-score-decay-scale'."
+  "Decay SCORE.
+This is done according to `gnus-score-decay-constant'
+and `gnus-score-decay-scale'."
   (floor
    (- score
       (* (if (< score 0) 1 -1)
@@ -14729,12 +14857,12 @@ in either monochrome @code{XBM} format or color @code{XPM} and
 @vindex gnus-picons-piconsearch-url
 If you have a permanent connection to the Internet you can use Steve
 Kinzler's Picons Search engine by setting
-@code{gnus-picons-piconsearch-url} to the string
+@code{gnus-picons-piconsearch-url} to the string @*
 @file{http://www.cs.indiana.edu/picons/search.html}.
 
 @vindex gnus-picons-database
 Otherwise you need a local copy of his database.  For instructions on
-obtaining and installing the picons databases, point your Web browser at
+obtaining and installing the picons databases, point your Web browser at @*
 @file{http://www.cs.indiana.edu/picons/ftp/index.html}.  Gnus expects
 picons to be installed into a location pointed to by
 @code{gnus-picons-database}.
@@ -14766,8 +14894,10 @@ To enable displaying picons, simply put the following line in your
 
 @lisp
 (setq gnus-use-picons t)
-(add-hook 'gnus-article-display-hook 'gnus-article-display-picons t)
-(add-hook 'gnus-article-display-hook 'gnus-picons-article-display-x-face)
+(add-hook 'gnus-article-display-hook
+          'gnus-article-display-picons t)
+(add-hook 'gnus-article-display-hook
+          'gnus-picons-article-display-x-face)
 @end lisp
 
 and make sure @code{gnus-picons-database} points to the directory
@@ -14776,7 +14906,8 @@ containing the Picons databases.
 Alternatively if you want to use the web piconsearch engine add this:
 
 @lisp
-(setq gnus-picons-piconsearch-url "http://www.cs.indiana.edu:800/piconsearch")
+(setq gnus-picons-piconsearch-url
+      "http://www.cs.indiana.edu:800/piconsearch")
 @end lisp
 
 
@@ -15072,7 +15203,7 @@ foreground and background color of the splash page glyph.
 @item gnus-xmas-logo-color-style
 @vindex gnus-xmas-logo-color-style
 This is the key used to look up the color in the alist described above.
-Legal values include @code{flame}, @code{pine}, @code{moss},
+Valid values include @code{flame}, @code{pine}, @code{moss},
 @code{irish}, @code{sky}, @code{tin}, @code{velvet}, @code{grape},
 @code{labia}, @code{berry}, @code{neutral}, and @code{september}.
 
@@ -15192,7 +15323,7 @@ each unsolicited commercial email---at your leisure.
 
 If you are also a lazy net citizen, you will probably prefer complaining
 automatically with the @file{gnus-junk.el} package, available FOR FREE
-at @file{<URL:http://stud2.tuwien.ac.at/~e9426626/gnus-junk.html>}.
+at @* @file{<URL:http://stud2.tuwien.ac.at/~e9426626/gnus-junk.html>}.
 Since most e-mail spam is sent automatically, this may reconcile the
 cosmic balance somewhat.
 
@@ -15376,7 +15507,10 @@ In May 1996 the next Gnus generation (aka. ``September Gnus'' (after 99
 releases)) was released under the name ``Gnus 5.2'' (40 releases).
 
 On July 28th 1996 work on Red Gnus was begun, and it was released on
-January 25th 1997 (after 84 releases) as ``Gnus 5.4''.
+January 25th 1997 (after 84 releases) as ``Gnus 5.4'' (67 releases).
+
+On September 13th 1997, Quassia Gnus was started and lasted 37
+releases.  If was released as ``Gnus 5.6 on March 8th 1998.
 
 If you happen upon a version of Gnus that has a prefixed name --
 ``(ding) Gnus'', ``September Gnus'', ``Red Gnus'', ``Quassia Gnus'' --
@@ -15652,7 +15786,7 @@ David Moore---rewrite of @file{nnvirtual.el} and many other things.
 Kevin Davidson---came up with the name @dfn{ding}, so blame him.
 
 @item
-Fran$BmP(Bis Pinard---many, many interesting and thorough bug reports, as
+Fran,Ag(Bois Pinard---many, many interesting and thorough bug reports, as
 well as autoconf support.
 
 @end itemize
@@ -15665,7 +15799,7 @@ The following people have contributed many patches and suggestions:
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
-David K$BiH(Bedal,
+David K,Ae(Bgedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
@@ -15697,6 +15831,7 @@ Joao Cachopo,
 Zlatko Calusic,
 Massimo Campostrini,
 Castor,
+David Charlap,
 Dan Christensen,
 Kevin Christian,
 Michael R. Cook,
@@ -15735,7 +15870,7 @@ Marc Horowitz,
 Gunnar Horrigmo,
 Richard Hoskins,
 Brad Howes,
-Fran$BmP(Bis Felix Ingrand,
+Fran,Ag(Bois Felix Ingrand,
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
 Iwamuro Motonori, @c Iwamuro
@@ -15743,13 +15878,16 @@ Rajappa Iyer,
 Andreas Jaeger,
 Randell Jesup,
 Fred Johansen,
+Gareth Jones,
 Simon Josefsson,
 Greg Klanderman,
 Karl Kleinpaste,
 Peter Skov Knudsen,
 Shuhei Kobayashi, @c Kobayashi
+Koseki Yoshinori, @c Koseki
 Thor Kristoffersen,
 Jens Lautenbacher,
+Martin Larose,
 Seokchan Lee, @c Lee
 Carsten Leonhardt,
 James LewisMoss,
@@ -15781,7 +15919,9 @@ William Perry,
 Stephen Peters,
 Jens-Ulrik Holger Petersen,
 Ulrich Pfeifer,
+Matt Pharr,
 John McClary Prevost,
+Bill Pringlemeir,
 Mike Pullen,
 Jim Radford,
 Colin Rafferty,
@@ -15820,6 +15960,7 @@ Teddy,
 Chuck Thompson,
 Philippe Troin,
 James Troup,
+Trung Tran-Duc,
 Aaron M. Ucko,
 Aki Vehtari,
 Didier Verna,
@@ -15852,7 +15993,7 @@ actually are people who are using Gnus.  Who'd'a thunk it!
 * ding Gnus::          New things in Gnus 5.0/5.1, the first new Gnus.
 * September Gnus::     The Thing Formally Known As Gnus 5.3/5.3.
 * Red Gnus::           Third time best---Gnus 5.4/5.5.
-* Quassia Gnus::       Two times two is four, or Gnus 5.6.22.
+* Quassia Gnus::       Two times two is four, or Gnus 5.6/5.7.
 @end menu
 
 These lists are, of course, just @emph{short} overviews of the
@@ -16378,7 +16519,8 @@ mail before saving the mail (@pxref{Washing Mail}).
 Emphasized text can be properly fontisized:
 
 @lisp
-(add-hook 'gnus-article-display-hook 'gnus-article-emphasize)
+(add-hook 'gnus-article-display-hook
+          'gnus-article-emphasize)
 @end lisp
 
 @end itemize
@@ -16387,7 +16529,7 @@ Emphasized text can be properly fontisized:
 @node Quassia Gnus
 @subsubsection Quassia Gnus
 
-New features in Gnus 5.6.22:
+New features in Gnus 5.6:
 
 @itemize @bullet
 
@@ -16612,8 +16754,6 @@ stuff just skips past them.  Read articles are the same.
 articles aren't displayed.
 @item
  nndoc should always allocate unique Message-IDs.
-@item
- implement gnus-score-thread
 @item
  If there are mail groups the first time you use Gnus, Gnus'll
 make the mail groups killed.
@@ -17134,7 +17274,7 @@ you could also try to read the archive for that group.  Part of the
 problem is that archives are spread all over the net, unlike FAQs.
 What would be best I suppose is to find the one closest to your site.
 
-In any case, there is a list of general news group archives at
+In any case, there is a list of general news group archives at @*
 ftp://ftp.neosoft.com/pub/users/claird/news.lists/newsgroup_archives.html
 
 
@@ -17155,8 +17295,8 @@ From: Jason L Tibbitts III <tibbs@@hpc.uh.edu>
 @end example
 
 @item
- tanken var at n$BiS(B du bruker `gnus-startup-file' som prefix (FOO) til íÈÅlete
-opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den v$BkS(Be en
+ tanken var at n,Ae(Br du bruker `gnus-startup-file' som prefix (FOO) til ilete
+opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den v,Af(Bre en
 liste hvor du bruker hvert element i listen som FOO, istedet.  da kunne man
 hatt forskjellige serveres startup-filer forskjellige steder.
 
@@ -17229,8 +17369,8 @@ there was a sci.somethingelse group or section, then it should prompt
 for sci? first the sci.something? then sci.somethingelse?...
 
 @item
-Ja, det burde v$BkS(Be en m$BiU(Be íÈÅsi slikt.  Kanskje en ny variabel?
-`gnus-use-few-score-files'?  SíÈÅkunne score-regler legges til den
+Ja, det burde v,Af(Bre en m,Ae(Bte ,Ae(B si slikt.  Kanskje en ny variabel?
+`gnus-use-few-score-files'?  S,Ae(B kunne score-regler legges til den
 "mest" lokale score-fila.  F. eks. ville no-gruppene betjenes av
 "no.all.SCORE", osv.
 
@@ -17541,9 +17681,6 @@ Mac, MS (etc) characters into ISO 8859-1.
 numbers and match on the age of the article.
 
 @item
- gnus-cacheable-groups
-
-@item
 @example
 >  > > If so, I've got one gripe: It seems that when I fire up gnus 5.2.25
 >  > > under xemacs-19.14, it's creating a new frame, but is erasing the
@@ -17563,7 +17700,7 @@ the current process mark set onto the stack.
 
 @item
  gnus-article-hide-pgp
-Selv ville jeg nok ha valgt íÈÅslette den dersom teksten matcher
+Selv ville jeg nok ha valgt islette den dersom teksten matcher
 @example
 "\\(This\s+\\)?[^ ]+ has been automatically signed by"
 @end example
@@ -17698,6 +17835,28 @@ topics for displaying.
 @item
 `n' in the group buffer with topics should go to the next group
 with unread articles, even if that group is hidden in a topic.
+
+@item
+gnus-posting-styles doesn't work in drafts.
+
+@item
+gnus-summary-limit-include-cached is slow when there are
+many articles in the cache, since it regenerates big parts of the
+summary buffer for each article.
+
+@item
+Implement gnus-batch-brew-soup.
+
+@item
+Group parameters and summary commands for un/subscribing to mailing
+lists. 
+
+@item
+Introduce nnmail-home-directory.
+
+@item
+gnus-fetch-group and friends should exit Gnus when the user
+exits the group.
 
 @item
 Solve the halting problem.
@@ -18025,7 +18184,8 @@ useful data is in the summary buffer, anyway.  Set this variable to
 Set this hook to all the available hiding commands:
 @lisp
 (setq gnus-article-display-hook
-      '(gnus-article-hide-headers gnus-article-hide-signature
+      '(gnus-article-hide-headers
+        gnus-article-hide-signature
         gnus-article-hide-citation))
 @end lisp
 
@@ -18227,6 +18387,19 @@ Takes an unprefixed group name and a select method, and returns the full
 @item gnus-get-info
 @findex gnus-get-info
 Returns the group info list for @var{group}.
+
+@item gnus-group-unread
+@findex gnus-group-unread
+The number of unread articles in @var{group}, or @code{t} if that is
+unknown.
+
+@item gnus-active
+@findex gnus-active
+The active entry for @var{group}.
+
+@item gnus-set-active
+@findex gnus-set-active
+Set the active entry for @var{group}.
 
 @item gnus-add-current-to-buffer-list
 @findex gnus-add-current-to-buffer-list

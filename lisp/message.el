@@ -243,6 +243,12 @@ any confusion."
   :group 'message-interface
   :type 'regexp)
 
+(defcustom message-supersede-setup-function
+  'message-supersede-setup-for-mime-edit
+  "Function to setup a supersede message."
+  :group 'message-sending
+  :type 'function)
+
 (defcustom message-subject-re-regexp "^[ \t]*\\([Rr][Ee]:[ \t]*\\)*[ \t]*"
   "*Regexp matching \"Re: \" in the subject line."
   :group 'message-various
@@ -491,6 +497,12 @@ the signature is inserted."
 (defcustom message-bounce-setup-hook nil
   "Normal hook, run each time a a re-sending bounced message is initialized.
 The function `message-bounce' runs this hook."
+  :group 'message-various
+  :type 'hook)
+
+(defcustom message-supersede-setup-hook nil
+  "Normal hook, run each time a supersede message is initialized.
+The function `message-supersede' runs this hook."
   :group 'message-various
   :type 'hook)
 
@@ -3933,6 +3945,10 @@ responses here are directed to other newsgroups."))
 	    (message "Canceling your article...done"))
 	(kill-buffer buf)))))
 
+(defun message-supersede-setup-for-mime-edit ()
+  (set (make-local-variable 'message-setup-hook) nil)
+  (mime-edit-again))
+
 ;;;###autoload
 (defun message-supersede ()
   "Start composing a message to supersede the current message.
@@ -3966,7 +3982,11 @@ header line with the old Message-ID."
     (goto-char (point-max))
     (insert mail-header-separator)
     (widen)
-    (forward-line 1)))
+    (when message-supersede-setup-function
+      (funcall message-supersede-setup-function))
+    (run-hooks 'message-supersede-setup-hook)
+    (goto-char (point-min))
+    (search-forward (concat "\n" mail-header-separator "\n") nil t)))
 
 ;;;###autoload
 (defun message-recover ()
@@ -4151,9 +4171,6 @@ Optional NEWS will use news to forward instead of mail."
     (message "Resending message to %s...done" address)))
 
 (defun message-bounce-setup-for-mime-edit ()
-  (goto-char (point-min))
-  (when (search-forward (concat "\n" mail-header-separator "\n") nil t)
-    (replace-match "\n\n"))
   (set (make-local-variable 'message-setup-hook) nil)
   (mime-edit-again))
 
