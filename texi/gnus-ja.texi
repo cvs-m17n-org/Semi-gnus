@@ -2608,10 +2608,12 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B%U%!%$%k$J$I$r$b$H$K%0%k!<%W$r:n@.$7$^(B
 $B$9(B (@code{gnus-group-make-doc-group})$B!#$3$N%3%^%s%I$K@\F,<-$rM?$($?>l9g!"(B
 $B%U%!%$%kL>$H%U%!%$%k%?%$%W$r%W%m%s%W%H$GF~NO$7$^$9!#8=:_%5%]!<%H$5$l$F$$(B
-$B$k%U%!%$%k%?%$%W$O!"(B
-@code{babyl}, @code{mbox}, @code{digest}, @code{mmdf}, @code{news}, @code{rnews}, @code{clari-briefs}, @code{rfc934}, @code{rfc822-forward}, @code{nsmail}, @code{forward} $B$G(B
-$B$9!#@\F,<-$J$7$G$3$N%3%^%s%I$r<B9T$9$k$H!"(Bgnus $B$O%U%!%$%k%?%$%W$r?dB,$7(B
-$B$^$9!#(B
+$B$k%U%!%$%k%?%$%W$O(B @code{mbox}, @code{babyl}, @code{digest}, @code{news},
+@code{rnews}, @code{mmdf}, @code{forward}, @code{rfc934},
+@code{rfc822-forward}, @code{mime-parts}, @code{standard-digest},
+@code{slack-digest}, @code{clari-briefs}, @code{nsmail}, @code{outlook},
+@code{oe-dbx} $B$*$h$S(B @code{mailman} $B$G$9!#@\F,<-$J$7$G$3$N%3%^%s%I$r<B9T(B
+$B$9$k$H!"(Bgnus $B$O%U%!%$%k%?%$%W$r?dB,$7$^$9!#(B
 @xref{Document Groups}$B!#(B
 
 @item G u
@@ -14168,8 +14170,12 @@ MIME $BB>ItJ,%a%C%;!<%8(B (multipart) $B$G$9!#(B
 @table @code
 @item nndoc-article-type
 @vindex nndoc-article-type
-$B$3$l$O(B @code{mbox}, @code{babyl}, @code{digest}, @code{news}, @code{rnews}, @code{mmdf}, @code{forward}, @code{rfc934}, @code{rfc822-forward}, @code{mime-digest}, @code{standard-digest}, @code{slack-digest}, @code{clari-briefs}, @code{guess} $B$N(B
-$B$$$:$l$+$G$J$/$F$O$J$j$^$;$s!#(B
+$B$3$l$O(B @code{mbox}, @code{babyl}, @code{digest}, @code{news},
+@code{rnews}, @code{mmdf}, @code{forward}, @code{rfc934},
+@code{rfc822-forward}, @code{mime-parts}, @code{standard-digest},
+@code{slack-digest}, @code{clari-briefs}, @code{nsmail}, @code{outlook},
+@code{oe-dbx} $B$*$h$S(B @code{mailman} $B$^$?$O(B @code{guess} $B$N$$$:$l$+$G$J$/(B
+$B$F$O$J$j$^$;$s!#(B
 
 @item nndoc-post-type
 @vindex nndoc-post-type

@@ -1,5 +1,5 @@
 ;;; imap.el --- imap library
-;; Copyright (C) 1998, 1999, 2000
+;; Copyright (C) 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <jas@pdc.kth.se>
@@ -218,14 +218,33 @@ until a successful connection is made."
   :group 'imap
   :type 'boolean)
 
-(defvar imap-shell-host "gateway"
-  "Hostname of rlogin proxy.")
+(defcustom imap-use-utf7 t
+  "If non-nil, do utf7 encoding/decoding of mailbox names.
+Since the UTF7 decoding currently only decodes into ISO-8859-1
+characters, you may disable this decoding if you need to access UTF7
+encoded mailboxes which doesn't translate into ISO-8859-1."
+  :group 'imap
+  :type 'boolean)
 
-(defvar imap-default-user (user-login-name)
-  "Default username to use.")
+(defcustom imap-log nil
+  "If non-nil, a imap session trace is placed in *imap-log* buffer."
+  :group 'imap
+  :type 'boolean)
 
-(defvar imap-error nil
-  "Error codes from the last command.")
+(defcustom imap-debug nil
+  "If non-nil, random debug spews are placed in *imap-debug* buffer."
+  :group 'imap
+  :type 'boolean)
+
+(defcustom imap-shell-host "gateway"
+  "Hostname of rlogin proxy."
+  :group 'imap
+  :type 'string)
+
+(defcustom imap-default-user (user-login-name)
+  "Default username to use."
+  :group 'imap
+  :type 'string)
 
 ;; Various variables.
 
@@ -273,11 +292,8 @@ NAME names the authenticator.  CHECK is a function returning non-nil if
 the server support the authenticator and AUTHENTICATE is a function
 for doing the actuall authentification.")
 
-(defvar imap-use-utf7 t
-  "If non-nil, do utf7 encoding/decoding of mailbox names.
-Since the UTF7 decoding currently only decodes into ISO-8859-1
-characters, you may disable this decoding if you need to access UTF7
-encoded mailboxes which doesn't translate into ISO-8859-1.")
+(defvar imap-error nil
+  "Error codes from the last command.")
 
 ;; Internal constants.  Change theese and die.
 
@@ -304,6 +320,8 @@ encoded mailboxes which doesn't translate into ISO-8859-1.")
 				 imap-process
 				 imap-calculate-literal-size-first
 				 imap-mailbox-data))
+(defconst imap-log-buffer "*imap-log*")
+(defconst imap-debug-buffer "*imap-debug*")
 
 ;; Internal variables.
 
@@ -370,14 +388,6 @@ human readable response text (a string).")
 (defvar imap-continuation nil
   "Non-nil indicates that the server emitted a continuation request.
 The actually value is really the text on the continuation line.")
-
-(defvar imap-log nil
-  "Name of buffer for imap session trace.
-For example: (setq imap-log \"*imap-log*\")")
-
-(defvar imap-debug nil			;"*imap-debug*"
-  "Name of buffer for random debug spew.
-For example: (setq imap-debug \"*imap-debug*\")")
 
 
 ;; Utility functions:
@@ -480,7 +490,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	      (accept-process-output process 1)
 	      (sit-for 1))
 	    (and imap-log
-		 (with-current-buffer (get-buffer-create imap-log)
+		 (with-current-buffer (get-buffer-create imap-log-buffer)
 		   (buffer-disable-undo)
 		   (goto-char (point-max))
 		   (insert-buffer-substring buffer)))
@@ -539,7 +549,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	      (accept-process-output process 1)
 	      (sit-for 1))
 	    (and imap-log
-		 (with-current-buffer (get-buffer-create imap-log)
+		 (with-current-buffer (get-buffer-create imap-log-buffer)
 		   (buffer-disable-undo)
 		   (goto-char (point-max))
 		   (insert-buffer-substring buffer)))
@@ -595,7 +605,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	      (accept-process-output process 1)
 	      (sit-for 1))
 	    (and imap-log
-		 (with-current-buffer (get-buffer-create imap-log)
+		 (with-current-buffer (get-buffer-create imap-log-buffer)
 		   (buffer-disable-undo)
 		   (goto-char (point-max))
 		   (insert-buffer-substring buffer)))
@@ -623,7 +633,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(accept-process-output process 1)
 	(sit-for 1))
       (and imap-log
-	   (with-current-buffer (get-buffer-create imap-log)
+	   (with-current-buffer (get-buffer-create imap-log-buffer)
 	     (buffer-disable-undo)
 	     (goto-char (point-max))
 	     (insert-buffer-substring buffer)))
@@ -658,7 +668,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	    (accept-process-output process 1)
 	    (sit-for 1))
 	  (and imap-log
-	       (with-current-buffer (get-buffer-create imap-log)
+	       (with-current-buffer (get-buffer-create imap-log-buffer)
 		 (buffer-disable-undo)
 		 (goto-char (point-max))
 		 (insert-buffer-substring buffer)))
@@ -694,7 +704,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(accept-process-output process 1)
 	(sit-for 1))
       (and imap-log
-	   (with-current-buffer (get-buffer-create imap-log)
+	   (with-current-buffer (get-buffer-create imap-log-buffer)
 	     (buffer-disable-undo)
 	     (goto-char (point-max))
 	     (insert-buffer-substring buffer)))
@@ -1553,7 +1563,7 @@ on failure."
 (defun imap-send-command-1 (cmdstr)
   (setq cmdstr (concat cmdstr imap-client-eol))
   (and imap-log
-       (with-current-buffer (get-buffer-create imap-log)
+       (with-current-buffer (get-buffer-create imap-log-buffer)
 	 (buffer-disable-undo)
 	 (goto-char (point-max))
 	 (insert cmdstr)))
@@ -1596,7 +1606,7 @@ on failure."
 			 (with-current-buffer cmd
 			   (and imap-log
 				(with-current-buffer (get-buffer-create
-						      imap-log)
+						      imap-log-buffer)
 				  (buffer-disable-undo)
 				  (goto-char (point-max))
 				  (insert-buffer-substring cmd)))
@@ -1658,7 +1668,7 @@ Return nil if no complete line has arrived."
     (goto-char (point-max))
     (insert string)
     (and imap-log
-	 (with-current-buffer (get-buffer-create imap-log)
+	 (with-current-buffer (get-buffer-create imap-log-buffer)
 	   (buffer-disable-undo)
 	   (goto-char (point-max))
 	   (insert string)))
@@ -2534,8 +2544,8 @@ Return nil if no complete line has arrived."
 
 (when imap-debug			; (untrace-all)
   (require 'trace)
-  (buffer-disable-undo (get-buffer-create imap-debug))
-  (mapcar (lambda (f) (trace-function-background f imap-debug))
+  (buffer-disable-undo (get-buffer-create imap-debug-buffer))
+  (mapcar (lambda (f) (trace-function-background f imap-debug-buffer))
 	  '(
 	    imap-read-passwd
 	    imap-utf7-encode
