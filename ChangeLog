@@ -1,3 +1,29 @@
+2002-04-20  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-delay.el (gnus-delay-article): Undo the last change.
+
+	* lisp/gnus-draft.el: Revert to the original implementation.
+	(gnus-draft-edit-message): Pass restore as the 3rd argument of
+	gnus-draft-setup; call save-buffer instead of message-save-drafts.
+	(gnus-draft-setup): Rename from gnus-draft-setup-for-editing.
+	(gnus-draft-setup-for-sending): Abolish.
+
+	* lisp/gnus-i18n.el (gnus-newsgroup-default-charset-alist): Don't
+	decode headers of articles stored in nndraft:drafts.
+
+	* lisp/nnheader.el (nnheader-auto-save-coding-system): New variable.
+
+	* lisp/message.el (message-draft-coding-system): Delegate the
+	value to nnheader-auto-save-coding-system.
+	(message-mode-map): Don't bind message-save-drafts.
+	(message-dont-send): Use save-buffer instead of message-save-buffer.
+	(message-save-drafts): Abolish.
+
+	* lisp/nndraft.el (nndraft-request-article): Revert to the
+	original implementation.
+
 2002-04-18   Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/gnus-draft.el (gnus-group-send-queue): Pass group and
