@@ -1397,7 +1397,7 @@ downloaded into the agent."
         (nnheader-translate-file-chars
          (nnheader-replace-duplicate-chars-in-string
           (nnheader-replace-chars-in-string 
-           (gnus-group-real-name group)
+           (gnus-group-real-name (gnus-group-decoded-name group))
            ?/ ?_)
           ?. ?_)))
   (if (or nnmail-use-long-file-names
@@ -1414,7 +1414,9 @@ downloaded into the agent."
   ;; while plugged.
   (let ((gnus-command-method (or gnus-command-method
                                  (gnus-find-method-for-group group))))
-    (nnmail-group-pathname (gnus-group-real-name group) (gnus-agent-directory))))
+    (nnmail-group-pathname (gnus-group-real-name
+			    (gnus-group-decoded-name group))
+			   (gnus-agent-directory))))
 
 (defun gnus-agent-get-function (method)
   (if (gnus-online method)
