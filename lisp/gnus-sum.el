@@ -1,5 +1,5 @@
 ;;; gnus-sum.el --- summary mode commands for Semi-gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -246,6 +246,7 @@ simplification is selected."
 
 (defcustom gnus-thread-hide-subtree nil
   "*If non-nil, hide all threads initially.
+This can be a predicate specifier which says which threads to hide.
 If threads are hidden, you have to run the command
 `gnus-summary-show-thread' by hand or use `gnus-select-article-hook'
 to expose hidden threads."
@@ -306,13 +307,16 @@ This variable can either be the symbols `first' (place point on the
 first subject), `unread' (place point on the subject line of the first
 unread article), `best' (place point on the subject line of the
 higest-scored article), `unseen' (place point on the subject line of
-the first unseen article), or a function to be called to place point on
-some subject line.."
+the first unseen article), 'unseen-or-unread' (place point on the subject
+line of the first unseen article or, if all article have been seen, on the
+subject line of the first unread article), or a function to be called to
+place point on some subject line.."
   :group 'gnus-group-select
   :type '(choice (const best)
 		 (const unread)
 		 (const first)
-		 (const unseen)))
+		 (const unseen)
+	         (const unseen-or-unread)))
 
 (defcustom gnus-dont-select-after-jump-to-other-group nil
   "If non-nil, don't select the first unread article after entering the
@@ -597,7 +601,11 @@ list of parameters to that command."
 It works along the same lines as a normal formatting string,
 with some simple extensions.
 
-%S  The subject"
+%S  The subject
+
+General format specifiers can also be used.
+See (gnus)Formatting Variables."
+  :link '(custom-manual "(gnus)Formatting Variables")
   :group 'gnus-threading
   :type 'string)
 
@@ -682,7 +690,9 @@ was sent, sorting by number means sorting by arrival time.)
 
 Ready-made functions include `gnus-thread-sort-by-number',
 `gnus-thread-sort-by-author', `gnus-thread-sort-by-subject',
-`gnus-thread-sort-by-date', `gnus-thread-sort-by-score' and
+`gnus-thread-sort-by-date', `gnus-thread-sort-by-score',
+`gnus-thread-sort-by-most-recent-number',
+`gnus-thread-sort-by-most-recent-date', and
 `gnus-thread-sort-by-total-score' (see `gnus-thread-score-function').
 
 When threading is turned off, the variable
@@ -774,15 +784,14 @@ If you'd like to simplify subjects like the
 `gnus-summary-next-same-subject' command does, you can use the
 following hook:
 
- (setq gnus-select-group-hook
-      (list
-	(lambda ()
-	  (mapcar (lambda (header)
-		     (mail-header-set-subject
-		      header
-		      (gnus-simplify-subject
-		       (mail-header-subject header) 're-only)))
-		  gnus-newsgroup-headers))))"
+ (add-hook gnus-select-group-hook
+	   (lambda ()
+	     (mapcar (lambda (header)
+		       (mail-header-set-subject
+			header
+			(gnus-simplify-subject
+			 (mail-header-subject header) 're-only)))
+		     gnus-newsgroup-headers)))"
   :group 'gnus-group-select
   :type 'hook)
 
@@ -922,7 +931,7 @@ which it may alter in any way.")
   (mime-find-field-decoder 'From 'nov)
   "Variable that says which function should be used to decode a string with encoded words.")
 
-(defcustom gnus-extra-headers nil
+(defcustom gnus-extra-headers '(To Newsgroups)
   "*Extra headers to parse."
   :version "21.1"
   :group 'gnus-summary
@@ -1741,9 +1750,7 @@ increase the score of each group you read."
     "l" gnus-summary-stop-page-breaking
     "r" gnus-summary-caesar-message
     "t" gnus-article-toggle-headers
-    "g" gnus-summary-toggle-smiley
-    "u" gnus-article-treat-unfold-headers
-    "n" gnus-article-treat-fold-newsgroups
+    "g" gnus-treat-smiley
     "v" gnus-summary-verbose-headers
     "m" gnus-summary-toggle-mime
     "a" gnus-article-strip-headers-in-body ;; mnemonic: wash archive
@@ -1769,9 +1776,15 @@ increase the score of each group you read."
     "c" gnus-article-highlight-citation
     "s" gnus-article-highlight-signature)
 
+  (gnus-define-keys (gnus-summary-wash-header-map "G" gnus-summary-wash-map)
+    "f" gnus-article-treat-fold-headers
+    "u" gnus-article-treat-unfold-headers
+    "n" gnus-article-treat-fold-newsgroups)
+
   (gnus-define-keys (gnus-summary-wash-display-map "D" gnus-summary-wash-map)
     "x" gnus-article-display-x-face
-    "s" gnus-summary-toggle-smiley
+    "s" gnus-treat-smiley
+    "D" gnus-article-remove-images
     "f" gnus-treat-from-picon
     "m" gnus-treat-mail-picon
     "n" gnus-treat-newsgroups-picon)
@@ -1905,7 +1918,8 @@ increase the score of each group you read."
 	      ["Lapsed" gnus-article-date-lapsed t]
 	      ["User-defined" gnus-article-date-user t])
 	     ("Display"
-	      ["Toggle smiley" gnus-summary-toggle-smiley t]
+	      ["Remove images" gnus-article-remove-images t]
+	      ["Toggle smiley" gnus-treat-smiley t]
 	      ["Show X-Face" gnus-article-display-x-face t]
 	      ["Show picons in From" gnus-treat-from-picon t]
 	      ["Show picons in mail headers" gnus-treat-mail-picon t]
@@ -2005,7 +2019,7 @@ increase the score of each group you read."
 	     ["Fetch article with id..." gnus-summary-refer-article t]
 	     ["Setup Mailing List Params" gnus-mailing-list-insinuate t]
 	     ["Redisplay" gnus-summary-show-article t]
-	     ["Raw article" gnus-summary-show-raw-article t])))
+	     ["Raw article" gnus-summary-show-raw-article :keys "C-u g"])))
       (easy-menu-define
        gnus-summary-article-menu gnus-summary-mode-map ""
        (cons "Article" innards))
@@ -2060,6 +2074,10 @@ increase the score of each group you read."
        ["Wide reply and yank" gnus-summary-wide-reply-with-original
 	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Mail a reply, quoting this article"))]
+       ["Very wide reply" gnus-summary-very-wide-reply t]
+       ["Very wide reply and yank" gnus-summary-very-wide-reply-with-original
+	,@(if (featurep 'xemacs) '(t)
+	    '(:help "Mail a very wide reply, quoting this article"))]
        ["Mail forward" gnus-summary-mail-forward t]
        ["Post forward" gnus-summary-post-forward t]
        ["Digest and mail" gnus-summary-digest-mail-forward t]
@@ -2810,7 +2828,12 @@ display only a single character."
 
 (defun gnus-summary-setup-buffer (group)
   "Initialize summary buffer."
-  (let ((buffer (gnus-summary-buffer-name group)))
+  (let ((buffer (gnus-summary-buffer-name group))
+	(dead-name (concat "*Dead Summary "
+			   (gnus-group-decoded-name group) "*")))
+    ;; If a dead summary buffer exists, we kill it.
+    (when (gnus-buffer-live-p dead-name)
+      (gnus-kill-buffer dead-name))
     (if (get-buffer buffer)
 	(progn
 	  (set-buffer buffer)
@@ -2970,11 +2993,12 @@ buffer that was in action when the last article was fetched."
 	    (cond
 	     ((setq to (cdr (assq 'To extra-headers)))
 	      (concat "-> "
-		      (gnus-summary-extract-address-component
-		       (funcall gnus-decode-encoded-word-function to))))
+		      (inline
+			(gnus-summary-extract-address-component
+			 (funcall gnus-decode-encoded-word-function to)))))
 	     ((setq newsgroups (cdr (assq 'Newsgroups extra-headers)))
 	      (concat "=> " newsgroups)))))
-     (gnus-summary-extract-address-component gnus-tmp-from))))
+     (inline (gnus-summary-extract-address-component gnus-tmp-from)))))
 
 (defun gnus-summary-insert-line (gnus-tmp-header
 				 gnus-tmp-level gnus-tmp-current
@@ -3287,9 +3311,7 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	;; Hide conversation thread subtrees.  We cannot do this in
 	;; gnus-summary-prepare-hook since kill processing may not
 	;; work with hidden articles.
-	(and gnus-show-threads
-	     gnus-thread-hide-subtree
-	     (gnus-summary-hide-all-threads))
+	(gnus-summary-maybe-hide-threads)
 	(when kill-buffer
 	  (gnus-kill-or-deaden-summary kill-buffer))
 	(gnus-summary-auto-select-subject)
@@ -3300,7 +3322,10 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 		 gnus-auto-select-first)
 	    (progn
 	      (gnus-configure-windows 'summary)
-	      (gnus-summary-goto-article (gnus-summary-article-number)))
+	      (let ((art (gnus-summary-article-number)))
+		(unless (or (memq art gnus-newsgroup-undownloaded)
+			    (memq art gnus-newsgroup-downloadable))
+		  (gnus-summary-goto-article art))))
 	  ;; Don't select any articles.
 	  (gnus-summary-position-point)
 	  (gnus-configure-windows 'summary 'force)
@@ -3328,6 +3353,8 @@ If SHOW-ALL is non-nil, already read articles are also listed."
     (gnus-summary-first-unread-subject))
    ((eq gnus-auto-select-subject 'unseen)
     (gnus-summary-first-unseen-subject))
+   ((eq gnus-auto-select-subject 'unseen-or-unread)
+    (gnus-summary-first-unseen-or-unread-subject))
    ((eq gnus-auto-select-subject 'first)
     ;; Do nothing.
     )
@@ -3430,7 +3457,7 @@ If SHOW-ALL is non-nil, already read articles are also listed."
     (while threads
       (when (setq references (mail-header-references (caar threads)))
 	(setq id (mail-header-id (caar threads))
-	      ids (gnus-split-references references)
+	      ids (inline (gnus-split-references references))
 	      entered nil)
 	(while (setq ref (pop ids))
 	  (setq ids (delete ref ids))
@@ -4165,15 +4192,47 @@ Unscored articles will be counted as having a score of zero."
 
 (defun gnus-thread-total-score (thread)
   ;; This function find the total score of THREAD.
-  (cond ((null thread)
-	 0)
-	((consp thread)
-	 (if (stringp (car thread))
-	     (apply gnus-thread-score-function 0
-		    (mapcar 'gnus-thread-total-score-1 (cdr thread)))
-	   (gnus-thread-total-score-1 thread)))
-	(t
-	 (gnus-thread-total-score-1 (list thread)))))
+  (cond
+   ((null thread)
+    0)
+   ((consp thread)
+    (if (stringp (car thread))
+	(apply gnus-thread-score-function 0
+	       (mapcar 'gnus-thread-total-score-1 (cdr thread)))
+      (gnus-thread-total-score-1 thread)))
+   (t
+    (gnus-thread-total-score-1 (list thread)))))
+
+(defun gnus-thread-sort-by-most-recent-number (h1 h2)
+  "Sort threads such that the thread with the most recently arrived article comes first."
+  (> (gnus-thread-highest-number h1) (gnus-thread-highest-number h2)))
+
+(defun gnus-thread-highest-number (thread)
+  "Return the highest article number in THREAD."
+  (apply 'max (mapcar (lambda (header)
+			(mail-header-number header))
+		      (message-flatten-list thread))))
+
+(defun gnus-thread-sort-by-most-recent-date (h1 h2)
+  "Sort threads such that the thread with the most recently dated article comes first."
+  (> (gnus-thread-latest-date h1) (gnus-thread-latest-date h2)))
+
+(defun gnus-thread-latest-date (thread)
+  "Return the highest article date in THREAD."
+  (let ((previous-time 0))
+    (apply 'max (mapcar
+		 (lambda (header)
+		   (setq previous-time
+			 (time-to-seconds
+			  (mail-header-parse-date
+			   (condition-case ()
+			       (mail-header-date header)
+			     (error previous-time))))))
+		 (sort
+		  (message-flatten-list thread)
+		  (lambda (h1 h2)
+		    (< (mail-header-number h1)
+		       (mail-header-number h2))))))))
 
 (defun gnus-thread-total-score-1 (root)
   ;; This function find the total score of the thread below ROOT.
@@ -4956,8 +5015,8 @@ If SELECT-ARTICLES, only select those articles from GROUP."
        ((eq mark-type 'range)
 	(cond
 	 ((eq mark 'seen)
-	  ;; T-gnus change: Fix the record for `seen' if it looks like
-	  ;; (seen NUM1 . NUM2).  It should be (seen (NUM1 . NUM2)).
+	  ;; Fix the record for `seen' if it looks like (seen NUM1 . NUM2).
+	  ;; It should be (seen (NUM1 . NUM2)).
 	  (when (numberp (cddr marks))
 	    (setcdr marks (list (cdr marks))))
 	  (setq articles (cdr marks))
@@ -6188,10 +6247,11 @@ The state which existed when entering the ephemeral is reset."
   (suppress-keymap gnus-dead-summary-mode-map)
   (substitute-key-definition
    'undefined 'gnus-summary-wake-up-the-dead gnus-dead-summary-mode-map)
-  (let ((keys '("\C-d" "\r" "\177" [delete])))
-    (while keys
-      (define-key gnus-dead-summary-mode-map
-	(pop keys) 'gnus-summary-wake-up-the-dead))))
+  (dolist (key '("\C-d" "\r" "\177" [delete]))
+    (define-key gnus-dead-summary-mode-map
+      key 'gnus-summary-wake-up-the-dead))
+  (dolist (key '("q" "Q"))
+    (define-key gnus-dead-summary-mode-map key 'bury-buffer)))
 
 (defvar gnus-dead-summary-mode nil
   "Minor mode for Gnus summary buffers.")
@@ -6237,17 +6297,20 @@ The state which existed when entering the ephemeral is reset."
 	(set-buffer buffer)
 	(gnus-kill-buffer gnus-article-buffer)
 	(gnus-kill-buffer gnus-original-article-buffer)))
-    (cond (gnus-kill-summary-on-exit
-	   (when (and gnus-use-trees
-		      (gnus-buffer-exists-p buffer))
-	     (save-excursion
-	       (set-buffer buffer)
-	       (gnus-tree-close gnus-newsgroup-name)))
-	   (gnus-kill-buffer buffer))
-	  ((gnus-buffer-exists-p buffer)
-	   (save-excursion
-	     (set-buffer buffer)
-	     (gnus-deaden-summary))))))
+    (cond
+     ;; Kill the buffer.
+     (gnus-kill-summary-on-exit
+      (when (and gnus-use-trees
+		 (gnus-buffer-exists-p buffer))
+	(save-excursion
+	  (set-buffer buffer)
+	  (gnus-tree-close gnus-newsgroup-name)))
+      (gnus-kill-buffer buffer))
+     ;; Deaden the buffer.
+     ((gnus-buffer-exists-p buffer)
+      (save-excursion
+	(set-buffer buffer)
+	(gnus-deaden-summary))))))
 
 (defun gnus-summary-wake-up-the-dead (&rest args)
   "Wake up the dead summary buffer."
@@ -6373,9 +6436,12 @@ Returns the article selected or nil if there are no unread articles."
 		      (and (not (and undownloaded
 				     (eq gnus-undownloaded-mark
 					 (gnus-data-mark (car data)))))
-			   (not (and unseen
-				     (memq (car data) gnus-newsgroup-unseen)))
-			   (not (gnus-data-unread-p (car data)))))
+			   (if unseen
+			       (or (not (memq
+					 (gnus-data-number (car data))
+					 gnus-newsgroup-unseen))
+				   (not (gnus-data-unread-p (car data))))
+			     (not (gnus-data-unread-p (car data))))))
 	    (setq data (cdr data)))
 	  (when data
 	    (goto-char (gnus-data-pos (car data)))
@@ -6425,6 +6491,8 @@ If optional argument UNREAD is non-nil, only unread article is selected."
   "Go the subject line of ARTICLE.
 If FORCE, also allow jumping to articles not currently shown."
   (interactive "nArticle number: ")
+  (unless (numberp article)
+    (error "Article %s is not a number" article))
   (let ((b (point))
 	(data (gnus-data-find article)))
     ;; We read in the article if we have to.
@@ -6466,7 +6534,8 @@ Given a prefix, will force an `article' buffer configuration."
   (when (gnus-buffer-live-p gnus-article-buffer)
     (with-current-buffer gnus-article-buffer
       (setq gnus-article-charset gnus-newsgroup-charset)
-      (setq gnus-article-ignored-charsets gnus-newsgroup-ignored-charsets)))
+      (setq gnus-article-ignored-charsets gnus-newsgroup-ignored-charsets)
+      (set-buffer-multibyte t)))
   (if (null article)
       nil
     (prog1
@@ -6519,13 +6588,14 @@ be displayed."
 	  ;; The requested article is different from the current article.
 	  (progn
 	    (gnus-summary-display-article article all-headers)
-	    (when (or all-headers gnus-show-all-headers)
-	      (gnus-article-show-all-headers))
+;;; Hidden headers are not hidden text any more.
+;;	    (when (or all-headers gnus-show-all-headers)
+;;	      (gnus-article-show-all-headers))
 	    (gnus-article-set-window-start
 	     (cdr (assq article gnus-newsgroup-bookmarks)))
 	    article)
-	(when (or all-headers gnus-show-all-headers)
-	  (gnus-article-show-all-headers))
+;;	(when (or all-headers gnus-show-all-headers)
+;;	  (gnus-article-show-all-headers))
 	'old))))
 
 (defun gnus-summary-force-verify-and-decrypt ()
@@ -6824,6 +6894,19 @@ Return nil if there are no unseen articles."
 	(gnus-summary-first-subject t t t))
     (gnus-summary-position-point)))
 
+(defun gnus-summary-first-unseen-or-unread-subject ()
+  "Place the point on the subject line of the first unseen article.
+Return nil if there are no unseen articles."
+  (interactive)
+  (prog1
+      (unless (when (gnus-summary-first-subject t t t)
+		(gnus-summary-show-thread)
+		(gnus-summary-first-subject t t t))
+	(when (gnus-summary-first-subject t)
+	  (gnus-summary-show-thread)
+	  (gnus-summary-first-subject t)))
+    (gnus-summary-position-point)))
+
 (defun gnus-summary-first-article ()
   "Select the first article.
 Return nil if there are no articles."
@@ -7035,7 +7118,7 @@ articles that are younger than AGE days."
   (interactive
    (let ((header
 	  (intern
-	   (gnus-completing-read
+	   (gnus-completing-read-with-default
 	    (symbol-name (car gnus-extra-headers))
 	    (if current-prefix-arg
 		"Exclude extra header:"
@@ -7246,9 +7329,7 @@ If ALL, mark even excluded ticked and dormants as read."
     ;; according to the new limit.
     (gnus-summary-prepare)
     ;; Hide any threads, possibly.
-    (and gnus-show-threads
-	 gnus-thread-hide-subtree
-	 (gnus-summary-hide-all-threads))
+    (gnus-summary-maybe-hide-threads)
     ;; Try to return to the article you were at, or one in the
     ;; neighborhood.
     (when data
@@ -7661,7 +7742,10 @@ to guess what the document format is."
 		(gnus-group-read-ephemeral-group
 		 name `(nndoc ,name (nndoc-address ,(get-buffer dig))
 			      (nndoc-article-type
-			       ,(if force 'mbox 'guess))) t))
+			       ,(if force 'mbox 'guess)))
+		 t nil nil nil
+		 `((adapt-file . ,(gnus-score-file-name gnus-newsgroup-name
+							"ADAPT")))))
 	      ;; Make all postings to this group go to the parent group.
 	      (nconc (gnus-info-params (gnus-get-info name))
 		     params)
@@ -8119,13 +8203,10 @@ are `C-u g'."
     (let ((gnus-newsgroup-charset
 	   (or (cdr (assq arg gnus-summary-show-article-charset-alist))
 	       (mm-read-coding-system
-		"View as charset: "
+		"View as charset: " ;; actually it is coding system.
 		(save-excursion
 		  (set-buffer gnus-article-buffer)
-		  (let ((coding-systems
-			 (detect-coding-region (point) (point-max))))
-		    (or (car-safe coding-systems)
-			coding-systems))))))
+		  (mm-detect-coding-region (point) (point-max))))))
 	  (gnus-newsgroup-ignored-charsets 'gnus-all))
       (gnus-summary-select-article nil 'force)
       (let ((deps gnus-newsgroup-dependencies)
@@ -8319,7 +8400,9 @@ ACTION can be either `move' (the default), `crosspost' or `copy'."
     ;; `gnus-read-move-group-name' an opportunity to suggest an
     ;; appropriate default.
     (unless (gnus-buffer-live-p gnus-original-article-buffer)
-      (gnus-summary-select-article nil nil nil (car articles)))
+      (let ((gnus-display-mime-function nil)
+	    (gnus-article-prepare-hook nil))
+	(gnus-summary-select-article nil nil nil (car articles))))
     ;; Read the newsgroup name.
     (when (and (not to-newsgroup)
 	       (not select-method))
@@ -8550,7 +8633,7 @@ latter case, they will be copied into the relevant groups."
 				  (car (gnus-find-method-for-group
 					gnus-newsgroup-name)))))
 		(method
-		 (gnus-completing-read
+		 (gnus-completing-read-with-default
 		  methname "What backend do you want to use when respooling?"
 		  methods nil t nil 'gnus-mail-method-history))
 		ms)
@@ -8883,13 +8966,6 @@ groups."
   (gnus-summary-edit-article)
   (execute-kbd-macro (concat (this-command-keys) key))
   (gnus-article-edit-done))
-
-(defun gnus-summary-toggle-smiley (&optional arg)
-  "Toggle the display of smilies as small graphical icons."
-  (interactive "P")
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (gnus-article-smiley-display arg)))
 
 ;;; Respooling
 
@@ -9809,18 +9885,49 @@ Returns nil if no thread was there to be shown."
       (goto-char orig)
       (gnus-summary-position-point))))
 
-(defun gnus-summary-hide-all-threads ()
-  "Hide all thread subtrees."
+(defun gnus-summary-maybe-hide-threads ()
+  "If requested, hide the threads that should be hidden."
+  (when (and gnus-show-threads
+	     gnus-thread-hide-subtree)
+    (gnus-summary-hide-all-threads
+     (if (or (consp gnus-thread-hide-subtree)
+	     (gnus-functionp gnus-thread-hide-subtree))
+	 (gnus-make-predicate gnus-thread-hide-subtree)
+       nil))))
+
+;;; Hiding predicates.
+
+(defun gnus-article-unread-p (header)
+  (memq (mail-header-number header) gnus-newsgroup-unreads))
+
+(defun gnus-article-unseen-p (header)
+  (memq (mail-header-number header) gnus-newsgroup-unseen))
+
+(defun gnus-map-articles (predicate articles)
+  "Map PREDICATE over ARTICLES and return non-nil if any predicate is non-nil."
+  (apply 'gnus-or (mapcar predicate
+			  (mapcar 'gnus-summary-article-header articles))))
+
+(defun gnus-summary-hide-all-threads (&optional predicate)
+  "Hide all thread subtrees.
+If PREDICATE is supplied, threads that satisfy this predicate
+will not be hidden."
   (interactive)
   (save-excursion
     (goto-char (point-min))
-    (gnus-summary-hide-thread)
-    (while (zerop (gnus-summary-next-thread 1 t))
-      (gnus-summary-hide-thread)))
+    (let ((end nil))
+      (while (not end)
+	(when (or (not predicate)
+		  (gnus-map-articles
+		   predicate (gnus-summary-article-children)))
+	    (gnus-summary-hide-thread))
+	(setq end (not (zerop (gnus-summary-next-thread 1 t)))))))
   (gnus-summary-position-point))
 
 (defun gnus-summary-hide-thread ()
   "Hide thread subtrees.
+If PREDICATE is supplied, threads that satisfy this predicate
+will not be hidden.
 Returns nil if no threads were there to be hidden."
   (interactive)
   (let ((buffer-read-only nil)
@@ -10016,8 +10123,7 @@ Argument REVERSE means reverse order."
     ;; We do the sorting by regenerating the threads.
     (gnus-summary-prepare)
     ;; Hide subthreads if needed.
-    (when (and gnus-show-threads gnus-thread-hide-subtree)
-      (gnus-summary-hide-all-threads))))
+    (gnus-summary-maybe-hide-threads)))
 
 (defun gnus-summary-sort (predicate reverse)
   "Sort summary buffer by PREDICATE.  REVERSE means reverse order."
@@ -10040,8 +10146,7 @@ Argument REVERSE means reverse order."
     ;; We do the sorting by regenerating the threads.
     (gnus-summary-prepare)
     ;; Hide subthreads if needed.
-    (when (and gnus-show-threads gnus-thread-hide-subtree)
-      (gnus-summary-hide-all-threads))))
+    (gnus-summary-maybe-hide-threads)))
 
 ;; Summary saving commands.
 
@@ -10233,23 +10338,26 @@ save those articles instead."
 	 (to-newsgroup
 	  (cond
 	   ((null split-name)
-	    (gnus-completing-read default prom
-				  gnus-active-hashtb
-				  'gnus-valid-move-group-p
-				  nil prefix
-				  'gnus-group-history))
+	    (gnus-completing-read-with-default
+	     default prom
+	     gnus-active-hashtb
+	     'gnus-valid-move-group-p
+	     nil prefix
+	     'gnus-group-history))
 	   ((= 1 (length split-name))
-	    (gnus-completing-read (car split-name) prom
-				  gnus-active-hashtb
-				  'gnus-valid-move-group-p
-				  nil nil
-				  'gnus-group-history))
+	    (gnus-completing-read-with-default
+	     (car split-name) prom
+	     gnus-active-hashtb
+	     'gnus-valid-move-group-p
+	     nil nil
+	     'gnus-group-history))
 	   (t
-	    (gnus-completing-read nil prom
-				  (mapcar (lambda (el) (list el))
-					  (nreverse split-name))
-				  nil nil nil
-				  'gnus-group-history))))
+	    (gnus-completing-read-with-default
+	     nil prom
+	     (mapcar (lambda (el) (list el))
+		     (nreverse split-name))
+	     nil nil nil
+	     'gnus-group-history))))
 	 (to-method (gnus-server-to-method (gnus-group-method to-newsgroup))))
     (when to-newsgroup
       (if (or (string= to-newsgroup "")
@@ -11080,7 +11188,8 @@ If ALL is a number, fetch this number of articles."
 		      (setq older (subseq older 0 all))))))))
 	(if (not older)
 	    (message "No old news.")
-	  (gnus-summary-insert-articles older)
+	  (let ((gnus-fetch-old-headers t))
+	    (gnus-summary-insert-articles older))
 	  (gnus-summary-limit (gnus-union older old))))
     (gnus-summary-position-point)))
 

@@ -1,6 +1,6 @@
 ;;; nnagent.el --- offline backend for Gnus
 
-;; Copyright (C) 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -128,6 +128,46 @@
     (append-to-file (point-min) (point-max) (gnus-agent-lib-file "flags")))
   nil)
 
+(deffoo nnagent-retrieve-headers (articles &optional group server fetch-old)
+  (let ((file (gnus-agent-article-name ".overview" group))
+	arts n)
+    (save-excursion
+      (gnus-agent-load-alist group)
+      (setq arts (gnus-set-difference articles 
+				      (mapcar 'car gnus-agent-article-alist)))
+      (set-buffer nntp-server-buffer)
+      (erase-buffer)
+      (nnheader-insert-file-contents file)
+      (goto-char (point-min)) 
+      (while (and arts (not (eobp)))
+	(cond 
+	 ((looking-at "[0-9]")
+	  (setq n (read (current-buffer)))
+	  (if (> n (car arts))
+	      (beginning-of-line))
+	  (while (and arts (> n (car arts)))
+	    (insert (format 
+		     "%d\t[Undownloaded article %d]\tGnus Agent\t\t\t\n"
+		     (car arts) (car arts)))
+	    (pop arts))
+	  (if (and arts (= n (car arts)))
+	    (pop arts))))
+	(forward-line 1))
+      (while (and arts)
+	(insert (format
+		 "%d\t[Undownloaded article %d]\tGnus Agent\t\t\t\n"
+		 (car arts) (car arts)))
+	(pop arts))
+      (if (and fetch-old
+	       (not (numberp fetch-old)))
+	  t				; Don't remove anything.
+	(nnheader-nov-delete-outside-range
+	 (if fetch-old (max 1 (- (car articles) fetch-old))
+	   (car articles))
+	 (car (last articles)))
+	t)
+      'nov)))
+
 (deffoo nnagent-request-group (group &optional server dont-check)
   (nnoo-parent-function 'nnagent 'nnml-request-group
 			(list group (nnagent-server server) dont-check)))
@@ -177,10 +217,6 @@
 (deffoo nnagent-request-scan (&optional group server)
   (nnoo-parent-function 'nnagent 'nnml-request-scan
 			(list group (nnagent-server server))))
-
-(deffoo nnagent-retrieve-headers (sequence &optional group server fetch-old)
-  (nnoo-parent-function 'nnagent 'nnml-retrieve-headers
-			(list sequence group (nnagent-server server) fetch-old)))
 
 (deffoo nnagent-set-status (article name value &optional group server)
   (nnoo-parent-function 'nnagent 'nnml-set-status

@@ -1,6 +1,7 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
-;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000, 2001, 2002 Free Software Foundation, Inc.
+
+;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996, 1997,
+;; 1998, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -143,6 +144,10 @@
   :link '(custom-manual "(gnus)Summary Maneuvering")
   :group 'gnus-summary)
 
+(defgroup gnus-picon nil
+  "Show pictures of people, domains, and newsgroups."
+  :group 'gnus-visual)
+
 (defgroup gnus-summary-mail nil
   "Mail group commands."
   :link '(custom-manual "(gnus)Mail Group Commands")
@@ -269,6 +274,11 @@ is restarted, and sometimes reloaded."
 
 (defgroup gnus-exit nil
   "Exiting gnus."
+  :link '(custom-manual "(gnus)Exiting Gnus")
+  :group 'gnus)
+
+(defgroup gnus-fun nil
+  "Frivolous Gnus extensions."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
@@ -800,17 +810,17 @@ be set in `.emacs' instead."
     (berry "#cc6485" "#ff7db5")
     (dino "#724214" "#1e3f03")
     (oort "#cccccc" "#888888")
+    (storm "#666699" "#99ccff")
+    (pdino "#9999cc" "#99ccff")
+    (purp "#9999cc" "#666699")
     (neutral "#b4b4b4" "#878787")
     (september "#bf9900" "#ffcc00"))
   "Color alist used for the Gnus logo.")
 
 (defcustom gnus-logo-color-style 'oort
   "*Color styles used for the Gnus logo."
-  :type '(choice (const flame) (const pine) (const moss)
-		 (const irish) (const sky) (const tin)
-		 (const velvet) (const grape) (const labia)
-		 (const berry) (const neutral) (const september)
-		 (const dino))
+  :type `(choice ,@(mapcar (lambda (elem) (list 'const (car elem)))
+			   gnus-logo-color-alist))
   :group 'gnus-xmas)
 
 (defvar gnus-logo-colors
@@ -1792,6 +1802,9 @@ face."
 (defvar gnus-plugged t
   "Whether Gnus is plugged or not.")
 
+(defvar gnus-agent-cache t
+  "Whether Gnus use agent cache.")
+
 (defcustom gnus-default-charset 'iso-8859-1
   "Default charset assumed to be used when viewing non-ASCII characters.
 This variable is overridden on a group-to-group basis by the
@@ -1816,6 +1829,8 @@ covered by that variable."
 
 (defvar gnus-agent-fetching nil
   "Whether Gnus agent is in fetching mode.")
+
+(defvar gnus-agent-covered-methods nil)
 
 (defvar gnus-command-method nil
   "Dynamically bound variable that says what the current backend is.")
@@ -2062,6 +2077,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-demon-remove-handler)
      ("gnus-demon" :interactive t
       gnus-demon-init gnus-demon-cancel)
+     ("gnus-fun" gnus-convert-gray-x-face-to-xpm gnus-display-x-face-in-from
+      gnus-convert-image-to-gray-x-face)
      ("gnus-salt" gnus-highlight-selected-tree gnus-possibly-generate-tree
       gnus-tree-open gnus-tree-close gnus-carpal-setup-buffer)
      ("gnus-nocem" gnus-nocem-scan-groups gnus-nocem-close
@@ -2136,7 +2153,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("gnus-picon" :interactive t gnus-treat-from-picon)
      ("gnus-gl" bbb-login bbb-logout bbb-grouplens-group-p
       gnus-grouplens-mode)
-     ("smiley" :interactive t gnus-smiley-display)
+     ("smiley" :interactive t smiley-region)
      ("gnus-win" gnus-configure-windows gnus-add-configuration)
      ("gnus-sum" gnus-summary-insert-line gnus-summary-read-group
       gnus-list-of-unread-articles gnus-list-of-read-articles
@@ -2169,7 +2186,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
       gnus-article-date-original gnus-article-date-lapsed
-      gnus-article-show-all-headers gnus-article-show-all
+      gnus-article-show-all-headers
+      ;; gnus-article-show-all
       gnus-article-edit-mode gnus-article-edit-article
       gnus-article-edit-done article-decode-encoded-words
       gnus-start-date-timer gnus-stop-date-timer
@@ -2205,7 +2223,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("gnus-agent" gnus-open-agent gnus-agent-get-function
       gnus-agent-save-groups gnus-agent-save-active gnus-agent-method-p
       gnus-agent-get-undownloaded-list gnus-agent-fetch-session
-      gnus-summary-set-agent-mark gnus-agent-save-group-info)
+      gnus-summary-set-agent-mark gnus-agent-save-group-info
+      gnus-agent-request-article gnus-agent-retrieve-headers)
      ("gnus-agent" :interactive t
       gnus-unplugged gnus-agentize gnus-agent-batch)
      ("gnus-vm" :interactive t gnus-summary-save-in-vm
@@ -2241,7 +2260,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 ;;; gnus-sum.el thingies
 
 
-(defcustom gnus-summary-line-format "%U%R%z%I%(%[%4L: %-23,23n%]%) %s\n"
+(defcustom gnus-summary-line-format "%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n"
   "*The format specification of the lines in the summary buffer.
 
 It works along the same lines as a normal formatting string,
@@ -2289,10 +2308,6 @@ with some simple extensions.
      will be inserted into the summary just like information from any other
      summary specifier.
 
-Text between %( and %) will be highlighted with `gnus-mouse-face'
-when the mouse point is placed inside the area.	 There can only be one
-such area.
-
 The %U (status), %R (replied) and %z (zcore) specs have to be handled
 with care.  For reasons of efficiency, Gnus will compute what column
 these characters will end up in, and \"hard-code\" that.  This means that
@@ -2303,7 +2318,11 @@ which is bad enough.
 The smart choice is to have these specs as far to the left as
 possible.
 
-This restriction may disappear in later versions of Gnus."
+This restriction may disappear in later versions of Gnus.
+
+General format specifiers can also be used.
+See (gnus)Formatting Variables."
+  :link '(custom-manual "(gnus)Formatting Variables")
   :type 'string
   :group 'gnus-summary-format)
 
@@ -2346,6 +2365,12 @@ This restriction may disappear in later versions of Gnus."
 (defmacro gnus-gethash (string hashtable)
   "Get hash value of STRING in HASHTABLE."
   `(symbol-value (intern-soft ,string ,hashtable)))
+
+(defmacro gnus-gethash-safe (string hashtable)
+  "Get hash value of STRING in HASHTABLE.
+Return nil if not defined."
+  `(let ((sym (intern-soft ,string ,hashtable)))
+     (and (boundp sym) (symbol-value sym))))
 
 (defmacro gnus-sethash (string value hashtable)
   "Set hash value.  Arguments are STRING, VALUE, and HASHTABLE."
@@ -2948,7 +2973,7 @@ You should probably use `gnus-find-method-for-group' instead."
   (let (new)
     (dolist (elem parameters)
       (if (and (stringp (cdr elem))
-	       (string-match "\\\\" (cdr elem)))
+	       (string-match "\\\\[0-9&]" (cdr elem)))
 	  (push (cons (car elem)
 		      (gnus-expand-group-parameter match (cdr elem) group))
 		new)
@@ -2997,12 +3022,10 @@ If you call this function inside a loop, consider using the faster
     (set-buffer gnus-group-buffer)
     (if symbol
 	(gnus-group-fast-parameter group symbol allow-list)
-      (let ((parameters
-	     (nconc
-	      (copy-sequence
-	       (funcall gnus-group-get-parameter-function group))
-	      (gnus-parameters-get-parameter group))))
-	parameters))))
+      (nconc
+       (copy-sequence
+	(funcall gnus-group-get-parameter-function group))
+       (gnus-parameters-get-parameter group)))))
 
 (defun gnus-group-get-parameter (group &optional symbol allow-list)
   "Return the group parameters for GROUP.
@@ -3332,22 +3355,35 @@ Allow completion over sensible values."
      (t
       (list (intern method) "")))))
 
+;;; Agent functions
+
+(defun gnus-agent-method-p (method)
+  "Say whether METHOD is covered by the agent."
+  (member method gnus-agent-covered-methods))
+
+(defun gnus-online (method)
+  (not
+   (if gnus-plugged
+       (eq (cadr (assoc method gnus-opened-servers)) 'offline)
+     (gnus-agent-method-p method))))
+
 ;;; User-level commands.
 
 ;;;###autoload
 (defun gnus-slave-no-server (&optional arg)
-  "Read network news as a slave, without connecting to local server."
+  "Read network news as a slave, without connecting to the local server."
   (interactive "P")
   (gnus-no-server arg t))
 
 ;;;###autoload
 (defun gnus-no-server (&optional arg slave)
   "Read network news.
-If ARG is a positive number, Gnus will use that as the
-startup level.	If ARG is nil, Gnus will be started at level 2.
-If ARG is non-nil and not a positive number, Gnus will
-prompt the user for the name of an NNTP server to use.
-As opposed to `gnus', this command will not connect to the local server."
+If ARG is a positive number, Gnus will use that as the startup
+level. If ARG is nil, Gnus will be started at level 2.  If ARG is
+non-nil and not a positive number, Gnus will prompt the user for the
+name of an NNTP server to use.
+As opposed to `gnus', this command will not connect to the local
+server."
   (interactive "P")
   (gnus-no-server-1 arg slave))
 

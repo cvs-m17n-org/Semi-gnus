@@ -1,5 +1,5 @@
 ;;; nnmail.el --- mail support functions for the Gnus mail backends
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -465,7 +465,7 @@ parameter.  It should return nil, `warn' or `delete'."
 		 (const warn)
 		 (const delete)))
 
-(defcustom nnmail-extra-headers nil
+(defcustom nnmail-extra-headers '(To Newsgroups)
   "*Extra headers to parse."
   :version "21.1"
   :group 'nnmail
@@ -703,7 +703,7 @@ If SOURCE is a directory spec, try to return the group name component."
 
 (defsubst nnmail-search-unix-mail-delim ()
   "Put point at the beginning of the next Unix mbox message."
-  ;; Algorithm used to find the the next article in the
+  ;; Algorithm used to find the next article in the
   ;; brain-dead Unix mbox format:
   ;;
   ;; 1) Search for "^From ".
@@ -732,7 +732,7 @@ If SOURCE is a directory spec, try to return the group name component."
 
 (defun nnmail-search-unix-mail-delim-backward ()
   "Put point at the beginning of the current Unix mbox message."
-  ;; Algorithm used to find the the next article in the
+  ;; Algorithm used to find the next article in the
   ;; brain-dead Unix mbox format:
   ;;
   ;; 1) Search for "^From ".
@@ -1072,13 +1072,11 @@ FUNC will be called with the group name to determine the article number."
 				  (funcall func (car method)))))))))
 	;; Produce a trace if non-empty.
 	(when (and trace nnmail-split-trace)
-	  (let ((trace (nreverse nnmail-split-trace))
-		(restore (current-buffer)))
+	  (let ((restore (current-buffer)))
 	    (nnheader-set-temp-buffer "*Split Trace*")
 	    (gnus-add-buffer)
-	    (while trace
-	      (insert (car trace) "\n")
-	      (setq trace (cdr trace)))
+	    (dolist (trace (nreverse nnmail-split-trace))
+	      (insert trace "\n"))
 	    (goto-char (point-min))
 	    (gnus-configure-windows 'split-trace)
 	    (set-buffer restore)))

@@ -1,8 +1,26 @@
+2002-01-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.5 revision 02 (merged
+	t-gnus-6_15-quimby branch).
+
+2002-01-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Advise `byte-compile-inline-expand' for Mule
+	to ignore built-in functions as Emacs 20+ does.
+
 2002-01-15  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-adjust-marked-articles): Fix the record
 	for `seen' if it looks like (seen NUM1 . NUM2).  It should be
 	(seen (NUM1 . NUM2)).
+
+2002-01-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nntp.el (nntp-send-buffer): Bind `mc-flag' to nil.
+
+	* lisp/nnheader.el (mm-with-unibyte-buffer): Alias to
+	`nnheader-with-unibyte-buffer'.
+	(nnheader-with-unibyte-buffer): New macro.
 
 2002-01-12  Katsuhiro Hermit Endo  <hermit@koka-in.org>
 
@@ -27,7 +45,11 @@
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 11 in
 	order to force update cached format specs.
 
-	* lisp/gnus-spec.el (gnus-spec-tab): Deal with wide characters.
+	* lisp/gnus-spec.el (gnus-use-correct-string-widths): Default to t.
+
+2002-01-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el: Adopt for old Gnusae.
 
 2002-01-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -37,13 +59,14 @@
 	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Position
 	point to the top.
 
-2002-01-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+2002-01-05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
-	* lisp/canlock.el (canlock-string-as-unibyte): New macro.
-	(canlock-sha1-with-openssl): Return a unibyte string.
-	(canlock-make-cancel-key): Treat Message-ID as a unibyte string.
+	* etc/gnus/oort.xface (X-Face): Oort X-Face from
+	Raymond Scholz <ray-2002@zonix.de>.
 
 2002-01-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/lpath.el: Fbind `coding-system-to-mime-charset' for Mule 2.
 
 	* lisp/nnheader.el (std11-fold-region): New function copied from
 	`rfc2047-fold-region'.
@@ -53,16 +76,27 @@
 
 	* lisp/gnus.el: Don't autoload "gnus-bitmap".
 
-	* lisp/gnus-sum.el (gnus-summary-toggle-smiley): Replace
-	`gnus-smiley-display' with `gnus-article-smiley-display'.
+	* lisp/gnus-ems.el: Autoload "smiley-mule" if running Emacs
+	version is less than 21.
 
-	* lisp/gnus-art.el (gnus-article-smiley-display): Re-implement to
-	integrate smiley functions for various Emacsen.
-	(gnus-treatment-function-alist): Always use
-	`gnus-article-smiley-display' for `gnus-treat-display-smileys'.
+	* lisp/gnus-art.el (gnus-article-smiley-display): Remove.
+	(gnus-treat-smiley): Reload "smiley-ems" or "smiley-mule" if
+	needed.
 	(gnus-treat-display-smileys): Use `gnus-image-type-available-p'.
 	(gnus-article-smiley-mule-loaded-p): New internal variable.
 	(gnus-article-should-use-smiley-mule): New user option.
+
+2002-01-09  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nneething.el (nneething-mime-extensions): New variable.
+	(nneething-request-article): Refer it.
+
+	* lisp/nnheader.el (mm-detect-coding-region): Alias to
+	`nnheader-detect-coding-region'.
+	(nnheader-detect-coding-region): New function.
+	(mm-detect-mime-charset-region): Alias to
+	`nnheader-detect-mime-charset-region'.
+	(nnheader-detect-mime-charset-region) New function.
 
 2002-01-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
@@ -73,6 +107,12 @@
 
 	* lisp/gnus-art.el (article-toggle-headers): Expose headers even
 	if there is a boundary line.
+
+	* lisp/nntp.el (nntp-send-buffer): Don't use
+	`mm-with-unibyte-current-buffer'.  Use expanded form instead.
+
+	* lisp/gnus-art.el (gnus-treatment-function-alist): Move X-Face
+	stuff down after unfolding stuff.
 
 2002-01-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
@@ -107,6 +147,15 @@
 	(mail-narrow-to-head): Alias to `std11-narrow-to-header'.
 	(mail-header-narrow-to-field): Alias to `std11-narrow-to-field'.
 	(std11-narrow-to-field): New function.
+
+2002-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.5 revision 00.
+
+2002-01-02  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* etc/gnus/describe-group.xpm: Set pixels of first line to
+	background color. A bug in Emacs?
 
 2002-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
 

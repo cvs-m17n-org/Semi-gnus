@@ -1,5 +1,5 @@
 ;;; gnus-start.el --- startup functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -415,16 +415,13 @@ Can be used to turn version control on or off."
   :group 'gnus-newsrc
   :type 'boolean)
 
-(defvar gnus-startup-file-coding-system (static-if (boundp 'MULE)
-					    '*ctext*
-					  'ctext)
-  "*Coding system for startup file.")
-
-(defvar gnus-ding-file-coding-system gnus-startup-file-coding-system
-  "*Coding system for ding file.")
-;; Note that the ding file for T-gnus ought not to have byte-codes.
-
 ;;; Internal variables
+
+(defvar gnus-ding-file-coding-system (static-if (boundp 'MULE)
+					 '*ctext*
+				       'ctext)
+  "Coding system for ding file.")
+;; Note that the ding file for T-gnus ought not to have byte-codes.
 
 (defvar gnus-newsrc-file-version nil)
 (defvar gnus-override-subscribe-method nil)
@@ -452,21 +449,15 @@ Can be used to turn version control on or off."
     (if gnus-init-inhibit
 	(setq gnus-init-inhibit nil)
       (setq gnus-init-inhibit inhibit-next)
-      (let ((files (list gnus-site-init-file gnus-init-file))
-	    file)
-	(while files
-	  (and (setq file (pop files))
-	       (or (and (file-exists-p file)
-			;; Don't try to load a directory.
-			(not (file-directory-p file)))
-		   (file-exists-p (concat file ".el"))
-		   (file-exists-p (concat file ".elc")))
-	       (if (or debug-on-error debug-on-quit)
-		   (load file nil t)
-		 (condition-case var
-		     (load file nil t)
-		   (error
-		    (error "Error in %s: %s" file var))))))))))
+      (dolist (file (list gnus-site-init-file gnus-init-file))
+	(when (and file
+		   (locate-library file))
+	  (if (or debug-on-error debug-on-quit)
+	      (load file nil t)
+	    (condition-case var
+		(load file nil t)
+	      (error
+	       (error "Error in %s: %s" file var)))))))))
 
 ;; For subscribing new newsgroup
 
@@ -1624,7 +1615,7 @@ newsgroup."
 	  (when (and (<= (gnus-info-level info) foreign-level)
 		     (setq active (gnus-activate-group group 'scan)))
 	    ;; Let the Gnus agent save the active file.
-	    (when (and gnus-agent gnus-plugged active)
+	    (when (and gnus-agent active (gnus-online method))
 	      (gnus-agent-save-group-info
 	       method (gnus-group-real-name group) active))
 	    (unless (inline (gnus-virtual-group-p group))
@@ -1931,7 +1922,7 @@ newsgroup."
 	(insert ?\\)))
 
     ;; Let the Gnus agent save the active file.
-    (when (and gnus-agent real-active gnus-plugged)
+    (when (and gnus-agent real-active (gnus-online method))
       (gnus-agent-save-active method))
 
     ;; If these are groups from a foreign select method, we insert the
@@ -2007,7 +1998,7 @@ newsgroup."
     ;; Let the Gnus agent save the active file.
     (if (and gnus-agent
 	     real-active
-	     gnus-plugged
+	     (gnus-online method)
 	     (gnus-agent-method-p method))
 	(progn
 	  (gnus-agent-save-groups method)
@@ -2104,6 +2095,14 @@ If FORCE is non-nil, the .newsrc file is read."
 		   (gnus-yes-or-no-p
 		    (format "Error in %s; continue? " ding-file))
 		   (error "Error in %s" ding-file))))))
+;;	;; Older versions of `gnus-format-specs' are no longer valid
+;;	;; in Oort Gnus 0.01.
+;;	(let ((version
+;;	       (and gnus-newsrc-file-version
+;;		    (gnus-continuum-version gnus-newsrc-file-version))))
+;;	  (when (or (not version)
+;;		    (< version 5.090009))
+;;	    (setq gnus-format-specs gnus-default-format-specs)))
 	(when gnus-newsrc-assoc
 	  (setq gnus-newsrc-alist gnus-newsrc-assoc))))
     (gnus-make-hashtable-from-newsrc-alist)

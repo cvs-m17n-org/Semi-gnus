@@ -1,5 +1,5 @@
 ;;; rfc2047.el --- Functions for encoding and decoding rfc2047 messages
-;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -535,13 +535,20 @@ The buffer may be narrowed."
 (defun rfc2047-decode-string (string)
   "Decode the quoted-printable-encoded STRING and return the results."
   (let ((m (mm-multibyte-p)))
-    (with-temp-buffer
-      (when m
-	(mm-enable-multibyte))
-      (insert string)
-      (inline
-	(rfc2047-decode-region (point-min) (point-max)))
-      (buffer-string))))
+    (if (string-match "=\\?" string)
+	(with-temp-buffer
+	  (when m
+	    (mm-enable-multibyte))
+	  (insert string)
+	  (inline
+	    (rfc2047-decode-region (point-min) (point-max)))
+	  (buffer-string))
+      (if (and m
+	       mail-parse-charset
+	       (not (eq mail-parse-charset 'us-ascii))
+	       (not (eq mail-parse-charset 'gnus-decoded)))
+	  (mm-decode-coding-string string mail-parse-charset)
+	string))))
 
 (defun rfc2047-parse-and-decode (word)
   "Decode WORD and return it if it is an encoded word.

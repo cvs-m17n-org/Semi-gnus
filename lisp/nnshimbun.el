@@ -103,6 +103,17 @@
 ;; '(index-range all prefetch-articles off encapsulate-images on
 ;;               expiry-wait 6)
 
+(unless (fboundp 'gnus-define-group-parameter)
+  (defmacro gnus-define-group-parameter (&rest args) nil)
+  (defun nnshimbun-find-group-parameters (name)
+    "Return a nnshimbun GROUP's group parameters."
+    (when name
+      (or (gnus-group-find-parameter name 'nnshimbun-group-parameters t)
+	  (assoc-default name
+			 (and (boundp 'nnshimbun-group-parameters-alist)
+			      (symbol-value 'nnshimbun-group-parameters-alist))
+			 (function string-match))))))
+
 (gnus-define-group-parameter
  nnshimbun-group-parameters
  :type list

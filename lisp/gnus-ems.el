@@ -1,5 +1,5 @@
 ;;; gnus-ems.el --- functions for making Semi-gnus work under different Emacsen
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -48,9 +48,13 @@
   (autoload 'gnus-xmas-redefine "gnus-xmas")
   (autoload 'appt-select-lowest-window "appt"))
 
-(if (featurep 'xemacs)
-    (autoload 'gnus-smiley-display "smiley")
-  (autoload 'gnus-smiley-display "smiley-ems")) ; override XEmacs version
+(cond ((featurep 'xemacs)
+       (autoload 'smiley-region "smiley"))
+      ;; override XEmacs version
+      ((>= emacs-major-version 21)
+       (autoload 'smiley-region "smiley-ems"))
+      (t
+       (autoload 'smiley-region "smiley-mule")))
 
 (defun gnus-kill-all-overlays ()
   "Delete all overlays in the current buffer."
@@ -219,86 +223,6 @@
 	  (goto-char (point-min))
 	  (sit-for 0))))))
 
-(defvar gnus-article-xface-ring-internal nil
-  "Cache for face data.")
-
-;; Worth customizing?
-(defvar gnus-article-xface-ring-size 6
-  "Length of the ring used for `gnus-article-xface-ring-internal'.")
-
-(defvar gnus-article-compface-xbm
-  (condition-case ()
-      (eq 0 (string-match "#define"
-			  (shell-command-to-string "uncompface -X")))
-    (error nil))
-  "Non-nil means the compface program supports the -X option.
-That produces XBM output.")
-
-(defun gnus-article-display-xface (data)
-  "Display the XFace header FACE in the current buffer.
-Requires support for images in your Emacs and the external programs
-`uncompface', and `icontopbm'.  On a GNU/Linux system these
-might be in packages with names like `compface' or `faces-xface' and
-`netpbm' or `libgr-progs', for instance.  See also
-`gnus-article-compface-xbm'.
-
-This function is for Emacs 21+.  See `gnus-xmas-article-display-xface'
-for XEmacs."
-  ;; It might be worth converting uncompface's output in Lisp.
-
-  (when (if (fboundp 'display-graphic-p)
-	    (display-graphic-p))
-    (unless gnus-article-xface-ring-internal ; Only load ring when needed.
-      (setq gnus-article-xface-ring-internal
-	    (make-ring gnus-article-xface-ring-size)))
-    (save-excursion
-      (let* ((cur (current-buffer))
-	     (image (cdr-safe (assoc data (ring-elements
-					   gnus-article-xface-ring-internal))))
-	     default-enable-multibyte-characters)
-	(unless image
-	  (with-temp-buffer
-	    (insert data)
-	    (and (eq 0 (apply #'call-process-region (point-min) (point-max)
-			      "uncompface"
-			      'delete '(t nil) nil
-			      (if gnus-article-compface-xbm
-				  '("-X"))))
-		 (if gnus-article-compface-xbm
-		     t
-		   (goto-char (point-min))
-		   (progn (insert "/* Width=48, Height=48 */\n") t)
-		   (eq 0 (call-process-region (point-min) (point-max)
-					      "icontopbm"
-					      'delete '(t nil))))
-		 ;; Miles Bader says that faces don't look right as
-		 ;; light on dark.
-		 (if (eq 'dark (cdr-safe (assq 'background-mode
-					       (frame-parameters))))
-		     (setq image (create-image (buffer-string)
-					       (if gnus-article-compface-xbm
-						   'xbm
-						 'pbm)
-					       t
-					       :ascent 'center
-					       :foreground "black"
-					       :background "white"))
-		   (setq image (create-image (buffer-string)
-					     (if gnus-article-compface-xbm
-						 'xbm
-					       'pbm)
-					     t
-					     :ascent 'center)))))
-	  (ring-insert gnus-article-xface-ring-internal (cons data image)))
-	(when image
-	  (goto-char (point-min))
-	  (re-search-forward "^From:" nil 'move)
-	  (while (get-text-property (point) 'display)
-	    (goto-char (next-single-property-change (point) 'display)))
-	  (gnus-add-wash-type 'xface)
-	  (gnus-add-image 'xface image)
-	  (insert-image image))))))
-
 ;;; Image functions.
 
 (defun gnus-image-type-available-p (type)
@@ -313,12 +237,18 @@ for XEmacs."
     (apply 'create-image file type data-p props)))
 
 (defun gnus-put-image (glyph &optional string)
-  (insert-image glyph string))
+  (insert-image glyph (or string " "))
+  (unless string
+    (put-text-property (1- (point)) (point)
+		       'gnus-image-text-deletable t))
+  glyph)
 
 (defun gnus-remove-image (image)
-  (dolist (position (gnus-text-with-property 'display))
+  (dolist (position (message-text-with-property 'display))
     (when (equal (get-text-property position 'display) image)
-      (put-text-property position (1+ position) 'display nil))))
+      (put-text-property position (1+ position) 'display nil)
+      (when (get-text-property position 'gnus-image-text-deletable)
+	(delete-region position (1+ position))))))
 
 (defun-maybe assoc-ignore-case (key alist)
   "Like `assoc', but assumes KEY is a string and ignores case when comparing."

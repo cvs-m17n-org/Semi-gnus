@@ -1,5 +1,5 @@
 ;;; message.el --- composing mail and news messages
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -158,6 +158,11 @@ mailbox format."
   :group 'message-sending
   :type '(repeat (symbol :tag "Type")))
 
+(defcustom message-fcc-externalize-attachments nil
+  "If non-nil, attachments are included as external parts in Fcc copies."
+  :type 'boolean
+  :group 'message-sending)
+
 (defcustom message-courtesy-message
   "The following message is a courtesy copy of an article\nthat has been posted to %s as well.\n\n"
   "*This is inserted at the start of a mailed copy of a posted message.
@@ -242,14 +247,14 @@ included.  Organization, Lines and User-Agent are optional."
   :type 'sexp)
 
 (defcustom message-ignored-news-headers
-  "^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:\\|^X-Draft-From:"
+  "^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:\\|^X-Draft-From:\\|^X-Gnus-Agent-Meta-Information:"
   "*Regexp of headers to be removed unconditionally before posting."
   :group 'message-news
   :group 'message-headers
   :type 'regexp)
 
 (defcustom message-ignored-mail-headers
-  "^[GF]cc:\\|^Resent-Fcc:\\|^Xref:\\|^X-Draft-From:"
+  "^[GF]cc:\\|^Resent-Fcc:\\|^Xref:\\|^X-Draft-From:\\|^X-Gnus-Agent-Meta-Information:"
   "*Regexp of headers to be removed unconditionally before mailing."
   :group 'message-mail
   :group 'message-headers
@@ -1751,6 +1756,7 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\C-c?" 'describe-mode)
 
   (define-key message-mode-map "\C-c\C-f\C-t" 'message-goto-to)
+  (define-key message-mode-map "\C-c\C-f\C-o" 'message-goto-from)
   (define-key message-mode-map "\C-c\C-f\C-b" 'message-goto-bcc)
   (define-key message-mode-map "\C-c\C-f\C-w" 'message-goto-fcc)
   (define-key message-mode-map "\C-c\C-f\C-c" 'message-goto-cc)
@@ -1771,6 +1777,9 @@ Point is left at the beginning of the narrowed-to region."
 
   (define-key message-mode-map "\C-c\C-t" 'message-insert-to)
   (define-key message-mode-map "\C-c\C-n" 'message-insert-newsgroups)
+
+  (define-key message-mode-map "\C-c\C-u" 'message-insert-or-toggle-importance)
+  (define-key message-mode-map "\C-c\M-n" 'message-insert-disposition-notification-to)
 
   (define-key message-mode-map "\C-c\C-y" 'message-yank-original)
   (define-key message-mode-map "\C-c\M-\C-y" 'message-yank-buffer)
@@ -1814,12 +1823,16 @@ Point is left at the beginning of the narrowed-to region."
    ["Kill To Signature" message-kill-to-signature t]
    ["Newline and Reformat" message-newline-and-reformat t]
    ["Rename buffer" message-rename-buffer t]
-   ["Flag as important" message-insert-importance-high
+   ["Flag As Important" message-insert-importance-high
     ,@(if (featurep 'xemacs) '(t)
 	'(:help "Mark this message as important"))]
-   ["Flag as unimportant" message-insert-importance-low
+   ["Flag As Unimportant" message-insert-importance-low
     ,@(if (featurep 'xemacs) '(t)
 	'(:help "Mark this message as unimportant"))]
+   ["Request Receipt"
+    message-insert-disposition-notification-to
+    ,@(if (featurep 'xemacs) '(t)
+	'(:help "Request a Disposition Notification of this article"))]
    ["Spellcheck" ispell-message
     ,@(if (featurep 'xemacs) '(t)
 	'(:help "Spellcheck this message"))]
@@ -1847,6 +1860,7 @@ Point is left at the beginning of the narrowed-to region."
    ["Fetch Newsgroups" message-insert-newsgroups t]
    "----"
    ["To" message-goto-to t]
+   ["From" message-goto-from t]
    ["Subject" message-goto-subject t]
    ["Cc" message-goto-cc t]
    ["Reply-To" message-goto-reply-to t]
@@ -1939,6 +1953,7 @@ C-c C-f  move to a header field (and create it if there isn't):
 	 C-c C-f C-k  move to Keywords	C-c C-f C-d  move to Distribution
 	 C-c C-f C-f  move to Followup-To
 	 C-c C-f C-m  move to Mail-Followup-To
+	 C-c C-f C-i  cycle through Importance values
 	 C-c C-f c    move to Mail-Copies-To
 C-c C-t  `message-insert-to' (add a To header to a news followup)
 C-c C-n  `message-insert-newsgroups' (add a Newsgroup header to a news reply)
@@ -1951,7 +1966,8 @@ C-c C-e  `message-elide-region' (elide the text between point and mark).
 C-c C-v  `message-delete-not-region' (remove the text outside the region).
 C-c C-z  `message-kill-to-signature' (kill the text up to the signature).
 C-c C-r  `message-caesar-buffer-body' (rot13 the message body).
-C-c C-p  `message-insert-or-toggle-importance'  (insert or cycle importance)
+C-c C-u  `message-insert-or-toggle-importance'  (insert or cycle importance).
+C-c M-n  `message-insert-disposition-notification-to'  (request receipt).
 M-RET    `message-newline-and-reformat' (break the line and reformat)."
   (set (make-local-variable 'message-reply-buffer) nil)
   (make-local-variable 'message-send-actions)
@@ -2055,6 +2071,11 @@ M-RET    `message-newline-and-reformat' (break the line and reformat)."
   "Move point to the To header."
   (interactive)
   (message-position-on-field "To"))
+
+(defun message-goto-from ()
+  "Move point to the From header."
+  (interactive)
+  (message-position-on-field "From"))
 
 (defun message-goto-subject ()
   "Move point to the Subject header."
@@ -2319,10 +2340,14 @@ Prefix arg means justify as well."
       (if not-break
 	  (setq point nil)
 	(if bolp
-	    (insert "\n")
-	  (insert "\n\n"))
+	    (newline)
+	  (newline)
+	  (newline))
 	(setq point (point))
-	(insert "\n\n")
+	;; (newline 2) doesn't mark both newline's as hard, so call
+	;; newline twice. -jas
+	(newline)
+	(newline)
 	(delete-region (point) (re-search-forward "[ \t]*"))
 	(when (and quoted (not bolp))
 	  (insert quoted leading-space)))
@@ -2432,6 +2457,16 @@ and `low'."
 			 "high"))))
       (message-goto-eoh)
       (insert (format "Importance: %s\n" new)))))
+
+(defun message-insert-disposition-notification-to ()
+  "Request a disposition notification (return receipt) to this message.
+Note that this should not be used in newsgroups."
+  (interactive)
+  (save-excursion
+    (message-remove-header "Disposition-Notification-To")
+    (message-goto-eoh)
+    (insert (format "Disposition-Notification-To: %s\n"
+		    (or (message-fetch-field "From") (message-make-from))))))
 
 (defun message-elide-region (b e)
   "Elide the text in the region.
@@ -2972,7 +3007,7 @@ It should typically alter the sending method in some way or other."
       (save-excursion
 	(set-buffer message-encoding-buffer)
 	(erase-buffer)
-	;; ;; Avoid copying text props.
+	;; ;; Avoid copying text props (except hard newlines).
 	;; T-gnus change: copy all text props from the editing buffer
 	;; into the encoding buffer.
 	(insert-buffer message-edit-buffer)
@@ -3060,6 +3095,17 @@ used to distinguish whether the invisible text is a MIME part or not."
 		(add-text-properties start end
 				     '(invisible t mime-edit-invisible t))
 	      (put-text-property start end 'invisible t))))))
+
+(defun message-text-with-property (prop)
+  "Return a list of all points where the text has PROP."
+  (let ((points nil)
+	(point (point-min)))
+    (save-excursion
+      (while (< point (point-max))
+	(when (get-text-property point prop)
+	  (push point points))
+	(incf point)))
+    (nreverse points)))
 
 (defun message-fix-before-sending ()
   "Do various things to make the message nice before sending it."
@@ -3271,6 +3317,9 @@ This sub function is for exclusive use of `message-send-mail'."
 	  (save-excursion
 	    (set-buffer tembuf)
 	    (erase-buffer)
+	    ;; ;; Avoid copying text props (except hard newlines).
+	    ;; T-gnus change: copy all text props from the editing buffer
+	    ;; into the encoding buffer.
 	    (insert-buffer message-encoding-buffer)
 	    ;; Remove some headers.
 	    (save-restriction
@@ -3279,7 +3328,6 @@ This sub function is for exclusive use of `message-send-mail'."
 ;;	      ;; We (re)generate the Lines header.
 ;;	      (when (memq 'Lines message-required-mail-headers)
 ;;		(message-generate-headers '(Lines)))
-	      ;; Remove some headers.
 	      (message-remove-header message-ignored-mail-headers t))
 	    (goto-char (point-max))
 	    ;; require one newline at the end.
@@ -3703,7 +3751,7 @@ Otherwise, generate and save a value for `canlock-password' first."
 		   (zerop
 		    (length
 		     (setq to (completing-read
-			       "Followups to: (default all groups) "
+			       "Followups to (default: no Followup-To header) "
 			       (mapcar (lambda (g) (list g))
 				       (cons "poster"
 					     (message-tokenize-header
@@ -4051,7 +4099,8 @@ Otherwise, generate and save a value for `canlock-password' first."
   (let ((case-fold-search t)
 	(coding-system-for-write 'raw-text)
 	(output-coding-system 'raw-text)
-	list file)
+	list file
+	(mml-externalize-attachments message-fcc-externalize-attachments))
     (save-excursion
       (save-restriction
 	(message-narrow-to-headers)
@@ -4204,7 +4253,7 @@ If NOW, use that time instead."
 	     (aset user (match-beginning 0) ?_))
 	   user)
        (message-number-base36 (user-uid) -1))
-     (message-number-base36 (+ (car   tm)
+     (message-number-base36 (+ (car tm)
 			       (lsh (% message-unique-id-char 25) 16)) 4)
      (message-number-base36 (+ (nth 1 tm)
 			       (lsh (/ message-unique-id-char 25) 16)) 4)
@@ -4321,16 +4370,6 @@ If NOW, use that time instead."
 			 (aset tmp (1- (match-end 0)) ?-))
 		       (string-match "[\\()]" tmp)))))
 	(insert fullname)
-	(goto-char (point-min))
-	;; Look for a character that cannot appear unquoted
-	;; according to RFC 822.
-	(when (re-search-forward "[^- !#-'*+/-9=?A-Z^-~]" nil 1)
-	  ;; Quote fullname, escaping specials.
-	  (goto-char (point-min))
-	  (insert "\"")
-	  (while (re-search-forward "[\"\\]" nil 1)
-	    (replace-match "\\\\\\&" t))
-	  (insert "\""))
 	(insert " <" login ">"))
        (t				; 'parens or default
 	(insert login " (")
@@ -4392,7 +4431,7 @@ give as trustworthy answer as possible."
       (match-string 1 user-mail))
      ;; Default to this bogus thing.
      (t
-      (concat system-name ".i-did-not-set--mail-host-address--so-shoot-me")))))
+      (concat system-name ".i-did-not-set--mail-host-address--so-tickle-me")))))
 
 (defun message-make-host-name ()
   "Return the name of the host."
@@ -4563,6 +4602,8 @@ Headers already prepared in the buffer are not modified."
 		    (goto-char (point-max))
 		    (insert (if (stringp header) header (symbol-name header))
 			    ": " value)
+		    ;; We check whether the value was ended by a
+		    ;; newline.  If now, we insert one.
 		    (unless (bolp)
 		      (insert "\n"))
 		    (forward-line -1))
@@ -4859,7 +4900,7 @@ than 988 characters long, and if they are not, trim them until they are."
 	    to group)
 	(if (not (or (null name)
 		     (string-equal name "mail")
-		     (string-equal name "news")))
+		     (string-equal name "posting")))
 	    (setq name (concat "*sent " name "*"))
 	  (message-narrow-to-headers)
 	  (setq to (message-fetch-field "to"))
@@ -4871,7 +4912,7 @@ than 988 characters long, and if they are not, trim them until they are."
 			     (or (car (mail-extract-address-components to))
 				 to) "*"))
 		 ((and group (not (string= group "")))
-		  (concat "*sent news on " group "*"))
+		  (concat "*sent posting on " group "*"))
 		 (t "*sent mail*"))))
 	(unless (string-equal name (buffer-name))
 	  (rename-buffer name t)))))
@@ -5054,7 +5095,7 @@ OTHER-HEADERS is an alist of header/value pairs."
   "Start editing a news article to be sent."
   (interactive)
   (let ((message-this-is-news t))
-    (message-pop-to-buffer (message-buffer-name "news" nil newsgroups))
+    (message-pop-to-buffer (message-buffer-name "posting" nil newsgroups))
     (message-setup `((Newsgroups . ,(or newsgroups ""))
 		     (Subject . ,(or subject ""))))))
 
@@ -5851,7 +5892,7 @@ you."
 	(special-display-regexps nil)
 	(same-window-buffer-names nil)
 	(same-window-regexps nil))
-    (message-pop-to-buffer (message-buffer-name "news" nil newsgroups)))
+    (message-pop-to-buffer (message-buffer-name "posting" nil newsgroups)))
   (let ((message-this-is-news t))
     (message-setup `((Newsgroups . ,(or newsgroups ""))
 		     (Subject . ,(or subject ""))))))
@@ -5865,7 +5906,7 @@ you."
 	(special-display-regexps nil)
 	(same-window-buffer-names nil)
 	(same-window-regexps nil))
-    (message-pop-to-buffer (message-buffer-name "news" nil newsgroups)))
+    (message-pop-to-buffer (message-buffer-name "posting" nil newsgroups)))
   (let ((message-this-is-news t))
     (message-setup `((Newsgroups . ,(or newsgroups ""))
 		     (Subject . ,(or subject ""))))))
@@ -5938,6 +5979,9 @@ which specify the range to operate on."
 		    message-mode-map)
 		   (tool-bar-add-item-from-menu
 		    'message-insert-importance-low "unimportant"
+		    message-mode-map)
+		   (tool-bar-add-item-from-menu
+		    'message-insert-disposition-notification-to "receipt"
 		    message-mode-map)
 		   tool-bar-map)))))
 
@@ -6178,11 +6222,11 @@ regexp varstr."
 	(message-narrow-to-headers-or-head)
 	(message-remove-first-header "Content-Type")
 	(message-remove-first-header "Content-Transfer-Encoding"))
-      ;; We always make sure that the message has a Content-Type header.
-      ;; This is because some broken MTAs and MUAs get awfully confused
-      ;; when confronted with a message with a MIME-Version header and
-      ;; without a Content-Type header.  For instance, Solaris'
-      ;; /usr/bin/mail.
+      ;; We always make sure that the message has a Content-Type
+      ;; header.  This is because some broken MTAs and MUAs get
+      ;; awfully confused when confronted with a message with a
+      ;; MIME-Version header and without a Content-Type header.  For
+      ;; instance, Solaris' /usr/bin/mail.
       (unless content-type-p
 	(goto-char (point-min))
 	;; For unknown reason, MIME-Version doesn't exist.
@@ -6190,16 +6234,16 @@ regexp varstr."
 	  (forward-line 1)
 	  (insert "Content-Type: text/plain; charset=us-ascii\n"))))))
 
-(defun message-read-from-minibuffer (prompt)
+(defun message-read-from-minibuffer (prompt &optional initial-contents)
   "Read from the minibuffer while providing abbrev expansion."
   (if (fboundp 'mail-abbrevs-setup)
       (let ((mail-abbrev-mode-regexp "")
 	    (minibuffer-setup-hook 'mail-abbrevs-setup)
 	    (minibuffer-local-map message-minibuffer-local-map))
-	(read-from-minibuffer prompt))
+	(read-from-minibuffer prompt initial-contents))
     (let ((minibuffer-setup-hook 'mail-abbrev-minibuffer-setup-hook)
 	  (minibuffer-local-map message-minibuffer-local-map))
-      (read-string prompt))))
+      (read-string prompt initial-contents))))
 
 (defun message-use-alternative-email-as-from ()
   (require 'mail-utils)

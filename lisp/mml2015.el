@@ -417,14 +417,13 @@ by you.")
 			  (match-string 1)))
 	     (fprint (and (re-search-forward
 			   "^\\[GNUPG:\\] VALIDSIG \\([0-9a-zA-Z]*\\) "
-			   nil t)
+		       nil t)
 			  (match-string 1)))
-	     (trust  (and (re-search-forward "^\\[GNUPG:\\] \\(TRUST_.*\\)$"
-					     nil t)
+	     (trust  (and (re-search-forward "^\\[GNUPG:\\] \\(TRUST_.*\\)$" nil t)
 			  (match-string 1)))
 	     (trust-good-enough-p
 	      (cdr (assoc (cdr (assoc trust gpg-unabbrev-trust-alist))
-			  mml2015-trust-boundaries-alist))))
+		      mml2015-trust-boundaries-alist))))
 	(if (and signer trust fprint)
 	    (concat signer
 		    (unless trust-good-enough-p

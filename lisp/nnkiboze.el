@@ -110,7 +110,8 @@
       (setq num (string-to-int (match-string 2 xref))
 	    group (match-string 1 xref))
       (or (with-current-buffer buffer
-	    (gnus-cache-request-article num group))
+	    (or (gnus-cache-request-article num group)
+		(gnus-agent-request-article num group)))
 	  (gnus-request-article num group buffer)))))
 
 (deffoo nnkiboze-request-scan (&optional group server)
@@ -254,6 +255,7 @@ Finds out what articles are to be part of the nnkiboze groups."
       (load newsrc-file))
     (let ((coding-system-for-write nnkiboze-file-coding-system)
 	  (output-coding-system nnkiboze-file-coding-system))
+      (gnus-make-directory (file-name-directory nov-file))
       (with-temp-file nov-file
 	(when (file-exists-p nov-file)
 	  (nnheader-insert-file-contents nov-file))
@@ -342,6 +344,7 @@ Finds out what articles are to be part of the nnkiboze groups."
 	  (gnus-message 3 "nnkiboze: Checking %s...done" (caar newsrc))
 	  (setq newsrc (cdr newsrc)))))
     ;; We save the kiboze newsrc for this group.
+    (gnus-make-directory (file-name-directory newsrc-file))
     (with-temp-file newsrc-file
       (insert "(setq nnkiboze-newsrc '")
       (gnus-prin1 nnkiboze-newsrc)

@@ -1,5 +1,5 @@
 ;;; gnus-int.el --- backend interface functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -35,6 +35,13 @@
   "Hook called just before opening connection to the news server."
   :group 'gnus-start
   :type 'hook)
+
+(defvar gnus-server-unopen-status nil
+  "The default status if the server is not able to open.
+If the server is covered by Gnus agent, the possible values are
+`denied', set the server denied; `offline', set the server offline;
+`nil', ask user.  If the server is not covered by Gnus agent, set the
+server denied.")
 
 ;;;
 ;;; Server Communication
@@ -196,9 +203,25 @@ If it is down, start it up (again)."
 	  (setq elem (list gnus-command-method nil)
 		gnus-opened-servers (cons elem gnus-opened-servers)))
 	;; Set the status of this server.
-	(setcar (cdr elem) (if result 'ok 'denied))
+	(setcar (cdr elem) 
+		(if result 
+		    (if (eq (cadr elem) 'offline)
+			'offline
+		      'ok)
+		  (if (and gnus-agent 
+			   (not (eq (cadr elem) 'offline))
+			   (gnus-agent-method-p gnus-command-method))
+		      (or gnus-server-unopen-status
+			  (if (gnus-y-or-n-p 
+			       (format "Unable to open %s:%s, go offline? "
+				       (car gnus-command-method)
+				       (cadr gnus-command-method)))
+			      'offline
+			    'denied))
+		    'denied)))
 	;; Return the result from the "open" call.
-	result))))
+	(or (eq (cadr elem) 'offline)
+	    result)))))
 
 (defun gnus-close-server (gnus-command-method)
   "Close the connection to GNUS-COMMAND-METHOD."
@@ -301,11 +324,16 @@ this group uses will be queried."
   "Request headers for ARTICLES in GROUP.
 If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
   (let ((gnus-command-method (gnus-find-method-for-group group)))
-    (if (and gnus-use-cache (numberp (car articles)))
-	(gnus-cache-retrieve-headers articles group fetch-old)
+    (cond
+     ((and gnus-use-cache (numberp (car articles)))
+      (gnus-cache-retrieve-headers articles group fetch-old))
+     ((and gnus-agent gnus-agent-cache (gnus-online gnus-command-method)
+	   (gnus-agent-method-p gnus-command-method))
+      (gnus-agent-retrieve-headers articles group fetch-old))
+     (t
       (funcall (gnus-get-function gnus-command-method 'retrieve-headers)
 	       articles (gnus-group-real-name group)
-	       (nth 1 gnus-command-method) fetch-old))))
+	       (nth 1 gnus-command-method) fetch-old)))))
 
 (defun gnus-retrieve-articles (articles group)
   "Request ARTICLES in GROUP."
@@ -370,6 +398,11 @@ If BUFFER, insert the article in that group."
 	   (gnus-cache-request-article article group))
       (setq res (cons group article)
 	    clean-up t))
+     ((and gnus-agent gnus-agent-cache gnus-plugged
+	   (numberp article)
+	   (gnus-agent-request-article article group))
+      (setq res (cons group article)
+	    clean-up t))
      ;; Use `head' function.
      ((fboundp head)
       (setq res (funcall head article (gnus-group-real-name group)
@@ -397,6 +430,12 @@ If BUFFER, insert the article in that group."
      ((and gnus-use-cache
 	   (numberp article)
 	   (gnus-cache-request-article article group))
+      (setq res (cons group article)
+	    clean-up t))
+     ;; Check the agent cache.
+     ((and gnus-agent gnus-agent-cache gnus-plugged
+	   (numberp article)
+	   (gnus-agent-request-article article group))
       (setq res (cons group article)
 	    clean-up t))
      ;; Use `head' function.

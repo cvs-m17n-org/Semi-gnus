@@ -1,6 +1,6 @@
 ;;; nneething.el --- arbitrary file access for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -73,6 +73,103 @@ included.")
 (defvoo nneething-active nil)
 (defvoo nneething-address nil)
 
+(defvar nneething-mime-extensions
+  '((""        . "text/plain")
+    (".abs"   . "audio/x-mpeg")
+    (".aif"   . "audio/aiff")
+    (".aifc"  . "audio/aiff")
+    (".aiff"  . "audio/aiff")
+    (".ano"   . "application/x-annotator")
+    (".au"    . "audio/ulaw")
+    (".avi"   . "video/x-msvideo")
+    (".bcpio" . "application/x-bcpio")
+    (".bin"   . "application/octet-stream")
+    (".cdf"   . "application/x-netcdr")
+    (".cpio"  . "application/x-cpio")
+    (".csh"   . "application/x-csh")
+    (".css"   . "text/css")
+    (".dvi"   . "application/x-dvi")
+    (".diff"  . "text/x-patch")
+    (".el"    . "application/emacs-lisp")
+    (".eps"   . "application/postscript")
+    (".etx"   . "text/x-setext")
+    (".exe"   . "application/octet-stream")
+    (".fax"   . "image/x-fax")
+    (".gif"   . "image/gif")
+    (".hdf"   . "application/x-hdf")
+    (".hqx"   . "application/mac-binhex40")
+    (".htm"   . "text/html")
+    (".html"  . "text/html")
+    (".icon"  . "image/x-icon")
+    (".ief"   . "image/ief")
+    (".jpg"   . "image/jpeg")
+    (".macp"  . "image/x-macpaint")
+    (".man"   . "application/x-troff-man")
+    (".me"    . "application/x-troff-me")
+    (".mif"   . "application/mif")
+    (".mov"   . "video/quicktime")
+    (".movie" . "video/x-sgi-movie")
+    (".mp2"   . "audio/x-mpeg")
+    (".mp3"   . "audio/x-mpeg")
+    (".mp2a"  . "audio/x-mpeg2")
+    (".mpa"   . "audio/x-mpeg")
+    (".mpa2"  . "audio/x-mpeg2")
+    (".mpe"   . "video/mpeg")
+    (".mpeg"  . "video/mpeg")
+    (".mpega" . "audio/x-mpeg")
+    (".mpegv" . "video/mpeg")
+    (".mpg"   . "video/mpeg")
+    (".mpv"   . "video/mpeg")
+    (".ms"    . "application/x-troff-ms")
+    (".nc"    . "application/x-netcdf")
+    (".nc"    . "application/x-netcdf")
+    (".oda"   . "application/oda")
+    (".patch" . "text/x-patch")
+    (".pbm"   . "image/x-portable-bitmap")
+    (".pdf"   . "application/pdf")
+    (".pgm"   . "image/portable-graymap")
+    (".pict"  . "image/pict")
+    (".png"   . "image/png")
+    (".pnm"   . "image/x-portable-anymap")
+    (".ppm"   . "image/portable-pixmap")
+    (".ps"    . "application/postscript")
+    (".qt"    . "video/quicktime")
+    (".ras"   . "image/x-raster")
+    (".rgb"   . "image/x-rgb")
+    (".rtf"   . "application/rtf")
+    (".rtx"   . "text/richtext")
+    (".sh"    . "application/x-sh")
+    (".sit"   . "application/x-stuffit")
+    (".siv"   . "application/sieve")
+    (".snd"   . "audio/basic")
+    (".src"   . "application/x-wais-source")
+    (".tar"   . "archive/tar")
+    (".tcl"   . "application/x-tcl")
+    (".tex"   . "application/x-tex")
+    (".texi"  . "application/texinfo")
+    (".tga"   . "image/x-targa")
+    (".tif"   . "image/tiff")
+    (".tiff"  . "image/tiff")
+    (".tr"    . "application/x-troff")
+    (".troff" . "application/x-troff")
+    (".tsv"   . "text/tab-separated-values")
+    (".txt"   . "text/plain")
+    (".vbs"   . "video/mpeg")
+    (".vox"   . "audio/basic")
+    (".vrml"  . "x-world/x-vrml")
+    (".wav"   . "audio/x-wav")
+    (".xls"   . "application/vnd.ms-excel")
+    (".wrl"   . "x-world/x-vrml")
+    (".xbm"   . "image/xbm")
+    (".xpm"   . "image/xpm")
+    (".xwd"   . "image/windowdump")
+    (".zip"   . "application/zip")
+    (".ai"    . "application/postscript")
+    (".jpe"   . "image/jpeg")
+    (".jpeg"  . "image/jpeg"))
+  "An alist of file extensions and corresponding MIME content-types.
+This variable is used as the alternative of `mailcap-mime-extensions'.")
+
 
 
 ;;; Interface functions.
@@ -126,11 +223,25 @@ included.")
 	 (file-exists-p file)		; The file exists.
 	 (not (file-directory-p file))	; It's not a dir.
 	 (save-excursion
-	   (nnmail-find-file file)	; Insert the file in the nntp buf.
+	   (let ((nnmail-file-coding-system 'binary))
+	     (nnmail-find-file file))	; Insert the file in the nntp buf.
 	   (unless (nnheader-article-p)	; Either it's a real article...
-	     (goto-char (point-min))
-	     (nneething-make-head
-	      file (current-buffer))	; ... or we fake some headers.
+	     (let ((type
+		    (unless (file-directory-p file)
+		      (or (cdr (assoc (concat "." (file-name-extension file))
+				      (if (boundp 'mailcap-mime-extensions)
+					  (symbol-value 'mailcap-mime-extensions)
+					nneething-mime-extensions)))
+			  "text/plain")))
+		   (charset
+		    (mm-detect-mime-charset-region (point-min) (point-max)))
+		   (encoding))
+	       (unless (string-match "\\`text/" type)
+		 (base64-encode-region (point-min) (point-max))
+		 (setq encoding "base64"))
+	       (goto-char (point-min))
+	       (nneething-make-head file (current-buffer)
+				    nil type charset encoding))
 	     (insert "\n"))
 	   t))))
 
@@ -272,13 +383,44 @@ included.")
     (insert-buffer-substring nneething-work-buffer)
     (goto-char (point-max))))
 
-(defun nneething-make-head (file &optional buffer extra-msg)
+(defun nneething-encode-file-name (file &optional coding-system)
+  "Encode the name of the FILE in CODING-SYSTEM."
+  (let ((pos 0) buf)
+    (setq file (mm-encode-coding-string
+		file (or coding-system nnmail-pathname-coding-system)))
+    (while (string-match "[^-a-zA-Z_:/.]" file pos)
+      (setq buf (cons (format "%%%02x" (aref file (match-beginning 0)))
+		      (cons (substring file pos (match-beginning 0)) buf))
+	    pos (match-end 0)))
+    (apply (function concat)
+	   (nreverse (cons (substring file pos) buf)))))
+
+(defun nneething-decode-file-name (file &optional coding-system)
+  "Decode the name of the FILE is encoded in CODING-SYSTEM."
+  (let ((pos 0) buf)
+    (while (string-match "%\\([0-9a-fA-F][0-9a-fA-F]\\)" file pos)
+      (setq buf (cons (string (string-to-number (match-string 1 file) 16))
+		      (cons (substring file pos (match-beginning 0)) buf))
+	    pos (match-end 0)))
+    (decode-coding-string
+     (apply (function concat)
+	    (nreverse (cons (substring file pos) buf)))
+     (or coding-system nnmail-pathname-coding-system))))
+
+(defun nneething-get-file-name (id)
+  "Extract the file name from the message ID string."
+  (when (string-match "\\`<nneething\\-[0-9]+\\-\\([^@]+\\)@.*>\\'" id)
+    (nneething-decode-file-name (match-string 1 id))))
+
+(defun nneething-make-head (file &optional buffer extra-msg
+				 mime-type mime-charset mime-encoding)
   "Create a head by looking at the file attributes of FILE."
   (let ((atts (file-attributes file)))
     (insert
      "Subject: " (file-name-nondirectory file) (or extra-msg "") "\n"
      "Message-ID: <nneething-"
      (int-to-string (incf nneething-message-id-number))
+     "-" (nneething-encode-file-name file)
      "@" (system-name) ">\n"
      (if (equal '(0 0) (nth 5 atts)) ""
        (concat "Date: " (current-time-string (nth 5 atts)) "\n"))
@@ -297,6 +439,19 @@ included.")
 	   (concat "Lines: " (int-to-string
 			      (count-lines (point-min) (point-max)))
 		   "\n"))
+       "")
+     (if mime-type
+	 (concat "Content-Type: " mime-type
+		 (if mime-charset
+		     (concat "; charset="
+			     (if (stringp mime-charset)
+				 mime-charset
+			       (symbol-name mime-charset)))
+		   "")
+		 (if mime-encoding
+		     (concat "\nContent-Transfer-Encoding: " mime-encoding)
+		   "")
+		 "\nMIME-Version: 1.0\n")
        ""))))
 
 (defun nneething-from-line (uid &optional file)

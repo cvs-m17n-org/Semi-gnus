@@ -1207,7 +1207,35 @@ find-file-hooks, etc.
   (defalias 'mm-multibyte-string-p
     (if (fboundp 'multibyte-string-p)
 	'multibyte-string-p
-      'ignore)))
+      'ignore))
+
+  (defun nnheader-detect-coding-region (start end)
+    "Like 'detect-coding-region' except returning the best one."
+    (let ((coding-systems
+	   (static-if (boundp 'MULE)
+	       (code-detect-region (point) (point-max))
+	     (detect-coding-region (point) (point-max)))))
+      (or (car-safe coding-systems)
+	  coding-systems)))
+  (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
+
+  (defun nnheader-detect-mime-charset-region (start end)
+    "Detect MIME charset of the text in the region between START and END."
+    (coding-system-to-mime-charset
+     (nnheader-detect-coding-region start end)))
+  (defalias 'mm-detect-mime-charset-region
+    'nnheader-detect-mime-charset-region)
+
+  (defmacro nnheader-with-unibyte-buffer (&rest forms)
+  "Create a temporary buffer, and evaluate FORMS there like `progn'.
+Use unibyte mode for this."
+  `(let (default-enable-multibyte-characters mc-flag)
+     (with-temp-buffer ,@forms)))
+  (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
+  (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
+  (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
+  (put 'mm-with-unibyte-buffer 'edebug-form-spec '(body))
+  (defalias 'mm-with-unibyte-buffer 'nnheader-with-unibyte-buffer))
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)

@@ -33,7 +33,7 @@ warn: clean-some gnus-load.el
 
 # The "clever" rule is unsafe, since redefined macros are loaded from
 # .elc files, and not the .el file.
-clever some: gnus-load.el
+clever some l: gnus-load.el
 	@if test -f $(srcdir)/gnus.elc; then \
 	  echo \
 	    "checking whether the all elc files should be recompiled..."; \

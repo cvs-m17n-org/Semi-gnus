@@ -1,6 +1,6 @@
 ;;; gnus-xmas.el --- Gnus functions for XEmacs
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -632,6 +632,8 @@ If it is non-nil, it must be a toolbar.  The five valid values are
     [gnus-group-unsubscribe gnus-group-unsubscribe t "Unsubscribe group"]
     [gnus-group-subscribe gnus-group-subscribe t "Subscribe group"]
     [gnus-group-kill-group gnus-group-kill-group t "Kill group"]
+    [gnus-summary-mail-save
+     gnus-group-save-newsrc t "Save .newsrc files"] ; borrowed icon.
     [gnus-group-exit gnus-group-exit t "Exit Gnus"])
   "The group buffer toolbar.")
 
@@ -689,6 +691,8 @@ If it is non-nil, it must be a toolbar.  The five valid values are
      gnus-summary-save-article-file t "Save article in file"]
     [gnus-summary-save-article
      gnus-summary-save-article t "Save article"]
+    [gnus-summary-cancel-article ; usenet : cancellation :: mail : deletion.
+     gnus-summary-delete-article t "Delete message"]
     [gnus-summary-catchup
      gnus-summary-catchup t "Catchup"]
     [gnus-summary-catchup-and-exit
@@ -721,41 +725,6 @@ XEmacs compatibility workaround."
   (apply
    'call-process-region (point-min) (point-max) command t '(t nil) nil
    args))
-
-(defface gnus-x-face '((t (:foreground "black" :background "white")))
-  "Face to show X face"
-  :group 'gnus-xmas)
-
-(defun gnus-xmas-article-display-xface (data)
-  "Display the XFace in DATA."
-  (save-excursion
-    (let ((xface-glyph
-	   (cond
-	    ((featurep 'xface)
-	     (make-glyph (vector 'xface :data
-				 (concat "X-Face: " data))))
-	    ((featurep 'xpm)
-	     (let ((cur (current-buffer)))
-	       (save-excursion
-		 (gnus-set-work-buffer)
-		 (insert data)
-		 (let ((coding-system-for-read 'binary)
-		       (coding-system-for-write 'binary))
-		   (gnus-xmas-call-region "uncompface")
-		   (goto-char (point-min))
-		   (insert "/* Width=48, Height=48 */\n")
-		   (gnus-xmas-call-region "icontopbm")
-		   (gnus-xmas-call-region "ppmtoxpm")
-		   (make-glyph
-		    (vector 'xpm :data (buffer-string)))))))
-	    (t
-	     (make-glyph [nothing])))))
-      ;;(set-glyph-face xface-glyph 'gnus-x-face)
-
-      (gnus-article-goto-header "from")
-      (gnus-put-image xface-glyph " ")
-      (gnus-add-wash-type 'xface)
-      (gnus-add-image 'xface xface-glyph))))
 
 (defvar gnus-xmas-modeline-left-extent
   (let ((ext (copy-extent modeline-buffer-id-left-extent)))
@@ -936,6 +905,8 @@ XEmacs compatibility workaround."
 Warning: Don't insert text immediately after the image."
   (let ((begin (point))
 	extent)
+    (if (and (bobp) (not string))
+	(setq string " "))
     (if string
 	(insert string)
       (setq begin (1- begin)))
