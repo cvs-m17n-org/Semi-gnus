@@ -1382,7 +1382,7 @@ When called interactively, prompt for REGEXP."
 	  (setq part (match-string 0 subject))
 	  (setq subject (substring subject (match-end 0)))))
     (or part
-	(while (string-match "\\([0-9]+\\)[^0-9]+\\([0-9]+\\)" subject)
+	(while (string-match "[0-9]+[^0-9]+[0-9]+" subject)
 	  (setq part (match-string 0 subject))
 	  (setq subject (substring subject (match-end 0)))))
     (or part "")))
