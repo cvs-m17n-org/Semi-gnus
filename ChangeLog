@@ -1,5 +1,161 @@
 1999-02-26  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
+	* Nana-gnus: Version 6.12.6 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.6.
+
+	* Sync up with gnus-6_10 (version 6.10.9+).
+
+* 1999-02-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* Makefile.in (xinfo, xinfo-ja): Make add-info-suffix, formatting,
+	and make remove-info-suffix.
+
+	* texi/Makefile.in (.texi): Don't specify the output filename when
+	makeinfo command is used.
+	(add-info-suffix, remove-info-suffix): New targets.
+
+	* lisp/dgnushack.el (dgnushack-add-info-suffix-maybe): New
+	function. It will be used for adding ".info" suffix to @setfilename
+	line in each .texi files.
+	(dgnushack-texi-file-regexp): New constant.
+	(dgnushack-info-file-regexp): Add ".info" suffix.
+
+* 1999-02-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/Makefile.in (all, total): Remove "auto-autoloads.el" and
+	"custom-load.el" as well.
+
+	* Makefile.in (xlick, xinfo, xinfo-ja): New targets.
+	(install-package-ja, package-ja, install-package, package): Use
+	them; use $XEMACS instead of $EMACS.
+	(osome): Use $XEMACS instead of "xemacs".
+
+	* lisp/dgnushack.el (dgnushack-install-package): Remove extra files
+	in destination lisp directory.
+	(dgnushack-make-package): Don't generate "_pkg.el" file; don't
+	remove "auto-autoloads.el*" files.
+	(dgnushack-compile): Don't remove "_pkg.el" from the list.
+
+* 1999-02-18  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* README-offline.en: Update.
+
+	* README-offline.ja: Fix typo.
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Set
+	`gnus-offline-hangup-program' and `gnus-offline-dialup-program' to
+	nil when null string is given.
+
+* 1999-02-18  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* texi/Makefile.in: Change to work on Windows environment and
+	other platforms.
+
+* 1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-make-package): Fix typo.
+
+* 1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* Makefile.in (install-package-ja, package-ja, install-package,
+	package): New targets.
+	(PACKAGEDIR): New user option.
+
+	* lisp/Makefile.in (install-package, package): New targets.
+	(PACKAGEDIR): New user option.
+
+	* lisp/dgnushack.el (dgnushack-install-package): New function.
+	(dgnushack-make-package): New function.
+	(dgnushack-info-file-regexp): New constant.
+	(dgnushack-compile): Remove "_pkg.el" from the list.
+
+* 1999-02-17  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* aclocal.m4: install .el files to site-lisp/gnus instead of
+	site-lisp.
+	* configure: Ditto.
+	* Makefile.in: add new rule `all-ja'.
+
+* 1999-02-15  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Bug fix when
+	using nnspool.
+
+	* lisp/pop3-fma.el (pop3-fma-movemail): Delete meadow specific
+	code.
+
+* 1999-02-12  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (article-hide-headers): Show all headers when
+	unhiding.
+
+	* lisp/message.el (message-make-forward-subject): Use "(none)" if
+	the original article has no subject.
+
+* 1999-02-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Use
+	`save-buffer-as-coding-system' instead of
+	`write-region-as-coding-system'.
+	(save-buffer-as-coding-system): New function defined with
+	`defun-maybe'. NOTE: It should be deleted in the future.
+
+	* lisp/gnus-sum.el (TopLevel): Require `mime-play' when compile.
+
+* 1999-02-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-mime-extract-message/rfc822): New
+	implementation.
+
+* 1999-02-08  Masatoshi Tsuchiya  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-articles-to-read): Use maximum number in
+	default instead of `gnus-large-newsgroup'.
+
+* 1999-02-08  Masatoshi Tsuchiya  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+              Katsumi Yamaoka   <yamaoka@jpl.org>,
+              Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-sum.el (gnus-articles-to-read): If the number of
+	unread articles is more than `gnus-large-newsgroup', use it in
+	default instead of the maximum number.
+
+* 1999-02-08  MORIOKA Tomohiko  <morioka@jaist.ac.jp>,
+              Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-mime-extract-multipart): New function;
+	add it to the acting-condition for extracting mulitpart messages.
+	(gnus-mime-extract-message/rfc822): New function; add it to the
+	acting-condition for extracting message/rfc822 or message/news.
+
+* 1999-02-08  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* README-offline.ja: Change for current version.
+	* README-offline.en: Ditto.
+
+* 1999-02-05  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-nov-parse-line): Use `nnheader-nov-field',
+	`nnheader-nov-read-integer' and `nnheader-nov-read-message-id'
+	instead of `gnus-nov-field', `gnus-nov-read-integer' or
+	`nnheader-generate-fake-message-id'; use `eobp' instead of
+	`(= (following-char) ?\n)' for checking whether a misc field
+	exists or not.
+	(gnus-nov-field): Abolished.
+	(gnus-nov-skip-field): Abolished.
+	(gnus-nov-read-integer): Abolished.
+
+	* lisp/nnheader.el (nnheader-parse-nov): Use
+	`nnheader-nov-read-message-id' instead of `nnheader-nov-field' or
+	`nnheader-generate-fake-message-id'.
+	(nnheader-nov-read-message-id): New macro.
+	(nnheader-nov-read-integer): New implementation.
+	(nnheader-nov-field): New implementation.
+	(nnheader-nov-next-field): New macro.
+
+1999-02-26  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
 	* Nana-gnus: Version 6.12.5 released.
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.12.5.
@@ -94,7 +250,6 @@
 	* Nana-TIPS.ja: New section
 	`message-mail-follow-up-address-checker'.
 
-
 1999-02-05  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.12.1.
