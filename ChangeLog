@@ -1,3 +1,8 @@
+2002-03-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-group.el (gnus-group-completing-read-group-name): Use
+	`mapatoms' to extract all groups from `gnus-active-hashtb'.
+
 2002-03-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-group.el (gnus-group-completing-read-group-name):

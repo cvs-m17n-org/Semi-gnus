@@ -1065,10 +1065,12 @@ The following commands are available:
 (defun gnus-group-completing-read-group-name
   (prompt table &optional predicate require-match initial-contents history)
   (if (vectorp table)
-      (dolist (group (prog1
-			 (delq 0 (append table nil))
-		       (setq table nil)))
-	(push (list (gnus-group-decoded-name (symbol-name group))) table))
+      (mapatoms
+       (lambda (group)
+	 (push (list (gnus-group-decoded-name (symbol-name group))) table))
+       (prog1
+	   table
+	 (setq table nil)))
     (dolist (entry (prog1
 		       table
 		     (setq table nil)))
