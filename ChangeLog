@@ -1,3 +1,21 @@
+2002-06-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
+
+	* contrib/gpg-ring.el: Remove RCS magic cookie.
+	* lisp/nnir.el: Ditto.
+	* lisp/sieve-manage.el: Ditto.
+	* lisp/sieve-mode.el: Ditto.
+
+	* texi/ptexinfmt.el (texinfo-discard-command-and-arg): New
+	function.
+
+2002-06-03  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* texi/ptexinfmt.el: discard @cartouche.  @anchor discard for Mule
+	2.3.  Support @., @:, @-.
+	(texinfo-format-inforef): New function.
+
 2002-04-30  Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/message.el (message-expand-name-function): New user option.

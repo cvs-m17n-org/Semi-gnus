@@ -64,8 +64,6 @@
 ;; Release history:
 ;;
 ;; 2001-10-31 Committed to Oort Gnus.
-;;
-;; $Id: sieve-manage.el,v 1.1.4.3 2002-05-07 02:55:07 yamaoka Exp $
 
 ;;; Code:
 
