@@ -250,7 +250,7 @@ is restarted, and sometimes reloaded."
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Quassia Gnus v0.32)" gnus-version-number)
+  (format "Semi-gnus %s (based on Quassia Gnus v0.33)" gnus-version-number)
   "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -641,20 +641,12 @@ be set in `.emacs' instead."
 
 (defvar gnus-simple-splash nil)
 
-(defvar gnus-bdf-image-file nil)
 (defun gnus-group-startup-message (&optional x y)
   "Insert startup message in current buffer."
   ;; Insert the message.
   (erase-buffer)
   (insert
-   (if (featurep 'bitmap)
-     (format "              %s
-
-"
-	     "" (if (and (stringp gnus-bdf-image-file)
-			 (file-exists-p gnus-bdf-image-file))
-		    (insert-file gnus-image-file)))
-     (format "              %s
+   (format "              %s
           _    ___ _             _
           _ ___ __ ___  __    _ ___
           __   _     ___    __  ___
@@ -674,7 +666,7 @@ be set in `.emacs' instead."
           __
 
 "
-	     "")))
+           ""))
   ;; And then hack it.
   (gnus-indent-rigidly (point-min) (point-max)
 		       (/ (max (- (window-width) (or x 46)) 0) 2))
@@ -1136,6 +1128,7 @@ slower."
     ("nnfolder" mail respool address)
     ("nngateway" none address prompt-address physical-address)
     ("nnweb" none)
+    ("nnlistserv" none)
     ("nnagent" post-mail))
   "*An alist of valid select methods.
 The first element of each list lists should be a string with the name
@@ -1640,7 +1633,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-group-list-groups gnus-group-first-unread-group
       gnus-group-set-mode-line gnus-group-set-info gnus-group-save-newsrc
       gnus-group-setup-buffer gnus-group-get-new-news
-      gnus-group-make-help-group gnus-group-update-group)
+      gnus-group-make-help-group gnus-group-update-group
+      gnus-clear-inboxes-moved gnus-group-iterate
+      gnus-group-group-name)
      ("gnus-bcklg" gnus-backlog-request-article gnus-backlog-enter-article
       gnus-backlog-remove-article)
      ("gnus-art" gnus-article-read-summary-keys gnus-article-save
@@ -2082,11 +2077,13 @@ g -- Group name."
 	((= c ?g)
 	 (gnus-group-group-name))
 	((= c ?A)
-	 (gnus-summary-article-number))
+	 (gnus-summary-skip-intangible)
+	 (or (get-text-property (point) 'gnus-number)
+	     (gnus-summary-last-subject)))
 	((= c ?H)
-	 (gnus-summary-article-header))
+	 (gnus-data-header (gnus-data-find (gnus-summary-article-number))))
 	(t
-	 (error "Not implemented spec")))
+	 (error "Non-implemented spec")))
        out)
       (cond
        ((= c ?r)
