@@ -269,7 +269,7 @@ on your system, you could say something like:
 
 (defun nnheader-parse-nov ()
   (let ((eol (gnus-point-at-eol)))
-    (vector
+    (make-full-mail-header
      (nnheader-nov-read-integer)	; number
      (nnheader-nov-field)		; subject
      (nnheader-nov-field)		; from
