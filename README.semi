@@ -13,9 +13,9 @@ ftp://ftp.jaist.ac.jp/pub/elisp/semi/
 Required environment for SEMI is written in README.en of SEMI package.
 
   T-gnus major change has been done. It won't work with the old versions
-of SEMI packages, e.g. FLIM 1.10.5, SEMI 1.9.1, etc. If you have that one,
+of SEMI packages, e.g. FLIM 1.11.3, SEMI 1.10.2, etc. If you have that one,
 please update your environment before installing it. The recommended
-versions of SEMI packages are APEL 9.10, FLIM 1.11.3 and SEMI 1.10.2 or
+versions of SEMI packages are APEL 9.11, FLIM 1.12.0 and SEMI 1.11.0 or
 newer than them.
 
 

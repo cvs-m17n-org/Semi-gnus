@@ -102,6 +102,11 @@ on your system, you could say something like:
 (defalias 'mail-header-xref 'mime-entity-xref-internal)
 (defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
 
+(defalias 'nnheader-decode-subject
+  (mime-find-field-decoder 'Subject 'nov))
+(defalias 'nnheader-decode-from
+  (mime-find-field-decoder 'From 'nov))
+
 (defalias 'mail-header-extra 'ignore)
 (defalias 'mail-header-set-extra 'ignore)
 
@@ -121,10 +126,10 @@ on your system, you could say something like:
    nil
    nil nil nil
    (if subject
-       (eword-decode-and-unfold-unstructured-field subject)
+       (nnheader-decode-subject subject)
      )
    (if from
-       (eword-decode-and-unfold-structured-field from)
+       (nnheader-decode-from from)
      )
    date id references
    chars lines xref

@@ -1077,7 +1077,7 @@ If PROMPT (the prefix), prompt for a coding system to use."
     (let ((charset (save-excursion
 		     (set-buffer gnus-summary-buffer)
 		     default-mime-charset)))
-      (eword-decode-header charset)
+      (mime-decode-header-in-buffer charset)
       )))
 
 (defun article-de-quoted-unreadable (&optional force)
@@ -3878,7 +3878,7 @@ For example:
 ;;;
 
 (defun gnus-article-header-presentation-method (entity situation)
-  (mime-insert-decoded-header entity)
+  (mime-insert-header entity)
   )
 
 (set-alist 'mime-header-presentation-method-alist

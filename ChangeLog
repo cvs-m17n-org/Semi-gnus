@@ -1,5 +1,10 @@
 1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.034.
+	(gnus-version): Modify for SEMI 1.11, FLIM 1.12.
+
+1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* make.bat: Replace line endings from `LF' to `CRLF'.
 
 1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
@@ -42,6 +47,13 @@
 	* Sync up with Pterodactyl Gnus 0.44.
 
 1998-11-13  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-header-presentation-method): Use
+	`mime-insert-header' instead of `mime-insert-decoded-header'.
+
+	* lisp/nnheader.el (nnheader-decode-subject): Change the 2nd arg of
+	`mime-find-field-decoder' to 'nov'.
+	(nnheader-decode-from): Ditto.
 
 	* lisp/message.el (message-maybe-split-and-send-mail): Discard
 	a return from `message-send-mail-function'.
@@ -132,6 +144,12 @@
 
 1998-11-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/nnheader.el (nnheader-decode-subject): Call
+	`mime-find-field-decoder' with `summary' as the 2nd arg.
+	(nnheader-decode-from): Ditto.
+
+1998-11-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/pop3-fma.el: Set the value of `nnmail-read-passwd' as a
 	symbol `pop3-fma-read-passwd'.
 
@@ -214,6 +232,12 @@
 	(gnus-bbdb/update-record): Use `save-excursion' and change timing
 	of `save-restriction'.
 
+1998-10-31  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-draft.el (gnus-draft-decoding-function): Use
+	`mime-edit-decode-message-in-buffer' instead of
+	`mime-edit-decode-buffer'.
+
 1998-10-31  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/nnheader.el (nnheader-decode-field-body): New inline
@@ -250,6 +274,10 @@
 
 1998-10-30  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus-art.el (article-decode-encoded-words): Use
+	`mime-decode-header-in-buffer' instead of `eword-decode-header'.
+	(gnus-article-display-message-with-encoded-word): Likewise.
+
 	* lisp/gnus-art.el (gnus-article-mime-edit-article-setup): Fix
 	typo.
 
@@ -257,6 +285,17 @@
 
 	* lisp/gnus-draft.el (gnus-draft-decoding-function): Use
 	`mime-edit-decode-buffer' simply as initial value.
+
+	* lisp/message.el (message-make-forward-subject): Use
+	`nnheader-decode-subject' instead of
+	`eword-decode-unstructured-field-body'.
+
+	* lisp/nnheader.el (nnheader-decode-subject): New alias.
+	(nnheader-decode-from): New alias.
+	(make-full-mail-header): Use `nnheader-decode-subject' and
+	`nnheader-decode-from' instead of
+	`eword-decode-and-unfold-unstructured-field' and
+	`eword-decode-and-unfold-structured-field'.
 
 1998-10-29  Katsumi Yamaoka   <yamaoka@jpl.org>
 
