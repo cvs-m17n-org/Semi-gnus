@@ -28,11 +28,10 @@
 (eval-when-compile
   (require 'cl)
   (require 'imap)
-  (eval-when-compile (defvar display-time-mail-function)))
-(eval-and-compile
-  (defvar pop3-leave-mail-on-server)
+  (defvar display-time-mail-function)
   (autoload 'pop3-movemail "pop3")
-  (autoload 'pop3-get-message-count "pop3")
+  (autoload 'pop3-get-message-count "pop3"))
+(eval-and-compile
   (autoload 'nnheader-cancel-timer "nnheader")
   (autoload 'nnheader-run-at-time "nnheader"))
 (require 'format-spec)
@@ -742,6 +741,7 @@ Pass INFO on to CALLBACK."
 	      (funcall function mail-source-crash-box))
 	     ;; The default is to use pop3.el.
 	     (t
+	      (require 'pop3)
 	      (let ((pop3-password password)
 		    (pop3-maildrop user)
 		    (pop3-mailhost server)
@@ -752,7 +752,7 @@ Pass INFO on to CALLBACK."
 		    (pop3-leave-mail-on-server
 		     (or leave
 			 (and (boundp 'pop3-leave-mail-on-server)
-			      pop3-leave-mail-on-server))))
+			      (symbol-value 'pop3-leave-mail-on-server)))))
 		(if (or debug-on-quit debug-on-error)
 		    (save-excursion (pop3-movemail mail-source-crash-box))
 		  (condition-case err
@@ -808,6 +808,7 @@ Pass INFO on to CALLBACK."
 	     (function)
 	     ;; The default is to use pop3.el.
 	     (t
+	      (require 'pop3)
 	      (let ((pop3-password password)
 		    (pop3-maildrop user)
 		    (pop3-mailhost server)

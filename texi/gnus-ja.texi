@@ -10464,6 +10464,12 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 $B5-;v%P%C%U%!$GMQ$$$i$l$k%7%s%?%C%/%9%F!<%V%k$G$9!#$3$l(B
 $B$O(B @code{text-mode-syntax-table} $B$r$b$H$K=i4|2=$5$l$^$9!#(B
 
+@vindex gnus-article-over-scroll
+@item gnus-article-over-scroll
+$BHs(B-@code{nil} $B$K$9$k$3$H$K$h$C$F!"$=$l0J>e%9%/%m!<%k$9$k?7$7$$%F%-%9%H$,(B
+$BL5$/$F$b5-;v%P%C%U%!$r%9%/%m!<%k$9$k$3$H$r2DG=$K$7$^$9!#%G%#%U%)%k%H(B
+$B$O(B @code{nil} $B$G$9!#(B($BLuCm(B: $B8=<B$NF0:n$H9g$C$F$$$J$$$h$&$J5$$,$9$k!#(B)
+
 @vindex gnus-article-mode-line-format
 @item gnus-article-mode-line-format
 $B$3$NJQ?t$O(B @code{gnus-summary-mode-line-format} $B$HF1$89T$K=>$C$?MM<0J8;z(B

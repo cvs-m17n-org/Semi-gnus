@@ -476,6 +476,7 @@ Thank you for your help in stamping out bugs.
 	 (set (make-local-variable 'gnus-newsgroup-name) ,group)
 	 (gnus-maybe-setup-default-charset)
 	 (gnus-run-hooks 'gnus-message-setup-hook))
+       (message-hide-headers)
        (gnus-add-buffer)
        (gnus-configure-windows ,config t)
        (run-hooks 'post-command-hook)
