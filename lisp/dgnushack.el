@@ -525,11 +525,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
   (when (featurep 'xemacs)
     (autoload 'c-mode "cc-mode" nil t)
     (autoload 'font-lock-mode "font-lock" nil t)
-    (autoload 'nnheader-detect-coding-region "nnheader")
     (autoload 'read-kbd-macro "edmacro" nil t)
-    (autoload 'std11-extract-addresses-components "nnheader")
-    (autoload 'std11-fold-regionstd11-unfold-region "nnheader")
-    (autoload 'std11-narrow-to-field "nnheader")
     (autoload 'turn-on-font-lock "font-lock" nil t)))
 
 (defconst dgnushack-unexporting-files

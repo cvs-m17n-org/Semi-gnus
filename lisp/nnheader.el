@@ -140,212 +140,253 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;; mm-util stuff.
-(unless (featurep 'mm-util)
-  ;; Should keep track of `mm-image-load-path' in mm-util.el.
-  (defun nnheader-image-load-path (&optional package)
-    (let (dir result)
-      (dolist (path load-path (nreverse result))
-	(if (file-directory-p
-	     (setq dir (concat (file-name-directory
-				(directory-file-name path))
-			       "etc/" (or package "gnus/"))))
-	    (push dir result))
-	(push path result))))
-  (defalias 'mm-image-load-path 'nnheader-image-load-path)
+(eval-and-compile
+  (unless (featurep 'mm-util)
+    ;; Should keep track of `mm-image-load-path' in mm-util.el.
+    (defun nnheader-image-load-path (&optional package)
+      (let (dir result)
+	(dolist (path load-path (nreverse result))
+	  (if (file-directory-p
+	       (setq dir (concat (file-name-directory
+				  (directory-file-name path))
+				 "etc/" (or package "gnus/"))))
+	      (push dir result))
+	  (push path result))))
+    (defalias 'mm-image-load-path 'nnheader-image-load-path)
 
-  ;; Should keep track of `mm-read-coding-system' in mm-util.el.
-  (defalias 'mm-read-coding-system
-    (if (or (and (featurep 'xemacs)
-		 (<= (string-to-number emacs-version) 21.1))
-	    (boundp 'MULE))
-	(lambda (prompt &optional default-coding-system)
-	  (read-coding-system prompt))
-      'read-coding-system))
+    ;; Should keep track of `mm-read-coding-system' in mm-util.el.
+    (defalias 'mm-read-coding-system
+      (if (or (and (featurep 'xemacs)
+		   (<= (string-to-number emacs-version) 21.1))
+	      (boundp 'MULE))
+	  (lambda (prompt &optional default-coding-system)
+	    (read-coding-system prompt))
+	'read-coding-system))
 
-  ;; Should keep track of `mm-%s' in mm-util.el.
-  (defalias 'mm-multibyte-string-p
-    (if (fboundp 'multibyte-string-p)
-	'multibyte-string-p
-      'ignore))
-  (defalias 'mm-encode-coding-string 'encode-coding-string)
-  (defalias 'mm-decode-coding-string 'decode-coding-string)
+    ;; Should keep track of `mm-%s' in mm-util.el.
+    (defalias 'mm-multibyte-string-p
+      (if (fboundp 'multibyte-string-p)
+	  'multibyte-string-p
+	'ignore))
+    (defalias 'mm-encode-coding-string 'encode-coding-string)
+    (defalias 'mm-decode-coding-string 'decode-coding-string)
 
-  ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
-  (defun nnheader-detect-coding-region (start end)
-    "Like 'detect-coding-region' except returning the best one."
-    (let ((coding-systems
-	   (static-if (boundp 'MULE)
-	       (code-detect-region (point) (point-max))
-	     (detect-coding-region (point) (point-max)))))
-      (or (car-safe coding-systems)
-	  coding-systems)))
-  (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
+    ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
+    (defun nnheader-detect-coding-region (start end)
+      "Like 'detect-coding-region' except returning the best one."
+      (let ((coding-systems
+	     (static-if (boundp 'MULE)
+		 (code-detect-region (point) (point-max))
+	       (detect-coding-region (point) (point-max)))))
+	(or (car-safe coding-systems)
+	    coding-systems)))
+    (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
 
-  ;; Should keep track of `mm-detect-mime-charset-region' in mm-util.el.
-  (defun nnheader-detect-mime-charset-region (start end)
-    "Detect MIME charset of the text in the region between START and END."
-    (coding-system-to-mime-charset
-     (nnheader-detect-coding-region start end)))
-  (defalias 'mm-detect-mime-charset-region
-    'nnheader-detect-mime-charset-region)
+    ;; Should keep track of `mm-detect-mime-charset-region' in mm-util.el.
+    (defun nnheader-detect-mime-charset-region (start end)
+      "Detect MIME charset of the text in the region between START and END."
+      (coding-system-to-mime-charset
+       (nnheader-detect-coding-region start end)))
+    (defalias 'mm-detect-mime-charset-region
+      'nnheader-detect-mime-charset-region)
 
-  ;; Should keep track of `mm-with-unibyte-buffer' in mm-util.el.
-  (defmacro nnheader-with-unibyte-buffer (&rest forms)
-  "Create a temporary buffer, and evaluate FORMS there like `progn'.
+    ;; Should keep track of `mm-with-unibyte-buffer' in mm-util.el.
+    (defmacro nnheader-with-unibyte-buffer (&rest forms)
+      "Create a temporary buffer, and evaluate FORMS there like `progn'.
 Use unibyte mode for this."
-  `(let (default-enable-multibyte-characters default-mc-flag)
-     (with-temp-buffer ,@forms)))
-  (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
-  (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
-  (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
-  (put 'mm-with-unibyte-buffer 'edebug-form-spec '(body))
-  (defalias 'mm-with-unibyte-buffer 'nnheader-with-unibyte-buffer)
+      `(let (default-enable-multibyte-characters default-mc-flag)
+	 (with-temp-buffer ,@forms)))
+    (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
+    (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
+    (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
+    (put 'mm-with-unibyte-buffer 'edebug-form-spec '(body))
+    (defalias 'mm-with-unibyte-buffer 'nnheader-with-unibyte-buffer)
 
-  ;; Should keep track of `mm-with-unibyte-current-buffer' in mm-util.el.
-  (defmacro nnheader-with-unibyte-current-buffer (&rest forms)
-    "Evaluate FORMS with current current buffer temporarily made unibyte.
+    ;; Should keep track of `mm-with-unibyte-current-buffer' in mm-util.el.
+    (defmacro nnheader-with-unibyte-current-buffer (&rest forms)
+      "Evaluate FORMS with current current buffer temporarily made unibyte.
 Also bind `default-enable-multibyte-characters' to nil.
 Equivalent to `progn' in XEmacs"
-    (let ((multibyte (make-symbol "multibyte"))
-	  (buffer (make-symbol "buffer")))
-      (cond ((featurep 'xemacs)
-	     `(let (default-enable-multibyte-characters)
-		,@forms))
-	    ((boundp 'MULE)
-	     `(let ((,multibyte mc-flag)
-		    (,buffer (current-buffer)))
-		(unwind-protect
-		    (let (default-enable-multibyte-characters default-mc-flag)
-		      (setq mc-flag nil)
-		      ,@forms)
-		  (set-buffer ,buffer)
-		  (setq mc-flag ,multibyte))))
-	    (t
-	     `(let ((,multibyte enable-multibyte-characters)
-		    (,buffer (current-buffer)))
-		(unwind-protect
-		    (let (default-enable-multibyte-characters)
-		      (set-buffer-multibyte nil)
-		      ,@forms)
-		  (set-buffer ,buffer)
-		  (set-buffer-multibyte ,multibyte)))))))
-  (put 'nnheader-with-unibyte-current-buffer 'lisp-indent-function 0)
-  (put 'nnheader-with-unibyte-current-buffer 'edebug-form-spec '(body))
-  (put 'mm-with-unibyte-current-buffer 'lisp-indent-function 0)
-  (put 'mm-with-unibyte-current-buffer 'edebug-form-spec '(body))
-  (defalias 'mm-with-unibyte-current-buffer
-    'nnheader-with-unibyte-current-buffer)
+      (let ((multibyte (make-symbol "multibyte"))
+	    (buffer (make-symbol "buffer")))
+	(cond ((featurep 'xemacs)
+	       `(let (default-enable-multibyte-characters)
+		  ,@forms))
+	      ((boundp 'MULE)
+	       `(let ((,multibyte mc-flag)
+		      (,buffer (current-buffer)))
+		  (unwind-protect
+		      (let (default-enable-multibyte-characters
+			     default-mc-flag)
+			(setq mc-flag nil)
+			,@forms)
+		    (set-buffer ,buffer)
+		    (setq mc-flag ,multibyte))))
+	      (t
+	       `(let ((,multibyte enable-multibyte-characters)
+		      (,buffer (current-buffer)))
+		  (unwind-protect
+		      (let (default-enable-multibyte-characters)
+			(set-buffer-multibyte nil)
+			,@forms)
+		    (set-buffer ,buffer)
+		    (set-buffer-multibyte ,multibyte)))))))
+    (put 'nnheader-with-unibyte-current-buffer 'lisp-indent-function 0)
+    (put 'nnheader-with-unibyte-current-buffer 'edebug-form-spec '(body))
+    (put 'mm-with-unibyte-current-buffer 'lisp-indent-function 0)
+    (put 'mm-with-unibyte-current-buffer 'edebug-form-spec '(body))
+    (defalias 'mm-with-unibyte-current-buffer
+      'nnheader-with-unibyte-current-buffer)
 
-  ;; Should keep track of `mm-with-unibyte' in mm-util.el.
-  (defmacro nnheader-with-unibyte (&rest forms)
-    "Eval the FORMS with the default value of `enable-multibyte-characters'
+    ;; Should keep track of `mm-with-unibyte' in mm-util.el.
+    (defmacro nnheader-with-unibyte (&rest forms)
+      "Eval the FORMS with the default value of `enable-multibyte-characters'
 nil, ."
-    `(let (default-enable-multibyte-characters)
-       ,@forms))
-  (put 'nnheader-with-unibyte 'lisp-indent-function 0)
-  (put 'nnheader-with-unibyte 'edebug-form-spec '(body))
-  (put 'mm-with-unibyte 'lisp-indent-function 0)
-  (put 'mm-with-unibyte 'edebug-form-spec '(body))
-  (defalias 'mm-with-unibyte 'nnheader-with-unibyte)
+      `(let (default-enable-multibyte-characters)
+	 ,@forms))
+    (put 'nnheader-with-unibyte 'lisp-indent-function 0)
+    (put 'nnheader-with-unibyte 'edebug-form-spec '(body))
+    (put 'mm-with-unibyte 'lisp-indent-function 0)
+    (put 'mm-with-unibyte 'edebug-form-spec '(body))
+    (defalias 'mm-with-unibyte 'nnheader-with-unibyte)
 
-  ;; Should keep track of `mm-guess-mime-charset' in mm-util.el.
-  (defun nnheader-guess-mime-charset ()
-  "Guess the default MIME charset from the language environment."
-  (let ((language-info
-	 (and (boundp 'current-language-environment)
-	      (assoc current-language-environment
-		     language-info-alist)))
-	item)
-    (cond
-     ((null language-info)
-      'iso-8859-1)
-     ((setq item
-	    (cadr
-	     (or (assq 'coding-priority language-info)
-		 (assq 'coding-system language-info))))
-      (if (fboundp 'coding-system-get)
-	  (or (coding-system-get item 'mime-charset)
-	      item)
-	item))
-     ((setq item (car (last (assq 'charset language-info))))
-      (if (eq item 'ascii)
-	  'iso-8859-1
-	 (charsets-to-mime-charset (list item))))
-     (t
-      'iso-8859-1))))
-  (defalias 'mm-guess-mime-charset 'nnheader-guess-mime-charset)
+    ;; Should keep track of `mm-guess-mime-charset' in mm-util.el.
+    (defun nnheader-guess-mime-charset ()
+      "Guess the default MIME charset from the language environment."
+      (let ((language-info
+	     (and (boundp 'current-language-environment)
+		  (assoc current-language-environment
+			 language-info-alist)))
+	    item)
+	(cond
+	 ((null language-info)
+	  'iso-8859-1)
+	 ((setq item
+		(cadr
+		 (or (assq 'coding-priority language-info)
+		     (assq 'coding-system language-info))))
+	  (if (fboundp 'coding-system-get)
+	      (or (coding-system-get item 'mime-charset)
+		  item)
+	    item))
+	 ((setq item (car (last (assq 'charset language-info))))
+	  (if (eq item 'ascii)
+	      'iso-8859-1
+	    (charsets-to-mime-charset (list item))))
+	 (t
+	  'iso-8859-1))))
+    (defalias 'mm-guess-mime-charset 'nnheader-guess-mime-charset)
 
-  (defalias 'mm-char-int 'char-int)
+    (defalias 'mm-char-int 'char-int)
 
-  ;; Should keep track of the same alias in mm-util.el.
-  (defalias 'mm-multibyte-p
-    (static-cond ((and (featurep 'xemacs) (featurep 'mule))
-		  (lambda nil t))
-		 ((featurep 'xemacs)
-		  (lambda nil nil))
-		 ((boundp 'MULE)
-		  (lambda nil mc-flag))
-		 (t
-		  (lambda nil enable-multibyte-characters))))
+    ;; Should keep track of the same alias in mm-util.el.
+    (defalias 'mm-multibyte-p
+      (static-cond ((and (featurep 'xemacs) (featurep 'mule))
+		    (lambda nil t))
+		   ((featurep 'xemacs)
+		    (lambda nil nil))
+		   ((boundp 'MULE)
+		    (lambda nil mc-flag))
+		   (t
+		    (lambda nil enable-multibyte-characters))))
 
-  ;; Should keep track of the same alias in mm-util.el.
-  (defalias 'mm-make-temp-file
-    (if (fboundp 'make-temp-file)
-	'make-temp-file
-      (lambda (prefix &optional dir-flag)
-	(let ((file (expand-file-name
-		     (make-temp-name prefix)
-		     (if (fboundp 'temp-directory)
-			 (temp-directory)
-		       temporary-file-directory))))
-	  (if dir-flag
-	      (make-directory file))
-	  file))))
+    ;; Should keep track of the same alias in mm-util.el.
+    (defalias 'mm-make-temp-file
+      (if (fboundp 'make-temp-file)
+	  'make-temp-file
+	(lambda (prefix &optional dir-flag)
+	  (let ((file (expand-file-name
+		       (make-temp-name prefix)
+		       (if (fboundp 'temp-directory)
+			   (temp-directory)
+			 temporary-file-directory))))
+	    (if dir-flag
+		(make-directory file))
+	    file))))
 
-  ;; Should keep track of `mm-coding-system-p' in mm-util.el.
-  (defun nnheader-coding-system-p (sym)
-    "Return non-nil if SYM is a coding system."
-    (or (and (fboundp 'find-coding-system) (find-coding-system sym))
-	(and (fboundp 'coding-system-p) (coding-system-p sym))))
-  (defalias 'mm-coding-system-p 'nnheader-coding-system-p))
+    ;; Should keep track of `mm-coding-system-p' in mm-util.el.
+    (defun nnheader-coding-system-p (sym)
+      "Return non-nil if SYM is a coding system."
+      (or (and (fboundp 'find-coding-system) (find-coding-system sym))
+	  (and (fboundp 'coding-system-p) (coding-system-p sym))))
+    (defalias 'mm-coding-system-p 'nnheader-coding-system-p))
 
-;; mail-parse stuff.
-(unless (featurep 'mail-parse)
-  ;; Should keep track of `rfc2047-narrow-to-field' in rfc2047.el.
-  (defun-maybe std11-narrow-to-field ()
-    "Narrow the buffer to the header on the current line."
-    (forward-line 0)
-    (narrow-to-region (point)
-		      (progn
-			(std11-field-end)
-			(when (eolp) (forward-line 1))
-			(point)))
-    (goto-char (point-min)))
-  (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
+  ;; mail-parse stuff.
+  (unless (featurep 'mail-parse)
+    ;; Should keep track of `rfc2047-narrow-to-field' in rfc2047.el.
+    (defun-maybe std11-narrow-to-field ()
+      "Narrow the buffer to the header on the current line."
+      (forward-line 0)
+      (narrow-to-region (point)
+			(progn
+			  (std11-field-end)
+			  (when (eolp) (forward-line 1))
+			  (point)))
+      (goto-char (point-min)))
+    (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
 
-  ;; Should keep track of `ietf-drums-narrow-to-header' in ietf-drums.el.
-  (defun mail-narrow-to-head ()
-    "Narrow to the header section in the current buffer."
-    (narrow-to-region
-     (goto-char (point-min))
-     (if (re-search-forward "^\r?$" nil 1)
-	 (match-beginning 0)
-       (point-max)))
-    (goto-char (point-min)))
+    ;; Should keep track of `ietf-drums-narrow-to-header' in ietf-drums.el.
+    (defun mail-narrow-to-head ()
+      "Narrow to the header section in the current buffer."
+      (narrow-to-region
+       (goto-char (point-min))
+       (if (re-search-forward "^\r?$" nil 1)
+	   (match-beginning 0)
+	 (point-max)))
+      (goto-char (point-min)))
 
-  ;; Should keep track of `rfc2047-fold-region' in rfc2047.el.
-  (defun-maybe std11-fold-region (b e)
-    "Fold long lines in region B to E."
-    (save-restriction
-      (narrow-to-region b e)
-      (goto-char (point-min))
-      (let ((break nil)
-	    (qword-break nil)
-	    (first t)
-	    (bol (save-restriction
-		   (widen)
-		   (gnus-point-at-bol))))
-	(while (not (eobp))
+    ;; Should keep track of `rfc2047-fold-region' in rfc2047.el.
+    (defun-maybe std11-fold-region (b e)
+      "Fold long lines in region B to E."
+      (save-restriction
+	(narrow-to-region b e)
+	(goto-char (point-min))
+	(let ((break nil)
+	      (qword-break nil)
+	      (first t)
+	      (bol (save-restriction
+		     (widen)
+		     (gnus-point-at-bol))))
+	  (while (not (eobp))
+	    (when (and (or break qword-break)
+		       (> (- (point) bol) 76))
+	      (goto-char (or break qword-break))
+	      (setq break nil
+		    qword-break nil)
+	      (if (looking-at "[ \t]")
+		  (insert "\n")
+		(insert "\n "))
+	      (setq bol (1- (point)))
+	      ;; Don't break before the first non-LWSP characters.
+	      (skip-chars-forward " \t")
+	      (unless (eobp)
+		(forward-char 1)))
+	    (cond
+	     ((eq (char-after) ?\n)
+	      (forward-char 1)
+	      (setq bol (point)
+		    break nil
+		    qword-break nil)
+	      (skip-chars-forward " \t")
+	      (unless (or (eobp) (eq (char-after) ?\n))
+		(forward-char 1)))
+	     ((eq (char-after) ?\r)
+	      (forward-char 1))
+	     ((memq (char-after) '(?  ?\t))
+	      (skip-chars-forward " \t")
+	      (if first
+		  ;; Don't break just after the header name.
+		  (setq first nil)
+		(setq break (1- (point)))))
+	     ((not break)
+	      (if (not (looking-at "=\\?[^=]"))
+		  (if (eq (char-after) ?=)
+		      (forward-char 1)
+		    (skip-chars-forward "^ \t\n\r="))
+		(setq qword-break (point))
+		(skip-chars-forward "^ \t\n\r")))
+	     (t
+	      (skip-chars-forward "^ \t\n\r"))))
 	  (when (and (or break qword-break)
 		     (> (- (point) bol) 76))
 	    (goto-char (or break qword-break))
@@ -358,147 +399,108 @@ nil, ."
 	    ;; Don't break before the first non-LWSP characters.
 	    (skip-chars-forward " \t")
 	    (unless (eobp)
-	      (forward-char 1)))
-	  (cond
-	   ((eq (char-after) ?\n)
-	    (forward-char 1)
-	    (setq bol (point)
-		  break nil
-		  qword-break nil)
-	    (skip-chars-forward " \t")
-	    (unless (or (eobp) (eq (char-after) ?\n))
-	      (forward-char 1)))
-	   ((eq (char-after) ?\r)
-	    (forward-char 1))
-	   ((memq (char-after) '(?  ?\t))
-	    (skip-chars-forward " \t")
-	    (if first
-		;; Don't break just after the header name.
-		(setq first nil)
-	      (setq break (1- (point)))))
-	   ((not break)
-	    (if (not (looking-at "=\\?[^=]"))
-		(if (eq (char-after) ?=)
-		    (forward-char 1)
-		  (skip-chars-forward "^ \t\n\r="))
-	      (setq qword-break (point))
-	      (skip-chars-forward "^ \t\n\r")))
-	   (t
-	    (skip-chars-forward "^ \t\n\r"))))
-	(when (and (or break qword-break)
-		   (> (- (point) bol) 76))
-	  (goto-char (or break qword-break))
-	  (setq break nil
-		qword-break nil)
-	  (if (looking-at "[ \t]")
-	      (insert "\n")
-	    (insert "\n "))
-	  (setq bol (1- (point)))
-	  ;; Don't break before the first non-LWSP characters.
-	  (skip-chars-forward " \t")
-	  (unless (eobp)
-	    (forward-char 1))))))
+	      (forward-char 1))))))
 
-  ;; Should keep track of `rfc2047-fold-field' in rfc2047.el.
-  (defun-maybe std11-fold-field ()
-    "Fold the current line."
-    (save-excursion
+    ;; Should keep track of `rfc2047-fold-field' in rfc2047.el.
+    (defun-maybe std11-fold-field ()
+      "Fold the current line."
+      (save-excursion
+	(save-restriction
+	  (std11-narrow-to-field)
+	  (std11-fold-region (point-min) (point-max)))))
+
+    (defalias 'mail-header-fold-field 'std11-fold-field)
+
+    ;; Should keep track of `rfc2047-unfold-region' in rfc2047.el.
+    (defun-maybe std11-unfold-region (b e)
+      "Unfold lines in region B to E."
       (save-restriction
-	(std11-narrow-to-field)
-	(std11-fold-region (point-min) (point-max)))))
+	(narrow-to-region b e)
+	(goto-char (point-min))
+	(let ((bol (save-restriction
+		     (widen)
+		     (gnus-point-at-bol)))
+	      (eol (gnus-point-at-eol)))
+	  (forward-line 1)
+	  (while (not (eobp))
+	    (if (and (looking-at "[ \t]")
+		     (< (- (gnus-point-at-eol) bol) 76))
+		(delete-region eol (progn
+				     (goto-char eol)
+				     (skip-chars-forward "\r\n")
+				     (point)))
+	      (setq bol (gnus-point-at-bol)))
+	    (setq eol (gnus-point-at-eol))
+	    (forward-line 1)))))
 
-  (defalias 'mail-header-fold-field 'std11-fold-field)
+    ;; Should keep track of `rfc2047-unfold-field' in rfc2047.el.
+    (defun-maybe std11-unfold-field ()
+      "Fold the current line."
+      (save-excursion
+	(save-restriction
+	  (std11-narrow-to-field)
+	  (std11-unfold-region (point-min) (point-max)))))
 
-  ;; Should keep track of `rfc2047-unfold-region' in rfc2047.el.
-  (defun-maybe std11-unfold-region (b e)
-    "Unfold lines in region B to E."
-    (save-restriction
-      (narrow-to-region b e)
-      (goto-char (point-min))
-      (let ((bol (save-restriction
-		   (widen)
-		   (gnus-point-at-bol)))
-	    (eol (gnus-point-at-eol)))
-	(forward-line 1)
-	(while (not (eobp))
-	  (if (and (looking-at "[ \t]")
-		   (< (- (gnus-point-at-eol) bol) 76))
-	      (delete-region eol (progn
-				   (goto-char eol)
-				   (skip-chars-forward "\r\n")
-				   (point)))
-	    (setq bol (gnus-point-at-bol)))
-	  (setq eol (gnus-point-at-eol))
-	  (forward-line 1)))))
+    (defalias 'mail-header-unfold-field 'std11-unfold-field)
 
-  ;; Should keep track of `rfc2047-unfold-field' in rfc2047.el.
-  (defun-maybe std11-unfold-field ()
-    "Fold the current line."
-    (save-excursion
-      (save-restriction
-	(std11-narrow-to-field)
-	(std11-unfold-region (point-min) (point-max)))))
-
-  (defalias 'mail-header-unfold-field 'std11-unfold-field)
-
-  ;; This is the original function in T-gnus.
-  (defun-maybe std11-extract-addresses-components (string)
-    "Extract a list of full name and canonical address from STRING.  Each
+    ;; This is the original function in T-gnus.
+    (defun-maybe std11-extract-addresses-components (string)
+      "Extract a list of full name and canonical address from STRING.  Each
 element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
 If no name can be extracted, FULL-NAME will be nil."
-    (when string
-      (let (addresses)
-	(dolist (structure (std11-parse-addresses-string
-			    (std11-unfold-string string))
-			   addresses)
-	  (push (list (std11-full-name-string structure)
-		      (std11-address-string structure))
-		addresses))
-	(nreverse addresses))))
+      (when string
+	(let (addresses)
+	  (dolist (structure (std11-parse-addresses-string
+			      (std11-unfold-string string))
+			     addresses)
+	    (push (list (std11-full-name-string structure)
+			(std11-address-string structure))
+		  addresses))
+	  (nreverse addresses))))
 
-  ;; Should keep track of `ietf-drums-parse-addresses' in ietf-drums.el.
-  (defun mail-header-parse-addresses (string)
-    "Parse STRING and return a list of MAILBOX / DISPLAY-NAME pairs."
-    (mapcar (function
-	     (lambda (components)
-	       (cons (nth 1 components) (car components))))
-	    (std11-extract-addresses-components string)))
+    ;; Should keep track of `ietf-drums-parse-addresses' in ietf-drums.el.
+    (defun mail-header-parse-addresses (string)
+      "Parse STRING and return a list of MAILBOX / DISPLAY-NAME pairs."
+      (mapcar (function
+	       (lambda (components)
+		 (cons (nth 1 components) (car components))))
+	      (std11-extract-addresses-components string)))
 
-  ;; Should keep track of `rfc2047-field-value' in rfc2047.el.
-  (defun std11-field-value (&optional dont-include-last-newline)
-    "Return the value of the field at point.  If the optional argument is
+    ;; Should keep track of `rfc2047-field-value' in rfc2047.el.
+    (defun std11-field-value (&optional dont-include-last-newline)
+      "Return the value of the field at point.  If the optional argument is
 given, the return value will not contain the last newline."
-    (let ((begin (point))
-	  (inhibit-point-motion-hooks t)
-	  start value)
-      (beginning-of-line)
-      (unless (eobp)
-	(while (and (memq (char-after) '(?\t ?\ ))
-		    (zerop (forward-line -1))))
-	(when (looking-at "[^\t\n ]+:[\t\n ]+")
-	  (goto-char (setq start (match-end 0)))
-	  (forward-line 1)
+      (let ((begin (point))
+	    (inhibit-point-motion-hooks t)
+	    start value)
+	(beginning-of-line)
+	(unless (eobp)
 	  (while (and (memq (char-after) '(?\t ?\ ))
-		      (zerop (forward-line 1))))
-	  (when dont-include-last-newline
-	    (skip-chars-backward "\t\n " start))
-	  (setq value (buffer-substring start (point)))))
-      (goto-char begin)
-      value))
+		      (zerop (forward-line -1))))
+	  (when (looking-at "[^\t\n ]+:[\t\n ]+")
+	    (goto-char (setq start (match-end 0)))
+	    (forward-line 1)
+	    (while (and (memq (char-after) '(?\t ?\ ))
+			(zerop (forward-line 1))))
+	    (when dont-include-last-newline
+	      (skip-chars-backward "\t\n " start))
+	    (setq value (buffer-substring start (point)))))
+	(goto-char begin)
+	value))
 
-  (defalias 'mail-header-field-value 'std11-field-value))
+    (defalias 'mail-header-field-value 'std11-field-value))
 
-;; ietf-drums stuff.
-(unless (featurep 'ietf-drums)
-  ;; Should keep track of `ietf-drums-unfold-fws' in ietf-drums.el.
-  (defun nnheader-unfold-fws ()
-    "Unfold folding white space in the current buffer."
-    (goto-char (point-min))
-    (while (re-search-forward "[ \t]*\n[ \t]+" nil t)
-      (replace-match " " t t))
-    (goto-char (point-min)))
+  ;; ietf-drums stuff.
+  (unless (featurep 'ietf-drums)
+    ;; Should keep track of `ietf-drums-unfold-fws' in ietf-drums.el.
+    (defun nnheader-unfold-fws ()
+      "Unfold folding white space in the current buffer."
+      (goto-char (point-min))
+      (while (re-search-forward "[ \t]*\n[ \t]+" nil t)
+	(replace-match " " t t))
+      (goto-char (point-min)))
 
-  (defalias 'ietf-drums-unfold-fws 'nnheader-unfold-fws))
+    (defalias 'ietf-drums-unfold-fws 'nnheader-unfold-fws)))
 
 ;;; Header access macros.
 

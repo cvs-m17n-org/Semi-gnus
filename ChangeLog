@@ -1,3 +1,10 @@
+2003-04-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el: Enclose T-gnus specific function definitions,
+	e.g. `nnheader-detect-coding-region', with `eval-and-compile'.
+
+	* lisp/dgnushack.el: Don't autoload nnheader.
+
 2003-04-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: Autoload font-lock and nnheader for XEmacs
