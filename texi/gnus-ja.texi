@@ -15137,12 +15137,30 @@ http://w3m.sourceforge.net/
 @acronym{RSS} $B$O$H$F$b5,B'E*$+$DNI<A$J%$%s%?!<%U%'!<%9$G!"(Bgnus $B$,%0%k!<(B
 $B%W$r>o$K?7$7$/$7$F$*$/$?$a$N>pJs$rF@$k$3$H$,$G$-$^$9!#(B
 
+$BCm(B: @code{utf-8} coding system $B$r%5%]!<%H$9$k(B Emacs $B$r;H$&$N$,NI$$$G$9!#(B
+@acronym{RSS} $B$O!"Hs(B-@acronym{ASCII} $B%F%-%9%H$r%(%s%3!<%I$9$k$?$a$K!"%G%#(B
+$B%U%)%k%H$G(B UTF-8 $B$r;H$&$+$i$G$9!#$=$l$O$^$?!"%G%#%U%)%k%H$G(B
+$BHs(B-@acronym{ASCII} $B%0%k!<%WL>$K$b;H$o$l$^$9!#(B
+
 @kindex G R ($B35N,(B)
 Feed $B$r9VFI$9$k$K$O!"35N,%P%C%U%!$+$i(B @kbd{G R} $B$r;H$C$F2<$5$$(B---feed $B$N(B
-$B=j:_$NF~NO$r5a$a$i$l$k$G$7$g$&!#(B
+$B=j:_!"%?%$%H%k$*$h$S@bL@$NF~NO$r5a$a$i$l$k$G$7$g$&!#%?%$%H%k$O$I$s$JJ8;z(B
+$B$G$b$h$/!"$=$l$O%0%k!<%WL>$H%0%k!<%W$N%G!<%?!&%U%!%$%k$NL>A0$K;H$o$l$^$9!#(B
+$B@bL@$O>JN,$G$-$^$9!#(B
 
 $B4JC1$K(B @code{nnrss} $B$r$O$8$a$kJ}K!$O!"%0%k!<%W%P%C%U%!$G(B @kbd{B nnrss
 RET y} $B$N$h$&$J$3$H$r>'$(!"$=$7$F%0%k!<%W$r9VFI$9$k$3$H$G$9!#(B
+
+@code{nnrss} $B%P%C%/%(%s%I$O!"$=$l$>$l$N(B @code{nnrss} $B%0%k!<%W$N$?$a$N%G!<(B
+$B%?!&%U%!%$%k$r(B @code{nnrss-directory} ($B2<5-;2>H(B) $B$KJ]B8$7$^$9!#(B
+$BHs(B-@acronym{ASCII} $BJ8;z$r4^$s$G$$$k%U%!%$%kL>(B
+$B$O!"(B@code{nnmail-pathname-coding-system} $BJQ?t$G;XDj$5$l$?(B coding
+system $B$G%(%s%3!<%I$5$l$^$9!#$=$l$,(B @code{nil} $B$G$"$k$H!"(BEmacs $B$G(B
+$B$O(B coding system $B$O%G%#%U%)%k%H(B
+$B$G(B @code{default-file-name-coding-system} $B$NCM$K$J$j$^$9!#$"$J$?(B
+$B$,(B XEmacs $B$r;H$C$F$$$F!"Hs(B-@acronym{ASCII} $B%0%k!<%WL>$r;H$$$?$1$l$P!"(B
+@code{nnmail-pathname-coding-system} $BJQ?t$NCM$rE,@Z$K@_Dj$7$J$1$l$P$J$j(B
+$B$^$;$s!#(B
 
 @cindex OPML
 $B$"$J$?$N9VFIL\O?$r(B @acronym{OPML} $B%U%)!<%^%C%H(B (Outline Processor Markup
@@ -15165,6 +15183,13 @@ Language) $B$G%m!<%I(B/$B%;!<%V$9$k$?$a$K!"0J2<$N%3%^%s%I$r;H$&$3$H$b$G$-$^$9
 @vindex nnrss-directory
 @code{nnrss} $B$,%U%!%$%k$r=q$-9~$`%G%#%l%/%H%j!<$G!"%G%#%U%)%k%H(B
 $B$O(B @file{~/News/rss/} $B$G$9!#(B
+
+@item nnrss-file-coding-system
+@vindex nnrss-file-coding-system
+@code{nnrss} $B%0%k!<%W$N%G!<%?!&%U%!%$%k$rFI$_=q$-$9$k$H$-$K;H$o$l(B
+$B$k(B coding system $B$G$9!#%G%#%U%)%k%H(B
+$B$O(B @code{mm-universal-coding-system} $B$NCM(B ($B$=$N%G%#%U%)%k%H$O(B Emacs $B$G(B
+$B$O(B @code{emacs-mule}$B!"(BXEmacs $B$G$O(B @code{escape-quoted}) $B$G$9!#(B
 
 @item nnrss-use-local
 @vindex nnrss-use-local

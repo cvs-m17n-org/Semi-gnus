@@ -1,3 +1,53 @@
+2004-12-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* GNUS-NEWS: Generated.
+
+2004-12-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnrss.el: Require nnheader instead of mm-util, mime-parse
+	instead of rfc2231; require eword-encode, mime-edit and mime-view;
+	reload nnheader when compiling to override mm-util macros.
+	(nnrss-file-coding-system): New variable.
+	(nnrss-format-string): Redefine it as an inline function.
+	(nnrss-decode-group-name): New function.
+	(nnrss-string-as-multibyte): Remove.
+	(nnrss-retrieve-headers): Decode group name; don't use
+	nnrss-format-string.
+	(nnrss-request-group): Decode group name.
+	(nnrss-body-presentation-method): New function.
+	(nnrss-request-article): Decode group name; allow a Message-ID as
+	well as an article number; encode group name; don't use
+	nnrss-format-string; replace whitespace with _ in Message-ID; use
+	nnrss-body-presentation-method and mime-edit-translate-body to
+	compose a MIME article.
+	(nnrss-request-expire-articles): Decode group name.
+	(nnrss-request-delete-group): Decode group name.
+	(nnrss-fetch): Clarify error message.
+	(nnrss-read-server-data): Use insert-file-contents instead of load;
+	bind file-name-coding-system; use multibyte buffer.
+	(nnrss-save-server-data): Bind coding-system-for-write to the
+	value of nnrss-file-coding-system; bind file-name-coding-system;
+	add coding cookie.
+	(nnrss-read-group-data): Use insert-file-contents instead of load;
+	bind file-name-coding-system; use multibyte buffer.
+	(nnrss-save-group-data): Bind coding-system-for-write to the
+	value of nnrss-file-coding-system; bind file-name-coding-system.
+	(nnrss-decode-entities-string): Rename from n-d-e-unibyte-string;
+	make it work with non-ASCII text.
+	(nnrss-snarf-moreover-categories): Use mime-decode-parameters
+	instead of rfc2231-decode-encoded-string.
+	(nnrss-find-el): Make it work with old xml.el as well.
+
+2004-12-26  Tsuyoshi AKIHO  <akiho@kawachi.zaq.ne.jp>
+
+	* lisp/nnrss.el (nnrss-get-encoding): New function.
+	(nnrss-fetch): Use unibyte buffer initially; bind
+	coding-system-for-read while performing mm-url-insert; remove ^Ms;
+	decode contents according to the encoding attribute.
+	(nnrss-save-group-data): Add coding cookie.
+	(nnrss-mime-encode-string): New function.
+	(nnrss-check-group): Use it to encode subject and author.
+
 2004-12-23  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/infohack.el (infohack-texi-format): Revert.
