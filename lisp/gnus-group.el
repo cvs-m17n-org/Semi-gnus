@@ -1,7 +1,7 @@
 ;;; gnus-group.el --- group mode commands for Gnus
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -711,7 +711,7 @@ ticked: The number of ticked articles."
 	 (fboundp 'gnus-soup-pack-packet)]
 	["Pack packet" gnus-soup-pack-packet (fboundp 'gnus-soup-pack-packet)]
 	["Save areas" gnus-soup-save-areas (fboundp 'gnus-soup-pack-packet)]
-	["Brew SOUP" gnus-soup-brew-soup (fboundp 'gnus-soup-pack-packet)])
+	["Brew SOUP" gnus-group-brew-soup (fboundp 'gnus-soup-pack-packet)])
        ["Send a bug report" gnus-bug t]
        ["Send a mail" gnus-group-mail t]
        ["Post an article..." gnus-group-post-news t]
@@ -1234,7 +1234,8 @@ already."
 (defun gnus-group-group-name ()
   "Get the name of the newsgroup on the current line."
   (let ((group (get-text-property (gnus-point-at-bol) 'gnus-group)))
-    (and group (symbol-name group))))
+    (when group
+      (symbol-name group))))
 
 (defun gnus-group-group-level ()
   "Get the level of the newsgroup on the current line."
@@ -1584,14 +1585,14 @@ Return the name of the group is selection was successful."
   ;; Transform the select method into a unique server.
   (when (stringp method)
     (setq method (gnus-server-to-method method)))
-  (let ((saddr (intern (format "%s-address" (car method)))))
-    (setq method (gnus-copy-sequence method))
-    (require (car method))
-    (when (boundp saddr)
-      (unless (assq saddr method)
-	(nconc method `((,saddr ,(cadr method))))
-	(setf (cadr method) (format "%s-%d" (cadr method)
-				    (incf gnus-ephemeral-group-server))))))
+;;;  (let ((saddr (intern (format "%s-address" (car method)))))
+;;;    (setq method (gnus-copy-sequence method))
+;;;    (require (car method))
+;;;    (when (boundp saddr)
+;;;      (unless (assq saddr method)
+;;;	(nconc method `((,saddr ,(cadr method))))
+;;;	(setf (cadr method) (format "%s-%d" (cadr method)
+;;;				    (incf gnus-ephemeral-group-server))))))
   (let ((group (if (gnus-group-foreign-p group) group
 		 (gnus-group-prefixed-name group method))))
     (gnus-sethash
@@ -2735,11 +2736,10 @@ of groups killed."
     (if (< (length out) 2) (car out) (nreverse out))))
 
 (defun gnus-group-yank-group (&optional arg)
-  "Yank the last newsgroups killed with \\[gnus-group-kill-group],
-inserting it before the current newsgroup.  The numeric ARG specifies
-how many newsgroups are to be yanked.  The name of the newsgroup yanked
-is returned, or (if several groups are yanked) a list of yanked groups
-is returned."
+  "Yank the last newsgroups killed with \\[gnus-group-kill-group], inserting it before the current newsgroup.
+The numeric ARG specifies how many newsgroups are to be yanked.  The
+name of the newsgroup yanked is returned, or (if several groups are
+yanked) a list of yanked groups is returned."
   (interactive "p")
   (setq arg (or arg 1))
   (let (info group prev out)
@@ -3354,7 +3354,7 @@ or `gnus-group-catchup-group-hook'."
 
 (defsubst gnus-group-timestamp (group)
   "Return the timestamp for GROUP."
-  (gnus-group-get-parameter group 'timestamp))
+  (gnus-group-get-parameter group 'timestamp t))
 
 (defun gnus-group-timestamp-delta (group)
   "Return the offset in seconds from the timestamp for GROUP to the current time, as a floating point number."

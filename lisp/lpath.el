@@ -2,6 +2,12 @@
 
 (defvar byte-compile-default-warnings)
 
+(or (featurep 'path-util)
+    (load "apel/path-util"))
+(add-path "apel")
+(add-path "flim")
+(add-path "semi")
+
 (defun maybe-fbind (args)
   (while args
     (or (fboundp (car args))

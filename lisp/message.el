@@ -1,7 +1,7 @@
 ;;; message.el --- composing mail and news messages
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;; Keywords: mail, news, MIME
 
@@ -227,6 +227,11 @@ any confusion."
   :group 'message-interface
   :type 'regexp)
 
+(defcustom message-subject-re-regexp "^[ \t]*\\([Rr][Ee]:[ \t]*\\)*[ \t]*"
+  "*Regexp matching \"Re: \" in the subject line."
+  :group 'message-various
+  :type 'regexp)
+
 ;;;###autoload
 (defcustom message-signature-separator "^-- *$"
   "Regexp matching the signature separator."
@@ -408,7 +413,9 @@ might set this variable to '(\"-f\" \"you@some.where\")."
 	((boundp 'gnus-select-method)
 	 gnus-select-method)
 	(t '(nnspool "")))
-  "*Method used to post news."
+  "*Method used to post news.
+Note that when posting from inside Gnus, for instance, this
+variable isn't used."
   :group 'message-news
   :group 'message-sending
   ;; This should be the `gnus-select-method' widget, but that might
@@ -1002,7 +1009,8 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defun message-fetch-field (header &optional not-all)
   "The same as `mail-fetch-field', only remove all newlines."
-  (let ((value (mail-fetch-field header nil (not not-all))))
+  (let* ((inhibit-point-motion-hooks t)
+	 (value (mail-fetch-field header nil (not not-all))))
     (when value
       (nnheader-replace-chars-in-string value ?\n ? ))))
 
@@ -1044,7 +1052,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defun message-strip-subject-re (subject)
   "Remove \"Re:\" from subject lines."
-  (if (string-match "^[Rr][Ee]: *" subject)
+  (if (string-match message-subject-re-regexp subject)
       (substring subject (match-end 0))
     subject))
 
@@ -1105,22 +1113,24 @@ Return the number of headers removed."
 
 (defun message-news-p ()
   "Say whether the current buffer contains a news message."
-  (or message-this-is-news
-      (save-excursion
-	(save-restriction
-	  (message-narrow-to-headers)
-	  (and (message-fetch-field "newsgroups")
-	       (not (message-fetch-field "posted-to")))))))
+  (and (not message-this-is-mail)
+       (or message-this-is-news
+	   (save-excursion
+	     (save-restriction
+	       (message-narrow-to-headers)
+	       (and (message-fetch-field "newsgroups")
+		    (not (message-fetch-field "posted-to"))))))))
 
 (defun message-mail-p ()
   "Say whether the current buffer contains a mail message."
-  (or message-this-is-mail
-      (save-excursion
-	(save-restriction
-	  (message-narrow-to-headers)
-	  (or (message-fetch-field "to")
-	      (message-fetch-field "cc")
-	      (message-fetch-field "bcc"))))))
+  (and (not message-this-is-news)
+       (or message-this-is-mail
+	   (save-excursion
+	     (save-restriction
+	       (message-narrow-to-headers)
+	       (or (message-fetch-field "to")
+		   (message-fetch-field "cc")
+		   (message-fetch-field "bcc")))))))
 
 (defun message-next-header ()
   "Go to the beginning of the next header."
@@ -1975,7 +1985,7 @@ the user from the mailer."
 	t))))
 
 (defun message-send-via-mail (arg)
-  "Send the current message via mail."  
+  "Send the current message via mail."
   (message-send-mail arg))
 
 (defun message-send-via-news (arg)
@@ -3144,7 +3154,7 @@ Headers already prepared in the buffer are not modified."
 	    (insert "Original-")
 	    (beginning-of-line))
 	  (when (or (message-news-p)
-		    (string-match "^[^@]+@.+\\..+" secure-sender))
+		    (string-match "@.+\\.." secure-sender))
 	    (insert "Sender: " secure-sender "\n")))))))
 
 (defun message-insert-courtesy-copy ()
@@ -3646,10 +3656,14 @@ responses here are directed to other newsgroups."))
 		message-id (message-fetch-field "message-id" t)
 		distribution (message-fetch-field "distribution")))
 	;; Make sure that this article was written by the user.
-	(unless (string-equal
-		 (downcase
-		  (or sender (cadr (std11-extract-address-components from))))
-		 (downcase (message-make-address)))
+ 	(unless (or (and sender
+ 			 (string-equal
+ 			  (downcase sender)
+ 			  (downcase (message-make-sender))))
+ 		    (string-equal
+ 		     (downcase (cadr (mail-extract-address-components from)))
+ 		     (downcase (cadr (mail-extract-address-components
+ 				      (message-make-from))))))
 	  (error "This article is not yours"))
 	;; Make control message.
 	(setq buf (set-buffer (get-buffer-create " *message cancel*")))

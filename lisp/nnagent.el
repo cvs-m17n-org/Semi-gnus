@@ -1,7 +1,7 @@
 ;;; nnagent.el --- offline backend for Gnus
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -108,6 +108,7 @@
   nil)
 
 (deffoo nnagent-request-post (&optional server)
+  (gnus-agent-insert-meta-information 'news gnus-command-method)
   (gnus-request-accept-article "nndraft:queue"))
 
 ;; Use nnml functions for just about everything.

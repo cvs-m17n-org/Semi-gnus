@@ -2,7 +2,7 @@
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <amanda@iesd.auc.dk>
-;;	Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -268,6 +268,11 @@ This variable allows the same syntax as `gnus-home-score-file'."
   "If a number, this is the minimum score value that can be assigned to a word."
   :group 'gnus-score-adapt
   :type '(choice (const nil) integer))
+
+(defcustom gnus-adaptive-word-no-group-words nil
+  "If t, don't adaptively score words included in the group name."
+  :group 'gnus-score-adapt
+  :type 'boolean)
 
 (defcustom gnus-score-mimic-keymap nil
   "*Have the score entry functions pretend that they are a keymap."
@@ -1070,8 +1075,9 @@ SCORE is the score to add."
   ;; Load score file FILE.  Returns a list a retrieved score-alists.
   (let* ((file (expand-file-name
 		(or (and (string-match
-			  (concat "^" (expand-file-name
-				       gnus-kill-files-directory))
+			  (concat "^" (regexp-quote
+				       (expand-file-name
+					gnus-kill-files-directory)))
 			  (expand-file-name file))
 			 file)
 		    (concat (file-name-as-directory gnus-kill-files-directory)
@@ -1328,7 +1334,7 @@ SCORE is the score to add."
 		(gnus-prin1 score)
 	      ;; This is a normal score file, so we print it very
 	      ;; prettily.
-	      (let ((emacs-lisp-mode-syntax-table score-mode-syntax-table))
+	      (let ((lisp-mode-syntax-table score-mode-syntax-table))
 		(pp score (current-buffer)))))
 	  (gnus-make-directory (file-name-directory file))
 	  ;; If the score file is empty, we delete it.
@@ -2089,6 +2095,10 @@ SCORE is the score to add."
       (set-syntax-table syntab))
     ;; Make all the ignorable words ignored.
     (let ((ignored (append gnus-ignored-adaptive-words
+			   (if gnus-adaptive-word-no-group-words
+			       (message-tokenize-header
+				(gnus-group-real-name gnus-newsgroup-name)
+				"."))
 			   gnus-default-ignored-adaptive-words)))
       (while ignored
 	(gnus-sethash (pop ignored) nil hashtb)))))
@@ -2217,6 +2227,11 @@ SCORE is the score to add."
 	    (set-syntax-table syntab))
 	  ;; Make all the ignorable words ignored.
 	  (let ((ignored (append gnus-ignored-adaptive-words
+				 (if gnus-adaptive-word-no-group-words
+				     (message-tokenize-header
+				      (gnus-group-real-name 
+				       gnus-newsgroup-name)
+				      "."))
 				 gnus-default-ignored-adaptive-words)))
 	    (while ignored
 	      (gnus-sethash (pop ignored) nil hashtb)))
@@ -2725,6 +2740,7 @@ The list is determined from the variable gnus-score-file-alist."
   (interactive (list gnus-global-score-files))
   (let (out)
     (while files
+      ;; #### /$ Unix-specific?
       (if (string-match "/$" (car files))
 	  (setq out (nconc (directory-files
 			    (car files) t

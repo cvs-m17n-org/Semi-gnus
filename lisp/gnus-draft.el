@@ -1,8 +1,9 @@
-;;; gnus-draft.el --- draft message support for Gnus
+;;; gnus-draft.el --- draft message support for Semi-gnus
 ;; Copyright (C) 1997,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtgnus-run-hooks
-;; Keywords: news
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; Keywords: mail, news, MIME, offline
 
 ;; This file is part of GNU Emacs.
 
@@ -30,6 +31,7 @@
 (require 'message)
 (require 'gnus-msg)
 (require 'nndraft)
+(require 'gnus-agent)
 (eval-when-compile (require 'cl))
 
 ;;; Draft minor mode
@@ -117,8 +119,26 @@
   "Send message ARTICLE."
   (gnus-draft-setup article (or group "nndraft:queue"))
   (let ((message-syntax-checks 'dont-check-for-anything-just-trust-me)
-	message-send-hook)
-    (message-send-and-exit)))
+	message-send-hook type method)
+    ;; We read the meta-information that says how and where
+    ;; this message is to be sent.
+    (save-restriction
+      (message-narrow-to-head)
+      (when (re-search-forward
+	     (concat "^" (regexp-quote gnus-agent-meta-information-header) ":")
+	     nil t)
+	(setq type (ignore-errors (read (current-buffer)))
+	      method (ignore-errors (read (current-buffer))))
+	(message-remove-header gnus-agent-meta-information-header)))
+    ;; Then we send it.  If we have no meta-information, we just send
+    ;; it and let Message figure out how.
+    (if type
+	(let ((message-this-is-news (eq type 'news))
+	      (message-this-is-mail (eq type 'mail))
+	      (gnus-post-method method)
+	      (message-post-method method))
+	  (message-send-and-exit))
+      (message-send-and-exit))))
 
 (defun gnus-draft-send-all-messages ()
   "Send all the sendable drafts."
@@ -143,6 +163,16 @@
 
 ;;; Utility functions
 
+(defcustom gnus-draft-decoding-function
+  (function
+   (lambda ()
+     (mime-edit-decode-buffer nil)
+     (eword-decode-header)
+     ))
+  "*Function called to decode the message from network representation."
+  :group 'gnus-agent
+  :type 'function)
+
 ;;;!!!If this is byte-compiled, it fails miserably.
 ;;;!!!This is because `gnus-setup-message' uses uninterned symbols.
 ;;;!!!This has been fixed in recent versions of Emacs and XEmacs,
@@ -157,6 +187,7 @@
       (if (not (gnus-request-restore-buffer article group))
 	  (error "Couldn't restore the article")
 	;; Insert the separator.
+	(funcall gnus-draft-decoding-function)
 	(goto-char (point-min))
 	(search-forward "\n\n")
 	(forward-char -1)

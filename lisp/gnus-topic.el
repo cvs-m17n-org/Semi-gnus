@@ -2,7 +2,7 @@
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Ilja Weis <kult@uni-paderborn.de>
-;;	Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -355,8 +355,8 @@ with some simple extensions.
 ;;; Generating group buffers
 
 (defun gnus-group-prepare-topics (level &optional all lowest regexp list-topic topic-level)
-  "List all newsgroups with unread articles of level LEVEL or lower, and
-use the `gnus-group-topics' to sort the groups.
+  "List all newsgroups with unread articles of level LEVEL or lower.
+Use the `gnus-group-topics' to sort the groups.
 If ALL is non-nil, list groups that have no unread articles.
 If LOWEST is non-nil, list all newsgroups of level LOWEST or higher."
   (set-buffer gnus-group-buffer)

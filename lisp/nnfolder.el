@@ -2,7 +2,7 @@
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Scott Byer <byer@mv.us.adobe.com>
-;;	Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: mail
 
@@ -101,24 +101,16 @@ time saver for large mailboxes.")
   (save-excursion
     (set-buffer nntp-server-buffer)
     (erase-buffer)
-    (let (article art-string start stop)
+    (let (article start stop)
       (nnfolder-possibly-change-group group server)
       (when nnfolder-current-buffer
 	(set-buffer nnfolder-current-buffer)
 	(goto-char (point-min))
 	(if (stringp (car articles))
 	    'headers
-	  (while articles
-	    (setq article (car articles))
-	    (setq art-string (nnfolder-article-string article))
+	  (while (setq article (pop articles))
 	    (set-buffer nnfolder-current-buffer)
-	    (when (or (search-forward art-string nil t)
-		      ;; Don't search the whole file twice!  Also, articles
-		      ;; probably have some locality by number, so searching
-		      ;; backwards will be faster.  Especially if we're at the
-		      ;; beginning of the buffer :-). -SLB
-		      (search-backward art-string nil t))
-	      (nnmail-search-unix-mail-delim-backward)
+	    (when (nnfolder-goto-article article)
 	      (setq start (point))
 	      (search-forward "\n\n" nil t)
 	      (setq stop (1- (point)))
@@ -126,8 +118,7 @@ time saver for large mailboxes.")
 	      (insert (format "221 %d Article retrieved.\n" article))
 	      (insert-buffer-substring nnfolder-current-buffer start stop)
 	      (goto-char (point-max))
-	      (insert ".\n"))
-	    (setq articles (cdr articles)))
+	      (insert ".\n")))
 
 	  (set-buffer nntp-server-buffer)
 	  (nnheader-fold-continuation-lines)
@@ -165,9 +156,8 @@ time saver for large mailboxes.")
   (save-excursion
     (set-buffer nnfolder-current-buffer)
     (goto-char (point-min))
-    (when (search-forward (nnfolder-article-string article) nil t)
+    (when (nnfolder-goto-article article)
       (let (start stop)
-	(nnmail-search-unix-mail-delim-backward)
 	(setq start (point))
 	(forward-line 1)
 	(unless (and (nnmail-search-unix-mail-delim)
@@ -309,7 +299,7 @@ time saver for large mailboxes.")
       (set-buffer nnfolder-current-buffer)
       (while (and articles is-old)
 	(goto-char (point-min))
-	(when (search-forward (nnfolder-article-string (car articles)) nil t)
+	(when (nnfolder-goto-article (car articles))
 	  (if (setq is-old
 		    (nnmail-expired-article-p
 		     newsgroup
@@ -354,7 +344,7 @@ time saver for large mailboxes.")
 	 (nnfolder-possibly-change-group group server)
 	 (set-buffer nnfolder-current-buffer)
 	 (goto-char (point-min))
-	 (when (search-forward (nnfolder-article-string article) nil t)
+	 (when (nnfolder-goto-article article)
 	   (nnfolder-delete-mail))
 	 (when last
 	   (nnfolder-save-buffer)
@@ -406,12 +396,15 @@ time saver for large mailboxes.")
   (nnfolder-possibly-change-group group)
   (save-excursion
     (set-buffer buffer)
+    (goto-char (point-min))
+    (when (looking-at "X-From-Line: ")
+      (replace-match "From "))
     (nnfolder-normalize-buffer)
     (set-buffer nnfolder-current-buffer)
     (goto-char (point-min))
-    (if (not (search-forward (nnfolder-article-string article) nil t))
+    (if (not (nnfolder-goto-article article))
 	nil
-      (nnfolder-delete-mail t t)
+      (nnfolder-delete-mail t)
       (insert-buffer-substring buffer)
       (nnfolder-save-buffer)
       t)))
@@ -473,10 +466,9 @@ time saver for large mailboxes.")
       (goto-char (point-min))
       (while (and (search-forward marker nil t)
 		  (re-search-forward number nil t))
-	(setq activemin (min activemin
-			     (string-to-number (buffer-substring
-						(match-beginning 0)
-						(match-end 0))))))
+	(let ((newnum (string-to-number (match-string 0))))
+	  (if (nnmail-within-headers-p)
+	      (setq activemin (min activemin newnum)))))
       (setcar active activemin))))
 
 (defun nnfolder-article-string (article)
@@ -484,19 +476,45 @@ time saver for large mailboxes.")
       (concat "\n" nnfolder-article-marker (int-to-string article) " ")
     (concat "\nMessage-ID: " article)))
 
-(defun nnfolder-delete-mail (&optional force leave-delim)
-  "Delete the message that point is in."
-  (save-excursion
-    (delete-region
-     (save-excursion
-       (nnmail-search-unix-mail-delim-backward)
-       (if leave-delim (progn (forward-line 1) (point))
-	 (point)))
-     (progn
-       (forward-line 1)
-       (if (nnmail-search-unix-mail-delim)
-	   (point)
-	 (point-max))))))
+(defun nnfolder-goto-article (article)
+  "Place point at the start of the headers of ARTICLE.
+ARTICLE can be an article number or a Message-ID.
+Returns t if successful, nil otherwise."
+  (let ((art-string (nnfolder-article-string article))
+	start found)
+    ;; It is likely that we are at or before the delimiter line.
+    ;; We therefore go to the end of the previous line, and start
+    ;; searching from there.
+    (beginning-of-line)
+    (unless (bobp)
+      (forward-char -1))
+    (setq start (point))
+    ;; First search forward.
+    (while (and (setq found (search-forward art-string nil t))
+		(not (nnmail-within-headers-p))))
+    ;; If unsuccessful, search backward from where we started,
+    (unless found
+      (goto-char start)
+      (while (and (setq found (search-backward art-string nil t))
+		  (not (nnmail-within-headers-p)))))
+    (when found
+      (nnmail-search-unix-mail-delim-backward))))
+
+(defun nnfolder-delete-mail (&optional leave-delim)
+  "Delete the message that point is in.
+If optional argument LEAVE-DELIM is t, then mailbox delimiter is not
+deleted.  Point is left where the deleted region was."
+  (delete-region
+   (save-excursion
+     (forward-line 1) ; in case point is at beginning of message already
+     (nnmail-search-unix-mail-delim-backward)
+     (if leave-delim (progn (forward-line 1) (point))
+       (point)))
+   (progn
+     (forward-line 1)
+     (if (nnmail-search-unix-mail-delim)
+	 (point)
+       (point-max)))))
 
 (defun nnfolder-possibly-change-group (group &optional server dont-check)
   ;; Change servers.
@@ -692,8 +710,9 @@ time saver for large mailboxes.")
 	    (while (and (search-forward marker nil t)
 			(re-search-forward number nil t))
 	      (let ((newnum (string-to-number (match-string 0))))
-		(setq maxid (max maxid newnum))
-		(setq minid (min minid newnum))))
+		(if (nnmail-within-headers-p)
+		    (setq maxid (max maxid newnum)
+		          minid (min minid newnum)))))
 	    (setcar active (max 1 (min minid maxid)))
 	    (setcdr active (max maxid (cdr active)))
 	    (goto-char (point-min)))
@@ -767,7 +786,7 @@ time saver for large mailboxes.")
           (nnfolder-possibly-change-folder file)
           (nnfolder-possibly-change-group file)
           (nnfolder-close-group file))))
-    (message "")))
+    (nnheader-message 5 "")))
 
 (defun nnfolder-group-pathname (group)
   "Make pathname for GROUP."

@@ -1,7 +1,7 @@
 ;;; gnus-nocem.el --- NoCeM pseudo-cancellation treatment
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -108,8 +108,7 @@ matches an previously scanned and verified nocem message."
   "Real-name mappings of subscribed groups.")
 
 (defun gnus-fill-real-hashtb ()
-  "Fill up a hash table with the real-name mappings from the user's
-active file."
+  "Fill up a hash table with the real-name mappings from the user's active file."
   (setq gnus-nocem-real-group-hashtb (gnus-make-hashtable
 				      (length gnus-newsrc-alist)))
   (mapcar (lambda (group)

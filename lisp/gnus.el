@@ -2,7 +2,7 @@
 ;; Copyright (C) 1987,88,89,90,93,94,95,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;;	Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -250,11 +250,13 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "5.6.6"
-  "Version number for this version of Gnus.")
+(defconst gnus-version-number "6.4.0"
+  "Version number for this version of gnus.")
 
-(defconst gnus-version (format "Gnus v%s" gnus-version-number)
-  "Version string for this version of Gnus.")
+(defconst gnus-version
+  (format "Semi-gnus %s (based on Gnus 5.6.11; for SEMI 1.5)"
+          gnus-version-number)
+  "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
   "If non-nil, the startup message will not be displayed.
@@ -706,7 +708,12 @@ All other Gnus path variables are initialized from this variable."
 
 (defcustom gnus-directory (or (getenv "SAVEDIR")
 			      (nnheader-concat gnus-home-directory "News/"))
-  "*Directory variable from which all other Gnus file variables are derived."
+  "*Directory variable from which all other Gnus file variables are derived.
+
+Note that Gnus is mostly loaded when the `.gnus.el' file is read.
+This means that other directory variables that are initialized from
+this variable won't be set properly if you set this variable in `.gnus.el'.
+Set this variable in `.emacs' instead."
   :group 'gnus-files
   :type 'directory)
 
@@ -1335,7 +1342,6 @@ want."
 	     gnus-article-emphasize
 	     gnus-article-fill-cited-article
 	     gnus-article-remove-cr
-	     gnus-article-de-quoted-unreadable
 	     gnus-summary-stop-page-breaking
 	     ;; gnus-summary-caesar-message
 	     ;; gnus-summary-verbose-headers
@@ -1536,8 +1542,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	(if (eq (nth 1 package) ':interactive)
 	    (cdddr package)
 	  (cdr package)))))
-   '(("metamail" metamail-buffer)
-     ("info" Info-goto-node)
+   '(("info" Info-goto-node)
      ("hexl" hexl-hex-string-to-integer)
      ("pp" pp pp-to-string pp-eval-expression)
      ("ps-print" ps-print-preprint)
@@ -1662,7 +1667,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-hide-headers gnus-article-hide-boring-headers
       gnus-article-treat-overstrike gnus-article-word-wrap
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
-      gnus-article-display-x-face gnus-article-de-quoted-unreadable
+      gnus-article-display-x-face
       gnus-article-mime-decode-quoted-printable gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
@@ -2411,10 +2416,19 @@ also examines the topic parameters."
 
 (defun gnus-group-parameter-value (params symbol &optional allow-list)
   "Return the value of SYMBOL in group PARAMS."
-  (or (car (memq symbol params))	; It's either a simple symbol, 
-      (and (or allow-list
-	       (atom (cdr (assq symbol params)))) ; and it's not a local variable
-	   (cdr (assq symbol params))))) ; but a cons.
+  ;; We only wish to return group parameters (dotted lists) and
+  ;; not local variables, which may have the same names.
+  ;; But first we handle single elements...
+  (or (car (memq symbol params))
+      ;; Handle alist.
+      (let (elem)
+	(catch 'found
+	  (while (setq elem (pop params))
+	    (when (and (consp elem)
+		       (eq (car elem) symbol)
+		       (or allow-list
+			   (atom (cdr elem))))
+	      (throw 'found (cdr elem))))))))
 
 (defun gnus-group-add-parameter (group param)
   "Add parameter PARAM to GROUP."
@@ -2682,7 +2696,7 @@ Allow completion over sensible values."
 
 ;;;###autoload
 (defun gnus-slave-no-server (&optional arg)
-  "Read network news as a slave, without connecting to local server"
+  "Read network news as a slave, without connecting to local server."
   (interactive "P")
   (gnus-no-server arg t))
 

@@ -1,3 +1,7 @@
+1998-06-08  Tanaka Akira  <akr@jaist.ac.jp>
+
+	* Sync up with gnus-6_2_3 to gnus-6_4_0
+
 1998-04-28  Tanaka Akira  <akr@jaist.ac.jp>
 
 	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Delete
@@ -11,6 +15,93 @@
         (message-make-subject): New function.
 	(message-reply): Use `message-make-subject'.
 	(message-followup): Use `message-make-subject'.
+
+1998-06-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-ems.el (gnus-ems-redefine): Must require 'path-util
+	before call `module-installed-p'.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.4.0.
+	(gnus-version): Modify for SEMI 1.5.
+
+	* lisp/gnus-art.el: Modify for SEMI 1.5 API.
+
+1998-06-04  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: New file. To handle multiple POP account.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.4.
+	And fix typo 5.6.10 -> 5.6.11.
+	
+1998-06-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.3.
+
+	* Sync up with Gnus 5.6.11.
+
+1998-06-03  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "The Article Buffer".
+
+1998-06-03  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "The Summary Buffer".
+
+1998-06-02  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.2.
+
+	* Sync up with Gnus 5.6.10.
+
+1998-05-30  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* README.semi: Add description of `shuhei-k' branch.
+
+1998-05-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.1.
+
+1998-05-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-util.el (gnus-output-to-rmail): Guard as binary.
+
+	* lisp/gnus-util.el (gnus-output-to-mail): Guard as binary.
+
+1998-04-24  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "The Active File".
+
+1998-05-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.3.0.
+	(gnus-version): Modify for SEMI 1.4.
+
+	* lisp/gnus-sum.el: Use 'mime-add-condition to set up
+ 	acting-condition.
+
+1998-05-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/lpath.el: Must add "flim" instead of "mel" to load-path.
+
+1998-05-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.5.
+
+	* texi/gnus.texi, lisp/ChangeLog: Sync up with Gnus v5.6.9.
+
+	* lisp/gnus.el, lisp/message.el, lisp/gnus-sum.el,
+	lisp/gnus-msg.el, lisp/gnus-draft.el, lisp/gnus-agent.el: Sync up
+	with Gnus v5.6.9.
+
+1998-04-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.4.
+
+	* texi/gnus.texi, lisp/ChangeLog: Sync up with Gnus 5.6.7.
+
+	* lisp/gnus.el, lisp/message.el, lisp/gnus-sum.el,
+ 	lisp/gnus-msg.el, lisp/gnus-cache.el, lisp/gnus-art.el: Sync up
+ 	with Gnus 5.6.7.
 
 1998-04-28  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 

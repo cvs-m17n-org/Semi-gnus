@@ -1,7 +1,7 @@
 ;;; nntp.el --- nntp access for Gnus
 ;;; Copyright (C) 1987-90,92-97 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -144,10 +144,6 @@ by one.")
 If the gap between two consecutive articles is bigger than this
 variable, split the XOVER request into two requests.")
 
-(defvoo nntp-connection-timeout nil
-  "*Number of seconds to wait before an nntp connection times out.
-If this variable is nil, which is the default, no timers are set.")
-
 (defvoo nntp-prepare-server-hook nil
   "*Hook run before a server is opened.
 If can be used to set up a server remotely, for instance.  Say you
@@ -278,7 +274,7 @@ server there that you can connect to.  See also
 	      ;; Nix out "nntp reading...." message.
 	      (when nntp-have-messaged
 		(setq nntp-have-messaged nil)
-		(message ""))
+		(nnheader-message 5 ""))
 	      t))))
       (unless discard
 	(erase-buffer)))))
@@ -676,15 +672,16 @@ server there that you can connect to.  See also
 
 (deffoo nntp-close-server (&optional server)
   (nntp-possibly-change-group nil server t)
-  (let (process)
-    (while (setq process (car (pop nntp-connection-alist)))
+  (let ((process (nntp-find-connection nntp-server-buffer)))
+    (while process
       (when (memq (process-status process) '(open run))
 	(ignore-errors
 	  (nntp-send-string process "QUIT")
 	  (unless (eq nntp-open-connection-function 'nntp-open-network-stream)
 	    (sleep-for 1))))
       (when (buffer-name (process-buffer process))
-	(kill-buffer (process-buffer process))))
+	(kill-buffer (process-buffer process)))
+      (setq process (car (pop nntp-connection-alist))))
     (nnoo-close-server 'nntp)))
 
 (deffoo nntp-request-close ()
@@ -714,16 +711,11 @@ server there that you can connect to.  See also
   (nntp-possibly-change-group nil server)
   (save-excursion
     (set-buffer nntp-server-buffer)
-    (let* ((date (timezone-parse-date date))
-	   (time-string
-	    (format "%s%02d%02d %s%s%s"
-		    (substring (aref date 0) 2) (string-to-int (aref date 1))
-		    (string-to-int (aref date 2)) (substring (aref date 3) 0 2)
-		    (substring
-		     (aref date 3) 3 5) (substring (aref date 3) 6 8))))
-      (prog1
-	  (nntp-send-command "^\\.\r?\n" "NEWGROUPS" time-string)
-	(nntp-decode-text)))))
+    (prog1
+	(nntp-send-command
+	 "^\\.\r?\n" "NEWGROUPS"
+	 (format-time-string "%y%m%d %H%M%S" (nnmail-date-to-time date)))
+      (nntp-decode-text))))
 
 (deffoo nntp-request-post (&optional server)
   (nntp-possibly-change-group nil server)
@@ -985,8 +977,7 @@ password contained in '~/.nntp-authinfo'."
     (while (not (eobp))
       (end-of-line)
       (delete-char 1)
-      (insert nntp-end-of-line)
-      (forward-line 1))
+      (insert nntp-end-of-line))
     (forward-char -1)
     (unless (eq (char-after (1- (point))) ?\r)
       (insert "\r"))))

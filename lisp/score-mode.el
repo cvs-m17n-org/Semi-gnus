@@ -1,7 +1,7 @@
 ;;; score-mode.el --- mode for editing Gnus score files
 ;; Copyright (C) 1996 Free Software Foundation, Inc.
 
-;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -46,7 +46,7 @@
   (define-key gnus-score-mode-map "\C-c\C-p" 'gnus-score-pretty-print))
 
 (defvar score-mode-syntax-table
-  (let ((table (copy-syntax-table emacs-lisp-mode-syntax-table)))
+  (let ((table (copy-syntax-table lisp-mode-syntax-table)))
     (modify-syntax-entry ?| "w" table)
     table)
   "Syntax table used in score-mode buffers.")

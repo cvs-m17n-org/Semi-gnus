@@ -2,7 +2,7 @@
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <abraham@iesd.auc.dk>
-;;	Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -366,22 +366,23 @@ The vector contain five strings,
   [prefix name encoding description number]
 though the two last may be nil if they are missing."
   (let (areas)
-    (save-excursion
-      (set-buffer (nnheader-find-file-noselect file 'force))
-      (buffer-disable-undo (current-buffer))
-      (goto-char (point-min))
-      (while (not (eobp))
-	(push (vector (gnus-soup-field)
-		      (gnus-soup-field)
-		      (gnus-soup-field)
-		      (and (eq (preceding-char) ?\t)
-			   (gnus-soup-field))
-		      (and (eq (preceding-char) ?\t)
-			   (string-to-int (gnus-soup-field))))
-	      areas)
-	(when (eq (preceding-char) ?\t)
-	  (beginning-of-line 2)))
-      (kill-buffer (current-buffer)))
+    (when (file-exists-p file)
+      (save-excursion
+	(set-buffer (nnheader-find-file-noselect file 'force))
+	(buffer-disable-undo (current-buffer))
+	(goto-char (point-min))
+	(while (not (eobp))
+	  (push (vector (gnus-soup-field)
+			(gnus-soup-field)
+			(gnus-soup-field)
+			(and (eq (preceding-char) ?\t)
+			     (gnus-soup-field))
+			(and (eq (preceding-char) ?\t)
+			     (string-to-int (gnus-soup-field))))
+		areas)
+	  (when (eq (preceding-char) ?\t)
+	    (beginning-of-line 2)))
+	(kill-buffer (current-buffer))))
     areas))
 
 (defun gnus-soup-parse-replies (file)
