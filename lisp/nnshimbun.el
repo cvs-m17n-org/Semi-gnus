@@ -409,24 +409,32 @@ also be nil."
       (insert " "))
     (forward-line 1)))
 
+(defmacro nnshimbun-find-parameter (group variable)
+  `(or (let ((v (gnus-group-find-parameter
+		 (concat "nnshimbun+"
+			 (nnoo-current-server 'nnshimbun)
+			 ":" ,group)
+		 (quote ,variable)
+		 'allow-list)))
+	 (if (listp v) (car v) v))
+       ,variable))
+
 (defun nnshimbun-generate-nov-database (group)
   (nnshimbun-possibly-change-group group)
   (with-current-buffer (nnshimbun-open-nov group)
     (goto-char (point-max))
     (forward-line -1)
-    (let ((i (or (ignore-errors (read (current-buffer))) 0)))
-      (dolist (header (shimbun-headers
-		       nnshimbun-shimbun
-		       (or (gnus-group-find-parameter
-			    (concat "nnshimbun+"
-				    (nnoo-current-server 'nnshimbun)
-				    ":" group)
-			    'nnshimbun-index-range)
-			   nnshimbun-index-range)))
+    (let ((i (or (ignore-errors (read (current-buffer))) 0))
+	  (pre-fetch
+	   (nnshimbun-find-parameter group nnshimbun-pre-fetch-article)))
+      (dolist (header
+	       (shimbun-headers
+		nnshimbun-shimbun
+		(nnshimbun-find-parameter group nnshimbun-index-range)))
 	(unless (nnshimbun-search-id group (shimbun-header-id header))
 	  (goto-char (point-max))
 	  (nnshimbun-insert-nov (setq i (1+ i)) header)
-	  (when nnshimbun-pre-fetch-article
+	  (when pre-fetch
 	    (nnshimbun-request-article-1 i group nil nnshimbun-buffer)))))
   (nnshimbun-write-nov group)))
 
@@ -525,10 +533,9 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 	       ;; Prefer the shimbun's default to `nnmail-expiry-wait'
 	       ;; only when the group's parameter is nil.
 	       (nnmail-expiry-wait
-		(if (gnus-group-find-parameter name 'expiry-wait)
-		    nnmail-expiry-wait
-		  (or (shimbun-article-expiration-days nnshimbun-shimbun)
-		      nnmail-expiry-wait)))
+		(or (gnus-group-find-parameter name 'expiry-wait)
+		    (shimbun-article-expiration-days nnshimbun-shimbun)
+		    nnmail-expiry-wait))
 	       article end time)
 	  (save-excursion
 	    (set-buffer buffer)

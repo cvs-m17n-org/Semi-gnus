@@ -1,3 +1,9 @@
+2001-06-12  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-find-parameter): New macro.
+	(nnshimbun-generate-nov-database): Use `nnshimbun-find-parameter'.
+	(nnshimbun-request-expire-articles): Fixed.
+
 2001-06-12  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (Gnus-p): Use `file-exists-p' instead of
