@@ -1,3 +1,21 @@
+2002-01-16  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.28 (This is alpha status.)
+	Sync. up `nnshimbun.el' with T-gnus.
+	Change user operation when open the large group.  (This is
+	preliminary.)
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.29.
+
+	* lisp/gnus-sum.el (gnus-summary-read-number-from-minibuffer): New
+	function.
+	(gnus-articles-to-read): Use
+	`gnus-summary-read-number-from-minibuffer'.
+
+2002-01-10  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/nnshimbun.el: Sync up with T-gnus.
+
 2002-01-10  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.28 (This is alpha status.)
