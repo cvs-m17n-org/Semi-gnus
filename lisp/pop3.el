@@ -140,10 +140,10 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 	    (pop3-retr process (caar messages) crashbuf)
 	    (push (caar messages) retrieved-messages)
 	    (setq messages (cdr messages)
-		  n (1+ n)))
-	  (with-current-buffer crashbuf
-	    (write-region-as-binary (point-min) (point-max)
-				    crashbox 'append 'nomesg))
+		  n (1+ n))
+	    (with-current-buffer crashbuf
+	      (write-region-as-binary (point-min) (point-max)
+				      crashbox 'append 'nomesg)))
 	  ;; mark messages as read
 	  (when pop3-leave-mail-on-server
 	    (pop3-save-uidls))
@@ -540,9 +540,6 @@ Return the response string if optional second argument RETURN is non-nil."
       (setq end (point-marker))
       (pop3-clean-region start end)
       (pop3-munge-message-separator start end)
-      (save-excursion
-	(set-buffer crashbuf)
-	(erase-buffer))
       (copy-to-buffer crashbuf start end)
       (delete-region start end)
       )))
