@@ -33,9 +33,6 @@
 (require 'gnus-start)
 (require 'nnmh)
 (require 'nnoo)
-(eval-when-compile
-  ;; This is just to shut up the byte-compiler.
-  (defalias 'nndraft-request-group 'ignore))
 
 (nnoo-declare nndraft
   nnmh)
