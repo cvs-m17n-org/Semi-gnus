@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.19 1998-12-14 04:41:24 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.20 1998-12-14 12:39:32 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -7,7 +7,7 @@
 ;;;         Yukihiro Ito <ito@rs.civil.tohoku.ac.jp>
 ;;;         Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
-;;; Version: 2.00
+;;; Version: 2.01
 ;;; Keywords: news , mail , offline , gnus
 ;;;
 ;;; SPECIAL THANKS
@@ -99,11 +99,11 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "2.00 pl01")
+(defconst gnus-offline-version-number "2.01")
 (defconst gnus-offline-codename
 ;;  "Beta5"			; Beta
-  "This is the time"		; 2.00
-;;  "A matter of trust"
+;;  "This is the time"		; 2.00
+  "A matter of trust"
 ;;  "Modern Woman"
 ;;  "Code of silence"
   )
@@ -768,7 +768,7 @@ If value is nil , dialup line is disconnected status.")
      ["Send mails in spool" mail-spool-send t]
      "----"
      ["Message Offline" message-offline-state (not message-offline-state)]
-     ["Message Online" message-online-state message-online-state]
+     ["Message Online" message-online-state message-offline-state]
      "----"
      ("Gnus Offline"
       ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
