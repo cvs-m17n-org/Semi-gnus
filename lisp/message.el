@@ -342,7 +342,7 @@ Checks include `subject-cmsg', `multiple-headers', `sendsys',
 `approved', `sender', `empty', `empty-headers', `message-id', `from',
 `subject', `shorten-followup-to', `existing-newsgroups',
 `buffer-file-name', `unchanged', `newsgroups', `reply-to',
-'continuation-headers'."
+'continuation-headers', and `long-header-lines'."
   :group 'message-news
   :type '(repeat sexp))			; Fixme: improve this
 
@@ -4315,6 +4315,20 @@ Otherwise, generate and save a value for `canlock-password' first."
 	 (y-or-n-p
 	  "The control code \"cmsg\" is in the subject.  Really post? ")
        t))
+   ;; Check long header lines.
+   (message-check 'long-header-lines
+     (let ((start (point))
+	   found)
+       (while (and (not found)
+		   (re-search-forward "^\\([^ \t:]+\\): " nil t))
+	 (when (> (- (point) start) 998)
+	   (setq found t))
+	 (setq start (match-beginning 0))
+	 (forward-line 1))
+       (if found
+	   (y-or-n-p (format "Your %s header is too long.  Really post? "
+			     (match-string 1)))
+	 t)))
    ;; Check for multiple identical headers.
    (message-check 'multiple-headers
      (let (found)

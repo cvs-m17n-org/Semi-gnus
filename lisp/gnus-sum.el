@@ -6708,7 +6708,8 @@ Returns the article selected or nil if there are no unread articles."
 	(let ((data gnus-newsgroup-data))
 	  (while (and data
 		      (and (not (and undownloaded
-				     (memq (car data) gnus-newsgroup-undownloaded)))
+				     (memq (car data)
+					   gnus-newsgroup-undownloaded)))
 			   (if unseen
 			       (or (not (memq
 					 (gnus-data-number (car data))
