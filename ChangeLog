@@ -20,6 +20,42 @@
 	Delete variable pop3-fma-movemail options.
 	Add new variabel pop3-fma-commandline-arguments.
 
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-make-user-agent): New implementation.
+
+1998-08-25  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-msg.el (gnus-bug-message): About Semi-gnus.
+	(gnus-extended-version): Return gnus version only.
+	(gnus-bug): Add Semi-gnus developers to recipients.
+
+	* lisp/message.el (message-make-user-agent): New function.
+	(message-generate-headers): Use it.
+
+1998-06-12  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-required-news-headers): `X-Newsreader'
+	was replaced by `User-Agent'.
+	(message-required-mail-headers): `X-Mailer' was replaced by
+	`User-Agent'.
+	(message-header-format-alist): `X-Mailer' and `X-Newsreader' were
+	replaced by `User-Agent'.
+	(message-generate-headers): Ditto.
+
+	(message-user-agent): New variable.
+	(message-newsreader): Replaced by `message-user-agent'.
+	(message-mailer): Ditto.
+	(message-mode): `message-mailer' and `message-newsreader' were
+	replaced by `message-user-agent'.
+
+	* lisp/gnus-msg.el (gnus-inews-add-send-actions): `message-mailer'
+	and `message-newsreader' were replaced by `message-user-agent'.
+	(gnus-extended-version): Generate "PRODUCT/VERSION" style strings.
+
+	* lisp/gnus-soup.el (gnus-soup-send-packet): `message-mailer' and
+	`message-newsreader' were replaced by `message-user-agent'.
+
 1998-09-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-draft.el (gnus-draft-edit-message): Use
