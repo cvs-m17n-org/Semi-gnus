@@ -2302,11 +2302,11 @@ It should typically alter the sending method in some way or other."
   (unless (bolp)
     (insert "\n"))
   ;; Make all invisible text visible.
-  ;;(when (text-property-any (point-min) (point-max) 'invisible t)
-  ;;  (put-text-property (point-min) (point-max) 'invisible nil)
-  ;;  (unless (yes-or-no-p "Invisible text found and made visible; continue posting?")
-  ;;    (error "Invisible text found and made visible")))
-  )
+  (when (text-property-any (point-min) (point-max) 'invisible t)
+    (put-text-property (point-min) (point-max) 'invisible nil)
+    (unless (yes-or-no-p
+	     "Invisible text found and made visible; continue posting?")
+      (error "Invisible text found and made visible"))))
 
 (defun message-add-action (action &rest types)
   "Add ACTION to be performed when doing an exit of type TYPES."
