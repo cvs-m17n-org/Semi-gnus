@@ -449,33 +449,34 @@ all.  This may very well take some time.")
       (goto-char (point-min))
       (when (looking-at "X-From-Line: ")
 	(replace-match "From "))
-      (and
-       (nnfolder-request-list)
-       (save-excursion
-	 (set-buffer buf)
-	 (goto-char (point-min))
-	 (if (search-forward "\n\n" nil t)
-	     (forward-line -1)
-	   (goto-char (point-max)))
-	 (while (re-search-backward (concat "^" nnfolder-article-marker) nil t)
-	   (delete-region (point) (progn (forward-line 1) (point))))
-	 (when nnmail-cache-accepted-message-ids
-	   (nnmail-cache-insert (nnmail-fetch-field "message-id")))
-	 (setq result (if (stringp group)
-			  (list (cons group (nnfolder-active-number group)))
-			(setq art-group
-			      (nnmail-article-group 'nnfolder-active-number))))
-	 (if (and (null result)
-		  (yes-or-no-p "Moved to `junk' group; delete article? "))
-	     (setq result 'junk)
-	   (setq result
-		 (car (nnfolder-save-mail result)))))
-       (when last
-	 (save-excursion
-	   (nnfolder-possibly-change-folder (or (caar art-group) group))
-	   (nnfolder-save-buffer)
-	   (when nnmail-cache-accepted-message-ids
-	     (nnmail-cache-close)))))
+      (let ((nnmail-file-coding-system nnfolder-active-file-coding-system))
+	(with-temp-buffer
+	  (nnmail-find-file nnfolder-active-file)
+	  (setq nnfolder-group-alist (nnmail-parse-active))))
+      (save-excursion
+	(goto-char (point-min))
+	(if (search-forward "\n\n" nil t)
+	    (forward-line -1)
+	  (goto-char (point-max)))
+	(while (re-search-backward (concat "^" nnfolder-article-marker) nil t)
+	  (delete-region (point) (progn (forward-line 1) (point))))
+	(when nnmail-cache-accepted-message-ids
+	  (nnmail-cache-insert (nnmail-fetch-field "message-id")))
+	(setq result (if (stringp group)
+			 (list (cons group (nnfolder-active-number group)))
+		       (setq art-group
+			     (nnmail-article-group 'nnfolder-active-number))))
+	(if (and (null result)
+		 (yes-or-no-p "Moved to `junk' group; delete article? "))
+	    (setq result 'junk)
+	  (setq result
+		(car (nnfolder-save-mail result)))))
+      (when last
+	(save-excursion
+	  (nnfolder-possibly-change-folder (or (caar art-group) group))
+	  (nnfolder-save-buffer)
+	  (when nnmail-cache-accepted-message-ids
+	    (nnmail-cache-close))))
       (nnfolder-save-active nnfolder-group-alist nnfolder-active-file)
       (unless result
 	(nnheader-report 'nnfolder "Couldn't store article"))
@@ -776,20 +777,21 @@ deleted.  Point is left where the deleted region was."
       (push (list group (nnfolder-read-folder group))
 	    nnfolder-buffer-alist))))
 
-;; This method has a problem if you've accidentally let the active list get
-;; out of sync with the files.  This could happen, say, if you've
-;; accidentally gotten new mail with something other than Gnus (but why
-;; would _that_ ever happen? :-).  In that case, we will be in the middle of
-;; processing the file, ready to add new X-Gnus article number markers, and
-;; we'll run across a message with no ID yet - the active list _may_not_ be
-;; ready for us yet.
+;; This method has a problem if you've accidentally let the active
+;; list get out of sync with the files.  This could happen, say, if
+;; you've accidentally gotten new mail with something other than Gnus
+;; (but why would _that_ ever happen? :-).  In that case, we will be
+;; in the middle of processing the file, ready to add new X-Gnus
+;; article number markers, and we'll run across a message with no ID
+;; yet - the active list _may_not_ be ready for us yet.
 
-;; To handle this, I'm modifying this routine to maintain the maximum ID seen
-;; so far, and when we hit a message with no ID, we will _manually_ scan the
-;; rest of the message looking for any more, possibly higher IDs.  We'll
-;; assume the maximum that we find is the highest active.  Note that this
-;; shouldn't cost us much extra time at all, but will be a lot less
-;; vulnerable to glitches between the mbox and the active file.
+;; To handle this, I'm modifying this routine to maintain the maximum
+;; ID seen so far, and when we hit a message with no ID, we will
+;; _manually_ scan the rest of the message looking for any more,
+;; possibly higher IDs.  We'll assume the maximum that we find is the
+;; highest active.  Note that this shouldn't cost us much extra time
+;; at all, but will be a lot less vulnerable to glitches between the
+;; mbox and the active file.
 
 (defun nnfolder-read-folder (group)
   (let* ((file (nnfolder-group-pathname group))
