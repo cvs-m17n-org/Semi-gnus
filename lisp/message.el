@@ -6452,11 +6452,6 @@ that further discussion should take place only in "
        ,@(and distribution (list (cons 'Distribution distribution))))
      cur)))
 
-(eval-when-compile
-  ;; Must be dynamically bound for message-is-yours-p.
-  (defvar sender)
-  (defvar from))
-
 (defun message-is-yours-p ()
   "Non-nil means current article is yours.
 If you have added 'cancel-messages to 'message-shoot-gnksa-feet', all articles
