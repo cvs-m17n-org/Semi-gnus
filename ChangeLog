@@ -1,5 +1,10 @@
 1999-12-26  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* lisp/gnus-art.el (gnus-mime-display-part-with-mime-view): Bind
+	`mime-display-text/plain-hook' for `gnus-treat-article'.
+
+1999-12-26  Keiichi Suzuki  <keiichi@nanap.org>
+
 	* Nana-gnus: Version 7.1.0.2 (This is very alpha status.)
 	See announcement of 7.1.0.0.
 
