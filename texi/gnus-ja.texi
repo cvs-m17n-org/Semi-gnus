@@ -497,7 +497,7 @@ Emacs $B$,J8>O$rJT=8$9$k?M$KNO$rM?$($k$h$&$K!"(Bgnus $B$O%K%e!<%9$rFI$`?M$KNO
 
 Other related manuals
 
-* Message:(message).            Composing messages.
+* Message:(message).            $B%a%C%;!<%8$N:n@.(B
 * Emacs-MIME:(emacs-mime).      Composing messages; @acronym{MIME}-specific parts.
 * Sieve:(sieve).                Managing Sieve scripts in Emacs.
 * PGG:(pgg).                    @acronym{PGP/MIME} with Gnus.
@@ -24272,54 +24272,57 @@ Message $B$O(B From:, To: $B$*$h$S(B Cc: $B$K$"$kHs(B-@acronym{ASCII} $B%
 $B$3$l$rF/$+$J$$$h$&$K$9$k$K$O!"(B@code{(setq gnus-treat-display-smileys
 nil)} $B$r(B @file{~/.emacs} $B$KCV$$$F2<$5$$!#(B
 
+@item
+Gnus $B$O:#$G$O(B Sender: $B%X%C%@!<$r<+F0$G$O@8@.$7$^$;$s!#(B
+
+$B=i4|$N$3$m!"$=$l$O%f!<%6!<$,@_Dj$G$-$k(B email $B%"%I%l%9$,!"(BGnus $B$,A[Dj$7$?(B
+$B%f!<%6!<$N%G%#%U%)%k%H$N%"%I%l%9$H0c$C$F$$$?>l9g$K@8@.$5$l$^$7$?!#:#F|$G(B
+$B$O$=$NA[Dj%"%k%4%j%:%`$,@5$7$$$3$H$O$^$l$G!"(BSender: $B%X%C%@!<$NM#0l$N(B ($B5D(B
+$BO@$NE*$K$J$k(B) $BMQES$O!"%K%e!<%9$r(B cancel/supersede $B$9$k;q3J$,$"$k$+$I$&$+(B
+$B$r8!::$9$k$3$H(B ($B$3$l$OBe$o$j$K!"B>$N9`$G=R$Y$i$l$k(B Cancel Locks $B$K$h$C$F(B
+$B2r7h$5$l$?(B) $B$J$N$G!"$=$N%X%C%@!<$N@8@.$O%G%#%U%)%k%H$GM^@)$5$l$F$$$^$9!#(B
+$BJQ?t(B @code{message-required-headers}$B!"(B
+@code{message-required-news-headers} $B$*$h(B
+$B$S(B @code{message-required-mail-headers} $B$r;2>H$7$F2<$5$$!#(B
+
+@item
+$B%5!<%I%Q!<%F%#!<$K$h$k(B @file{message-utils.el} $B$N5!G=(B
+$B$,(B @file{message.el} $B$K2C$($i$l$^$7$?!#(B
+
+Message $B$OI=Bj(B (subject) $B$N9T$+$i(B @samp{(was: <old subject>)} $B$r:o=|$9$k(B
+$B$+$I$&$+$r?R$M$k$h$&$K$J$j$^$7(B
+$B$?(B (@code{message-subject-trailing-was-query} $B;2>H(B)$B!#(B
+@kbd{C-c M-m} $B$H(B @kbd{C-c M-f} $B$OA^F~$5$l$?%F%-%9%H$r<($90u$rA^F~$7$^$9!#(B
+@kbd{C-c C-f a} $B$O(B X-No-Archive: $B%X%C%@!<$rIU$12C$($^$9!#(B@kbd{C-c C-f
+x} $B$O!"E,@Z$J%X%C%@!<$H!"%/%m%9%]%9%H$H%U%)%m!<@h$K$D$$$F$NCm0U=q$-$rK\(B
+$BJ8$KA^F~$7$^$9(B (@code{message-cross-post-@var{*}} $BJQ?t72$r8+$F2<$5$$(B)$B!#(B
+
+@item
+$B:#$d(B @code{message-generate-headers-first} $B$,(B @code{nil} $B$@$C$?$i!"%a%C(B
+$B%;!<%8$N:n@.$r;O$a$k$H$-$K(B References $B$H(B X-Draft-Headers $B$O@8@.$5$l$^$;(B
+$B$s!#(B
+
+@item
+$B2~NI$5$l$?(B spam $BBP935!G=!#(B
+
+Gnus $B$OHs>o$KJQ2=$KIY$s$@%W%m%0%i%`$H_I2a$N5,B'$r;H$C$F!"%a!<%k$d%K%e!<(B
+$B%9$NK[N.$+$i(B spam $B$rH4$-<h$C$F$7$^$&$3$H$,$G$-$k$h$&$K$J$j$^$7$?!#BP1~$7(B
+$B$F$$$kJ}<0$O!"(BRBL blocklists$B!"(Bbogofilter $B$=$l$K%[%o%$%H(B/$B%V%i%C%/%j%9%H$G(B
+$B$9!#$^$?(B SpamAssassin $B$d(B Hashcash $B$N$h$&$J30It%Q%C%1!<%8$r4JC1$K;H$&$?$a(B
+$B$N(B hook $B$b?7$7$/$J$j$^$7$?!#(B@xref{Thwarting Email Spam}$B!#(B
+
+@item
+X-Faces $B%X%C%@!<$NA^F~$,4JC1$K$J$j$^$7$?!#(B
+
+@item
+$B35N,%P%C%U%!$K!"?7$7$$%3%^%s%I(B @kbd{/ N} $B$O?7Ce%a%C%;!<%8$rA^F~$7!"(B
+@kbd{/ o} $B$O8E$$%a%C%;!<%8$rA^F~$7$^$9!#(B
+
+@item
+@kbd{W m} $B$r2!$9$H!"(BGnus $B$O%b!<%k%9$GId9f2=$5$l$?%a%C%;!<%8$r%G%3!<%I$7(B
+$B$^$9!#(B
+
 @c TRANSLATEME
-@item
-Gnus no longer generate the Sender: header automatically.
-
-Earlier it was generated iff the user configurable email address was
-different from the Gnus guessed default user address.  As the guessing
-algorithm is rarely correct these days, and (more controversally) the
-only use of the Sender: header was to check if you are entitled to
-cancel/supersede news (which is now solved by Cancel Locks instead,
-see another entry), generation of the header has been disabled by
-default.  See the variables @code{message-required-headers},
-@code{message-required-news-headers}, and
-@code{message-required-mail-headers}.
-
-@item
-Features from third party @file{message-utils.el} added to @file{message.el}.
-
-Message now asks if you wish to remove @samp{(was: <old subject>)} from
-subject lines (see @code{message-subject-trailing-was-query}).  @kbd{C-c
-M-m} and @kbd{C-c M-f} inserts markers indicating included text.
-@kbd{C-c C-f a} adds a X-No-Archive: header.  @kbd{C-c C-f x} inserts
-appropriate headers and a note in the body for cross-postings and
-followups (see the variables @code{message-cross-post-@var{*}}).
-
-@item
-References and X-Draft-Headers are no longer generated when you start
-composing messages and @code{message-generate-headers-first} is
-@code{nil}.
-
-@item
-Improved anti-spam features.
-
-Gnus is now able to take out spam from your mail and news streams
-using a wide variety of programs and filter rules. Among the supported
-methods are RBL blocklists, bogofilter and white/blacklists.  Hooks
-for easy use of external packages such as SpamAssassin and Hashcash
-are also new.  @xref{Thwarting Email Spam}.
-
-@item
-Easy inclusion of X-Faces headers.
-
-@item
-In the summary buffer, the new command @kbd{/ N} inserts new messages
-and @kbd{/ o} inserts old messages.
-
-@item
-Gnus decodes morse encoded messages if you press @kbd{W m}.
-
 @item
 Unread count correct in nnimap groups.
 
