@@ -133,6 +133,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'static))
 
 (eval-and-compile
   (autoload 'open-ssl-stream "ssl")
@@ -143,6 +144,25 @@
   (autoload 'utf7-decode "utf7")
   (autoload 'format-spec "format-spec")
   (autoload 'format-spec-make "format-spec"))
+
+(static-if (and (fboundp 'base64-decode-string)
+		(subrp (symbol-function 'base64-decode-string)))
+    (eval-and-compile (fset 'imap-base64-decode-string 'base64-decode-string))
+  (require 'mel)
+  (defun imap-base64-decode-string (string)
+    (fset 'imap-base64-decode-string
+	  (symbol-function (mel-find-function 'mime-decode-string "base64")))
+    (imap-base64-decode-string string))
+  )
+
+(static-if (and (fboundp 'base64-encode-string)
+		(subrp (symbol-function 'base64-encode-string)))
+    (eval-and-compile (fset 'imap-base64-encode-string 'base64-encode-string))
+  (defun imap-base64-encode-string (string)
+    (fset 'imap-base64-encode-string
+	  (symbol-function (mel-find-function 'mime-encode-string "base64")))
+    (imap-base64-encode-string string))
+  )
 
 (autoload 'md5 "md5")
 
@@ -574,7 +594,7 @@ successful, nil otherwise."
        (list
 	"AUTHENTICATE CRAM-MD5"
 	(lambda (challenge)
-	  (let* ((decoded (base64-decode-string challenge))
+	  (let* ((decoded (imap-base64-decode-string challenge))
 		 (hash-function (if (and (featurep 'xemacs)
 					 (>= (function-max-args 'md5) 4))
 				    (lambda (object &optional start end)
@@ -582,7 +602,7 @@ successful, nil otherwise."
 				  'md5))
 		 (hash (rfc2104-hash hash-function 64 16 passwd decoded))
 		 (response (concat user " " hash))
-		 (encoded (base64-encode-string response)))
+		 (encoded (imap-base64-encode-string response)))
 	    encoded))))))))
 
 (defun imap-login-p (buffer)
