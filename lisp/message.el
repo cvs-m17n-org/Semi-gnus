@@ -1019,6 +1019,11 @@ The cdr of ech entry is a function for applying the face to a region.")
 (defvar message-send-coding-system 'binary
   "Coding system to encode outgoing mail.")
 
+(defvar message-draft-coding-system 
+  (if (string-match "XEmacs\\|Lucid" emacs-version)
+      'escape-quoted 'emacs-mule)
+  "Coding system to compose mail.")
+
 ;;; Internal variables.
 
 (defvar message-default-charset nil)
@@ -3782,7 +3787,8 @@ Headers already prepared in the buffer are not modified."
       (setq buffer-file-name (expand-file-name "*message*"
 					       message-auto-save-directory))
       (setq buffer-auto-save-file-name (make-auto-save-file-name)))
-    (clear-visited-file-modtime)))
+    (clear-visited-file-modtime)
+    (setq buffer-file-coding-system message-draft-coding-system)))
 
 (defun message-disassociate-draft ()
   "Disassociate the message buffer from the drafts directory."

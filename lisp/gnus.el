@@ -259,10 +259,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.039"
+(defconst gnus-version-number "6.10.040"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.53"
+(defconst gnus-original-version-number "0.54"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
