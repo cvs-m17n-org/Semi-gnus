@@ -63,16 +63,24 @@ newsgroup name.  SYMBOL is MIME charset or coding-system.")
 It is specified by variable `gnus-newsgroup-default-charset-alist'
 \(cf. function `gnus-set-newsgroup-default-charset')."
   (if (buffer-live-p gnus-summary-buffer)
-      (let* ((group (save-excursion
-		      (set-buffer gnus-summary-buffer)
-		      (gnus-group-real-name gnus-newsgroup-name)))
-	     (alist gnus-newsgroup-default-charset-alist)
-	     (charset (catch 'found
-			(let (pair)
-			  (while (setq pair (car alist))
-			    (if (string-match (car pair) group)
-				(throw 'found (cdr pair)))
-			    (setq alist (cdr alist)))))))
+      (let* ((qgroup (save-excursion
+		       (set-buffer gnus-summary-buffer)
+		       gnus-newsgroup-name))
+	     (rgroup (gnus-group-real-name qgroup))
+	     alist pair charset)
+	(setq charset (catch 'found
+			;; First, use "qualified" newsgroup name.
+			(setq alist gnus-newsgroup-default-charset-alist)
+			(while (setq pair (car alist))
+			  (if (string-match (car pair) qgroup)
+			      (throw 'found (cdr pair)))
+			  (setq alist (cdr alist)))
+			;; Next, try "real" newsgroup name.
+			(setq alist gnus-newsgroup-default-charset-alist)
+			(while (setq pair (car alist))
+			  (if (string-match (car pair) rgroup)
+			      (throw 'found (cdr pair)))
+			  (setq alist (cdr alist)))))
 	(if charset
 	    (progn
 	      (save-excursion
