@@ -2864,14 +2864,14 @@ It should typically alter the sending method in some way or other."
 						  'mime-edit-invisible t))
 		   (text-property-any (point-min) (point-max)
 				      'message-invisible t)))
-	 (to (or (if emiko
-		     (text-property-not-all from (point-max)
-					    'mime-edit-invisible t)
-		   (text-property-not-all from (point-max)
-					  'message-invisible t))
-		 (point-max)))
-	 regions)
+	 to regions)
     (when from
+      (setq to (or (if emiko
+		       (text-property-not-all from (point-max)
+					      'mime-edit-invisible t)
+		     (text-property-not-all from (point-max)
+					    'message-invisible t))
+		   (point-max)))
       (push (cons from to) regions)
       (if emiko
 	  (while (setq from (text-property-any to (point-max)
