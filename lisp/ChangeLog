@@ -1,3 +1,21 @@
+2001-10-30 21:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* canlock.el, sha1-el.el, hex-util.el: Move from contrib
+	directory. Thanks to Katsumi Yamaoka <yamaoka@jpl.org> and Shuhei
+	KOBAYASHI <shuhei@aqua.ocn.ne.jp>.
+	
+2001-10-30 20:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (article-display-x-face): Nix buffer-read-only
+	again.
+
+	* mml2015.el (mml2015-gpg-verify): Convert <LF> to <CR><LF>.
+
+2001-10-30 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-spec.el (gnus-parse-simple-format): Use
+	  buffer-substring-no-properties.
+
 2001-10-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-art.el (article-verify-cancel-lock): New function.

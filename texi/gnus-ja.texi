@@ -10763,6 +10763,19 @@ default force yes
 されています。それらは二種類に分類することができ、直接接続するための関数
 群 (三つ) と間接的に接続するためのもの (二つ) があります。
 
+@item nntp-prepare-post-hook
+@vindex nntp-prepare-post-hook
+記事をポストする直前に実行されるフックです。もし記事
+に @code{Message-ID} ヘッダーが無くてニュースサーバーが推奨 ID を提供し
+てくれるならば、このフックが実行される前にそれが記事に加えられます。これ
+は、もしあなたが gnus が @code{Message-ID} ヘッダーを付けないようにして
+いても、@code{Cancel-Lock} ヘッダーを作るために利用することができます。
+それにはこうすれば良いでしょう:
+
+@lisp
+(add-hook 'nntp-prepare-post-hook 'canlock-insert-header)
+@end lisp
+
 @item nntp-list-options
 @vindex nntp-list-options
 LIST コマンドのオプションに使って、(サーバーの) リスト出力を設定したニュー
