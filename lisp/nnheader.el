@@ -1206,7 +1206,7 @@ find-file-hooks, etc.
   (defalias 'mm-multibyte-string-p
     (if (fboundp 'multibyte-string-p)
 	'multibyte-string-p
-      'ignore)))
+      'ignore))) 
 
 (when (featurep 'xemacs)
   (require 'nnheaderxm))
