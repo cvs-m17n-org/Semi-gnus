@@ -755,7 +755,7 @@ Returns t if login was successful, nil otherwise."
       (while (or (not user) (not passwd))
 	(setq user (or imap-username
 		       (read-from-minibuffer
-			(concat "IMAP username for " imap-server 
+			(concat "IMAP username for " imap-server
 				" (using stream `" (symbol-name imap-stream)
 				"'): ")
 			(or user imap-default-user))))
@@ -955,8 +955,8 @@ necessery.  If nil, the buffer name is generated."
 				(imap-open-1 (current-buffer))))
 			(progn
 			  (kill-buffer (current-buffer))
-			  (message 
-			   "imap: Reconnecting with stream `%s'...failed" 
+			  (message
+			   "imap: Reconnecting with stream `%s'...failed"
 			   stream))
 		      ;; We're done, kill the first connection
 		      (imap-close buffer)
@@ -974,7 +974,7 @@ necessery.  If nil, the buffer name is generated."
 		(setq streams nil))))))
       (when (imap-opened buffer)
 	(setq imap-mailbox-data (make-vector imap-mailbox-prime 0)))
-      (when imap-stream 
+      (when imap-stream
 	buffer))))
 
 (defun imap-opened (&optional buffer)
@@ -1003,7 +1003,7 @@ password is remembered in the buffer."
       (if user (setq imap-username user))
       (if passwd (setq imap-password passwd))
       (if imap-auth
-	  (and (funcall (nth 2 (assq imap-auth 
+	  (and (funcall (nth 2 (assq imap-auth
 				     imap-authenticator-alist)) buffer)
 	       (setq imap-state 'auth))
 	;; Choose authenticator.

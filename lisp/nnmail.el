@@ -380,8 +380,8 @@ GROUP: Mail will be stored in GROUP (a string).
 junk: Mail will be deleted.  Use with care!  Do not submerge in water!
   Example:
   (setq nnmail-split-fancy
-        '(| (\"Subject\" \"MAKE MONEY FAST\" junk)
-            ...other.rules.omitted...))
+	'(| (\"Subject\" \"MAKE MONEY FAST\" junk)
+	    ...other.rules.omitted...))
 
 FIELD must match a complete field name.  VALUE must match a complete
 word according to the `nnmail-split-fancy-syntax-table' syntax table.

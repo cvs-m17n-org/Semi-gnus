@@ -528,7 +528,7 @@ marks file will be regenerated properly by Gnus.")
 	(expand-file-name file nnml-current-directory)
       (when (not nnheader-directory-files-is-safe)
 	;; Just to make sure nothing went wrong when reading over NFS --
- 	;; check once more.
+	;; check once more.
 	(when (file-exists-p
 	       (setq file (expand-file-name (number-to-string article)
 					    nnml-current-directory)))

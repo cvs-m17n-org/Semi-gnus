@@ -4055,7 +4055,7 @@ This command may read the active file."
 		(unless (eq n article)
 		  (push n gnus-newsgroup-unselected))
 		(setq n (1+ n)))
-	      (setq gnus-newsgroup-unselected 
+	      (setq gnus-newsgroup-unselected
 		    (nreverse gnus-newsgroup-unselected)))))
       (gnus-activate-group group)
       (gnus-group-make-articles-read group

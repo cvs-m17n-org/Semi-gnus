@@ -218,7 +218,7 @@ use this option with care."
   :group 'gnus-message
   :type '(repeat (symbol :tab "Variable")))
 
-(defcustom gnus-discouraged-post-methods 
+(defcustom gnus-discouraged-post-methods
   '(nndraft nnml nnimap nnmaildir nnmh nnfolder nndir)
   "A list of back ends that are not used in \"real\" newsgroups.
 This variable is used only when `gnus-post-method' is `current'."
@@ -1238,7 +1238,7 @@ forward those articles instead."
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."
   (interactive
-   (list (message-read-from-minibuffer 
+   (list (message-read-from-minibuffer
 	  "Resend message(s) to: "
 	  (when (gnus-buffer-live-p gnus-original-article-buffer)
 	    ;; If some other article is currently selected, the
