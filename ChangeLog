@@ -1,3 +1,8 @@
+2001-07-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/message.el (message-font-lock-keywords-2): Move definitions
+	for cited texts and mml tags to `message-font-lock-keywords-1'.
+
 2001-07-10  Katsuhiro Hermit Endo <hermit@koka-in.org>
 
 	* texi/gnus-ja.texi (Mail Group Commands): Fix a slight mistake.
