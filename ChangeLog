@@ -1,3 +1,8 @@
+1999-01-13  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>
+
+	* lisp/nnspool.el (nnspool-retrieve-headers): Protect against empty
+	body.
+
 1999-01-13  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-offline.el: Add Tsukamoto Tetsuo
