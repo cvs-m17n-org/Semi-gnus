@@ -524,7 +524,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	  (setq source `(,type))
 	  (mapc
 	   #'(lambda (sym)
-	       (unless (not (symbol-value sym))
+	       (when (symbol-value sym)
 		 (setq source
 		       (nconc source
 			      (list
