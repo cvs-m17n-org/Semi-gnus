@@ -6678,10 +6678,10 @@ news, Source is the list of newsgroups is was posted to."
 		from)
 	    (if group
 		(gnus-group-decoded-name group)
-	      (if (setq from (message-fetch-field "from"))
-		  (std11-extract-address-components (nnheader-decode-from
-						     from))
-		"(nowhere)")))
+	      (or (and (setq from (message-fetch-field "from"))
+		       (car (std11-extract-address-components 
+			     (nnheader-decode-from from))))
+		  "(nowhere)")))
 	  "] " subject))
 
 (defun message-forward-subject-author-subject (subject)
