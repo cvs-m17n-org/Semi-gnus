@@ -11153,6 +11153,17 @@ www.my-deja.com などのウェブメールサーバーからメールを取得します。
 トで、最初の要素が @code{:} であると、2番目の要素が @var{args} を引数と
 して関数として呼ばれます。関数は @var{split} を返すべきです。
 
+例えば以下の関数は、記事のボディに基づいた分割に使えるでしょう:
+
+@lisp
+(defun split-on-body ()
+  (save-excursion
+    (set-buffer " *nnmail incoming*")
+    (goto-char (point-min))
+    (when (re-search-forward "Some.*string" nil t)
+      "string.group")))
+@end lisp
+
 @item
 @code{(! @var{func} @var{split})}: 分割がリストで、最初の要素が @code{!}
  であると @var{split} が実行され、@var{func} は @var{split} の結果を引数

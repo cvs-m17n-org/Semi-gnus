@@ -2912,7 +2912,10 @@ This sub function is for exclusive use of `message-send-mail'."
 		(insert ?\n))
 	    (when (and news
 		       (or (message-fetch-field "cc")
-			   (message-fetch-field "to")))
+			   (message-fetch-field "to"))
+		       (let ((ct (mime-read-Content-Type)))
+			 (and (eq 'text (cdr (assq 'type ct)))
+			      (eq 'plain (cdr (assq 'subtype ct))))))
 	      (message-insert-courtesy-copy))
 	    (setq failure (message-maybe-split-and-send-mail)))
 	(kill-buffer tembuf))
@@ -4801,7 +4804,7 @@ If ARG, allow editing of the cancellation message."
 	  (setq buf (set-buffer (get-buffer-create " *message cancel*"))))
 	(erase-buffer)
 	(insert "Newsgroups: " newsgroups "\n"
-		"From: " (message-make-from) "\n"
+               "From: " from "\n"
 		"Subject: cmsg cancel " message-id "\n"
 		"Control: cancel " message-id "\n"
 		(if distribution
