@@ -1,7 +1,8 @@
 ;;; gnus-ems.el --- functions for making Gnus work under different Emacsen
-;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
+;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;;         Tatsuya Ichikawa <t-ichi@niagara.shiojiri.ne.jp>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -56,16 +57,19 @@
     (let ((inhibit-point-motion-hooks t)
 	  from to)
       (goto-line number)
-      (if (boundp 'MULE)
-	  (forward-char (chars-in-string prefix))
-	(forward-char (length prefix)))
-      (skip-chars-forward " \t")
-      (setq from (point))
-      (end-of-line 1)
-      (skip-chars-backward " \t")
-      (setq to (point))
-      (when (< from to)
-	(gnus-overlay-put (gnus-make-overlay from to) 'face face)))))
+      (unless (eobp)            ; Sometimes things become confused (broken).
+        (if (boundp 'MULE)
+            (forward-char (chars-in-string prefix))
+          (forward-char (length prefix)))
+        (skip-chars-forward " \t")
+        (setq from (point))
+        (end-of-line 1)
+        (skip-chars-backward " \t")
+        (setq to (point))
+        (when (< from to)
+          (push (setq overlay (gnus-make-overlay from to))
+                gnus-cite-overlay-list)
+          (gnus-overlay-put (gnus-make-overlay from to) 'face face))))))
 
 (defun gnus-mule-max-width-function (el max-width)
   (` (let* ((val (eval (, el)))
@@ -74,6 +78,56 @@
        (if (> (length valstr) (, max-width))
 	   (truncate-string valstr (, max-width))
 	 valstr))))
+
+(defvar gnus-bdf-image-file nil)
+(defun gnus-mule-group-startup-message (&optional x y)
+  "Insert startup message in current buffer."
+  ;; Insert the message.
+  (erase-buffer)
+  (insert
+   (if (featurep 'bitmap)
+     (format "              %s
+
+"
+	     "" (if (and (stringp gnus-bdf-image-file)
+			 (file-exists-p gnus-bdf-image-file))
+		    (insert-file gnus-image-file)))
+     (format "              %s
+          _    ___ _             _
+          _ ___ __ ___  __    _ ___
+          __   _     ___    __  ___
+              _           ___     _
+             _  _ __             _
+             ___   __            _
+                   __           _
+                    _      _   _
+                   _      _    _
+                      _  _    _
+                  __  ___
+                 _   _ _     _
+                _   _
+              _    _
+             _    _
+            _
+          __
+
+"
+	     "")))
+  ;; And then hack it.
+  (gnus-indent-rigidly (point-min) (point-max)
+		       (/ (max (- (window-width) (or x 46)) 0) 2))
+  (goto-char (point-min))
+  (forward-line 1)
+  (let* ((pheight (count-lines (point-min) (point-max)))
+	 (wheight (window-height))
+	 (rest (- wheight pheight)))
+    (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
+  ;; Fontify some.
+  (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)
+  (goto-char (point-min))
+  (setq mode-line-buffer-identification (concat " " gnus-version))
+  (setq gnus-simple-splash t)
+  (set-buffer-modified-p t))
 
 (defun gnus-encode-coding-string (string system)
   string)
@@ -93,7 +147,8 @@
     (gnus-xmas-define))
 
    ((or (not (boundp 'emacs-minor-version))
-	(< emacs-minor-version 30))
+	(and (< emacs-major-version 20)
+	     (< emacs-minor-version 30)))
     ;; Remove the `intangible' prop.
     (let ((props (and (boundp 'gnus-hidden-properties)
 		      gnus-hidden-properties)))
@@ -175,9 +230,13 @@
       "Display table used in summary mode buffers.")
     (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face)
     (fset 'gnus-max-width-function 'gnus-mule-max-width-function)
-    (fset 'gnus-summary-set-display-table 'ignore)
+    (fset 'gnus-summary-set-display-table (lambda ()))
     (fset 'gnus-encode-coding-string 'encode-coding-string)
     (fset 'gnus-decode-coding-string 'decode-coding-string)
+
+    (and window-system
+	 (module-installed-p 'bitmap)
+	 (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message))
 
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting
