@@ -354,7 +354,7 @@ can be gotten by any nefarious means you can think of---@sc{nntp}, local
 spool or your mbox file.  All at the same time, if you want to push your
 luck.
 
-<<<<Semi-gnus provides MIME features based on SEMI API.  So Semi-gnus
+Semi-gnus provides MIME features based on SEMI API.  So Semi-gnus
 supports your right to read strange messages including big images or
 other various kinds of formats.  Semi-gnus also supports
 internationalization/localization and multiscript features based on MULE

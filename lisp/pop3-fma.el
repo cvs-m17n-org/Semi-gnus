@@ -385,5 +385,3 @@ Argument PROMPT ."
 (provide 'pop3-fma)
 ;;
 ;; pop3-fma.el ends here.
-
-

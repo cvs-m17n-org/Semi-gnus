@@ -5112,12 +5112,12 @@ gnus-exit-group-hook is called with no arguments if that value is non-nil."
 	  (gnus-kill-buffer buf)))
       (setq gnus-current-select-method gnus-select-method)
       (pop-to-buffer gnus-group-buffer)
-      ;; Clear the current group name.
       (if (not quit-config)
 	  (progn
 	    (goto-char group-point)
 	    (gnus-configure-windows 'group 'force))
 	(gnus-handle-ephemeral-exit quit-config))
+      ;; Clear the current group name.
       (unless quit-config
 	(setq gnus-newsgroup-name nil)))))
 

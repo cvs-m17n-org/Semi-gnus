@@ -964,7 +964,7 @@ characters to translate to."
     (let ((charset (save-excursion
 		     (set-buffer gnus-summary-buffer)
 		     default-mime-charset)))
-      (eword-decode-header charset)
+      (mime-decode-header-in-buffer charset)
       )))
 
 (defun article-hide-pgp (&optional arg)
@@ -2000,7 +2000,7 @@ commands:
     (make-local-variable 'default-mime-charset)
     (setq default-mime-charset charset)
     (let (buffer-read-only)
-      (eword-decode-header charset)
+      (mime-decode-header-in-buffer charset)
       (goto-char (point-min))
       (if (search-forward "\n\n" nil t)
 	  (decode-mime-charset-region (match-end 0) (point-max) charset)))

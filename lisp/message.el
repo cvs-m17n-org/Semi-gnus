@@ -469,7 +469,7 @@ variable isn't used."
   :group 'message-headers
   :type 'boolean)
 
-(defcustom message-setup-hook 'turn-on-mime-edit
+(defcustom message-setup-hook '(turn-on-mime-edit)
   "Normal hook, run each time a new outgoing message is initialized.
 The function `message-setup' runs this hook."
   :group 'message-various
@@ -2148,7 +2148,6 @@ the user from the mailer."
 	    ;; Remove some headers.
 	    (save-restriction
 	      (message-narrow-to-headers)
-	      ;; Remove some headers.
 	      (message-remove-header message-ignored-mail-headers t))
 	    (goto-char (point-max))
 	    ;; require one newline at the end.
@@ -4041,10 +4040,12 @@ the message."
       (let ((funcs message-make-forward-subject-function)
 	    (subject (if message-wash-forwarded-subjects
 			 (message-wash-subject
-			  (or (eword-decode-unstructured-field-body
-			       (message-fetch-field "Subject")) ""))
-		       (or (eword-decode-unstructured-field-body
-			    (message-fetch-field "Subject")) ""))))
+			  (or (nnheader-decode-subject
+			       (message-fetch-field "Subject"))
+			      ""))
+		       (or (nnheader-decode-subject
+			    (message-fetch-field "Subject"))
+			   ""))))
 	;; Make sure funcs is a list.
 	(and funcs
 	     (not (listp funcs))
@@ -4395,7 +4396,6 @@ regexp varstr."
 	   (set (make-local-variable (car local))
 		(cdr local)))))
      locals)))
-
 
 ;;; @ for MIME Edit mode
 ;;;

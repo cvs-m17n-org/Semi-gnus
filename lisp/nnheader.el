@@ -102,6 +102,11 @@ on your system, you could say something like:
 (defalias 'mail-header-xref 'mime-entity-xref-internal)
 (defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
 
+(defalias 'nnheader-decode-subject
+  (mime-find-field-decoder 'Subject 'unfolding))
+(defalias 'nnheader-decode-from
+  (mime-find-field-decoder 'From 'unfolding))
+
 (defsubst make-full-mail-header (&optional number subject from date id
 					   references chars lines xref)
   "Create a new mail header structure initialized with the parameters given."
@@ -110,10 +115,10 @@ on your system, you could say something like:
    nil
    nil nil nil
    (if subject
-       (eword-decode-field-body subject 'Subject t)
+       (nnheader-decode-subject subject)
      )
    (if from
-       (eword-decode-field-body from 'From t)
+       (nnheader-decode-from from)
      )
    date id references
    chars lines xref
