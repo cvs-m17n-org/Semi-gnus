@@ -1,3 +1,7 @@
+1998-04-10  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/ChangeLog, lisp/gnus-agent.el: Sync up with Gnus 5.6.4.
+
 1998-04-08  MORIOKA Tomohiko  <morioka@mousai.jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.1.2.
