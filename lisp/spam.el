@@ -777,7 +777,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		nil
 	      decision)))))))
 
-;;; log a spam-processor invocation to the registry
+;;; log a ham- or spam-processor invocation to the registry
 (defun spam-log-processing-to-registry (id type classification check group)
   (when spam-log-to-registry
     (if (and (stringp id)
@@ -795,7 +795,30 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	   type
 	   cell-list))
 
-      (gnus-message 5 "spam-log-processing-to-registry called with bad ID, type, check, or group"))))
+      (gnus-message 5 (format "%s called with bad ID, type, check, or group"
+			      "spam-log-processing-to-registry")))))
+
+;;; check if a ham- or spam-processor registration needs to be undone
+(defun spam-log-unregistration-needed-p (id type classification check)
+  (when spam-log-to-registry
+    (if (and (stringp id)
+	     (or (eq type 'incoming)
+		 (eq type 'process))
+	     (or (eq classification 'spam)
+		 (eq classification 'ham))
+	     (assoc check spam-list-of-checks))
+	(let ((cell-list (cdr-safe (gnus-registry-fetch-extra id type)))
+	      found)
+	  (dolist (cell cell-list)
+	    (unless found
+	      (when (and (eq classification (nth 0 cell))
+			 (eq check (nth 1 cell)))
+		(setq found t))))
+	  found)
+      (progn 
+	(gnus-message 5 (format "%s called with bad ID, type, check, or group"
+				"spam-log-unregistration-needed-p"))
+	nil))))
 
 ;;; set up IMAP widening if it's necessary  
 (defun spam-setup-widening ()
@@ -927,7 +950,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	(spam-fetch-field-message-id-fast article)
 	'process
 	'ham
-	'spam-processing-use-BBDB 
+	'spam-use-BBDB 
 	gnus-newsgroup-name)
        (spam-enter-ham-BBDB (spam-fetch-field-from-fast article)))))
 
@@ -1010,7 +1033,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
       (spam-fetch-field-message-id-fast article)
       'process
       'spam
-      'spam-processing-use-ifile-spam
+      'spam-use-ifile
       gnus-newsgroup-name)
      (spam-ifile-register-with-ifile 
       (spam-get-article-as-string article) spam-ifile-spam-category))
@@ -1024,7 +1047,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
       (spam-fetch-field-message-id-fast article)
       'process
       'ham
-      'spam-processing-use-ifile-ham
+      'spam-use-ifile
       gnus-newsgroup-name)
      (spam-ifile-register-with-ifile 
       (spam-get-article-as-string article) spam-ifile-ham-category))))
@@ -1051,7 +1074,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 	    (spam-fetch-field-message-id-fast article)
 	    'process
 	    'spam
-	    'spam-processing-use-stat-spam
+	    'spam-use-stat
 	    gnus-newsgroup-name)
 	   (let ((article-string (spam-get-article-as-string article)))
 	     (with-temp-buffer
@@ -1067,7 +1090,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 	    (spam-fetch-field-message-id-fast article)
 	    'process
 	    'ham
-	    'spam-processing-use-stat-ham
+	    'spam-use-stat
 	    gnus-newsgroup-name)
 	   (let ((article-string (spam-get-article-as-string article)))
 	     (with-temp-buffer
@@ -1180,7 +1203,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
       (spam-fetch-field-message-id-fast article)
       'process
       'spam
-      'spam-processing-use-blacklist
+      'spam-use-blacklist
       gnus-newsgroup-name)
      (let ((from (spam-fetch-field-from-fast article)))
        (when (stringp from)
@@ -1198,7 +1221,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
       (spam-fetch-field-message-id-fast article)
       'process
       'ham
-      'spam-processing-use-whitelist
+      'spam-use-whitelist
       gnus-newsgroup-name)
      (let ((from (spam-fetch-field-from-fast article)))
        (when (stringp from)
@@ -1278,7 +1301,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
       (spam-fetch-field-message-id-fast article)
       'process
       'spam
-      'spam-processing-use-bogofilter-spam
+      'spam-use-bogofilter
       gnus-newsgroup-name)
      (spam-bogofilter-register-with-bogofilter
       (spam-get-article-as-string article) t))
@@ -1292,7 +1315,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
       (spam-fetch-field-message-id-fast article)
       'process
       'ham
-      'spam-processing-use-bogofilter-ham
+      'spam-use-bogofilter
       gnus-newsgroup-name)
      (spam-bogofilter-register-with-bogofilter
       (spam-get-article-as-string article) nil))))
@@ -1350,7 +1373,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
       (spam-fetch-field-message-id-fast article)
       'process
       'ham
-      'spam-processing-use-spamoracle-ham
+      'spam-use-spamoracle
       gnus-newsgroup-name)
      (spam-spamoracle-learn article nil))))
 
@@ -1361,7 +1384,7 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
       (spam-fetch-field-message-id-fast article)
       'process
       'spam
-      'spam-processing-use-spamoracle-spam
+      'spam-use-spamoracle
       gnus-newsgroup-name)
      (spam-spamoracle-learn article t))
    nil))

@@ -219,7 +219,13 @@ until a successful connection is made."
   :type '(repeat string))
 
 (defcustom imap-process-connection-type nil
-  "*Value for `process-connection-type' to use for Kerberos4 and GSSAPI."
+  "*Value for `process-connection-type' to use for Kerberos4, GSSAPI and SSL.
+The `process-connection-type' variable control type of device
+used to communicate with subprocesses.  Values are nil to use a
+pipe, or t or `pty' to use a pty.  The value has no effect if the
+system has no ptys or if all ptys are busy: then a pipe is used
+in any case.  The value takes effect when a IMAP server is
+opened, changing it after that has no effect.."
   :group 'imap
   :type 'boolean)
 
@@ -493,6 +499,13 @@ sure of changing the value of `foo'."
 	    (while (and (memq (process-status process) '(open run))
 			(set-buffer buffer) ;; XXX "blue moon" nntp.el bug
 			(goto-char (point-min))
+			;; Athena IMTEST can output SSL verify errors
+			(or (while (looking-at "^verify error:num=")
+			      (forward-line))
+			    t)
+			(or (while (looking-at "^TLS connection established")
+			      (forward-line))
+			    t)
 			;; cyrus 1.6.x (13? < x <= 22) queries capabilities
 			(or (while (looking-at "^C:")
 			      (forward-line))
