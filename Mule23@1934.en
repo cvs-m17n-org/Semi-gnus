@@ -1,0 +1,74 @@
+FIX loaddefs.el
+===============
+
+Unfortunately, some variables for `message' are predefined in lisp/
+loaddefs.el which is dumped in Mule executable file.  It is uninvited,
+moreover, it has a bad influence.  So you should remove these
+definitions from lisp/loaddefs.el and rebuild Mule.  However, if you
+don't want to rebuild Mule, put the following lines in the beginning
+of .emacs file instead.
+
+(mapcar
+ (lambda (symbol)
+   (makunbound (intern (format "message-%s" symbol))))
+ '(citation-line-function
+   cite-function courtesy-message default-headers default-mail-headers
+   default-news-headers deletable-headers fcc-handler-function
+   followup-to-function from-style generate-headers-first generate-new-buffers
+   ignored-bounced-headers ignored-cited-headers ignored-mail-headers
+   ignored-news-headers ignored-resent-headers ignored-supersedes-headers
+   included-forward-headers indent-citation-function interactive
+   kill-buffer-on-exit post-method reply-to-function required-mail-headers
+   required-news-headers send-mail-function send-news-function
+   signature signature-before-forwarded-message signature-file
+   signature-separator syntax-checks use-followup-to user-organization-file
+   wide-reply-to-function yank-prefix))
+
+
+INSTALL CUSTOM, APEL, FLIM, SEMI/WEMI
+=====================================
+
+T-gnus requires the latest version of CUSTOM, APEL, FLIM and SEMI or
+WEMI; you should install these packages before installing T-gnus.
+
+As for CUSTOM, you should apply the following patch before building it.
+
+------ cut here ------ cut here ------ cut here ------ cut here ------
+--- custom-1.9962/cus-face.el~	Wed Mar  4 19:52:39 1998
++++ custom-1.9962/cus-face.el	Mon Mar  9 08:05:33 1998
+@@ -96,7 +96,7 @@
+       "Define a new FACE on all frames, ignoring X resources."
+       (interactive "SMake face: ")
+       (or (internal-find-face name)
+-	  (let ((face (make-vector 8 nil)))
++	  (let ((face (make-vector face-vector-length nil)))
+ 	    (aset face 0 'face)
+ 	    (aset face 1 name)
+ 	    (let* ((frames (frame-list))
+------ cut here ------ cut here ------ cut here ------ cut here ------
+
+By the way, the latest CUSTOM package for Emacs v19 is available from:
+
+ftp://ftp.dina.kvl.dk/pub/Staff/Per.Abrahamsen/custom/custom-1.9962.tar.gz
+
+
+INSTALL T-gnus
+==============
+
+There are two ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
+
+ 1. Use the configure option `--with-addpath=' to specify the colon
+    separated directory names where EMU, APEL or CUSTOM packages have
+    already installed.  For example:
+
+    % configure --with-emacs=mule\
+      --with-addpath=~/elisp/emu:~/elisp/apel:~elisp/custom
+    % make install
+
+ 2. Copy `sample.lpath.el' to `~/.lpath.el' and modify it suitably for
+    your environment.  Then type as following:
+
+    % configure
+    % make EMACS=mule
+
+    In this case, you shuold install manually.
