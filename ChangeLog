@@ -1,3 +1,12 @@
+1999-02-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/mail-source.el (mail-source-fetch-pop): Fix typo in original
+	source and merged it.
+
+	* README.ichikawa: Update description about the latest T-gnus.
+
 1999-02-22  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-art.el (gnus-narrow-to-page): Fix that "^L" do not work.
