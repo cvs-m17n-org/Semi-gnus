@@ -1,3 +1,16 @@
+2000-06-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/message.el (message-fix-before-sending): Expose all
+	invisible text with the property `message-invisible'; don't expose
+	invisible X-Face fields; widen at first.
+	(message-invisible-region): New function, substitute for
+	`invisible-region'.
+	(message-send): Call `message-fix-before-sending' after evaluating
+	`message-send-hook'.
+	(message-check-ignore-invisible-x-face-field): Remove.  You can use
+	(add-hook 'message-send-hook 'x-face-xmas-remove-x-face-glyph)
+	instead.
+
 2000-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-save-drafts): Rewrite.
