@@ -1,9 +1,42 @@
 1998-08-31  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.04.
+
+	* Sync up with Pterodactyl Gnus 0.10.
+
+	* lisp/gnus-agent.el : back to version Gnus 5.6.32.
+	
+1998-08-31  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/rfc1522.el: Abolished.
+
+	* lisp/message.el: (message-send-mail) (message-send-news): Don't
+	use `mm-encode-message-header'.
+
+	* lisp/gnus.el: Delete autoload settings for
+	`hexl-hex-string-to-integer', `mm-decode-words-region',
+ 	`mm-decode-words-string', `gnus-hack-decode-rfc1522',
+	`gnus-article-de-quoted-unreadable', `gnus-decode-rfc1522' and
+ 	`article-decode-rfc1522'.
+
+	* lisp/gnus-sum.el: Delete Key definitions for
+	`gnus-article-decode-mime-words', `gnus-article-decode-mime-words'
+	and `gnus-article-de-quoted-unreadable'.
+
+	* lisp/gnus-art.el (gnus-article-decode-mime-words)
+	(gnus-decode-rfc1522) (article-de-quoted-unreadable)
+	(article-mime-decode-quoted-printable-buffer): Abolished.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.03.
+
+	* Sync up with Pterodactyl Gnus 0.9.
+
+1998-08-31  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
 	* lisp/gnus-agent.el: Do not use nnheader-temp-write.
-	
+
 	* lisp/gnus-ems.el: Do not use nnheader-temp-write.
-	
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.02.
 
 	* Sync up with Pterodactyl Gnus 0.8.
@@ -14,7 +47,7 @@
 
 	* lisp/gnus.el (gnus-original-version-number)
 	(gnus-original-product-name) : New variable.
-	
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.01.
 	Third version number 0x means Original gnus's status in beta version.
 
@@ -38,10 +71,6 @@
 
 	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Match
 	"real" newsgroup name; strip "backend+server" prefix.
-
-	* lisp/message.el (message-make-in-reply-to):
-	Use `std11-extract-address-components'.
-	(message-use-mail-reply-to): Doc fix.
 
 1998-08-28  Katsumi Yamaoka   <yamaoka@jpl.org>
 

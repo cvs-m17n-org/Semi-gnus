@@ -1505,6 +1505,8 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (setq adaptive-fill-first-line-regexp
 	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|"
 		adaptive-fill-first-line-regexp))
+  (when (fboundp 'set-buffer-multibyte)
+    (set-buffer-multibyte t))
   (run-hooks 'text-mode-hook 'message-mode-hook))
 
 
@@ -2195,8 +2197,6 @@ the user from the mailer."
       (let ((message-deletable-headers
 	     (if news nil message-deletable-headers)))
 	(message-generate-headers message-required-mail-headers))
-      (if (featurep 'mm-encode)
-	  (mm-encode-message-header))
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
     (unwind-protect
@@ -2398,8 +2398,6 @@ to find out how to use this."
       (message-narrow-to-headers)
       ;; Insert some headers.
       (message-generate-headers message-required-news-headers)
-      (if (featurep 'mm-encode)
-	  (mm-encode-message-header))
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
     (message-cleanup-headers)

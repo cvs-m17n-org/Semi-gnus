@@ -253,10 +253,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.9.02"
+(defconst gnus-version-number "6.9.04"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.8"
+(defconst gnus-original-version-number "0.10"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -1579,10 +1579,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	    (cdddr package)
 	  (cdr package)))))
    '(("info" Info-goto-node)
-     ("hexl" hexl-hex-string-to-integer)
      ("pp" pp pp-to-string pp-eval-expression)
      ("qp" quoted-printable-decode-region quoted-printable-decode-string)
-     ("mm-decode" mm-decode-words-region mm-decode-words-string)
      ("ps-print" ps-print-preprint)
      ("mail-extr" mail-extract-address-components)
      ("browse-url" browse-url)
@@ -1703,19 +1701,19 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-next-page gnus-article-prev-page
       gnus-request-article-this-buffer gnus-article-mode
       gnus-article-setup-buffer gnus-narrow-to-page
-      gnus-article-delete-invisible-text gnus-hack-decode-rfc1522)
+      gnus-article-delete-invisible-text)
      ("gnus-art" :interactive t
       gnus-article-hide-headers gnus-article-hide-boring-headers
       gnus-article-treat-overstrike gnus-article-word-wrap
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
-      gnus-article-display-x-face gnus-article-de-quoted-unreadable
+      gnus-article-display-x-face
       gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
       gnus-article-date-original gnus-article-date-lapsed
       gnus-article-show-all-headers
       gnus-article-edit-mode gnus-article-edit-article
-      gnus-article-edit-done gnus-decode-rfc1522 article-decode-rfc1522
+      gnus-article-edit-done
       gnus-start-date-timer gnus-stop-date-timer)
      ("gnus-int" gnus-request-type)
      ("gnus-start" gnus-newsrc-parse-options gnus-1 gnus-no-server-1

@@ -1405,9 +1405,6 @@ increase the score of each group you read."
     "c" gnus-article-highlight-citation
     "s" gnus-article-highlight-signature)
 
-  (gnus-define-keys (gnus-summary-wash-mime-map "M" gnus-summary-wash-map)
-    "w" gnus-article-decode-mime-words)
-
   (gnus-define-keys (gnus-summary-wash-time-map "T" gnus-summary-wash-map)
     "z" gnus-article-date-ut
     "u" gnus-article-date-ut
@@ -1507,9 +1504,6 @@ increase the score of each group you read."
               ["Headers" gnus-article-highlight-headers t]
               ["Signature" gnus-article-highlight-signature t]
               ["Citation" gnus-article-highlight-citation t])
-	     ("MIME"
-	      ["Words" gnus-article-decode-mime-words t]
-	      ["QP" gnus-article-de-quoted-unreadable t])
              ("Date"
               ["Local" gnus-article-date-local t]
               ["ISO8601" gnus-article-date-iso8601 t]
@@ -4234,7 +4228,7 @@ If WHERE is `summary', the summary mode line format will be used."
 	  ;; We might have to chop a bit of the string off...
 	  (when (> (length mode-string) max-len)
 	    (setq mode-string
-		  (concat (gnus-truncate-string mode-string (- max-len 3))
+		  (concat (truncate-string mode-string (- max-len 3))
 			  "...")))
 	  ;; Pad the mode string a bit.
 	  (setq mode-string (format (format "%%-%ds" max-len) mode-string))))

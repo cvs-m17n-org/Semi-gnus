@@ -957,17 +957,6 @@ characters to translate to."
 		  (process-send-region "article-x-face" beg end)
 		  (process-send-eof "article-x-face"))))))))))
 
-(defun gnus-article-decode-mime-words ()
-  "Decode all MIME-encoded words in the article."
-  (interactive)
-  (save-excursion
-    (set-buffer gnus-article-buffer)
-    (let ((inhibit-point-motion-hooks t)
-	  buffer-read-only)
-      (mm-decode-words-region (point-min) (point-max)))))
-
-(defalias 'gnus-decode-rfc1522 'gnus-article-decode-rfc1522)
-
 ;;
 ;; Semi-gnus specific
 (defun gnus-article-decode-rfc1522 ()
@@ -978,27 +967,6 @@ characters to translate to."
 		     default-mime-charset)))
       (eword-decode-header charset)
       )))
-;;
-;; Semi-gnus specific
-
-(defun article-de-quoted-unreadable (&optional force)
-  "Translate a quoted-printable-encoded article.
-If FORCE, decode the article whether it is marked as quoted-printable
-or not."
-  (interactive (list 'force))
-  (save-excursion
-    (let ((buffer-read-only nil)
-	  (type (gnus-fetch-field "content-transfer-encoding")))
-      (gnus-article-decode-rfc1522)
-      (when (or force
-		(and type (string-match "quoted-printable" (downcase type))))
-	(goto-char (point-min))
-	(search-forward "\n\n" nil 'move)
-	(quoted-printable-decode-region (point) (point-max))))))
-
-(defun article-mime-decode-quoted-printable-buffer ()
-  "Decode Quoted-Printable in the current buffer."
-  (quoted-printable-decode-region (point-min) (point-max)))
 
 (defun article-hide-pgp (&optional arg)
   "Toggle hiding of any PGP headers and signatures in the current article.
