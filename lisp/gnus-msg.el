@@ -311,8 +311,7 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
   (let* ((more-than-one (> (length articles) 1))
 	 (frame (when (and message-use-multi-frames more-than-one)
 		  (window-frame (get-buffer-window (current-buffer)))))
-	 (refs "")
-	 beg article references)
+	 refs beg article references)
     (message-goto-body)
     (while (setq article (pop articles))
       (save-window-excursion
@@ -324,16 +323,13 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
 
       ;; Gathering references.
       (when more-than-one
-	(save-current-buffer
-	  (set-buffer (gnus-copy-article-buffer))
-	  (save-restriction
-	    (message-narrow-to-head)
-	    (setq refs (concat refs
-			       (or (message-fetch-field "references") "")
-			       " "
-			       (or (message-fetch-field "message-id") "")
-			       " ")))))
+	(setq refs
+	      (append
+	       refs
+	       (split-string (mail-header-references gnus-current-headers))
+	       (list (mail-header-message-id gnus-current-headers)))))
 
+      (gnus-copy-article-buffer)
       (let ((message-reply-buffer gnus-article-copy)
 	    (message-reply-headers gnus-current-headers))
 	(message-yank-original)
@@ -343,13 +339,13 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
     (push-mark)
 
     ;; Eliminate duplicated references.
-    (unless (string-match "^ *$" refs)
+    (when refs
       (mapcar
        (lambda (ref)
 	 (or (zerop (length ref))
 	     (member ref references)
 	     (setq references (append references (list ref)))))
-       (split-string refs)))
+       refs))
 
     ;; Replace with the gathered references.
     (when references
