@@ -935,6 +935,7 @@ Various
 * Image Enhancements::          $B:G?7$N(B Emacs/XEmacs $B$O3($rI=<($G$-$k(B
 * Fuzzy Matching::              $BBg$-$JLJLS$C$F2?(B?
 * Thwarting Email Spam::        $BM>7W$J>&6HE*EE;R%a!<%k$rHr$1$kJ}K!(B
+* Pay Hashcash::                CPU $B;~4V$rHq$d$7$F(B spam $BB`<#$9$k(B
 * Various Various::             $BK\Ev$K$$$m$$$m$J$b$N(B
 
 Formatting Variables
@@ -12613,7 +12614,9 @@ table) $B$K=>$C$F40A4$K9gCW$7$J$1$l$P$J$j$^$;$s!#@55,I=8=$G%U%#!<%k%IL>$+(B
 $B$i(B @code{nnmail-split-fancy-with-parent} $B$r;H$C$F$_$F$/$@$5$$!#%3%m%s$r(B
 $B;H$C$F$3$s$JIw$K=q$-$^$9(B:
 @lisp
-(setq nnmail-split-fancy
+(setq nnmail-treat-duplicates 'warn     ; $B$^$?$O(B 'delete
+      nnmail-cache-accepted-message-ids t
+      nnmail-split-fancy
       '(| (: nnmail-split-fancy-with-parent)
           ;; $B;D$j$N?6$jJ,$1J}$O$3$3$K=q$/(B
         ))
@@ -18456,6 +18459,7 @@ Gnus $B$O0lF|$K0l2s%9%3%"$rIeGT$5$;$h$&$H$7$^$9!#Nc$($P!"$b$7(B gnus $B$r;MF|
 * Image Enhancements::          $B:G?7$N(B Emacs/XEmacs $B$O3($rI=<($G$-$k(B
 * Fuzzy Matching::              $BBg$-$JLJLS$C$F2?(B?
 * Thwarting Email Spam::        $BM>7W$J>&6HE*EE;R%a!<%k$rHr$1$kJ}K!(B
+* Pay Hashcash::                CPU $B;~4V$rHq$d$7$F(B spam $BB`<#$9$k(B
 * Various Various::             $BK\Ev$K$$$m$$$m$J$b$N(B
 @end menu
 
@@ -20257,6 +20261,67 @@ Gnus $B$O!"%9%3%"IU$1!"%9%l%C%I$N7A@.!"%9%l%C%IHf3S$J$I$r9T$&$H$-$K!"(B
 $B$k$3$H$,$G$-(B ($BIaDL$K(B @kbd{r} $B$r2!$9$@$1$G$G$-$k(B)$B!";d$O(B spam $B$KHQ$o$5$l$k(B
 $B$3$H$OA4$/$"$j$^$;$s!#F@!9>uBV$G$9!#;d$N0U8+$H$7$F$O!"(B@code{From} $B%X%C%@!<(B
 $B$K56B$$7$FB8:_$7$J$$%I%a%$%s$KAw$i$;$k$N$O%-%?%J%$$G$9!#(B
+
+@node Pay Hashcash
+@section Pay Hashcash
+@cindex hashcash
+@cindex spam
+
+A novel technique to fight spam is to require senders to do something
+costly for each message they send.  This has the obvious drawback that
+you cannot rely on that everyone uses this technique, since it is
+optional, but it may be useful in smaller communities.
+
+@cindex X-Hashcash
+The ``something costly'' is to burn CPU time, more specifically to
+compute a hash collision up to a certain number of bits.  The
+resulting hashcash cookie is inserted in a @samp{X-Hashcash:}
+header. For more details, and for the external application
+@code{hashcash} you need to install to use this feature, see
+@uref{http://www.cypherspace.org/~adam/hashcash/}.  Even more
+information can be found at @uref{http://www.camram.org/}.
+
+If you wish to call hashcash for each message you send, say something
+like:
+
+@lisp
+(require 'hashcash)
+(add-hook 'message-send-hook 'mail-add-payment)
+@end lisp
+
+The @code{hashcash.el} library can be found at
+@uref{http://users.actrix.gen.nz/mycroft/hashcash.el}, or in the Gnus
+development contrib directory.
+
+You will need to set up some additional variables as well:
+
+@table @code
+
+@item hashcash-default-payment
+@vindex hashcash-default-payment
+This variable indicates the default number of bits the hash collision
+should consist of.  By default this is 0, meaning nothing will be
+done.  Suggested useful values include 17 to 29.
+
+@item hashcash-payment-alist
+@vindex hashcash-payment-alist
+Some receivers may require you to spend burn more CPU time than the
+default.  This variable contains a list of @samp{(ADDR AMOUNT)} cells,
+where ADDR is the receiver (email address or newsgroup) and AMOUNT is
+the number of bits in the collision that is needed.  It can also
+contain @samp{(ADDR STRING AMOUNT)} cells, where the STRING is the
+string to use (normally the email address or newsgroup name is used).
+
+@item hashcash
+@vindex hashcash
+Where the @code{hashcash} binary is installed.
+
+@end table
+
+Currently there is no built in functionality in Gnus to verify
+hashcash cookies, it is expected that this is performed by your hand
+customized mail filtering scripts.  Improvements in this area would be
+a useful contribution, however.
 
 @node Various Various
 @section $B$$$m$$$m$N$$$m$$$m(B
