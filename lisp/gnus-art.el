@@ -949,7 +949,6 @@ See the manual for details."
     (gnus-treat-display-xface gnus-article-display-x-face)
     (gnus-treat-hide-headers gnus-article-maybe-hide-headers)
     (gnus-treat-hide-boring-headers gnus-article-hide-boring-headers)
-    (gnus-treat-hide-signature gnus-article-hide-signature)
     (gnus-treat-hide-citation gnus-article-hide-citation)
     (gnus-treat-strip-list-identifiers gnus-article-hide-list-identifiers)
     (gnus-treat-strip-pgp gnus-article-hide-pgp)
@@ -958,6 +957,7 @@ See the manual for details."
     (gnus-treat-emphasize gnus-article-emphasize)
     (gnus-treat-highlight-citation gnus-article-highlight-citation)
     (gnus-treat-highlight-signature gnus-article-highlight-signature)
+    (gnus-treat-hide-signature gnus-article-hide-signature)
     (gnus-treat-date-ut gnus-article-date-ut)
     (gnus-treat-date-local gnus-article-date-local)
     (gnus-treat-date-lapsed gnus-article-date-lapsed)
@@ -1718,13 +1718,28 @@ always hide."
 If given a negative prefix, always show; if given a positive prefix,
 always hide."
   (interactive (gnus-article-hidden-arg))
-  (unless (gnus-article-check-hidden-text 'signature arg)
-    (save-excursion
-      (save-restriction
-	(let ((buffer-read-only nil))
-	  (when (gnus-article-narrow-to-signature)
-	    (gnus-article-hide-text-type
-	     (point-min) (point-max) 'signature)))))))
+  (save-excursion
+    (save-restriction
+      (if (interactive-p)
+	  (progn
+	    (widen)
+	    (article-goto-body))
+	(goto-char (point-min)))
+      (unless (gnus-article-check-hidden-text 'signature arg)
+	(let ((buffer-read-only nil)
+	      (button (point)))
+	  (while (setq button (text-property-any button (point-max)
+						 'gnus-callback
+						 'gnus-signature-toggle))
+	    (setq button (text-property-not-all button (point-max)
+						'gnus-callback
+						'gnus-signature-toggle))
+	    (when (and button (not (eobp)))
+	      (gnus-article-hide-text-type
+	       (1+ button)
+	       (or (next-single-property-change (1+ button) 'mime-view-entity)
+		   (point-max))
+	       'signature))))))))
 
 (defun article-strip-headers-in-body ()
   "Strip offensive headers from bodies."
@@ -2164,8 +2179,21 @@ This format is defined by the `gnus-article-time-format' variable."
   "Show all hidden text in the article buffer."
   (interactive)
   (save-excursion
+    (widen)
     (let ((buffer-read-only nil))
-      (gnus-article-unhide-text (point-min) (point-max)))))
+      (gnus-article-unhide-text (point-min) (point-max))
+      (gnus-remove-text-with-property 'gnus-prev)
+      (gnus-remove-text-with-property 'gnus-next))))
+
+(defun article-show-all-headers ()
+  "Show all hidden headers in the article buffer."
+  (interactive)
+  (save-excursion
+    (save-restriction
+      (widen)
+      (article-narrow-to-head)
+      (let ((buffer-read-only nil))
+	(gnus-article-unhide-text (point-min) (point-max))))))
 
 (defun article-emphasize (&optional arg)
   "Emphasize text according to `gnus-emphasis-alist'."
@@ -2560,7 +2588,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-emphasize
      article-treat-dumbquotes
      article-normalize-headers
-     (article-show-all . gnus-article-show-all-headers))))
+     (article-show-all-headers . gnus-article-show-all-headers)
+     (article-show-all . gnus-article-show-all))))
 
 ;;;
 ;;; Gnus article mode
@@ -4521,18 +4550,20 @@ It does this by highlighting everything after
   (save-excursion
     (set-buffer gnus-article-buffer)
     (let ((buffer-read-only nil)
-	  (inhibit-point-motion-hooks t))
-      (save-restriction
-	(when (and gnus-signature-face
-		   (gnus-article-narrow-to-signature))
-	  (gnus-overlay-put (gnus-make-overlay (point-min) (point-max))
-			    'face gnus-signature-face)
-	  (widen)
-	  (gnus-article-search-signature)
-	  (let ((start (match-beginning 0))
-		(end (set-marker (make-marker) (1+ (match-end 0)))))
-	    (gnus-article-add-button start (1- end) 'gnus-signature-toggle
-				     end)))))))
+	  (inhibit-point-motion-hooks t)
+	  start end)
+      (when (save-restriction
+	      (when (gnus-article-narrow-to-signature)
+		(setq start (point-min)
+		      end (point-max))))
+	(when gnus-signature-face
+	  (gnus-overlay-put (gnus-make-overlay start end)
+			    'face gnus-signature-face))
+	(gnus-article-search-signature)
+	(gnus-article-add-button (match-beginning 0) (match-end 0)
+				 'gnus-signature-toggle
+				 (set-marker (make-marker)
+					     (1+ (match-end 0))))))))
 
 (defun gnus-button-in-region-p (b e prop)
   "Say whether PROP exists in the region."
@@ -4647,10 +4678,12 @@ specified by `gnus-button-alist'."
   (save-excursion
     (set-buffer gnus-article-buffer)
     (let ((buffer-read-only nil)
-	  (inhibit-point-motion-hooks t))
+	  (inhibit-point-motion-hooks t)
+	  (limit (or (next-single-property-change end 'mime-view-entity)
+		     (point-max))))
       (if (get-text-property end 'invisible)
-	  (gnus-article-unhide-text end (point-max))
-	(gnus-article-hide-text end (point-max) gnus-hidden-properties)))))
+	  (gnus-article-unhide-text end limit)
+	(gnus-article-hide-text end limit gnus-hidden-properties)))))
 
 (defun gnus-button-entry ()
   ;; Return the first entry in `gnus-button-alist' matching this place.
