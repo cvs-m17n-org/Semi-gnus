@@ -6953,8 +6953,7 @@ Optional NEWS will use news to forward instead of mail."
     (setq e (point))
     (insert
      "\n-------------------- End of forwarded message --------------------\n")
-    (when (and (not current-prefix-arg)
-	       message-forward-ignored-headers)
+    (when message-forward-ignored-headers
       (save-restriction
 	(narrow-to-region b e)
 	(goto-char b)
@@ -7000,7 +6999,7 @@ Optional NEWS will use news to forward instead of mail."
 	(goto-char (point-max))))
     (setq e (point))
     (insert "<#/mml>\n")
-    (when (and (not current-prefix-arg)
+    (when (and (not message-forward-decoded-p)
 	       message-forward-ignored-headers)
       (save-restriction
 	(narrow-to-region b e)
