@@ -42,6 +42,9 @@
 (require 'gnus)	; for the definitions of group content classification and spam processors
 (require 'message)			;for the message-fetch-field functions
 
+;; for nnimap-split-download-body-default
+(eval-when-compile (require 'nnimap))
+
 ;; autoload query-dig
 (eval-and-compile
   (autoload 'query-dig "dig"))
@@ -106,6 +109,11 @@ are considered spam."
 
 (defcustom spam-use-blackholes nil
   "Whether blackholes should be used by spam-split."
+  :type 'boolean
+  :group 'spam)
+
+(defcustom spam-use-hashcash nil
+  "Whether hashcash payments should be detected by spam-split."
   :type 'boolean
   :group 'spam)
 
@@ -555,6 +563,7 @@ your main source of newsgroup names."
     (spam-use-ifile	 		. 	spam-check-ifile)
     (spam-use-stat	 		. 	spam-check-stat)
     (spam-use-blackholes 		. 	spam-check-blackholes)
+    (spam-use-hashcash  		. 	spam-check-hashcash)
     (spam-use-bogofilter-headers 	. 	spam-check-bogofilter-headers)
     (spam-use-bogofilter 		. 	spam-check-bogofilter))
 "The spam-list-of-checks list contains pairs associating a parameter
@@ -603,8 +612,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 (defun spam-setup-widening ()
   (dolist (check spam-list-of-statistical-checks)
     (when (symbol-value check)
-      (setq nnimap-split-download-body t)
-      (return))))
+      (setq nnimap-split-download-body-default t))))
 
 (add-hook 'gnus-get-new-news-hook 'spam-setup-widening)
 
@@ -666,6 +674,20 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 			matches))))))))
     (when matches
       spam-split-group)))
+
+;;;; Hashcash.
+
+(condition-case nil
+    (progn
+      (require 'hashcash)
+      
+      (defun spam-check-hashcash ()
+	"Check the headers for hashcash payments."
+	(mail-check-payment)))		;mail-check-payment returns a boolean
+
+  (file-error (progn
+		(defalias 'mail-check-payment 'ignore)
+		(defalias 'spam-check-hashcash 'ignore))))
 
 ;;;; BBDB 
 

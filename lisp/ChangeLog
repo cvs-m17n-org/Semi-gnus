@@ -1,3 +1,27 @@
+2003-03-07  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el: load nnimap.el when compiling
+	(spam-setup-widening): use
+	nnimap-split-download-body-default instead of
+	nnimap-split-download-body which is a user-customizable variable
+	 
+
+2003-03-07  Simon Josefsson  <jas@extundo.com>
+
+	* nnimap.el (nnimap-split-download-body-default): New, holds
+	default for n-s-d-b.
+	(nnimap-split-download-body): Add new setting (symbol default),
+	which uses contents of n-s-d-b-d, and made it the default.
+
+2003-03-07  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-use-hashcash): new variable
+	(spam-list-of-checks): added spam-use-hashcash with associated
+	spam-check-hashcash
+	(spam-check-hashcash): new function, installed iff hashcash.el is
+	loaded
+	(spam-setup-widening): don't use (return)
+
 2003-03-06  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* gnus-agent.el (gnus-agent-fetch-group-1): Added default
@@ -560,7 +584,7 @@
 	* mm-decode.el (mm-path-name-rewrite-functions): Doc fix: don't
 	use "path name".
 
-2003-02-21  Teodor Zlatanov  <tzz@bwh.harvard.edu>
+2003-02-21  Teodor Zlatanov  <tzz@lifelogs.com>
 
 	* gnus-sum.el (gnus-summary-move-article)
 	(gnus-summary-expire-articles): send data header for article, not
@@ -695,7 +719,7 @@
 
 	* gnus-util.el (gnus-faces-at): Simplify.
 
-2003-02-13  Teodor Zlatanov  <tzz@bwh.harvard.edu>
+2003-02-13  Teodor Zlatanov  <tzz@lifelogs.com>
 
 	* spam.el (spam-ham-move-routine) 
 	(spam-mark-spam-as-expired-and-move-routine): made the article

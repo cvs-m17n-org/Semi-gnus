@@ -1,3 +1,15 @@
+2003-03-07  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-idna.el (gnus-idna-to-ascii-rhs-1): Narrow to
+	head (otherwise forwarded mail break havoc).
+
+2003-03-07  Teodor Zlatanov  <tzz@bwh.harvard.edu>
+
+	* hashcash.el: New version from Paul Foley with better variable
+	names, executable-find support, and no errors in GNU Emacs
+	(hashcash-version): return nil when invoked with a
+	nil token
+
 2003-02-21  Simon Josefsson  <jas@extundo.com>
 
 	* hashcash.el (hashcash-point-at-bol):
