@@ -248,16 +248,9 @@ Argument PORT specifies connecting port."
   "Open a SSL connection for a service to a host.
 Returns a subprocess-object to represent the connection.
 Args are NAME BUFFER HOST SERVICE."
-  (cond ((eq system-type 'windows-nt)
-	 (let (selective-display
-	       (coding-system-for-write 'binary)
-	       (coding-system-for-read 'raw-text-dos))
-	   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
-	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
-	(t
-	 (as-binary-process
-	  (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
-	      (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))))
+  (as-binary-process
+   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
 
 (defun pop3-open-tls-stream (name buffer host service)
   "Open a TLSv1 connection for a service to a host.
