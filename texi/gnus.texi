@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.046 Manual
+@settitle Semi-gnus 6.10.047 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -318,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.046 Manual
+@title Semi-gnus 6.10.047 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -361,7 +361,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.046.
+This manual corresponds to Semi-gnus 6.10.047.
 
 @end ifinfo
 
@@ -2173,6 +2173,23 @@ If you want to hear a beep when you enter a group, you could put
 something like @code{(dummy-variable (ding))} in the parameters of that
 group.  @code{dummy-variable} will be set to the result of the
 @code{(ding)} form, but who cares?
+
+@item posting-style
+You can store additional posting style information for this group only
+here (@pxref{Posting Styles}). The format is that of an entry in the
+@code{gnus-posting-styles} alist, except that there's no regexp matching
+the group name (of course). Style elements in this group parameter will
+take precedence over the ones found in @code{gnus-posting-styles}.
+
+For instance, if you want a funky name and signature in this group only,
+instead of hacking @code{gnus-posting-styles}, you could put something
+like this in the group parameters:
+
+@example
+(posting-style 
+  (name "Funky Name") 
+  (signature "Funky Signature"))
+@end example
 
 @end table
 
@@ -6927,7 +6944,7 @@ signature after all.
 @cindex MIME decoding
 
 @table @kbd
-@item M-tgnus-summary-display-buttonized
+@item M-t
 @kindex M-t (Summary)
 @findex gnus-summary-display-buttonized
 Toggle the buttonized display of the article buffer
