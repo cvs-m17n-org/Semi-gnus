@@ -1,3 +1,10 @@
+1998-01-08  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* smtpmail.el (smtpmail-via-smtp): Bind `coding-system-for-read'
+	with `smtpmail-coding-system' to avoid dead-locking in Emacs 20.
+
+	* gnus.el: gnus.el (gnus-version-number): Update to version 6.0.2.
+
 1998-01-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* nnmail.el, message.el: Sync with Quassia Gnus v0.22.
