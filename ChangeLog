@@ -1,7 +1,23 @@
 1999-12-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 07.
+
+	* lisp/gnus-util.el (gnus-union): Remove.
+	(gnus-ems-redefine): Don't call it; don't require `gnus-ems'.
+
+	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Use `union'
+	instead of `gnus-union'.
+
+1999-12-10  A.Hitachi       <a_hitachi@msi.biglobe.ne.jp>
+            Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (union): New compiler macro for emulating cl
+	function.
+
+1999-12-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-util.el: Require `gnus-ems'.
-	(gnus-ems-redefine): Call it for redefine functions
+	(gnus-ems-redefine): Call it to redefine the functions
 	`gnus-truncate-string', etc.
 	(gnus-union): Fix doc string.
 
