@@ -2,6 +2,7 @@
 	
 	* lisp/gnus-offline.el (gnus-offline-setup): Add
 	gnus-offline-setup to gnus-group-mode-hook.
+	(gnus-offline-set-offline-sendmail-function): Bug fix.
 	
 1998-12-10  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 

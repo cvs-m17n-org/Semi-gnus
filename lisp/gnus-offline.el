@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.14 1998-12-10 09:38:36 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.15 1998-12-10 09:58:13 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -275,8 +275,8 @@ If value is nil , dialup line is disconnected status.")
 	 (gnus-offline-set-offline-sendmail-function))
 	((eq gnus-offline-mail-treat-environ 'online)
 	 ;; send mail under offline environ.
-	 (gnus-offline-set-online-sendmail-function)))
-  (add-hook 'gnus-group-mode-hook 'gnus-offline-setup))
+	 (gnus-offline-set-online-sendmail-function))))
+;;  (add-hook 'gnus-group-mode-hook 'gnus-offline-setup))
 
 ;;
 ;; Setting Error check.
@@ -308,8 +308,11 @@ If value is nil , dialup line is disconnected status.")
 (defun gnus-offline-set-offline-sendmail-function ()
   "*Initialize sendmail-function when unplugged status."
   (if (eq gnus-offline-drafts-queue-type 'miee)
-      (setq message-send-mail-function 'sendmail-to-spool-in-gnspool-format)
-    (setq message-send-mail-function 'gnus-agent-send-mail)))
+      (if (eq gnus-offline-news-fetch-method 'nnagent)
+	  (setq gnus-agent-send-mail-function 'sendmail-to-spool-in-gnspool-format))
+    (setq message-send-mail-function 'sendmail-to-spool-in-gnspool-format)
+    (setq gnus-agent-send-mail-function message-send-mail-function
+	  message-send-mail-function 'gnus-agent-send-mail)))
 ;;
 (defun gnus-offline-set-online-sendmail-function ()
   "*Initialize sendmail-function when plugged status."
@@ -745,7 +748,7 @@ If value is nil , dialup line is disconnected status.")
 (defun gnus-offline-define-menu-on-miee ()
   "*Set menu bar on MIEE menu."
   (easy-menu-define
-   gnus-offline-menu-on-miee global-map "Gnus offline menu on Miee"
+   gnus-offline-menu-on-miee gnus-group-mode-map "Gnus offline menu on Miee"
    '("Miee"
      ["Post news in spool" news-spool-post t]
      ["Send mails in spool" mail-spool-send t]
