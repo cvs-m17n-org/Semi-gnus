@@ -194,7 +194,7 @@ options make any sense in this context."
 (add-hook 'gnus-exit-gnus-hook 'gnus-namazu/shutdown)
 
 (defun gnus-namazu/request-list (server)
-  "Return the groups of the server SERVER."
+  "Return groups of the server SERVER."
   (and (memq (car server) '(nnml nnmh))
        (nnoo-change-server (car server) (nth 1 server) (nthcdr 2 server))
        (gnus-request-list server)
