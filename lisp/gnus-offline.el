@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.7 1999-10-21 15:25:28 czkmt Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.8 1999-10-24 10:26:31 czkmt Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -118,16 +118,7 @@
      msspool-news-server
      msspool-news-service
      miee-popup-menu
-     gnus-group-toolbar))
-  (mapc
-   (lambda (symbol)
-     (unless (fboundp symbol)
-       (defalias symbol 'ignore)))
-   '(general-process-argument-editing-function
-     define-process-argument-editing
-     gnspool-get-news
-     mail-spool-send
-     news-spool-post)))
+     gnus-group-toolbar)))
 
 (put 'gnus-offline-set-unplugged-state 'menu-enable 'gnus-offline-connected)
 (if (eq system-type 'windows-nt)
@@ -825,13 +816,13 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   (if (featurep 'xemacs)
       ;; Overwrite the toolbar spec for gnus-group-mode.
       (add-hook 'gnus-startup-hook
-		(lambda ()
-		  (catch 'tag
-		    (mapc (lambda (but)
-			    (when (eq 'gnus-group-get-new-news (aref but 1))
-			      (aset but 1 'gnus-offline-gnus-get-new-news)
-			      (throw 'tag nil)))
-			  gnus-group-toolbar))))))
+		#'(lambda ()
+		    (catch 'tag
+		      (mapc (lambda (but)
+			      (when (eq 'gnus-group-get-new-news (aref but 1))
+				(aset but 1 'gnus-offline-gnus-get-new-news)
+				(throw 'tag nil)))
+			    gnus-group-toolbar))))))
 ;;
 ;;
 (defun gnus-offline-get-menu-items (list)
