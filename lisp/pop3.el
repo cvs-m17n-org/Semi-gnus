@@ -64,7 +64,7 @@
 ;;(setq mail-sources '((pop :server "pop3.mail.server" :leave t)))
 ;;
 ;;    Already read mails are registered into the ~/.uidls-SERVER file
-;;    (which is the default, see `pop3-uidl-file-name'), and You will
+;;    (which is the default, see `pop3-uidl-file-name'), and you will
 ;;    never need to fetch them twice.  The default value for the
 ;;    `:leave' keyword is specified by the `pop3-leave-mail-on-server'
 ;;    variable.  You have no need to modify that value normally.
