@@ -443,14 +443,18 @@ The original alist is not modified.  See also `destructive-alist-to-plist'."
 (defun mm-copy-to-buffer ()
   "Copy the contents of the current buffer to a fresh buffer."
   (save-excursion
-    (let ((obuf (current-buffer))
-	  beg)
+    (let ((flag enable-multibyte-characters)
+	  (new-buffer (generate-new-buffer " *mm*")))
       (goto-char (point-min))
       (search-forward-regexp "^\n" nil t)
-      (setq beg (point))
-      (set-buffer (generate-new-buffer " *mm*"))
-      (insert-buffer-substring obuf beg)
-      (current-buffer))))
+      (save-restriction
+	(narrow-to-region (point) (point-max))
+	(when flag
+	  (set-buffer-multibyte nil))
+	(copy-to-buffer new-buffer (point-min) (point-max))
+	(when flag
+	  (set-buffer-multibyte t)))
+      new-buffer)))
 
 (defun mm-display-parts (handle &optional no-default)
   (if (stringp (car handle))

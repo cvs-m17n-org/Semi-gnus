@@ -1,3 +1,8 @@
+2001-03-21  Thierry Emery <thierry.emery@club-internet.fr>
+
+	* lisp/mm-decode.el (mm-copy-to-buffer): Copy buffer in unibyte
+	mode.
+
 2001-03-19  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-kill.el (gnus-execute): Work with the extra headers.
