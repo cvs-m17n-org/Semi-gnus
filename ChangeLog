@@ -1,5 +1,24 @@
 2001-02-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el: Add autoloads for
+	`gnus-summary-digest-post-forward' and
+	`gnus-summary-digest-mail-forward'.
+
+	* lisp/gnus-sum.el (gnus-summary-post-menu): Replace
+	`gnus-uu-digest-mail-forward' and `gnus-uu-digest-post-forward'
+	with `gnus-summary-digest-post-forward' and
+	`gnus-summary-digest-mail-forward'.
+
+	* lisp/gnus-msg.el (gnus-summary-digest-post-forward): Restore and
+	repair the command `gnus-summary-post-digest' and rename it.
+	(gnus-summary-digest-mail-forward): Ditto.
+	(gnus-summary-send-map): Replace `gnus-uu-digest-mail-forward' and
+	`gnus-uu-digest-post-forward' with
+	`gnus-summary-digest-post-forward' and
+	`gnus-summary-digest-mail-forward'.
+
+2001-02-27  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-sum.el (gnus-summary-show-article): Bind
 	`gnus-inhibit-treatment' to t while fetching the raw article.
 
