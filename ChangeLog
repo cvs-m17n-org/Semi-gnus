@@ -1,3 +1,10 @@
+1999-12-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-util.el (gnus-ems-redefine): Call it.
+	(gnus-union): Fix doc string.
+
+	* lisp/dgnushack.el (mapcon, mapc): Eliminate the redundant code.
+
 1999-12-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 06.
