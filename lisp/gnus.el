@@ -1622,7 +1622,8 @@ This variable can be nil, gnus or gnus-ja."
     gnus-newsrc-alist gnus-server-alist
     gnus-killed-list gnus-zombie-list
     gnus-topic-topology gnus-topic-alist
-    gnus-format-specs)
+    gnus-format-specs
+    mail-source-password-cache)
   "Gnus variables saved in the quick startup file.")
 
 (defvar gnus-newsrc-alist nil

@@ -3,6 +3,9 @@
 	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): To work with
 	external movemail program.
 
+	* lisp/gnus.el (gnus-variable-list): Add
+	mail-source-password-cache to save password information.
+
 1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.057.
