@@ -1,3 +1,25 @@
+1999-03-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/message.el (messgage-inhibit-body-encoding): Default to t.
+	(message-mode): Abolish `message-mime-attach-file' from doc
+	string.
+	(message-mode-map): Abolish `message-mime-attach-file' from
+	`message-mode-menu'.
+
+	* lisp/gnus-start.el (save-buffer-as-coding-system): Abolished. It
+	is given in APEL 9.13 by now.
+
+	* lisp/gnus-ems.el (gnus-decode-coding-string): Abolished.
+	(gnus-encode-coding-string): Abolished.
+	(gnus-mule-cite-add-face): Restored.
+	(gnus-cite-add-face): Restored.
+
+	* README.semi.ja: Note that APEL 9.13 or later is required.
+	* README.semi: Ditto.
+	* README.T-gnus: Ditto.
+
 1999-02-27  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.061.
