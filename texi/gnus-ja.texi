@@ -2830,7 +2830,8 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B%s%0%j%9%H$G$"$k$H2r<a$7$^$9!#$3$N>pJs$r(B gnus $B$KM?$($k$3$H$O!"$"$J$?$,$=(B
 $B$l$i$N%a!<%j%s%0%j%9%H$KEj9F$9$k$H$-$K@5$7$$(B Mail-Followup-To $B%X%C%@!<$r(B
 $B@8@.$9$k$?$a$N(B ($B$[$s$N(B) $BBh0lJb$G$9!#MxMQ$G$-$k(B MFT $BBP1~5!G=$r40A4$K07$&(B
-$B$K$O!"$3$3(B @pxref{(message)Mailing Lists} $B$r8+$F2<$5$$!#(B
+$B$K$O!"$3$3(B @pxref{Mailing Lists, , Mailing Lists, message, The Message
+Manual} $B$r8+$F2<$5$$!#(B
 
 @code{gnus-find-subscribed-addresses} $B$b;2>H$7$F2<$5$$!#$3$N4X?t$O$3$N%0(B
 $B%k!<%W%Q%i%a!<%?$rD>@\$K;H$$$^$9!#(B
@@ -4216,7 +4217,8 @@ gnus $B$O(B @code{browse-url} $B$r;H$C$F%3%s%H%m!<%k%a%C%;!<%8$r3+$-$^$9!#$=$
 
 $B%3%s%H%m!<%k%a%C%;!<%8$O05=L$5$l$F$$$k$3$H$KCm0U$7$F2<$5$$!#$3$N%3%^%s%I(B
 $B$r;H$&$K$O(B @code{auto-compression-mode} $B$r(B on $B$K$7$F$*$/I,MW$,$"$j$^(B
-$B$9(B (@pxref{(emacs)Compressed Files})$B!#(B
+$B$9(B (@pxref{Compressed Files, ,Compressed Files, emacs, The Emacs
+Manual})$B!#(B
 
 @item H d
 @itemx C-c C-d
@@ -8295,9 +8297,10 @@ URL $B$K4^$^$l$k2~9T$r:o=|$7$^$9!#$$$/$D$+$N%a%$%i!<$O!"9T$rC;$/$9$k$?$a$K(B
 
 @vindex gnus-article-wash-function
 $B%G%#%U%)%k%H$G$O(B @sc{html} $B$NJQ49$K(B @code{mm-text-html-renderer}
-(@pxref{(emacs-mime)Display Customization}) $B$G@_Dj$5$l$?4X?t$r;H$$$^$9$,!"(B
-$B$3$l$OJQ?t(B @code{gnus-article-wash-function} $B$G@)8f$5$l$^$9!#;H$&$3$H$,(B
-$B$G$-$k!"$"$i$+$8$aMQ0U$5$l$?4X?t$O0J2<$NDL$j$G$9!#(B
+(@pxref{Display Customization, ,Display Customization, emacs-mime, The
+Emacs MIME Manual}) $B$G@_Dj$5$l$?4X?t$r;H$$$^$9$,!"$3$l$OJQ(B
+$B?t(B @code{gnus-article-wash-function} $B$G@)8f$5$l$^$9!#;H$&$3$H$,$G$-$k!"(B
+$B$"$i$+$8$aMQ0U$5$l$?4X?t$O0J2<$NDL$j$G$9!#(B
 
 @table @code
 @item w3
@@ -10928,7 +10931,12 @@ from date id references chars lines xref extra $B$N3F%X%C%@!<$+$i@.$k%Y%/(B
 $B$J$$$+$i$G$9!=!=%0%k!<%W$NA4$F$N5-;v$O1J5W$KL$FI$G$9!#(B
 
 $B$b$7%0%k!<%W$,B8:_$7$J$$$J$i!"$=$l$O:n@.$5$l!"9XFI$5$l$^$9!#%0%k!<%W%P%C(B
-$B%U%!$+$i$=$l$r>C$75n$kM#0l$NJ}K!$O!"$=$l$rL$9XFI$K$9$k$3$H$G$9!#(B
+$B%U%!$+$i$=$l$r>C$75n$kM#0l$NJ}K!$O!"$=$l$rL$9XFI$K$9$k$3$H$G$9!#2<=q$-%0(B
+$B%k!<%W$NFCJL$NFC@-$O%0%k!<%WFC@-(B (@pxref{Group Parameters}) $B$K$h$C$F@8$8!"(B
+$B$=$l$,<:$o$l$F$7$^$&$HB>$N%0%k!<%W$N$h$&$K?6$kIq$&$h$&$K$J$j$^$9!#$3$l$O(B
+$B0J2<$N%3%^%s%I$,;H$($J$$$3$H$r0UL#$7$^$9!#$=$N%0%k!<%W$NFCJL$NFC@-$rI|3h(B
+$B$5$;$k4JC1$JJ}K!$O!"(B@kbd{C-k} $B$G$=$N%0%k!<%W$r:o=|$7$F$+$i(B gnus $B$r:F5/F0(B
+$B$9$k$3$H$G$9!#$=$N%0%k!<%W$NFbMFJ*$O<:$o$l$^$;$s!#(B
 
 @c @findex gnus-dissociate-buffer-from-draft
 @c @kindex C-c M-d (Mail)
@@ -19775,13 +19783,13 @@ gnus $B$O4X?t(B @code{gnus-user-format-function-}@samp{foo} $B$r8F$S=P$7$^$9!
 $BMM$G$9!#(B@code{gnus-balloon-face-*} $BJQ?t$OJ8;zNs$+J8;zNs$rJV$94X?t$r;X$9(B
 $B%7%s%\%k$N$I$A$i$+$G$"$kI,MW$,$"$j$^$9!#%^%&%9$,%W%m%Q%F%#$N@_Dj$5$l$F$$(B
 $B$k%F%-%9%H$N>e$rDL2a$9$k$H!"%P%k!<%s%&%#%s%I%&$,8=$l$F!"J8;zNs$rI=<($7$^(B
-$B$9!#$3$l$N>\$7$$>pJs$O(B @ref{(emacs)Help Echo} (GNU Emacs) $B$^$?(B
-$B$O(B @code{balloon-help-mode} (XEmacs) $B$N@bL@J8;zNs$r;2>H$7$F$/$@$5$$!#(B($B5;(B
-$B=QE*$JM}M3$N$?$a$K!"%.%#%a(B (guillemets: @footnote{guillemets ($BJ)8l(B) $B$O%.%e(B
-$B%a$H$bI=5-$5$l$^$9!#F|K\8l$N!V!W$KEv$?$k$b$N$G!"8}F,I=8=$rI=5-$7$?$j!"6/(B
-$BD4$7$?$$C18l$r0O$`!"2?$+$+$i$N0zMQItJ,$r0O$`!"=qJ*Ey$N%?%$%H%k$r5-$9EyMM!9(B
-$B$K;H$o$l$^$9!#(B}) $B$O$3$N@a$G$O(B @samp{<<} $B$*$h$S(B @samp{>>} $B$H$7$F6a;w$5$l(B
-$B$^$7$?!#(B)
+$B$9!#$3$l$N>\$7$$>pJs$O(B @ref{Tooltips, ,Tooltips, emacs, The Emacs
+Manual} (GNU Emacs) $B$^$?$O(B @code{balloon-help-mode} (XEmacs) $B$N@bL@J8;z(B
+$BNs$r;2>H$7$F$/$@$5$$!#(B($B5;=QE*$JM}M3$N$?$a$K!"%.%#%a(B (guillemets:
+@footnote{guillemets ($BJ)8l(B) $B$O%.%e%a$H$bI=5-$5$l$^$9!#F|K\8l$N!V!W$KEv$?(B
+$B$k$b$N$G!"8}F,I=8=$rI=5-$7$?$j!"6/D4$7$?$$C18l$r0O$`!"2?$+$+$i$N0zMQItJ,(B
+$B$r0O$`!"=qJ*Ey$N%?%$%H%k$r5-$9EyMM!9$K;H$o$l$^$9!#(B}) $B$O$3$N@a$G(B
+$B$O(B @samp{<<} $B$*$h$S(B @samp{>>} $B$H$7$F6a;w$5$l$^$7$?!#(B)
 
 $B$3$l$O%0%k!<%W%P%C%U%!$NBeBX<jK!$G$9(B:
 
