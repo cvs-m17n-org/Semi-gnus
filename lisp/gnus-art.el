@@ -5380,7 +5380,7 @@ The text in the region will be yanked.  If the region isn't active,
 the entire article will be yanked."
   (interactive "P")
   (let ((article (cdr gnus-article-current)) cont)
-    (if (not (mark t))
+    (if (not (gnus-mark-active-p))
 	(with-current-buffer gnus-summary-buffer
 	  (gnus-summary-reply (list (list article)) wide))
       (setq cont (buffer-substring (point) (mark t)))
@@ -5398,7 +5398,7 @@ The text in the region will be yanked.  If the region isn't active,
 the entire article will be yanked."
   (interactive)
   (let ((article (cdr gnus-article-current)) cont)
-      (if (not (mark t))
+      (if (not (gnus-mark-active-p))
 	  (with-current-buffer gnus-summary-buffer
 	    (gnus-summary-followup (list (list article))))
 	(setq cont (buffer-substring (point) (mark t)))
