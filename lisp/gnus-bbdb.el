@@ -150,9 +150,9 @@ displaying the record corresponding to the sender of the current message."
 (defun gnus-bbdb/split-mail (header-field bbdb-field
 					  &optional regexp group)
   "Mail split method for `nnmail-split-fancy'.
-HEADER-FIELED is a regexp or list of regexps as mail header field name
-for gathering mail addresses.  If HEADER-FIELED is a string, then it's
-used for just matching pattern.  If HEADER-FIELED is a list of strings,
+HEADER-FIELD is a regexp or list of regexps as mail header field name
+for gathering mail addresses.  If HEADER-FIELD is a string, then it's
+used for just matching pattern.  If HEADER-FIELD is a list of strings,
 then these strings have priorities in the order.
 
 BBDB-FIELD is field name of BBDB.
@@ -160,8 +160,8 @@ Optional argument REGEXP is regexp string for matching BBDB-FIELD value.
 If REGEXP is nil or not specified, then all BBDB-FIELD value is matched.
 
 If GROUP is nil or not specified, then BBDB-FIELD value is returned as
-group name.  If GROUP is a symbol `&', then list of all matcing group's
-BBDB-FEILD values is returned.  Otherwise, GROUP is returned."
+group name.  If GROUP is a symbol `&', then list of all matching group's
+BBDB-FIELD values is returned.  Otherwise, GROUP is returned."
   (if (listp header-field)
       (if (eq group '&)
 	  (gnus-bbdb/split-mail (mapconcat 'identity header-field "\\|")
