@@ -1183,31 +1183,30 @@ find-file-hooks, etc.
       (message "%s(Y/n) Yes" prompt)
       t)))
 
-(eval-and-compile
-  (unless (featurep 'mm-util)
-    (defun nnheader-image-load-path (&optional package)
-      (let (dir result)
-	(dolist (path load-path (nreverse result))
-	  (if (file-directory-p
-	       (setq dir (concat (file-name-directory
-				  (directory-file-name path))
-				 "etc/" (or package "gnus/"))))
-	      (push dir result))
-	  (push path result))))
-    (defalias 'mm-image-load-path 'nnheader-image-load-path)
+(unless (featurep 'mm-util)
+  (defun nnheader-image-load-path (&optional package)
+    (let (dir result)
+      (dolist (path load-path (nreverse result))
+	(if (file-directory-p
+	     (setq dir (concat (file-name-directory
+				(directory-file-name path))
+			       "etc/" (or package "gnus/"))))
+	    (push dir result))
+	(push path result))))
+  (defalias 'mm-image-load-path 'nnheader-image-load-path)
 
-    (defalias 'mm-read-coding-system
-      (if (or (and (featurep 'xemacs)
-		   (<= (string-to-number emacs-version) 21.1))
-	      (boundp 'MULE))
-	  (lambda (prompt &optional default-coding-system)
-	    (read-coding-system prompt))
-	'read-coding-system))
+  (defalias 'mm-read-coding-system
+    (if (or (and (featurep 'xemacs)
+		 (<= (string-to-number emacs-version) 21.1))
+	    (boundp 'MULE))
+	(lambda (prompt &optional default-coding-system)
+	  (read-coding-system prompt))
+      'read-coding-system))
 
-    (defalias 'mm-multibyte-string-p
-      (if (fboundp 'multibyte-string-p)
-	  'multibyte-string-p
-	'ignore))))
+  (defalias 'mm-multibyte-string-p
+    (if (fboundp 'multibyte-string-p)
+	'multibyte-string-p
+      'ignore)))
 
 (when (featurep 'xemacs)
   (require 'nnheaderxm))
