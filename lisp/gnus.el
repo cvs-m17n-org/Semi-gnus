@@ -269,7 +269,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.13.2"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "11"
+(defconst gnus-revision-number "12"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.97"
@@ -1714,7 +1714,8 @@ use the article treating faculties instead.  Is is described in Info node
        (gnus-summary-score-map keymap) gnus-score-save gnus-score-headers
       gnus-current-score-file-nondirectory gnus-score-adaptive
       gnus-score-find-trace gnus-score-file-name)
-     ("gnus-cus" :interactive t gnus-group-customize gnus-score-customize)
+     ("gnus-cus" :interactive t gnus-custom-mode gnus-group-customize
+       gnus-score-customize)
      ("gnus-topic" :interactive t gnus-topic-mode)
      ("gnus-topic" gnus-topic-remove-group gnus-topic-set-parameters)
      ("gnus-salt" :interactive t gnus-pick-mode gnus-binary-mode)
@@ -1811,11 +1812,12 @@ use the article treating faculties instead.  Is is described in Info node
       gnus-offline-toggle-auto-hangup
       gnus-offline-toggle-on/off-send-mail
       gnus-offline-toggle-articles-to-fetch
-      gnus-offline-toggle-movemail-program
       gnus-offline-set-interval-time
       gnus-offline-agent-expire)
-     ("pop3-fma" :interactive t
-      pop3-fma-set-pop3-password)
+     ("miee" :interactive t gnspool-get-news
+      mail-spool-send news-spool-post)
+     ("international/mw32misc" define-process-argument-editing
+      general-process-argument-editing-function)
      ("gnus-agent" gnus-open-agent gnus-agent-get-function
       gnus-agent-save-groups gnus-agent-save-active gnus-agent-method-p
       gnus-agent-get-undownloaded-list gnus-agent-fetch-session
