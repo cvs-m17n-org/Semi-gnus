@@ -4850,7 +4850,15 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
 			(gnus-group-enter-directory dir))))))))
 	  (setq gnus-original-article (cons group article))
 
-	  (set-buffer gnus-original-article-buffer)
+	  ;; The current buffer is `gnus-original-article-buffer'. 
+	  (if (get-buffer gnus-original-article-buffer)
+	      (set-buffer gnus-original-article-buffer)
+	    (set-buffer (gnus-get-buffer-create gnus-original-article-buffer))
+	    (set-buffer-multibyte nil)
+	    (buffer-disable-undo)
+	    (setq major-mode 'gnus-original-article-mode)
+	    (setq buffer-read-only nil))
+
 	  (cond
 	   ;; Refuse to select canceled articles.
 	   ((and (numberp article)

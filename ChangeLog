@@ -2,7 +2,8 @@
 
 	* lisp/gnus-art.el (gnus-request-article-this-buffer): Copy an
 	article from `gnus-original-article-buffer' to
-	`gnus-article-buffer'.
+	`gnus-article-buffer'.  Generate `gnus-original-article-buffer'
+	safely.
 
 2001-09-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
