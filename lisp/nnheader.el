@@ -778,7 +778,7 @@ find-file-hooks, etc.
 	(after-insert-file-functions nil)
 	(find-file-hooks nil))
     (insert-file-contents-as-coding-system
-     filename nnheader-file-coding-system visit beg end replace)))
+     nnheader-file-coding-system filename visit beg end replace)))
 
 (defun nnheader-find-file-noselect (&rest args)
   (let ((format-alist nil)
@@ -788,7 +788,7 @@ find-file-hooks, etc.
 	(after-insert-file-functions nil)
 	(find-file-hooks nil))
     (apply 'find-file-noselect-as-coding-system
-	   (car args) nnheader-file-coding-system (cdr args))))
+	   nnheader-file-coding-system args)))
 
 (defun nnheader-auto-mode-alist ()
   "Return an `auto-mode-alist' with only the .gz (etc) thingies."
