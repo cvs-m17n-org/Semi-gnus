@@ -1,3 +1,8 @@
+2002-07-18  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/truncate-article-list): Remove
+	a redundancy.
+
 2002-07-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* texi/gnus-ja.texi (Web Newspaper): Update the url of w3m.

@@ -540,17 +540,15 @@ generate possible group names from it."
     (when (and gnus-large-newsgroup
 	       (> hit gnus-large-newsgroup))
       (let* ((cursor-in-echo-area nil)
-	     (input
-	      (when (> hit gnus-large-newsgroup)
-		(read-from-minibuffer
-		 (format
-		  "Too many articles were retrieved.  How many articles (max %d): "
-		  hit)
-		 (cons (number-to-string gnus-large-newsgroup) 0)))))
+	     (input (read-from-minibuffer
+		     (format "\
+Too many articles were retrieved.  How many articles (max %d): "
+			     hit)
+		     (cons (number-to-string gnus-large-newsgroup) 0))))
 	(unless (string-match "\\`[ \t]*\\'" input)
 	  (setcdr (nthcdr (min (1- (string-to-number input)) hit) articles)
-		  nil))))
-    articles))
+		  nil)))))
+  articles)
 
 ;;;###autoload
 (defun gnus-namazu-search (groups query)
