@@ -868,3 +868,86 @@ gnus-group-clear-data-on-native-groups} を使って、基本グループに関するデー
 タをすべて消去することができます。このコマンドは注意して使ってください。 
 
 
+@node Startup Files
+@section Startup Files
+@cindex startup files
+@cindex .newsrc
+@cindex .newsrc.el
+@cindex .newsrc.eld
+
+今や、あなたはファイル @file{.newrc} についてすべて知っています。すべて
+の購読情報は伝統的にこのファイルに蓄積されます。
+
+@sc{gnus} では物事が少々複雑になっています。ファイル @file{.newsrc} を最
+新のものにするだけではなく、ファイル @file{.newsrc} には合わない情報を保
+存しておくために @file{.newsrc.el} と呼ばれるファイルを使います。 (実際
+は、ファイル @file{.newsrc} の全ての情報を複製して保持しています。)
+@sc{gnus}はこれらの中で一番最後に保存されたものを使います。これをするこ
+とにより、@sc{gnus} と他のニュースリーダーを切り替えて使うことができます。
+
+これはちょっとばかな方法なので、 gnus はもっと良い方法を編み出しました。
+@file{.newsrc} と @file{.newsrc.el} ファイルに加えて、 gnus は
+@file{.newsrc.eld} と呼ばれるファイルも持っています。Gnus はこれらの中で
+一番新しいファイルを読みますが、ファイル @file{.newsrc.el} に書き込むこ
+とはありません。ファイル @file{.newsrc.eld} は絶対に消すべきではありませ
+ん。---それはファイル @file{.newsrc} にはないたくさんの情報を保持してい
+ます。 
+
+@vindex gnus-save-newsrc-file
+@code{gnus-save-newsrc-file} を @code{nil} にすることによってファイル
+@file{.newsrc} に書き込むのを止めることができます。そうすれば、そのファ
+イルを削除することができ、ディスク容量を節約することができ、gnus の終了
+が速くなります。しかし、そうすると他のニュースリーダーを使えなくなります。
+でも、ちょっと、誰かそうしたい人がいるでしょうか。 
+
+@vindex gnus-save-killed-list
+@code{gnus-save-killed-list} (ディフォルトでは @code{t}) が @code{nil} 
+であると、gnus は削除されたグループを起動ファイルに保存しません。これは、
+(起動時と終了時の) 時間と、(ディスクの) 容量を節約します。こうすると、
+gnusがどのグループが新しいかの記録を持っていないことになりますので、新し
+いグループの自動購読方法は意味が無くなります。この変数を @code{nil} にし
+たときは、@code{gnus-check-new-newsgroups} を常に @code{nil} か
+@code{ask-server} にしておくべきでしょう (@pxref{New Groups})。この変数
+は正規表現であることもできます。そのような場合は、ファイルを保存する直前
+にその正規表現に合致しないすべてのグループを消去します。これは、すべての
+サーバーが @code{ask-server} を理解するわけではない、といったような、特
+定のあいまいな状況のときに役に立つでしょう。  
+
+@vindex gnus-startup-file
+変数 @code{gnus-startup-file} は起動ファイルがどこにあるかを指定します。
+ディフォルトの値は @file{~/.newsrc} で、それがどのようなものであれ、
+末尾に @samp{.eld} をつけたものが gnus (El Dingo) の起動ファイルになりま
+す。 
+
+@vindex gnus-save-newsrc-hook
+@vindex gnus-save-quick-newsrc-hook
+@vindex gnus-save-standard-newsrc-hook
+@code{gnus-save-newsrc-hook} は newsrc ファイルの中のどれかを保存する前に実
+行されるのに対し、@code{gnus-save-quick-newsrc-hook} はファイル
+@file{.newsrc.eld} を保存する前に実行され、
+@code{gnus-save-standard-newsrc-hook} はファイル @file{.newsrc.eld} を保
+存する前に実行されます。後の二つは普通は版管理を入れたり切ったりするのに
+使われます。ディフォルトでは、起動ファイルを保存するときに版管理に入りま
+す。バックアップファイルの作成を止めたいときは、次のようにしてください。 
+
+@lisp
+(defun turn-off-backup ()
+  (set (make-local-variable 'backup-inhibited) t))
+
+(add-hook 'gnus-save-quick-newsrc-hook 'turn-off-backup)
+(add-hook 'gnus-save-standard-newsrc-hook 'turn-off-backup)
+@end lisp
+
+@vindex gnus-init-file
+Gnus が起動すると、@code{gnus-site-init-file} (ディフォルトでは
+@file{.../site-lisp/gnus}) と @code{gnus-init-file} (ディフォルトでは
+@file{~/.gnus}) のファイルを読み込みます。これらは普通の Emacs Lisp ファ
+イルで、@file{~/.emacs} や @file{site-init} ファイルを gnus 関係のもので
+乱雑にしないようにするために使うことができます。Gnus はこれらと同じ名前
+のファイルを調べますが、接尾語 @file{.elc} と @file{.el} がついているも
+のも調べます。言い換えれば、@code{gnus-init-file} を @file{~/.gnus} に設
+定すると、gnus は (この順番に) @file{~/.gnus.elc} 、@file{~/.gnus.el} を
+探し、最後に @file{~/.gnus} を探します。
+
+
+
