@@ -4,7 +4,7 @@
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;; Keywords: mail, pop3
-;; Version: 1.3m
+;; Version: 1.3q
 
 ;; This file is part of GNU Emacs.
 
@@ -91,7 +91,8 @@ Used for APOP authentication.")
       (pop3-retr process n crashbuf)
       (save-excursion
 	(set-buffer crashbuf)
-	(write-region-as-binary (point-min) (point-max) crashbox 'append)
+	(write-region-as-binary (point-min) (point-max)
+				crashbox 'append 'nomesg)
 	(set-buffer (process-buffer process))
 	(while (> (buffer-size) 5000)
 	  (goto-char (point-min))

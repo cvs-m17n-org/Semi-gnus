@@ -31,6 +31,7 @@
 (eval '(run-hooks 'gnus-load-hook))
 
 (eval-when-compile (require 'cl))
+(require 'mm-util)
 
 (require 'custom)
 (eval-and-compile
@@ -264,13 +265,13 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.061"
+(defconst gnus-version-number "6.10.062"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "03"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.79"
+(defconst gnus-original-version-number "0.80"
     "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
@@ -2444,6 +2445,15 @@ that that variable is buffer-local to the summary buffers."
 		(while (and s1 (member (car s1) s2))
 		  (setq s1 (cdr s1)))
 		(null s1))))))
+
+(defun gnus-methods-equal-p (m1 m2)
+  (let ((m1 (or m1 gnus-select-method))
+	(m2 (or m2 gnus-select-method)))
+    (or (equal m1 m2)
+	(and (eq (car m1) (car m2))
+	     (or (not (memq 'address (assoc (symbol-name (car m1))
+					    gnus-valid-select-methods)))
+		 (equal (nth 1 m1) (nth 1 m2)))))))
 
 (defun gnus-server-equal (m1 m2)
   "Say whether two methods are equal."
