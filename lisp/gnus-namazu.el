@@ -450,18 +450,20 @@ and make a virtual group contains its results."
     (if articles
 	(let ((real-groups groups)
 	      (vgroup
-	       (encode-coding-string
-		(apply (function format)
-		       "nnvirtual:namazu-search?query=%s&groups=%s&id=%d%d%d"
-		       query
-		       (if groups (mapconcat 'identity groups ",") "ALL")
-		       (current-time))
-		gnus-namazu-coding-system)))
+	       (apply (function format)
+		      "nnvirtual:namazu-search?query=%s&groups=%s&id=%d%d%d"
+		      query
+		      (if groups (mapconcat 'identity groups ",") "ALL")
+		      (current-time))
+	       gnus-namazu-coding-system))
 	  (gnus-namazu/truncate-article-list articles)
 	  (unless real-groups
 	    (dolist (a articles)
 	      (add-to-list 'real-groups (gnus-namazu/article-group a))))
 	  ;; Generate virtual group which includes all results.
+	  (when (fboundp 'gnus-group-decoded-name)
+	    (setq vgroup
+		  (encode-coding-string vgroup gnus-namazu-coding-system)))
 	  (setq vgroup
 		(gnus-group-read-ephemeral-group
 		 vgroup
