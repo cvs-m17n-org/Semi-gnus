@@ -660,7 +660,7 @@ See also the documentation for `gnus-article-highlight-citation'."
 	       (goto-char (point-max))
 	       (gnus-article-search-signature)
 	       (point)))
-	alist entry start begin end numbers prefix)
+	alist entry start begin end numbers prefix mc-flag)
     ;; Get all potential prefixes in `alist'.
     (while (< (point) max)
       ;; Each line.
