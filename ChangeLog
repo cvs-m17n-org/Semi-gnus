@@ -1,5 +1,11 @@
 1998-03-13  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus-art.el: Rename `mime-view-quitting-method-for-gnus' ->
+ 	`mime-preview-quitting-method-for-gnus'.
+
+	* lisp/gnus-art.el: Rename `mime-view-quitting-method-alist' ->
+ 	`mime-preview-quitting-method-alist'.
+
 	* lisp/gnus-art.el: Rename `mime-view-kill-buffer' ->
  	`mime-preview-kill-buffer'.
 
