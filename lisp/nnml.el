@@ -116,9 +116,6 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
 (defvoo nnml-generate-active-function 'nnml-generate-active-info)
 
 (defvar nnml-nov-buffer-file-name nil)
-(defvar nnml-check-directory-twice t
-  "If t, to make sure nothing went wrong when reading over NFS --
-check twice.")
 
 (defvoo nnml-file-coding-system nnmail-file-coding-system)
 
@@ -140,12 +137,7 @@ check twice.")
 	     (count 0)
 	     (file-name-coding-system nnmail-pathname-coding-system)
 	     (pathname-coding-system nnmail-pathname-coding-system)
-	     beg article
-	     (nnml-check-directory-twice
-	      (and nnml-check-directory-twice
-		   ;; To speed up, disable it in some case.
-		   (or (not (numberp nnmail-large-newsgroup))
-		       (<= number nnmail-large-newsgroup)))))
+	     beg article)
 	(if (stringp (car sequence))
 	    'headers
 	  (if (nnml-retrieve-headers-with-nov sequence fetch-old)
@@ -212,7 +204,7 @@ check twice.")
 	(when (and (setq group-num (nnml-find-group-number id))
 		   (cdr
 		    (assq (cdr group-num)
-			  (nnheader-article-to-file-alist
+			  (nnml-article-to-file-alist
 			   (setq gpath
 				 (nnmail-group-pathname
 				  (car group-num)
@@ -286,7 +278,7 @@ check twice.")
 	    nnml-group-alist)
       (nnml-possibly-create-directory group)
       (nnml-possibly-change-directory group server)
-      (let ((articles (nnheader-directory-articles nnml-current-directory)))
+      (let ((articles (nnml-directory-articles nnml-current-directory)))
 	(when articles
 	  (setcar active (apply 'min articles))
 	  (setcdr active (apply 'max articles))))
@@ -312,7 +304,7 @@ check twice.")
 (deffoo nnml-request-expire-articles (articles group &optional server force)
   (nnml-possibly-change-directory group server)
   (let ((active-articles
-	 (nnheader-directory-articles nnml-current-directory))
+	 (nnml-directory-articles nnml-current-directory))
 	(is-old t)
 	article rest mod-time number)
     (nnmail-activate 'nnml)
@@ -493,7 +485,7 @@ check twice.")
       ;; We move the articles file by file instead of renaming
       ;; the directory -- there may be subgroups in this group.
       ;; One might be more clever, I guess.
-      (let ((files (nnheader-article-to-file-alist old-dir)))
+      (let ((files (nnml-article-to-file-alist old-dir)))
 	(while files
 	  (rename-file
 	   (concat old-dir (cdar files))
@@ -539,7 +531,7 @@ check twice.")
   (let (file)
     (if (setq file (cdr (assq article nnml-article-file-alist)))
 	(expand-file-name file nnml-current-directory)
-      (if nnml-check-directory-twice
+      (if (not nnheader-directory-files-is-safe)
 	  ;; Just to make sure nothing went wrong when reading over NFS --
 	  ;; check once more.
 	  (when (file-exists-p
@@ -688,7 +680,7 @@ check twice.")
       (unless nnml-article-file-alist
 	(setq nnml-article-file-alist
 	      (sort
-	       (nnheader-article-to-file-alist nnml-current-directory)
+	       (nnml-article-to-file-alist nnml-current-directory)
 	       'car-less-than-car)))
       (setq active
 	    (if nnml-article-file-alist
@@ -733,18 +725,22 @@ check twice.")
 	(mail-header-set-number headers number)
 	headers))))
 
+(defun nnml-get-nov-buffer (group)
+  (let ((buffer (get-buffer-create (format " *nnml overview %s*" group))))
+    (save-excursion
+      (set-buffer buffer)
+      (set (make-local-variable 'nnml-nov-buffer-file-name)
+	   (expand-file-name
+	    nnml-nov-file-name
+	    (nnmail-group-pathname group nnml-directory)))
+      (erase-buffer)
+      (when (file-exists-p nnml-nov-buffer-file-name)
+	(nnheader-insert-file-contents nnml-nov-buffer-file-name)))
+    buffer))
+
 (defun nnml-open-nov (group)
   (or (cdr (assoc group nnml-nov-buffer-alist))
-      (let ((buffer (get-buffer-create (format " *nnml overview %s*" group))))
-	(save-excursion
-	  (set-buffer buffer)
-	  (set (make-local-variable 'nnml-nov-buffer-file-name)
-	       (expand-file-name
-		nnml-nov-file-name
-		(nnmail-group-pathname group nnml-directory)))
-	  (erase-buffer)
-	  (when (file-exists-p nnml-nov-buffer-file-name)
-	    (nnheader-insert-file-contents nnml-nov-buffer-file-name)))
+      (let ((buffer (nnml-get-nov-buffer group)))
 	(push (cons group buffer) nnml-nov-buffer-alist)
 	buffer)))
 
@@ -879,7 +875,51 @@ check twice.")
   (when (or (not nnml-article-file-alist)
 	    force)
     (setq nnml-article-file-alist
-	  (nnheader-article-to-file-alist nnml-current-directory))))
+	  (nnml-article-to-file-alist nnml-current-directory))))
+
+(defun nnml-directory-articles (dir)
+  "Return a list of all article files in a directory.
+Use the nov database for that directory if available."
+  (if (or gnus-nov-is-evil nnml-nov-is-evil
+	  (not (file-exists-p
+		(expand-file-name nnml-nov-file-name dir))))
+      (nnheader-directory-articles dir)
+    ;; build list from .overview if available
+    ;; We would use nnml-open-nov, except that nnml-nov-buffer-alist is
+    ;; defvoo'd, and we might get called when it hasn't been swapped in.
+    (save-excursion
+      (let ((list nil)
+	    art
+	    (buffer (nnml-get-nov-buffer nnml-current-group)))
+	(set-buffer buffer)
+	(goto-char (point-min))
+	(while (not (eobp))
+	  (setq art (read (current-buffer)))
+	  (push art list)
+	  (forward-line 1))
+	list))))
+
+(defun nnml-article-to-file-alist (dir)
+  "Return an alist of article/file pairs in DIR.
+Use the nov database for that directory if available."
+  (if (or gnus-nov-is-evil nnml-nov-is-evil
+	  (not (file-exists-p
+		(expand-file-name nnml-nov-file-name
+				  nnml-current-directory))))
+      (nnheader-article-to-file-alist nnml-current-directory)
+    ;; build list from .overview if available
+    (save-excursion
+      (let ((alist nil)
+	    art
+	    (buffer (nnml-get-nov-buffer nnml-current-group)))
+	(set-buffer buffer)
+	(goto-char (point-min))
+	(while (not (eobp))
+	  (setq art (read (current-buffer)))
+	  ;; assume file name is unadorned (ie. not compressed etc)
+	  (push (cons art (int-to-string art)) alist)
+	  (forward-line 1))
+	alist))))
 
 (deffoo nnml-request-set-mark (group actions &optional server)
   (nnml-possibly-change-directory group server)
@@ -940,8 +980,8 @@ check twice.")
 		 (error "Cannot write to %s (%s)" err))))))
 
 (defun nnml-open-marks (group server)
-  (let ((file (expand-file-name 
-	       nnml-marks-file-name 
+  (let ((file (expand-file-name
+	       nnml-marks-file-name
 	       (nnmail-group-pathname group nnml-directory))))
     (if (file-exists-p file)
 	(setq nnml-marks (condition-case err

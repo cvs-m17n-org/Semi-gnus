@@ -818,7 +818,10 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
     (string-match nnheader-numerical-short-files file)
     (string-to-int (match-string 0 file))))
 
-(defvar nnheader-directory-files-is-safe nil
+(defvar nnheader-directory-files-is-safe
+  (or (eq system-type 'windows-nt)
+      (and (not (featurep 'xemacs))
+	   (> emacs-major-version 20)))
   "If non-nil, Gnus believes `directory-files' is safe.
 It has been reported numerous times that `directory-files' fails with
 an alarming frequency on NFS mounted file systems. If it is nil,
