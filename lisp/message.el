@@ -593,7 +593,7 @@ Otherwise, directly inline the old message in the forwarded message."
   :group 'message-forwarding
   :type 'boolean)
 
-(defcustom message-forward-show-mml t
+(defcustom message-forward-show-mml nil
   "*Non-nil means show forwarded messages as mml.
 Otherwise, forwarded messages are unchanged."
   :version "21.1"
