@@ -953,6 +953,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 	  "^ *---+ +Original message +---+ *$\\|"
 	  "^ *--+ +begin message +--+ *$\\|"
 	  "^ *---+ +Original message follows +---+ *$\\|"
+	  "^ *---+ +Undelivered message follows +---+ *$\\|"
 	  "^|? *---+ +Message text follows: +---+ *|?$")
   "A regexp that matches the separator before the text of a failed message.")
 
@@ -1617,10 +1618,12 @@ With the prefix argument FORCE, insert the header anyway."
 	quoted)
     (save-excursion
       (beginning-of-line)
-      (setq quoted (looking-at (regexp-quote message-yank-prefix))))
+      (if (looking-at (sc-cite-regexp))
+	  (setq quoted (buffer-substring (match-beginning 0) (match-end 0)))))
     (insert "\n\n\n\n")
+    (delete-region (point) (re-search-forward "[ \t]*"))
     (when quoted
-      (insert message-yank-prefix))
+      (insert quoted))
     (fill-paragraph nil)
     (goto-char point)
     (forward-line 2)))
@@ -3831,7 +3834,11 @@ Optional NEWS will use news to forward instead of mail."
 ;;;###autoload
 (defun message-resend (address)
   "Resend the current article to ADDRESS."
-  (interactive "sResend message to: ")
+  (interactive
+   (list
+    (let ((mail-abbrev-mode-regexp ""))
+      (read-from-minibuffer
+       "Resend message to: " nil message-mode-map))))
   (message "Resending message to %s..." address)
   (save-excursion
     (let ((cur (current-buffer))

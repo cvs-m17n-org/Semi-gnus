@@ -139,7 +139,7 @@
     "message/rfc822")
   "A list of MIME types to be displayed automatically.")
 
-(defvar mm-attachment-override-types '("text/plain" "text/x-vcard")
+(defvar mm-attachment-override-types '("text/x-vcard")
   "Types that should have \"attachment\" ignored if they can be displayed inline.")
 
 (defvar mm-automatic-external-display nil
@@ -190,7 +190,11 @@ to:
       (if (or (not ctl)
 	      (not (string-match "/" (car ctl))))
 	  (mm-dissect-singlepart
-	   '("text/plain") nil no-strict-mime
+	   '("text/plain") 
+	   (and cte (intern (downcase (mail-header-remove-whitespace
+				       (mail-header-remove-comments
+					cte)))))
+	   no-strict-mime
 	   (and cd (ignore-errors (mail-header-parse-content-disposition cd)))
 	   description)
 	(setq type (split-string (car ctl) "/"))

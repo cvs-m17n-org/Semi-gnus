@@ -616,6 +616,22 @@ be added below it (otherwise)."
   :group 'gnus-article-headers
   :type 'boolean)
 
+(defcustom gnus-article-mime-match-handle-function 'undisplayed-alternative
+  "Function called with a MIME handle as the argument.
+This is meant for people who want to view first matched part.
+For `undisplayed-alternative' (default), the first undisplayed 
+part or alternative part is used. For `undisplayed', the first 
+undisplayed part is used. For a function, the first part which 
+the function return `t' is used. For `nil', the first part is
+used."
+  :group 'gnus-article-mime
+  :type '(choice 
+	  (item :tag "first" :value nil)
+	  (item :tag "undisplayed" :value undisplayed)
+	  (item :tag "undisplayed or alternative" 
+		:value undisplayed-alternative)
+	  (function)))
+
 ;;;
 ;;; The treatment variables
 ;;;
@@ -1086,6 +1102,7 @@ Initialized from `text-mode-syntax-table.")
 	  (when (setq beg (text-property-any
 			   (point-min) (point-max) 'message-rank (+ 2 max)))
 	    ;; We delete the unwanted headers.
+	    (push 'headers gnus-article-wash-types)
 	    (add-text-properties (point-min) (+ 5 (point-min))
 				 '(article-type headers dummy-invisible t))
 	    (delete-region beg (point-max))))))))
@@ -1494,9 +1511,9 @@ header in the current article."
 	(when (re-search-forward "^-----BEGIN PGP SIGNED MESSAGE-----\n" nil t)
 	  (push 'pgp gnus-article-wash-types)
 	  (delete-region (match-beginning 0) (match-end 0))
-	  ;; PGP 5 and GNU PG add a `Hash: <>' comment, hide that too
-	  (when (looking-at "Hash:.*$")
-	    (delete-region (point) (1+ (gnus-point-at-eol))))
+	  ;; Remove armor headers (rfc2440 6.2)
+	  (delete-region (point) (or (re-search-forward "^[ \t]*\n" nil t)
+				     (point)))
 	  (setq beg (point))
 	  ;; Hide the actual signature.
 	  (and (search-forward "\n-----BEGIN PGP SIGNATURE-----\n" nil t)
@@ -1824,7 +1841,7 @@ should replace the \"Date:\" one, or should be added below it."
 	 (date (if (vectorp header) (mail-header-date header)
 		 header))
 	 (inhibit-point-motion-hooks t)
-	 (newline t)
+	 pos
 	 bface eface)
     (when (and date (not (string= date "")))
       (save-excursion
@@ -1842,16 +1859,17 @@ should replace the \"Date:\" one, or should be added below it."
 	  (let ((buffer-read-only nil))
  	    ;; Delete any old Date headers.
  	    (while (re-search-forward date-regexp nil t)
-	      (if newline
+	      (if pos
 		  (delete-region (progn (beginning-of-line) (point))
-				 (progn (end-of-line) (point)))
+				 (progn (forward-line 1) (point)))
 		(delete-region (progn (beginning-of-line) (point))
-			       (progn (forward-line 1) (point))))
-	      (setq newline nil))
-	    (when (re-search-forward tdate-regexp nil t)
+			       (progn (end-of-line) (point)))
+		(setq pos (point))))
+	    (when (and (not pos) (re-search-forward tdate-regexp nil t))
 	      (forward-line 1))
+	    (if pos (goto-char pos))
 	    (insert (article-make-date-line date (or type 'ut)))
-	    (when newline
+	    (when (not pos)
 	      (insert "\n")
 	      (forward-line -1))
 	    ;; Do highlighting.
@@ -1905,9 +1923,13 @@ should replace the \"Date:\" one, or should be added below it."
 	 (format-time-string gnus-article-time-format time))))
      ;; ISO 8601.
      ((eq type 'iso8601)
-      (concat
-       "Date: "
-       (format-time-string "%Y%m%dT%H%M%S" time)))
+      (let ((tz (car (current-time-zone time))))
+	(concat
+	 "Date: "
+	 (format-time-string "%Y%m%dT%H%M%S" time)
+	 (format "%s%02d%02d"
+		 (if (> tz 0) "+" "-") (/ (abs tz) 3600) 
+		 (/ (% (abs tz) 3600) 60)))))
      ;; Do an X-Sent lapsed format.
      ((eq type 'lapsed)
       ;; If the date is seriously mangled, the timezone functions are
@@ -2043,6 +2065,7 @@ This format is defined by the `gnus-article-time-format' variable."
 		face (nth 3 elem))
 	  (while (re-search-forward regexp nil t)
  	    (when (and (match-beginning visible) (match-beginning invisible))
+	      (push 'emphasis gnus-article-wash-types)
  	      (gnus-article-hide-text
  	       (match-beginning invisible) (match-end invisible) props)
  	      (gnus-article-unhide-text-type
@@ -2547,6 +2570,8 @@ commands:
     (if (get-buffer name)
 	(save-excursion
 	  (set-buffer name)
+	  (if gnus-article-mime-handles
+	      (mm-destroy-parts gnus-article-mime-handles))
 	  (kill-all-local-variables)
 	  (buffer-disable-undo)
 	  (setq buffer-read-only t)
@@ -2914,11 +2939,33 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (interactive "p")
   (gnus-article-part-wrapper n 'gnus-mime-inline-part))
 
-(defun gnus-article-view-part (n)
+(defun gnus-article-mime-match-handle-first (condition)
+  (if condition
+      (let ((alist gnus-article-mime-handle-alist) ihandle n)
+	(while (setq ihandle (pop alist))
+	  (if (and (cond 
+		    ((functionp condition)
+		     (funcall condition (cdr ihandle)))
+		    ((eq condition 'undisplayed) 
+		     (not (or (mm-handle-undisplayer (cdr ihandle))
+			      (equal (mm-handle-media-type (cdr ihandle))
+				 "multipart/alternative"))))
+		    ((eq condition 'undisplayed-alternative)
+		     (not (mm-handle-undisplayer (cdr ihandle))))
+		    (t t))
+		   (gnus-article-goto-part (car ihandle))
+		   (or (not n) (< (car ihandle) n)))
+	      (setq n (car ihandle))))
+	(or n 1))
+    1))
+
+(defun gnus-article-view-part (&optional n)
   "View MIME part N, which is the numerical prefix."
-  (interactive "p")
+  (interactive "P")
   (save-current-buffer
     (set-buffer gnus-article-buffer)
+    (or (numberp n) (setq n (gnus-article-mime-match-handle-first 
+			     gnus-article-mime-match-handle-function)))
     (when (> n (length gnus-article-mime-handle-alist))
       (error "No such part"))
     (let ((handle (cdr (assq n gnus-article-mime-handle-alist))))
