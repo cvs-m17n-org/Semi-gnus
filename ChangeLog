@@ -1,5 +1,11 @@
 1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.033.
+
+	* Sync up with Pterodactyl Gnus 0.48.
+
+1998-11-16  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* texi/emacs-mime.texi: Fix iso-8859-1 chars.
 
 	* lisp/message.el (message-send-news): Call
@@ -27,7 +33,8 @@
 
 1998-11-14  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
-	* lisp/message.el: Forget bind "\C-c\C-a" 'message-insert-mime-part
+	* lisp/message.el: Restore the forgotten function
+	`message-insert-mime-part' from the original source.
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.030.
 
