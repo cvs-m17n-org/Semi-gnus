@@ -1,8 +1,8 @@
 ;; mess-bbdb.el --- Interface to message (For after Nana-gnus 6.12.1).
 
-;; Copyright (C) 1998 Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;; Copyright (C) 1998 Keiichi Suzuki <keiichi@nanap.org>
 
-;; Author: Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;; Author: Keiichi Suzuki <keiichi@nanap.org>
 ;; Keywords: BBDB, mail, news
 
 ;; This file is part of Nana-gnus.

@@ -1,7 +1,7 @@
 ;;; mess-lcl.el --- Control message format with recipient's locale
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
-;; Author: Keiichi Suzuki   <kei-suzu@nanap.org>
+;; Author: Keiichi Suzuki   <keiichi@nanap.org>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.

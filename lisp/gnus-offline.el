@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.6.3 1999-03-31 07:59:55 keiichi Exp $
+;;; $Id: gnus-offline.el,v 1.1.6.4 1999-04-28 05:07:54 keiichi Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -12,7 +12,7 @@
 ;;; Keywords: news , mail , offline , gnus
 ;;;
 ;;; SPECIAL THANKS
-;;;    Keiichi Suzuki <kei-suzu@mail.wbs.or.jp>
+;;;    Keiichi Suzuki <keiichi@nanap.org>
 ;;;    KORIYAMA Naohiro <kory@ba2.so-net.or.jp>
 ;;;    Katsumi Yamaoka <yamaoka@jpl.org>
 

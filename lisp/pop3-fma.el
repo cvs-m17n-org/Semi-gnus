@@ -7,7 +7,7 @@
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
-;;    Keiichi Suzuki <kei-suzu@mail.wbs.or.jp>
+;;    Keiichi Suzuki <keiichi@nanap.org>
 ;;    Katsumi Yamaoka <yamaoka@jpl.org>
 ;;
 ;; This file is not part of GNU Emacs.

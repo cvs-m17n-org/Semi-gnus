@@ -4,7 +4,7 @@
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;         Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
-;;         Keiichi Suzuki   <kei-suzu@mail.wbs.ne.jp>
+;;         Keiichi Suzuki   <keiichi@nanap.org>
 ;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Katsumi Yamaoka  <yamaoka@jpl.org>
 ;;         Kiyokazu SUTO    <suto@merry.xmath.ous.ac.jp>
