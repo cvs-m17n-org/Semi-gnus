@@ -7,6 +7,7 @@
 ;;         Keiichi Suzuki   <kei-suzu@mail.wbs.ne.jp>
 ;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Katsumi Yamaoka  <yamaoka@jpl.org>
+;;         Kiyokazu SUTO    <suto@merry.xmath.ous.ac.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
