@@ -1,3 +1,8 @@
+2002-01-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* texi/gnus-ja.texi (Web Newspaper): Update the document of
+	mime-w3m.el.
+
 2002-01-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (article-toggle-headers): Expose headers even

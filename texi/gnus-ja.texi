@@ -13518,18 +13518,7 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 @file{~/.gnus} ファイルに以下の設定をして下さい。
 
 @lisp
-(setq mime-setup-enable-inline-html nil)
-(eval-after-load "mime-view"
-  '(progn
-     (autoload 'mime-w3m-preview-text/html "mime-w3m")
-     (ctree-set-calist-strictly
-      'mime-preview-condition
-      '((type . text)
-        (subtype . html)
-        (body . visible)
-        (body-presentation-method . mime-w3m-preview-text/html)))
-     (set-alist 'mime-view-type-subtype-score-alist
-                '(text . html) 3)))
+(require 'mime-w3m)
 @end lisp
 
 Web Newspaper に関する以下の @code{nnshimbun} 変数を変えることが可能です:
