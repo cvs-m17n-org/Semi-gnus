@@ -276,8 +276,8 @@ variable."
 	    (eval `(nndoc-address
 		    ,(let ((file (nnheader-find-etc-directory
 				  "gnus-tut.txt" t)))
-		       (unless file
-			 (error "Couldn't find doc group"))
+		       (or file
+			   (error "Couldn't find doc group"))
 		       file))))))
   "*Alist of useful group-server pairs."
   :group 'gnus-group-listing
@@ -1482,7 +1482,9 @@ and with point over the group in question."
 	(let ((,groups (gnus-group-process-prefix arg))
 	      (,window (selected-window))
 	      ,group)
-	  (while (setq ,group (pop ,groups))
+	  (while ,groups
+	    (setq ,group (car ,groups)
+		  ,groups (cdr ,groups))
 	    (select-window ,window)
 	    (gnus-group-remove-mark ,group)
 	    (save-selected-window
