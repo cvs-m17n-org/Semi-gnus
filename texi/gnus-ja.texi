@@ -16133,6 +16133,12 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch
 初期設定値) であれば、既読記事のみが消去の対象となり、未読、可視、保留記
 事はさらに無期限に保持します。
 
+@findex gnus-agent-regenerate
+期限切れ消去されているはずなのに残っている記事を見つけたならば、たぶんい
+くつかの gnus エージェントファイルが壊れています。
+@code{gnus-agent-regenerate} は、起こりうる問題を修復するための特別なコ
+マンドです。
+
 @node Agent and IMAP
 @subsection エージェントを IMAP で使う方法
 
