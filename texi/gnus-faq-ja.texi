@@ -6,8 +6,8 @@
 @node Frequently Asked Questions
 @section $BIQHK$K?R$M$i$l$k<ALd(B
 
-$B$3$l$O(B Semi-gnus $B$KBP$9$kNI$/$"$k<ALd$H!"$=$l$KBP$9$k2sEz=8$G$9!#$b$7$"(B
-$B$J$?$,%&%'%V%V%i%&%6!<$r;}$C$F$$$k$J$i!"%O%$%Q!<%F%-%9%HHG$,(B 
+$B$3$l$O(B T-gnus $B$KBP$9$kNI$/$"$k<ALd$H!"$=$l$KBP$9$k2sEz=8$G$9!#$b$7$"$J$?(B
+$B$,%&%'%V%V%i%&%6!<$r;}$C$F$$$k$J$i!"%O%$%Q!<%F%-%9%HHG$,(B
 @file{http://www.mdcnet.co.jp/%7Ekeiichi/semi-gnus-faq-ja.shtml} $B$G<j$K(B
 $BF~$j!"$*$=$i$/$"$J$?$,$3$l$r<u$1<h$C$F$+$i99?7$5$l$F$$$k$G$7$g$&!#(B
 
@@ -23,42 +23,42 @@
 
 @node Introduction
 @subsection $B>R2p(B
-$B$3$NJ8=q$O!"(B Semi-gnus $B$KBP$9$k$h$/$"$k<ALd$H!"$=$l$KBP$9$k2sEz=8$G$9!#(B
+$B$3$NJ8=q$O(B T-gnus $B$KBP$9$k$h$/$"$k<ALd$H!"$=$l$KBP$9$k2sEz=8$G$9!#(B
 
-Semi-gnus $B$O(B Emacs $B>e$GF0:n$9$k%M%C%H%K%e!<%9!&%j!<%@!<(B / $BEE;R%a!<%k!&%f!<(B
-$B%6!<!&%(%$%8%'%s%H(B (MUA) $B$G$9!#(BSemi-gnus $B$N%*%j%8%J%k$H$J$C$F$$$k(B Gnus 
-$B$O!"8=:_(B6$B<~G/$r7^$(!"$=$N4V(B Emacs $B$NI8=`%Q%C%1!<%8$H$7$F$bG[I[$5$l$F$-$^(B
-$B$7$?!#(B Gnus 5 $B$O:G?7$N(B($B$=$7$F:G9b$N(B)$B$b$N$G$9!#(B Gnus $B$N%*%j%8%J%k!&%P!<%8%g(B
-$B%s$O(B Masanobu UMEDA $B$K$h$k(BGNUS $B$G$9!#(B 1994$BG/$N=)$,G&$S4s$k:"!"(B Lars
+T-gnus $B$O(B Emacs $B>e$GF0:n$9$k%M%C%H%K%e!<%9!&%j!<%@!<(B / $BEE;R%a!<%k!&%f!<(B
+$B%6!<!&%(%$%8%'%s%H(B (MUA) $B$G$9!#(BT-gnus $B$N%*%j%8%J%k$H$J$C$F$$$k(B Gnus $B$O!"(B
+$B8=:_(B6$B<~G/$r7^$(!"$=$N4V(B Emacs $B$NI8=`%Q%C%1!<%8$H$7$F$bG[I[$5$l$F$-$^$7$?!#(B
+Pterodactyl Gnus $B$O:G?7$N(B($B$=$7$F:G9b$N(B)$B$b$N$G$9!#(B Gnus $B$N%*%j%8%J%k!&%P!<(B
+$B%8%g%s$O(B Masanobu UMEDA $B$K$h$k(BGNUS $B$G$9!#(B 1994$BG/$N=)$,G&$S4s$k:"!"(B Lars
 Magne Ingebrigtsen $B$O(B Gnus $B$r=q$-D>$=$&$H7h0U$7$^$7$?!#(B
 
-$B$7$+$7!"(B Gnus $BC1FH$G$O(B MIME $B2=$5$l$?5-;v!&%a!<%k$rFI$`$3$H$O$G$-$^$;$s!#(B 
+$B$7$+$7!"(B Gnus $BC1FH$G$O(B MIME $B2=$5$l$?5-;v!&%a!<%k$rFI$`$3$H$O$G$-$^$;$s!#(B
 $B$=$3$G!"(B Emacs $B>e$G(B MIME $B%5%]!<%H$r$9$k$?$a$N%Q%C%1!<%8$G$"$k(B SEMI $B$r;H(B
-$BMQ$7$F0lIt$N?M$?$A$,(B Gnus $B$r;HMQ$9$k$h$&$K$J$j$^$7$?!#$7$+$7!"$3$l$K$O(B 
-Gnus $B$K(B patch $B$r$"$F$kI,MW$,$"$k>e$K%*%j%8%J%k$N(B Gnus ($B$3$A$i$b(B 
+$BMQ$7$F0lIt$N?M$?$A$,(B Gnus $B$r;HMQ$9$k$h$&$K$J$j$^$7$?!#$7$+$7!"$3$l$K$O(B
+Gnus $B$K(B patch $B$r$"$F$kI,MW$,$"$k>e$K%*%j%8%J%k$N(B Gnus ($B$3$A$i$b(B
 Quassia-Gnus $B$H8F$P$l3+H/ESCf$G$7$?(B)$B$NJQ99FbMF$K$h$C$F$O$=$N(B patch $B<+BN(B
-$B$b:n$jD>$5$J$1$l$P$J$j$^$;$s$G$7$?!#$=$s$J(B 1997$BG/$N(B11$B7n!"<i2,CNI'(B 
+$B$b:n$jD>$5$J$1$l$P$J$j$^$;$s$G$7$?!#$=$s$J(B 1997$BG/$N(B11$B7n!"<i2,CNI'(B
 <morioka@@jaist.ac.jp> $B$O<~0O(B($B9%$-<T$?$A(B)$B$N4|BT$K2!$5$l(B SEMI $B$KBP1~$7$?!"(B
 $BB?9q8l$N$?$a$N(B Gnus$B!"(B Semi-gnus $B$r8x3+$7$?$N$G$9!#(B
 
-Semi-gnus $B$N%=!<%9!&%3!<%I$O8=:_(B CVS $B$G4IM}$5$l$F$*$j!"M-;V$NJ}!9$K$h$C(B
-$B$FF|!92~A1$,$J$5$l$F$$$^$9!#(B
+T-gnus $B$N%=!<%9!&%3!<%I$O8=:_(B CVS $B$G4IM}$5$l$F$*$j!"M-;V$NJ}!9$K$h$C$FF|!9(B
+$B2~A1$,$J$5$l$F$$$^$9!#(B
 
-Semi-gnus $B$N:GBg$N6/$_$O%*%j%8%J%k$N(B Gnus $B$+$i0z$-7Q$,$l$?!"6/NO$J%+%9%?(B
-$B%^%$%:5!G=$H(B SEMI $B$,$b$?$i$96/NO$J(BMIME $B%5%]!<%H$K$"$j$^$9!#:G=i$N0lJM$G(B
-$B$O$3$N%+%9%?%^%$%:5!G=$NK-IY$5$KB?>/62I]$r46$8$k$+$bCN$l$^$;$s!"$7$+$7!"(B
-$B$"$J$?$,$=$N5!G=$rI,MW$K$J$k$^$G$OJ#;($J5!G=$N$[$H$s$I$rL5;k$9$k$3$H$,$G(B
-$B$-$^$9!#(B $B$b$7!"$"$J$?$,$^$"$^$"$NNL$N%a%$%k$r<u$1<h$k(B($B$$$/$D$b$N%a!<%j%s(B
-$B%0%j%9%H$K;22C$7$F$$$k(B)$B!"$^$?$O!"Hs>o$KN.NL$NB?$$%a!<%j%s%0%j%9%H$K;22C(B
-$B$7$F$$$k$N$G$"$l$P!"$"$J$?$O(B Semi-gnus $B$G%a%$%k$rFI$`$?$a$ND4::$r$O$8$a(B
-$B$?$/$J$k$G$7$g$&!#(B
+T-gnus $B$N:GBg$N6/$_$O%*%j%8%J%k$N(B Gnus $B$+$i0z$-7Q$,$l$?!"6/NO$J%+%9%?%^(B
+$B%$%:5!G=$H(B SEMI $B$,$b$?$i$96/NO$J(BMIME $B%5%]!<%H$K$"$j$^$9!#:G=i$N0lJM$G$O(B
+$B$3$N%+%9%?%^%$%:5!G=$NK-IY$5$KB?>/62I]$r46$8$k$+$bCN$l$^$;$s!"$7$+$7!"$"(B
+$B$J$?$,$=$N5!G=$rI,MW$K$J$k$^$G$OJ#;($J5!G=$N$[$H$s$I$rL5;k$9$k$3$H$,$G$-(B
+$B$^$9!#(B $B$b$7!"$"$J$?$,$^$"$^$"$NNL$N%a%$%k$r<u$1<h$k(B($B$$$/$D$b$N%a!<%j%s%0(B
+$B%j%9%H$K;22C$7$F$$$k(B)$B!"$^$?$O!"Hs>o$KN.NL$NB?$$%a!<%j%s%0%j%9%H$K;22C$7(B
+$B$F$$$k$N$G$"$l$P!"$"$J$?$O(B T-gnus $B$G%a%$%k$rFI$`$?$a$ND4::$r$O$8$a$?$/$J(B
+$B$k$G$7$g$&!#(B
 
 $B$3$N(B FAQ $B$O!"NkLZ7=0l$K$h$C$FJ]<i$5$l$F$$$^$9!#(B $B$3$N(B FAQ $B$N4pAC$H$J$C$F(B
 $B$$$k%*%j%8%J%k(B Gnus $B$N(B FAQ $B$rJ]<i$5$l$F$$$k(B Justin Sheehy $B;a$K46<U$rJ{$2!"(B
 $B$^$?(B Justin Sheehy $B;a0JA0$K(B Gnus FAQ $B$G$9$P$i$7$$:n6H$r$5$l$F$$$?!"(BSteve
 Baur $B;a!"(B Per Abrahamsen $B;a$K46<U$7$^$9!#(B
 
-$BB>$NJ}K!(B($B%a%$%k!"%M%C%H%K%e!<%9Ey(B)$B$G>pJs$rF@$h$&$H$9$kA0$K!"$^$:$3$N(B FAQ 
+$BB>$NJ}K!(B($B%a%$%k!"%M%C%H%K%e!<%9Ey(B)$B$G>pJs$rF@$h$&$H$9$kA0$K!"$^$:$3$N(B FAQ
 $B$r8+$F$_$F$/$@$5$$!#(B
 
 $B$3$N>pJs$O(B Semi-gnus (Ja) $B%a%$%j%s%0!&%j%9%H$N1g=u$r<u$1$FJT=8$7$?$b$N$G!"(B
@@ -68,25 +68,23 @@ Baur $B;a!"(B Per Abrahamsen $B;a$K46<U$7$^$9!#(B
 @subsection $BF3F~(B
 
 @itemize @bullet
-@item 
-Q1.1: $B:G?7$N%P!<%8%g%s$O(B? 
+@item
+Q1.1: $B:G?7$N%P!<%8%g%s$O(B?
 
-$B8=:_$NI8=`%Q%C%1!<%8$N:G?7%P!<%8%g%s$O(B Semi-gnus 6.7 (tag: gnus-6_7) $B$G!"(B
-$B3+H/HG$N:G?7%P!<%8%g%s$O(B Semi-gnus 6.8 (tag: gnus-6_8) $B$G$9!#(B
+$B8=:_$N3+H/HG$N:G?7%P!<%8%g%s$O(B T-gnus 6.13 (tag: t-gnus-6_13) $B$G!"I8=`%Q%C(B
+$B%1!<%8$N:G?7%P!<%8%g%s$O(B T-gnus 6.12 (tag: t-gnus-6_12) $B$G$9!#(B
 
-Semi-gnus 6.7 $B$r;HMQ$9$k$?$a$K$OJL%Q%C%1!<%8$N(B FLIM 1.7 / SEMI ($B$^$?$O(B 
-WEMI) 1.8 $B$,I,MW$G$9!#(B $B$=$NB>!"(B APEL $B$,I,MW$K$J$j$^$9$,!"I,MW$J%P!<%8%g(B
-$B%s$O(B FLIM / SEMI (WEMI) $B%Q%C%1!<%8Fb$N(B README $B$r;2>H$7$F$/$@$5$$!#(B
+T-gnus 6.13 $B$r;HMQ$9$k$?$a$K$OJL%Q%C%1!<%8$N(B FLIM 1.13.1 $B0J>e(B, SEMI ($B$^(B
+$B$?$O(B WEMI) 1.13.5 $B0J>e$,I,MW$G$9!#(B $B$=$NB>!"(B APEL $B$,I,MW$K$J$j$^$9$,!"I,(B
+$BMW$J%P!<%8%g%s$O(B FLIM / SEMI (WEMI) $B%Q%C%1!<%8Fb$N(B README $B$r;2>H$7$F$/$@(B
+$B$5$$!#(B
 
-Semi-gnus $B$N%P!<%8%g%s$O!"I,MW$J(B SEMI (WEMI) $B$*$h$S(B FLIM $B$N%P!<%8%g%s$K(B
-$B?<$/4X78$7$F$$$^$9!#(B $BI,$:!"(B Semi-gnus $B$N%P!<%8%g%s$K$"$C$?(B SEMI (WEMI) 
-$B$*$h$S(B FLIM $B$r;HMQ$7$F$/$@$5$$!#(B
+T-gnus $B$N%P!<%8%g%s$O!"I,MW$J(B SEMI (WEMI) $B$*$h$S(B FLIM $B$N%P!<%8%g%s$K?<$/(B
+$B4X78$7$F$$$^$9!#(B $BI,$:!"(B T-gnus $B$N%P!<%8%g%s$K$"$C$?(B SEMI (WEMI) $B$*$h$S(B
+FLIM $B$r;HMQ$7$F$/$@$5$$!#(B
 
-$B8=:_!"$+$J$j$N%O%$%Z!<%9$G%P!<%8%g%s$,>e$,$C$F$$$^$9!#(B CVS $B$N(B main trunk
-(tag $BL5$7(B) $B$,0BDj%P!<%8%g%s$G$9!#(B
-
-@item 
-Q1.2: $BF~<jJ}K!$O(B? 
+@item
+Q1.2: $BF~<jJ}K!$O(B?
 
 CVS $B$K$h$kG[I[$r<g$H$7!"(Banonymous ftp $B$K$h$kG[I[$O$=$l$rJL$N7A$GG[I[$7$F(B
 $B$$$k$@$1$N$b$N$H$$$&0LCV$E$1$K$J$C$F$$$^$9!#(B
@@ -105,7 +103,7 @@ CVS $B$G$N<hF@(B
   CVS password: [CR] # NULL string
 
 @item checkout
-Semi-gnus $B$r%A%'%C%/%"%&%H$7$^$9!#<B:]$K$O!"(B-r gnus-6_8 $B$N$h$&$K%?%0$rIU(B
+T-gnus $B$r%A%'%C%/%"%&%H$7$^$9!#<B:]$K$O!"(B-r t-gnus-6_13 $B$N$h$&$K%?%0$rIU(B
 $B$1$F<B9T$7$^$9!#(B
 
 % cvs -d \
@@ -125,7 +123,7 @@ anonymous ftp $B$G$N<hF@(B
 
 anonymous ftp $B$G$O0J2<$N>l=j$+$i<hF@$G$-$^$9!#(B
 
-@file{ftp://ftp.jaist.ac.jp/GNU/elisp/semi-gnus/snapshots/}
+@file{ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/}
 
 SEMI, FLIM, APEL $B$N<hF@(B
 
@@ -133,31 +131,31 @@ SEMI, FLIM, APEL $B$O!"(Banonymous ftp $B$G0J2<$N>l=j$+$i<hF@$7$^$9!#(B
 
 @table @var
 @item SEMI
-@file{ftp://ftp.jaist.ac.jp/GNU/elisp/semi/}
+@file{ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.12/}
 
 @item FLIM
-@file{ftp://ftp.jaist.ac.jp/GNU/elisp/flim/}
+@file{ftp://ftp.m17n.org/pub/mule/flim/flim-1.13/}
 
 @item APEL
-@file{ftp://ftp.jaist.ac.jp/GNU/elisp/apel/}
+@file{ftp://ftp.m17n.org/pub/mule/apel/}
 
 @end table
 
-@item 
-Q1.3: $BI,MW$J(B Emacs $B$N%P!<%8%g%s$O(B? 
+@item
+Q1.3: $BI,MW$J(B Emacs $B$N%P!<%8%g%s$O(B?
 
-Semi-gnus $B$,8x<0$KBP1~$7$F$$$k(B Emacs $B$N%P!<%8%g%s$O<!$NDL$j$G$9!#(B
+T-gnus $B$,8x<0$KBP1~$7$F$$$k(B Emacs $B$N%P!<%8%g%s$O<!$NDL$j$G$9!#(B
 
 @itemize @bullet
-@item 
+@item
 GNU Emacs
 
-$B%P!<%8%g%s(B 20.1 $B0J>e!#(B
+$B%P!<%8%g%s(B 19.34 $B0J>e$N(B Mule $B5!G=IU$-(B
 
-@item 
+@item
 XEmacs
 
-$B%P!<%8%g%s(B 20.2 $B0J>e$N(BMule $B5!G=IU$-(B
+$B%P!<%8%g%s(B 20.2 $B0J>e$N(B Mule $B5!G=IU$-(B
 
 @item
 Meadow
@@ -165,38 +163,30 @@ Meadow
 $B%P!<%8%g%s(B 1.00 $B0J>e!#(B(Mule for Windows $B$G$OF0$-$^$;$s!#(B)
 @end itemize
 
-$B;32,9nH~$5$s(B <yamaoka@@ga.sony.co.jp> $B:n$NHs8x<0$N(B 
-@file{semi-mule23@@1934-YYMMDD.tar.gz} $B$r;HMQ$9$l$P(B Mule 2.3 / Emacs
-19.34 $B$G$OF0:n$9$k$G$7$g$&!#(B
-
-$B$3$l$O!"<!$N$H$3$m$+$i<hF@$7$F2<$5$$!#(B
-
-@file{http://www.jpl.org/elips}
-
 @item
-Q1.4: Semi-gnus $B$r(B GNU Emacs $B$H(B XEmacs $B$NN>J}$GF0$+$9$3$H$O$G$-$^$9$+(B? 
+Q1.4: T-gnus $B$r(B GNU Emacs $B$H(B XEmacs $B$NN>J}$GF0$+$9$3$H$O$G$-$^$9$+(B?
 
-$B%=!<%9!&%l%Y%k(B( *.el )$B$G$O2DG=$G$9!#(B 
+$B%=!<%9!&%l%Y%k(B( *.el )$B$G$O2DG=$G$9!#(B
 
 $B$7$+$7!"%P%$%H!&%3%s%Q%$%k$7$?%U%!%$%k(B ( *.elc ) $B$O6&M-$G$-$^$;$s$N$G!"(B
 $B$=$l$>$l;HMQ$9$k(B emacs $B$G%P%$%H%3%s%Q%$%k$9$kI,MW$,$"$j$^$9!#(B
 
 @item
-Q1.5: Semi-gnus $B$K$D$$$F$N>pJs8;$O(B?
+Q1.5: T-gnus $B$K$D$$$F$N>pJs8;$O(B?
 
 @table @var
 
 @item $B%K%e!<%9%0%k!<%W(B
 
-fj.news.reader.gnus $B$,$"$j$^$9$,!"(B Semi-gnus $B$K4X$7$F$N<ALd$G2sEz$rF@$i(B
-$B$l$k$H$9$l$P!"$[$H$s$I(B Semi-gnus-ja $B%a%$%j%s%0!&%j%9%H$N%a%s%P!<$G$7$g$&!#(B
+fj.news.reader.gnus $B$,$"$j$^$9$,!"(B T-gnus $B$K4X$7$F$N<ALd$G2sEz$rF@$i$l$k(B
+$B$H$9$l$P!"$[$H$s$I(B Semi-gnus-ja $B%a%$%j%s%0!&%j%9%H$N%a%s%P!<$G$7$g$&!#(B
 
 @item $B%a!<%j%s%0%j%9%H(B
 
 $B>\$7$/$O!"(B@xref{Mailing list FAQ, $B%a!<%j%s%0%j%9%H(B}, $B$r;2>H$7$F$/$@$5$$!#(B
 
-$B8=:_!"$3$l$,$b$C$H$b3N<B$J>pJs8;$G$7$g$&!#(B Semi-gnus $B$r;H$&$N$G$"$l$P!"(B
-$B@'Hs;22C$9$k$3$H$r$*$9$9$a$7$^$9!#(B
+$B8=:_!"$3$l$,$b$C$H$b3N<B$J>pJs8;$G$7$g$&!#(B T-gnus $B$r;H$&$N$G$"$l$P!"@'Hs(B
+$B;22C$9$k$3$H$r$*$9$9$a$7$^$9!#(B
 
 $B%@%$%8%'%9%HHG%5!<%S%9$O$"$j$^$;$s!#(B
 
@@ -207,14 +197,14 @@ fj.news.reader.gnus $B$,$"$j$^$9$,!"(B Semi-gnus $B$K4X$7$F$N<ALd$G2sEz$rF@$i
 @end table
 
 @item
-Q1.6: Semi-gnus $B$HO"7H$9$k%Q%C%1!<%8$O(B?
+Q1.6: T-gnus $B$HO"7H$9$k%Q%C%1!<%8$O(B?
 
 @table @var
 
 @item SEMI
 
-Semi-gnus $B$G$O(B TM $B$O;HMQ$G$-$^$;$s!#Be$o$j$K(B SEMI $B$r;HMQ$7$^$9!#(B
-Semi-gnus $B$r;HMQ$9$k$?$a$K$O(B SEMI, FLIM, APEL $B$OI,?\$G$9!#(B
+T-gnus $B$G$O(B TM $B$O;HMQ$G$-$^$;$s!#Be$o$j$K(B SEMI $B$r;HMQ$7$^$9!#(B
+T-gnus $B$r;HMQ$9$k$?$a$K$O(B SEMI, FLIM, APEL $B$OI,?\$G$9!#(B
 
 .emacs $B$N(B gnus $B$N=i4|@_Dj$h$jA0$K0J2<$N@_Dj$r=q$$$F2<$5$$(B:
 
@@ -222,36 +212,30 @@ Semi-gnus $B$r;HMQ$9$k$?$a$K$O(B SEMI, FLIM, APEL $B$OI,?\$G$9!#(B
 (load "mime-setup")
 @end lisp
 
-@item Insidious Big Brother Database 
+@item Insidious Big Brother Database
 
 BBDB $B$O(B Netscape $B$GM-L>$J(B Jamie Zawinski <jwz@@netscape.com> $B$N:n$G!"(BGNU
-Emacs $BMQ$N(Brolodex-like $B$J%G!<%?%Y!<%9%W%m%0%i%`$G$9!#(B Jamie $B$O(B BBDB $B$N(B 
+Emacs $BMQ$N(Brolodex-like $B$J%G!<%?%Y!<%9%W%m%0%i%`$G$9!#(B Jamie $B$O(B BBDB $B$N(B
 Web $B%Z!<%8$r;}$C$F$$$^$9!#(B @file{http://people.netscape.com/jwz/bbdb/}$B$3(B
-$B$l$O!"<!$N$H$3$m$K$b$"$j$^$9!#(B 
-@file{ftp://ftp.xemacs.org/pub/xemacs/bbdb/} gnus-bbdb $B$O(B Brian Edmonds 
-$B$N<!$N$H$3$m$+$i$bF~<j$G$-$^$9!#(B 
+$B$l$O!"<!$N$H$3$m$K$b$"$j$^$9!#(B
+@file{ftp://ftp.xemacs.org/pub/xemacs/bbdb/} gnus-bbdb $B$O(B Brian Edmonds
+$B$N<!$N$H$3$m$+$i$bF~<j$G$-$^$9!#(B
 @file{http://www.cs.ubc.ca/spider/edmonds/usenet/gnus/gnus-bbdb.el}$B$3$l(B
 $B$O!"(B BBDB $B$N?7$7$$%P!<%8%g%sMQ$G!"FbMF$,(B gnus-bbdb.el $B$G$9!#(B
 
 Jamie $B$O8x<0$K$O(B BBDB $B$N%a%$%s%F%J!<%7%C%W$r(B Matt Simmons $B$K0z$-EO$7$F$$(B
 $B$^$9!#(B $BH`$N?7$7$$%P!<%8%g%s$OB8:_$7$^$9$,!"$"$/$^$G$b!HHs8x<0!I$J$b$N$G(B
-$B$9!#(B $B$3$l$O<!$N>l=j$K$"$j$^$9!#(B 
+$B$9!#(B $B$3$l$O<!$N>l=j$K$"$j$^$9!#(B
 @file{http://www.netcom.com/%7Esimmonmt/index.html}
 
-Semi-gnus $B$G;HMQ$9$k>l9g$K$O!"I,$:(B Q2.1 $B$r;2>H$7$F$/$@$5$$!#(B 
+T-gnus $B$G;HMQ$9$k>l9g$K$O!"I,$:(B Q2.1 $B$r;2>H$7$F$/$@$5$$!#(B
 
 @item gnus-offline
-gnus-offline $B$O!";T@nC#:H(B <t-ichi@@po.shiojiri.ne.jp> $B$N:n$G!"(B Semi-gnus 
-$B$r$$$o$f$k!V%*%U%i%$%s;HMQ!W(B($B%K%e!<%95-;v!"%a%$%k$NAw<u?.$r0l3g$7$F9T$$!"(B
+gnus-offline $B$O!";T@nC#:H(B <t-ichi@@po.shiojiri.ne.jp> $B$N:n$G!"(B T-gnus $B$r(B
+$B$$$o$f$k!V%*%U%i%$%s;HMQ!W(B($B%K%e!<%95-;v!"%a%$%k$NAw<u?.$r0l3g$7$F9T$$!"(B
 $B$=$l$i$N%a%C%;!<%8$NFI$_=q$-$O%5!<%P!<$KL$@\B3$N>uBV$G9T$&(B)$B$9$k$3$H$rMF(B
-$B0W$K$9$k$?$a$N%Q%C%1!<%8$G$9!#(B
-
-$BF~<j@h$H!";HMQJ}K!$O<!$N$H$3$m$G$9!#(B 
-@file{http://www.shiojiri.ne.jp/%7Et-ichi/meadow.html}
-$B%_%i!<$O$3$A$i$G$9!#(B 
-@file{http://www.jpl.org/elips/}
-
-T-gnus (tag: ichikawa) $B$K$OI8=`$G4^$^$l$F$$$^$9!#(B
+$B0W$K$9$k$?$a$N%Q%C%1!<%8$G$9!#(BT-gnus (tag: t-gnus-6_13) $B$K$OI8=`$G4^$^$l(B
+$B$F$$$^$9!#(B
 
 @end table
 
@@ -269,8 +253,8 @@ gnus $B$,FI$_9~$_$K;HMQ$7$F$$$k$b$N$H0c$&%3!<%G%#%s%0%7%9%F%`$GJ]B8$5$l$F(B
 
 Q2.2 $B$b;2>H$7$F2<$5$$!#(B
 
-@item 
-Q1.8: Semi-gnus $B$N5/F0$rAa$/$9$k$K$O(B? 
+@item
+Q1.8: T-gnus $B$N5/F0$rAa$/$9$k$K$O(B?
 
 $B9XFI$7$F$$$J$$%0%k!<%W$r(B ``kill'' (*Group* $B%P%C%U%!!<$G(B C-k) $B$7$F$"$k$3(B
 $B$H$r3NG'$7$F$/$@$5$$!#$=$7$F!">o$K(B ``.newsrc'' $B$r>.$5$/J]$D$h$&$K$7$F$/(B
@@ -283,47 +267,47 @@ Q1.8: Semi-gnus $B$N5/F0$rAa$/$9$k$K$O(B?
 
 @itemize @bullet
 @item
-Q2.1: Semi-gnus $B$N%P!<%8%g%s$r$"$2$?$i(B BBDB $B$,F0$+$J$/$J$C$F$7$^$$$^$7$?!#(B
+Q2.1: T-gnus $B$N%P!<%8%g%s$r$"$2$?$i(B BBDB $B$,F0$+$J$/$J$C$F$7$^$$$^$7$?!#(B
 
 Semi-gnus 6.8 $B0J9_$N%P!<%8%g%s$G$O!"%*%j%8%J%k$N(B bbdb-gnus.el $B$OF0:n$7$^(B
-$B$;$s!#(B $B<!$N$h$&$KBP1~$7$F$/$@$5$$!#(B 
+$B$;$s!#(B $B<!$N$h$&$KBP1~$7$F$/$@$5$$!#(B
 
 @enumerate a
 @item
-bbdb-gnus.el $B$G!"(B gnus-article-buffer $B$NBe$j$K(B 
+bbdb-gnus.el $B$G!"(B gnus-article-buffer $B$NBe$j$K(B
 gnus-original-article-buffer $B$r;2>H$9$k$h$&$K$9$k!#(B
 
 $B$b$7!"%*%j%8%J%k$N(B Gnus (September $B0J9_(B) $B$r;H$C$F$$$k$N$G$"$l$P!"$3$NJ}(B
 $BK!$,NI$$$G$7$g$&!#(B
 
 @item
-bbdb/gnus-update-record $B$r(B gnus-article-prepare-hook $B$NBe$j$K(B 
+bbdb/gnus-update-record $B$r(B gnus-article-prepare-hook $B$NBe$j$K(B
 gnus-article-display-hook $B$KDI2C$9$k!#(B
 
 @end enumerate
 
-a $B$NJ}K!!"$*$h$S(B bbdb-user-mail-names $B$KBP1~$7$?(B BBDB 2.00.01 $B$KBP$9$k(B 
-patch $B!"4pK\E*$J@_DjNc$,!"(B 
+a $B$NJ}K!!"$*$h$S(B bbdb-user-mail-names $B$KBP1~$7$?(B BBDB 2.00.01 $B$KBP$9$k(B
+patch $B!"4pK\E*$J@_DjNc$,!"(B
 @file{http://www.mdcnet.co.jp/~keiichi/bbdb.shtml} $B$K$"$j$^$9!#(B
 
 @item
-Q2.2: hook $B$r@_Dj$7$?$i(B Semi-gnus $B$NF0:n$,$*$+$7$/$J$C$?(B
+Q2.2: hook $B$r@_Dj$7$?$i(B T-gnus $B$NF0:n$,$*$+$7$/$J$C$?(B
 
-$BDL>o$NJQ?t$G$bF1MM$G$9$,!"(B Semi-gnus $B$G$OB?$/$N(B hook $B$K=i4|CM$,@_Dj$5$l(B
-$B$F$$$^$9!#(B
+$BDL>o$NJQ?t$G$bF1MM$G$9$,!"(B T-gnus $B$G$OB?$/$N(B hook $B$K=i4|CM$,@_Dj$5$l$F$$(B
+$B$^$9!#(B
 
-$B$3$NCM$rJQ99$7$h$&$H$7$F!"JQ?t$,Dj5A$5$l$F$$$k%U%!%$%k$r%m!<%I$9$kA0$K(B 
-setq / add-hook $BEy$r9T$&$H!"$3$l$i$N=i4|CM$,@_Dj$5$l$:!"(B Semi-gnus $B$,@5(B
-$B>o$KF0:n$7$J$/$J$k>l9g$,$"$j$^$9!#(B($BFC$K(B Semi-gnus $B$N%P!<%8%g%s$,JQ$C$?>l(B
-$B9g(B)
+$B$3$NCM$rJQ99$7$h$&$H$7$F!"JQ?t$,Dj5A$5$l$F$$$k%U%!%$%k$r%m!<%I$9$kA0$K(B
+setq / add-hook $BEy$r9T$&$H!"$3$l$i$N=i4|CM$,@_Dj$5$l$:!"(B T-gnus $B$,@5>o$K(B
+$BF0:n$7$J$/$J$k>l9g$,$"$j$^$9!#(B($BFC$K(B T-gnus $B$N%P!<%8%g%s$,JQ$C$?>l9g(B)
 
-$B$3$l$rKI$0$?$a$K$b!"(B Semi-gnus $B$K4X$9$k@_Dj$O$G$-$k$@$1(B ~/.gnus.el $BFb$G(B
-$B9T$&$h$&$K$7$F$/$@$5$$!#(B
+$B$3$l$rKI$0$?$a$K$b!"(B T-gnus $B$K4X$9$k@_Dj$O$G$-$k$@$1(B ~/.gnus.el $BFb$G9T$&(B
+$B$h$&$K$7$F$/$@$5$$!#(B
 
 @item
-Q2.3: $B08@h$K$h$C$F(B Signature $B$rJQ99$9$k$K$O(B? 
+Q2.3: $B08@h$K$h$C$F(B Signature $B$rJQ99$9$k$K$O(B?
 
-SEMI $B$K$O(B signature.el $B$H$$$&$3$N$?$a$N%D!<%k$,IUB0$7$F$$$^$9!#;HMQJ}K!$O0J2<$N$H$*$j$G$9!#(B 
+SEMI $B$K$O(B signature.el $B$H$$$&$3$N$?$a$N%D!<%k$,IUB0$7$F$$$^$9!#;HMQJ}K!(B
+$B$O0J2<$N$H$*$j$G$9!#(B
 
 tm $B$N(B info $B$NFbMF$r(B SEMI $B$K9g$o$;$FJQ99$7$?$b$N$G$9!#(B
 
@@ -344,7 +328,7 @@ SEMI $B$K$O(B *signature* $B$H$$$&(B signature $B$N<+F0@ZBX$((B tool $B$,
 
 @defvar mime-setup-use-signature
 
-$B$3$NJQ?t$,(B @code{nil} $B0J30$N;~!"(B@file{signature.el} $B$r;H$$$^$9!#=i4|CM$O(B 
+$B$3$NJQ?t$,(B @code{nil} $B0J30$N;~!"(B@file{signature.el} $B$r;H$$$^$9!#=i4|CM$O(B
 @code{t} $B$G$9!#(B
 @end defvar
 
@@ -391,43 +375,43 @@ gnus-posting-style $B$r;HMQ$9$k;v$b$G$-$^$9!#(B
 
 @itemize bullet
 @item
-Q5.1: $B%a%$%j%s%0!&%j%9%H$+$iC&B`$9$k$K$O(B? 
+Q5.1: $B%a%$%j%s%0!&%j%9%H$+$iC&B`$9$k$K$O(B?
 
 @table @var
-@item $BF|K\8lMQ(B 
+@item $BF|K\8lMQ(B
 @file{semi-gnus-ja-unsubscribe@@meadow.scphys.kyoto-u.ac.jp} $B$K6u$N%a%$(B
 $B%k$rAw$C$F2<$5$$!#(B(Subject $B$bITMW$G$9!#(B)
 
-@item $B1Q8lMQ(B 
+@item $B1Q8lMQ(B
 @file{semi-gnus-en-unsubscribe@@meadow.scphys.kyoto-u.ac.jp} $B$K6u$N%a%$(B
 $B%k$rAw$C$F2<$5$$!#(B(Subject $B$bITMW$G$9!#(B)
 
 @end table
 
 @item
-Q5.2: $B%a%$%j%s%0!&%j%9%H$K;22C$9$k$K$O(B? 
+Q5.2: $B%a%$%j%s%0!&%j%9%H$K;22C$9$k$K$O(B?
 
-Semi-gnus $B$G$O!"MxMQ<T$H0];}<T$H$$$&=>Mh$NB?$/$N%Q%C%1!<%8$G:NMQ$5$l$F$$(B
-$B$k3+H/BN@)$O<h$C$F$$$^$;$s!#(B $B$=$N$?$a!"%a!<%j%s%0%j%9%H$H$7$F$bMxMQ<TMQ!"(B
+T-gnus $B$G$O!"MxMQ<T$H0];}<T$H$$$&=>Mh$NB?$/$N%Q%C%1!<%8$G:NMQ$5$l$F$$$k(B
+$B3+H/BN@)$O<h$C$F$$$^$;$s!#(B $B$=$N$?$a!"%a!<%j%s%0%j%9%H$H$7$F$bMxMQ<TMQ!"(B
 $B3+H/<TMQ$H$$$&6hJL$r9T$C$F$$$^$;$s!#(B
 
 @table @var
-@item $BF|K\8lMQ(B 
+@item $BF|K\8lMQ(B
 @file{semi-gnus-ja-help@@meadow.scphys.kyoto-u.ac.jp} $B$K6u$N%a!<%k$rAw$C(B
-$B$F!"Aw$i$l$F$/$k%a!<%k$N;X<($K=>$C$F$/$/$@$5$$!#(B(Subject $B$bITMW$G$9!#(B) 
+$B$F!"Aw$i$l$F$/$k%a!<%k$N;X<($K=>$C$F$/$/$@$5$$!#(B(Subject $B$bITMW$G$9!#(B)
 
-@item $B1Q8lMQ(B 
+@item $B1Q8lMQ(B
 @file{semi-gnus-en-help@@meadow.scphys.kyoto-u.ac.jp} $B$K6u$N%a!<%k$rAw$C(B
 $B$F!"Aw$i$l$F$/$k%a!<%k$N;X<($K=>$C$F$/$@$5$$!#(B(Subject $B$bITMW$G$9!#(B)
 
 @end table
 
 @item
-Q5.3: Semi-gnus $B$K4X$9$kJ}?K7hDj$O(B? 
+Q5.3: T-gnus $B$K4X$9$kJ}?K7hDj$O(B?
 
-Semi-gnus $B$N3+H/Ey$K4X$9$kJ}?K$N7hDj$OA4$F(B Semi-gnus-ja/en $B%a!<%j%s%0%j(B
-$B%9%HFb$G9T$o$l$^$9!#(B $B3F%a%s%P!<$+$i$NDs0F$O%"%s%1!<%H$N7A$GDs0F$5$l7h5D(B
-$B$5$l$^$9$,!"$=$NJ}K!$O<!$N<j=g$G9T$o$l$^$9!#(B
+T-gnus $B$N3+H/Ey$K4X$9$kJ}?K$N7hDj$OA4$F(B Semi-gnus-ja/en $B%a!<%j%s%0%j%9%H(B
+$BFb$G9T$o$l$^$9!#(B $B3F%a%s%P!<$+$i$NDs0F$O%"%s%1!<%H$N7A$GDs0F$5$l7h5D$5$l(B
+$B$^$9$,!"$=$NJ}K!$O<!$N<j=g$G9T$o$l$^$9!#(B
 
 @enumerate
 @item
@@ -440,7 +424,7 @@ Semi-gnus $B$N3+H/Ey$K4X$9$kJ}?K$N7hDj$OA4$F(B Semi-gnus-ja/en $B%a!<%j%s%0%j
 $B$7$/$O(Bsemi-gnus-en@@meadow.scphys.kyoto-u.ac.jp $B$G9T$&!#(B
 
 @item
-$B:G=*E*$JJ}?K$O%"%s%1!<%H7k2L$NB??t0U8+$r:NMQ$9$k!#(B 
+$B:G=*E*$JJ}?K$O%"%s%1!<%H7k2L$NB??t0U8+$r:NMQ$9$k!#(B
 
 @item
 $BDs0F<T$O%"%s%1!<%H$N2sEz4|8B$r@_$1$k$3$H$,$G$-$k!#$3$l$O#1F|0J>e$G$J$1$l(B

@@ -31,6 +31,19 @@
 (eval-and-compile
   (autoload 'message-make-message-id "message"))
 
+(defvar mml-generate-multipart-alist
+  '(("signed" . rfc2015-generate-signed-multipart)
+    ("encrypted" . rfc2015-generate-encrypted-multipart))
+  "*Alist of multipart generation functions.
+
+Each entry has the form (NAME . FUNCTION), where
+NAME: is a string containing the name of the part (without the 
+leading \"/multipart/\"),
+FUNCTION: is a Lisp function which is called to generate the part.
+
+The Lisp function has to supply the appropriate MIME headers and the
+contents of this part.")
+
 (defvar mml-syntax-table
   (let ((table (copy-syntax-table emacs-lisp-mode-syntax-table)))
     (modify-syntax-entry ?\\ "/" table)
@@ -43,6 +56,13 @@
     (modify-syntax-entry ?\; " " table)
     (modify-syntax-entry ?\' " " table)
     table))
+
+(defvar mml-boundary-function 'mml-make-boundary
+  "A function called to suggest a boundary.
+The function may be called several times, and should try to make a new
+suggestion each time.  The function is called with one parameter,
+which is a number that says how many times the function has been
+called for this message.")
 
 (defun mml-parse ()
   "Parse the current buffer as an MML document."
@@ -229,7 +249,8 @@
 	    (insert-buffer-substring (cdr (assq 'buffer cont))))
 	   ((and (setq filename (cdr (assq 'filename cont)))
 		 (not (equal (cdr (assq 'nofile cont)) "yes")))
-	    (mm-insert-file-contents filename))
+	    (let ((coding-system-for-read mm-binary-coding-system))
+	      (mm-insert-file-contents filename nil nil nil nil t)))
 	   (t
 	    (insert (cdr (assq 'contents cont)))))
 	  (setq encoding (mm-encode-buffer type)
@@ -271,22 +292,27 @@
     (insert (or (cdr (assq 'contents cont))))
     (insert "\n"))
    ((eq (car cont) 'multipart)
-    (let ((mml-boundary (mml-compute-boundary cont)))
-      (insert (format "Content-Type: multipart/%s; boundary=\"%s\"\n"
-		      (or (cdr (assq 'type cont)) "mixed")
-		      mml-boundary))
-      (insert "\n")
-      (setq cont (cddr cont))
-      (while cont
-	(insert "\n--" mml-boundary "\n")
-	(mml-generate-mime-1 (pop cont)))
-      (insert "\n--" mml-boundary "--\n")))
+    (let* ((type (or (cdr (assq 'type cont)) "mixed"))
+           (handler (assoc type mml-generate-multipart-alist)))
+      (if handler
+          (funcall (cdr handler) cont)
+        ;; No specific handler.  Use default one.
+        (let ((mml-boundary (mml-compute-boundary cont)))
+          (insert (format "Content-Type: multipart/%s; boundary=\"%s\"\n"
+                          type mml-boundary))
+          (insert "\n")
+          (setq cont (cddr cont))
+          (while cont
+            (insert "\n--" mml-boundary "\n")
+            (mml-generate-mime-1 (pop cont)))
+          (insert "\n--" mml-boundary "--\n")))))
    (t
     (error "Invalid element: %S" cont))))
 
 (defun mml-compute-boundary (cont)
   "Return a unique boundary that does not exist in CONT."
-  (let ((mml-boundary (mml-make-boundary)))
+  (let ((mml-boundary (funcall mml-boundary-function
+			       (incf mml-multipart-number))))
     ;; This function tries again and again until it has found
     ;; a unique boundary.
     (while (not (catch 'not-unique
@@ -309,16 +335,17 @@
 	(goto-char (point-min))
 	(when (re-search-forward (concat "^--" (regexp-quote mml-boundary))
 				 nil t)
-	  (setq mml-boundary (mml-make-boundary))
+	  (setq mml-boundary (funcall mml-boundary-function
+				      (incf mml-multipart-number)))
 	  (throw 'not-unique nil))))
      ((eq (car cont) 'multipart)
       (mapcar 'mml-compute-boundary-1 (cddr cont))))
     t))
 
-(defun mml-make-boundary ()
-  (concat (make-string (% (incf mml-multipart-number) 60) ?=)
-	  (if (> mml-multipart-number 17)
-	      (format "%x" mml-multipart-number)
+(defun mml-make-boundary (number)
+  (concat (make-string (% number 60) ?=)
+	  (if (> number 17)
+	      (format "%x" number)
 	    "")
 	  mml-base-boundary))
 
@@ -430,7 +457,7 @@
   "Translate the current buffer from MML to MIME."
   (message-encode-message-body)
   (save-restriction
-    (message-narrow-to-headers)
+    (message-narrow-to-headers-or-head)
     (mail-encode-encoded-word-buffer)))
 
 (defun mml-insert-mime (handle &optional no-markup)
@@ -449,7 +476,10 @@
       (mapcar 'mml-insert-mime (cdr handle))
       (insert "<#/multipart>\n"))
      (textp
-      (mm-insert-part handle)
+      (let ((text (mm-get-part handle))
+	    (charset (mail-content-type-get
+		      (mm-handle-type handle) 'charset)))
+	(insert (mm-decode-string text charset)))
       (goto-char (point-max)))
      (t
       (insert "<#/part>\n")))))
@@ -499,6 +529,7 @@
     (define-key map "p" 'mml-insert-part)
     (define-key map "v" 'mml-validate)
     (define-key map "P" 'mml-preview)
+    (define-key map "n" 'mml-narrow-to-part)
     (define-key main "\M-m" map)
     main))
 
@@ -512,6 +543,7 @@
    ("Insert"
     ["Multipart" mml-insert-multipart t]
     ["Part" mml-insert-part t])
+   ["Narrow" mml-narrow-to-part t]
    ["Quote" mml-quote-region t]
    ["Validate" mml-validate t]
    ["Preview" mml-preview t]))
@@ -605,7 +637,8 @@
       ;; Quote parts.
       (while (re-search-forward
 	      "<#/?!*\\(multipart\\|part\\|external\\)" nil t)
-	(goto-char (match-beginning 1))
+	;; Insert ! after the #.
+	(goto-char (+ (match-beginning 0) 2))
 	(insert "!")))))
 
 (defun mml-insert-tag (name &rest plist)
@@ -684,6 +717,9 @@ If RAW, don't highlight the article."
                                "*MIME preview of ") (buffer-name))))
    (erase-buffer)
    (insert-buffer buf)
+   (if (re-search-forward
+	(concat "^" (regexp-quote mail-header-separator) "\n") nil t)
+       (replace-match "\n"))
    (mml-to-mime)
    (unless raw
      (run-hooks 'gnus-article-decode-hook)

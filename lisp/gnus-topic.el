@@ -27,7 +27,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-
 (require 'gnus)
 (require 'gnus-group)
 (require 'gnus-start)
@@ -212,11 +211,12 @@ If TOPIC, start with that topic."
 			 (if (member group gnus-zombie-list)
 			     gnus-level-zombie gnus-level-killed))))
       (and
-       unread				; nil means that the group is dead.
+       info				; nil means that the group is dead.
        (<= clevel level)
        (>= clevel lowest)		; Is inside the level we want.
        (or all
-	   (if (eq unread t)
+	   (if (or (eq unread t)
+		   (eq unread nil))
 	       gnus-group-list-inactive-groups
 	     (> unread 0))
 	   (and gnus-list-groups-with-ticked-articles
@@ -617,15 +617,18 @@ articles in the topic and its subtopics."
     (let* ((top (gnus-topic-find-topology
 		 (gnus-topic-parent-topic topic)))
 	   (tp (reverse (cddr top))))
-      (while (not (equal (caaar tp) topic))
-	(setq tp (cdr tp)))
-      (pop tp)
-      (while (and tp
-		  (not (gnus-topic-goto-topic (caaar tp))))
-	(pop tp))
-      (if tp
-	  (gnus-topic-forward-topic 1)
-	(gnus-topic-goto-missing-topic (caadr top))))
+      (if (not top)
+	  (gnus-topic-insert-topic-line
+	   topic t t (car (gnus-topic-find-topology topic)) nil 0)
+	(while (not (equal (caaar tp) topic))
+	  (setq tp (cdr tp)))
+	(pop tp)
+	(while (and tp
+		    (not (gnus-topic-goto-topic (caaar tp))))
+	  (pop tp))
+	(if tp
+	    (gnus-topic-forward-topic 1)
+	  (gnus-topic-goto-missing-topic (caadr top)))))
     nil))
 
 (defun gnus-topic-update-topic-line (topic-name &optional reads)
@@ -981,6 +984,7 @@ articles in the topic and its subtopics."
 	["Create" gnus-topic-create-topic t]
 	["Mark" gnus-topic-mark-topic t]
 	["Indent" gnus-topic-indent t]
+	["Sort" gnus-topic-sort-topics t]
 	["Toggle hide empty" gnus-topic-toggle-display-empty-topics t]
 	["Edit parameters" gnus-topic-edit-parameters t])
        ["List active" gnus-topic-list-active t]))))
@@ -1119,23 +1123,25 @@ If COPYP, copy the groups instead."
 	 (completing-read "Move to topic: " gnus-topic-alist nil t)))
   (let ((groups (gnus-group-process-prefix n))
 	(topicl (assoc topic gnus-topic-alist))
-	(start-group (progn (forward-line 1) (gnus-group-group-name)))
 	(start-topic (gnus-group-topic-name))
+	(start-group (progn (forward-line 1) (gnus-group-group-name)))
 	entry)
-    (mapcar
-     (lambda (g)
-       (gnus-group-remove-mark g)
-       (when (and
-	      (setq entry (assoc (gnus-current-topic) gnus-topic-alist))
-	      (not copyp))
-	 (setcdr entry (gnus-delete-first g (cdr entry))))
-       (nconc topicl (list g)))
-     groups)
-    (gnus-topic-enter-dribble)
-    (if start-group
-	(gnus-group-goto-group start-group)
-      (gnus-topic-goto-topic start-topic))
-    (gnus-group-list-groups)))
+    (if (and (not groups) (not copyp) start-topic)
+	(gnus-topic-move start-topic topic)
+      (mapcar
+       (lambda (g)
+	 (gnus-group-remove-mark g)
+	 (when (and
+		(setq entry (assoc (gnus-current-topic) gnus-topic-alist))
+		(not copyp))
+	   (setcdr entry (gnus-delete-first g (cdr entry))))
+	 (nconc topicl (list g)))
+       groups)
+      (gnus-topic-enter-dribble)
+      (if start-group
+	  (gnus-group-goto-group start-group)
+	(gnus-topic-goto-topic start-topic))
+      (gnus-group-list-groups))))
 
 (defun gnus-topic-remove-group (&optional arg)
   "Remove the current group from the topic."
@@ -1475,6 +1481,68 @@ If REVERSE, sort in reverse order."
   (interactive "P")
   (gnus-topic-sort-groups 'gnus-group-sort-by-method reverse))
 
+(defun gnus-topic-sort-topics-1 (top reverse)
+  (if (cdr top)
+      (let ((subtop
+	     (mapcar `(lambda (top)
+			(gnus-topic-sort-topics-1 top ,reverse))
+		     (sort (cdr top)
+			   '(lambda (t1 t2) 
+			      (string-lessp (caar t1) (caar t2)))))))
+	(setcdr top (if reverse (reverse subtop) subtop))))
+  top)
+
+(defun gnus-topic-sort-topics (&optional topic reverse)
+  "Sort topics in TOPIC alphabeticaly by topic name.
+If REVERSE, reverse the sorting order."
+  (interactive 
+   (list (completing-read "Sort topics in : " gnus-topic-alist nil t 
+			  (gnus-current-topic))
+	 current-prefix-arg))
+  (let ((topic-topology (or (and topic (cdr (gnus-topic-find-topology topic)))
+			    gnus-topic-topology)))
+    (gnus-topic-sort-topics-1 topic-topology reverse)
+    (gnus-topic-enter-dribble)
+    (gnus-group-list-groups)
+    (gnus-topic-goto-topic topic)))
+
+(defun gnus-topic-move (current to)
+  "Move the CURRENT topic to TO."
+  (interactive 
+   (list 
+    (gnus-group-topic-name)
+    (completing-read "Move to topic: " gnus-topic-alist nil t)))
+  (unless (and current to)
+    (error "Can't find topic"))
+  (let ((current-top (cdr (gnus-topic-find-topology current)))
+	(to-top (cdr (gnus-topic-find-topology to))))
+    (unless current-top
+      (error "Can't find topic `%s'" current))
+    (unless to-top
+      (error "Can't find topic `%s'" to))
+    (if (gnus-topic-find-topology to current-top 0) ;; Don't care the level
+	(error "Can't move `%s' to its sub-level" current))
+    (gnus-topic-find-topology current nil nil 'delete)
+    (while (cdr to-top)
+      (setq to-top (cdr to-top)))
+    (setcdr to-top (list current-top))
+    (gnus-topic-enter-dribble)
+    (gnus-group-list-groups)
+    (gnus-topic-goto-topic current)))
+
+(defun gnus-subscribe-topics (newsgroup)
+  (catch 'end
+    (let (match gnus-group-change-level-function)
+      (dolist (topic (gnus-topic-list))
+	(when (and (setq match (cdr (assq 'subscribe
+					  (gnus-topic-parameters topic))))
+		   (string-match match newsgroup))
+	  ;; Just subscribe the group.
+	  (gnus-subscribe-alphabetically newsgroup)
+	  ;; Add the group to the topic.
+	  (nconc (assoc topic gnus-topic-alist) (list newsgroup))
+	  (throw 'end t))))))
+	  
 (provide 'gnus-topic)
 
 ;;; gnus-topic.el ends here

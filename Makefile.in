@@ -5,8 +5,8 @@ srcdir = @srcdir@
 
 @SET_MAKE@
 EMACS = @EMACS@
-XEMACS = xemacs
-PACKAGEDIR =
+XEMACS = @XEMACS@
+PACKAGEDIR = @PACKAGEDIR@
 
 all: lick info
 
@@ -20,17 +20,17 @@ install:
 	cd texi && $(MAKE) EMACS="$(EMACS)" install
 
 # Rule for XEmacs package.
-package: xlick add-info-suffix xinfo remove-info-suffix
+package: xlick xinfo
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" package
 
-install-package: add-info-suffix xinfo xinfo remove-info-suffix
+install-package: xinfo
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
 		install-package
 
-package-ja: xlick add-info-suffix xinfo xinfo-ja remove-info-suffix
+package-ja: xlick xinfo xinfo-ja
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" package
 
-install-package-ja: add-info-suffix xinfo xinfo-ja remove-info-suffix
+install-package-ja: xinfo xinfo-ja
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
 		install-package
 
@@ -38,16 +38,10 @@ xlick:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" lispdir="$(lispdir)" all
 
 xinfo:
-	cd texi && $(MAKE) EMACS="$(XEMACS)" all
+	cd texi && $(MAKE) EMACS="$(XEMACS)" all-info
 
 xinfo-ja:
-	cd texi && $(MAKE) EMACS="$(XEMACS)" MAKEINFO=no ja
-
-add-info-suffix:
-	cd texi && $(MAKE) EMACS="$(XEMACS)" add-info-suffix
-
-remove-info-suffix:
-	cd texi && $(MAKE) remove-info-suffix
+	cd texi && $(MAKE) EMACS="$(XEMACS)" MAKEINFO=no ja-info
 
 # Rule for Lars and nobody else.
 some:
@@ -63,24 +57,25 @@ info-ja:
 
 clean:
 	rm -f */*.orig */*.rej *.orig *.rej
+	rm -f MANIFEST.*
+	for i in lisp texi; do (cd $$i; $(MAKE) clean); done
 
 xsome:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" some
 
 elclean:
-	rm lisp/*.elc
+	cd lisp && rm -f *.elc auto-autoloads.el custom-load.el
 
 x:
-	make EMACS="$(XEMACS)"
+	$(MAKE) EMACS="$(XEMACS)"
 
-distclean:
-	make clean
+distclean: clean
 	rm -rf *~
-	for i in lisp texi; do (cd $$i; make distclean); done
+	for i in lisp texi; do (cd $$i; $(MAKE) distclean); done
 	rm -f config.log config.status config.cache Makefile
 
 osome:
-	make EMACS="$(XEMACS)" some
+	$(MAKE) EMACS="$(XEMACS)" some
 
 config.status: $(srcdir)/configure
 	$(SHELL) ./config.status --recheck

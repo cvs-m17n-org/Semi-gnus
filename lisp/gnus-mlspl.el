@@ -19,6 +19,7 @@
 ;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
 ;; Boston, MA 02111-1307, USA.
 
+(eval-when-compile (require 'cl))
 (require 'gnus)
 (require 'gnus-sum)
 (require 'gnus-group)
@@ -38,8 +39,8 @@ default catch-all group")
 splitting, and defines the variable nnmail-split-fancy according with
 group parameters.
 
-if AUTO-UPDATE is non-nil (prefix argument accepted, if called
-interactive), makes sure nnmail-split-fancy is re-computed before
+If AUTO-UPDATE is non-nil (prefix argument accepted, if called
+interactively), it makes sure nnmail-split-fancy is re-computed before
 getting new mail, by adding gnus-group-split-update to
 nnmail-pre-get-new-mail-hook."
   (interactive "P")
@@ -92,7 +93,7 @@ otherwise, a | split, that does not allow crossposting, will be
 returned.
 
 if CATCH-ALL is not nil, and there is no selected group whose
-split-regexp matches the empty string, nor is there a selected group
+SPLIT-REGEXP matches the empty string, nor is there a selected group
 whose SPLIT-SPEC is 'catch-all, this group name will be appended to
 the returned SPLIT list, as the last element in a '| SPLIT.
 
@@ -121,10 +122,10 @@ nnml:mail.others:
 Calling (gnus-group-split-fancy nil nil \"mail.misc\") returns:
 
 \(| (& (any \"\\\\(bar@femail\\\\.com\\\\|.*@femail\\\\.com\\\\)\"
-	   \"nnml:mail.bar\")
+	   \"mail.bar\")
       (any \"\\\\(foo@nowhere\\\\.gov\\\\|foo@localhost\\\\|foo-redist@home\\\\)\"
-           - \"bugs-foo\" - \"rambling-foo\" \"nnml:mail.foo\"))
-   \"nnml:mail.others\")"
+           - \"bugs-foo\" - \"rambling-foo\" \"mail.foo\"))
+   \"mail.others\")"
   (let* ((newsrc (cdr gnus-newsrc-alist))
 	 split)
     (dolist (info newsrc)

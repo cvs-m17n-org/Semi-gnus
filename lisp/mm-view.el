@@ -31,7 +31,11 @@
 (eval-and-compile
   (autoload 'gnus-article-prepare-display "gnus-art")
   (autoload 'vcard-parse-string "vcard")
-  (autoload 'vcard-format-string "vcard"))
+  (autoload 'vcard-format-string "vcard")
+  (autoload 'diff-mode "diff-mode"))
+
+;; Avoid byte compile warning.
+(defvar gnus-article-mime-handles)
 
 ;;;
 ;;; Functions for displaying various formats inline
@@ -81,10 +85,12 @@
 	  (save-restriction
 	    (narrow-to-region b (point))
 	    (goto-char (point-min))
-	    (if (or (re-search-forward
-		     w3-meta-content-type-charset-regexp nil t)
-		    (re-search-forward
-		     w3-meta-charset-content-type-regexp nil t))
+	    (if (or (and (boundp 'w3-meta-content-type-charset-regexp)
+			 (re-search-forward
+			  w3-meta-content-type-charset-regexp nil t))
+		    (and (boundp 'w3-meta-charset-content-type-regexp)
+			 (re-search-forward
+			  w3-meta-charset-content-type-regexp nil t)))
 		(setq charset (w3-coding-system-for-mime-charset 
 			       (buffer-substring-no-properties 
 				(match-beginning 2) 
@@ -165,25 +171,43 @@
 
 (defun mm-view-message ()
   (mm-enable-multibyte)
-  (gnus-article-prepare-display)
-  (run-hooks 'gnus-article-decode-hook)
+  (let (handles)
+    (let (gnus-article-mime-handles)
+      ;; Double decode problem may happen. See mm-inline-message.
+      (run-hooks 'gnus-article-decode-hook)
+      (gnus-article-prepare-display)
+      (setq handles gnus-article-mime-handles))
+    (when handles
+      (setq gnus-article-mime-handles
+	    (nconc gnus-article-mime-handles 
+		   (if (listp (car handles)) 
+		       handles (list handles))))))
   (fundamental-mode)
   (goto-char (point-min)))
 
 (defun mm-inline-message (handle)
   (let ((b (point))
+	(charset (mail-content-type-get
+		  (mm-handle-type handle) 'charset))
 	gnus-displaying-mime handles)
     (save-excursion
       (save-restriction
 	(narrow-to-region b b)
 	(mm-insert-part handle)
-	(let (gnus-article-mime-handles)
+	(let (gnus-article-mime-handles
+	      (gnus-newsgroup-charset (or charset gnus-newsgroup-charset)))
 	  (run-hooks 'gnus-article-decode-hook)
 	  (gnus-article-prepare-display)
 	  (setq handles gnus-article-mime-handles))
+	(goto-char (point-max))
+	(unless (bolp)
+	  (insert "\n"))
+	(insert "----------\n\n")
 	(when handles
 	  (setq gnus-article-mime-handles
-		(append gnus-article-mime-handles handles)))
+		(nconc gnus-article-mime-handles 
+		       (if (listp (car handles)) 
+			   handles (list handles)))))
 	(mm-handle-set-undisplayer
 	 handle
 	 `(lambda ()
@@ -195,6 +219,20 @@
 			 (face-property 'default prop) (current-buffer)))
 		      '(background background-pixmap foreground)))
 	      (delete-region ,(point-min-marker) ,(point-max-marker)))))))))
+
+(defun mm-display-patch-inline (handle)
+  (let (text)
+    (with-temp-buffer
+      (mm-insert-part handle)
+      (diff-mode)
+      (font-lock-fontify-buffer)
+      (when (fboundp 'extent-list)
+	(map-extents (lambda (ext ignored)
+		       (set-extent-property ext 'duplicable t)
+		       nil)
+		     nil nil nil nil nil 'text-prop))
+      (setq text (buffer-string)))
+    (mm-insert-inline handle text)))
 
 (provide 'mm-view)
 

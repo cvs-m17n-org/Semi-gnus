@@ -25,13 +25,13 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'nnheader)
 (require 'nnmail)
 (require 'gnus-start)
 (require 'nnmh)
 (require 'nnoo)
 (eval-when-compile
-  (require 'cl)
   ;; This is just to shut up the byte-compiler.
   (fset 'nndraft-request-group 'ignore))
 
@@ -177,8 +177,8 @@
 	(dolist (backup
 		 (let ((kept-new-versions 1)
 		       (kept-old-versions 0))
-		   (cdr (find-backup-file-name
-			 (nndraft-article-filename article)))))
+		   (find-backup-file-name
+		    (nndraft-article-filename article))))
 	  (when (file-exists-p backup)
 	    (funcall nnmail-delete-file-function backup)))))
     res))

@@ -73,7 +73,7 @@ matched by that regexp."
   (save-excursion
     (save-restriction
       (narrow-to-region from to)
-      (mm-encode-body)
+;;      (mm-encode-body)
       ;; Encode all the non-ascii and control characters.
       (goto-char (point-min))
       (while (and (skip-chars-forward
@@ -95,13 +95,16 @@ matched by that regexp."
       (when fold
 	;; Fold long lines.
 	(goto-char (point-min))
-	(end-of-line)
-	(while (> (current-column) 72)
-	  (beginning-of-line)
-	  (forward-char 72)
-	  (search-backward "=" (- (point) 2) t)
-	  (insert "=\n")
-	  (end-of-line))))))
+	(while (not (eobp))
+	  (end-of-line)
+	  (while (> (current-column) 72)
+	    (beginning-of-line)
+	    (forward-char 71) ;; 71 char plus an "="
+	    (search-backward "=" (- (point) 2) t)
+	    (insert "=\n")
+	    (end-of-line))
+	  (unless (eobp)
+	    (forward-line)))))))
 
 (defun quoted-printable-encode-string (string)
  "QP-encode STRING and return the results."

@@ -97,8 +97,7 @@
   (let ((article (gnus-summary-article-number)))
     (gnus-summary-mark-as-read article gnus-canceled-mark)
     (gnus-draft-setup-for-editing article gnus-newsgroup-name)
-    (set-buffer-modified-p t)
-    (save-buffer)
+    (message-save-drafts)
     (let ((gnus-verbose-backends nil))
       (gnus-request-expire-articles (list article) gnus-newsgroup-name t))
     (push
@@ -177,14 +176,18 @@
   (interactive)
   (gnus-activate-group "nndraft:queue")
   (save-excursion
-    (let ((articles (nndraft-articles))
-	  (unsendable (gnus-uncompress-range
-		       (cdr (assq 'unsend
-				  (gnus-info-marks
-				   (gnus-get-info "nndraft:queue"))))))
-	  article)
+    (let* ((articles (nndraft-articles))
+	   (unsendable (gnus-uncompress-range
+			(cdr (assq 'unsend
+				   (gnus-info-marks
+				    (gnus-get-info "nndraft:queue"))))))
+	   (n (length articles))
+	   article i)
       (while (setq article (pop articles))
-	(unless (memq article unsendable)
+	(setq i (- n (length articles)))
+	(message "Sending message %d of %d." i n)
+	(if (memq article unsendable)
+	    (message "Message %d of %d is unsendable." i n)
 	  (gnus-draft-send article))))))
 
 ;;; Utility functions

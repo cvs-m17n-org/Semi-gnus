@@ -25,6 +25,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'gnus)
 ;; (require 'xpm)
 (require 'annotations)
@@ -96,9 +97,9 @@ Some people may want to add \"unknown\" to this list."
   (when (featurep 'x)
     (let ((types (list "xbm")))
       (when (featurep 'gif)
-	(push "gif" types))
+	(setq types (cons "gif" types)))
       (when (featurep 'xpm)
-	(push "xpm" types))
+	(setq types (cons "xpm" types)))
       types))
   "*List of suffixes on picon file names to try."
   :type '(repeat string)

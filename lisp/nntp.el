@@ -25,13 +25,12 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'nnheader)
 (require 'nnoo)
 (require 'gnus-util)
 
 (nnoo-declare nntp)
-
-(eval-when-compile (require 'cl))
 
 (defvoo nntp-address nil
   "Address of the physical nntp server.")
@@ -296,6 +295,11 @@ noticing asynchronous data.")
       (unless discard
 	(erase-buffer)))))
 
+(defun nntp-kill-buffer (buffer)
+  (when (buffer-name buffer)
+    (kill-buffer buffer)
+    (nnheader-init-server-buffer)))
+
 (defsubst nntp-find-connection (buffer)
   "Find the connection delivering to BUFFER."
   (let ((alist nntp-connection-alist)
@@ -308,8 +312,7 @@ noticing asynchronous data.")
     (when process
       (if (memq (process-status process) '(open run))
 	  process
-	(when (buffer-name (process-buffer process))
-	  (kill-buffer (process-buffer process)))
+	(nntp-kill-buffer (process-buffer process))
 	(setq nntp-connection-alist (delq entry nntp-connection-alist))
 	nil))))
 
@@ -482,6 +485,9 @@ noticing asynchronous data.")
   (nntp-possibly-change-group nil server)
   (when (nntp-find-connection-buffer nntp-server-buffer)
     (save-excursion
+      ;; Erase nntp-sever-buffer before nntp-inhibit-erase.
+      (set-buffer nntp-server-buffer)
+      (erase-buffer)
       (set-buffer (nntp-find-connection-buffer nntp-server-buffer))
       ;; The first time this is run, this variable is `try'.  So we
       ;; try.
@@ -700,8 +706,7 @@ noticing asynchronous data.")
 	    ;; QUIT command actually is sent out before we kill
 	    ;; the process.
 	    (sleep-for 1))))
-      (when (buffer-name (process-buffer process))
-	(kill-buffer (process-buffer process)))
+      (nntp-kill-buffer (process-buffer process))
       (setq process (car (pop nntp-connection-alist))))
     (nnoo-close-server 'nntp)))
 
@@ -717,8 +722,7 @@ noticing asynchronous data.")
 	    ;; QUIT command actually is sent out before we kill
 	    ;; the process.
 	    (sleep-for 1))))
-      (when (buffer-name (process-buffer process))
-	(kill-buffer (process-buffer process))))))
+      (nntp-kill-buffer (process-buffer process)))))
 
 (deffoo nntp-request-list (&optional server)
   (nntp-possibly-change-group nil server)
@@ -866,8 +870,7 @@ password contained in '~/.nntp-authinfo'."
 	       (nnheader-run-at-time
 		nntp-connection-timeout nil
 		`(lambda ()
-		   (when (buffer-name ,pbuffer)
-		     (kill-buffer ,pbuffer))))))
+		   (nntp-kill-buffer ,pbuffer)))))
 	 (process
 	  (condition-case ()
 	      (funcall nntp-open-connection-function pbuffer)
@@ -891,8 +894,7 @@ password contained in '~/.nntp-authinfo'."
 	      (let ((nnheader-callback-function nil))
 		(run-hooks 'nntp-server-opened-hook)
 		(nntp-send-authinfo t))))
-	(when (buffer-name (process-buffer process))
-	  (kill-buffer (process-buffer process)))
+	(nntp-kill-buffer (process-buffer process))
 	nil))))
 
 (defun nntp-open-network-stream (buffer)
@@ -1141,9 +1143,10 @@ password contained in '~/.nntp-authinfo'."
    ((numberp nntp-nov-gap)
     (let ((count 0)
 	  (received 0)
-	  (last-point (point-min))
+	  last-point
+	  in-process-buffer-p
 	  (buf nntp-server-buffer)
-	  ;;(process-buffer (nntp-find-connection (current-buffer))))
+	  (process-buffer (nntp-find-connection-buffer nntp-server-buffer))
 	  first)
       ;; We have to check `nntp-server-xover'.  If it gets set to nil,
       ;; that means that the server does not understand XOVER, but we
@@ -1156,40 +1159,55 @@ password contained in '~/.nntp-authinfo'."
 		    (< (- (nth 1 articles) (car articles)) nntp-nov-gap))
 	  (setq articles (cdr articles)))
 
-	(when (nntp-send-xover-command first (car articles))
-	  (setq articles (cdr articles)
-		count (1+ count))
-
+	(setq in-process-buffer-p (stringp nntp-server-xover))
+	(nntp-send-xover-command first (car articles))
+	(setq articles (cdr articles))
+	
+	(when (and nntp-server-xover in-process-buffer-p)
+	  ;; Don't count tried request.
+	  (setq count (1+ count))
+	  
 	  ;; Every 400 requests we have to read the stream in
 	  ;; order to avoid deadlocks.
 	  (when (or (null articles)	;All requests have been sent.
 		    (zerop (% count nntp-maximum-request)))
-	    (accept-process-output)
+
+	    (nntp-accept-response)
 	    ;; On some Emacs versions the preceding function has
 	    ;; a tendency to change the buffer.  Perhaps.  It's
 	    ;; quite difficult to reproduce, because it only
 	    ;; seems to happen once in a blue moon.
-	    (set-buffer buf)
+	    (set-buffer process-buffer)
 	    (while (progn
-		     (goto-char last-point)
+		     (goto-char (or last-point (point-min)))
 		     ;; Count replies.
 		     (while (re-search-forward "^[0-9][0-9][0-9] " nil t)
 		       (setq received (1+ received)))
 		     (setq last-point (point))
 		     (< received count))
-	      (accept-process-output)
-	      (set-buffer buf)))))
+	      (nntp-accept-response)
+	      (set-buffer process-buffer))
+	    (set-buffer buf))))
 
       (when nntp-server-xover
-	;; Wait for the reply from the final command.
-	(goto-char (point-max))
-	(re-search-backward "^[0-9][0-9][0-9] " nil t)
-	(when (looking-at "^[23]")
-	  (while (progn
-		   (goto-char (point-max))
-		   (forward-line -1)
-		   (not (looking-at "^\\.\r?\n")))
-	    (nntp-accept-response)))
+	(when in-process-buffer-p
+	  (set-buffer process-buffer)
+	  ;; Wait for the reply from the final command.
+	  (goto-char (point-max))
+	  (re-search-backward "^[0-9][0-9][0-9] " nil t)
+	  (when (looking-at "^[23]")
+	    (while (progn
+		     (goto-char (point-max))
+		     (forward-line -1)
+		     (not (looking-at "^\\.\r?\n")))
+	      (nntp-accept-response)
+	      (set-buffer process-buffer)))
+	  (set-buffer buf)
+	  (goto-char (point-max))
+	  (insert-buffer-substring process-buffer)
+	  (set-buffer process-buffer)
+	  (erase-buffer)
+	  (set-buffer buf))
 
 	;; We remove any "." lines and status lines.
 	(goto-char (point-min))
@@ -1212,7 +1230,7 @@ password contained in '~/.nntp-authinfo'."
 	    (nntp-send-command-nodelete
 	     "\r?\n\\.\r?\n" nntp-server-xover range)
 	  ;; We do not wait for the reply.
-	  (nntp-send-command-nodelete "\r?\n\\.\r?\n" nntp-server-xover range))
+	  (nntp-send-command-nodelete nil nntp-server-xover range))
       (let ((commands nntp-xover-commands))
 	;; `nntp-xover-commands' is a list of possible XOVER commands.
 	;; We try them all until we get at positive response.
@@ -1281,7 +1299,6 @@ password contained in '~/.nntp-authinfo'."
 		   (setq nntp-telnet-passwd
 			 (mail-source-read-passwd "Password: ")))
 	       "\n"))
-	(erase-buffer)
 	(nntp-wait-for-string nntp-telnet-shell-prompt)
 	(process-send-string
 	 proc (concat (mapconcat 'identity nntp-telnet-parameters " ") "\n"))

@@ -26,7 +26,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-
 (require 'gnus)
 (require 'gnus-start)
 (require 'nnmail)
@@ -157,6 +156,7 @@ with some simple extensions.
 %O    Moderated group (string, \"(m)\" or \"\")
 %P    Topic indentation (string)
 %m    Whether there is new(ish) mail in the group (char, \"%\")
+%w    Number of new(ish) mails in the group (integer)
 %l    Whether there are GroupLens predictions for this group (string)
 %n    Select from where (string)
 %z    A string that look like `<%s:%n>' if a foreign select method is used
@@ -407,6 +407,13 @@ ticked: The number of ticked articles."
     (?l gnus-tmp-grouplens ?s)
     (?z gnus-tmp-news-method-string ?s)
     (?m (gnus-group-new-mail gnus-tmp-group) ?c)
+    (?w (if (gnus-news-group-p gnus-tmp-group) 
+	    ""
+	  (int-to-string 
+	   (length 
+	    (nnmail-new-mail-numbers (gnus-group-real-name gnus-tmp-group))
+	    )))
+	?s)
     (?d (gnus-group-timestamp-string gnus-tmp-group) ?s)
     (?u gnus-tmp-user-defined ?s)))
 
@@ -514,6 +521,7 @@ ticked: The number of ticked articles."
     "u" gnus-group-make-useful-group
     "a" gnus-group-make-archive-group
     "k" gnus-group-make-kiboze-group
+    "l" gnus-group-nnimap-edit-acl
     "m" gnus-group-make-group
     "E" gnus-group-edit-group
     "e" gnus-group-edit-group-method
@@ -525,6 +533,7 @@ ticked: The number of ticked articles."
     "w" gnus-group-make-web-group
     "r" gnus-group-rename-group
     "c" gnus-group-customize
+    "x" gnus-group-nnimap-expunge
     "\177" gnus-group-delete-group
     [delete] gnus-group-delete-group)
 
@@ -1473,7 +1482,9 @@ and with point over the group in question."
 	(let ((,groups (gnus-group-process-prefix arg))
 	      (,window (selected-window))
 	      ,group)
-	  (while (setq ,group (pop ,groups))
+	  (while ,groups
+	    (setq ,group (car ,groups)
+		  ,groups (cdr ,groups))
 	    (select-window ,window)
 	    (gnus-group-remove-mark ,group)
 	    (save-selected-window
@@ -1600,7 +1611,7 @@ ephemeral group.
 If REQUEST-ONLY, don't actually read the group; just request it.
 If SELECT-ARTICLES, only select those articles.
 
-Return the name of the group is selection was successful."
+Return the name of the group if selection was successful."
   ;; Transform the select method into a unique server.
   (when (stringp method)
     (setq method (gnus-server-to-method method)))
@@ -1808,10 +1819,11 @@ ADDRESS."
 
   (when (stringp method)
     (setq method (or (gnus-server-to-method method) method)))
-  (let* ((meth (when (and method
-			  (not (gnus-server-equal method gnus-select-method)))
-		 (if address (list (intern method) address)
-		   method)))
+  (let* ((meth (gnus-method-simplify
+		(when (and method
+			   (not (gnus-server-equal method gnus-select-method)))
+		  (if address (list (intern method) address)
+		    method))))
 	 (nname (if method (gnus-group-prefixed-name name meth) name))
 	 backend info)
     (when (gnus-gethash nname gnus-newsrc-hashtb)
@@ -2046,6 +2058,7 @@ and NEW-NAME will be prompted for."
 			  ((= char ?d) 'digest)
 			  ((= char ?f) 'forward)
 			  ((= char ?a) 'mmfd)
+			  ((= char ?g) 'guess)
 			  (t (setq err (format "%c unknown. " char))
 			     nil))))
       (setq type found)))
@@ -2095,6 +2108,42 @@ If SOLID (the prefix), create a solid group."
        group method t
        (cons (current-buffer)
 	     (if (eq major-mode 'gnus-summary-mode) 'summary 'group))))))
+
+(defvar nnwarchive-type-definition)
+(defvar gnus-group-warchive-type-history nil)
+(defvar gnus-group-warchive-login-history nil)
+(defvar gnus-group-warchive-address-history nil)
+
+(defun gnus-group-make-warchive-group ()
+  "Create a nnwarchive group."
+  (interactive)
+  (require 'nnwarchive)
+  (let* ((group (gnus-read-group "Group name: "))
+	 (default-type (or (car gnus-group-warchive-type-history)
+			   (symbol-name (caar nnwarchive-type-definition))))
+	 (type
+	  (gnus-string-or
+	   (completing-read
+	    (format "Warchive type (default %s): " default-type)
+	    (mapcar (lambda (elem) (list (symbol-name (car elem))))
+		    nnwarchive-type-definition)
+	    nil t nil 'gnus-group-warchive-type-history)
+	   default-type))
+	 (address (read-string "Warchive address: "
+			       nil 'gnus-group-warchive-address-history))
+	 (default-login (or (car gnus-group-warchive-login-history)
+			    user-mail-address))
+	 (login
+	  (gnus-string-or
+	   (read-string
+	    (format "Warchive login (default %s): " user-mail-address)
+	    default-login 'gnus-group-warchive-login-history)
+	   user-mail-address))
+	 (method
+	  `(nnwarchive ,address 
+		       (nnwarchive-type ,(intern type))
+		       (nnwarchive-login ,login))))
+    (gnus-group-make-group group method)))
 
 (defun gnus-group-make-archive-group (&optional all)
   "Create the (ding) Gnus archive group of the most recent articles.
@@ -2213,6 +2262,62 @@ score file entries for articles to include in the group."
 		   (if (eq major-mode 'gnus-summary-mode)
 		       'summary 'group)))
       (error "Couldn't enter %s" dir))))
+
+(eval-and-compile
+  (autoload 'nnimap-expunge "nnimap")
+  (autoload 'nnimap-acl-get "nnimap")
+  (autoload 'nnimap-acl-edit "nnimap"))
+
+(defun gnus-group-nnimap-expunge (group)
+  "Expunge deleted articles in current nnimap GROUP."
+  (interactive (list (gnus-group-group-name)))
+  (let ((mailbox (gnus-group-real-name group)) method)
+    (unless group
+      (error "No group on current line"))
+    (unless (gnus-get-info group)
+      (error "Killed group; can't be edited"))
+    (unless (eq 'nnimap (car (setq method (gnus-find-method-for-group group))))
+      (error "%s is not an nnimap group" group))
+    (nnimap-expunge mailbox (cadr method))))
+
+(defun gnus-group-nnimap-edit-acl (group)
+  "Edit the Access Control List of current nnimap GROUP."
+  (interactive (list (gnus-group-group-name)))
+  (let ((mailbox (gnus-group-real-name group)) method acl)
+    (unless group
+      (error "No group on current line"))
+    (unless (gnus-get-info group)
+      (error "Killed group; can't be edited"))
+    (unless (eq (car (setq method (gnus-find-method-for-group group))) 'nnimap)
+      (error "%s is not an nnimap group" group))
+    (gnus-edit-form (setq acl (nnimap-acl-get mailbox (cadr method)))
+		    (format "Editing the access control list for `%s'.
+
+   An access control list is a list of (identifier . rights) elements.
+
+   The identifier string specifies the corresponding user. The
+   identifier \"anyone\" is reserved to refer to the universal identity.
+
+   Rights is a string listing a (possibly empty) set of alphanumeric
+   characters, each character listing a set of operations which is being
+   controlled. Letters are reserved for ``standard'' rights, listed
+   below.  Digits are reserved for implementation or site defined rights.
+
+   l - lookup (mailbox is visible to LIST/LSUB commands)
+   r - read (SELECT the mailbox, perform CHECK, FETCH, PARTIAL,
+       SEARCH, COPY from mailbox)
+   s - keep seen/unseen information across sessions (STORE SEEN flag)
+   w - write (STORE flags other than SEEN and DELETED)
+   i - insert (perform APPEND, COPY into mailbox)
+   p - post (send mail to submission address for mailbox,
+       not enforced by IMAP4 itself)
+   c - create (CREATE new sub-mailboxes in any implementation-defined
+       hierarchy)
+   d - delete (STORE DELETED flag, perform EXPUNGE)
+   a - administer (perform SETACL)" group)
+		    `(lambda (form)
+		       (nnimap-acl-edit
+			,mailbox ',method ',acl form)))))
 
 ;; Group sorting commands
 ;; Suggested by Joe Hildebrand <hildjj@idaho.fuentez.com>.
@@ -2679,10 +2784,11 @@ N and the number of steps taken is returned."
     (gnus-group-yank-group)
     (gnus-group-position-point)))
 
-(defun gnus-group-kill-all-zombies ()
-  "Kill all zombie newsgroups."
-  (interactive)
-  (when (gnus-yes-or-no-p "Really kill all zombies? ")
+(defun gnus-group-kill-all-zombies (&optional dummy)
+  "Kill all zombie newsgroups.
+The optional DUMMY should always be nil."
+  (interactive (list (not (gnus-yes-or-no-p "Really kill all zombies? "))))
+  (unless dummy
     (setq gnus-killed-list (nconc gnus-zombie-list gnus-killed-list))
     (setq gnus-zombie-list nil)
     (gnus-dribble-touch)
@@ -2865,7 +2971,8 @@ entail asking the server for the groups."
   (interactive)
   ;; First we make sure that we have really read the active file.
   (unless (gnus-read-active-file-p)
-    (let ((gnus-read-active-file t))
+    (let ((gnus-read-active-file t)
+	  (gnus-agent nil)) ; Trick the agent into ignoring the active file.
       (gnus-read-active-file)))
   ;; Find all groups and sort them.
   (let ((groups
@@ -3287,7 +3394,7 @@ and the second element is the address."
   (gnus-browse-foreign-server method))
 
 (defun gnus-group-set-info (info &optional method-only-group part)
-  (when info
+  (when (or info part)
     (let* ((entry (gnus-gethash
 		   (or method-only-group (gnus-info-group info))
 		   gnus-newsrc-hashtb))

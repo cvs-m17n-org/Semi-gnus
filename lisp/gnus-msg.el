@@ -31,18 +31,19 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'static))
 
 (require 'gnus)
 (require 'gnus-ems)
 (require 'message)
 (require 'gnus-art)
 
-(defcustom gnus-post-method nil
+(defcustom gnus-post-method 'current
   "*Preferred method for posting USENET news.
 
 If this variable is `current', Gnus will use the \"current\" select
 method when posting.  If it is nil (which is the default), Gnus will
-use the native posting method of the server.
+use the native select method when posting.
 
 This method will not be used in mail groups and the like, only in
 \"real\" newsgroups.
@@ -107,6 +108,7 @@ the second with the current group name.")
 (defcustom gnus-group-posting-charset-alist
   '(("^no\\." iso-8859-1)
     (message-this-is-mail nil)
+    ("^de\\." nil)
     (".*" iso-8859-1)
     (message-this-is-news iso-8859-1))
   "Alist of regexps (to match group names) and default charsets to be unencoded when posting."
@@ -174,6 +176,7 @@ Thank you for your help in stamping out bugs.
   "c" gnus-summary-cancel-article
   "s" gnus-summary-supersede-article
   "r" gnus-summary-reply
+  "y" gnus-summary-yank-message
   "R" gnus-summary-reply-with-original
   "w" gnus-summary-wide-reply
   "W" gnus-summary-wide-reply-with-original
@@ -479,6 +482,10 @@ header line with the old Message-ID."
 	  (set-buffer gnus-article-copy)
 	  (delete-region (goto-char (point-min))
 			 (or (search-forward "\n\n" nil t) (point-max)))
+	  ;; Encode bitmap smileys to ordinary text.
+	  (static-unless (featurep 'xemacs)
+	    (when (featurep 'smiley-mule)
+	      (smiley-encode-buffer)))
 	  ;; Insert the original article headers.
 	  (insert-buffer-substring gnus-original-article-buffer beg end)
 	  (article-decode-encoded-words)))
@@ -609,6 +616,7 @@ If SILENT, don't prompt the user."
      ;; Override normal method.
      ((and (eq gnus-post-method 'current)
 	   (not (eq (car group-method) 'nndraft))
+	   (gnus-get-function group-method 'request-post t)
 	   (not arg))
       group-method)
      ((and gnus-post-method
@@ -939,23 +947,26 @@ If YANK is non-nil, include the original article."
       (insert gnus-bug-message)
       (goto-char (point-min)))
     (message-pop-to-buffer "*Gnus Bug*")
-    (message-setup
-     `((To . ,gnus-maintainer) (Cc . ,semi-gnus-developers) (Subject . "")))
+    (message-setup `((To . ,gnus-maintainer) (Subject . "")))
     (when gnus-bug-create-help-buffer
       (push `(gnus-bug-kill-buffer) message-send-actions))
     (goto-char (point-min))
     (re-search-forward (concat "^" (regexp-quote mail-header-separator) "$"))
     (forward-line 1)
-    (insert (gnus-version) "\n"
+    (insert gnus-product-name " " gnus-version-number
+	    " (r" gnus-revision-number ") "
+	    "based on " gnus-original-product-name " v"
+	    gnus-original-version-number "\n"
 	    (emacs-version) "\n")
     (when (and (boundp 'nntp-server-type)
 	       (stringp nntp-server-type))
       (insert nntp-server-type))
     (insert "\n\n\n\n\n")
-    (save-excursion
-      (set-buffer (gnus-get-buffer-create " *gnus environment info*"))
-      (gnus-debug))
-    (insert "<#part type=application/x-emacs-lisp buffer=\" *gnus environment info*\" disposition=inline description=\"User settings\"><#/part>")
+    (let (mime-content-types)
+      (mime-edit-insert-tag "text" "plain" "; type=emacs-lisp"))
+    (insert (with-temp-buffer
+	      (gnus-debug)
+	      (buffer-string)))
     (goto-char (point-min))
     (search-forward "Subject: " nil t)
     (message "")))
@@ -963,6 +974,19 @@ If YANK is non-nil, include the original article."
 (defun gnus-bug-kill-buffer ()
   (when (get-buffer "*Gnus Help Bug*")
     (kill-buffer "*Gnus Help Bug*")))
+
+(defun gnus-summary-yank-message (buffer n)
+  "Yank the current article into a composed message."
+  (interactive
+   (list (completing-read "Buffer: " (mapcar 'list (message-buffers)) nil t)
+	 current-prefix-arg))
+  (gnus-summary-iterate n
+    (let ((gnus-display-mime-function nil)
+	  (gnus-inhibit-treatment t))
+      (gnus-summary-select-article))
+    (save-excursion
+      (set-buffer buffer)
+      (message-yank-buffer gnus-article-buffer))))
 
 (defun gnus-debug ()
   "Attempts to go through the Gnus source file and report what variables have been changed.
@@ -1058,6 +1082,7 @@ this is a reply."
 	(message-narrow-to-headers)
 	(let ((gcc (or gcc (mail-fetch-field "gcc" nil t)))
 	      (coding-system-for-write 'raw-text)
+	      (output-coding-system 'raw-text)
 	      groups group method)
 	  (when gcc
 	    (message-remove-header "gcc")
@@ -1196,7 +1221,7 @@ this is a reply."
   (unless gnus-inhibit-posting-styles
     (let ((group (or gnus-newsgroup-name ""))
 	  (styles gnus-posting-styles)
-	  style match variable attribute value v styles results
+	  style match variable attribute value v results
 	  filep name address element)
       ;; If the group has a posting-style parameter, add it at the end with a
       ;; regexp matching everything, to be sure it takes precedence over all
@@ -1208,10 +1233,15 @@ this is a reply."
       ;; Go through all styles and look for matches.
       (dolist (style styles)
 	(setq match (pop style))
+	(goto-char (point-min))
 	(when (cond
 	       ((stringp match)
 		;; Regexp string match on the group name.
 		(string-match match group))
+	       ((eq match 'header)
+		(let ((header (message-fetch-field (pop style))))
+		  (and header
+		       (string-match (pop style) header))))
 	       ((or (symbolp match)
 		    (gnus-functionp match))
 		(cond
@@ -1231,7 +1261,7 @@ this is a reply."
 		  filep nil)
 	    (setq value
 		  (cond
-		   ((eq (car attribute) :file)
+		   ((eq (car attribute) ':file)
 		    (setq filep t)
 		    (cadr attribute))
 		   ((eq (car attribute) :value)
@@ -1256,7 +1286,7 @@ this is a reply."
 	      (setq element 'signature
 		    filep t))
 	    ;; Get the contents of file elems.
-	    (when filep
+	    (when (and filep v)
 	      (setq v (with-temp-buffer
 			(insert-file-contents v)
 			(buffer-string))))
@@ -1271,6 +1301,8 @@ this is a reply."
 	(when (cdr result)
 	  (add-hook 'message-setup-hook
 		    (cond
+		     ((eq 'eval (car result))
+		      'ignore)
 		     ((eq 'body (car result))
 		      `(lambda ()
 			 (save-excursion
@@ -1282,7 +1314,8 @@ this is a reply."
 		      `(lambda ()
 			 (save-excursion
 			   (let ((message-signature ,(cdr result)))
-			     (message-insert-signature)))))
+			     (when message-signature
+			       (message-insert-signature))))))
 		     (t
 		      (let ((header
 			     (if (symbolp (car result))
@@ -1296,7 +1329,7 @@ this is a reply."
       (when (or name address)
 	(add-hook 'message-setup-hook
 		  `(lambda ()
-		     (let ((user-full-name ,(or (cdr name) user-full-name))
+		     (let ((user-full-name ,(or (cdr name) (user-full-name)))
 			   (user-mail-address
 			    ,(or (cdr address) user-mail-address)))
 		       (save-excursion
@@ -1320,6 +1353,21 @@ this is a reply."
 	  (make-local-variable 'default-mime-charset)
 	  (setq default-mime-charset charset)
 	  ))))
+
+
+;;; @ for MIME view mode
+;;;
+
+(defun gnus-following-method (buf)
+  (gnus-setup-message 'reply-yank
+    (set-buffer buf)
+    (if (message-news-p)
+	(message-followup)
+      (message-reply nil 'wide))
+    (let ((message-reply-buffer buf))
+      (message-yank-original))
+    (message-goto-body))
+  (kill-buffer buf))
 
 
 ;;; Allow redefinition of functions.

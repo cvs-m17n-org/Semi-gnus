@@ -31,6 +31,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'nntp)
 (require 'nnheader)
 (require 'gnus)
@@ -39,16 +40,14 @@
 (require 'gnus-start)
 (require 'gnus-sum)
 (require 'gnus-msg)
-(require 'cl)
 
 (nnoo-declare nnvirtual)
 
 (defvoo nnvirtual-always-rescan t
   "*If non-nil, always scan groups for unread articles when entering a group.
-If this variable is nil (which is the default) and you read articles
-in a component group after the virtual group has been activated, the
-read articles from the component group will show up when you enter the
-virtual group.")
+If this variable is nil and you read articles in a component group
+after the virtual group has been activated, the read articles from the
+component group will show up when you enter the virtual group.")
 
 (defvoo nnvirtual-component-regexp nil
   "*Regexp to match component groups.")

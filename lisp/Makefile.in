@@ -6,39 +6,46 @@ subdir = lisp
 top_srcdir = @top_srcdir@
 
 EMACS = @EMACS@
-FLAGS = -batch -q -no-site-file -l ./dgnushack.el
+FLAGS = -batch -q -no-site-file -l $(srcdir)/dgnushack.el
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 VPATH = @srcdir@
-PACKAGEDIR =
+PACKAGEDIR = @PACKAGEDIR@
 
 all total:
-	rm -f *.elc auto-autoloads.el custom-load.el ; \
-	$(EMACS) $(FLAGS) -f dgnushack-compile
+	rm -f *.elc auto-autoloads.el custom-load.el
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
 
 warn:
-	rm -f *.elc ; $(EMACS) $(FLAGS) --eval '(dgnushack-compile t)' 2>&1 | egrep -v "variable G|inhibit-point-motion-hooks|coding-system|temp-results|variable gnus|variable nn|scroll-in-place|deactivate-mark|filladapt-mode|byte-code-function-p|print-quoted|ps-right-header|ps-left-header|article-inhibit|print-escape|ssl-program-arguments|message-log-max"
+	rm -f *.elc
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) --eval '(dgnushack-compile t)' 2>&1 | egrep -v "variable G|inhibit-point-motion-hooks|coding-system|temp-results|variable gnus|variable nn|scroll-in-place|deactivate-mark|filladapt-mode|byte-code-function-p|print-quoted|ps-right-header|ps-left-header|article-inhibit|print-escape|ssl-program-arguments|message-log-max"
 
 # The "clever" rule is unsafe, since redefined macros are loaded from
 # .elc files, and not the .el file.
 clever some:
-	$(EMACS) $(FLAGS) -f dgnushack-compile
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
 
 install: clever
 	rm -f dgnushack.elc
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
-	for p in *.elc; do \
-	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
-	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
+	@for p in *.el; do \
+	  if test "$$p" != "dgnuspath.el"; then \
+	    echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
+	    $(INSTALL_DATA) $$p $(lispdir)/$$p; \
+	    if test -f $$p"c"; then \
+	      echo " $(INSTALL_DATA) $$p""c"" $(lispdir)/$$p""c"; \
+	      $(INSTALL_DATA) $$p"c" $(lispdir)/$$p"c"; \
+	    fi; \
+	  fi; \
 	done
 
 package:
-	$(EMACS) $(FLAGS) -f dgnushack-make-package
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-package
 
 install-package: clever
 	rm -f dgnushack.elc
-	$(EMACS) $(FLAGS) -f dgnushack-make-package \
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-package \
 		-f dgnushack-install-package $(PACKAGEDIR)
 
 tags:
@@ -62,8 +69,12 @@ gnus-load.el:
 	echo >> gnus-load.el
 	echo ";;; gnus-load.el ends here" >> gnus-load.el
 
-distclean:
-	rm -f *.orig *.rej *.elc *~ Makefile
+clean:
+	rm -f *.orig *.rej *.elc *~
+	rm -f auto-autoloads.el custom-load.el
+
+distclean: clean
+	rm -f Makefile dgnuspath.el
 
 Makefile: $(srcdir)/Makefile.in ../config.status
 	cd .. \

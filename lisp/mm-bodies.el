@@ -38,25 +38,7 @@
 ;; BS, vertical TAB, form feed, and ^_
 (defvar mm-8bit-char-regexp "[^\x20-\x7f\r\n\t\x7\x8\xb\xc\x1f]")
 
-(defvar mm-body-charset-encoding-alist
-  '((us-ascii . 7bit)
-    (iso-8859-1 . quoted-printable)
-    (iso-8859-2 . quoted-printable)
-    (iso-8859-3 . quoted-printable)
-    (iso-8859-4 . quoted-printable)
-    (iso-8859-5 . base64)
-    (koi8-r . 8bit)
-    (iso-8859-7 . quoted-printable)
-    (iso-8859-8 . quoted-printable)
-    (iso-8859-9 . quoted-printable)
-    (iso-2022-jp . base64)
-    (iso-2022-kr . base64)
-    (gb2312 . base64)
-    (cn-gb . base64)
-    (cn-gb-2312 . base64)
-    (euc-kr . 8bit)
-    (iso-2022-jp-2 . base64)
-    (iso-2022-int-1 . base64))
+(defvar mm-body-charset-encoding-alist nil
   "Alist of MIME charsets to encodings.
 Valid encodings are `7bit', `8bit', `quoted-printable' and `base64'.")
 
@@ -123,7 +105,7 @@ If no encoding was done, nil is returned."
       bits)
      (t
       (let ((encoding (or (cdr (assq charset mm-body-charset-encoding-alist))
-			  'quoted-printable)))
+			  (mm-qp-or-base64))))
 	(mm-encode-content-transfer-encoding encoding "text/plain")
 	encoding)))))
 
@@ -168,6 +150,7 @@ If no encoding was done, nil is returned."
 				  (save-excursion
 				    (goto-char (point-max))
 				    (skip-chars-backward "\n\t ")
+				    (delete-region (point) (point-max))
 				    (point))))
 	   ((memq encoding '(7bit 8bit binary))
 	    )
@@ -208,9 +191,10 @@ The characters in CHARSET should then be decoded."
 		   ;; buffer-file-coding-system
 		   ;;Article buffer is nil coding system
 		   ;;in XEmacs
-		   enable-multibyte-characters
+		   (mm-multibyte-p)
 		   (or (not (eq mule-charset 'ascii))
-		       (setq mule-charset mail-parse-charset)))
+		       (setq mule-charset mail-parse-charset))
+		   (not (eq mule-charset 'gnus-decoded)))
 	  (mm-decode-coding-region (point-min) (point-max) mule-charset))))))
 
 (defun mm-decode-string (string charset)
@@ -224,7 +208,7 @@ The characters in CHARSET should then be decoded."
      (let (mule-charset)
        (when (and charset
 		  (setq mule-charset (mm-charset-to-coding-system charset))
-		  enable-multibyte-characters
+		  (mm-multibyte-p)
 		  (or (not (eq mule-charset 'ascii))
 		      (setq mule-charset mail-parse-charset)))
 	 (mm-decode-coding-string string mule-charset))))

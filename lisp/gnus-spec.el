@@ -27,7 +27,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-
 (require 'gnus)
 
 ;;; Internal variables.
@@ -304,10 +303,10 @@ by `gnus-xmas-redefine'."
   ;; SPEC-ALIST and returns a list that can be eval'ed to return the
   ;; string.  If the FORMAT string contains the specifiers %( and %)
   ;; the text between them will have the mouse-face text property.
-  ;; If the FORMAT string contains the specifiers %< and %>, the text between
+  ;; If the FORMAT string contains the specifiers %[ and %], the text between
   ;; them will have the balloon-help text property.
   (if (string-match
-       "\\`\\(.*\\)%[0-9]?[{(<]\\(.*\\)%[0-9]?[})>]\\(.*\n?\\)\\'"
+       "\\`\\(.*\\)%[0-9]?[{(«]\\(.*\\)%[0-9]?[»})]\\(.*\n?\\)\\'"
        format)
       (gnus-parse-complex-format format spec-alist)
     ;; This is a simple format.
@@ -322,13 +321,13 @@ by `gnus-xmas-redefine'."
       (replace-match "\\\"" nil t))
     (goto-char (point-min))
     (insert "(\"")
-    (while (re-search-forward "%\\([0-9]+\\)?\\([{}()<>]\\)" nil t)
+    (while (re-search-forward "%\\([0-9]+\\)?\\([«»{}()]\\)" nil t)
       (let ((number (if (match-beginning 1)
 			(match-string 1) "0"))
 	    (delim (aref (match-string 2) 0)))
 	(if (or (= delim ?\()
 		(= delim ?\{)
-		(= delim ?\<))
+		(= delim ?\«))
 	    (replace-match (concat "\"("
 				   (cond ((= delim ?\() "mouse")
 					 ((= delim ?\{) "face")

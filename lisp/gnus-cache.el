@@ -476,7 +476,9 @@ Returns the list of articles removed."
 	   (nnheader-translate-file-chars
 	    (if (gnus-use-long-file-name 'not-cache)
 		group
-	      (let ((group (nnheader-replace-chars-in-string group ?/ ?_)))
+	      (let ((group (nnheader-replace-duplicate-chars-in-string
+			    (nnheader-replace-chars-in-string group ?/ ?_)
+			    ?. ?_)))
 		;; Translate the first colon into a slash.
 		(when (string-match ":" group)
 		  (aset group (match-beginning 0) ?/))
@@ -687,7 +689,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
 		 gnus-cache-active-altered))
     (gnus-write-active-file-as-coding-system
      gnus-cache-write-file-coding-system
-     gnus-cache-active-file gnus-cache-active-hashtb)
+     gnus-cache-active-file gnus-cache-active-hashtb t)
     ;; Mark the active hashtb as unaltered.
     (setq gnus-cache-active-altered nil)))
 

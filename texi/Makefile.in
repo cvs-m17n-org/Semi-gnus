@@ -1,15 +1,17 @@
-infodir = @infodir@
 prefix = @prefix@
+infodir = @infodir@
 srcdir = @srcdir@
 subdir = texi
 top_srcdir = @top_srcdir@
 
+@SET_MAKE@
+VPATH=$(srcdir)
 TEXI2DVI=texi2dvi
-EMACS=emacs
+EMACS=@EMACS@
 MAKEINFO=@MAKEINFO@
-EMACSINFO=$(EMACS) -batch -q -no-site-file
-INFOSWI=-l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
-XINFOSWI=-l texinfmt -f texinfo-every-node-update -f texinfo-format-buffer -f save-buffer
+FLAGS=-batch -q -no-site-file
+INFOSWI=-l ./dgnushack.el -f dgnushack-texi-format
+XINFOSWI=-l ./dgnushack.el -f dgnushack-texi-add-suffix-and-format
 LATEX=latex
 DVIPS=dvips
 PERL=perl
@@ -19,28 +21,32 @@ SHELL = /bin/sh
 PAPERTYPE=a4
 
 all: gnus message emacs-mime
+all-info: gnus.info message.info emacs-mime.info
+
+gnus.info: gnus.texi gnus-faq.texi
+message.info: message.texi
+emacs-mime.info: emacs-mime.texi
 
 ja: gnus-ja message-ja
+ja-info: gnus-ja.info message-ja.info
 
-# Rule for XEmacs package.
-add-info-suffix:
-	cd ../lisp && $(EMACS) -batch -q -no-site-file \
-		-l dgnushack.el -f dgnushack-add-info-suffix-maybe
-
-remove-info-suffix:
-	for file in gnus message emacs-mime gnus-ja message-ja; do \
-	  if test -f $$file.texi_; then \
-	    mv $$file.texi_ $$file.texi; \
-	  fi; \
-	done
+gnus-ja.info: gnus-ja.texi gnus-faq-ja.texi
+message-ja.info: message-ja.texi
 
 most: texi2latex.elc latex latexps
+
+%.info: %.texi
+	if test $(MAKEINFO) = no; then \
+	  cd ../lisp && $(EMACS) $(FLAGS) $(XINFOSWI) ../texi/$<; \
+	else \
+	  makeinfo -o $@ $<; \
+	fi
 
 .SUFFIXES: .texi .dvi .ps
 
 .texi:
 	if test $(MAKEINFO) = no; then \
-	  $(EMACSINFO) $< $(XINFOSWI); \
+	  cd ../lisp && $(EMACS) $(FLAGS) $(INFOSWI) ../texi/$<; \
 	else \
 	  makeinfo $<; \
 	fi
@@ -61,7 +67,14 @@ clean:
 	*.tp *.toc *.pg gnus.latexi *.aux *.[cgk]idx \
 	gnus.ilg gnus.ind gnus.[cgk]ind gnus.idx \
 	gnus.tmptexi *.tmplatexi gnus.tmplatexi1 texput.log *.orig *.rej \
-	gnus.latexi*~* tmp/*.ps xface.tex picons.tex smiley.tex *.latexi
+	gnus.latexi*~* tmp/*.ps xface.tex picons.tex smiley.tex *.latexi \
+	gnus.info* gnus-ja.info* message.info* message-ja.info* \
+	emacs-mime.info
+	rm -f *.orig *.rej *.elc *~ gnus gnus-[0-9] gnus-[0-9][0-9]
+	rm -f message message-[0-9]
+	rm -f emacs-mime
+	rm -f gnus-ja gnus-ja-[0-9] gnus-ja-[0-9][0-9]
+	rm -f message-ja message-ja-[0-9]
 
 makeinfo:
 	makeinfo -o gnus gnus.texi
@@ -74,7 +87,7 @@ latex: gnus.texi texi2latex.elc
 	$(EMACS) -batch -q -no-site-file gnus.texi -l ./texi2latex.elc -f latexi-translate
 
 latexps:
-	make texi2latex.elc
+	$(MAKE) texi2latex.elc
 	rm -f gnus.aux
 	egrep -v "label.*Index|chapter.*Index" gnus.latexi > gnus.tmplatexi1
 	$(LATEX) gnus.tmplatexi1
@@ -91,22 +104,22 @@ latexps:
 	$(DVIPS) -t $(PAPERTYPE) -f gnus.dvi > gnus.ps
 
 pss:
-	make latex
-	make latexps
+	$(MAKE) latex
+	$(MAKE) latexps
 
 psout:
-	make latex
-	make latexboth
-	make out
+	$(MAKE) latex
+	$(MAKE) latexboth
+	$(MAKE) out
 
 latexboth:
 	rm -f gnus-manual-a4.ps.gz gnus-manual-standard.ps.gz
-	make latexps
+	$(MAKE) latexps
 	mv gnus.ps gnus-manual-a4.ps
 	gzip gnus-manual-a4.ps
 	sed 's/,a4paper/,letterpaper/' gnus.latexi > gnus-standard.latexi
 	mv gnus-standard.latexi gnus.latexi
-	make latexps PAPERTYPE=letter
+	$(MAKE) latexps PAPERTYPE=letter
 	mv gnus.ps gnus-manual-standard.ps
 	gzip gnus-manual-standard.ps
 
@@ -118,15 +131,11 @@ out:
 	gnus-manual-a4.ps.gz \
 	/hom/larsi/www_docs/www.gnus.org/documents
 
-veryclean:
-	make clean
+veryclean: clean
 	rm -f gnus.dvi gnus.ps texi2latex.elc
 
-distclean:
-	make clean
-	rm -f *.orig *.rej *.elc *~ gnus gnus-[0-9] gnus-[0-9][0-9] Makefile
-	rm -f message message-[0-9]
-	rm -f emacs-mime
+distclean: clean
+	rm -f Makefile
 
 install:
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(infodir)
@@ -141,13 +150,13 @@ install:
 
 tmps:
 	if [ ! -e tmp ]; then mkdir tmp; fi
-	make screens
-	make herdss
-	make etcs
-	make piconss
-	make xfaces
-	make smiley
-	make miscs
+	$(MAKE) screens
+	$(MAKE) herdss
+	$(MAKE) etcs
+	$(MAKE) piconss
+	$(MAKE) xfaces
+	$(MAKE) smiley
+	$(MAKE) miscs
 
 herdss:
 	cd herds ; for i in new-herd-[0-9]*.gif; do echo $$i; giftopnm $$i | pnmcrop -white | pnmmargin -white 9 | pnmscale 2 | pnmconvol convol5.pnm  | ppmtopgm | pnmdepth 255 | pnmtops -width 100 -height 100 -noturn > ../tmp/`basename $$i .gif`.ps; done
@@ -191,9 +200,9 @@ pspackage:
 	tar czvf pspackage.tar.gz gnus-faq.texi gnus.texi herds misc pagestyle.sty picons pixidx.sty postamble.tex ps screen smilies splitindex texi2latex.el xface Makefile README etc
 
 complete:
-	make texi2latex.elc
-	make tmps
-	make pss
+	$(MAKE) texi2latex.elc
+	$(MAKE) tmps
+	$(MAKE) pss
 
 Makefile: $(srcdir)/Makefile.in ../config.status
 	cd .. \

@@ -53,74 +53,6 @@
 
 ;;; Mule functions.
 
-(defun gnus-mule-cite-add-face (number prefix face)
-  ;; At line NUMBER, ignore PREFIX and add FACE to the rest of the line.
-  (when face
-    (let ((inhibit-point-motion-hooks t)
-	  from to overlay)
-      (goto-char (point-min))
-      (when (zerop (forward-line (1- number)))
-	(move-to-column (string-width prefix))
-	(skip-chars-forward " \t")
-	(setq from (point))
-	(end-of-line 1)
-	(skip-chars-backward " \t")
-	(setq to (point))
-	(when (< from to)
-	  (push (setq overlay (gnus-make-overlay from to))
-		gnus-cite-overlay-list)
-	  (gnus-overlay-put overlay 'face face))))))
-
-(defvar gnus-mule-bitmap-image-file nil)
-(defun gnus-mule-group-startup-message (&optional x y)
-  "Insert startup message in current buffer."
-  ;; Insert the message.
-  (erase-buffer)
-  (insert
-   (if (featurep 'bitmap)
-     (format "              %s
-
-"
-	     "" (if (and (stringp gnus-mule-bitmap-image-file)
-			 (file-exists-p gnus-mule-bitmap-image-file))
-		    (insert-file gnus-mule-bitmap-image-file)))
-     (format "              %s
-          _    ___ _             _
-          _ ___ __ ___  __    _ ___
-          __   _     ___    __  ___
-              _           ___     _
-             _  _ __             _
-             ___   __            _
-                   __           _
-                    _      _   _
-                   _      _    _
-                      _  _    _
-                  __  ___
-                 _   _ _     _
-                _   _
-              _    _
-             _    _
-            _
-          __
-
-"
-	     "")))
-  ;; And then hack it.
-  (gnus-indent-rigidly (point-min) (point-max)
-		       (/ (max (- (window-width) (or x 46)) 0) 2))
-  (goto-char (point-min))
-  (forward-line 1)
-  (let* ((pheight (count-lines (point-min) (point-max)))
-	 (wheight (window-height))
-	 (rest (- wheight pheight)))
-    (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
-  ;; Fontify some.
-  (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)
-  (goto-char (point-min))
-  (setq mode-line-buffer-identification (concat " " gnus-version))
-  (setq gnus-simple-splash t)
-  (set-buffer-modified-p t))
-
 (eval-and-compile
   (if (string-match "XEmacs\\|Lucid" emacs-version)
       nil
@@ -163,7 +95,8 @@
 (eval-and-compile
   (let ((case-fold-search t))
     (cond
-     ((string-match "windows-nt\\|os/2\\|emx" (symbol-name system-type))
+     ((string-match "windows-nt\\|os/2\\|emx\\|cygwin32"
+		    (symbol-name system-type))
       (setq nnheader-file-name-translation-alist
 	    (append nnheader-file-name-translation-alist
 		    '((?: . ?_)
@@ -251,19 +184,10 @@
 		      val (- (string-width val) ,cut) ,cut))
 	       val)))))
 
-    (when window-system
-      (require 'path-util)
-      (if (module-installed-p 'bitmap)
-	  (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message)
-	))
-
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting
 	    (delq 'long-lines
 		  (delq 'control-chars gnus-check-before-posting))))
-
-    (when (fboundp 'chars-in-string)
-      (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face))
 
     )))
 
@@ -294,8 +218,8 @@
 	(erase-buffer)
 	(when (and dir
 		   (file-exists-p (setq file (concat dir "x-splash"))))
-	  (with-temp-file nil
-	    (insert-file-contents file)
+	  (with-temp-buffer
+	    (insert-file-contents-as-binary file)
 	    (goto-char (point-min))
 	    (ignore-errors
 	      (setq pixmap (read (current-buffer))))))
@@ -304,7 +228,7 @@
 	    (make-face 'gnus-splash))
 	  (setq height (/ (car pixmap) (frame-char-height))
 		width (/ (cadr pixmap) (frame-char-width)))
-	  (set-face-foreground 'gnus-splash "ForestGreen")
+	  (set-face-foreground 'gnus-splash "Brown")
 	  (set-face-stipple 'gnus-splash pixmap)
 	  (insert-char ?\n (* (/ (window-height) 2 height) height))
 	  (setq i height)
@@ -318,15 +242,48 @@
 	  (goto-char (point-min))
 	  (sit-for 0))))))
 
-(if (fboundp 'split-string)
-    (fset 'gnus-split-string 'split-string)
-  (defun gnus-split-string (string pattern)
-    "Return a list of substrings of STRING which are separated by PATTERN."
-    (let (parts (start 0))
-      (while (string-match pattern string start)
-	(setq parts (cons (substring string start (match-beginning 0)) parts)
-	      start (match-end 0)))
-      (nreverse (cons (substring string start) parts)))))
+(defun-maybe assoc-ignore-case (key alist)
+  "Like `assoc', but assumes KEY is a string and ignores case when comparing."
+  (setq key (downcase key))
+  (let (element)
+    (while (and alist (not element))
+      (if (equal key (downcase (car (car alist))))
+	  (setq element (car alist)))
+      (setq alist (cdr alist)))
+    element))
+
+
+;;; Language support staffs.
+
+(defvar-maybe current-language-environment "English"
+  "The language environment.")
+
+(defvar-maybe language-info-alist nil
+  "Alist of language environment definitions.")
+
+(defun-maybe get-language-info (lang-env key)
+  "Return information listed under KEY for language environment LANG-ENV."
+  (if (symbolp lang-env)
+      (setq lang-env (symbol-name lang-env)))
+  (let ((lang-slot (assoc-ignore-case lang-env language-info-alist)))
+    (if lang-slot
+	(cdr (assq key (cdr lang-slot))))))
+
+(defun-maybe set-language-info (lang-env key info)
+  "Modify part of the definition of language environment LANG-ENV."
+  (if (symbolp lang-env)
+      (setq lang-env (symbol-name lang-env)))
+  (let (lang-slot key-slot)
+    (setq lang-slot (assoc lang-env language-info-alist))
+    (if (null lang-slot)		; If no slot for the language, add it.
+	(setq lang-slot (list lang-env)
+	      language-info-alist (cons lang-slot language-info-alist)))
+    (setq key-slot (assq key lang-slot))
+    (if (null key-slot)			; If no slot for the key, add it.
+	(progn
+	  (setq key-slot (list key))
+	  (setcdr lang-slot (cons key-slot (cdr lang-slot)))))
+    (setcdr key-slot info)))
 
 (provide 'gnus-ems)
 

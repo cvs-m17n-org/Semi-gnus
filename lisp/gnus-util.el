@@ -31,8 +31,9 @@
 
 ;;; Code:
 
-(require 'custom)
 (eval-when-compile (require 'cl))
+(eval-when-compile (require 'static))
+(require 'custom)
 (require 'nnheader)
 (require 'message)
 (require 'time-date)
@@ -51,10 +52,12 @@
   "Pop to BUFFER, evaluate FORMS, and then return to the original window."
   (let ((tempvar (make-symbol "GnusStartBufferWindow"))
         (w (make-symbol "w"))
-        (buf (make-symbol "buf")))
+        (buf (make-symbol "buf"))
+	(frame (make-symbol "frame")))
     `(let* ((,tempvar (selected-window))
             (,buf ,buffer)
-            (,w (get-buffer-window ,buf 'visible)))
+            (,w (get-buffer-window ,buf 'visible))
+	    ,frame)
        (unwind-protect
            (progn
              (if ,w
@@ -63,7 +66,9 @@
                    (set-buffer (window-buffer ,w)))
                (pop-to-buffer ,buf))
              ,@forms)
-         (select-window ,tempvar)))))
+	 (setq ,frame (selected-frame))
+         (select-window ,tempvar)
+	 (select-frame ,frame)))))
 
 (put 'gnus-eval-in-buffer-window 'lisp-indent-function 1)
 (put 'gnus-eval-in-buffer-window 'edebug-form-spec '(form body))
@@ -109,15 +114,34 @@
      (when (gnus-buffer-exists-p buf)
        (kill-buffer buf))))
 
-(fset 'gnus-point-at-bol
-      (if (fboundp 'point-at-bol)
-	  'point-at-bol
-	'line-beginning-position))
-
-(fset 'gnus-point-at-eol
-      (if (fboundp 'point-at-eol)
-	  'point-at-eol
-	'line-end-position))
+(static-cond
+ ((fboundp 'point-at-bol)
+  (fset 'gnus-point-at-bol 'point-at-bol))
+ ((fboundp 'line-beginning-position)
+  (fset 'gnus-point-at-bol 'line-beginning-position))
+ (t
+  (defun gnus-point-at-bol ()
+    "Return point at the beginning of the line."
+    (let ((p (point)))
+      (beginning-of-line)
+      (prog1
+	  (point)
+	(goto-char p))))
+  ))
+(static-cond
+ ((fboundp 'point-at-eol)
+  (fset 'gnus-point-at-eol 'point-at-eol))
+ ((fboundp 'line-end-position)
+  (fset 'gnus-point-at-eol 'line-end-position))
+ (t
+  (defun gnus-point-at-eol ()
+    "Return point at the end of the line."
+    (let ((p (point)))
+      (end-of-line)
+      (prog1
+	  (point)
+	(goto-char p))))
+  ))
 
 (defun gnus-delete-first (elt list)
   "Delete by side effect the first occurrence of ELT as a member of LIST."
@@ -298,7 +322,9 @@
 
 (defun gnus-dd-mmm (messy-date)
   "Return a string like DD-MMM from a big messy string."
-  (format-time-string "%d-%b" (safe-date-to-time messy-date)))
+  (condition-case ()
+      (format-time-string "%d-%b" (safe-date-to-time messy-date))
+    (error "  -   ")))
 
 (defmacro gnus-date-get-time (date)
   "Convert DATE string to Emacs time.
@@ -709,7 +735,7 @@ with potentially long computations."
       ;; Decide whether to append to a file or to an Emacs buffer.
       (let ((outbuf (get-file-buffer filename)))
 	(if (not outbuf)
-	    (append-to-file (point-min) (point-max) filename)
+	    (write-region-as-binary (point-min) (point-max) filename 'append)
 	  ;; File has been visited, in buffer OUTBUF.
 	  (set-buffer outbuf)
 	  (let ((buffer-read-only nil)
@@ -961,19 +987,37 @@ ARG is passed to the first function."
 	(throw 'found nil)))
     t))
 
-(defun gnus-write-active-file-as-coding-system (coding-system file hashtb)
-  (let ((coding-system-for-write coding-system))
+(defun gnus-write-active-file-as-coding-system (coding-system file hashtb
+							      &optional
+							      full-names)
+  (let ((output-coding-system coding-system)
+	(coding-system-for-write coding-system))
     (with-temp-file file
       (mapatoms
        (lambda (sym)
 	 (when (and sym
 		    (boundp sym)
 		    (symbol-value sym))
-	   (insert (format "%s %d %d y\n"
-			   (gnus-group-real-name (symbol-name sym))
-			   (cdr (symbol-value sym))
+	   (insert (format "%S %d %d y\n"
+			   (if full-names
+			       sym
+			     (intern (gnus-group-real-name (symbol-name sym))))
+			   (or (cdr (symbol-value sym))
+			       (car (symbol-value sym)))
 			   (car (symbol-value sym))))))
-       hashtb))))
+       hashtb)
+      (goto-char (point-max))
+      (while (search-backward "\\." nil t)
+	(delete-char 1)))))
+
+(defun gnus-union (a b)
+  "Add members of list A to list B
+if they are not equal to items already in B."
+  (if (null a)
+      b
+    (if (member (car a) b)
+	(gnus-union (cdr a) b)
+      (gnus-union (cdr a) (cons (car a) b)))))
 
 (provide 'gnus-util)
 

@@ -1,0 +1,76 @@
+Emacs 19.34 をベースにした Mule 2.3 で T-gnus を作る方法。
+
+FIX loaddefs.el
+===============
+
+残念なことにいくつかの `message' で使う変数が lisp/loaddefs.el で定義
+されていて Mule の実行ファイルに組み込まれてしまっています。これは余計
+なお世話だし、しかも悪影響があります。そこであなたはそれらの定義を
+lisp/loaddefs.el から削除して、Mule を作り直さなければなりません。
+しかし、もしあなたが Mule を作り直すことを望まないならば、.emacs ファ
+イルの先頭に以下の各行を書き込むことで代用することができます。
+
+(mapcar
+ (lambda (symbol)
+   (makunbound (intern (format "message-%s" symbol))))
+ '(citation-line-function
+   cite-function courtesy-message default-headers default-mail-headers
+   default-news-headers deletable-headers fcc-handler-function
+   followup-to-function from-style generate-headers-first generate-new-buffers
+   ignored-bounced-headers ignored-cited-headers ignored-mail-headers
+   ignored-news-headers ignored-resent-headers ignored-supersedes-headers
+   included-forward-headers indent-citation-function interactive
+   kill-buffer-on-exit post-method reply-to-function required-mail-headers
+   required-news-headers send-mail-function send-news-function
+   signature signature-before-forwarded-message signature-file
+   signature-separator syntax-checks use-followup-to user-organization-file
+   wide-reply-to-function yank-prefix))
+
+
+INSTALL CUSTOM, APEL, FLIM, SEMI
+================================
+
+T-gnus は最新版の CUSTOM, APEL, FLIM および SEMI か WEMI を必要としま
+す。あなたはこれらのパッケージを T-gnus の前にインストールしなければな
+りません。CUSTOM については、作る前にあなたは以下のパッチを当てる必要
+があります。
+
+------ cut here ------ cut here ------ cut here ------ cut here ------
+--- custom-1.9962/cus-face.el~	Wed Mar  4 19:52:39 1998
++++ custom-1.9962/cus-face.el	Mon Mar  9 08:05:33 1998
+@@ -96,7 +96,7 @@
+       "Define a new FACE on all frames, ignoring X resources."
+       (interactive "SMake face: ")
+       (or (internal-find-face name)
+-	  (let ((face (make-vector 8 nil)))
++	  (let ((face (make-vector face-vector-length nil)))
+ 	    (aset face 0 'face)
+ 	    (aset face 1 name)
+ 	    (let* ((frames (frame-list))
+------ cut here ------ cut here ------ cut here ------ cut here ------
+
+なお Emacs v19 用の最新の CUSTOM は以下のものを入手することができます。
+
+ftp://ftp.dina.kvl.dk/pub/Staff/Per.Abrahamsen/custom/custom-1.9962.tar.gz
+
+
+INSTALL T-gnus
+==============
+
+Mule 2.3 based on Emacs 19.34 で gnus を作るには二つの方法があります。
+
+ 1. configure オプションの `--with-addpath=' を使って EMU, APEL および
+    CUSTOM の各パッケージがインストールされている場所を指定して下さい。
+    例えば
+
+    % configure --with-emacs=mule\
+      --with-addpath=~/elisp/emu:~/elisp/apel:~elisp/custom
+    % make
+
+ 2. `sample.lpath.el' を `~/.lpath.el' にコピーして、あなたの環境に
+    合うように書き換えて下さい。そして次のようにタイプして下さい。
+
+    % configure
+    % make EMACS=mule
+
+    この場合 install は手作業で行なって下さい。

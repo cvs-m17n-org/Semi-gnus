@@ -24,11 +24,12 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
+(eval-when-compile (require 'static))
 (require 'nnheader)
 (require 'message)
 (require 'nnmail)
 (require 'nnoo)
-(eval-when-compile (require 'cl))
 
 (nnoo-declare nnmbox)
 
@@ -188,11 +189,18 @@
 		       (1+ (- (cdr active) (car active)))
 		       (car active) (cdr active) group)))))
 
-(defun nnmbox-save-buffer ()
-  (let ((coding-system-for-write 
-	 (or nnmbox-file-coding-system-for-write
-	     nnmbox-file-coding-system)))
-	 (save-buffer)))
+(static-if (boundp 'MULE)
+    (defun nnmbox-save-buffer ()
+      (let ((output-coding-system
+	     (or nnmbox-file-coding-system-for-write
+		 nnmbox-file-coding-system)))
+	(save-buffer)))
+  (defun nnmbox-save-buffer ()
+    (let ((coding-system-for-write
+	   (or nnmbox-file-coding-system-for-write
+	       nnmbox-file-coding-system)))
+      (save-buffer)))
+  )
 
 (defun nnmbox-save-active (group-alist active-file)
   (let ((nnmail-active-file-coding-system

@@ -29,7 +29,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-
 (require 'mail-utils)
 (require 'mime)
 
@@ -68,6 +67,8 @@ on your system, you could say something like:
 ;; (That next-to-last entry is defined as "misc" in the NOV format,
 ;; but Gnus uses it for xrefs.)
 
+(require 'mmgnus)
+
 (defmacro mail-header-number (header)
   "Return article number in HEADER."
   `(mime-entity-location-internal ,header))
@@ -76,86 +77,85 @@ on your system, you could say something like:
   "Set article number of HEADER to NUMBER."
   `(mime-entity-set-location-internal ,header ,number))
 
-(defalias 'mail-header-subject 'mime-entity-decoded-subject-internal)
-(defalias 'mail-header-set-subject 'mime-entity-set-decoded-subject-internal)
+(defalias 'mail-header-subject 'mime-gnus-entity-subject-internal)
+(defalias 'mail-header-set-subject 'mime-gnus-entity-set-subject-internal)
 
-(defalias 'mail-header-from 'mime-entity-decoded-from-internal)
-(defalias 'mail-header-set-from 'mime-entity-set-decoded-from-internal)
+(defalias 'mail-header-from 'mime-gnus-entity-from-internal)
+(defalias 'mail-header-set-from 'mime-gnus-entity-set-from-internal)
 
-(defalias 'mail-header-date 'mime-entity-date-internal)
-(defalias 'mail-header-set-date 'mime-entity-set-date-internal)
+(defalias 'mail-header-date 'mime-gnus-entity-date-internal)
+(defalias 'mail-header-set-date 'mime-gnus-entity-set-date-internal)
 
-(defalias 'mail-header-message-id 'mime-entity-message-id-internal)
-(defalias 'mail-header-id 'mime-entity-message-id-internal)
-(defalias 'mail-header-set-message-id 'mime-entity-set-message-id-internal)
-(defalias 'mail-header-set-id 'mime-entity-set-message-id-internal)
+(defalias 'mail-header-message-id 'mime-gnus-entity-id-internal)
+(defalias 'mail-header-id 'mime-gnus-entity-id-internal)
+(defalias 'mail-header-set-message-id 'mime-gnus-entity-set-id-internal)
+(defalias 'mail-header-set-id 'mime-gnus-entity-set-id-internal)
 
-(defalias 'mail-header-references 'mime-entity-references-internal)
-(defalias 'mail-header-set-references 'mime-entity-set-references-internal)
+(defalias 'mail-header-references 'mime-gnus-entity-references-internal)
+(defalias 'mail-header-set-references
+  'mime-gnus-entity-set-references-internal)
 
-(defalias 'mail-header-chars 'mime-entity-chars-internal)
-(defalias 'mail-header-set-chars 'mime-entity-set-chars-internal)
+(defalias 'mail-header-chars 'mime-gnus-entity-chars-internal)
+(defalias 'mail-header-set-chars 'mime-gnus-entity-set-chars-internal)
 
-(defalias 'mail-header-lines 'mime-entity-lines-internal)
-(defalias 'mail-header-set-lines 'mime-entity-set-lines-internal)
+(defalias 'mail-header-lines 'mime-gnus-entity-lines-internal)
+(defalias 'mail-header-set-lines 'mime-gnus-entity-set-lines-internal)
 
-(defalias 'mail-header-xref 'mime-entity-xref-internal)
-(defalias 'mail-header-set-xref 'mime-entity-set-xref-internal)
+(defalias 'mail-header-xref 'mime-gnus-entity-xref-internal)
+(defalias 'mail-header-set-xref 'mime-gnus-entity-set-xref-internal)
 
 (defalias 'nnheader-decode-subject
   (mime-find-field-decoder 'Subject 'nov))
 (defalias 'nnheader-decode-from
   (mime-find-field-decoder 'From 'nov))
 
-(defalias 'mail-header-extra 'ignore)
-(defalias 'mail-header-set-extra 'ignore)
+(defalias 'mail-header-extra 'mime-gnus-entity-extra-internal)
+(defalias 'mail-header-set-extra 'mime-gnus-entity-set-extra-internal)
 
-(defsubst nnheader-decode-field-body (field-body field-name
-						 &optional mode max-column)
+(defun nnheader-decode-field-body (field-body field-name
+					      &optional mode max-column)
   (mime-decode-field-body field-body
-                          (if (stringp field-name)
-                              (intern (capitalize field-name))
-                            field-name)
-                          mode max-column))
+			  (if (stringp field-name)
+			      (intern (capitalize field-name))
+			    field-name)
+			  mode max-column))
 
-(defsubst make-full-mail-header
-  (&optional number subject from date id references chars lines xref extra)
+(defsubst make-full-mail-header (&optional number subject from date id
+					   references chars lines xref
+					   extra)
   "Create a new mail header structure initialized with the parameters given."
-  (make-mime-entity-internal
-   'gnus number
-   nil
-   nil nil nil
-   (if subject
-       (nnheader-decode-subject subject)
-     )
-   (if from
-       (nnheader-decode-from from)
-     )
-   date id references
-   chars lines xref
-   (list (cons 'Subject subject)
-	 (cons 'From from))
-   nil nil nil nil nil nil
-;;   extra
-   ))
+  (luna-make-entity (mm-expand-class-name 'gnus)
+		    :location number
+		    :subject (if subject
+				 (nnheader-decode-subject subject))
+		    :from (if from
+			      (nnheader-decode-from from))
+		    :date date
+		    :id id
+		    :references references
+		    :chars chars
+		    :lines lines
+		    :xref xref
+		    :original-header (list (cons 'Subject subject)
+					   (cons 'From from))
+		    :extra extra))
 
 (defsubst make-full-mail-header-from-decoded-header
   (&optional number subject from date id references chars lines xref extra)
   "Create a new mail header structure initialized with the parameters given."
-  (make-mime-entity-internal
-   'gnus number
-   nil
-   nil nil nil
-   subject
-   from
-   date id references
-   chars lines xref
-   nil
-   nil nil nil nil nil nil
-;;   extra
-   ))
+  (luna-make-entity (mm-expand-class-name 'gnus)
+		    :location number
+		    :subject subject
+		    :from from
+		    :date date
+		    :id id
+		    :references references
+		    :chars chars
+		    :lines lines
+		    :xref xref
+		    :extra extra))
 
-(defun make-mail-header (&optional init)
+(defsubst make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
   (make-full-mail-header init init init init init
 			 init init init init init))
@@ -361,6 +361,17 @@ on your system, you could say something like:
 		": " (cdar extra) "\t")
         (pop extra))))
   (insert "\n"))
+
+(defun nnheader-insert-header (header)
+  (insert
+   "Subject: " (or (mail-header-subject header) "(none)") "\n"
+   "From: " (or (mail-header-from header) "(nobody)") "\n"
+   "Date: " (or (mail-header-date header) "") "\n"
+   "Message-ID: " (or (mail-header-id header) (nnmail-message-id)) "\n"
+   "References: " (or (mail-header-references header) "") "\n"
+   "Lines: ")
+  (princ (or (mail-header-lines header) 0) (current-buffer))
+  (insert "\n\n"))
 
 (defun nnheader-insert-article-line (article)
   (goto-char (point-min))
@@ -850,6 +861,21 @@ without formatting."
     (while (< idx len)
       (when (= (aref string idx) from)
 	(aset string idx to))
+      (setq idx (1+ idx)))
+    string))
+
+(defun nnheader-replace-duplicate-chars-in-string (string from to)
+  "Replace characters in STRING from FROM to TO."
+  (let ((string (substring string 0))	;Copy string.
+	(len (length string))
+	(idx 0) prev i)
+    ;; Replace all occurrences of FROM with TO.
+    (while (< idx len)
+      (setq i (aref string idx))
+      (when (and (eq prev from) (= i from))
+	(aset string (1- idx) to)
+	(aset string idx to))
+      (setq prev i)
       (setq idx (1+ idx)))
     string))
 

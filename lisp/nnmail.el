@@ -26,7 +26,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-
 (require 'nnheader)
 (require 'message)
 (require 'custom)
@@ -36,6 +35,15 @@
 (eval-and-compile
   (autoload 'gnus-error "gnus-util")
   (autoload 'gnus-buffer-live-p "gnus-util"))
+
+(eval-when-compile (require 'static))
+
+(static-condition-case nil
+    :symbol-for-testing-whether-colon-keyword-is-available-or-not
+  (void-variable
+   (defconst :user ':user)
+   (defconst :path ':path)
+   (defconst :predicate ':predicate)))
 
 (defgroup nnmail nil
   "Reading mail with Gnus."
@@ -461,6 +469,9 @@ parameter.  It should return nil, `warn' or `delete'."
   "Make pathname for GROUP."
   (concat
    (let ((dir (file-name-as-directory (expand-file-name dir))))
+     (setq group (nnheader-replace-duplicate-chars-in-string
+		  (nnheader-replace-chars-in-string group ?/ ?_)
+		  ?. ?_))
      (setq group (nnheader-translate-file-chars group))
      ;; If this directory exists, we use it directly.
      (if (or nnmail-use-long-file-names
@@ -496,7 +507,8 @@ nn*-request-list should have been called before calling this function."
 
 (defun nnmail-save-active (group-assoc file-name)
   "Save GROUP-ASSOC in ACTIVE-FILE."
-  (let ((coding-system-for-write nnmail-active-file-coding-system))
+  (let ((coding-system-for-write nnmail-active-file-coding-system)
+	(output-coding-system nnmail-active-file-coding-system))
     (when file-name
       (with-temp-file file-name
 	(nnmail-generate-active group-assoc)))))
@@ -812,8 +824,8 @@ If SOURCE is a directory spec, try to return the group name component."
        ;; if there is no head-body delimiter, we search a bit manually.
        (while (and (looking-at "From \\|[^ \t]+:")
 		   (not (eobp)))
-	 (forward-line 1)
-	 (point))))
+	 (forward-line 1))
+       (point)))
     ;; Find the Message-ID header.
     (goto-char (point-min))
     (if (re-search-forward "^Message-ID:[ \t]*\\(<[^>]+>\\)" nil t)
@@ -997,35 +1009,39 @@ Return the number of characters in the body."
   (let (lines chars)
     (save-excursion
       (goto-char (point-min))
-      (when (search-forward "\n\n" nil t)
-	(setq chars (- (point-max) (point)))
-	(setq lines (count-lines (point) (point-max)))
-	(forward-char -1)
-	(save-excursion
-	  (when (re-search-backward "^Lines: " nil t)
-	    (delete-region (point) (progn (forward-line 1) (point)))))
-	(beginning-of-line)
-	(insert (format "Lines: %d\n" (max lines 0)))
-	chars))))
+      (unless (search-forward "\n\n" nil t)
+	(goto-char (point-max))
+	(insert "\n"))
+      (setq chars (- (point-max) (point)))
+      (setq lines (count-lines (point) (point-max)))
+      (forward-char -1)
+      (save-excursion
+	(when (re-search-backward "^Lines: " nil t)
+	  (delete-region (point) (progn (forward-line 1) (point)))))
+      (beginning-of-line)
+      (insert (format "Lines: %d\n" (max lines 0)))
+      chars)))
 
 (defun nnmail-insert-xref (group-alist)
   "Insert an Xref line based on the (group . article) alist."
   (save-excursion
     (goto-char (point-min))
-    (when (search-forward "\n\n" nil t)
-      (forward-char -1)
-      (when (re-search-backward "^Xref: " nil t)
-	(delete-region (match-beginning 0)
-		       (progn (forward-line 1) (point))))
-      (insert (format "Xref: %s" (system-name)))
-      (while group-alist
-	(insert (format " %s:%d"
-			(encode-coding-string
-			 (caar group-alist)
-			 nnmail-pathname-coding-system)
-			(cdar group-alist)))
-	(setq group-alist (cdr group-alist)))
-      (insert "\n"))))
+    (unless (search-forward "\n\n" nil t)
+      (goto-char (point-max))
+      (insert "\n"))
+    (forward-char -1)
+    (when (re-search-backward "^Xref: " nil t)
+      (delete-region (match-beginning 0)
+		     (progn (forward-line 1) (point))))
+    (insert (format "Xref: %s" (system-name)))
+    (while group-alist
+      (insert (format " %s:%d"
+		      (encode-coding-string
+		       (caar group-alist)
+		       nnmail-pathname-coding-system)
+		      (cdar group-alist)))
+      (setq group-alist (cdr group-alist)))
+    (insert "\n")))
 
 ;;; Message washing functions
 
@@ -1038,11 +1054,11 @@ Return the number of characters in the body."
 (defun nnmail-remove-list-identifiers ()
   "Remove list identifiers from Subject headers."
   (let ((regexp (if (stringp nnmail-list-identifiers) nnmail-list-identifiers
-		  (mapconcat 'identity nnmail-list-identifiers "\\|"))))
+		  (mapconcat 'identity nnmail-list-identifiers " *\\|"))))
     (when regexp
       (goto-char (point-min))
       (when (re-search-forward
-	     (concat "^Subject: +\\(Re: +\\)?\\(" regexp "\\) *")
+	     (concat "^Subject: +\\(Re: +\\)?\\(" regexp " *\\)")
 	     nil t)
 	(delete-region (match-beginning 2) (match-end 0))))))
 
@@ -1159,7 +1175,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 		    (setq value (cdr (assq value nnmail-split-abbrev-alist))))
 		;; Someone might want to do a \N sub on this match, so get the
 		;; correct match positions.
-		(re-search-backward value start-of-value))
+		(re-search-backward (concat "\\<" value "\\>") start-of-value))
 	      (dolist (sp (nnmail-split-it (car split-rest)))
 		(unless (memq sp split-result)
 		  (push sp split-result))))))
@@ -1446,7 +1462,9 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	    (incf total new)
 	    (incf i))))
       ;; If we did indeed read any incoming spools, we save all info.
-      (unless (zerop total)
+      (if (zerop total)
+	  (nnheader-message 4 "%s: Reading incoming mail (no new mail)...done"
+			    method (car source))
 	(nnmail-save-active
 	 (nnmail-get-value "%s-group-alist" method)
 	 (nnmail-get-value "%s-active-file" method))
@@ -1591,6 +1609,16 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	(setq found t
 	      his nil)))
     found))
+
+(defun nnmail-new-mail-numbers (group)
+  "Say how many articles has been incorporated to GROUP."
+  (let ((his (apply 'append nnmail-split-history))
+	numbers)
+    (while his
+      (when (string= group (caar his))
+	(push (cdar his) numbers))
+      (setq his (cdr his)))
+    numbers))
 
 (defun nnmail-within-headers-p ()
   "Check to see if point is within the headers of a unix mail message.

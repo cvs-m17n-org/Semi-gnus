@@ -29,7 +29,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-
 (require 'nnoo)
 (require 'nnweb)
 

@@ -26,7 +26,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-
 (require 'gnus)
 (require 'gnus-spec)
 (require 'gnus-group)
@@ -592,19 +591,38 @@ The following commands are available:
 	  (goto-char (point-min))
 	  (unless (string= gnus-ignored-newsgroups "")
 	    (delete-matching-lines gnus-ignored-newsgroups))
-         (while (and (not (eobp)) (forward-line))
+	  (while (not (eobp)) 
 	    (ignore-errors
-             (push (cons (read cur)
-			  (max 0 (- (1+ (read cur)) (read cur))))
-		    groups)))))
+	      (push (cons 
+		     (if (eq (char-after) ?\")
+			 (read cur)
+		       (let ((p (point)) (name ""))
+			 (skip-chars-forward "^ \t\\\\")
+			 (setq name (buffer-substring p (point)))
+			 (while (eq (char-after) ?\\)
+			   (setq p (1+ (point)))
+			   (forward-char 2)
+			   (skip-chars-forward "^ \t\\\\")
+			   (setq name (concat name (buffer-substring
+						    p (point)))))
+			 name))
+		     (max 0 (- (1+ (read cur)) (read cur))))
+		    groups))
+	    (forward-line))))
       (setq groups (sort groups
 			 (lambda (l1 l2)
 			   (string< (car l1) (car l2)))))
-      (let ((buffer-read-only nil))
+      (let ((buffer-read-only nil) 
+	    (gnus-select-method nil) 
+	    name)
 	(while groups
-	  (setq group (car groups))
-	  (insert
-	   (format "K%7d: %s\n" (cdr group) (car group)))
+	  (setq group (car groups)
+		name (format "%s" (car group)))
+	  (insert (if (cadr (gnus-gethash 
+			     (gnus-group-prefixed-name name method)
+			     gnus-newsrc-hashtb))
+		      " " "K")
+		  (format "%7d: " (cdr group)) name "\n")
 	  (setq groups (cdr groups))))
       (switch-to-buffer (current-buffer))
       (goto-char (point-min))
@@ -723,7 +741,8 @@ buffer.
 		   nil nil (if (gnus-server-equal
 				gnus-browse-current-method "native")
 			       nil
-			     gnus-browse-current-method))
+			     (gnus-method-simplify 
+			      gnus-browse-current-method)))
 	     gnus-level-default-subscribed gnus-level-killed
 	     (and (car (nth 1 gnus-newsrc-alist))
 		  (gnus-gethash (car (nth 1 gnus-newsrc-alist))

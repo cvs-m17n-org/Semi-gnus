@@ -25,8 +25,8 @@
 
 ;;; Code:
 
-(require 'nnheader)
 (eval-when-compile (require 'cl))
+(require 'nnheader)
 
 (defvar nnoo-definition-alist nil)
 (defvar nnoo-state-alist nil)

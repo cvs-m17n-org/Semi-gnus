@@ -31,10 +31,10 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'gnus-art)
 
 (eval-when-compile
-  (require 'cl)
   (autoload 'vm-mode "vm")
   (autoload 'vm-read-file-name "vm")
   (autoload 'vm-save-message "vm"))

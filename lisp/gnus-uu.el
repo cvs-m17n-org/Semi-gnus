@@ -526,6 +526,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 		 (gnus-get-buffer-create " *gnus-uu-forward*")))
       (erase-buffer)
       (insert-file file)
+      (delete-file file)
       (let ((fs gnus-uu-digest-from-subject))
 	(when fs
 	  (setq from (caar fs)
@@ -623,8 +624,9 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
   (interactive)
   (gnus-save-hidden-threads
     (let ((level (gnus-summary-thread-level)))
-      (while (and (gnus-summary-set-process-mark (gnus-summary-article-number))
-		  (zerop (gnus-summary-next-subject 1))
+      (while (and (gnus-summary-set-process-mark
+		   (gnus-summary-article-number))
+		  (zerop (gnus-summary-next-subject 1 nil t))
 		  (> (gnus-summary-thread-level) level)))))
   (gnus-summary-position-point))
 
@@ -954,7 +956,8 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 	(beginning-of-line)
 	(forward-line 1)
 	(when (file-exists-p gnus-uu-binhex-article-name)
-	  (append-to-file start-char (point) gnus-uu-binhex-article-name))))
+	  (write-region-as-binary start-char (point)
+				  gnus-uu-binhex-article-name 'append))))
     (if (memq 'begin state)
 	(cons gnus-uu-binhex-article-name state)
       state)))

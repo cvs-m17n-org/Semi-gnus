@@ -178,7 +178,7 @@ displayed, no centering will be performed."
     (sit-for 0))
   (when gnus-auto-center-summary
     (let* ((height (if (fboundp 'window-displayed-height)
-		       (1- (window-displayed-height))
+		       (window-displayed-height)
 		     (- (window-height) 2)))
 	   (top (cond ((< height 4) 0)
 		      ((< height 7) 1)
@@ -194,8 +194,10 @@ displayed, no centering will be performed."
 	;; Set the window start to either `bottom', which is the biggest
 	;; possible valid number, or the second line from the top,
 	;; whichever is the least.
+	;; NOFORCE parameter suggested by Daniel Pittman <daniel@danann.net>.
 	(set-window-start
-	 window (min bottom (save-excursion (forward-line (- top)) (point)))))
+	 window (min bottom (save-excursion (forward-line (- top)) (point))) 
+	 t))
       ;; Do horizontal recentering while we're at it.
       (when (and (get-buffer-window (current-buffer) t)
 		 (not (eq gnus-auto-center-summary 'vertical)))
@@ -623,7 +625,11 @@ the resulting string may be narrower than END-COLUMN.
 			     ("background" . ,(face-background 'default)))])
 			 ((featurep 'xbm)
 			  `[xbm :file ,logo-xbm])
-			 (t [nothing])))))
+			 (t [nothing]))))
+	   (wpheight (window-pixel-height))
+	   (rest (max 0 (1- (/ (* (- wpheight (glyph-height glyph))
+				  (window-height))
+			       wpheight 2)))))
       (insert " ")
       (set-extent-begin-glyph (make-extent (point) (point)) glyph)
       (goto-char (point-min))
@@ -631,15 +637,23 @@ the resulting string may be narrower than END-COLUMN.
 	(insert (make-string (/ (max (- (window-width) (or x 35)) 0) 2)
 			     ?\ ))
 	(forward-line 1))
-      (setq gnus-simple-splash nil))
-    (goto-char (point-min))
-    (let* ((pheight (+ 20 (count-lines (point-min) (point-max))))
-	   (wheight (window-height))
-	   (rest (- wheight pheight)))
-      (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n))))
+      (setq gnus-simple-splash nil)
+      (goto-char (point-min))
+      (insert gnus-product-name " " gnus-version-number
+	      (if (zerop (string-to-number gnus-revision-number))
+		  ""
+		(concat " (r" gnus-revision-number ")"))
+	      " based on " gnus-original-product-name " v"
+	      gnus-original-version-number "\n")
+      (goto-char (point-min))
+      (put-text-property (point) (gnus-point-at-eol) 'face 'gnus-splash-face)
+      (insert-char ?\ ; space
+		   (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
+      (forward-line 1)
+      (insert-char ?\n rest)
+      (set-window-start (selected-window) (point-min))))
    (t
-    (insert
-     (format "              %s
+    (insert "
           _    ___ _             _
           _ ___ __ ___  __    _ ___
           __   _     ___    __  ___
@@ -659,9 +673,20 @@ the resulting string may be narrower than END-COLUMN.
           __
 
 "
-	     ""))
+	    )
+    (goto-char (point-min))
+    (insert gnus-product-name " " gnus-version-number
+	    (if (zerop (string-to-number gnus-revision-number))
+		""
+	      (concat " (r" gnus-revision-number ")"))
+	    " based on " gnus-original-product-name " v"
+	    gnus-original-version-number)
+    (goto-char (point-min))
+    (insert-char ?\ ; space
+		 (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
+    (forward-line 1)
     ;; And then hack it.
-    (gnus-indent-rigidly (point-min) (point-max)
+    (gnus-indent-rigidly (point) (point-max)
 			 (/ (max (- (window-width) (or x 46)) 0) 2))
     (goto-char (point-min))
     (forward-line 1)

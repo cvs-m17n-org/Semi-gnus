@@ -27,7 +27,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-
 (require 'gnus)
 (require 'gnus-sum)
 (require 'gnus-range)
@@ -437,21 +436,55 @@ of the last successful match.")
 
 (defconst gnus-header-index
   ;; Name to index alist.
-  '(("number" 1 gnus-score-integer)
-    ("subject" 8 gnus-score-string)
-    ("from" 9 gnus-score-string)
-    ("date" 10 gnus-score-date)
-    ("message-id" 11 gnus-score-string)
-    ("references" 12 gnus-score-string)
-    ("chars" 13 gnus-score-integer)
-    ("lines" 14 gnus-score-integer)
-    ("xref" 15 gnus-score-string)
-    ("extra" 16 gnus-score-string)
+  `(("number"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'location)
+     gnus-score-integer)
+    ("subject"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'subject)
+     gnus-score-string)
+    ("from"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'from)
+     gnus-score-string)
+    ("date"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'date)
+     gnus-score-date)
+    ("message-id"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'id)
+     gnus-score-string)
+    ("references"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'references)
+     gnus-score-string)
+    ("chars"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'chars)
+     gnus-score-integer)
+    ("lines"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'lines)
+     gnus-score-integer)
+    ("xref"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'xref)
+     gnus-score-string)
+;;    ("extra" 16 gnus-score-string)
+    ("extra" -1 gnus-score-body)
     ("head" -1 gnus-score-body)
     ("body" -1 gnus-score-body)
     ("all" -1 gnus-score-body)
-    ("followup" 9 gnus-score-followup)
-    ("thread" 12 gnus-score-thread)))
+    ("followup"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'from)
+     gnus-score-followup)
+    ("thread"
+     ,(luna-class-slot-index (luna-find-class 'mime-gnus-entity)
+			     'references)
+     gnus-score-thread)))
 
 ;;; Summary mode score maps.
 
@@ -502,7 +535,7 @@ used as score."
 	    (?s "subject" nil nil string)
 	    (?b "body" "" nil body-string)
 	    (?h "head" "" nil body-string)
-	    (?i "message-id" nil t string)
+	    (?i "message-id" nil nil string)
 	    (?r "references" "message-id" nil string)
 	    (?x "xref" nil nil string)
 	    (?e "extra" nil nil string)
@@ -1342,7 +1375,7 @@ EXTRA is the possible non-standard header."
       (while cache
 	(current-buffer)
 	(setq entry (pop cache)
-	      file (car entry)
+	      file (nnheader-translate-file-chars (car entry) t)
 	      score (cdr entry))
 	(if (or (not (equal (gnus-score-get 'touched score) '(t)))
 		(gnus-score-get 'read-only score)
@@ -1477,7 +1510,7 @@ EXTRA is the possible non-standard header."
 	  (let (score)
 	    (while (setq score (pop scores))
 	      (while score
-		(when (listp (caar score))
+		(when (consp (caar score))
 		  (gnus-score-advanced (car score) trace))
 		(pop score))))
 
@@ -2853,7 +2886,9 @@ If ADAPT, return the home adaptive file instead."
 	      (when (string-match (gnus-globalify-regexp (car elem)) group)
 		(replace-match (cadr elem) t nil group ))))))
     (when found
-      (nnheader-concat gnus-kill-files-directory found))))
+      (if (file-name-absolute-p found)
+          found
+        (nnheader-concat gnus-kill-files-directory found)))))
 
 (defun gnus-hierarchial-home-score-file (group)
   "Return the score file of the top-level hierarchy of GROUP."

@@ -104,6 +104,9 @@
     ("text/plain" mm-inline-text identity)
     ("text/enriched" mm-inline-text identity)
     ("text/richtext" mm-inline-text identity)
+    ("text/x-patch" mm-display-patch-inline
+     (lambda (handle)
+       (locate-library "diff-mode")))
     ("text/html"
      mm-inline-text
      (lambda (handle)
@@ -111,7 +114,8 @@
     ("text/x-vcard"
      mm-inline-text
      (lambda (handle)
-       (locate-library "vcard")))
+       (or (featurep 'vcard)
+	   (locate-library "vcard"))))
     ("message/delivery-status" mm-inline-text identity)
     ("message/rfc822" mm-inline-message identity)
     ("text/.*" mm-inline-text identity)
@@ -124,24 +128,31 @@
      (lambda (handle)
        (and (or (featurep 'nas-sound) (featurep 'native-sound))
 	    (device-sound-enabled-p))))
+    ("application/pgp-signature" ignore identity)
     ("multipart/alternative" ignore identity)
     ("multipart/mixed" ignore identity)
     ("multipart/related" ignore identity))
   "Alist of media types/test that say whether the media types can be displayed inline.")
 
 (defvar mm-inlined-types
-  '("image/.*" "text/.*" "message/delivery-status" "message/rfc822")
+  '("image/.*" "text/.*" "message/delivery-status" "message/rfc822"
+    "application/pgp-signature")
   "List of media types that are to be displayed inline.")
   
 (defvar mm-automatic-display
   '("text/plain" "text/enriched" "text/richtext" "text/html"
     "text/x-vcard" "image/.*" "message/delivery-status" "multipart/.*"
-    "message/rfc822")
+    "message/rfc822" "text/x-patch" "application/pgp-signature")
   "A list of MIME types to be displayed automatically.")
 
-(defvar mm-attachment-override-types
-  '("text/plain" "text/x-vcard")
+(defvar mm-attachment-override-types '("text/x-vcard")
   "Types that should have \"attachment\" ignored if they can be displayed inline.")
+
+(defvar mm-inline-override-types nil
+  "Types that should be treated as attachments even if they can be displayed inline.")
+
+(defvar mm-inline-override-types nil
+  "Types that should be treated as attachments even if they can be displayed inline.")
 
 (defvar mm-automatic-external-display nil
   "List of MIME type regexps that will be displayed externally automatically.")
@@ -191,7 +202,11 @@ to:
       (if (or (not ctl)
 	      (not (string-match "/" (car ctl))))
 	  (mm-dissect-singlepart
-	   '("text/plain") nil no-strict-mime
+	   '("text/plain") 
+	   (and cte (intern (downcase (mail-header-remove-whitespace
+				       (mail-header-remove-comments
+					cte)))))
+	   no-strict-mime
 	   (and cd (ignore-errors (mail-header-parse-content-disposition cd)))
 	   description)
 	(setq type (split-string (car ctl) "/"))
@@ -315,9 +330,9 @@ external if displayed external."
 	  (insert-buffer-substring cur)
 	  (message "Viewing with %s" method)
 	  (let ((mm (current-buffer))
-		(non-viewer (assoc "non-viewer"
-				   (mailcap-mime-info
-				    (mm-handle-media-type handle) t))))
+		(non-viewer (assq 'non-viewer
+				  (mailcap-mime-info
+				   (mm-handle-media-type handle) t))))
 	    (unwind-protect
 		(if method
 		    (funcall method)
@@ -334,6 +349,7 @@ external if displayed external."
 			 (mm-handle-media-type handle) t))
 	     (needsterm (or (assoc "needsterm" mime-info)
 			    (assoc "needsterminal" mime-info)))
+	     (copiousoutput (assoc "copiousoutput" mime-info))
 	     process file buffer)
 	;; We create a private sub-directory where we store our files.
 	(make-directory dir)
@@ -342,22 +358,35 @@ external if displayed external."
 	    (setq file (expand-file-name (file-name-nondirectory filename)
 					 dir))
 	  (setq file (make-temp-name (expand-file-name "mm." dir))))
-	(write-region (point-min) (point-max) file nil 'nomesg)
+	(let ((coding-system-for-write mm-binary-coding-system))
+	  (write-region (point-min) (point-max) file nil 'nomesg))
 	(message "Viewing with %s" method)
 	(unwind-protect
 	    (setq process
-		  (if needsterm
-		      (start-process "*display*" nil
-				     "xterm"
-				     "-e" shell-file-name "-c"
-				     (mm-mailcap-command
-				      method file (mm-handle-type handle)))
-		    (start-process "*display*"
-				   (setq buffer (generate-new-buffer "*mm*"))
-				   shell-file-name
-				   "-c"
-				   (mm-mailcap-command
-				    method file (mm-handle-type handle)))))
+		  (cond (needsterm
+			 (start-process "*display*" nil
+					"xterm"
+					"-e" shell-file-name 
+					shell-command-switch
+					(mm-mailcap-command
+					 method file (mm-handle-type handle))))
+			(copiousoutput
+			 (start-process "*display*"
+					(setq buffer 
+					      (generate-new-buffer "*mm*"))
+					shell-file-name
+					shell-command-switch
+					(mm-mailcap-command
+					 method file (mm-handle-type handle)))
+			 (switch-to-buffer buffer))
+			(t
+			 (start-process "*display*"
+					(setq buffer
+					      (generate-new-buffer "*mm*"))
+					shell-file-name
+					shell-command-switch
+					(mm-mailcap-command
+					 method file (mm-handle-type handle))))))
 	  (mm-handle-set-undisplayer handle (cons file buffer)))
 	(message "Displaying %s..." (format method file))))))
 
@@ -437,9 +466,14 @@ external if displayed external."
 
 (defun mm-display-inline (handle)
   (let* ((type (mm-handle-media-type handle))
-	 (function (cadr (assoc type mm-inline-media-tests))))
+	 (function (cadr (mm-assoc-string-match mm-inline-media-tests type))))
     (funcall function handle)
     (goto-char (point-min))))
+
+(defun mm-assoc-string-match (alist type)
+  (dolist (elem alist)
+    (when (string-match (car elem) type)
+      (return elem))))
 
 (defun mm-inlinable-p (handle)
   "Say whether HANDLE can be displayed inline."
@@ -447,7 +481,7 @@ external if displayed external."
 	(type (mm-handle-media-type handle))
 	test)
     (while alist
-      (when (equal type (caar alist))
+      (when (string-match (caar alist) type)
 	(setq test (caddar alist)
 	      alist nil)
 	(setq test (funcall test handle)))
@@ -460,7 +494,8 @@ external if displayed external."
 	(type (mm-handle-media-type handle))
 	method result)
     (while (setq method (pop methods))
-      (when (and (string-match method type)
+      (when (and (not (mm-inline-override-p handle))
+		 (string-match method type)
 		 (mm-inlinable-p handle))
 	(setq result t
 	      methods nil)))
@@ -472,7 +507,8 @@ external if displayed external."
 	(type (mm-handle-media-type handle))
 	method result)
     (while (setq method (pop methods))
-      (when (and (string-match method type)
+      (when (and (not (mm-inline-override-p handle))
+		 (string-match method type)
 		 (mm-inlinable-p handle))
 	(setq result t
 	      methods nil)))
@@ -487,6 +523,16 @@ external if displayed external."
       (while (setq ty (pop types))
 	(when (and (string-match ty type)
 		   (mm-inlinable-p handle))
+	  (throw 'found t))))))
+
+(defun mm-inline-override-p (handle)
+  "Say whether HANDLE should have inline behavior overridden."
+  (let ((types mm-inline-override-types)
+	(type (mm-handle-media-type handle))
+	ty)
+    (catch 'found
+      (while (setq ty (pop types))
+	(when (string-match ty type)
 	  (throw 'found t))))))
 
 (defun mm-automatic-external-display-p (type)
@@ -566,21 +612,13 @@ external if displayed external."
 (defun mm-save-part-to-file (handle file)
   (mm-with-unibyte-buffer
     (mm-insert-part handle)
-    ;; Now every coding system is 100% binary within mm-with-unibyte-buffer
-    ;; Is text still special?
-    (let ((coding-system-for-write
-	   (if (equal "text" (mm-handle-media-supertype handle))
-	       buffer-file-coding-system
-	     'binary))
+    (let ((coding-system-for-write 'binary)
 	  ;; Don't re-compress .gz & al.  Arguably we should make
 	  ;; `file-name-handler-alist' nil, but that would chop
-	  ;; ange-ftp which it's reasonable to use here.
+	  ;; ange-ftp, which is reasonable to use here.
 	  (inhibit-file-name-operation 'write-region)
 	  (inhibit-file-name-handlers
-	   (if (equal (mm-handle-media-type handle)
-		      "application/octet-stream")
-	       (cons 'jka-compr-handler inhibit-file-name-handlers)
-	     inhibit-file-name-handlers)))
+	   (cons 'jka-compr-handler inhibit-file-name-handlers)))
       (write-region (point-min) (point-max) file))))
 
 (defun mm-pipe-part (handle)

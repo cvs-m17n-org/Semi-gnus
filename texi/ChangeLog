@@ -1,3 +1,152 @@
+1999-12-01 14:21:19  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Topic Parameters): Addition.
+	(Summary Message Commands): New.
+	(Canceling and Superseding): Made into subsection.
+
+1999-11-30 10:54:31  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Mail Source Specifiers): Add a note.
+
+1999-11-27 17:15:00  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi: Typo fixes and @sc.
+
+1999-11-26 16:59:29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (On Writing Manuals): New.
+
+1999-11-23 17:23:37  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Mail Source Specifiers): Update.
+
+1999-11-23 05:07:59  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Web Archive): Add nnwarchive.
+
+1999-11-23 03:05:32  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Mail Source Specifiers): Add webmail.
+
+1999-11-19 12:15:23  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Slashdot): Addition.
+
+1999-11-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnus.texi (Finding the Parent): Fix example.
+
+1999-11-16 10:09:44  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi: Addition.
+	(present): Addition.
+
+1999-11-13  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus.texi (Mail Source Specifiers): Fix. Added documentation for
+	IMAP mail-source keywords `fetchflag' and `dontexpunge'.
+
+1999-11-12 18:00:56  Eli Zaretskii  <eliz@is.elta.co.il>
+
+	* gnus.texi (Fancy Mail Splitting): Fix @vars.
+
+1999-11-12 17:08:35  Gunnar Evermann  <ge204@eng.cam.ac.uk>
+
+	* gnus.texi (Splitting in IMAP): @@ fix.
+
+1999-11-12 08:17:49  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Mail Source Specifiers): Addition.
+
+1999-11-12 08:17:44  Ulf Betlehem  <flu@iki.fi>
+
+	* gnus.texi (Mail Source Specifiers): Example.
+
+1999-11-12 05:26:22  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Slashdot): Addition.
+
+1999-11-11 04:32:57  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.texi (News Headers): Fix.
+
+	* gnus.texi (Browsing the Web): New.
+	(Slashdot): New.
+	(Ultimate): New.
+
+1999-11-10 11:32:00  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Archived Messages): Fix.
+
+1999-11-07 01:28:07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (MIME Commands): Addition.
+
+1999-11-06 23:09:31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Customizing Articles): Fix.
+
+1999-11-05 22:34:23  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Posting Styles): Addition.
+
+1999-10-23  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus.texi (Mail Source Specifiers): Add imap mail-source.
+	(IMAP): New subsection.
+	(SOUP): Typo.
+
+1999-09-27 16:07:31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* emacs-mime.texi (New Viewers): Fix.
+
+1999-10-29  David S. Goldberg  <dsg@mitre.org>
+
+	* emacs-mime.texi (Customization): Document mm-inline-override-types
+
+1999-09-25 10:58:17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.texi (Forwarding): Updated.
+
+	* emacs-mime.texi (New Viewers): New.
+
+1999-09-24 18:52:34  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Line Specification): Doc fix.
+
+1999-09-24 18:06:33  Bill White  <billw@wolfram.com>
+
+	* gnus.texi (Article Washing): Fix.
+
+1999-08-27 20:47:39  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Posting Styles): Doc fix.
+
+1999-08-27 18:51:42  Robin S. Socha  <robin@socha.net>
+
+	* gnus.texi: Typo fix.
+
+1999-08-27 15:09:01  Jim Meyering  <meyering@ascend.com>
+
+	* gnus.texi (The Active File): Typo fix.
+
+1999-08-27 15:00:23  Yoshiki Hayashi  <t90553@m.ecc.u-tokyo.ac.jp>
+
+	* gnus.texi (Generic Marking Commands): Typo fixes.
+
+1999-08-27 14:46:21  Lee Willis  <lee@gbdirect.co.uk>
+
+	* gnus.texi (Customizing Articles): More explanation.
+
+1999-07-10  Mike McEwan  <mike@lotusland.demon.co.uk>
+
+	* gnus.texi (More Threading): Document new variable
+	`gnus-sort-gathered-threads-function'.
+
+1999-07-30  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus.texi: Added `gnus-list-identifiers' stuff.
+
 1999-07-09 19:41:34  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Using MIME): Addition.

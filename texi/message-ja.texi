@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message-ja
-@settitle Message 6.10.072 Manual
+@settitle T-gnus 6.13 Message Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -20,7 +20,7 @@ This file documents Message, the Emacs message composition mode.
 $B$3$N%U%!%$%k$O(B Emacs $B$N%a%C%;!<%8:n@.%b!<%I$G$"$k(B Message $B$K4X$9$k@bL@J8(B
 $B=q$G$9!#(B
 
-Copyright (C) 1996 Free Software Foundation, Inc.
+Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -60,14 +60,14 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Message 6.10.072 Manual
+@title T-gnus 6.13 Message Manual
 
 @author by Lars Magne Ingebrigtsen
 @translated by members of Semi-gnus mailing-list
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1996 Free Software Foundation, Inc. 
+Copyright @copyright{} 1996,97,98,99 Free Software Foundation, Inc. 
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -112,8 +112,8 @@ Gnus $B$NA4$F$N%a%C%;!<%8$N:n@.(B ($B%a!<%k$H%K%e!<%9$NN>J}(B) $B$O%a%C%;!<
 * Key Index::         $B%a%C%;!<%8%b!<%I%-!<$N0lMw!#(B
 @end menu
 
-$B$3$N%^%K%e%"%k$O(B Message 6.10.072 $B$KBP1~$7$^$9!#(BMessage $B$O$3$N%^%K%e%"%k$H(B
-$BF1$8HGHV9f$N(B Gnus $B$NG[I[$H6&$KG[I[$5$l$^$9!#(B
+$B$3$N%^%K%e%"%k$O(B T-gnus 6.13 Message $B$KBP1~$7$^$9!#(BMessage $B$O$3$N%^%K%e(B
+$B%"%k$HF1$8HGHV9f$N(B Gnus $B$NG[I[$H6&$KG[I[$5$l$^$9!#(B
 
 
 @node Interface
@@ -215,7 +215,7 @@ Message $B$OJVEz$,2?=h$K9T$/$+$r7hDj$9$k$?$a$KIaDL$NJ}K!$r;H$$$^$9$,!"(B
 $B$K;H$o$l$^$9(B (@pxref{Reply})$B!#(B
 
 
-@findex rmail-dont-reply-to-names
+@findex message-dont-reply-to-names
 $B@55,I=8=(B @code{rmail-dont-reply-to-names} $B$K9gCW$9$k%"%I%l%9$O(B @code{Cc} 
 $B%X%C%@!<$+$i<h$j=|$+$l$^$9!#(B
 
@@ -271,26 +271,10 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 $B%K%e!<%9$r;H$$$^$9!#(B
 
 @table @code
-@item message-forward-state-separator
-@vindex message-forward-start-separator
-$BE>Aw$5$l$k%a%C%;!<%8$NA0$KA^F~$5$l$k6h@Z$j$G$9!#=i4|CM$O(B @*
-@samp{------- Start of forwarded message -------\n} $B$G$9!#(B
-
-@vindex message-forward-end-separator
-@item message-forward-end-separator
-$BE>Aw$5$l$k%a%C%;!<%8$N8e$KA^F~$5$l$k6h@Z$j$G$9!#=i4|CM$O(B @*
-@samp{------- End of forwarded message -------\n} $B$G$9!#(B
-
-@item message-signature-before-forwarded-message
-@vindex message-signature-before-forwarded-message
-$B$b$7$3$NJQ?t$,(B @code{t} $B$G$"$k$H!"$=$l$,=i4|CM$G$9$,!"$"$J$?$N8D?ME*$J=p(B
-$BL>$,E>Aw$5$l$k%a%C%;!<%8$NA0$KA^F~$5$l$^$9!#$b$7$=$&$G$J$1$l$P!"E>Aw$5$l(B
-$B$k%a%C%;!<%8$O?7$7$$%a!<%k$N:G=i$KA^F~$5$l$^$9!#(B
-
-@item message-included-forward-headers
-@vindex message-included-forward-headers
-$B$3$l$O@55,I=8=$G!"$=$l$OE>Aw$5$l$k%a%C%;!<%8$K4^$^$l$k%X%C%@!<9T$K9gCW$9(B
-$B$k$b$N$G$9!#(B
+@item message-ignored-forward-headers
+@vindex message-ignored-forward-headers
+$B$3$N@55,I=8=$K9gCW$9$k$9$Y$F$N%X%C%@!<$,!"E>Aw$5$l$k%a%C%;!<%8$+$i:o=|$5(B
+$B$l$^$9!#(B
 
 @end table
 
@@ -329,6 +313,7 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 * Header Commands::     $B%X%C%@!<$K0\F0$9$k$?$a$NL?Na!#(B
 * Movement::            $B%a%C%;!<%8%P%C%U%!$rF0$-2s$k!#(B
 * Insertion::           $B%a%C%;!<%8%P%C%U%!$KJ*;v$rA^F~$9$k!#(B
+@c * MIME::                @sc{mime} considerations.
 * Various Commands::    $B$$$m$$$m$J;v!#(B
 * Sending::             $B<B:]$K%a%C%;!<%8$rAw$k!#(B
 * Mail Aliases::        $B$I$N$h$&$K$7$F%a!<%k$NJLL>$r;H$&$+!#(B
@@ -435,6 +420,12 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 $BE=$jIU$1$^$9!#IaDL$O(B @code{gnus-article-copy} $B$O$"$J$?$,JVEz$7$h$&$H$7$F(B
 $B$$$k%a%C%;!<%8$G$9(B (@code{messsage-yank-original})$B!#(B
 
+@item C-c C-Y
+@kindex C-c C-Y
+@findex message-yank-buffer
+Prompt for a buffer name and yank the contents of that buffer into the
+message buffer (@code{message-yank-buffer}).
+
 @item C-c C-q
 @kindex C-c C-q
 @findex message-fill-yanked-message
@@ -449,6 +440,11 @@ u} (@code{undo}) $B$,;HMQ2DG=$G!"Bg>fIW$G$"$k$H8@$&;v$r3P$($F$*$$$F2<$5$$!#(B
 @kindex C-c C-w
 @findex message-insert-signature
 $B%P%C%U%!$N:G8e$K=pL>$rA^F~$7$^$9(B (@code{message-insert-signature})$B!#(B
+
+@item C-c M-h
+@kindex C-c M-h
+@findex message-insert-headers
+$B%a%C%;!<%8$N%X%C%@!<$rA^F~$7$^$9(B (@code{message-insert-headers})$B!#(B
 
 @end table
 
@@ -476,8 +472,7 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 $B$"$J$?$,5-;v$KJVEz$+%U%)%m!<%"%C%W$r$7$F$$$k$H$-$O!"IaDL$O$"$J$?$,1~Ez$7(B
 $B$F$$$k?M$N$b$N$K0zMQId$rIU$1$?$$$G$7$g$&!#0zMQJ8$NA^F~$O(B @dfn{$BE=$jIU$1(B} 
 $B$K$h$C$F$J$5$l!"$=$l$>$l$NE=$jIU$1$i$l$?0zMQ9T$O$=$NA0$K(B 
-@code{message-yank-prefix} $B$rIU$1$i$l$^$9!#=i4|CM$O(B @samp{> } $B$G$9!#$b$7(B
-$B$=$l$,(B @code{nil} $B$G$"$l$P!"%a%C%;!<%8$N;z2<$2$@$1$r$7$^$9!#(B
+@code{message-yank-prefix} $B$rIU$1$i$l$^$9!#=i4|CM$O(B @samp{> } $B$G$9!#(B
 
 @item message-indentation-spaces
 @vindex message-indentation-spaces
@@ -527,6 +522,27 @@ RFC1036bis $B$O!"=pL>$O$=$NA0$K(B @samp{-- } $B$N(B3$BJ8;z$@$1$N9T$,$"$k$Y$
 $BF~$l$k;v$O!"3'$K$"$J$?$,GO</$G2?$b=EMW$J;v$O8@$o$J$$$H8@$&;v$r?.$8$5$;$k(B
 $B$?$a$N8z2LE*$JJ}K!$G$9!#(B
 
+@c FIXTGNUS We should provide MIME manual.
+@c @node MIME
+@c @section MIME
+@c @cindex MML
+@c @cindex MIME
+@c @cindex multipart
+@c @cindex attachment
+
+@c Message is a @sc{mime}-compliant posting agent.  The user generally
+@c doesn't have to do anything to make the @sc{mime} happen---Message will
+@c automatically add the @code{Content-Type} and
+@c @code{Content-Transfer-Encoding} headers.
+
+@c The most typical thing users want to use the multipart things in
+@c @sc{mime} for is to add ``attachments'' to mail they send out.  This can
+@c be done with the @code{C-c C-a} command, which will prompt for a file
+@c name and a @sc{mime} type.
+
+@c You can also create arbitrarily complex multiparts using the MML
+@c language (@pxref{Composing, , Composing, emacs-mime, The Emacs MIME
+@c Manual}).
 
 
 @node Various Commands
@@ -839,10 +855,9 @@ Lines (optional . X-Mailer))} $B$G$9!#(B
 @cindex Sun
 $B$3$NI,MW$J%X%C%@!<$O(B Message $B$K$h$j:n@.$5$l$^$9!#F|IU!";~4V!"MxMQ<TL>!"(B
 $B%7%9%F%`L>$K4p$E$$$?B>$KL5$$(B ID $B$,:n@.$5$l$^$9!#(BMessage $B$O(B 
-@code{mail-host-address} $B$,Dj5A$5$l$F$$$l$P!"$=$l$r(B fully qualified
-domain name (FQDN) ($B40A4$K>r7o$rK~$?$7$?%I%a%$%sL>(B) $B$H$7$F;H$$$^$9!#$b$7(B
-$B$=$&$G$J$1$l$P!"$=$l$O(B @code{system-name} $B$r;H$$!"$=$l$O$$$/$D$+$N%^%7%s(B 
--- $B<g$K(B Sun $B$G$O!"(BFQDN $B$rJs9p$7$^$;$s!#(B
+@code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$3$l$,(B fully
+qualified domain name (FQDN) ($B40A4$K>r7o$rK~$?$7$?%I%a%$%sL>(B) $B$G$J$$$J$i(B
+$B$P!"(BMessage $B$O(B @code{mail-host-address} $B$r(B FQDN $B$H$7$F;H$$$^$9!#(B
 
 @item X-Newsreader
 @cindex X-Nesreader
@@ -935,6 +950,8 @@ domain name (FQDN) ($B40A4$K>r7o$rK~$?$7$?%I%a%$%sL>(B) $B$H$7$F;H$$$^$9!#$b$
 $B2q<T$@$1$,4^$`$Y$-J*$G$9!#(B
 @item empty
 $B5-;v$,6u$+$I$&$+$rD4$Y$^$9!#(B
+@item invisible-text
+$B%P%C%U%!$KIT2D;k$N%F%-%9%H$,$"$k$+$I$&$+$rD4$Y$^$9!#(B
 @item empty-headers
 $B%X%C%@!<$N$I$l$+$,6u$G$"$k$+$rD4$Y$^$9!#(B
 @item existing-newsgroups
@@ -1043,9 +1060,8 @@ follows this line--} $B$G$9!#(B
 (add-hook 'message-send-hook 'my-message-add-content)
 (defun my-message-add-content ()
   (message-add-header
-   "Mime-Version: 1.0"
-   "Content-Type: text/plain"
-   "Content-Transfer-Encoding: 7bit"))
+   "X-In-No-Sense: Nonsense"
+   "X-Whatever: no"))
 @end lisp
 
 $B$3$N4X?t$O!"%X%C%@!<$,4{$KB8:_$7$F$$$k>l9g$O%X%C%@!<$r2C$($^$;$s!#(B

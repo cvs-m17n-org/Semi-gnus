@@ -35,11 +35,8 @@
 
 ;;; Code:
 
-(eval-when-compile
-  (require 'cl)
-  (require 'smtp)
-  )
-
+(eval-when-compile (require 'cl))
+(eval-when-compile (require 'smtp))
 (require 'mailheader)
 (require 'nnheader)
 (require 'easymenu)
@@ -48,6 +45,7 @@
     (require 'mail-abbrevs)
   (require 'mailabbrev))
 (require 'mime-edit)
+(eval-when-compile (require 'static))
 
 ;; Avoid byte-compile warnings.
 (eval-when-compile
@@ -312,7 +310,7 @@ is the symbol `guess', try to detect \"Re: \" within an encoded-word."
   :type 'regexp
   :group 'message-various)
 
-(defcustom message-elide-elipsis "\n[...]\n\n"
+(defcustom message-elide-ellipsis "\n[...]\n\n"
   "*The string which is inserted for elided text."
   :type 'string
   :group 'message-various)
@@ -407,6 +405,11 @@ The provided functions are:
  :type '(radio (function-item message-forward-subject-author-subject)
 	       (function-item message-forward-subject-fwd)))
 
+(defcustom message-forward-as-mime t
+  "*If non-nil, forward messages as an inline/rfc822 MIME section.  Otherwise, directly inline the old message in the forwarded message."
+  :group 'message-forwarding
+  :type 'boolean)
+
 (defcustom message-wash-forwarded-subjects nil
   "*If non-nil, try to remove as much old cruft as possible from the subject of messages before generating the new subject of a forward."
   :group 'message-forwarding
@@ -416,6 +419,12 @@ The provided functions are:
   "*All headers that match this regexp will be deleted when resending a message."
   :group 'message-interface
   :type 'regexp)
+
+(defcustom message-forward-ignored-headers nil
+  "*All headers that match this regexp will be deleted when forwarding a message."
+  :group 'message-forwarding
+  :type '(choice (const :tag "None" nil)
+		 regexp))
 
 (defcustom message-ignored-cited-headers "."
   "*Delete these headers from the messages you yank."
@@ -647,6 +656,7 @@ Predefined functions include `message-cite-original' and
 Note that `message-cite-original' uses `mail-citation-hook' if that is non-nil."
   :type '(radio (function-item message-cite-original)
 		(function-item message-cite-original-without-signature)
+		(function-item mu-cite-original)
 		(function-item sc-cite-original)
 		(function :tag "Other"))
   :group 'message-insertion)
@@ -822,6 +832,13 @@ Valid valued are `unique' and `unsent'."
   :group 'message
   :type 'symbol)
 
+(defcustom message-dont-reply-to-names rmail-dont-reply-to-names
+  "*A regexp specifying names to prune when doing wide replies.
+A value of nil means exclude your own name only."
+  :group 'message
+  :type '(choice (const :tag "Yourself" nil)
+		 regexp))
+
 ;;; Internal variables.
 ;;; Well, not really internal.
 
@@ -961,10 +978,152 @@ Defaults to `text-mode-abbrev-table'.")
   "Face used for displaying MML."
   :group 'message-faces)
 
-(defvar message-font-lock-keywords
-  (let* ((cite-prefix "A-Za-z")
-	 (cite-suffix (concat cite-prefix "0-9_.@-"))
-	 (content "[ \t]*\\(.+\\(\n[ \t].*\\)*\\)"))
+(defvar message-font-lock-fence-open-regexp "[+|]"
+  "*Regexp that matches fence open string.")
+
+(defvar message-font-lock-fence-close-regexp "|"
+  "*Regexp that matches fence close string.")
+
+(defvar message-font-lock-fence-open-position nil
+  "*Cons of SYMBOL of a function or a variable and a number of OFFSET that
+indicate the fence open position.  If it is non-nil,
+`message-font-lock-fence-open-regexp' is not used for searching for the
+fence open position.  If SYMBOL is a function, it is called with one argument
+last cursor position and should return the fence open position as a number
+or a marker.  If SYMBOL is a variable symbol, the value is examined with
+`symbol-value'.  OFFSET is added to the position to compensate the value.
+For example, the following combinations of variable symbol and offset value
+can be used:
+
+Egg v3: '(egg:*region-start* . -1)
+Canna:  '(canna:*region-start* . 0)
+")
+
+(defvar message-font-lock-fence-close-position nil
+  "*Cons of SYMBOL of a function or a variable and a number of OFFSET that
+indicate the fence close position.  If it is non-nil,
+`message-font-lock-fence-close-regexp' is not used for searching for the
+fence close position.  If SYMBOL is a function, it is called with one argument
+last cursor position and should return the fence close position as a number
+or a marker.  If SYMBOL is a variable symbol, the value is examined with
+`symbol-value'.  OFFSET is added to the position to compensate the value.
+For example, the following combinations of variable symbol and offset value
+can be used:
+
+Egg v3: '(egg:*region-end* . 0)
+Canna:  '(canna:*region-end* . 0)
+")
+
+(defvar message-font-lock-cited-text-regexp
+  "^[\t ]*\\([^\000- :>|}\177]*\\)[:>|}].*"
+  "*Regexp that matches cited text.  It should have a grouping for the
+citation prefix which is ended at the beginning of citation mark string.")
+
+(defvar message-font-lock-citation-name-max-column 10
+  "*Maximun number of column for citation name for fontifying.")
+
+(defvar message-font-lock-last-position nil
+  "Internal buffer local variable to save the last cursor position
+before fontifying.")
+
+(eval-after-load "font-lock"
+  '(defadvice font-lock-after-change-function
+     (before message-font-lock-save-last-position activate compile)
+     "Save last cursor position before fontifying."
+     (if (eq 'message-mode major-mode)
+	 (setq message-font-lock-last-position (point)))))
+
+(defun message-font-lock-cited-text-matcher (limit)
+  "Search for a cited text containing `message-font-lock-cited-text-regexp'
+forward.  Argument LIMIT bounds the search.  If a cited text is found, it
+returns t and sets match data 1 and 2, otherwise it returns nil.  Normally,
+match data 2 has zero length, but if the FENCE (for input method) is detected
+in matched text, result is divided into match data 1 and 2 across the FENCE.
+See also the documentations for the following variables:
+ `message-font-lock-fence-open-regexp'
+ `message-font-lock-fence-close-regexp'
+ `message-font-lock-fence-open-position'
+ `message-font-lock-fence-close-position'
+"
+  (prog1
+      (when (re-search-forward message-font-lock-cited-text-regexp limit t)
+	(let* ((start0 (match-beginning 0))
+	       (end0 (match-end 0))
+	       (cite-mark (match-end 1))
+	       (should-fontify
+		(progn
+		  (goto-char cite-mark)
+		  (<= (current-column)
+		      message-font-lock-citation-name-max-column)))
+	       end1 start2)
+	  (and
+	   should-fontify
+	   message-font-lock-last-position
+	   (>= message-font-lock-last-position start0)
+	   (<= message-font-lock-last-position end0)
+	   (cond
+	    (message-font-lock-fence-open-position
+	     (let* ((symbol (car message-font-lock-fence-open-position))
+		    (open
+		     (cond ((functionp symbol)
+			    (funcall symbol message-font-lock-last-position))
+			   ((and (symbolp symbol)
+				 (boundp symbol))
+			    (symbol-value symbol)))))
+	       (when (markerp open)
+		 (setq open (marker-position open)))
+	       (and (numberp open)
+		    (setq open
+			  (+ open
+			     (cdr message-font-lock-fence-open-position)))
+		    (>= message-font-lock-last-position open)
+		    (goto-char open)
+		    (or (not message-font-lock-fence-open-regexp)
+			(looking-at message-font-lock-fence-open-regexp))
+		    (setq end1 open))))
+	    (message-font-lock-fence-open-regexp
+	     (goto-char message-font-lock-last-position)
+	     (when (re-search-backward
+		    message-font-lock-fence-open-regexp start0 t)
+	       (setq end1 (match-beginning 0)))))
+	   (setq should-fontify
+		 (and message-font-lock-fence-open-position
+		      (not (eq cite-mark end1))))
+	   (cond
+	    (message-font-lock-fence-close-position
+	     (let* ((symbol (car message-font-lock-fence-close-position))
+		    (close
+		     (cond ((functionp symbol)
+			    (funcall symbol message-font-lock-last-position))
+			   ((and (symbolp symbol)
+				 (boundp symbol))
+			    (symbol-value symbol)))))
+	       (when (markerp close)
+		 (setq close (marker-position close)))
+	       (and (numberp close)
+		    (setq close
+			  (+ close
+			     (cdr message-font-lock-fence-close-position)))
+		    (<= message-font-lock-last-position close)
+		    (setq start2 close))))
+	    (message-font-lock-fence-close-regexp
+	     (goto-char message-font-lock-last-position)
+	     (when (looking-at message-font-lock-fence-close-regexp)
+	       (setq start2 (match-end 0)))))
+	   (setq should-fontify
+		 (and (not (and (not message-font-lock-fence-open-position)
+				(eq cite-mark end1)))
+		      (not (eq cite-mark start2)))))
+	  (goto-char end0)
+	  (when should-fontify
+	    (if start2
+		(store-match-data (list start0 end0 start0 end1 start2 end0))
+	      (store-match-data (list start0 end0 start0 end0 end0 end0)))
+	    t)))
+    (setq message-font-lock-last-position nil)))
+
+(defvar message-font-lock-keywords-1
+  (let ((content "[ \t]*\\(.+\\(\n[ \t].*\\)*\\)"))
     `((,(concat "^\\([Tt]o:\\)" content)
        (1 'message-header-name-face)
        (2 'message-header-to-face nil t))
@@ -990,18 +1149,27 @@ Defaults to `text-mode-abbrev-table'.")
 		 (not (equal mail-header-separator "")))
 	    `((,(concat "^\\(" (regexp-quote mail-header-separator) "\\)$")
 	       1 'message-separator-face))
-	  nil)
-      (,(concat "^[ \t]*"
-		"\\([" cite-prefix "]+[" cite-suffix "]*\\)?"
-		"[:>|}].*")
-       (0 'message-cited-text-face))
-      ("<#/?\\(multipart\\|part\\|external\\).*>"
-       (0 'message-mml-face))))
+	  nil))))
+
+(defvar message-font-lock-keywords-2
+  (append message-font-lock-keywords-1
+	  '((message-font-lock-cited-text-matcher
+	     (1 'message-cited-text-face)
+	     (2 'message-cited-text-face))
+	    ("<#/?\\(multipart\\|part\\|external\\).*>"
+	     (0 'message-mml-face)))))
+
+(defvar message-font-lock-keywords message-font-lock-keywords-2
   "Additional expressions to highlight in Message mode.")
 
 ;; XEmacs does it like this.  For Emacs, we have to set the
 ;; `font-lock-defaults' buffer-local variable.
-(put 'message-mode 'font-lock-defaults '(message-font-lock-keywords t))
+(put 'message-mode 'font-lock-defaults
+     '((message-font-lock-keywords
+	message-font-lock-keywords-1
+	message-font-lock-keywords-2)
+       nil nil nil nil
+       (font-lock-mark-block-function . mark-paragraph)))
 
 (defvar message-face-alist
   '((bold . bold-region)
@@ -1047,6 +1215,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defvar message-draft-coding-system
   (cond
+   ((boundp 'MULE) '*junet*)
    ((not (fboundp 'find-coding-system)) nil)
    ((find-coding-system 'emacs-mule)
     (if (memq system-type '(windows-nt ms-dos ms-windows))
@@ -1131,6 +1300,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 	  "^ *---+ +Original message +---+ *$\\|"
 	  "^ *--+ +begin message +--+ *$\\|"
 	  "^ *---+ +Original message follows +---+ *$\\|"
+	  "^ *---+ +Undelivered message follows +---+ *$\\|"
 	  "^|? *---+ +Message text follows: +---+ *|?$")
   "A regexp that matches the separator before the text of a failed message.")
 
@@ -1166,7 +1336,8 @@ The cdr of ech entry is a function for applying the face to a region.")
   (autoload 'gnus-request-post "gnus-int")
   (autoload 'gnus-copy-article-buffer "gnus-msg")
   (autoload 'gnus-alive-p "gnus-util")
-  (autoload 'rmail-output "rmail"))
+  (autoload 'rmail-output "rmail")
+  (autoload 'mu-cite-original "mu-cite"))
 
 
 
@@ -1250,7 +1421,7 @@ The cdr of ech entry is a function for applying the face to a region.")
     (when value
       (while (string-match "\n[\t ]+" value)
 	(setq value (replace-match " " t t value)))
-      ;; We remove all text props.delete-region
+      ;; We remove all text props.
       (format "%s" value))))
 
 (defun message-narrow-to-field ()
@@ -1279,6 +1450,7 @@ The cdr of ech entry is a function for applying the face to a region.")
       (unless (re-search-forward (concat "^" (regexp-quote hclean) ":") nil t)
 	(insert (car headers) ?\n))))
     (setq headers (cdr headers))))
+
 
 (defun message-fetch-reply-field (header)
   "Fetch FIELD from the message we're replying to."
@@ -1491,6 +1663,7 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\C-c\C-n" 'message-insert-newsgroups)
 
   (define-key message-mode-map "\C-c\C-y" 'message-yank-original)
+  (define-key message-mode-map "\C-c\C-Y" 'message-yank-buffer)
   (define-key message-mode-map "\C-c\C-q" 'message-fill-yanked-message)
   (define-key message-mode-map "\C-c\C-w" 'message-insert-signature)
   (define-key message-mode-map "\C-c\M-h" 'message-insert-headers)
@@ -1582,7 +1755,8 @@ C-c C-q  message-fill-yanked-message (fill what was yanked).
 C-c C-e  message-elide-region (elide the text between point and mark).
 C-c C-v  message-delete-not-region (remove the text outside the region).
 C-c C-z  message-kill-to-signature (kill the text up to the signature).
-C-c C-r  message-caesar-buffer-body (rot13 the message body)."
+C-c C-r  message-caesar-buffer-body (rot13 the message body).
+M-RET    message-newline-and-reformat (break the line and reformat)."
   (interactive)
   (kill-all-local-variables)
   (set (make-local-variable 'message-reply-buffer) nil)
@@ -1645,15 +1819,21 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (message-set-auto-save-file-name)
   (unless (string-match "XEmacs" emacs-version)
     (set (make-local-variable 'font-lock-defaults)
-	 '(message-font-lock-keywords t)))
+	 '((message-font-lock-keywords
+	    message-font-lock-keywords-1
+	    message-font-lock-keywords-2)
+	   nil nil nil nil
+	   (font-lock-mark-block-function . mark-paragraph))))
+  (set (make-local-variable 'message-font-lock-last-position) nil)
   (make-local-variable 'adaptive-fill-regexp)
   (setq adaptive-fill-regexp
-	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|" adaptive-fill-regexp))
+	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|"
+		adaptive-fill-regexp))
   (unless (boundp 'adaptive-fill-first-line-regexp)
     (setq adaptive-fill-first-line-regexp nil))
   (make-local-variable 'adaptive-fill-first-line-regexp)
   (setq adaptive-fill-first-line-regexp
-	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|"
+	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|"
 		adaptive-fill-first-line-regexp))
   (make-local-variable 'indent-tabs-mode) ;Turn off tabs for indentation.
   (setq indent-tabs-mode nil)
@@ -1827,17 +2007,24 @@ With the prefix argument FORCE, insert the header anyway."
 (defun message-newline-and-reformat ()
   "Insert four newlines, and then reformat if inside quoted text."
   (interactive)
-  (let ((point (point))
-	quoted)
-    (save-excursion
-      (beginning-of-line)
-      (setq quoted (looking-at (regexp-quote message-yank-prefix))))
-    (insert "\n\n\n\n")
+  (let ((prefix "[]>»|:}+ \t]*")
+	(supercite-thing "[-._a-zA-Z0-9]*[>]+[ \t]*")
+	quoted point)
+    (unless (bolp)
+      (save-excursion
+	(beginning-of-line)
+	(when (looking-at (concat prefix
+				  supercite-thing))
+	  (setq quoted (match-string 0))))
+      (insert "\n"))
+    (setq point (point))
+    (insert "\n\n\n")
+    (delete-region (point) (re-search-forward "[ \t]*"))
     (when quoted
-      (insert message-yank-prefix))
+      (insert quoted))
     (fill-paragraph nil)
     (goto-char point)
-    (forward-line 2)))
+    (forward-line 1)))
 
 (defun message-insert-signature (&optional force)
   "Insert a signature.  See documentation for the `message-signature' variable."
@@ -1878,13 +2065,11 @@ With the prefix argument FORCE, insert the header anyway."
 
 (defun message-elide-region (b e)
   "Elide the text between point and mark.
-An ellipsis (from `message-elide-elipsis') will be inserted where the
+An ellipsis (from `message-elide-ellipsis') will be inserted where the
 text was killed."
   (interactive "r")
   (kill-region b e)
-  (unless (bolp)
-    (insert "\n"))
-  (insert message-elide-elipsis))
+  (insert message-elide-ellipsis))
 
 (defvar message-caesar-translation-table nil)
 
@@ -1953,7 +2138,7 @@ Mail and USENET news headers are not rotated."
         (unless (equal 0 (call-process-region
                            (point-min) (point-max) program t t))
             (insert body)
-            (message "%s failed." program))))))
+            (message "%s failed" program))))))
 
 (defun message-rename-buffer (&optional enter-string)
   "Rename the *message* buffer to \"*message* RECIPIENT\".
@@ -2119,6 +2304,24 @@ be added to \"References\" field."
 	(insert ?\n))
       (unless modified
 	(setq message-checksum (message-checksum))))))
+
+(defun message-yank-buffer (buffer)
+  "Insert BUFFER into the current buffer and quote it."
+  (interactive "bYank buffer: ")
+  (let ((message-reply-buffer buffer))
+    (save-window-excursion
+      (message-yank-original))))
+
+(defun message-buffers ()
+  "Return a list of active message buffers."
+  (let (buffers)
+    (save-excursion
+      (dolist (buffer (buffer-list t))
+	(set-buffer buffer)
+	(when (and (eq major-mode 'message-mode)
+		   (null message-sent-message-via))
+	  (push (buffer-name buffer) buffers))))
+    (nreverse buffers)))
 
 (defun message-cite-original-without-signature ()
   "Cite function in the standard Message manner."
@@ -2293,9 +2496,9 @@ The text will also be indented the normal way."
 
 (defun message-delete-frame (frame org-frame)
   "Delete frame for editing message."
-  (when (and (or (and (featurep 'xemacs)
-		      (not (eq 'tty (device-type))))
-		 window-system
+  (when (and (or (static-if (featurep 'xemacs)
+		     (device-on-window-system-p)
+		   window-system)
 		 (>= emacs-major-version 20))
 	     (or (and (eq message-delete-frame-on-exit t)
 		      (select-frame frame)
@@ -2352,22 +2555,20 @@ the user from the mailer."
 	(message-fix-before-sending)
 	(while (and success
 		    (setq elem (pop alist)))
-	  (when (and (or (not (funcall (cadr elem)))
-			 (and (or (not (memq (car elem)
-					     message-sent-message-via))
-				  (y-or-n-p
-				   (format
-				    "Already sent message via %s; resend? "
-				    (car elem))))
-			      (setq success (funcall (caddr elem) arg)))))
+	  (when (or (not (funcall (cadr elem)))
+		    (and (or (not (memq (car elem)
+					message-sent-message-via))
+			     (y-or-n-p
+			      (format
+			       "Already sent message via %s; resend? "
+			       (car elem))))
+			 (setq success (funcall (caddr elem) arg))))
 	    (setq sent t))))
-      (unless sent
+      (unless (or sent (not success))
 	(error "No methods specified to send by"))
       (prog1
 	  (when (and success sent)
 	    (message-do-fcc)
-	    ;;(when (fboundp 'mail-hist-put-headers-into-history)
-	    ;; (mail-hist-put-headers-into-history))
 	    (save-excursion
 	      (run-hooks 'message-sent-hook))
 	    (message "Sending...done")
@@ -3123,6 +3324,7 @@ This sub function is for exclusive use of `message-send-news'."
   "Process Fcc headers in the current buffer."
   (let ((case-fold-search t)
 	(coding-system-for-write 'raw-text)
+	(output-coding-system 'raw-text)
 	list file)
     (save-excursion
       (set-buffer (get-buffer-create " *message temp*"))
@@ -3589,12 +3791,16 @@ Headers already prepared in the buffer are not modified."
 		    ;; This header didn't exist, so we insert it.
 		    (goto-char (point-max))
 		    (insert (if (stringp header) header (symbol-name header))
-			    ": " value "\n")
+			    ": " value)
+		    (unless (bolp)
+		      (insert "\n"))
 		    (forward-line -1))
 		;; The value of this header was empty, so we clear
 		;; totally and insert the new value.
 		(delete-region (point) (gnus-point-at-eol))
-		(insert value))
+		(insert value)
+		(when (bolp)
+		  (delete-char -1)))
 	      ;; Add the deletable property to the headers that require it.
 	      (and (memq header message-deletable-headers)
 		   (progn (beginning-of-line) (looking-at "[^:]+: "))
@@ -3774,40 +3980,36 @@ Headers already prepared in the buffer are not modified."
    (t
     (format "*%s message*" type))))
 
+(defmacro message-pop-to-buffer-1 (buffer)
+  `(if pop-up-frames
+       (let (special-display-buffer-names
+	     special-display-regexps
+	     same-window-buffer-names
+	     same-window-regexps)
+	 (pop-to-buffer ,buffer))
+     (pop-to-buffer ,buffer)))
+
 (defun message-pop-to-buffer (name)
   "Pop to buffer NAME, and warn if it already exists and is modified."
-  (let ((pop-up-frames pop-up-frames)
-	(special-display-buffer-names special-display-buffer-names)
-	(special-display-regexps special-display-regexps)
-	(same-window-buffer-names same-window-buffer-names)
-	(same-window-regexps same-window-regexps)
-	(buffer (get-buffer name))
-	(cur (current-buffer)))
-    (if (or (and (featurep 'xemacs)
-		 (not (eq 'tty (device-type))))
-	    window-system
-	    (>= emacs-major-version 20))
-	(when message-use-multi-frames
-	  (setq pop-up-frames t
-		special-display-buffer-names nil
-		special-display-regexps nil
-		same-window-buffer-names nil
-		same-window-regexps nil))
-      (setq pop-up-frames nil))
+  (let ((buffer (get-buffer name))
+	(pop-up-frames (and (or (static-if (featurep 'xemacs)
+				    (device-on-window-system-p)
+				  window-system)
+				(>= emacs-major-version 20))
+			    message-use-multi-frames)))
     (if (and buffer
 	     (buffer-name buffer))
 	(progn
-	  (set-buffer (pop-to-buffer buffer))
+	  (message-pop-to-buffer-1 buffer)
 	  (when (and (buffer-modified-p)
 		     (not (y-or-n-p
 			   "Message already being composed; erase? ")))
 	    (error "Message being composed")))
-      (set-buffer (pop-to-buffer name)))
+      (message-pop-to-buffer-1 name))
     (erase-buffer)
     (message-mode)
     (when pop-up-frames
-      (make-local-variable 'message-original-frame)
-      (setq message-original-frame (selected-frame)))))
+      (set (make-local-variable 'message-original-frame) (selected-frame)))))
 
 (defun message-do-send-housekeeping ()
   "Kill old message buffers."
@@ -3906,7 +4108,9 @@ Headers already prepared in the buffer are not modified."
 					       message-auto-save-directory))
       (setq buffer-auto-save-file-name (make-auto-save-file-name)))
     (clear-visited-file-modtime)
-    (setq buffer-file-coding-system message-draft-coding-system)))
+    (static-if (boundp 'MULE)
+	(set-file-coding-system message-draft-coding-system)
+      (setq buffer-file-coding-system message-draft-coding-system))))
 
 (defun message-disassociate-draft ()
   "Disassociate the message buffer from the drafts directory."
@@ -4066,9 +4270,9 @@ directs your response to " (if (string-match "," mft)
 
 A typical situation where Mail-Followup-To is used is when the author thinks
 that further discussion should take place only in "
-		  (if (string-match "," mft)
-		      "the specified mailing lists"
-		    "that mailing list") ".")))
+			     (if (string-match "," mft)
+				 "the specified mailing lists"
+			       "that mailing list") ".")))
 	(setq follow-to (list (cons 'To mft)))
 	(when mct
 	  (push (cons 'Cc mct) follow-to)))
@@ -4085,8 +4289,9 @@ that further discussion should take place only in "
 	    (while (re-search-forward "[ \t]+" nil t)
 	      (replace-match " " t t))
 	    ;; Remove addresses that match `rmail-dont-reply-to-names'.
-	    (insert (prog1 (rmail-dont-reply-to (buffer-string))
-		      (erase-buffer)))
+	    (let ((rmail-dont-reply-to-names message-dont-reply-to-names))
+	      (insert (prog1 (rmail-dont-reply-to (buffer-string))
+			(erase-buffer))))
 	    (goto-char (point-min))
 	    ;; Perhaps Mail-Copies-To: never removed the only address?
 	    (when (eobp)
@@ -4522,7 +4727,8 @@ Optional NEWS will use news to forward instead of mail."
 ;;;###autoload
 (defun message-resend (address)
   "Resend the current article to ADDRESS."
-  (interactive "sResend message to: ")
+  (interactive
+   (list (message-read-from-minibuffer "Resend message to: ")))
   (message "Resending message to %s..." address)
   (save-excursion
     (let ((cur (current-buffer))
@@ -4938,16 +5144,28 @@ regexp varstr."
 	(forward-line 1)
 	(insert "Content-Type: text/plain; charset=us-ascii\n")))))
 
+(defun message-read-from-minibuffer (prompt)
+  "Read from the minibuffer while providing abbrev expansion."
+  (if (fboundp 'mail-abbrevs-setup)
+      (let ((mail-abbrev-mode-regexp "")
+	    (minibuffer-setup-hook 'mail-abbrevs-setup))
+	(read-from-minibuffer prompt)))
+  (let ((minibuffer-setup-hook 'mail-abbrev-minibuffer-setup-hook))
+    (read-string prompt)))
+
 (defvar message-save-buffer " *encoding")
 (defun message-save-drafts ()
   (interactive)
   (if (not (get-buffer message-save-buffer))
       (get-buffer-create message-save-buffer))
   (let ((filename buffer-file-name)
-	(buffer (current-buffer)))
+	(buffer (current-buffer))
+	(reply-headers message-reply-headers))
     (set-buffer message-save-buffer)
     (erase-buffer)
     (insert-buffer buffer)
+    (setq message-reply-headers reply-headers)
+    (message-generate-headers  '((optional . In-Reply-To)))
     (mime-edit-translate-buffer)
     (write-region (point-min) (point-max) filename)
     (set-buffer buffer)
