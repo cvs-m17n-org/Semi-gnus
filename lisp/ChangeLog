@@ -1,3 +1,66 @@
+2003-01-12  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.el (message-fetch-reply-field): Narrow to headers.
+
+	* gnus-msg.el (gnus-inews-do-gcc): Don't try to mark GCC's as read
+	if Gnus isn't alive.
+
+2002-01-11  Kevin Greiner  <kgreiner@xpediantsolutions.com>
+
+	* gnus-agent.el (gnus-agent-fetch-group-1): Remove downloadable
+	marks from articles that are already stored in the agent.
+	(gnus-agent-backup-overview-buffer): New debug tool.  Creates a
+	backup copy of an invalid .overview file for later analysis.
+	
+2003-01-12  Gregorio Gervasio, Jr.  <gtgj@pacbell.net>
+
+	* gnus-sum.el (gnus-summary-exit): Reverse change to make group
+	exit work with two frames.
+
+2003-01-11  Fran,Ag(Bois-David Collin  <Francois-David.Collin@wanadoo.fr>
+
+	* message.el (message-forward-make-body): Use mule4.
+
+2003-01-11  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-mode-map): Move wide-reply command.
+
+2003-01-10  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* deuglify.el (gnus-outlook-deuglify-attrib-verb-regexp): Added
+	castellano.
+	(gnus-outlook-display-hook): New variable.
+	(gnus-outlook-display-article-buffer): New function.
+	(gnus-outlook-unwrap-lines, gnus-outlook-repair-attribution)
+	(gnus-outlook-deuglify-article): Made them interactive and added
+	optional arg.  Use `g-o-d-a-b'.
+	(gnus-article-outlook-deuglify-article): Use `g-o-d-a-b'.
+
+	* gnus-sum.el: Added autoloads.
+	(gnus-summary-mode-map): Added gnus-summary-wash-deuglify-map.
+	(gnus-summary-make-menu-bar): Added "(Outlook) Deuglify" menu.
+
+2003-01-11  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-display-mime): Use the mime emulation
+	variable. 
+
+	* gnus-sum.el (gnus-article-emulate-mime): New variable.
+
+	* gnus-start.el (gnus-read-newsrc-el-file): Make sure that the
+	newsrc-alist is initialized properly.
+
+	* mail-source.el (mail-sources): Autoload.
+
+	* gnus-sum.el (gnus-summary-make-false-root-always): Default to
+	nil.
+
+	* gnus-msg.el (gnus-configure-posting-styles): Make sure we don't
+	insert two newlines.
+
+	* message.el (message-check-news-header-syntax): Compute the
+	header length correctly.
+
 2002-01-10  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* gnus-agent.el (gnus-agent-expire): Do not remove article from

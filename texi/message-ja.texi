@@ -263,6 +263,24 @@ Message $B$O%U%)%m!<%"%C%W$,$I$3$K9T$/$+$rIaDL$NJ}K!$r;H$C$F7hDj$7$^$9$,!"(B
 @code{message-cancel-message} $B$NCM$,<h$j>C$75-;v$NK\J8$KA^F~$5$l$^$9!#%G%#(B
 $B%U%)%k%H$O(B @samp{I am canceling my own article.} $B$G$9!#(B
 
+@c TRANSLATEME!
+@cindex Cancel Locks
+@vindex message-insert-canlock
+@cindex canlock
+When Message posts news messages, it inserts @code{Cancel-Lock}
+headers by default.  This is a cryptographic header that ensures that
+only you can cancel your own messages, which is nice.  The downside
+is that if you lose your @file{.emacs} file (which is where Gnus
+stores the secret cancel lock password (which is generated
+automatically the first time you use this feature)), you won't be
+able to cancel your message.
+
+Whether to insert the header or not is controlled by the
+@code{message-insert-canlock} variable.
+
+Not many news servers respect the @code{Cancel-Lock} header yet, but
+this is expected to change in the future.
+
 @node Superseding
 @section $BBeBX(B
 
@@ -673,23 +691,23 @@ MFT $B$rB:=E$9$k$3$H$ONI$$%M%A%1%C%H(B (nettiquette) $B$G$"$k$H9M$($i$l$F$$$^
 @kindex M-x message-insert-importance-high
 @findex message-insert-importance-high
 @cindex Importance
-$BCM(B @samp{high} $B$r;}$D(B @samp{Importance:} $B%X%C%@!<$rA^F~$7$^$9!#I,MW$J(B
+$BCM(B @samp{high} $B$r;}$D(B @samp{Importance} $B%X%C%@!<$rA^F~$7$^$9!#I,MW$J(B
 $B$i(B ($B$9$G$K$"$k(B) $B%X%C%@!<$r>C5n$7$F$+$i!#(B
 
 @item M-x message-insert-importance-low
 @kindex M-x message-insert-importance-low
 @findex message-insert-importance-low
 @cindex Importance
-$BCM(B @samp{low} $B$r;}$D(B @samp{Importance:} $B%X%C%@!<$rA^F~$7$^$9!#I,MW$J(B
+$BCM(B @samp{low} $B$r;}$D(B @samp{Importance} $B%X%C%@!<$rA^F~$7$^$9!#I,MW$J(B
 $B$i(B ($B$9$G$K$"$k(B) $B%X%C%@!<$r>C5n$7$F$+$i!#(B
 
 @item C-c C-f s
 @kindex C-c C-f s
 @findex message-change-subject
 @cindex Subject
-$B8=:_$N(B @samp{Subject:} $B%X%C%@!<$rJQ99$7$^$9!#?7$7$$(B @samp{Subject:} $B$r?R(B
-$B$M$F(B @code{(was: <$B8E$$BjL>(B>)} $B$rDI2C$7$^$9!#8E$$BjL>$OJV?.$9$k$H$-$K:o=|(B
-$B$9$k$3$H$,$G$-$^$9!#(B@code{message-subject-trailing-was-query}
+$B8=:_$N(B @samp{Subject} $B%X%C%@!<$rJQ99$7$^$9!#?7$7$$(B @samp{Subject} $B$r?R$M(B
+$B$F(B @code{(was: <$B8E$$BjL>(B>)} $B$rDI2C$7$^$9!#8E$$BjL>$OJV?.$9$k$H$-$K:o=|$9(B
+$B$k$3$H$,$G$-$^$9!#(B@code{message-subject-trailing-was-query}
 (@pxref{Message Headers}) $B$r8+$F2<$5$$!#(B
 
 @item C-c C-f x
@@ -699,18 +717,23 @@ MFT $B$rB:=E$9$k$3$H$ONI$$%M%A%1%C%H(B (nettiquette) $B$G$"$k$H9M$($i$l$F$$$^
 @cindex X-Post
 @cindex cross-post
 $B%/%m%9%]%9%H$9$k$?$a$KDI2C$9(B
-$B$k(B @samp{Newsgroups:} $B$H(B @samp{FollowUp-To:} $B$r?R$M$^$9!#(B
-@code{message-cross-post-followup-to} $B$O(B @samp{FollowUp-To:} $B$H(B @samp{Newsgroups:} $B$r!"(B
+$B$k(B @samp{Newsgroups} $B$H(B @samp{FollowUp-To} $B$r?R$M$^$9!#(B
+@code{message-cross-post-followup-to} $B$O(B @samp{FollowUp-To} $B$H(B @samp{Newsgroups} $B$r!"(B
 $B%0%k!<%W$r;X$7<($9$h$&$K@Z$jNv$-$^$9!#(B
 @code{message-cross-post-default} $B$,(B @code{nil} $B$@$C$?$j@\F,0z(B
-$B?t(B @samp{Follow-Up:} $BIU$-$G8F$P$l$k$H!"%a%C%;!<%8$O%/%m%9%]%9%H$5$l$^$;(B
+$B?t(B @samp{Follow-Up} $BIU$-$G8F$P$l$k$H!"%a%C%;!<%8$O%/%m%9%]%9%H$5$l$^$;(B
 $B$s!#(B
 
 @item C-c C-f t
 @kindex C-c C-f t
 @findex message-reduce-to-to-cc
-@samp{To:} $B%X%C%@!<$NFbMF$r(B @samp{Cc:} $B$+(B @samp{Bcc:} $B%X%C%@!<$NFbMF$GCV(B
-$B$-49$($^$9!#(B
+@samp{To} $B%X%C%@!<$NFbMF$r(B @samp{Cc} $B$+(B @samp{Bcc} $B%X%C%@!<$NFbMF$GCV$-(B
+$B49$($^$9!#(B
+
+@item C-c C-f w
+@kindex C-c C-f w
+@findex message-insert-wide-reply
+$B9-$$JVEz$r$7$?$h$&$K(B @samp{To} $B$H(B @samp{Cc} $B%X%C%@!<$rA^F~$7$^$9!#(B
 
 @item C-c C-f a
 @kindex C-c C-f a

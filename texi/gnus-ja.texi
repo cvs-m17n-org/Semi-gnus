@@ -2984,7 +2984,7 @@ See also @code{gnus-group-ignored-charsets-alist}.
 @end ignore
 @item posting-style
 @cindex posting-style
-$B$3$N%0%k!<%W$NDI2C$NEj9FMM<0$r$3$3$N$_$KJ]B8$9$k$3$H$,$G$-$^(B
+$B$3$N%0%k!<%W$NDI2C$NEj9FMM<0$r$3$3$KJ]B8$9$k$3$H$,$G$-$^(B
 $B$9(B (@pxref{Posting Styles})$B!#=q<0$O(B @code{gnus-posting-style} $BO"A[%j%9%H(B
 $B$HF1$8$G$9$,!"$3$3$K$O%0%k!<%WL>$K9gCW$9$k@55,I=8=$O$"$j$^$;$s(B ($BEvA3$G(B
 $B$9(B)$B!#$3$N%0%k!<%W$NMM<0$NMWAG$O(B @code{gnus-posting-styles} $B$G8+$D$+$C$?(B
@@ -2997,6 +2997,7 @@ See also @code{gnus-group-ignored-charsets-alist}.
 @example
 (posting-style
   (name "Funky Name")
+  ("X-My-Header" "Funky Value")
   (signature "Funky Signature"))
 @end example
 
@@ -8139,10 +8140,34 @@ Sm*rtq**t*s $B$O$b$C$HB?$/$N0zMQJ8;z$rDs6!$9$k$?$a$K!"%^"#"#"#%="#"#$,>!<j(B
 
 @item W k
 @kindex W k ($B35N,(B)
+@kindex W Y f ($B35N,(B)
 @findex gnus-article-outlook-deuglify-article
 @cindex Outlook Express
-$B2u$l$?(B Outlook (Express) $B$N5-;v$r(B deuglify $B$7$F:FI=<($7$^(B
+$B2u$l$?(B Outlook (Express) $B$N5-;v$r(B deuglify $B$7$^(B
 $B$9(B (@code{gnus-article-outlook-deuglify-article})$B!#(B
+
+@c TRANSLATEME!
+@item W Y u
+@kindex W Y u ($B35N,(B)
+@findex gnus-outlook-unwrap-lines
+Unwrap lines that appear to be wrapped citation lines.  You can control
+what lines will be unwrapped by frobbing
+@code{gnus-outlook-deuglify-unwrap-min} and
+@code{gnus-outlook-deuglify-unwrap-max}, indicating the miminum and
+maximum length of an unwrapped citation line.
+(@code{gnus-outlook-deuglify-article}).
+
+@item W Y a
+@kindex W Y a ($B35N,(B)
+@findex gnus-outlook-repair-attribution
+Repair a broken attribution line
+(@code{gnus-outlook-repair-attribution}).
+
+@item W Y c
+@kindex W Y c ($B35N,(B)
+@findex gnus-outlook-rearrange-citation
+Repair broken citations by rearranging the text.
+(@code{gnus-outlook-rearrange-citation}).
 
 @item W w
 @kindex W w ($B35N,(B)
@@ -11969,7 +11994,8 @@ Gnus $B$r;H$C$F?7$7$$%a!<%k$rFI$`;v$OHs>o$K4JC1$G$9!#$"$J$?$N%a!<%k%P%C%/(B
 $B$1$G!"$"$H$N$3$H$O<+F0E*$K5/$3$j$^$9!#(B
 
 $BNc$($P!"(B@code{nnml} ($B$3$l$O(B "$B0l%a!<%k0l%U%!%$%k(B" $B%P%C%/%(%s%I$G$9(B) $B$r;H(B
-$B$$$?$$$J$i!"<!$N$b$N$r$"$J$?$N(B @file{.gnus} $B%U%!%$%k$KF~$l$k;v$,$G$-$^$9!#(B
+$B$$$?$$$J$i!"<!$N$b$N$r$"$J$?$N(B @file{.gnus.el} $B%U%!%$%k$KF~$l$k;v$,$G$-(B
+$B$^$9!#(B
 
 @lisp
 (setq gnus-secondary-select-methods '((nnml "")))
@@ -13018,7 +13044,7 @@ nnml:mail.others:
 $B99?7$7$J$1$l$P$J$j$^$;$s!#(B@code{gnus-group-split-update} $B$r<B9T$9$k$3$H(B
 $B$G$=$l$r9T$($^$9!#<+F0E*$K99?7$5$l$kJ}$,9%$_$J$i!"(B
 @code{gnus-group-split-setup} $B$K$=$l$r<B9T$9$k$h$&$K65$($k$@$1$G$9!#Nc$((B
-$B$P!"(B@file{.gnus} $B$K0J2<$N$b$N$rDI2C$7$F$/$@$5$$(B:
+$B$P!"(B@file{.gnus.el} $B$K0J2<$N$b$N$rDI2C$7$F$/$@$5$$(B:
 
 @lisp
 (gnus-group-split-setup AUTO-UPDATE CATCH-ALL)
@@ -13141,8 +13167,8 @@ total-expire $B$NMxE@$O!"E,1~%9%3%"IU$1(B @pxref{Adaptive Scoring} $B$GNI9%$K
 $B%G%#%U%)%k%H$G$O<+F04|8B@Z$l>C5n2DG=$r;HMQ$9$k$H!"(Bgnus $B$O$"$J$?$,FI$s$@(B
 $BA4$F$N5-;v$r!"$=$l$,4{FI$G$"$C$?$+L$FI$G$"$C$?$+$K4X$o$i$:!"4|8B@Z$l>C5n(B
 $B2DG=$H$7$F0u$rIU$1$^$9!#4{FI$N0u$NIU$$$?5-;v$,<+F0E*$K4|8B@Z$l>C5n2DG=$H(B
-$B$7$F0uIU$1$i$l$k$N$rHr$1$k$?$a$K!"0J2<$N$h$&$J$b$N$r(B @file{.gnus} $B%U%!%$(B
-$B%k$K=q$/;v$,$G$-$^$9(B:
+$B$7$F0uIU$1$i$l$k$N$rHr$1$k$?$a$K!"0J2<$N$h$&$J$b$N$r(B @file{.gnus.el} $B%U%!(B
+$B%$%k$K=q$/;v$,$G$-$^$9(B:
 
 @vindex gnus-mark-article-hook
 @lisp
@@ -16588,14 +16614,6 @@ file
 * Server Agent Commands::       
 @end menu
 
-$B40A4$K%P%C%A$GF0:n$5$;$k$K$O!"%3%^%s%I9T$+$i0J2<$N$*$^$8$J$$$r<B9T$9$l$P(B
-$B$G$-$^$9!#(B
-
-@cindex gnus-agent-batch
-@example
-$ emacs -batch -l ~/.gnus.el -f gnus-agent-batch
-@end example
-
 @node Group Agent Commands
 @subsubsection $B%0%k!<%W%(!<%8%'%s%HL?Na(B
 
@@ -16919,9 +16937,13 @@ Gnus $B%(!<%8%'%s%H$K5-;v$r<hF@$5$;$k$N$O(B ($B$=$7$F$"$J$?$N=q$$$?2?$+$N%a%C
 $B%;!<%8$rEj9F$9$k$N$O(B)$B!"0lC6J*;v$r@5$7$/@_Dj$7$F$7$^$($PHs>o$K4JC1$G$9!#(B
 $B0J2<$N%7%'%k%9%/%j%W%H$OI,MW$J$3$H$rA4$F$d$C$F$/$l$k$G$7$g$&!#(B
 
+@c TRANSLATEME!
+You can run a complete batch command from the command line with the
+following incantation:
+
 @example
 #!/bin/sh
-emacs -batch -l ~/.emacs -f gnus-agent-batch >/dev/null
+emacs -batch -l ~/.emacs -f -l ~/.gnus.el gnus-agent-batch >/dev/null 2>&1
 @end example
 
 @node Control Agents
@@ -19805,8 +19827,8 @@ Gnus $B$O$5$^$6$^$J@)8f;R(B @dfn{handlers} $B$rDj5A$9$k$3$H$K$h$C$F$=$N$h$&$J
 $B$O(B @code{gnus-demon-timestep} $BIC$N$3$H$G$9!#$3$l$O=i4|@_Dj$G$O(B 60 $B$G$9!#(B
 $B$b$7$3$NJQ?t$rJQ99$9$k$H!"A4$F$N@)8f;R$N7W;~$K1F6A$rM?$($^$9!#(B)
 
-$B$H$$$&$o$1$G!"@)8f;R$rDI2C$7$?$1$l$P!"(B@file{.gnus} $B%U%!%$%k$K!"0J2<$N$h(B
-$B$&$J$b$N$r=q$/$3$H$,$G$-$^$9!#(B
+$B$H$$$&$o$1$G!"@)8f;R$rDI2C$7$?$1$l$P!"(B@file{.gnus.el} $B%U%!%$%k$K!"0J2<$N(B
+$B$h$&$J$b$N$r=q$/$3$H$,$G$-$^$9!#(B
 
 @findex gnus-demon-add-handler
 @lisp
@@ -19820,8 +19842,8 @@ Gnus $B$O$5$^$6$^$J@)8f;R(B @dfn{handlers} $B$rDj5A$9$k$3$H$K$h$C$F$=$N$h$&$J
 @findex gnus-demon-add-disconnection
 $B$3$N$?$a$N4{@=4X?t$,$$$/$D$+:n@.$5$l$F$$$^$9!#(B
 @code{gnus-demon-add-nocem}, @code{gnus-demon-add-disconnection}, @code{gnus-demon-add-nntp-close-connection}, @code{gnus-demon-add-scan-timestamps}, @code{gnus-demon-add-rescan}, @code{gnus-demon-add-scanmail} $B$G(B
-$B$9!#$3$l$i$NG=NO$,M_$7$1$l$P!"C1$K$3$l$i$N4X?t$r(B @file{.gnus} $B$KF~$l$F$/(B
-$B$@$5$$!#(B
+$B$9!#$3$l$i$NG=NO$,M_$7$1$l$P!"C1$K$3$l$i$N4X?t$r(B @file{.gnus.el} $B$KF~$l(B
+$B$F$/$@$5$$!#(B
 
 @findex gnus-demon-init
 @findex gnus-demon-cancel
@@ -22582,7 +22604,7 @@ Gnus $B$OIaDL$N(B Emacs $B$NJ}K!$G<+F0J]B8$5$l$k%I%j%V%k%P%C%U%!$rJ];}$7$F$$$
 
 @item
 Gnus $B$O:#$d%U%!%$%k(B @file{.emacs} $B$r$0$A$c$0$A$c$K$9$k;v$rHr$1$k$?$a$K@l(B
-$BMQ$N5/F0%U%!%$%k(B (@file{.gnus}) $B$r;}$D$h$&$K$J$j$^$7$?!#(B
+$BMQ$N5/F0%U%!%$%k(B (@file{.gnus.el}) $B$r;}$D$h$&$K$J$j$^$7$?!#(B
 
 @item
 $B%0%k!<%W$H5-;v$NN>J}$K%W%m%;%90u$rIU$1$k$3$H$,$G$-!"A4$F$N0u$NIU$$$?9`L\(B
