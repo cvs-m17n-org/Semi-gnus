@@ -44,13 +44,11 @@
 ;;            version 1.1 change file extension into ".siv" (official one)
 ;;                        added keymap and menubar to hook into sieve-manage
 ;; 2001-10-31 version 1.2 committed to Oort Gnus
-;;
-;; $Id: sieve-mode.el,v 1.1.2.3 2002-01-08 08:06:01 yamaoka Exp $
 
 ;;; Code:
 
-(autoload 'sieve-manage "sieve-manage")
-(autoload 'sieve-upload "sieve-manage")
+(autoload 'sieve-manage "sieve")
+(autoload 'sieve-upload "sieve")
 (require 'easymenu)
 (eval-when-compile
   (require 'font-lock))
