@@ -557,38 +557,35 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 ;;
 (defun gnus-offline-after-get-new-news ()
   "*After getting news and mail jobs."
-  (when gnus-plugged
-    (if (memq gnus-offline-articles-to-fetch '(both mail))
-	(progn
-	  ;; Mail/both
-	  ;; send mail/news in spool
-	  (gnus-offline-empting-spool)
-	  (if (eq gnus-offline-articles-to-fetch 'mail)
-	      (progn
-		;; Send only mail and hang up...
-		(if gnus-offline-connected
-		    (gnus-offline-set-unplugged-state))
-		;; Disable fetch mail.
-		(gnus-offline-disable-fetch-mail)
-		(gnus-offline-after-jobs-done)))))
-
-    ;; News/Both
-    (if (memq gnus-offline-articles-to-fetch '(both news))
-	(progn
-	  (if gnus-offline-connected
-	      (cond ((eq gnus-offline-news-fetch-method 'nnagent)
-		     ;; Get New News (gnus-agent)
-		     (gnus-agent-toggle-plugged t)
-		     ;; fetch articles
-		     (gnus-agent-fetch-session)
-		     ;; Hang Up line. then set to offline status.
-		     (gnus-offline-set-unplugged-state)
-		     ;; All online jobs has done.
-		     (gnus-offline-after-jobs-done))
-		    (t
-		     (if (eq gnus-offline-news-fetch-method 'nnspool)
-			 ;; Get New News (nnspool)
-			 (gnspool-get-news)))))))))
+  (cond (gnus-offline-connected
+	 (when (memq gnus-offline-articles-to-fetch '(both mail))
+	   ;; Mail/both
+	   ;; send mail/news in spool
+	   (gnus-offline-empting-spool)
+	   (when (eq gnus-offline-articles-to-fetch 'mail)
+	     ;; Send only mail and hang up...
+	     (if gnus-offline-connected
+		 (gnus-offline-set-unplugged-state))
+	     ;; Disable fetch mail.
+	     (gnus-offline-disable-fetch-mail)
+	     (gnus-offline-after-jobs-done)))
+	 (when (memq gnus-offline-articles-to-fetch '(both news))
+	   ;; News/Both
+	   (cond ((eq gnus-offline-news-fetch-method 'nnagent)
+		  ;; Get New News (gnus-agent)
+		  (gnus-agent-toggle-plugged t)
+		  ;; fetch articles
+		  (gnus-agent-fetch-session)
+		  ;; Hang Up line. then set to offline status.
+		  (gnus-offline-set-unplugged-state)
+		  ;; All online jobs has done.
+		  (gnus-offline-after-jobs-done))
+		 (t
+		  (if (eq gnus-offline-news-fetch-method 'nnspool)
+		      ;; Get New News (nnspool)
+		      (gnspool-get-news))))))
+	(t
+	 nil)))
 
 ;;
 ;; Add your custom header.
