@@ -600,11 +600,17 @@ The following commands are available:
       (setq groups (sort groups
 			 (lambda (l1 l2)
 			   (string< (car l1) (car l2)))))
-      (let ((buffer-read-only nil))
+      (let ((buffer-read-only nil) 
+	    (gnus-select-method nil) 
+	    name)
 	(while groups
-	  (setq group (car groups))
-	  (insert
-	   (format "K%7d: %s\n" (cdr group) (car group)))
+	  (setq group (car groups)
+		name (format "%s" (car group)))
+	  (insert (if (cadr (gnus-gethash 
+			     (gnus-group-prefixed-name name method)
+			     gnus-newsrc-hashtb))
+		      " " "K")
+		  (format "%7d: " (cdr group)) name "\n")
 	  (setq groups (cdr groups))))
       (switch-to-buffer (current-buffer))
       (goto-char (point-min))
