@@ -37,9 +37,6 @@
 (require 'std11)
 (require 'mime-view)
 
-(or (get-unified-alist mime-acting-condition '((type . text)))
-    (error "Please install latest SEMI."))
-
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
 (autoload 'gnus-set-summary-default-charset "gnus-i18n" nil t)
 
@@ -9027,12 +9024,13 @@ save those articles instead."
   "mime-partial"
   "Internal method to combine message/partial messages automatically.")
 
-(set-atype 'mime-acting-condition
-	   '((type . message)(subtype . partial)
-	     (method . mime-method-to-combine-message/partial-pieces)
-	     (major-mode . gnus-original-article-mode)
-	     (summary-buffer-exp . gnus-summary-buffer)
-	     ))
+(ctree-set-calist-strictly
+ 'mime-acting-condition
+ '((type . message)(subtype . partial)
+   (method . mime-method-to-combine-message/partial-pieces)
+   (major-mode . gnus-original-article-mode)
+   (summary-buffer-exp . gnus-summary-buffer)
+   ))
 
 (set-alist 'mime-view-partial-message-method-alist
 	   'gnus-original-article-mode
