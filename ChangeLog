@@ -1,3 +1,10 @@
+2000-05-26  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-make-html-contents): Show X-Face.
+	(nnshimbun-make-text-or-html-contents): Ditto.
+	(nnshimbun-request-article-1): Ditto.
+	(nnshimbun-x-face-alist): New variable.
+
 2000-05-25  Tanaka Akira      <akr@m17n.org>
 
         * README.semi, README.semi.ja: Update for CVS via SSH.
