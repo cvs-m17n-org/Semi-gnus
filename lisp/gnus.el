@@ -250,12 +250,15 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "6.8.19"
+(defconst gnus-product-name "Chao-gnus"
+  "Product name of this version of gnus.")
+
+(defconst gnus-version-number "6.9.0"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Gnus 5.6.44; for SEMI 1.8, FLIM 1.8/1.9)"
-          gnus-version-number)
+  (format "%s %s (based on Gnus 5.6.44; for SEMI 1.8, FLIM 1.8-1.10)"
+          gnus-product-name gnus-version-number)
   "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -1480,6 +1483,12 @@ want."
 (defconst gnus-maintainer
   "bugs@gnus.org (The Gnus Bugfixing Girls + Boys)"
   "The mail address of the Gnus maintainers.")
+
+(defconst semi-gnus-developers
+  "Semi-gnus Developers:
+ semi-gnus-en@meadow.scphys.kyoto-u.ac.jp (In English),\
+ semi-gnus-ja@meadow.scphys.kyoto-u.ac.jp (In Japanese);"
+  "The mail address of the Semi-gnus developers.")
 
 (defvar gnus-info-nodes
   '((gnus-group-mode "(gnus)The Group Buffer")
