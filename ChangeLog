@@ -1,3 +1,14 @@
+2004-05-02  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* gnus-namazu.el (gnus-namazu-imap-group-prefix): Abolished.
+	(gnus-namazu-imap-maildir): Abolished.
+	(gnus-namazu-remote-groups): New option.
+	(gnus-namazu/call-namazu): Simplified.
+	(gnus-namazu/make-directory-table): Refer the above option.
+	(gnus-namazu/search): Cancel the last change to support IMAP.
+	(gnus-namazu-update-index): Ditto.
+	(gnus-namazu-update-indices): Ditto.
+
 2004-04-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (describe-key-briefly): Remove compiler macro.
