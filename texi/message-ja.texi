@@ -923,6 +923,9 @@ Message はメッセージ作成部分に関しては非常に積極的です。それは次のようで
 変数 @code{message-required-mail-headers} と @code{message-required-news-headers} で、
 どのヘッダーが必要かを指定します。
 
+いくつかのヘッダーは、送信する前に消されたり作り直されたりします。これに
+は変数 @code{message-deletable-headers} (後述) が関係します。
+
 @item message-from-style
 @vindex message-from-style
 @code{From} ヘッダーがどのように見えるかを指定します。4つの合法的値があ

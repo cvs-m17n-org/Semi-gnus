@@ -602,7 +602,13 @@ variable isn't used."
   :type 'sexp)
 
 (defcustom message-generate-headers-first nil
-  "*If non-nil, generate all required headers before composing."
+  "*If non-nil, generate all required headers before composing.
+The variables `message-required-news-headers' and
+`message-required-mail-headers' specify which headers to generate.
+
+Note that the variable `message-deletable-headers' specifies headers which
+are to be deleted and then re-generated before sending, so this variable
+will not have a visible effect for those headers."
   :group 'message-headers
   :type 'boolean)
 
@@ -729,8 +735,10 @@ If a form, the result from the form will be used instead."
 
 ;;;###autoload
 (defcustom message-signature-file "~/.signature"
-  "*File containing the text inserted at end of message buffer."
-  :type 'file
+  "*Name of file containing the text inserted at end of message buffer.
+Ignored if the named file doesn't exist.
+If nil, don't insert a signature."
+  :type '(choice file (const :tags "None" nil))
   :group 'message-insertion)
 
 (defcustom message-distribution-function nil
@@ -5249,6 +5257,9 @@ Previous forwarders, replyers, etc. may add it."
 
 ;;; Forwarding messages.
 
+(defvar message-forward-decoded-p nil
+  "Non-nil means the original message is decoded.")
+
 (defun message-forward-subject-author-subject (subject)
   "Generate a SUBJECT for a forwarded message.
 The form is: [Source] Subject, where if the original message was mail,
@@ -5270,7 +5281,7 @@ The form is: Fwd: Subject, where Subject is the original subject of
 the message."
   (concat "Fwd: " subject))
 
-(defun message-make-forward-subject (&optional decoded)
+(defun message-make-forward-subject ()
   "Return a Subject header suitable for the message in the current buffer."
   (save-excursion
     (save-restriction
@@ -5279,7 +5290,7 @@ the message."
 	    (subject (message-fetch-field "Subject")))
 	(setq subject
 	      (if subject
-		  (if decoded
+		  (if message-forward-decoded-p
 		      subject
 		    (nnheader-decode-subject subject))
 		""))

@@ -9266,7 +9266,7 @@ Remove the @code{To} header if it is very long.
 Remove all @code{To} headers if there are more than one.
 @end table
 
-To include the four three elements, you could say something like;
+To include these three elements, you could say something like;
 
 @lisp
 (setq gnus-boring-article-headers
