@@ -239,8 +239,8 @@
 (defun gnus-face-face-function (form type)
   `(gnus-add-text-properties
     (point) (progn ,@form (point))
-    '(gnus-face t
-		face ',(symbol-value (intern (format "gnus-face-%d" type))))))
+    (list 'gnus-face t
+	  'face ',(symbol-value (intern (format "gnus-face-%d" type))))))
 
 (defun gnus-tilde-max-form (el max-width)
   "Return a form that limits EL to MAX-WIDTH."
