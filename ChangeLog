@@ -1,5 +1,9 @@
 1999-03-24  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
+	* Nana-gnus: Version 6.12.10 released.
+
+	* Nana-TIPS.ja: Reformatted for `outline-mode'.
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.12.10.
 
 	* lisp/gnus-sum.el (gnus-simplify-buffer-fuzzy): Add regexp for
