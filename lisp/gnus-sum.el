@@ -1451,9 +1451,7 @@ buffers. For example:
     ;; source file.
     (if (boundp 'gnus-newsgroup-variables)
         nil
-      (if (featurep 'xemacs)
-	  (load "gnus-sum.el" t t t)
-	(load "gnus-sum.el" t t t t)))
+      (load "gnus-sum.el" t t t))
     (require 'gnus)
     (require 'gnus-agent)
     (require 'gnus-art)))
@@ -2204,8 +2202,12 @@ gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 	      ["Crosspost article..." gnus-summary-crosspost-article
 	       (gnus-check-backend-function
 		'request-replace-article gnus-newsgroup-name)]
-	      ["Import file..." gnus-summary-import-article t]
-	      ["Create article..." gnus-summary-create-article t]
+	      ["Import file..." gnus-summary-import-article
+	       (gnus-check-backend-function
+		'request-accept-article gnus-newsgroup-name)]
+	      ["Create article..." gnus-summary-create-article
+	       (gnus-check-backend-function
+		'request-accept-article gnus-newsgroup-name)]
 	      ["Check if posted" gnus-summary-article-posted-p t]
 	      ["Edit article" gnus-summary-edit-article
 	       (not (gnus-group-read-only-p))]
@@ -5004,6 +5006,18 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	(gnus-kill-buffer (current-buffer)))
       (error "Couldn't request group %s: %s"
 	     group (gnus-status-message group)))
+
+    (when gnus-agent
+      ;; The agent may be storing articles that are no longer in the
+      ;; server's active range.  If that is the case, the active range
+      ;; needs to be expanded such that the agent's articles can be
+      ;; included in the summary.
+      (let* ((gnus-command-method (gnus-find-method-for-group group))
+             (alist (gnus-agent-load-alist group))
+             (active (gnus-active group)))
+        (if (and (car alist)
+                 (< (caar alist) (car active)))
+            (gnus-set-active group (cons (caar alist) (cdr active))))))
 
     (setq gnus-newsgroup-name group
 	  gnus-newsgroup-unselected nil
