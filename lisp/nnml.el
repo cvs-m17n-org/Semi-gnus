@@ -1,5 +1,6 @@
 ;;; nnml.el --- mail spool access for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -287,6 +288,13 @@ all.  This may very well take some time.")
 			 (nnmail-expired-article-p group mod-time force
 						   nnml-inhibit-expiry)))
 	      (progn
+		;; Allow a special target group.
+		(unless (eq nnmail-expiry-target 'delete)
+		  (with-temp-buffer
+		    (nnml-request-article article group server
+					  (current-buffer))
+		    (nnmail-expiry-target-group
+		     nnmail-expiry-target group)))
 		(nnheader-message 5 "Deleting article %s in %s"
 				  article group)
 		(condition-case ()

@@ -1,3 +1,31 @@
+2000-04-24  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (T-gnus): Update to 6.14.3.
+
+	* README.T-gnus: Update.
+
+	* GNUS-NEWS: Sync up with Gnus v5.8.5.
+	* lisp/{webmail.el,utf7.el,time-date.el,smiley.el,rfc2047.el,
+	rfc1843.el,qp.el,pop3.el,parse-time.el,nnweb.el,nnwarchive.el,
+	nnvirtual.el,nnultimate.el,nntp.el,nnspool.el,nnslashdot.el,
+	nnml.el,nnmail.el,nnimap.el,nnheader.el,nnfolder.el,nndraft.el,
+	nndoc.el,nnagent.el,mml.el,mm-view.el,mm-uu.el,mm-util.el,
+	mm-encode.el,mm-decode.el,mm-bodies.el,message.el,mail-source.el,
+	mail-prsvr.el,mail-parse.el,lpath.el,imap.el,ietf-drums.el,gnus.el,
+	gnus-xmas.el,gnus-win.el,gnus-uu.el,gnus-util.el,gnus-topic.el,
+	gnus-sum.el,gnus-start.el,gnus-srvr.el,gnus-spec.el,gnus-score.el,
+	gnus-msg.el,gnus-move.el,gnus-mlspl.el,gnus-mh.el,gnus-mailcap.el,
+	gnus-logic.el,gnus-kill.el,gnus-int.el,gnus-group.el,gnus-ems.el,
+	gnus-eform.el,gnus-dup.el,gnus-draft.el,gnus-cite.el,gnus-cache.el,
+	gnus-bcklg.el,gnus-async.el,gnus-art.el,gnus-agent.el,
+	format-spec.el,flow-fill.el,fill-flowed.el,dgnushack.el,ChangeLog}:
+	Sync up with Gnus v5.8.5.
+	* texi/{refcard.tex,gnusref.tex,gnus.texi,gnus-ja.texi,
+	gnus-faq-ja.texi,Makefile.in,ChangeLog}: Sync up with Gnus v5.8.5.
+
+	* README: Requires XEmacs 21.1.1 and later.
+	* texi/{gnus.texi, gnus-faq-ja.texi}: Ditto.
+
 2000-04-20  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (T-gnus): Update to 6.14.2.

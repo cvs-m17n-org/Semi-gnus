@@ -1,5 +1,6 @@
 ;;; gnus-score.el --- scoring code for Gnus
-;; Copyright (C) 1995,96,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <amanda@iesd.auc.dk>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -2854,10 +2855,10 @@ If ADAPT, return the home adaptive file instead."
 	     ;; Function.
 	     ((gnus-functionp elem)
 	      (funcall elem group))
-	     ;; Regexp-file cons
+	     ;; Regexp-file cons.
 	     ((consp elem)
 	      (when (string-match (gnus-globalify-regexp (car elem)) group)
-		(replace-match (cadr elem) t nil group ))))))
+		(replace-match (cadr elem) t nil group))))))
     (when found
       (if (file-name-absolute-p found)
           found

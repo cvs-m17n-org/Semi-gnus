@@ -1,3 +1,311 @@
+Mon Apr 24 21:12:06 2000  Lars Magne Ingebrigtsen  <lmi@quimbies.gnus.org>
+
+	* gnus.el: Gnus v5.8.5 is released.
+
+2000-04-24 16:29:07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* rfc2047.el (rfc2047-header-encoding-alist): Doc fix.
+
+	* gnus-util.el (gnus-netrc-machine): Default to nntp.
+
+	* mml.el (mml-generate-mime-1): Force 8bit on message/rfc822.
+
+2000-04-23 23:27:25  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-view.el (mm-inline-message): Disable prepare-hook. 
+
+2000-04-23 00:32:32  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el: Fix copyright statements.
+
+	* gnus-sum.el (gnus-alter-articles-to-read-function): New
+	variable. 
+	(gnus-articles-to-read): Use it.
+
+	* message.el (message-get-reply-headers): Bind free variable.
+
+2000-04-23 01:14:28  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-get-reply-headers): Fix to-address.
+
+2000-04-22 22:51:46  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el: Hotmail fix. Add a debug function.
+
+2000-04-23 00:32:32  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (t): M-down and M-up.
+
+2000-04-22 20:22:03  Kai Groﬂjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus-sum.el: Doc fix.
+
+2000-04-22 10:25:56  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnwarchive.el (nnwarchive-egroups-article): Remove < and >.
+
+2000-04-22 14:25:05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnweb.el (nnweb-dejanews-create-mapping): Remove the context
+	string. 
+	(nnweb-request-group): Don't scan twice.
+	(nnweb-request-scan): Don't nix out the hashtb.
+
+	* message.el (message-get-reply-headers): Return a value.
+
+2000-04-22 14:12:41  David Aspinwall  <aspinwall@TimesTen.com>
+
+	* gnus-art.el (gnus-button-url-regexp): New value to match naked
+	urls. 
+
+2000-04-22 01:23:59  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-cache.el (gnus-summary-insert-cached-articles): Reverse the
+	order messages are inserted.
+
+	* mml.el (mml-generate-mime-1): rfc2047-encode the heads of
+	message/rfc822 parts.
+
+	* gnus-art.el (gnus-article-read-summary-keys): Check for
+	numerical values.
+
+	* message.el (message-get-headers): Made into own function.
+	(message-reply): Use it.
+	(message-get-reply-headers): Renamed.
+	(message-widen-reply): New command.
+
+2000-04-21 20:52:09  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nntp.el (nntp-retrieve-data): Report the error and return nil.
+
+2000-04-21 19:38:43  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-bodies.el (mm-decode-content-transfer-encoding): Don't remove
+	non-base64 text at the end if not found.
+
+2000-03-01  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus-sum.el (gnus-read-move-group-name): 
+	(gnus-summary-move-article): Use `gnus-group-method' to find out
+	what method the manually entered group belong to.
+	`gnus-group-name-to-method' doesn't return any method parameters
+	and `gnus-find-method-for-group' uses `gnus-group-name-to-method'
+	for new groups so they wouldn't work.
+
+2000-04-21 22:27:15  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-configure-posting-styles): Allow nil values to
+	override. 
+
+2000-04-21 21:58:20  Kai Groﬂjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* nnmail.el (nnmail-cache-insert): Does some stuff that is
+	probably good to do, or something.  I dunno.  I just write these
+	ChangeLog entries, and my name is Lars.
+
+1999-12-06  Hrvoje Niksic  <hniksic@iskon.hr>
+
+	* message.el (message-caesar-region): Use translate-region.
+
+2000-04-21 21:20:32  Mike Fabian  <mike.fabian@gmx.de>
+
+	* gnus-group.el (gnus-group-catchup-current): Doc fix. 
+
+2000-04-21 20:36:21  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-article-setup-buffer): Don't kill local
+	variables, because that makes Emacs flash.
+
+	* gnus-group.el (gnus-group-insert-group-line): Don't call
+	gnus-group-add-icon unconditionally.
+
+	* gnus-xmas.el (gnus-group-add-icon): Moved here.
+
+	* gnus-group.el (gnus-group-glyph-directory): Don't depend on
+	xmas. 
+	(gnus-group-glyph-directory): Removed.
+
+2000-04-21 20:26:23  Jaap-Henk Hoepman  <hoepman@cs.utwente.nl>
+
+	* gnus-msg.el (gnus-inews-insert-archive-gcc): Don't do stuff if
+	gnus-newsgroup-name is "".
+
+2000-04-21  Florian Weimer  <fw@deneb.cygnus.argh.org>
+
+	* mm-util.el (mm-mime-mule-charset-alist): Add support for UTF-8
+	in conjunction with MULE-UCS.
+
+1999-12-13  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* rfc2047.el (rfc2047-fold-region): Don't use the same break twice.
+
+1999-12-14 04:14:44  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* dgnushack.el (last, mapcon, member-if, union): New compiler
+	macros for emulating cl functions.
+
+1999-12-21  Jan Vroonhof  <vroonhof@math.ethz.ch>
+
+	* message.el (message-shorten-references): Only cater to broken
+	INN for news. This caters for broken smtpd.
+
+2000-04-21 18:20:10  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mailcap.el (mailcap-mime-info): Use the first match; not the
+	last. 
+
+	* gnus-agent.el (gnus-category-kill): Save the category list.
+
+2000-04-21 16:41:50  Chris Brierley  <brierley@pobox.com>
+
+	* gnus-sum.el (gnus-summary-move-article): Do something or other. 
+
+2000-04-21 16:07:07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-group.el (gnus-group-add-icon): Fixed indentation.
+
+2000-04-21 16:07:07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-group.el (gnus-group-add-icon): Fixed indentation.
+
+2000-04-21 10:43:16  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-group.el (gnus-group-prepare-flat-predicate): New function.
+	(gnus-group-list-cached): Use it.
+
+2000-04-21 16:07:07  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el: Update all the copyright notices.
+
+2000-04-21 15:38:06  Vladimir Volovich  <vvv@vvv.vsu.ru>
+
+	* mm-bodies.el (mm-decode-content-transfer-encoding): Remove
+	non-base64 text at the end.
+
+2000-04-21 15:21:30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* mm-bodies.el (mm-body-charset-encoding-alist): defcustomized. 
+
+2000-04-21 15:15:41  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnheader.el: Don't autoload cancel-function-timers.
+
+	* message.el (message-fetch-field): Fold case.
+
+2000-04-21 15:11:09  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* message.el (message-forward-before-signature): New variable.
+
+2000-04-21 15:10:31  Alexandre Oliva  <oliva@lsd.ic.unicamp.br>
+
+	* gnus-mlspl.el: Fix stuff.
+
+2000-04-21 14:41:09  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-update-article-line): Don't hide
+	subjects when unthreaded.
+
+2000-04-21 14:11:39  David S. Goldberg  <dsg@mitre.org>
+
+	* gnus-art.el (gnus-boring-article-headers): Work on long CCs as
+	well. 
+
+2000-04-21 14:06:43  Rui Zhu  <sprache@iname.com>
+
+	* gnus-art.el (gnus-article-mode): Fix variable name.
+
+2000-04-21 13:54:51  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mm-view.el: Fix autoload.
+
+	* flow-fill.el (flow-fill): Fix provide.
+
+	* gnus-draft.el (gnus-draft-send): Bind message-setup-hook to
+	nil. 
+
+2000-04-20 22:24:04  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-win.el (gnus-configure-windows): Revert to switch-to-buffer.
+
+2000-04-21 05:22:18  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+        * gnus-util.el (gnus-netrc-machine): Didn't work.
+
+2000-04-20 21:22:10  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-draft.el (gnus-draft-setup): Restore to mml.
+
+2000-04-21 01:24:41  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* flow-fill.el: Renamed from fill-flowed.
+
+	* message.el (message-forward-ignored-headers): Default to
+	removing CTE.
+
+2000-04-21 00:48:48    <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* message.el (message-mode): Don't fill headers.
+
+2000-04-20 23:12:43  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-pipe-buffer-body): Use shell
+
+2000-02-21  Yoshiki Hayashi  <yoshiki@xemacs.org>
+
+	* nnvirtual.el (nnvirtual-request-article):
+	Bind gnus-override-method to nil.
+	(nnvirtual-request-update-mark): Don't update mark when
+	article is not there.
+
+2000-04-20 16:35:41  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-uu.el (mm-uu-dissect): Check forwarded message.
+
+2000-04-20 21:17:48  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-util.el (gnus-parse-netrc): Allow "port".
+	(gnus-netrc-machine): Take a port param.
+	(gnus-netrc-machine): 
+
+	* gnus-art.el (gnus-request-article-this-buffer): Allow
+	re-selecting referenced articles.
+
+	* message.el (message-cancel-news): Allow editing.
+	(message-cancel-message): Add newline.
+
+2000-04-20 21:03:54  William M. Perry  <wmperry@aventail.com>
+
+	* mm-view.el (mm-inline-image-emacs): New function. 
+
+2000-04-20 20:44:55  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mail-source.el (mail-source-delete-incoming): Change default in
+	cvs. 
+
+2000-04-20 20:43:34  Kim-Minh Kaplan  <kmkaplan@vocatex.fr>
+
+	* gnus-art.el (gnus-mime-view-part-as-type-internal): New
+	function. 
+
+2000-04-20 14:45:20  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnml.el (nnml-request-expire-articles): Use it.
+
+	* nnmail.el (nnmail-expiry-target): New variable.
+	(nnmail-expiry-target-group): New function.
+
+2000-04-20 02:36:31  Emerick Rogul  <emerick@cs.bu.edu>
+
+	* message.el (message-forward): Add non-MIME separators.
+
+2000-04-20 02:25:39  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-generate-headers): Respect the syntax check
+	spec. 
+
+	* gnus-sum.el (gnus-remove-thread-1): Show thread.
+	(gnus-remove-thread): Don't show all threads.
+
 Thu Apr 20 01:39:25 2000  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Pterodactyl Gnus v5.8.4 is released.
@@ -285,6 +593,21 @@ Thu Apr 20 01:39:25 2000  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 	(safe-date-to-time): Add autoload cookie.
 
 	* base64.el: Require cl when compiling.
+
+2000-01-05  BrYan P. Johnson  <beej@mindspring.net>
+
+	* gnus-group.el (gnus-group-line-format-alist): Added %E for
+	eyecandy.
+	(gnus-group-insert-group-line): Now groks %E and inserts icon in
+	group line using gnus-group-add-icon.
+	(gnus-group-icons): Added customize group.
+	(gnus-group-icon-list): Added variable.
+	(gnus-group-glyph-directory): Added variable.
+	(gnus-group-icon-cache): Added variable.
+	(gnus-group-running-xemacs): Added variable.
+	(gnus-group-add-icon): Added function. Add an icon to the current
+	line according to gnus-group-icon-list.
+	(gnus-group-icon-create-glyph): Added function.
 
 2000-01-05 17:31:52  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
@@ -855,6 +1178,11 @@ Wed Jan  5 17:06:41 2000  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 	* mm-bodies.el (mm-8bit-char-regexps): Removed.
 	(mm-7bit-chars): New variable.
 	(mm-body-7-or-8): Use it in both cases.
+
+1999-12-04  Michael Welsh Duggan  <md5i@cs.cmu.edu>
+
+	* gnus-start.el (gnus-site-init-file): Don't use cl macros in
+	  defcustom definitions.
 
 1999-12-04  Simon Josefsson  <jas@pdc.kth.se>
 

@@ -1,5 +1,5 @@
 ;;; nnwarchive.el --- interfacing with web archives
-;; Copyright (C) 1999 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: news egroups mail-archive
@@ -489,7 +489,7 @@
       (delete-region (point) (point-max)))
   (goto-char (point-min))
   (while (re-search-forward "<a[^>]+>\\([^<]+\\)</a>" nil t)
-    (replace-match "<\\1>"))
+    (replace-match "\\1"))
   (nnweb-decode-entities)
   (buffer-string))
 

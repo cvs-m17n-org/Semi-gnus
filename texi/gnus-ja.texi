@@ -2814,6 +2814,12 @@ kill $(B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$(B!#
 $(B@55,I=8=$K9gCW$9$kL>A0$+@bL@J8$r;}$D%0%k!<%W$rA4$FI=<($9$k(B
 (@code{gnus-group-description-apropos})$(B!#(B
 
+@item A c
+@kindex A c (Group)
+@findex gnus-group-list-cached
+$(B%-%c%C%7%e5-;v$r;}$D%0%k!<%W$rA4$FI=<($9$k(B
+(@code{gnus-group-list-cached})$(B!#(B
+
 @end table
 
 @vindex gnus-permanently-visible-groups
@@ -3921,7 +3927,8 @@ From Newsgroups})$(B!#(B
 @item L
 $(B5-;v$N9T?t!#(B
 @item c
-$(B5-;v$NJ8;z?t!#(B
+$(B5-;v$NJ8;z?t!#$3$NL>A0;XDj;R$O(B (nnfolder $(B$N$h$&$J(B) $(B$$$/$D$+$NA*BrJ}K!$r(B
+$(B%5%]!<%H$7$^$;$s!#(B
 @item I
 $(B%9%l%C%I$N%l%Y%k$K$h$k;z2<$2(B (@pxref{Customizing Threading})$(B!#(B
 @item T
@@ -5238,7 +5245,7 @@ Prefixes})$(B!#(B
 @kindex / x ($(B35N,(B)
 @findex gnus-summary-limit-to-extra
 ``$(BDI2C(B'' $(B$N%X%C%@!<$N0l$D$K9gCW$9$k5-;v$K35N,%P%C%U%!$r@)8B$7$^$9(B
-(@pxref{To From Newsgroups}) (@code{gnus-summary-limit-to-author}).
+(@pxref{To From Newsgroups}) (@code{gnus-summary-limit-to-extra}).
 
 @item / u
 @itemx x
@@ -5260,7 +5267,7 @@ Prefixes})$(B!#(B
 @kindex / t $(B!J35N,!K(B
 @findex gnus-summary-limit-to-age
 $(B?t;z$r?R$M$F!"35N,%P%C%U%!$r$=$N?t;z$NF|$h$j8E$$!J$b$7$/$OF1$8!K5-;v$K@)8B(B
-$(B$7$^$9(B (@code{gnus-summary-limit-to-marks})$(B!#$b$7@\F,0z?t$,M?$($i$l$l$P!"(B
+$(B$7$^$9(B (@code{gnus-summary-limit-to-age})$(B!#$b$7@\F,0z?t$,M?$($i$l$l$P!"(B
 $(B$=$N?t;z$NF|$h$j$b?7$7$$5-;v$K@)8B$7$^$9!#(B
 
 @item / n
@@ -5782,11 +5789,19 @@ gnus $(B$OA4$F$N5-;v$N40A4$J(B @code{References} $(BMs$r8+$F!"F1$8%9%l%C%I$KB
 
 @item T n
 @kindex T n $(B!J35N,!K(B
+@itemx M-C-n
+@kindex M-C-n (Summary)
+@itemx M-down
+@kindex M-down (Summary)
 @findex gnus-summary-next-thread
 $(B<!$N%9%l%C%I$K0\F0$7$^$9(B (@code{gnus-summary-next-thread})$(B!#(B
 
 @item T p
 @kindex T p $(B!J35N,!K(B
+@itemx M-C-p
+@kindex M-C-p (Summary)
+@itemx M-up
+@kindex M-up (Summary)
 @findex gnus-summary-prev-thread
 $(BA0$N%9%l%C%I$K0\F0$7$^$9(B (@code{gnus-summary-prev-thread})$(B!#(B
 
@@ -8144,6 +8159,21 @@ gnus $(B$O(B @code{Message-ID} $(B$rIU$1BX$($F!JI=<($N$?$a$@$1$K!K5-;v$rB>$N5
 $(BF1$8$h$&$KI=<($7$^$9!#$3$NJQ?t$,(B @code{t} $(B$G$"$k$H!"$=$l$O5-;v$rI=<($7$^$;(B
 $(B$s(B---$(B:G=i$+$iB8:_$7$J$+$C$?$+$N$h$&$K!#(B
 
+@vindex gnus-alter-articles-to-read-function
+@item gnus-alter-articles-to-read-function
+$(B$3$NJQ?t$K@_Dj$7$?4X?t$G!"A*Br$9$k5-;v$N%j%9%H$rJQ99$9$k$3$H$,$G$-$^$9!#(B
+$(B4X?t$OFs$D$N0z?t(B ($(B%0%k!<%WL>$HA*Br$9$k5-;v$N%j%9%H(B) $(B$r<u$1IU$1$^$9!#(B
+
+$(BNc$($P0J2<$N4X?t$O!"%-%c%C%7%e5-;v$N%j%9%H$r$"$k%0%k!<%W$N%j%9%H$@$1$KDI(B
+$(B2C$7$^$9!#(B
+
+@lisp
+(defun my-add-cached-articles (group articles)
+  (if (string= group "some.group")
+      (append gnus-newsgroup-cached articles)
+    articles))
+@end lisp
+
 @end table
 
 
@@ -9874,9 +9904,10 @@ Gnus $(B$,$I$l$+$N%5!<%P!<$+$i@\B35qH]$r<u$1$?$+$I$&$+$NA4$F$N0u$r>C5n$7$^(B
 @item
 $(B$=$l$>$l$N9T$OG$0U$N?t$N(B $(B6h@Z$j0u(B/$(BCM(B $(B$NBP$r4^$`;v$,$G$-$^$9!#M-8z$J6h@Z(B
 $(B$j0u$O(B @samp{machine}$(B!"(B@samp{login}$(B!"(B@samp{password}$(B!"(B@samp{default}$(B!"(B
-@samp{force} $(B$G$9!#(B($(B:G8e$N$b$N$OM-8z$J(B @code{.netrc}/@code{ftp} $(B$N6h@Z$j(B
-$(B0u$G$O$"$j$^$;$s!#$3$l$,%U%!%$%k(B @file{.authinfo} $(B$,(B @file{.netrc} $(B%U%!(B
-$(B%$%kMM<0$+$i0o$l$kM#0l$NJ}K!$G$9!#(B)
+@samp{port}$(B!"(B@samp{force} $(B$G$9!#(B
+($(B:G8e$N$b$N$OM-8z$J(B @code{.netrc}/@code{ftp} $(B$N6h@Z$j0u$G$O$"$j$^$;$s!#(B
+$(B$3$l$,%U%!%$%k(B @file{.authinfo} $(B$,(B @file{.netrc} $(B%U%!%$%kMM<0$+$i0o$l$k(B
+$(B$[$H$s$IM#0l$NJ}K!$G$9!#(B)
 
 @end enumerate
 
@@ -10774,7 +10805,18 @@ www.hotmail.com, mail.yahoo.com, www.netaddress.com, www.my-deja.com
 @item :plugged
 
 @code{nil} $(B$G$J$+$C$?$i!"(Bgnus $(B$,(B @dfn{unplugged} $(B$G$"$C$F$b%a!<%k$r<hF@(B
-$(B$7$^$9!#(B
+$(B$7$^$9!#$b$7$"$J$?$,%G%#%l%/%H%j$r%a!<%k%=!<%9$K;H$C$F$$$k$J$i$P!"$3$NNc(B
+$(B$N$h$&$K;XDj$9$k$3$H$,$G$-$^$9(B:
+
+@lisp
+(setq mail-sources
+      '((directory :path "/home/pavel/.Spool/" 
+                   :suffix ""
+                   :plugged t)))
+@end lisp
+
+$(B$"$J$?$,(B @dfn{unplugged} $(B$G$"$C$F$b(B gnus $(B$O%a!<%k$r<hF@$7$^$9!#$3$l$O!"(B
+$(B%m!<%+%k$N%a!<%k$H%K%e!<%9$r;H$&>l9g$KJXMx$G$9!#(B
 
 @end table
 @end table
@@ -11294,6 +11336,16 @@ Gnus $(B$O5-;v$,$I$N%0%k!<%W$KB0$7$F$$$k$+$K4p$E$$$F!"$=$l$,$I$N$/$i$$@8B8(B
 
 $(B4|8B@Z$l4|4V$rA*BrE*$KJQ99$9$k$?$a$K%0%k!<%W%Q%i%a!<%?(B
 @code{expiry-wait} $(B$r;H$&;v$b$G$-$^$9(B (@pxref{Group Parameters})$(B!#(B
+
+@vindex nnmail-expiry-target
+$(B5-;v$N4|8B@Z$l>C5n$NIaDL$NF0:n$O$=$l$i$r>C5n$9$k$3$H$G$9!#$7$+$7!">l9g$K(B
+$(B$h$C$F$O$=$l$i$r>C5n$9$k$h$j$bJL$N%0%k!<%W$K0\F0$7$?J}$,M-0U5A$+$b$7$l$^(B
+$(B$;$s!#(B@code{nnmail-expiry-target} ($(B$H%0%k!<%W%Q%i%a!<%?(B
+@code{expiry-target}) $(B$O$3$l$r@)8f$7$^$9!#%G%#%U%)%k%H$NCM$O(B
+@code{delete} $(B$G$9$,!"J8;zNs(B ($(B5-;v$r0\F0$9$k@h$N%0%k!<%WL>(B) $(B$^$?$O0\F0@h(B
+$(B$N%0%k!<%WL>$+(B @code{delete} $(B$rJV$94X?t(B ($(B5-;v$KHO0O$r69$a$?%P%C%U%!$G!"(B
+$(B$=$N5-;v$,B8:_$7$F$$$k%0%k!<%WL>$,0z?t$H$7$FM?$($i$l$^$9(B) $(B$K$9$k$3$H$,$G(B
+$(B$-$^$9!#(B
 
 @vindex nnmail-keep-last-article
 @code{nnmail-keep-last-article} $(B$,(B @code{nil} $(B$G$J$$$H!"(Bgnus $(B$O%a!<%k%K%e!<(B
@@ -20394,6 +20446,15 @@ When I type W W c (gnus-article-hide-citation) in the summary
 buffer, the citations are revealed, but the [+] buttons don't turn
 into [-] buttons.  (If I click on one of the [+] buttons, it does
 turn into a [-] button.)
+
+@item
+Perhaps there should be a command to "attach" a buffer of comments to
+a message?  That is, `B WHATEVER', you're popped into a buffer, write
+something, end with `C-c C-c', and then the thing you've written gets
+to be the child of the message you're commenting.
+
+@item
+Handle external-body parts.
 
 @item
 Solve the halting problem.
