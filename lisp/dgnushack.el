@@ -216,10 +216,13 @@
 (condition-case nil
     (char-before)
   (wrong-number-of-arguments
-   (define-compiler-macro char-before (&whole form &optional pos)
-     (if (null pos)
+   ;; Optimize byte code for `char-before'.
+   (put 'char-before 'byte-optimizer 'byte-optimize-char-before)
+   (defun byte-optimize-char-before (form)
+     (if (null (cdr form))
 	 '(char-before (point))
-       form))))
+       form))
+   ))
 
 ;; `char-after' and `char-before' must be well-behaved before lpath.el
 ;; is loaded.  Because it requires `poe' via `path-util'.
