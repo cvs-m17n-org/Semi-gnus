@@ -796,10 +796,12 @@ Updates the timeout for clearing the cache to `gpg-passphrase-timeout'."
 		    (timer-relative-time (current-time) 
 					 gpg-passphrase-timeout))
     (timer-set-function gpg-passphrase-timer 'gpg-passphrase-forget)
-    (timer-activate gpg-passphrase-timer)
+    (unless (and (fboundp 'itimer-live-p)
+		 (itimer-live-p gpg-passphrase-timer))
+      (timer-activate gpg-passphrase-timer))
     (setq gpg-passphrase passphrase))
   passphrase)
-  
+
 (defun gpg-passphrase-read ()
   "Read a passphrase and remember it for some time."
   (interactive)
