@@ -1,3 +1,32 @@
+1999-12-10  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lis/gnus.el (gnus-revision-numbser): Increment to 08.
+
+	* lisp/gnus-agent.el (gnus): Give up to advise here.
+	(gnus-group-get-new-news): New advice instead.
+
+	* lisp/gnus-offline.el (gnus-offline-setup): Call
+	`gnus-offline-processed-by-timer' and `gnus-offline-error-check'
+	here.
+	(gnus-offline-define-menu-and-key): Simplify.
+	(gnus-offline-processed-by-timer): Call `gnus-group-get-new-news'
+	interactively.
+
+	* lisp/gnus-ofsetup.el (TopLevel): Require `read-passwd' here, not in
+	`gnus-offline-setting-file'.
+	(gnus-nntp-service): Set this variable here, not in
+	`gnus-offline-setting-file'
+	(gnus-nntp-server): Ditto.
+	(gnus-after-getting-new-news-hook): Ditto.
+	(message-send-hook): Ditto.
+	(mail-source-read-passwd): Ditto.
+	(gnus-setup-news-hook): Ditto.
+	(gnus-setup-for-offline): Now one can get mails from `imap',
+	`file', `directory' or `maildir'.
+
+	* lisp/read-paswd.el (read-pw-set-mail-source-passwd-cache):
+	Ignore non-POP mail sources.
+
 1999-12-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
