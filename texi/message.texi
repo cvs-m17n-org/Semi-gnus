@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message
-@settitle T-gnus 6.13 Message Manual
+@settitle T-gnus 6.14 Message Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -42,7 +42,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title T-gnus 6.13 Message Manual
+@title T-gnus 6.14 Message Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -83,7 +83,7 @@ Message mode buffers.
 * Key Index::         List of Message mode keys.
 @end menu
 
-This manual corresponds to T-gnus 6.13 Message.  Message is
+This manual corresponds to T-gnus 6.14 Message.  Message is
 distributed with the Gnus distribution bearing the same version number
 as this manual.
 
@@ -422,8 +422,8 @@ Yank the message in the buffer @code{gnus-article-copy} into the message
 buffer. Normally @code{gnus-article-copy} is what you are replying to
 (@code{message-yank-original}).
 
-@item C-c C-Y
-@kindex C-c C-Y
+@item C-c M-C-y
+@kindex C-c M-C-y
 @findex message-yank-buffer
 Prompt for a buffer name and yank the contents of that buffer into the
 message buffer (@code{message-yank-buffer}).

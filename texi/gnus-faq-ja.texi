@@ -71,10 +71,10 @@ Baur 氏、 Per Abrahamsen 氏に感謝します。
 @item
 Q1.1: 最新のバージョンは?
 
-現在の開発版の最新バージョンは T-gnus 6.13 (tag: t-gnus-6_13) で、標準パッ
+現在の開発版の最新バージョンは T-gnus 6.14 (tag: t-gnus-6_14) で、標準パッ
 ケージの最新バージョンは T-gnus 6.12 (tag: t-gnus-6_12) です。
 
-T-gnus 6.13 を使用するためには別パッケージの FLIM 1.13.1 以上, SEMI (ま
+T-gnus 6.14 を使用するためには別パッケージの FLIM 1.13.1 以上, SEMI (ま
 たは WEMI) 1.13.5 以上が必要です。 その他、 APEL が必要になりますが、必
 要なバージョンは FLIM / SEMI (WEMI) パッケージ内の README を参照してくだ
 さい。
@@ -103,7 +103,7 @@ CVS での取得
   CVS password: [CR] # NULL string
 
 @item checkout
-T-gnus をチェックアウトします。実際には、-r t-gnus-6_13 のようにタグを付
+T-gnus をチェックアウトします。実際には、-r t-gnus-6_14 のようにタグを付
 けて実行します。
 
 % cvs -d \
@@ -123,7 +123,7 @@ anonymous ftp での取得
 
 anonymous ftp では以下の場所から取得できます。
 
-@file{ftp://ftp.jpl.org/pub/elisp/t-gnus-6.13/}
+@file{ftp://ftp.jpl.org/pub/elisp/t-gnus-6.14/}
 
 SEMI, FLIM, APEL の取得
 
@@ -234,7 +234,7 @@ T-gnus で使用する場合には、必ず Q2.1 を参照してください。
 gnus-offline は、市川達哉 <t-ichi@@po.shiojiri.ne.jp> の作で、 T-gnus を
 いわゆる「オフライン使用」(ニュース記事、メイルの送受信を一括して行い、
 それらのメッセージの読み書きはサーバーに未接続の状態で行う)することを容
-易にするためのパッケージです。T-gnus (tag: t-gnus-6_13) には標準で含まれ
+易にするためのパッケージです。T-gnus (tag: t-gnus-6_14) には標準で含まれ
 ています。
 
 @end table

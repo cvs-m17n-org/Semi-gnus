@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-  -*- coding: iso-latin-1 -*-
 
 @setfilename gnus
-@settitle T-gnus 6.13 Manual
+@settitle T-gnus 6.14 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -319,7 +319,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title T-gnus 6.13 Manual
+@title T-gnus 6.14 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -362,7 +362,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So T-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to T-gnus 6.13.
+This manual corresponds to T-gnus 6.14.
 
 @end ifinfo
 
@@ -3919,10 +3919,23 @@ Scroll the current article one line backward
 @kindex A g (Summary)
 @kindex g (Summary)
 @findex gnus-summary-show-article
+@vindex gnus-summary-show-article-charset-alist
 (Re)fetch the current article (@code{gnus-summary-show-article}).  If
 given a prefix, fetch the current article, but don't run any of the
 article treatment functions.  This will give you a ``raw'' article, just
 the way it came from the server.
+
+If given a numerical prefix, you can do semi-manual charset stuff.
+@kbd{C-u 0 g cn-gb-2312 RET} will decode the message as if it were
+encoded in the @code{cn-gb-2312} charset.  If you have
+
+@lisp
+(setq gnus-summary-show-article-charset-alist 
+      '((1 . cn-gb-2312) 
+        (2 . big5)))
+@end lisp
+
+then you can say @kbd{C-u 1 g} to get the same effect.
 
 @item A <
 @itemx <
@@ -7166,9 +7179,9 @@ instance, @kbd{3 b} means ``view the third @sc{mime} part''.
 
 @table @kbd
 @item b
-@itemx K b
+@itemx K v
 @kindex b (Summary)
-@kindex K b (Summary)
+@kindex K v (Summary)
 View the @sc{mime} part.
 
 @item K o
@@ -7318,6 +7331,42 @@ charsets that are listed here will be ignored.  The variable can be set
 on a group-by-group basis using the group parameters (@pxref{Group
 Parameters}).  The default value is @code{(unknown-8bit)}, which is
 something some agents insist on having in there.
+
+@cindex Russina
+@cindex koi8-r
+@cindex koi8-u
+@cindex iso-8859-5
+@cindex coding system aliases
+@cindex preferred charset
+
+Other charset tricks that may be useful, although not Gnus-specific:
+
+If there are several @sc{mime} charsets that encode the same Emacs
+charset, you can choose what charset to use by saying the following:
+
+@lisp
+(put-charset-property 'cyrillic-iso8859-5
+                      'preferred-coding-system 'koi8-r)
+@end lisp
+
+This means that Russian will be encoded using @code{koi8-r} instead of
+the default @code{iso-8859-5} @sc{mime} charset.
+
+If you want to read messages in @code{koi8-u}, you can cheat and say
+
+@lisp
+(define-coding-system-alias 'koi8-u 'koi8-r)
+@end lisp
+
+This will almost do the right thing.
+
+And finally, to read charsets like @code{windows-1251}, you can say
+something like
+
+@lisp
+(codepage-setup 1251)
+(define-coding-system-alias 'windows-1251 'cp1251)
+@end lisp
 
 
 @node Article Commands
@@ -10264,7 +10313,8 @@ month's rent money.
 @subsection Mail Sources
 
 Mail can be gotten from many different sources---the mail spool, from a
-POP mail server, or from a procmail directory, for instance.
+POP mail server, from a procmail directory, or from a maildir, for
+instance.
 
 @menu
 * Mail Source Specifiers::       How to specify what a mail source is.
@@ -10478,9 +10528,9 @@ Use @samp{movemail} to move the mail:
 @end lisp
 
 @item maildir
-Get mail from a maildir. This is a type of mailbox currently only
-supported by qmail, where each file in a special directory contains
-exactly one mail.
+Get mail from a maildir. This is a type of mailbox that is supported by
+at least qmail and postfix, where each file in a special directory
+contains exactly one mail.
 
 Keywords:
 
@@ -10491,14 +10541,22 @@ The path of the directory where the mails are stored.  The default is
 
 If you sometimes look at your mail through a pop3 daemon before fetching
 them with Gnus, you may also have to fetch your mails from the
-@code{cur} directory inside the maildir, like in the following example.
+@code{cur} directory inside the maildir, like in the first example
+below.
+
+You can also get mails from remote hosts (because maildirs don't suffer
+from locking problems).
 
 @end table
 
-An example maildir mail source:
+Two example maildir mail sources:
 
 @lisp
 (maildir :path "/home/user-name/Maildir/cur")
+@end lisp
+
+@lisp
+(maildir :path "/user@@remotehost.org:~/Maildir/new")
 @end lisp
 
 @item imap
@@ -17486,6 +17544,27 @@ spunky name, we decided that the name was @emph{too} spunky, so we
 renamed it back again to ``Gnus''.  But in mixed case.  ``Gnus'' vs.
 ``@sc{gnus}''.  New vs. old.
 
+@menu
+* Gnus Versions::       What Gnus versions have been released.
+* Other Gnus Versions:: Other Gnus versions that also have been released.
+* Why?::                What's the point of Gnus?
+* Compatibility::       Just how compatible is Gnus with @sc{gnus}?
+* Conformity::          Gnus tries to conform to all standards.
+* Emacsen::             Gnus can be run on a few modern Emacsen.
+* Gnus Development::    How Gnus is developed.
+* Contributors::        Oodles of people.
+* New Features::        Pointers to some of the new stuff in Gnus.
+* Newest Features::     Features so new that they haven't been written yet.
+@end menu
+
+
+@node Gnus Versions
+@subsection Gnus Versions
+@cindex Pterodactyl Gnus
+@cindex ding Gnus
+@cindex September Gnus
+@cindex Quassia Gnus
+
 The first ``proper'' release of Gnus 5 was done in November 1995 when it
 was included in the Emacs 19.30 distribution (132 (ding) Gnus releases
 plus 15 Gnus 5.0 releases).
@@ -17496,8 +17575,12 @@ releases)) was released under the name ``Gnus 5.2'' (40 releases).
 On July 28th 1996 work on Red Gnus was begun, and it was released on
 January 25th 1997 (after 84 releases) as ``Gnus 5.4'' (67 releases).
 
-On September 13th 1997, Quassia Gnus was started and lasted 37
-releases.  If was released as ``Gnus 5.6 on March 8th 1998.
+On September 13th 1997, Quassia Gnus was started and lasted 37 releases.
+If was released as ``Gnus 5.6'' on March 8th 1998 (46 releases).
+
+Gnus 5.6 begat Pterodactyl Gnus on August 29th 1998 and was released as
+``Gnus 5.8'' (after 99 releases and a CVS repository) on December 3rd
+1999. 
 
 If you happen upon a version of Gnus that has a prefixed name --
 ``(ding) Gnus'', ``September Gnus'', ``Red Gnus'', ``Quassia Gnus'' --
@@ -17506,16 +17589,21 @@ Slowly.  Whatever you do, don't run.  Walk away, calmly, until you're
 out of its reach.  Find a proper released version of Gnus and snuggle up
 to that instead.
 
-@menu
-* Why?::                What's the point of Gnus?
-* Compatibility::       Just how compatible is Gnus with @sc{gnus}?
-* Conformity::          Gnus tries to conform to all standards.
-* Emacsen::             Gnus can be run on a few modern Emacsen.
-* Gnus Development::    How Gnus is developed.
-* Contributors::        Oodles of people.
-* New Features::        Pointers to some of the new stuff in Gnus.
-* Newest Features::     Features so new that they haven't been written yet.
-@end menu
+
+@node Other Gnus Versions
+@subsection Other Gnus Versions
+@cindex Semi-gnus
+
+In addition to the versions of Gnus which have had their releases
+coordinated by Lars, one major development has been Semi-gnus from
+Japan.  It's based on a library called @sc{semi}, which provides
+@sc{mime} capabilities.
+
+These Gnusae are based mainly on Gnus 5.6 and Pterodactyl Gnus.
+Collectively, they are called ``Semi-gnus'', and different strains are
+called T-gnus, ET-gnus, Nana-gnus and Chaos.  These provide powerful
+@sc{mime} and multilingualization things, especially important for
+Japanese users.
 
 
 @node Why?
@@ -19336,7 +19424,7 @@ From: Jason L Tibbitts III <tibbs@@hpc.uh.edu>
 @end example
 
 @item
- tanken var at når du bruker `gnus-startup-file' som prefix (FOO) til å lete
+ tanken var at når du bruker `gnus-startup-file' som prefix (FOO) til  lete
 opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den være en
 liste hvor du bruker hvert element i listen som FOO, istedet.  da kunne man
 hatt forskjellige serveres startup-filer forskjellige steder.
@@ -19410,8 +19498,8 @@ there was a sci.somethingelse group or section, then it should prompt
 for sci? first the sci.something? then sci.somethingelse?...
 
 @item
-Ja, det burde være en måte å si slikt.  Kanskje en ny variabel?
-`gnus-use-few-score-files'?  Så kunne score-regler legges til den
+Ja, det burde være en måte  si slikt.  Kanskje en ny variabel?
+`gnus-use-few-score-files'?  S kunne score-regler legges til den
 "mest" lokale score-fila.  F. eks. ville no-gruppene betjenes av
 "no.all.SCORE", osv.
 
@@ -19741,7 +19829,7 @@ the current process mark set onto the stack.
 
 @item
  gnus-article-hide-pgp
-Selv ville jeg nok ha valgt å slette den dersom teksten matcher
+Selv ville jeg nok ha valgt  slette den dersom teksten matcher
 @example
 "\\(This\s+\\)?[^ ]+ has been automatically signed by"
 @end example
@@ -19976,6 +20064,9 @@ fetching.
 
 @item
 Be able to forward groups of messages as MIME digests.
+
+@item
+nnweb should include the "get whole article" article when getting articles. 
 
 @item
 Solve the halting problem.
@@ -20409,7 +20500,7 @@ Gnus will work.
 
 @item
 Try doing an @kbd{M-x gnus-version}.  If you get something that looks
-like @samp{T-gnus 6.13.* (based on Pterodactyl Gnus v0.*; for SEMI 1.1*,
+like @samp{T-gnus 6.14.* (based on Pterodactyl Gnus v0.*; for SEMI 1.1*,
 FLIM 1.1*)} you have the right files loaded.  If, on the other hand, you
 get something like @samp{NNTP 3.x} or @samp{nntp flee}, you have some
 old @file{.el} files lying around.  Delete these.
