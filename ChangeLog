@@ -1,3 +1,9 @@
+2000-05-16  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/message.el (message-forward) Replace the use of `eolp' with
+	`bolp' for detecting the start of the line.
+	(message-indent-citation): Ditto.
+
 2000-05-10   Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/pop-up-bbdb-buffer): Don't bind
