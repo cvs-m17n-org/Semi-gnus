@@ -20830,7 +20830,31 @@ gnus はこれを利用することにします。
 @end iftex
 @c @anchor{X-Face}
 
-@code{X-Face} ヘッダーの復号には、Emacs が @samp{compface} をサポー
+今や Gnus は @code{X-Face} ヘッダーをデコードするために、通常 Emacs で
+は ELisp で書かれた内部 @code{uncompface} プログラムを使います。それはど
+んな外部プログラムも必要としない一方、遅いマシンを使っている場合はそれを
+遅く感じるかもしれません。そんな場合は、以下の変数を変更することができま
+す:
+
+@table @code
+@item uncompface-use-external
+@vindex uncompface-use-external
+内部デコーダと外部デコーダのどちらが使われるべきかを指定します。
+@code{nil} は ELisp で書かれた内部 @code{uncompface} プログラムを使うこ
+とを意味し、@code{t} は外部デコーダを使うことを意味します。ディフォルト
+値はホストマシンが遅いかどうかを検査してそれを決めることを意味す
+る @code{undecided} で、@code{uncompface-use-external-threshold} (それを
+参照) によって制御されます。
+
+@item uncompface-use-external-threshold
+@vindex uncompface-use-external-threshold
+ホストマシンが遅いかどうかを検査するための秒数です。ELisp で書かれた内
+部 @code{uncompface} プログラムを使って @code{X-Face} をデコードするのに
+かかる時間がこの値より大きい場合は、外部デコーダの使用に変更されます。
+@end table
+
+内部デコーダが無効にされる場合、あるいは XEmacs を使っている場合は、
+@code{X-Face} ヘッダーのデコードには、Emacs が @samp{compface} をサポー
 ト (XEmacs のほとんどがサポート) しているか、あなたのシステム
 に @samp{compface} がインストールされている必要があります。もしどちらか
 が真ならば、gnus はディフォルトで @code{X-Face} ヘッダーを表示します。
@@ -25671,6 +25695,11 @@ Gnus が常に概略バッファを中心再設定をすることを禁止するためにこれ
 略バッファに入る事と抜ける事を速くするため
 に @code{gnus-show-threads} と @code{gnus-use-cross-reference}、それ
 に @code{gnus-nov-is-evil} を @code{nil} に設定して下さい。
+
+Gnus は @code{X-Face} ヘッダーをデコードするために、通常 Emacs で
+は ELisp で書かれた内部 @code{uncompface} プログラムを使います。それが遅
+く感じる場合は、@code{uncompface-use-external} を @code{t} に設定して下
+さい。@xref{X-Face}.
 
 @page
 @node Troubleshooting
