@@ -31,7 +31,7 @@
 (require 'product)
 (provide 'gnus-vers)
 
-(defconst gnus-revision-number "07"
+(defconst gnus-revision-number "08"
   "Revision number for this version of gnus.")
 
 ;; Product information of this gnus.

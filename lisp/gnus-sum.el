@@ -4417,14 +4417,31 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; Retrieve the headers and read them in.
       (gnus-message 5 "Fetching headers for %s..." gnus-newsgroup-name)
       (setq gnus-newsgroup-headers
-	    (gnus-retrieve-parsed-headers
-	     articles gnus-newsgroup-name
-	     ;; We might want to fetch old headers, but
-	     ;; not if there is only 1 article.
-	     (and (or (and (not (eq gnus-fetch-old-headers 'some))
-			   (not (numberp gnus-fetch-old-headers)))
-		      (> (length articles) 1))
-		  gnus-fetch-old-headers)))
+	    ;;;!!! FIXME: temporary fix for an infloop on nnimap.
+	    (if (eq 'nnimap (car (gnus-find-method-for-group group)))
+		(if (eq 'nov
+			(setq
+			 gnus-headers-retrieved-by
+			 (gnus-retrieve-headers
+			  articles gnus-newsgroup-name
+			  ;; We might want to fetch old headers, but
+			  ;; not if there is only 1 article.
+			  (and (or (and
+				    (not (eq gnus-fetch-old-headers 'some))
+				    (not (numberp gnus-fetch-old-headers)))
+				   (> (length articles) 1))
+			       gnus-fetch-old-headers))))
+		    (gnus-get-newsgroup-headers-xover
+		     articles nil nil gnus-newsgroup-name t)
+		  (gnus-get-newsgroup-headers))
+	      (gnus-retrieve-parsed-headers
+	       articles gnus-newsgroup-name
+	       ;; We might want to fetch old headers, but
+	       ;; not if there is only 1 article.
+	       (and (or (and (not (eq gnus-fetch-old-headers 'some))
+			     (not (numberp gnus-fetch-old-headers)))
+			(> (length articles) 1))
+		    gnus-fetch-old-headers))))
       (gnus-message 5 "Fetching headers for %s...done" gnus-newsgroup-name)
 
       ;; Suppress duplicates?
@@ -5129,8 +5146,11 @@ Return a list of headers that match SEQUENCE (see
 	(let ((gnus-nov-is-evil t))
 	  (nconc
 	   (nreverse headers)
-	   (gnus-retrieve-parsed-headers sequence group)
-	   ))))))
+	   ;;;!!! FIXME: temporary fix for an infloop on nnimap.
+	   (if (eq 'nnimap (car (gnus-find-method-for-group group)))
+	       (when (gnus-retrieve-headers sequence group)
+		 (gnus-get-newsgroup-headers))
+	     (gnus-retrieve-parsed-headers sequence group))))))))
 
 (defun gnus-article-get-xrefs ()
   "Fill in the Xref value in `gnus-current-headers', if necessary.
@@ -7410,7 +7430,6 @@ Optional argument BACKWARD means do search for backward.
   (require 'gnus-async)
   (require 'gnus-art)
   (let ((gnus-select-article-hook nil)	;Disable hook.
-	(gnus-article-display-hook nil)
 	(gnus-article-prepare-hook nil)
 	(gnus-mark-article-hook nil)	;Inhibit marking as read.
 	(gnus-use-article-prefetch nil)
@@ -7668,7 +7687,6 @@ without any article massaging functions being run."
     (require 'gnus-art)
     ;; Bind the article treatment functions to nil.
     (let ((gnus-have-all-headers t)
-	  gnus-article-display-hook
 	  gnus-article-prepare-hook
 	  gnus-article-decode-hook
 	  gnus-break-pages

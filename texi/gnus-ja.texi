@@ -19674,8 +19674,7 @@ Sources で得ることができます。
 @item Summary バッファと NOV ファイルに含める追加のヘッダーを、ユーザが
 決めることができるようになりました。
 
-@item @code{gnus-article-display-hook} が削除されました (訳注: T-gnus で
-は存在していますが、これを使うことは推奨されていません)。代わり
+@item @code{gnus-article-display-hook} が削除されました。代わり
 に @code{gnus-treat-} で始まるたくさんの変数が追加されました。
 
 @item Gnus posting styles が再び改装されました。現在は微妙に違う規則で動

@@ -1,3 +1,33 @@
+2001-02-16  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 08.
+
+	* lisp/gnus-sum.el (gnus-get-newsgroup-headers-xover): Don't use
+	`gnus-retrieve-parsed-headers' when the backend is nnimap.  It is
+	only a temporary fix for an infloop on nnimap.  FIXME!!!
+	(gnus-select-newsgroup): Ditto.
+
+2001-02-16  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* texi/gnus-ja.texi (New features in Gnus 5.8): Remove annotation
+	about `gnus-article-display-hook.'
+	* texi/gnus-faq-ja.texi (Q2.1): Remove mention of
+	`gnus-article-display-hook.'
+
+	* lisp/gnus.el (gnus-article-display-hook): Abolished.
+
+	* lisp/gnus-uu.el (gnus-uu-grab-articles): Don't care about
+	`gnus-article-display-hook'.
+	* lisp/gnus-sum.el (gnus-summary-show-article): Ditto.
+	(gnus-summary-search-article): Ditto.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb-insinuate): Use
+	`gnus-article-prepare-hook' instead of `gnus-article-display-hook'.
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Evaluate
+	`gnus-article-prepare-hook' after an article has been prepared;
+	don't evaluate `gnus-article-display-hook'.
+
 2001-02-15  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-cite-original-without-signature):
