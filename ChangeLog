@@ -1,3 +1,8 @@
+2002-02-22  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-request-article-this-buffer): Temporally
+	fix: erase the buffer before inserting (and saving) an article.
+
 2002-02-22  Steve Youngs  <youngs@xemacs.org>
 
 	* aclocal.m4 (AC_PATH_LISPDIR): Default to

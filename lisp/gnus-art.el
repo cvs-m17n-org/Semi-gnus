@@ -5436,6 +5436,10 @@ T-gnus change: Insert an article into `gnus-original-article-buffer'."
       ;; Copy the requested article from `gnus-original-article-buffer'.
       (unless (equal (buffer-name (current-buffer))
 		     (buffer-name (get-buffer gnus-original-article-buffer)))
+	;; There may be the same article if the current buffer is
+	;; `nntp-server-buffer' (e.g. a case that the command
+	;; `gnus-cache-enter-article' is invoked), it should be erased.
+	(erase-buffer)
 	(insert-buffer gnus-original-article-buffer))
 
       ;; Decode charsets.
