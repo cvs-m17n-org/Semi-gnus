@@ -1,3 +1,8 @@
+2001-01-15  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Save excursion
+	while `bbdb-annotate-message-sender' is being done.
+
 2001-01-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-treatment-function-alist): Use backquote.
