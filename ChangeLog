@@ -1,3 +1,12 @@
+1999-08-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-isearch-article): Set
+	`isearch-lazy-highlight' t in the buffer locally; goto the
+	beginning of the buffer before searching.
+
+	* lisp/gnus-util.el (gnus-eval-in-buffer-window): Select the last
+	selected frame.
+
 1999-08-23  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 10.
