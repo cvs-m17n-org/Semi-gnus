@@ -1,3 +1,10 @@
+1999-06-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 16.
+
+	* lisp/gnus-sum.el (gnus-article-sort-by-author): Bug fix - use the
+	car of the return value of `mime-read-field'.
+
 1999-05-28  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 15.
