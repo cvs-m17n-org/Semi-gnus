@@ -125,12 +125,12 @@ on your system, you could say something like:
 (defalias 'mail-header-message-id 'mail-header-id)
 (defmacro mail-header-id (header)
   "Return Id in HEADER."
-  `(aref ,header 4))
+  `(mime-fetch-field 'Message-Id (mail-header-entity ,header)))
 
 (defalias 'mail-header-set-message-id 'mail-header-set-id)
 (defmacro mail-header-set-id (header id)
   "Set article Id of HEADER to ID."
-  `(aset ,header 4 ,id))
+  `(mail-header-set-field ,header 'Message-Id ,id))
 
 (defmacro mail-header-references (header)
   "Return references in HEADER."
@@ -170,7 +170,8 @@ on your system, you could say something like:
   (let ((entity (make-mime-entity-internal nil nil)))
     (mime-entity-set-original-header-internal
      entity
-     (list (cons 'Date date)))
+     (list (cons 'Date date)
+	   (cons 'Message-Id id)))
     (mime-entity-set-parsed-header-internal
      entity
      (list (cons 'Subject subject)
