@@ -1,3 +1,23 @@
+1998-11-13  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus-msg.el (gnus-setup-message): Setup
+	`message-startup-parameter-alist' for starting `message-mode'.
+
+	* lisp/message.el (message-parameter-alist): New variable.
+	(message-startup-parameter-alist): New variable.
+	(message-eval-parameter): New function.
+	(message-get-reply-buffer): New function.
+	(message-get-original-reply-buffer): New function.
+	(message-mode): Make new local variable `message-parameter-alist'.
+	(message-fetch-reply-field): Use `message-get-reply-buffer'.
+	(message-yank-original): Ditto.
+	(message-setup): Get message reply buffer from
+	`message-parameter-alist'.
+	(message-mime-insert-article): Use
+	`message-get-original-reply-buffer'.
+
+	* lisp/gnus-bbdb.el: New file. Interface for BBDB.
+
 1998-11-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-summary-resend-bounced-mail): Bind
