@@ -1,3 +1,25 @@
+1998-04-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi: Fix typos.
+
+	* texi/gnus.texi: Modify for Semi-gnus.
+
+1998-04-23  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Auto Save".
+
+1998-04-22  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Startup Files".
+
+1998-04-21  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.2.0.
+	(gnus-version): Modify for SEMI 1.3.
+
+	* lisp/gnus-sum.el: Use 'ctree-set-calist-strictly instead of
+ 	'set-atype to set up for 'mime-acting-condition.
+
 1998-04-21  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* texi/gnus-ja.texi: Add "Changing Servers".
