@@ -4651,7 +4651,10 @@ If no internal viewer is available, use an external viewer."
 	 gnus-part ,gnus-tmp-id
 	 article-type annotation
 	 gnus-data ,handle))
-    (setq e (point))
+    (setq e (if (bolp)
+		;; Exclude a newline.
+		(1- (point))
+	      (point)))
     (widget-convert-button
      'link b e
      :mime-handle handle
@@ -6846,7 +6849,10 @@ specified by `gnus-button-alist'."
 	 article-type annotation
 	 mime-view-situation ,situation))
     (widget-convert-button
-     'link b (point)
+     'link b (if (bolp)
+		 ;; Exclude a newline.
+		 (1- (point))
+	       (point))
      :action 'gnus-button-prev-page
      :button-keymap gnus-prev-page-map)))
 
@@ -6886,7 +6892,10 @@ specified by `gnus-button-alist'."
 			  article-type annotation
 			  mime-view-situation ,situation))
     (widget-convert-button
-     'link b (point)
+     'link b (if (bolp)
+		 ;; Exclude a newline.
+		 (1- (point))
+	       (point))
      :action 'gnus-button-next-page
      :button-keymap gnus-next-page-map)))
 
@@ -7246,7 +7255,10 @@ For example:
 	 gnus-mime-details ,gnus-mime-security-button-pressed
 	 article-type annotation
 	 gnus-data ,handle))
-    (setq e (point))
+    (setq e (if (bolp)
+		;; Exclude a newline.
+		(1- (point))
+	      (point)))
     (widget-convert-button
      'link b e
      :mime-handle handle
