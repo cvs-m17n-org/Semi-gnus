@@ -5426,9 +5426,10 @@ Optional NEWS will use news to forward instead of mail."
 	(replace-match "X-From-Line: "))
       ;; Send it.
       (let ((message-encoding-buffer (current-buffer))
-	    (message-edit-buffer (current-buffer)))
-	(let (message-required-mail-headers)
-	  (message-send-mail)))
+	    (message-edit-buffer (current-buffer))
+	    message-required-mail-headers
+	    (inhibit-field-text-motion t))
+	(message-send-mail))
       (kill-buffer (current-buffer)))
     (message "Resending message to %s...done" address)))
 

@@ -1,3 +1,8 @@
+2001-10-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-resend): Bind
+	`inhibit-field-text-motion' to t while resending a mail.
+
 2001-10-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-send): Remove the text property `field'
