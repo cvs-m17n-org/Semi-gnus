@@ -56,6 +56,16 @@ is used instead.")
 
 (require 'mail-utils)
 
+(defalias 'hashcash-point-at-bol
+  (if (fboundp 'point-at-bol)
+      'point-at-bol
+    'line-beginning-position))
+
+(defalias 'hashcash-point-at-eol
+  (if (fboundp 'point-at-eol)
+      'point-at-eol
+    'line-end-position))
+
 (defun hashcash-strip-quoted-names (addr)
   (setq addr (mail-strip-quoted-names addr))
   (if (and addr (string-match "^[^+@]+\\(\\+[^@]*\\)@" addr))
@@ -90,7 +100,7 @@ is used instead.")
 	(call-process hashcash nil t nil (concat "-b " (number-to-string val))
 		      str)
 	(goto-char (point-min))
-	(buffer-substring (point-at-bol) (point-at-eol)))
+	(buffer-substring (hashcash-point-at-bol) (hashcash-point-at-eol)))
     nil))
 
 (defun hashcash-check-payment (token str val)
@@ -170,11 +180,11 @@ Prefix arg sets default accept amount temporarily."
 	(goto-char (point-min))
 	(while (and (not ok) (search-forward "X-Payment: hashcash 1.1 " end t))
 	  (setq ok (hashcash-verify-payment
-		    (buffer-substring (point) (point-at-eol)))))
+		    (buffer-substring (point) (hashcash-point-at-eol)))))
 	(goto-char (point-min))
 	(while (and (not ok) (search-forward "X-Hashcash: " end t))
 	  (setq ok (hashcash-verify-payment
-		    (buffer-substring (point) (point-at-eol)))))
+		    (buffer-substring (point) (hashcash-point-at-eol)))))
 	(when ok
 	  (message "Payment valid"))
 	ok))))
