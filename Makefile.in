@@ -63,24 +63,24 @@ info-ja:
 
 clean:
 	rm -f */*.orig */*.rej *.orig *.rej
+	rm -f MANIFEST.*
 
 xsome:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" some
 
 elclean:
-	rm lisp/*.elc
+	rm -f lisp/*.elc
 
 x:
-	make EMACS="$(XEMACS)"
+	$(MAKE) EMACS="$(XEMACS)"
 
-distclean:
-	make clean
+distclean: clean
 	rm -rf *~
 	for i in lisp texi; do (cd $$i; make distclean); done
 	rm -f config.log config.status config.cache Makefile
 
 osome:
-	make EMACS="$(XEMACS)" some
+	$(MAKE) EMACS="$(XEMACS)" some
 
 config.status: $(srcdir)/configure
 	$(SHELL) ./config.status --recheck
