@@ -22440,7 +22440,7 @@ Package Global Variables}) を付けます。グループを出るとき、それらの記事
 
 私の ham フォルダで、認識されなかった spam メール (否定の失敗) を見たと
 きはいつでも、私は単に @kbd{S x} (@code{gnus-summary-mark-as-spam}) を叩
-きます。グループを出るとき、それらのメッセージは @samp{training.ham} に
+きます。グループを出るとき、それらのメッセージは @samp{training.spam} に
 移されます。
 @end itemize
 
