@@ -2170,6 +2170,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 	     (subrp (symbol-function 'base64-encode-string)))
   (require 'base64))
 
+;; To make nnir groups.
+(autoload 'gnus-group-make-nnir-group "nnir" nil t)
+
 ;; To make shimbun groups.
 (autoload 'gnus-group-make-shimbun-group "nnshimbun" nil t)
 

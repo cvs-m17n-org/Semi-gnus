@@ -613,6 +613,8 @@ simple manner.")
     "V" gnus-group-make-empty-virtual
     "D" gnus-group-enter-directory
     "f" gnus-group-make-doc-group
+    "G" gnus-group-make-nnir-group
+    "S" gnus-group-make-shimbun-group
     "w" gnus-group-make-web-group
     "r" gnus-group-rename-group
     "c" gnus-group-customize

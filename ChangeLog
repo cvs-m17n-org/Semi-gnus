@@ -1,8 +1,13 @@
-2001-09-04  KOSEKI Yoshinori  <kose@wizard.tamra.co.jp>
-
-	* lisp/nnir.el: Add namazu support.
-
 2001-09-04  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnir.el (top): Don't call `nnir-group-mode-hook' in T-gnus.
+
+	* lisp/gnus-group.el (gnus-group-group-map): Define "G" as
+	`gnus-group-make-nnir-group', and define "S" as
+	`gnus-group-make-shimbun-group'.
+
+	* lisp/gnus.el (top): Add autoload of
+	`gnus-group-make-nnir-group'.
 
 	* lisp/nnir.el: Import from
 	ftp://ls6-ftp.cs.uni-dortmund.de/pub/src/emacs/nnir.el.

@@ -608,7 +608,10 @@ that it is for Namazu, not Glimpse."
         (kbd "G G")
       "GG")                             ; XEmacs 19 compat
     'gnus-group-make-nnir-group))
-(add-hook 'gnus-group-mode-hook 'nnir-group-mode-hook)
+(add-hook 'gnus-group-mode-hook
+	  (lambda ()
+	    (unless (string-ma "T-gnus" gnus-version)
+	      (nnir-group-mode-hook))))
 
 
 
@@ -1214,7 +1217,9 @@ Tested with Namazu 2.0.6 on a GNU/Linux system."
               (progn
                 (message "%s args: %s" nnir-namazu-program
                          (mapconcat 'identity (cddddr cp-list) " "))
-                (apply 'call-process cp-list))))
+		(let ((process-environement process-environment))
+		  (setenv "LANG" "C")
+		  (apply 'call-process cp-list)))))
         (unless (or (null exitstatus)
                     (zerop exitstatus))
           (nnheader-report 'nnir "Couldn't run namazu: %s" exitstatus)
