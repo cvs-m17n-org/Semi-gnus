@@ -47,8 +47,8 @@ If a number, prefetch only that many articles forward;
 if t, prefetch as many articles as possible."
   :group 'gnus-asynchronous
   :type '(choice (const :tag "off" nil)
-		 (const :tag "all" t)
-		 (integer :tag "some" 0)))
+		 (integer :tag "some" 0)
+		 (other :tag "all" t)))
 
 (defcustom gnus-prefetched-article-deletion-strategy '(read exit)
   "List of symbols that say when to remove articles from the prefetch buffer.
@@ -77,9 +77,7 @@ It should return non-nil if the article is to be prefetched."
 (defvar gnus-async-article-alist nil)
 (defvar gnus-async-article-semaphore '(nil))
 (defvar gnus-async-fetch-list nil)
-(defvar gnus-async-hashtb nil)
-(defvar gnus-async-current-prefetch-group nil)
-(defvar gnus-async-current-prefetch-article nil)
+(defvar gnus-asynch-obarray nil)
 
 (defvar gnus-async-prefetch-headers-buffer " *Async Prefetch Headers*")
 (defvar gnus-async-header-prefetched nil)
@@ -108,8 +106,8 @@ It should return non-nil if the article is to be prefetched."
 	 ,@forms)
      (gnus-async-release-semaphore 'gnus-async-article-semaphore)))
 
-(put 'gnus-async-with-semaphore 'lisp-indent-function 0)
-(put 'gnus-async-with-semaphore 'edebug-form-spec '(body))
+(put 'gnus-asynch-with-semaphore 'lisp-indent-function 0)
+(put 'gnus-asynch-with-semaphore 'edebug-form-spec '(body))
 
 ;;;
 ;;; Article prefetch
@@ -119,14 +117,14 @@ It should return non-nil if the article is to be prefetched."
 (defun gnus-async-close ()
   (gnus-kill-buffer gnus-async-prefetch-article-buffer)
   (gnus-kill-buffer gnus-async-prefetch-headers-buffer)
-  (setq gnus-async-hashtb nil
-	gnus-async-article-alist nil
+  (setq gnus-async-article-alist nil
 	gnus-async-header-prefetched nil))
 
 (defun gnus-async-set-buffer ()
   (nnheader-set-temp-buffer gnus-async-prefetch-article-buffer t)
-  (unless gnus-async-hashtb
-    (setq gnus-async-hashtb (gnus-make-hashtable 1023))))
+  (unless gnus-asynch-obarray
+    (set (make-local-variable 'gnus-asynch-obarray)
+	 (gnus-make-hashtable 1023))))
 
 (defun gnus-async-halt-prefetch ()
   "Stop prefetching."
@@ -206,33 +204,26 @@ It should return non-nil if the article is to be prefetched."
 		  (when do-message
 		    (gnus-message 9 "Prefetching article %d in group %s"
 				  article group))
-		  (setq gnus-async-current-prefetch-group group)
-		  (setq gnus-async-current-prefetch-article article)
 		  (gnus-request-article article group))))))))))
 
 (defun gnus-make-async-article-function (group article mark summary next)
   "Return a callback function."
   `(lambda (arg)
-     (gnus-async-article-callback arg ,group ,article ,mark ,summary ,next)))
-
-(defun gnus-async-article-callback (arg group article mark summary next)
-  "Function called when an async article is done being fetched."
-  (save-excursion
-    (setq gnus-async-current-prefetch-article nil)
-    (when arg
-      (gnus-async-set-buffer)
-      (gnus-async-with-semaphore
-       (setq
-	gnus-async-article-alist
-	(cons (list (intern (format "%s-%d" group article)
-			    gnus-async-hashtb)
-		    mark (set-marker (make-marker) (point-max))
-		    group article)
-	      gnus-async-article-alist))))
-    (if (not (gnus-buffer-live-p summary))
-	(gnus-async-with-semaphore
-	 (setq gnus-async-fetch-list nil))
-      (gnus-async-prefetch-article group next summary t))))
+     (save-excursion
+       (when arg
+	 (gnus-async-set-buffer)
+	 (gnus-async-with-semaphore
+	  (setq
+	   gnus-async-article-alist
+	   (cons (list ',(intern (format "%s-%d" group article)
+				 gnus-asynch-obarray)
+		       ,mark (set-marker (make-marker) (point-max))
+		       ,group ,article)
+		 gnus-async-article-alist))))
+       (if (not (gnus-buffer-live-p ,summary))
+	   (gnus-async-with-semaphore
+	    (setq gnus-async-fetch-list nil))
+	 (gnus-async-prefetch-article ,group ,next ,summary t)))))
 
 (defun gnus-async-unread-p (data)
   "Return non-nil if DATA represents an unread article."
@@ -241,9 +232,6 @@ It should return non-nil if the article is to be prefetched."
 (defun gnus-async-request-fetched-article (group article buffer)
   "See whether we have ARTICLE from GROUP and put it in BUFFER."
   (when (numberp article)
-    (when (and (equal group gnus-async-current-prefetch-group)
-	       (eq article gnus-async-current-prefetch-article))
-      (gnus-async-wait-for-article article))
     (let ((entry (gnus-async-prefetched-article-entry group article)))
       (when entry
 	(save-excursion
@@ -251,40 +239,10 @@ It should return non-nil if the article is to be prefetched."
 	  (copy-to-buffer buffer (cadr entry) (caddr entry))
 	  ;; Remove the read article from the prefetch buffer.
 	  (when (memq 'read gnus-prefetched-article-deletion-strategy)
-	    (gnus-async-delete-prefetched-entry entry))
+	    (gnus-async-delete-prefected-entry entry))
 	  t)))))
 
-(defun gnus-async-wait-for-article (article)
-  "Wait until ARTICLE is no longer the currently-being-fetched article."
-  (save-excursion
-    (gnus-async-set-buffer)
-    (let ((proc (nntp-find-connection (current-buffer)))
-	  (nntp-server-buffer (current-buffer))
-	  (nntp-have-messaged nil)
-	  (tries 0))
-      (condition-case nil
-	  ;; FIXME: we could stop waiting after some
-	  ;; timeout, but this is the wrong place to do it.
-	  ;; rather than checking time-spent-waiting, we
-	  ;; should check time-since-last-output, which
-	  ;; needs to be done in nntp.el.
-	  (while (eq article gnus-async-current-prefetch-article)
-	    (incf tries)
-	    (when (nntp-accept-process-output proc 1)
-	      (setq tries 0))
-	    (when (and (not nntp-have-messaged) (eq 3 tries))
-	      (gnus-message 5 "Waiting for async article...")
-	      (setq nntp-have-messaged t)))
-	(quit
-	 ;; if the user interrupted on a slow/hung connection,
-	 ;; do something friendly.
-	 (when (< 3 tries)
-	   (setq gnus-async-current-prefetch-article nil))
-	 (signal 'quit nil)))
-      (when nntp-have-messaged
-	(gnus-message 5 "")))))
-
-(defun gnus-async-delete-prefetched-entry (entry)
+(defun gnus-async-delete-prefected-entry (entry)
   "Delete ENTRY from buffer and alist."
   (ignore-errors
     (delete-region (cadr entry) (caddr entry))
@@ -303,7 +261,7 @@ It should return non-nil if the article is to be prefetched."
 	(gnus-async-set-buffer)
 	(while alist
 	  (when (equal group (nth 3 (car alist)))
-	    (gnus-async-delete-prefetched-entry (car alist)))
+	    (gnus-async-delete-prefected-entry (car alist)))
 	  (pop alist))))))
 
 (defun gnus-async-prefetched-article-entry (group article)
@@ -311,7 +269,7 @@ It should return non-nil if the article is to be prefetched."
   (let ((entry (save-excursion
 		 (gnus-async-set-buffer)
 		 (assq (intern (format "%s-%d" group article)
-			       gnus-async-hashtb)
+			       gnus-asynch-obarray)
 		       gnus-async-article-alist))))
     ;; Perhaps something has emptied the buffer?
     (if (and entry

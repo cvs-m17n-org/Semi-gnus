@@ -6,7 +6,7 @@
 @synindex vr cp
 @synindex pg cp
 @c @direntry
-@c * Gnus: (gnus).         The newsreader Gnus.
+@c * Semi-gnus: (gnus).         The newsreader Semi-gnus.
 @c @end direntry
 @iftex
 @finalout
@@ -14,280 +14,8 @@
 @setchapternewpage odd
 
 @iftex
-@iflatex
-\documentclass[twoside,a4paper,openright,11pt]{book}
-\usepackage[latin1]{inputenc}
-\usepackage{pagestyle}
-\usepackage{epsfig}
-\usepackage{bembo}
-\usepackage{pixidx}
-
-\makeindex
-\begin{document}
-
-\newcommand{\gnuschaptername}{}
-\newcommand{\gnussectionname}{}
-
-\newcommand{\gnusbackslash}{/}
-
-\newcommand{\gnusxref}[1]{See ``#1'' on page \pageref{#1}}
-\newcommand{\gnuspxref}[1]{see ``#1'' on page \pageref{#1}}
-
-\newcommand{\gnuskindex}[1]{\index{#1}}
-\newcommand{\gnusindex}[1]{\index{#1}}
-
-\newcommand{\gnustt}[1]{{\fontfamily{pfu}\fontsize{10pt}{10}\selectfont #1}}
-\newcommand{\gnuscode}[1]{\gnustt{#1}}
-\newcommand{\gnussamp}[1]{``{\fontencoding{OT1}\fontfamily{pfu}\fontsize{10pt}{10}\selectfont #1}''}
-\newcommand{\gnuslisp}[1]{\gnustt{#1}}
-\newcommand{\gnuskbd}[1]{`\gnustt{#1}'}
-\newcommand{\gnusfile}[1]{`\gnustt{#1}'}
-\newcommand{\gnusdfn}[1]{\textit{#1}}
-\newcommand{\gnusi}[1]{\textit{#1}}
-\newcommand{\gnusstrong}[1]{\textbf{#1}}
-\newcommand{\gnusemph}[1]{\textit{#1}}
-\newcommand{\gnusvar}[1]{{\fontsize{10pt}{10}\selectfont\textsl{\textsf{#1}}}}
-\newcommand{\gnussc}[1]{\textsc{#1}}
-\newcommand{\gnustitle}[1]{{\huge\textbf{#1}}}
-\newcommand{\gnusauthor}[1]{{\large\textbf{#1}}}
-
-\newcommand{\gnusbullet}{{${\bullet}$}}
-\newcommand{\gnusdollar}{\$}
-\newcommand{\gnusampersand}{\&}
-\newcommand{\gnuspercent}{\%}
-\newcommand{\gnushash}{\#}
-\newcommand{\gnushat}{\symbol{"5E}}
-\newcommand{\gnusunderline}{\symbol{"5F}}
-\newcommand{\gnusnot}{$\neg$}
-\newcommand{\gnustilde}{\symbol{"7E}}
-\newcommand{\gnusless}{{$<$}}
-\newcommand{\gnusgreater}{{$>$}}
-\newcommand{\gnusbraceleft}{{$>$}}
-\newcommand{\gnusbraceright}{{$>$}}
-
-\newcommand{\gnushead}{\raisebox{-1cm}{\epsfig{figure=ps/gnus-head.eps,height=1cm}}}
-\newcommand{\gnusinteresting}{
-\marginpar[\mbox{}\hfill\gnushead]{\gnushead}
-}
-
-\newcommand{\gnuscleardoublepage}{\ifodd\count0\mbox{}\clearpage\thispagestyle{empty}\mbox{}\clearpage\else\clearpage\fi}
-
-\newcommand{\gnuspagechapter}[1]{
-{\mbox{}}
-}
-
-\newdimen{\gnusdimen}
-\gnusdimen 0pt
-
-\newcommand{\gnuschapter}[2]{
-\gnuscleardoublepage
-\ifdim \gnusdimen = 0pt\setcounter{page}{1}\pagestyle{gnus}\pagenumbering{arabic} \gnusdimen 1pt\fi
-\chapter{#2}
-\renewcommand{\gnussectionname}{}
-\renewcommand{\gnuschaptername}{#2}
-\thispagestyle{empty}
-\hspace*{-2cm}
-\begin{picture}(500,500)(0,0)
-\put(480,350){\makebox(0,0)[tr]{#1}}
-\put(40,300){\makebox(500,50)[bl]{{\Huge\bf{#2}}}}
-\end{picture}
-\clearpage
-}
-
-\newcommand{\gnusfigure}[3]{
-\begin{figure}
-\mbox{}\ifodd\count0\hspace*{-0.8cm}\else\hspace*{-3cm}\fi\begin{picture}(440,#2)
-#3
-\end{picture}
-\caption{#1}
-\end{figure}
-}
-
-\newcommand{\gnusicon}[1]{
-\marginpar[\mbox{}\hfill\raisebox{-1.5cm}{\epsfig{figure=tmp/#1-up.ps,height=1.5cm}}]{\raisebox{-1cm}{\epsfig{figure=tmp/#1-up.ps,height=1cm}}}
-}
-
-\newcommand{\gnuspicon}[1]{
-\margindex{\epsfig{figure=#1,width=2cm}}
-}
-
-\newcommand{\gnusxface}[2]{
-\margindex{\epsfig{figure=#1,width=1cm}\epsfig{figure=#2,width=1cm}}
-}
-
-\newcommand{\gnussmiley}[2]{
-\margindex{\makebox[2cm]{\hfill\epsfig{figure=#1,width=0.5cm}\hfill\epsfig{figure=#2,width=0.5cm}\hfill}}
-}
-
-\newcommand{\gnusitemx}[1]{\mbox{}\vspace*{-\itemsep}\vspace*{-\parsep}\item#1}
-
-\newcommand{\gnussection}[1]{
-\renewcommand{\gnussectionname}{#1}
-\section{#1}
-}
-
-\newenvironment{codelist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newenvironment{kbdlist}%
-{\begin{list}{}{
-\labelwidth=0cm
-}
-}{\end{list}}
-
-\newenvironment{dfnlist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newenvironment{stronglist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newenvironment{samplist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newenvironment{varlist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newenvironment{emphlist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newlength\gnusheadtextwidth
-\setlength{\gnusheadtextwidth}{\headtextwidth}
-\addtolength{\gnusheadtextwidth}{1cm}
-
-\newpagestyle{gnuspreamble}%
-{
-{
-\ifodd\count0
-{
-\hspace*{-0.23cm}\underline{\makebox[\gnusheadtextwidth]{\mbox{}}\textbf{\hfill\roman{page}}}
-}
-\else
-{
-\hspace*{-3.25cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\roman{page}\hfill\mbox{}}}
-}
-}
-\fi
-}
-}
-{
-\ifodd\count0
-\mbox{} \hfill
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\else
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\hfill \mbox{}
-\fi
-}
-
-\newpagestyle{gnusindex}%
-{
-{
-\ifodd\count0
-{
-\hspace*{-0.23cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\gnuschaptername\hfill\arabic{page}}}}
-}
-\else
-{
-\hspace*{-3.25cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\arabic{page}\hfill\gnuschaptername}}}
-}
-\fi
-}
-}
-{
-\ifodd\count0
-\mbox{} \hfill
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\else
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\hfill \mbox{}
-\fi
-}
-
-\newpagestyle{gnus}%
-{
-{
-\ifodd\count0
-{
-\makebox[12cm]{\hspace*{3.1cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\arabic{chapter}.\arabic{section}} \textbf{\gnussectionname\hfill\arabic{page}}}}}
-}
-\else
-{
-\makebox[12cm]{\hspace*{-2.95cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\arabic{page}\hfill\gnuschaptername}}}}
-}
-\fi
-}
-}
-{
-\ifodd\count0
-\mbox{} \hfill
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\else
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\hfill \mbox{}
-\fi
-}
-
-\pagenumbering{roman}
-\pagestyle{gnuspreamble}
-
-@end iflatex
 @end iftex
 
-@iftex
-@iflatex
-\begin{titlepage}
-{
-
-%\addtolength{\oddsidemargin}{-5cm}
-%\addtolength{\evensidemargin}{-5cm}
-\parindent=0cm
-\addtolength{\textheight}{2cm}
-
-\gnustitle{\gnustitlename}\\
-\rule{15cm}{1mm}\\
-\vfill
-\hspace*{0cm}\epsfig{figure=ps/gnus-big-logo.eps,height=15cm}
-\vfill
-\rule{15cm}{1mm}\\
-\gnusauthor{by Lars Magne Ingebrigtsen}
-\newpage
-}
-
-\mbox{}
-\vfill
-
-\thispagestyle{empty}
-
-Copyright \copyright{} 1995,96,97 Free Software Foundation, Inc.
-
-Permission is granted to make and distribute verbatim copies of
-this manual provided the copyright notice and this permission notice
-are preserved on all copies.
-
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided that the
-entire resulting derived work is distributed under the terms of a
-permission notice identical to this one.
-
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions.
-
-\newpage
-\end{titlepage}
-@end iflatex
-@end iftex
 
 @ifinfo
 
@@ -366,11 +94,6 @@ This manual corresponds to Semi-gnus 6.10.
 @end ifinfo
 
 @iftex
-
-@iflatex
-\tableofcontents
-\gnuscleardoublepage
-@end iflatex
 
 Gnus is the advanced, self-documenting, customizable, extensible
 unreal-time newsreader for GNU Emacs.
@@ -857,8 +580,6 @@ recent, but it will never write a @file{.newsrc.el} file.  You should
 never delete the @file{.newsrc.eld} file---it contains much information
 not stored in the @file{.newsrc} file.
 
-In addition, gnus does not change anything.  Hail comrade Lars!
-
 @vindex gnus-save-newsrc-file
 You can turn off writing the @file{.newsrc} file by setting
 @code{gnus-save-newsrc-file} to @code{nil}, which means you can delete
@@ -1028,8 +749,8 @@ A hook run as the very last thing after starting up gnus
 A hook that is run as the very last thing after starting up gnus
 successfully.
 
-@item gnus-setup-news-hook
-@vindex gnus-setup-news-hook
+@item gnus-started-hook
+@vindex gnus-started-hook
 A hook that is run after reading the @file{.newsrc} file(s), but before
 generating the group buffer.
 
@@ -1073,19 +794,6 @@ The @dfn{group buffer} lists all (or parts) of the available groups.  It
 is the first buffer shown when gnus starts, and will never be killed as
 long as gnus is active.
 
-@iftex
-@iflatex
-\gnusfigure{The Group Buffer}{320}{
-\put(75,50){\epsfig{figure=tmp/group.ps,height=9cm}}
-\put(120,37){\makebox(0,0)[t]{Buffer name}}
-\put(120,38){\vector(1,2){10}}
-\put(40,60){\makebox(0,0)[r]{Mode line}}
-\put(40,58){\vector(1,0){30}}
-\put(200,28){\makebox(0,0)[t]{Native select method}}
-\put(200,26){\vector(-1,2){15}}
-}
-@end iflatex
-@end iftex
 
 @menu
 * Group Buffer Format::    Information listed and how you can change it.
@@ -1959,7 +1667,7 @@ Add the current group to an @code{nnvirtual} group
 (@code{gnus-group-add-to-virtual}).  Uses the process/prefix convention.
 @end table
 
-@xref{Select Methods} for more information on the various select
+@xref{Select Methods}, for more information on the various select
 methods.
 
 @vindex gnus-activate-foreign-newsgroups
@@ -1983,7 +1691,7 @@ Here's an example group parameter list:
  (auto-expire . t))
 @end example
 
-We see that each element consists of a ``dotted pair''---the thing
+We see that each element consists of a "dotted pair"---the thing
 before the dot is the key, while the thing after the dot is the value.
 All the parameters have this form @emph{except} local variable specs,
 which are not dotted pairs, but proper lists.
@@ -2550,14 +2258,6 @@ you put in some misc section that you never bother with anyway.  You can
 even group the Emacs sex groups as a sub-topic to either the Emacs
 groups or the sex groups---or both!  Go wild!
 
-@iftex
-@iflatex
-\gnusfigure{Group Topics}{400}{
-\put(75,50){\epsfig{figure=tmp/group-topic.ps,height=9cm}}
-}
-@end iflatex
-@end iftex
-
 Here's an example:
 
 @example
@@ -2831,7 +2531,7 @@ Sort the current topic alphabetically by backend name
 
 @end table
 
-@xref{Sorting Groups} for more information about group sorting.
+@xref{Sorting Groups}, for more information about group sorting.
 
 
 @node Topic Topology
@@ -3219,15 +2919,6 @@ You can have as many summary buffers open as you wish.
 @node Summary Buffer Format
 @section Summary Buffer Format
 @cindex summary buffer format
-
-@iftex
-@iflatex
-\gnusfigure{The Summary Buffer}{180}{
-\put(0,0){\epsfig{figure=tmp/summary.ps,width=7.5cm}}
-\put(445,0){\makebox(0,0)[br]{\epsfig{figure=tmp/summary-article.ps,width=7.5cm}}}
-}
-@end iflatex
-@end iftex
 
 @menu
 * Summary Buffer Lines::     You can specify how summary lines should look.
@@ -3858,7 +3549,7 @@ This command is mainly used if you have several accounts and want to
 ship a mail to a different account of yours.  (If you're both
 @code{root} and @code{postmaster} and get a mail for @code{postmaster}
 to the @code{root} account, you may want to resend it to
-@code{postmaster}.  Ordnung mu,A_(B sein!
+@code{postmaster}.  Ordnung muß sein!
 
 This command understands the process/prefix convention
 (@pxref{Process/Prefix}).
@@ -4019,7 +3710,7 @@ header by substituting one of those words for the word
 you would do normally.  The previous article will be
 canceled/superseded.
 
-Just remember, kids: There is no `c' in `supersede'.
+Just remember, kids: There is no 'c' in 'supersede'.
 
 
 @node Marking Articles
@@ -4176,7 +3867,7 @@ You can set a bookmark in the current article.  Say you are reading a
 long thesis on cats' urinary tracts, and have to go home for dinner
 before you've finished reading the thesis.  You can then set a bookmark
 in the article, and gnus will jump to this bookmark the next time it
-encounters the article.  @xref{Setting Marks}
+encounters the article.  @xref{Setting Marks}.
 
 @item
 @vindex gnus-replied-mark
@@ -4187,7 +3878,7 @@ answered) will be marked with an @samp{A} in the second column
 @item
 @vindex gnus-cached-mark
 Articles stored in the article cache will be marked with an @samp{*} in
-the second column (@code{gnus-cached-mark}).  @xref{Article Caching}
+the second column (@code{gnus-cached-mark}).  @xref{Article Caching}.
 
 @item
 @vindex gnus-saved-mark
@@ -4244,7 +3935,7 @@ article as unread.
 @kindex M t (Summary)
 @findex gnus-summary-tick-article-forward
 Tick the current article (@code{gnus-summary-tick-article-forward}).
-@xref{Article Caching}
+@xref{Article Caching}.
 
 @item M ?
 @itemx ?
@@ -4252,7 +3943,7 @@ Tick the current article (@code{gnus-summary-tick-article-forward}).
 @kindex M ? (Summary)
 @findex gnus-summary-mark-as-dormant
 Mark the current article as dormant
-(@code{gnus-summary-mark-as-dormant}).  @xref{Article Caching}
+(@code{gnus-summary-mark-as-dormant}).  @xref{Article Caching}.
 
 @item M d
 @itemx d
@@ -4670,17 +4361,6 @@ read or killed the root in a previous session.
 When there is no real root of a thread, gnus will have to fudge
 something.  This variable says what fudging method gnus should use.
 There are four possible values:
-
-@iftex
-@iflatex
-\gnusfigure{The Summary Buffer}{390}{
-\put(0,0){\epsfig{figure=tmp/summary-adopt.ps,width=7.5cm}}
-\put(445,0){\makebox(0,0)[br]{\epsfig{figure=tmp/summary-empty.ps,width=7.5cm}}}
-\put(0,400){\makebox(0,0)[tl]{\epsfig{figure=tmp/summary-none.ps,width=7.5cm}}}
-\put(445,400){\makebox(0,0)[tr]{\epsfig{figure=tmp/summary-dummy.ps,width=7.5cm}}}
-}
-@end iflatex
-@end iftex
 
 @cindex adopting articles
 
@@ -6203,7 +5883,7 @@ default.
 
 @end table
 
-@xref{Customizing Articles} for how to highlight articles automatically.
+@xref{Customizing Articles}, for how to highlight articles automatically.
 
 
 @node Article Fontisizing
@@ -6257,7 +5937,7 @@ say something like:
 (copy-face 'red 'gnus-emphasis-italic)
 @end lisp
 
-@xref{Customizing Articles} for how to fontize articles automatically.
+@xref{Customizing Articles}, for how to fontize articles automatically.
 
 
 @node Article Hiding
@@ -6378,7 +6058,7 @@ hidden.  If you give a positive prefix, they will always hide.
 Also @pxref{Article Highlighting} for further variables for
 citation customization.
 
-@xref{Customizing Articles} for how to hide article elements
+@xref{Customizing Articles}, for how to hide article elements
 automatically.
 
 
@@ -6400,7 +6080,7 @@ Cleaner, perhaps.
 @kindex W l (Summary)
 @findex gnus-summary-stop-page-breaking
 Remove page breaks from the current article
-(@code{gnus-summary-stop-page-breaking}).  @xref{Misc Article} for page
+(@code{gnus-summary-stop-page-breaking}).  @xref{Misc Article}, for page
 delimiters. 
 
 @item W r
@@ -6468,11 +6148,6 @@ Remove CR (i. e., @samp{^M}s on the end of the lines)
 @findex gnus-article-x-face-command
 @vindex gnus-article-x-face-command
 @vindex gnus-article-x-face-too-ugly
-@iftex
-@iflatex
-\include{xface}
-@end iflatex
-@end iftex
 Look for and display any X-Face headers
 (@code{gnus-article-display-x-face}).  The command executed by this
 function is given by the @code{gnus-article-x-face-command} variable.
@@ -6493,7 +6168,7 @@ last.
 @kindex W b (Summary)
 @findex gnus-article-add-buttons
 Add clickable buttons to the article (@code{gnus-article-add-buttons}).
-@xref{Article Buttons}
+@xref{Article Buttons}.
 
 @item W B
 @kindex W B (Summary)
@@ -6540,7 +6215,7 @@ body (@code{gnus-article-strip-leading-space}).
 
 @end table
 
-@xref{Customizing Articles} for how to wash articles automatically.
+@xref{Customizing Articles}, for how to wash articles automatically.
 
 
 @node Article Buttons
@@ -6626,7 +6301,7 @@ Face used when the mouse cursor is over a button.
 
 @end table
 
-@xref{Customizing Articles} for how to buttonize articles automatically.
+@xref{Customizing Articles}, for how to buttonize articles automatically.
 
 
 @node Article Date
@@ -6695,7 +6370,7 @@ that the article was posted in 1854.  Although something like that is
 
 @end table
 
-@xref{Customizing Articles} for how to display the date in your
+@xref{Customizing Articles}, for how to display the date in your
 preferred format automatically.
 
 
@@ -7910,11 +7585,6 @@ rather stupid.)
 
 Any similarity to real events and people is purely coincidental.  Ahem.
 
-To avoid such kind of situation, gnus stops to use
-@code{metamail-buffer}.  So now, you can set @code{gnus-show-mime} to
-non-@code{nil} every-time, then you can push button in the article
-buffer when there are nobody else.
-
 
 @node Customizing Articles
 @section Customizing Articles
@@ -8396,7 +8066,7 @@ any case, if this returns a non-@code{nil} value, then the style is said
 to @dfn{match}.
 
 Each style may contain a arbitrary amount of @dfn{attributes}.  Each
-attribute consists of a @var{(name value)} pair.  The attribute name
+attribute consists of a @var{(name . value)} pair.  The attribute name
 can be one of @code{signature}, @code{signature-file},
 @code{organization}, @code{address}, @code{name} or @code{body}.  The
 attribute name can also be a string.  In that case, this will be used as
@@ -10422,6 +10092,7 @@ your @file{.emacs} file:
 
 @end table
 
+
 @findex nnfolder-generate-active-file
 @kindex M-x nnfolder-generate-active-file
 If you have lots of @code{nnfolder}-like files you'd like to read with
@@ -11071,7 +10742,7 @@ group as read.
 
 If the search engine changes its output substantially, @code{nnweb}
 won't be able to parse it and will fail.  One could hardly fault the Web
-providers if they were to do this---their @emph{raison d',Aj(Btre} is to
+providers if they were to do this---their @emph{raison d'être} is to
 make money off of advertisements, not to provide services to the
 community.  Since @code{nnweb} washes the ads off all the articles, one
 might think that the providers might be somewhat miffed.  We'll see.
@@ -11464,7 +11135,7 @@ Agent (@pxref{Server Agent Commands}).  This will typically be only the
 primary select method, which is listed on the bottom in the buffer.
 
 @item
-Decide on download policy.  @xref{Agent Categories}
+Decide on download policy.  @xref{Agent Categories}.
 
 @item
 Uhm... that's it.
@@ -11736,7 +11407,7 @@ Fetch all eligible articles in all groups
 @kindex J S (Agent Group)
 @findex gnus-group-send-drafts
 Send all sendable messages in the draft group
-(@code{gnus-agent-send-draft}).  @xref{Drafts}
+(@code{gnus-agent-send-draft}).  @xref{Drafts}.
 
 @item J a
 @kindex J a (Agent Group)
@@ -13495,7 +13166,7 @@ then this operator will return @code{false}.
 
 @item !
 @itemx not
-@itemx ,A,(B
+@itemx ¬
 This logical operator only takes a single argument.  It returns the
 logical negation of the value of its argument.
 
@@ -14814,12 +14485,6 @@ advantage of that.
 @node Picons
 @subsection Picons
 
-@iftex
-@iflatex
-\include{picons}
-@end iflatex
-@end iftex
-
 So...  You want to slow down your news reader even more!  This is a
 good way to do so.  Its also a great way to impress people staring
 over your shoulder as you read news.
@@ -14837,12 +14502,6 @@ over your shoulder as you read news.
 @subsubsection Picon Basics
 
 What are Picons?  To quote directly from the Picons Web site:
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
 
 @quotation
 @dfn{Picons} is short for ``personal icons''.  They're small,
@@ -14913,12 +14572,6 @@ Alternatively if you want to use the web piconsearch engine add this:
 
 @node Hard Picons
 @subsubsection Hard Picons
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
 
 Gnus can display picons for you as you enter and leave groups and
 articles.  It knows how to interact with three sections of the picons
@@ -14995,12 +14648,6 @@ for the append flag of @code{add-hook}:
 @node Picon Useless Configuration
 @subsubsection Picon Useless Configuration
 
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
 The following variables offer further control over how things are
 done, where things are located, and other useless stuff you really
 don't need to worry about.
@@ -15073,24 +14720,11 @@ Gnus will never clear the cache itself; you will have to manually call
 @code{gnus-picons-clear-cache} to clear it.  Otherwise the cache will be
 cleared every time you exit Gnus.  Defaults to @code{t}.
 
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
 @end table
 
 @node Smileys
 @subsection Smileys
 @cindex smileys
-
-@iftex
-@iflatex
-\gnusfig{-3cm}{0.5cm}{\epsfig{figure=tmp/BigFace.ps,height=20cm}}
-\input{smiley}
-@end iflatex
-@end iftex
 
 @dfn{Smiley} is a package separate from Gnus, but since Gnus is
 currently the only package that uses Smiley, it is documented here.
@@ -15158,12 +14792,6 @@ Face used for mouse highlighting over the smiley face.
 
 @table @code
 
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
-
 @item gnus-use-toolbar
 @vindex gnus-use-toolbar
 If @code{nil}, don't display toolbars.  If non-@code{nil}, it should be
@@ -15211,12 +14839,6 @@ Valid values include @code{flame}, @code{pine}, @code{moss},
 @vindex gnus-xmas-modeline-glyph
 A glyph displayed in all Gnus mode lines.  It is a tiny gnu head by
 default.
-
-@iftex
-@iflatex
-\margindex{}
-@end iflatex
-@end iftex
 
 @end table
 
@@ -15786,7 +15408,7 @@ David Moore---rewrite of @file{nnvirtual.el} and many other things.
 Kevin Davidson---came up with the name @dfn{ding}, so blame him.
 
 @item
-Fran,Ag(Bois Pinard---many, many interesting and thorough bug reports, as
+François Pinard---many, many interesting and thorough bug reports, as
 well as autoconf support.
 
 @end itemize
@@ -15799,7 +15421,7 @@ The following people have contributed many patches and suggestions:
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
-David K,Ae(Bgedal,
+David Kågedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
@@ -15870,7 +15492,7 @@ Marc Horowitz,
 Gunnar Horrigmo,
 Richard Hoskins,
 Brad Howes,
-Fran,Ag(Bois Felix Ingrand,
+François Felix Ingrand,
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
 Iwamuro Motonori, @c Iwamuro
@@ -16121,12 +15743,6 @@ You can click on buttons instead of using the keyboard
 @node September Gnus
 @subsubsection September Gnus
 
-@iftex
-@iflatex
-\gnusfig{-28cm}{0cm}{\epsfig{figure=tmp/september.ps,height=20cm}}
-@end iflatex
-@end iftex
-
 New features in Gnus 5.2/5.3:
 
 @itemize @bullet
@@ -16268,11 +15884,6 @@ Configuration}).
 
 @item
 Mail can be re-scanned by a daemonic process (@pxref{Daemons}).
-@iftex
-@iflatex
-\marginpar[\mbox{}\hfill\epsfig{figure=tmp/fseptember.ps,height=5cm}]{\epsfig{figure=tmp/fseptember.ps,height=5cm}}
-@end iflatex
-@end iftex
 
 @item
 Gnus can make use of NoCeM files to weed out spam (@pxref{NoCeM}).
@@ -16367,12 +15978,6 @@ Further syntax checking of outgoing articles have been added.
 @subsubsection Red Gnus
 
 New features in Gnus 5.4/5.5:
-
-@iftex
-@iflatex
-\gnusfig{-5.5cm}{-4cm}{\epsfig{figure=tmp/red.ps,height=20cm}}
-@end iflatex
-@end iftex
 
 @itemize @bullet
 
@@ -16497,11 +16102,6 @@ Groups}).
 @item
 Cached articles can be pulled into the groups (@pxref{Summary Generation
 Commands}).
-@iftex
-@iflatex
-\marginpar[\mbox{}\hfill\epsfig{figure=tmp/fred.ps,width=3cm}]{\epsfig{figure=tmp/fred.ps,width=3cm}}
-@end iflatex
-@end iftex
 
 @item
 Score files are now applied in a more reliable order (@pxref{Score
@@ -17295,8 +16895,8 @@ From: Jason L Tibbitts III <tibbs@@hpc.uh.edu>
 @end example
 
 @item
- tanken var at n,Ae(Br du bruker `gnus-startup-file' som prefix (FOO) til ilete
-opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den v,Af(Bre en
+ tanken var at når du bruker `gnus-startup-file' som prefix (FOO) til å lete
+opp en fil FOO-SERVER, FOO-SERVER.el, FOO-SERVER.eld, kan du la den være en
 liste hvor du bruker hvert element i listen som FOO, istedet.  da kunne man
 hatt forskjellige serveres startup-filer forskjellige steder.
 
@@ -17369,8 +16969,8 @@ there was a sci.somethingelse group or section, then it should prompt
 for sci? first the sci.something? then sci.somethingelse?...
 
 @item
-Ja, det burde v,Af(Bre en m,Ae(Bte ,Ae(B si slikt.  Kanskje en ny variabel?
-`gnus-use-few-score-files'?  S,Ae(B kunne score-regler legges til den
+Ja, det burde være en måte å si slikt.  Kanskje en ny variabel?
+`gnus-use-few-score-files'?  Så kunne score-regler legges til den
 "mest" lokale score-fila.  F. eks. ville no-gruppene betjenes av
 "no.all.SCORE", osv.
 
@@ -17700,7 +17300,7 @@ the current process mark set onto the stack.
 
 @item
  gnus-article-hide-pgp
-Selv ville jeg nok ha valgt islette den dersom teksten matcher
+Selv ville jeg nok ha valgt å slette den dersom teksten matcher
 @example
 "\\(This\s+\\)?[^ ]+ has been automatically signed by"
 @end example
@@ -17874,10 +17474,6 @@ Solve the halting problem.
 
 This manual was generated from a TeXinfo file and then run through
 either @code{texi2dvi}
-@iflatex
-or my own home-brewed TeXinfo to \LaTeX\ transformer,
-and then run through @code{latex} and @code{dvips}
-@end iflatex
 to get what you hold in your hands now.
 
 The following conventions have been used:
@@ -17914,16 +17510,6 @@ If I say ``set @code{flumphel} to @code{yes}'', that would mean:
 @samp{yes} and @code{yes} are two @emph{very} different things---don't
 ever get them confused.
 
-@iflatex
-@c @head
-Of course, everything in this manual is of vital interest, so you should
-read it all.  Several times.  However, if you feel like skimming the
-manual, look for that gnu head you should see in the margin over
-there---it means that what's being discussed is of more importance than
-the rest of the stuff.  (On the other hand, if everything is infinitely
-important, how can anything be more important than that?  Just one more
-of the mysteries of this world, I guess.)
-@end iflatex
 
 @end iftex
 
@@ -19833,11 +19419,6 @@ former).  The manual is unambiguous, but it can be confusing.
 @contents
 @bye
 
-@iftex
-@iflatex
-\end{document}
-@end iflatex
-@end iftex
 
 @c End:
 

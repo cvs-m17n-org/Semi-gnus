@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message
-@settitle Pterodactyl Message 0.68 Manual
+@settitle Message 5.7 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -17,7 +17,7 @@
 
 This file documents Message, the Emacs message composition mode.
 
-Copyright (C) 1996,97,98 Free Software Foundation, Inc.
+Copyright (C) 1996 Free Software Foundation, Inc.
 
 Permission is granted to make and distribute verbatim copies of
 this manual provided the copyright notice and this permission notice
@@ -42,7 +42,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Pterodactyl Message 0.68 Manual
+@title Message 5.7 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -83,9 +83,9 @@ Message mode buffers.
 * Key Index::         List of Message mode keys.
 @end menu
 
-This manual corresponds to Pterodactyl Message 0.68.  Message is
-distributed with the Gnus distribution bearing the same version number
-as this manual.
+This manual corresponds to Message 5.7.  Message is distributed with
+the Gnus distribution bearing the same version number as this manual
+has. 
 
 
 @node Interface
@@ -446,16 +446,12 @@ strange.  You'll quickly get a feel for when it's safe, though.  Anyway,
 just remember that @kbd{C-x u} (@code{undo}) is available and you'll be
 all right.
 
+
 @item C-c C-w
 @kindex C-c C-w 
 @findex message-insert-signature
 Insert a signature at the end of the buffer
 (@code{message-insert-signature}).  
-
-@item C-c M-h
-@kindex C-c M-h
-@findex message-insert-headers
-Insert the message headers (@code{message-insert-headers}).
 
 @end table
 
@@ -960,8 +956,6 @@ Check whether the article has an @code{Approved} header, which is
 something only moderators should include.
 @item empty
 Check whether the article is empty.
-@item invisible-text
-Check whether there is any invisible text in the buffer.
 @item empty-headers
 Check whether any of the headers are empty.
 @item existing-newsgroups

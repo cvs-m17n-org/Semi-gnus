@@ -39,7 +39,7 @@
 (require 'gnus-start)
 (require 'gnus-sum)
 (require 'gnus-msg)
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 (nnoo-declare nnvirtual)
 
@@ -287,7 +287,6 @@ to virtual article number.")
 	 ;; The component group might be a virtual group.
 	 (nmark (gnus-request-update-mark cgroup (cdr nart) mark)))
     (when (and nart
-	       (memq mark gnus-auto-expirable-marks)
 	       (= mark nmark)
 	       (gnus-group-auto-expirable-p cgroup))
       (setq mark gnus-expirable-mark)))
@@ -386,7 +385,7 @@ to virtual article number.")
     (insert "\t"))
 
   ;; Remove any spaces at the beginning of the Xref field.
-  (while (eq (char-after (1- (point))) ? )
+  (while (= (char-after (1- (point))) ? )
     (forward-char -1)
     (delete-char 1))
 
@@ -418,7 +417,7 @@ to virtual article number.")
 
   ;; Ensure a trailing \t.
   (end-of-line)
-  (or (eq (char-after (1- (point))) ?\t)
+  (or (= (char-after (1- (point))) ?\t)
       (insert ?\t)))
 
 
@@ -437,21 +436,17 @@ If UPDATE-P is not nil, call gnus-group-update-group on the components."
 			(nnvirtual-partition-sequence
 			 (gnus-list-of-unread-articles
 			  (nnvirtual-current-group)))))
-	  (type-marks
-	   (delq nil
-		 (mapcar (lambda (ml)
-			   (if (eq (car ml) 'score)
-			       nil
-			     (cons (car ml)
-				   (nnvirtual-partition-sequence (cdr ml)))))
-			 (gnus-info-marks (gnus-get-info
-					   (nnvirtual-current-group))))))
+	  (type-marks (mapcar (lambda (ml)
+				(cons (car ml)
+				      (nnvirtual-partition-sequence (cdr ml))))
+			      (gnus-info-marks (gnus-get-info
+						(nnvirtual-current-group)))))
 	  mark type groups carticles info entry)
 
       ;; Ok, atomically move all of the (un)read info, clear any old
       ;; marks, and move all of the current marks.  This way if someone
       ;; hits C-g, you won't leave the component groups in a half-way state.
-      (progn
+      (gnus-atomic-progn
 	;; move (un)read
 	(let ((gnus-newsgroup-active nil)) ;workaround guns-update-read-articles
 	  (while (setq entry (pop unreads))
@@ -462,11 +457,7 @@ If UPDATE-P is not nil, call gnus-group-update-group on the components."
 	(while groups
 	  (when (and (setq info (gnus-get-info (pop groups)))
 		     (gnus-info-marks info))
-	    (gnus-info-set-marks
-	     info
-	     (if (assq 'score (gnus-info-marks info))
-		 (list (assq 'score (gnus-info-marks info)))
-	       nil))))
+	    (gnus-info-set-marks info nil)))
 
 	;; Ok, currently type-marks is an assq list with keys of a mark type,
 	;; with data of an assq list with keys of component group names

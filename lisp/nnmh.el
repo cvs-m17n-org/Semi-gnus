@@ -77,6 +77,7 @@
 	   (large (and (numberp nnmail-large-newsgroup)
 		       (> number nnmail-large-newsgroup)))
 	   (count 0)
+	   (file-name-coding-system 'binary)
 	   (pathname-coding-system 'binary)
 	   beg article)
       (nnmh-possibly-change-directory newsgroup server)
@@ -136,6 +137,7 @@
 		  nil
 		(concat nnmh-current-directory (int-to-string id))))
 	(pathname-coding-system 'binary)
+	(file-name-coding-system 'binary)
 	(nntp-server-buffer (or buffer nntp-server-buffer)))
     (and (stringp file)
 	 (file-exists-p file)
@@ -148,6 +150,7 @@
   (nnmh-possibly-change-directory group server)
   (let ((pathname (nnmail-group-pathname group nnmh-directory))
 	(pathname-coding-system 'binary)
+	(file-name-coding-system 'binary)
 	dir)
     (cond
      ((not (file-directory-p pathname))
@@ -187,9 +190,10 @@
 (deffoo nnmh-request-list (&optional server dir)
   (nnheader-insert "")
   (nnmh-possibly-change-directory nil server)
-  (let ((pathname-coding-system 'binary)
-	(nnmh-toplev
-	 (file-truename (or dir (file-name-as-directory nnmh-directory)))))
+  (let* ((pathname-coding-system 'binary)
+	 (file-name-coding-system 'binary)
+	 (nnmh-toplev
+	  (file-truename (or dir (file-name-as-directory nnmh-directory)))))
     (nnmh-request-list-1 nnmh-toplev))
   (setq nnmh-group-alist (nnmail-get-active))
   t)
@@ -402,6 +406,7 @@
     (nnmh-open-server server))
   (when newsgroup
     (let ((pathname (nnmail-group-pathname newsgroup nnmh-directory))
+	  (file-name-coding-system 'binary)
 	  (pathname-coding-system 'binary))
       (if (file-directory-p pathname)
 	  (setq nnmh-current-directory pathname)
@@ -451,6 +456,7 @@
   "Compute the next article number in GROUP."
   (let ((active (cadr (assoc group nnmh-group-alist)))
 	(dir (nnmail-group-pathname group nnmh-directory))
+	(file-name-coding-system 'binary)
 	(pathname-coding-system 'binary))
     (unless active
       ;; The group wasn't known to nnmh, so we just create an active

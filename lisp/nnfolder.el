@@ -90,7 +90,6 @@ time saver for large mailboxes.")
 (defvoo nnfolder-buffer-alist nil)
 (defvoo nnfolder-scantime-alist nil)
 (defvoo nnfolder-active-timestamp nil)
-(defvoo nnfolder-file-coding-system nnmail-file-coding-system-1)
 
 
 
@@ -275,6 +274,7 @@ time saver for large mailboxes.")
   (nnfolder-possibly-change-group nil server)
   (save-excursion
     (let ((nnmail-file-coding-system nnmail-active-file-coding-system)
+	  (file-name-coding-system 'binary)
 	  (pathname-coding-system 'binary))
       (nnmail-find-file nnfolder-active-file)
       (setq nnfolder-group-alist (nnmail-get-active)))
@@ -300,10 +300,7 @@ time saver for large mailboxes.")
       (set-buffer nnfolder-current-buffer)
       (while (and articles is-old)
 	(goto-char (point-min))
-	(when (and (nnfolder-goto-article (car articles))
-		   (search-forward (concat "\n" nnfolder-article-marker)
-				   nil t))
-	  (forward-sexp)
+	(when (nnfolder-goto-article (car articles))
 	  (if (setq is-old
 		    (nnmail-expired-article-p
 		     newsgroup
@@ -332,6 +329,7 @@ time saver for large mailboxes.")
        (nnfolder-request-article article group server)
        (save-excursion
 	 (set-buffer buf)
+	 (buffer-disable-undo (current-buffer))
 	 (erase-buffer)
 	 (insert-buffer-substring nntp-server-buffer)
 	 (goto-char (point-min))
@@ -514,20 +512,17 @@ Returns t if successful, nil otherwise."
   "Delete the message that point is in.
 If optional argument LEAVE-DELIM is t, then mailbox delimiter is not
 deleted.  Point is left where the deleted region was."
-  (save-restriction
-    (narrow-to-region
-     (save-excursion
-       (forward-line 1)			; in case point is at beginning of message already
-       (nnmail-search-unix-mail-delim-backward)
-       (if leave-delim (progn (forward-line 1) (point))
-	 (point)))
-     (progn
-       (forward-line 1)
-       (if (nnmail-search-unix-mail-delim)
-	   (point)
-	 (point-max))))
-    (run-hooks 'nnfolder-delete-mail-hook)
-    (delete-region (point-min) (point-max))))
+  (delete-region
+   (save-excursion
+     (forward-line 1) ; in case point is at beginning of message already
+     (nnmail-search-unix-mail-delim-backward)
+     (if leave-delim (progn (forward-line 1) (point))
+       (point)))
+   (progn
+     (forward-line 1)
+     (if (nnmail-search-unix-mail-delim)
+	 (point)
+       (point-max)))))
 
 (defun nnfolder-possibly-change-group (group &optional server dont-check)
   ;; Change servers.
@@ -540,7 +535,8 @@ deleted.  Point is left where the deleted region was."
   ;; Change group.
   (when (and group
 	     (not (equal group nnfolder-current-group)))
-    (let ((pathname-coding-system 'binary))
+    (let ((file-name-coding-system 'binary)
+	  (pathname-coding-system 'binary))
       (nnmail-activate 'nnfolder)
       (when (and (not (assoc group nnfolder-group-alist))
 		 (not (file-exists-p
@@ -594,8 +590,13 @@ deleted.  Point is left where the deleted region was."
     (unless (looking-at message-unix-mail-delimiter)
       (insert "From nobody " (current-time-string) "\n")
       (goto-char (point-min)))
-    ;; Quote all "From " lines in the article.
     (forward-line 1)
+    ;; Quote subsequent "From " lines in the header.
+    (while (looking-at message-unix-mail-delimiter)
+      (delete-region (point) (+ (point) 4))
+      (insert "X-From-Line:")
+      (forward-line 1))
+    ;; Quote all "From " lines in the article.
     (let (case-fold-search)
       (while (re-search-forward "^From " nil t)
 	(beginning-of-line)
@@ -686,10 +687,7 @@ deleted.  Point is left where the deleted region was."
 
 (defun nnfolder-read-folder (group)
   (let* ((file (nnfolder-group-pathname group))
-	 (buffer (set-buffer 
-		  (let ((nnmail-file-coding-system 
-			 nnfolder-file-coding-system))
-		    (nnheader-find-file-noselect file)))))
+	 (buffer (set-buffer (nnheader-find-file-noselect file))))
     (if (equal (cadr (assoc group nnfolder-scantime-alist))
 	       (nth 5 (file-attributes file)))
 	;; This looks up-to-date, so we don't do any scanning.
@@ -711,7 +709,7 @@ deleted.  Point is left where the deleted region was."
 	      (minid (lsh -1 -1))
 	      maxid start end newscantime
 	      buffer-read-only)
-	  (buffer-disable-undo)
+	  (buffer-disable-undo (current-buffer))
 	  (setq maxid (cdr active))
 	  (goto-char (point-min))
 
@@ -806,8 +804,7 @@ deleted.  Point is left where the deleted region was."
 
 (defun nnfolder-group-pathname (group)
   "Make pathname for GROUP."
-  (setq group
-	(mm-encode-coding-string group nnmail-pathname-coding-system))
+  (setq group (gnus-encode-coding-string group nnmail-pathname-coding-system))
   (let ((dir (file-name-as-directory (expand-file-name nnfolder-directory))))
     ;; If this file exists, we use it directly.
     (if (or nnmail-use-long-file-names

@@ -462,9 +462,7 @@ jabbering all the time."
 If N, return the Nth ancestor instead."
   (when references
     (let ((ids (inline (gnus-split-references references))))
-      (while (nthcdr (or n 1) ids)
-	(setq ids (cdr ids)))
-      (car ids))))
+      (car (last ids (or n 1))))))
 
 (defsubst gnus-buffer-live-p (buffer)
   "Say whether BUFFER is alive or not."
@@ -659,7 +657,7 @@ Bind `print-quoted' and `print-readably' to t while printing."
 	(gnus-put-text-property
 	 b (setq b (next-single-property-change b 'gnus-face nil end))
 	 prop val)))))
-  
+
 ;;; Protected and atomic operations.  dmoore@ucsd.edu 21.11.1996
 ;;; The primary idea here is to try to protect internal datastructures
 ;;; from becoming corrupted when the user hits C-g, or if a hook or
@@ -872,7 +870,7 @@ ARG is passed to the first function."
     (unwind-protect
 	(apply 'run-hooks funcs)
       (set-buffer buf))))
-  
+
 ;;;
 ;;; .netrc and .authinforc parsing
 ;;;

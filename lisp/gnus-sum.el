@@ -321,7 +321,7 @@ and non-`vertical', do both horizontal and vertical recentering."
   "*If non-nil, ignore articles with identical Message-ID headers."
   :group 'gnus-summary
   :type 'boolean)
-  
+
 (defcustom gnus-single-article-buffer t
   "*If non-nil, display all articles in the same buffer.
 If nil, each group will get its own article buffer."
@@ -350,7 +350,7 @@ It uses the same syntax as the `gnus-split-methods' variable."
 			 (cons :value ("" "") regexp (repeat string))
 			 (sexp :value nil))))
 
-(defcustom gnus-unread-mark ? 
+(defcustom gnus-unread-mark ? ;space
   "*Mark used for unread articles."
   :group 'gnus-summary-marks
   :type 'character)
@@ -465,7 +465,7 @@ It uses the same syntax as the `gnus-split-methods' variable."
   :group 'gnus-summary-marks
   :type 'character)
 
-(defcustom gnus-empty-thread-mark ? 
+(defcustom gnus-empty-thread-mark ? ;space
   "*There is no thread under the article."
   :group 'gnus-summary-marks
   :type 'character)
@@ -1236,7 +1236,7 @@ increase the score of each group you read."
     "L" gnus-summary-lower-score
     "\M-i" gnus-symbolic-argument
     "h" gnus-summary-select-article-buffer
-    
+
     "V" gnus-summary-score-map
     "X" gnus-uu-extract-map
     "S" gnus-summary-send-map)
@@ -2029,21 +2029,6 @@ The following commands are available:
     (setcar (nthcdr 2 (car data)) (+ offset (nth 2 (car data))))
     (setq data (cdr data))))
 
-(defun gnus-data-compute-positions ()
-  "Compute the positions of all articles."
-  (setq gnus-newsgroup-data-reverse nil)
-  (let ((data gnus-newsgroup-data))
-    (save-excursion
-      (gnus-save-hidden-threads
-	(gnus-summary-show-all-threads)
-	(goto-char (point-min))
-	(while data
-	  (while (get-text-property (point) 'gnus-intangible)
-	    (forward-line 1))
-	  (gnus-data-set-pos (car data) (+ (point) 3))
-	  (setq data (cdr data))
-	  (forward-line 1))))))
-
 (defun gnus-summary-article-pseudo-p (article)
   "Say whether this article is a pseudo article or not."
   (not (vectorp (gnus-data-header (gnus-data-find article)))))
@@ -2229,6 +2214,23 @@ marks of articles."
 		 (eq (char-after) ?\n))
 	(subst-char-in-region point (1+ point) ?\n ?\r)))))
 
+;; This needs to be put here because it uses the
+;; gnus-save-hidden-threads macro
+(defun gnus-data-compute-positions ()
+  "Compute the positions of all articles."
+  (setq gnus-newsgroup-data-reverse nil)
+  (let ((data gnus-newsgroup-data))
+    (save-excursion
+      (gnus-save-hidden-threads
+	(gnus-summary-show-all-threads)
+	(goto-char (point-min))
+	(while data
+	  (while (get-text-property (point) 'gnus-intangible)
+	    (forward-line 1))
+	  (gnus-data-set-pos (car data) (+ (point) 3))
+	  (setq data (cdr data))
+	  (forward-line 1))))))
+
 ;; Various summary mode internalish functions.
 
 (defun gnus-mouse-pick-article (e)
@@ -2398,7 +2400,7 @@ marks of articles."
 	  (if (or (null gnus-summary-default-score)
 		  (<= (abs (- gnus-tmp-score gnus-summary-default-score))
 		      gnus-summary-zcore-fuzz))
-	      ? 
+	      ? ;space
 	    (if (< gnus-tmp-score gnus-summary-default-score)
 		gnus-score-below-mark gnus-score-over-mark)))
 	 (gnus-tmp-replied
@@ -2463,7 +2465,7 @@ marks of articles."
 	 (if (or (null gnus-summary-default-score)
 		 (<= (abs (- score gnus-summary-default-score))
 		     gnus-summary-zcore-fuzz))
-	     ? 
+	     ? ;space
 	   (if (< score gnus-summary-default-score)
 	       gnus-score-below-mark gnus-score-over-mark))
 	 'score))
@@ -2680,7 +2682,7 @@ If NO-DISPLAY, don't generate a summary buffer."
 	  (goto-char (point-min))
 	  (gnus-summary-position-point)
 	  (gnus-configure-windows 'summary 'force)
-	  (gnus-set-mode-line 'summary))	
+	  (gnus-set-mode-line 'summary))
 	(when (get-buffer-window gnus-group-buffer t)
 	  ;; Gotta use windows, because recenter does weird stuff if
 	  ;; the current buffer ain't the displayed window.
@@ -3725,7 +3727,7 @@ or a straight list of headers."
 	     (if (or (null gnus-summary-default-score)
 		     (<= (abs (- gnus-tmp-score gnus-summary-default-score))
 			 gnus-summary-zcore-fuzz))
-		 ? 
+		 ? ;space
 	       (if (< gnus-tmp-score gnus-summary-default-score)
 		   gnus-score-below-mark gnus-score-over-mark))
 	     gnus-tmp-replied
@@ -4298,7 +4300,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
       ;; Then we add the read articles to the range.
       (gnus-add-to-range
        ninfo (setq articles (sort articles '<))))))
-  
+
 (defun gnus-group-make-articles-read (group articles)
   "Update the info of GROUP to say that ARTICLES are read."
   (let* ((num 0)
@@ -5006,7 +5008,7 @@ The prefix argument ALL means to select all articles."
 	  (gnus-update-read-articles
 	   group (append gnus-newsgroup-unreads gnus-newsgroup-unselected))
 	  ;; Set the current article marks.
-	  (let ((gnus-newsgroup-scored 
+	  (let ((gnus-newsgroup-scored
 		 (if (and (not gnus-save-score)
 			  (not non-destructive))
 		     nil
@@ -6144,7 +6146,7 @@ If ALL, mark even excluded ticked and dormants as read."
 (defsubst gnus-cut-thread (thread)
   "Go forwards in the thread until we find an article that we want to display."
   (when (or (eq gnus-fetch-old-headers 'some)
-	    (eq gnus-fetch-old-headers 'invisible)	    
+	    (eq gnus-fetch-old-headers 'invisible)
 	    (eq gnus-build-sparse-threads 'some)
 	    (eq gnus-build-sparse-threads 'more))
     ;; Deal with old-fetched headers and sparse threads.
@@ -6746,14 +6748,14 @@ to save in."
 	      (set-buffer buffer)
 	      (gnus-article-delete-invisible-text)
 	      (let ((ps-left-header
-		     (list 
+		     (list
 		      (concat "("
 			      (mail-header-subject gnus-current-headers) ")")
 		      (concat "("
 			      (mail-header-from gnus-current-headers) ")")))
-		    (ps-right-header 
-		     (list 
-		      "/pagenumberstring load" 
+		    (ps-right-header
+		     (list
+		      "/pagenumberstring load"
 		      (concat "("
 			      (mail-header-date gnus-current-headers) ")"))))
 		(gnus-run-hooks 'gnus-ps-print-hook)
