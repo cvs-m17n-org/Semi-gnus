@@ -2818,9 +2818,11 @@ Message Manual}) を見て下さい。
 し @code{(gcc-self . none)} があれば、@code{Gcc:} 欄は生成されず、
 @code{(gcc-self . "string")} があればこの文字列はそのまま @code{gcc} 欄
 に挿入されます。このパラメータは以下で説明する全ての @code{Gcc} の初期規
-則よりも優先されます (@pxref{Archived Messages})。警告:: @code{nntp} サー
-バーなどのグループで @code{(gcc-self . t)} を設定するとエラーを引き起こ
-します。なぜなら @code{nntp} サーバーは記事を受け入れませんから。
+則よりも優先されます (@pxref{Archived Messages})。
+
+@strong{警告}: @code{nntp} サーバーなどのグループ
+で @code{(gcc-self . t)} を設定するとエラーを引き起こします。なぜな
+ら @code{nntp} サーバーは記事を受け入れませんから。
 
 @item auto-expire
 @cindex auto-expire
@@ -2848,6 +2850,11 @@ Message Manual}) を見て下さい。
 定 (@pxref{Expiring Mail}) よりも優先されます。この値は時限消去の日
 数 (整数である必要はない) かもしくは @code{never} か @code{immediate} の
 シンボルを指定できます。
+
+@item expiry-target
+@cindex expiry-target
+時限消去されるメッセージの果てる場所。このパレメータ
+は @code{nnmail-expiry-target} を上書きします。
 
 @item score-file
 @cindex score file group parameter
@@ -2972,10 +2979,10 @@ See also @code{gnus-group-ignored-charsets-alist}.
 に @samp{fileinto "group.name";} というテスト条件を本体に持つ、
 Sieve の @samp{IF} 制御構造体が作られます。
 
-例えば、もし INBOX.list.sieve グループが @code{(sieve address "sender"
-"sieve-admin@@extundo.com")} というグループパラメータを持っていたならば、
-グループパラメータを Sieve スクリプトに変換す
-る (@pxref{Sieve Commands}) ときに、以下の Sieve コードが作られます:
+例えば、もし @samp{INBOX.list.sieve} グループが @code{(sieve address
+"sender" "sieve-admin@@extundo.com")} というグループパラメータを持ってい
+たならば、グループパラメータを Sieve スクリプトに変換する (@pxref{Sieve
+Commands}) ときに、以下の Sieve コードが作られます:
 
 @example
 if address \"sender\" \"sieve-admin@@extundo.com\" @{
@@ -2984,7 +2991,7 @@ if address \"sender\" \"sieve-admin@@extundo.com\" @{
 @end example
 
 Sieve 言語は RFC 3028 で述べられていま
-す (@pxref{Top, , Top, sieve, Emacs Sieve})。
+す (@pxref{Top, Emacs Sieve, Top, sieve, Emacs Sieve})。
 
 @item (@var{variable} @var{form})
 グループに入るときに、そのグループローカルの変数を設定するグループパラメー
@@ -3008,12 +3015,16 @@ form の @code{nil} はそこで評価されます。
 
 @vindex gnus-list-identifiers
 この機能の用途の一つは、記事の題名欄からメーリングリストの標識タグをはぎ
-取ることです。もしニュースグルー
-プ @samp{nntp+news.gnus.org:gmane.text.docbook.apps} が、すべての記事の
-題名に @samp{DOC-BOOK-APPS:} というタグを持っているならば、そのグループ
-のグループパラメータに @code{(gnus-list-identifiers "DOCBOOK-APPS:")} を
-入れることによって、そのグループの概略バッファに表示される記事の題名から
-タグをはぎ取ることができます。
+取ることです。もしニュースグループ
+
+@example
+nntp+news.gnus.org:gmane.text.docbook.apps
+@end example
+
+が、すべての記事の題名に @samp{DOC-BOOK-APPS:} というタグを持っているな
+らば、そのグループのグループパラメータに @code{(gnus-list-identifiers
+"DOCBOOK-APPS:")} を入れることによって、そのグループの概略バッファに表示
+される記事の題名からタグをはぎ取ることができます。
 
 これはもし必要であれば、グループ毎のフック関数としても使用できます。もし
 あるグループに入ったときにビープ音を鳴らしたければ、そのグループのパラメー
@@ -10789,9 +10800,8 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
 
 この変数は次のような事をするために使われます:
 
-@itemize @bullet
-@item
-文字列
+@table @asis
+@item 文字列
 メッセージはそのグループに保存されます。
 
 あなたはグループ名に選択方法を含めることができますが、そうするとそのメッ
@@ -10803,17 +10813,16 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
 出て行くメッセージは @samp{nnfolder+archive:foo} に保存されますが、もし
 あなたが @code{"nnml:foo"} という値を使うと、@samp{nnml:foo} に保存され
 ます。
-@samp{nnml:foo}.
-@item
-文字列のリスト
+
+@item 文字列のリスト
 メッセージはそれらの全てのグループに保存されます。
-@item
-正規表現、関数、様式の連想リスト
+
+@item 正規表現、関数、様式の連想リスト
 キーが『合致』すると、結果が使われます。
-@item
-@code{nil}
+
+@item @code{nil}
 メッセージの保存は行われません。これがディフォルトです。
-@end itemize
+@end table
 
 試してみましょう:
 

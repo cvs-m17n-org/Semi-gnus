@@ -1,3 +1,18 @@
+2003-08-04  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-group.el (gnus-group-rename-group): Don't allow renaming to
+	an existing name.
+
+	* gnus-sum.el (gnus-summary-highlight): Add uncached to docstring.
+
+	* nnmail.el (nnmail-large-newsgroup): Docstring fix.
+
+	* nntp.el (nntp-large-newsgroup): do.
+
+	* nnspool.el (nnspool-large-newsgroup): do.
+
+	* gnus-cus.el (gnus-group-parameters): Typo.
+
 2003-07-31  Simon Josefsson  <jas@extundo.com>
 
 	* mml-sec.el (mml-signencrypt-style-alist): Use separate S/MIME
