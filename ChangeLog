@@ -1,6 +1,14 @@
 1999-12-10  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
-	* lis/gnus.el (gnus-revision-numbser): Increment to 08.
+	* lisp/gnus.el (gnus-revision-number): Increment to 09.
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Accept an
+	optional argument `force'. Use `read-file-name' instead of
+	`read-directory-name'.
+
+1999-12-10  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-numbser): Increment to 08.
 
 	* lisp/gnus-agent.el (gnus): Give up to advise here.
 	(gnus-group-get-new-news): New advice instead.
@@ -24,7 +32,7 @@
 	(gnus-setup-for-offline): Now one can get mails from `imap',
 	`file', `directory' or `maildir'.
 
-	* lisp/read-paswd.el (read-pw-set-mail-source-passwd-cache):
+	* lisp/read-passwd.el (read-pw-set-mail-source-passwd-cache):
 	Ignore non-POP mail sources.
 
 1999-12-10  Katsumi Yamaoka <yamaoka@jpl.org>
