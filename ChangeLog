@@ -12,10 +12,31 @@
 
 	* lisp/smtpmail.el: Removed; Semi-gnus no longer use it.
 
+1998-06-18  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "Select Methods".
+
+1998-06-18  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Select Methods".
+
+1998-06-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: Small bug fix.
+	
+	* lisp/pop3-fma.el: Delete variable pop3-fma-cypher-key
+	Use base64-encode-string , base64-decode-string instead. 
+	Both change by Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
+
 1998-06-13  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/message.el (message-subject-encoded-re-regexp): Add
 	comment. Modify doc-string.
+
+1998-06-13  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: New function pop3-fma-cypher-string
+	 New variable pop3-fma-cypher-key
 
 1998-06-12  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
@@ -76,6 +97,28 @@
 	(message-use-mail-followup-to): Add doc string.
 	(message-reply): Use `message-use-mail-followup-to'.
 	(message-followup): Ditto.
+
+1998-06-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el: Delete setting for
+	`article-de-quoted-unreadable' and
+	`article-mime-decode-quoted-printable' because they have been
+	already abolished.
+
+1998-06-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi: Sync up with latest gnus.texi.
+
+	* texi/gnus.texi: Modify for Semi-gnus 6.4.0.
+
+1998-06-06  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-extract-address-components): Add
+	`std11-extract-address-components' as a choice.
+
+1998-06-06  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Composing Messages".
 
 1998-06-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
