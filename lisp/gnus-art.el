@@ -1,8 +1,9 @@
-;;; gnus-art.el --- article mode commands for Gnus
+;;; gnus-art.el --- article mode commands for Semi-gnus
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; Keywords: news
+;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
+;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
 
@@ -33,6 +34,8 @@
 (require 'gnus-spec)
 (require 'gnus-int)
 (require 'browse-url)
+(require 'alist)
+(require 'mime-view)
 
 (defgroup gnus-article nil
   "Article display."
@@ -365,14 +368,23 @@ be used as possible file names."
   :group 'gnus-article-mime
   :type 'boolean)
 
-(defcustom gnus-show-mime-method 'metamail-buffer
-  "Function to process a MIME message.
+(defcustom gnus-article-display-method-for-mime
+  'gnus-article-display-mime-message
+  "Function to display a MIME message.
 The function is called from the article buffer."
   :group 'gnus-article-mime
   :type 'function)
 
-(defcustom gnus-decode-encoded-word-method 'gnus-article-de-quoted-unreadable
-  "*Function to decode MIME encoded words.
+(defcustom gnus-article-display-method-for-encoded-word
+  'gnus-article-display-message-with-encoded-word
+  "*Function to display a message with MIME encoded-words.
+The function is called from the article buffer."
+  :group 'gnus-article-mime
+  :type 'function)
+
+(defcustom gnus-article-display-method-for-traditional
+  'gnus-article-display-traditional-message
+  "*Function to display a traditional message.
 The function is called from the article buffer."
   :group 'gnus-article-mime
   :type 'function)
@@ -924,84 +936,14 @@ characters to translate to."
 		  (process-send-region "article-x-face" beg end)
 		  (process-send-eof "article-x-face"))))))))))
 
-(defun gnus-hack-decode-rfc1522 ()
-  "Emergency hack function for avoiding problems when decoding."
-  (let ((buffer-read-only nil))
-    (goto-char (point-min))
-    ;; Remove encoded TABs.
-    (while (search-forward "=09" nil t)
-      (replace-match " " t t))
-    ;; Remove encoded newlines.
-    (goto-char (point-min))
-    (while (search-forward "=10" nil t)
-      (replace-match " " t t))))
-
-(defalias 'gnus-decode-rfc1522 'article-decode-rfc1522)
-(defalias 'gnus-article-decode-rfc1522 'article-decode-rfc1522)
-(defun article-decode-rfc1522 ()
-  "Hack to remove QP encoding from headers."
-  (let ((case-fold-search t)
-	(inhibit-point-motion-hooks t)
-	(buffer-read-only nil)
-	string)
-    (save-restriction
-      (narrow-to-region
-       (goto-char (point-min))
-       (or (search-forward "\n\n" nil t) (point-max)))
-      (goto-char (point-min))
-      (while (re-search-forward
-	      "=\\?iso-8859-1\\?q\\?\\([^?\t\n]*\\)\\?=" nil t)
-	(setq string (match-string 1))
-	(save-restriction
-	  (narrow-to-region (match-beginning 0) (match-end 0))
-	  (delete-region (point-min) (point-max))
-	  (insert string)
-	  (article-mime-decode-quoted-printable
-	   (goto-char (point-min)) (point-max))
-	  (subst-char-in-region (point-min) (point-max) ?_ ? )
-	  (goto-char (point-max)))
-	(goto-char (point-min))))))
-
-(defun article-de-quoted-unreadable (&optional force)
-  "Do a naive translation of a quoted-printable-encoded article.
-This is in no way, shape or form meant as a replacement for real MIME
-processing, but is simply a stop-gap measure until MIME support is
-written.
-If FORCE, decode the article whether it is marked as quoted-printable
-or not."
-  (interactive (list 'force))
-  (save-excursion
-    (let ((case-fold-search t)
-	  (buffer-read-only nil)
-	  (type (gnus-fetch-field "content-transfer-encoding")))
-      (gnus-article-decode-rfc1522)
-      (when (or force
-		(and type (string-match "quoted-printable" (downcase type))))
-	(goto-char (point-min))
-	(search-forward "\n\n" nil 'move)
-	(article-mime-decode-quoted-printable (point) (point-max))))))
-
-(defun article-mime-decode-quoted-printable-buffer ()
-  "Decode Quoted-Printable in the current buffer."
-  (article-mime-decode-quoted-printable (point-min) (point-max)))
-
-(defun article-mime-decode-quoted-printable (from to)
-  "Decode Quoted-Printable in the region between FROM and TO."
-  (interactive "r")
-  (goto-char from)
-  (while (search-forward "=" to t)
-    (cond ((eq (following-char) ?\n)
-	   (delete-char -1)
-	   (delete-char 1))
-	  ((looking-at "[0-9A-F][0-9A-F]")
-	   (subst-char-in-region
-	    (1- (point)) (point) ?=
-	    (hexl-hex-string-to-integer
-	     (buffer-substring (point) (+ 2 (point)))))
-	   (delete-char 2))
-	  ((looking-at "=")
-	   (delete-char 1))
-	  ((gnus-message 3 "Malformed MIME quoted-printable message")))))
+(defun gnus-article-decode-rfc1522 ()
+  "Decode MIME encoded-words in header fields."
+  (let (buffer-read-only)
+    (let ((charset (save-excursion
+		     (set-buffer gnus-summary-buffer)
+		     default-mime-charset)))
+      (eword-decode-header charset)
+      )))
 
 (defun article-hide-pgp (&optional arg)
   "Toggle hiding of any PGP headers and signatures in the current article.
@@ -1838,8 +1780,6 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      (article-fill . gnus-article-word-wrap)
      article-remove-cr
      article-display-x-face
-     article-de-quoted-unreadable
-     article-mime-decode-quoted-printable
      article-hide-pgp
      article-hide-pem
      article-hide-signature
@@ -1913,7 +1853,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
        ["Hide citation" gnus-article-hide-citation t]
        ["Treat overstrike" gnus-article-treat-overstrike t]
        ["Remove carriage return" gnus-article-remove-cr t]
-       ["Remove quoted-unreadable" gnus-article-de-quoted-unreadable t]))
+       ))
 
     ;; Note "Commands" menu is defined in gnus-sum.el for consistency
 
@@ -2014,6 +1954,50 @@ commands:
        (forward-line line)
        (point)))))
 
+;;; @@ article filters
+;;;
+
+(defun gnus-article-display-mime-message ()
+  "Article display method for MIME message."
+  (make-local-variable 'mime-button-mother-dispatcher)
+  (setq mime-button-mother-dispatcher
+	(function gnus-article-push-button))
+  (let ((default-mime-charset
+	  (save-excursion
+	    (set-buffer gnus-summary-buffer)
+	    default-mime-charset))
+	)
+    (mime-display-message mime-message-structure
+			  gnus-article-buffer nil gnus-article-mode-map)
+    )
+  (run-hooks 'gnus-mime-article-prepare-hook)
+  )
+
+(defun gnus-article-display-traditional-message ()
+  "Article display method for traditional message."
+  (set-buffer gnus-article-buffer)
+  (let (buffer-read-only)
+    (erase-buffer)
+    (insert-buffer-substring gnus-original-article-buffer)
+    ))
+
+(defun gnus-article-display-message-with-encoded-word ()
+  "Article display method for message with encoded-words."
+  (let ((charset (save-excursion
+		   (set-buffer gnus-summary-buffer)
+		   default-mime-charset)))
+    (gnus-article-display-traditional-message)
+    (let (buffer-read-only)
+      (eword-decode-header charset)
+      (goto-char (point-min))
+      (if (search-forward "\n\n" nil t)
+	  (decode-mime-charset-region (match-end 0) (point-max) charset))
+      )
+    (mime-maybe-hide-echo-buffer)
+    )
+  (gnus-run-hooks 'gnus-mime-article-prepare-hook)
+  )
+
 (defun gnus-article-prepare (article &optional all-headers header)
   "Prepare ARTICLE in article mode buffer.
 ARTICLE should either be an article number or a Message-ID.
@@ -2036,14 +2020,14 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	   result)
       (save-excursion
 	(gnus-article-setup-buffer)
-	(set-buffer gnus-article-buffer)
+	(set-buffer gnus-original-article-buffer)
 	;; Deactivate active regions.
 	(when (and (boundp 'transient-mark-mode)
 		   transient-mark-mode)
 	  (setq mark-active nil))
-	(if (not (setq result (let ((buffer-read-only nil))
-				(gnus-request-article-this-buffer
-				 article group))))
+	(if (not (setq result
+		       (let ((buffer-read-only nil))
+			 (gnus-request-original-article article group))))
 	    ;; There is no such article.
 	    (save-excursion
 	      (when (and (numberp article)
@@ -2106,19 +2090,21 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (or all-headers gnus-show-all-headers))))
 	    (when (or (numberp article)
 		      (stringp article))
-	      ;; Hooks for getting information from the article.
-	      ;; This hook must be called before being narrowed.
-	      (let (buffer-read-only)
+	      (let ((method
+		     (if gnus-show-mime
+			 (progn
+			   (mime-parse-buffer)
+			   (if (or (not gnus-strict-mime)
+				   (mime-fetch-field "MIME-Version"))
+			       gnus-article-display-method-for-mime
+			     gnus-article-display-method-for-encoded-word))
+		       gnus-article-display-method-for-traditional)))
+		;; Hooks for getting information from the article.
+		;; This hook must be called before being narrowed.
 		(gnus-run-hooks 'internal-hook)
 		(gnus-run-hooks 'gnus-article-prepare-hook)
-		;; Decode MIME message.
-		(when gnus-show-mime
-		  (if (or (not gnus-strict-mime)
-			  (gnus-fetch-field "Mime-Version"))
-		      (let ((coding-system-for-write 'binary)
-			    (coding-system-for-read 'binary))
-			(funcall gnus-show-mime-method))
-		    (funcall gnus-decode-encoded-word-method)))
+		;; Display message.
+		(funcall method)
 		;; Perform the article display hooks.
 		(gnus-run-hooks 'gnus-article-display-hook))
 	      ;; Do page break.
@@ -2538,6 +2524,124 @@ If given a prefix, show the hidden text instead."
 	    (erase-buffer)
 	    (insert-buffer-substring gnus-article-buffer))
 	  (setq gnus-original-article (cons group article))))
+
+      ;; Update sparse articles.
+      (when (and do-update-line
+		 (or (numberp article)
+		     (stringp article)))
+	(let ((buf (current-buffer)))
+	  (set-buffer gnus-summary-buffer)
+	  (gnus-summary-update-article do-update-line)
+	  (gnus-summary-goto-subject do-update-line nil t)
+	  (set-window-point (get-buffer-window (current-buffer) t)
+			    (point))
+	  (set-buffer buf))))))
+
+(defun gnus-request-original-article (article group)
+  "Get an article and insert it into original article buffer."
+  (let (do-update-line)
+    (prog1
+	(save-excursion
+	  (erase-buffer)
+	  (gnus-kill-all-overlays)
+	  (setq group (or group gnus-newsgroup-name))
+
+	  ;; Open server if it has closed.
+	  (gnus-check-server (gnus-find-method-for-group group))
+
+	  ;; Using `gnus-request-article' directly will insert the article into
+	  ;; `nntp-server-buffer' - so we'll save some time by not having to
+	  ;; copy it from the server buffer into the article buffer.
+
+	  ;; We only request an article by message-id when we do not have the
+	  ;; headers for it, so we'll have to get those.
+	  (when (stringp article)
+	    (let ((gnus-override-method gnus-refer-article-method))
+	      (gnus-read-header article)))
+
+	  ;; If the article number is negative, that means that this article
+	  ;; doesn't belong in this newsgroup (possibly), so we find its
+	  ;; message-id and request it by id instead of number.
+	  (when (and (numberp article)
+		     gnus-summary-buffer
+		     (get-buffer gnus-summary-buffer)
+		     (gnus-buffer-exists-p gnus-summary-buffer))
+	    (save-excursion
+	      (set-buffer gnus-summary-buffer)
+	      (let ((header (gnus-summary-article-header article)))
+		(when (< article 0)
+		  (cond
+		   ((memq article gnus-newsgroup-sparse)
+		    ;; This is a sparse gap article.
+		    (setq do-update-line article)
+		    (setq article (mail-header-id header))
+		    (let ((gnus-override-method gnus-refer-article-method))
+		      (gnus-read-header article))
+		    (setq gnus-newsgroup-sparse
+			  (delq article gnus-newsgroup-sparse)))
+		   ((vectorp header)
+		    ;; It's a real article.
+		    (setq article (mail-header-id header)))
+		   (t
+		    ;; It is an extracted pseudo-article.
+		    (setq article 'pseudo)
+		    (gnus-request-pseudo-article header))))
+
+		(let ((method (gnus-find-method-for-group
+			       gnus-newsgroup-name)))
+		  (when (and (eq (car method) 'nneething)
+			     (vectorp header))
+		    (let ((dir (concat (file-name-as-directory (nth 1 method))
+				       (mail-header-subject header))))
+		      (when (file-directory-p dir)
+			(setq article 'nneething)
+			(gnus-group-enter-directory dir))))))))
+
+	  (cond
+	   ;; Refuse to select canceled articles.
+	   ((and (numberp article)
+		 gnus-summary-buffer
+		 (get-buffer gnus-summary-buffer)
+		 (gnus-buffer-exists-p gnus-summary-buffer)
+		 (eq (cdr (save-excursion
+			    (set-buffer gnus-summary-buffer)
+			    (assq article gnus-newsgroup-reads)))
+		     gnus-canceled-mark))
+	    nil)
+	   ;; Check the backlog.
+	   ((and gnus-keep-backlog
+		 (gnus-backlog-request-article group article (current-buffer)))
+	    'article)
+	   ;; Check asynchronous pre-fetch.
+	   ((gnus-async-request-fetched-article group article (current-buffer))
+	    (gnus-async-prefetch-next group article gnus-summary-buffer)
+	    (when (and (numberp article) gnus-keep-backlog)
+	      (gnus-backlog-enter-article group article (current-buffer)))
+	    'article)
+	   ;; Check the cache.
+	   ((and gnus-use-cache
+		 (numberp article)
+		 (gnus-cache-request-article article group))
+	    'article)
+	   ;; Get the article and put into the article buffer.
+	   ((or (stringp article) (numberp article))
+	    (let ((gnus-override-method
+		   (and (stringp article) gnus-refer-article-method))
+		  (buffer-read-only nil))
+	      (erase-buffer)
+	      (gnus-kill-all-overlays)
+	      (when (gnus-request-article article group (current-buffer))
+		(when (numberp article)
+		  (gnus-async-prefetch-next group article gnus-summary-buffer)
+		  (when gnus-keep-backlog
+		    (gnus-backlog-enter-article
+		     group article (current-buffer))))
+		'article)))
+	   ;; It was a pseudo.
+	   (t article)))
+
+      ;; Associate this article with the current summary buffer.
+      (setq gnus-article-current-summary gnus-summary-buffer)
 
       ;; Update sparse articles.
       (when (and do-update-line
@@ -3268,6 +3372,54 @@ forbidden in URL encoding."
     (select-window (get-buffer-window gnus-article-buffer t))
     (gnus-article-prev-page)
     (select-window win)))
+
+
+;;; @ for mime-view
+;;;
+
+(defun gnus-article-header-presentation-method (entity situation)
+  (mime-insert-decoded-header entity nil nil default-mime-charset)
+  )
+
+(set-alist 'mime-header-presentation-method-alist
+	   'gnus-original-article-mode
+	   #'gnus-article-header-presentation-method)
+
+(defun mime-preview-quitting-method-for-gnus ()
+  (if (not gnus-show-mime)
+      (mime-preview-kill-buffer))
+  (delete-other-windows)
+  (gnus-article-show-summary)
+  (if (or (not gnus-show-mime)
+	  (null gnus-have-all-headers))
+      (gnus-summary-select-article nil t)
+    ))
+
+(set-alist 'mime-raw-representation-type-alist
+	   'gnus-original-article-mode 'binary)
+
+(set-alist 'mime-preview-quitting-method-alist
+	   'gnus-original-article-mode
+	   #'mime-preview-quitting-method-for-gnus)
+
+(set-alist 'mime-view-show-summary-method
+	   'gnus-original-article-mode
+	   #'mime-preview-quitting-method-for-gnus)
+
+(defun gnus-following-method (buf)
+  (set-buffer buf)
+  (message-followup)
+  (message-yank-original)
+  (kill-buffer buf)
+  (goto-char (point-min))
+  )
+
+(set-alist 'mime-preview-following-method-alist
+	   'gnus-original-article-mode #'gnus-following-method)
+
+
+;;; @ end
+;;;
 
 (gnus-ems-redefine)
 
