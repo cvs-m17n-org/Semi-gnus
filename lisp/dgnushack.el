@@ -50,102 +50,6 @@
 
 (require 'cl)
 
-;; Emulating cl functions.
-(unless (featurep 'xemacs)
-  (define-compiler-macro last (&whole form x &optional n)
-    (if (and (fboundp 'last)
-	     (subrp (symbol-function 'last)))
-	form
-      (if n
-	  `(let* ((x ,x)
-		  (n ,n)
-		  (m 0)
-		  (p x))
-	     (while (consp p)
-	       (incf m)
-	       (pop p))
-	     (if (<= n 0)
-		 p
-	       (if (< n m)
-		   (nthcdr (- m n) x)
-		 x)))
-	`(let ((x ,x))
-	   (while (consp (cdr x))
-	     (pop x))
-	   x))))
-
-  (define-compiler-macro mapc (&whole form fn seq &rest rest)
-    (if (and (fboundp 'mapc)
-	     (subrp (symbol-function 'mapc)))
-	form
-      (if rest
-	  `(let* ((fn ,fn)
-		  (seq ,seq)
-		  (args (list seq ,@rest))
-		  (m (apply (function min) (mapcar (function length) args)))
-		  (n 0))
-	     (while (< n m)
-	       (apply fn (mapcar (function (lambda (arg) (nth n arg))) args))
-	       (setq n (1+ n)))
-	     seq)
-	`(let ((seq ,seq))
-	   (mapcar ,fn seq)
-	   seq))))
-
-  (define-compiler-macro mapcon (&whole form fn seq &rest rest)
-    (if (and (fboundp 'mapcon)
-	     (subrp (symbol-function 'mapcon)))
-	form
-      (if rest
-	  `(let ((fn ,fn)
-		 res
-		 (args (list ,seq ,@rest))
-		 p)
-	     (while (not (memq nil args))
-	       (push (apply ,fn args) res)
-	       (setq p args)
-	       (while p
-		 (setcar p (cdr (pop p)))
-		 ))
-	     (apply (function nconc) (nreverse res)))
-	`(let ((fn ,fn)
-	       res
-	       (arg ,seq))
-	   (while arg
-	     (push (funcall ,fn arg) res)
-	     (setq arg (cdr arg)))
-	   (apply (function nconc) (nreverse res))))))
-
-  (define-compiler-macro member-if (&whole form pred list)
-    (if (and (fboundp 'member-if)
-	     (subrp (symbol-function 'member-if)))
-	form
-      `(let ((fn ,pred)
-	     (seq ,list))
-	 (while (and seq
-		     (not (funcall fn (car seq))))
-	   (pop seq))
-	 seq)))
-
-  (define-compiler-macro union (&whole form list1 list2)
-    (if (and (fboundp 'union)
-	     (subrp (symbol-function 'union)))
-	form
-      `(let ((a ,list1)
-	     (b ,list2))
-	 (cond ((null a) b)
-	       ((null b) a)
-	       ((equal a b) a)
-	       (t
-		(or (>= (length a) (length b))
-		    (setq a (prog1 b (setq b a))))
-		(while b
-		  (or (memq (car b) a)
-		      (push (car b) a))
-		  (pop b))
-		a)))))
-  )
-
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
 ;; into the building directory.  For that, we define this function
@@ -193,6 +97,8 @@
   (byte-compile 'byte-optimize-form-code-walker))
 
 (defvar srcdir (or (getenv "srcdir") "."))
+
+(load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
 ;(push "/usr/share/emacs/site-lisp" load-path)
 
