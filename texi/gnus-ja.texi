@@ -4022,6 +4022,9 @@ Gnus は変数 @code{gnus-extract-address-components} の値を @code{From
 サポートしません。
 @item I
 スレッドのレベルによる字下げ (@pxref{Customizing Threading})。
+@item B
+複雑な trn 様式のスレッド木 (tree)。どのような応答が行なわれたかの記録を
+表示します。
 @item T
 記事が本記事であれば何も表示せず、そうでない場合はたくさんの空白です (後
 のものをすべて画面の外に追い出してしまいます)。

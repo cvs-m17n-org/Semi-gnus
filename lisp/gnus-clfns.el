@@ -75,6 +75,17 @@
 	       ((typep x type) x)
 	       (t (error "Can't coerce %s to type %s" x type))))))
 
+  (define-compiler-macro copy-list (&whole form list)
+    (if (and (fboundp 'copy-list)
+	     (subrp (symbol-function 'copy-list)))
+	form
+      `(let ((list ,list))
+	 (if (consp list)
+	     (let ((res nil))
+	       (while (consp list) (push (pop list) res))
+	       (prog1 (nreverse res) (setcdr res list)))
+	   (car list)))))
+
   (define-compiler-macro last (&whole form x &optional n)
     (if (and (fboundp 'last)
 	     (subrp (symbol-function 'last)))
