@@ -1,3 +1,8 @@
+2003-01-14  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-add-send-actions): Allow a list of
+	articles to be marked as well.
+
 2003-01-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-util.el (gnus-read-event-char): Take an optional
