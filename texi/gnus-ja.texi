@@ -15652,11 +15652,12 @@ Gnus $(B$O$"$J$?<+?H$N=qK!;EMM;XDj$r:n$k<jEA$$$r$9$kL?Na$rHw$($F$$$^$9!#(B
 $(BL5;k(B (ignore) $(B$,:G=i$K$J$5$l$^$9!#$=$l$+$i@Z$jMn$H$7(B (cut) $(B$,9T$o$l$^$9!#(B
 $(B$=$7$F!"$=$l$+$i:G8e$NA`:n!"5M$a9~$_(B (pad) $(B$,9T$o$l$^$9!#(B
 
-$(B$b$7$3$l$i$N>e5i;2>H$r$?$/$5$s;H$C$F$$$k$J$i!"(Bgnus $(B$,$H$F$bCY$/$J$k$N$,(B
-$(B$o$+$k$G$7$g$&!#$3$l$O$"$J$?$N9T$N308+$KK~B-$7$?$H$-$K(B @kbd{M-x
-gnus-compile} $(B$r<B9T$9$k;v$G3JCJ$KB.EYDc2<$r8:$i$9;v$,$G$-$^$9!#(B
-(T-gnus $(B$N4{DjCM$G$OI,MW$J;~$K%3%s%Q%$%k$r<+F0E*$K<B9T$9$k$h$&$K$J$C$F$$(B
-$(B$^$9!#(B)
+@vindex gnus-compile-user-specs
+$(B$b$7$"$J$?$,6/$$8D@-$N;}$A<g$G(B @code{gnus-compile-user-specs} $(B$r(B
+@code{nil} $(B$K$7$F$$$F(B ($(B=i4|CM$O(B @code{t})$(B!"$3$l$i$N>e5i;2>H$r$?$/$5$s;H$C(B
+$(B$F$$$k$J$i!"(BT-gnus $(B$,$H$F$bCY$/$J$k$N$,$o$+$k$G$7$g$&!#$3$l$O$"$J$?$,9T(B
+$(B$N308+$KK~B-$7$?$H$-$K(B @kbd{M-x gnus-compile} $(B$r<B9T$9$k;v$G3JCJ$KB.EYDc(B
+$(B2<$r8:$i$9;v$,$G$-$^$9!#(B
 @xref{Compilation}$(B!#(B
 
 
@@ -15986,27 +15987,24 @@ The GNU Emacs Lisp Reference Manual}. XEmacs $(B$G$O!"%U%l!<%`%W%m%Q%F%#%j(B
 @findex gnus-compile
 
 $(B$"$N9T=qK!;EMM;XDjJQ?t$r3P$($F$$$^$9$+!)(B @code{gnus-summary-line-format}$(B!"(B
-@code{gnus-group-line-format} $(B$J$I$J$I$G$9!#$5$F!"(Bgnus $(B$O$b$A$m$s$3$l$i(B
-$(B$NJQ?t$,$I$N$h$&$J$b$N$G$bCm0U$7$^$9$,!"IT1?$J;v$K!"$=$l$i$rJQ99$9$k$H!"(B
-$(BBgJQ=EBg$JB.EYDc2<$r0z$-5/$3$9;v$K$J$j$^$9!#(B ($(B$3$l$i$NJQ?t$N=i4|CM$O$=$l(B
-$(B$i$K4XO"IU$1$i$l$?%P%$%H%3%s%Q%$%k$5$l$?4X?t$r;}$C$F$$$^$9$,!"MxMQ<T:n@.(B
-$(B$N$b$N$O$b$A$m$s$=$&$G$O$"$j$^$;$s!#(B)
+@code{gnus-group-line-format} $(B$J$I$J$I$G$9!#DL>o(B T-gnus $(B$O$3$l$i$NJQ?t$r(B
+$(B%P%$%H%3%s%Q%$%k$7$F;H$&$N$G!"B.EYDc2<$O:G>.8B$K?)$$;_$a$i$l$^$9!#$7$+$7(B
+@code{gnus-compile-user-specs} $(B$r(B @code{nil} ($(B=i4|CM$O(B @code{t}) $(B$K$7$?(B
+$(B>l9g$O!"IT1?$J;v$K$=$l$i$rJQ99$9$k$HBgJQ=EBg$JB.EYDc2<$r0z$-5/$3$9;v$K$J(B
+$(B$j$^$9!#(B ($(B$3$l$i$NJQ?t$N=i4|CM$O$=$l$i$K4XO"IU$1$i$l$?%P%$%H%3%s%Q%$%k$5(B
+$(B$l$?4X?t$r;}$C$F$$$^$9$,!"MxMQ<T:n@.$N$b$N$O$b$A$m$s$=$&$G$O$"$j$^$;$s!#(B)
 
 $(B$3$l$r2~A1$9$k$?$a$K!"JQ?t$rO.$j$^$o$7$F!"(B($(B$J$s$H$J$/(B) $(BK~B-$7$?$H46$8$?(B
 $(B8e$G!"(B@kbd{M-x gnus-compile} $(B$r<B9T$9$k;v$,$G$-$^$9!#$3$l$O?7$7$$;XDj$,(B
-$(B%P%$%H%3%s%Q%$%k$5$l!"$b$&0lEY:G9bB.EY$KI|5"$G$-$k$H$$$&;v$G$9!#(BT-gnus 
-$(B$O$3$l$i$N%3%s%Q%$%k$5$l$?;XDj$r%U%!%$%k(B @file{.newsrc.eld} $(B$KJ]B8$7$^$;(B
-$(B$s$,!"(B@code{gnus-compile-user-specs} $(B$N4{DjCM$K$h$C$FI,MW$J;~$K%3%s%Q%$(B
-$(B%k$r<+F0E*$K<B9T$9$k$h$&$K$J$C$F$$$^$9!#(B($(BMxMQ<TDj5A$N4X?t$O!"$3$N4X?t$G(B
-$(B$O%3%s%Q%$%k$5$l$^$;$s$,(B--$(B$=$l$i$r%3%s%Q%$%k$9$k$?$a$K$O!"$=$l$i$r%U%!%$(B
-$(B%k(B @code{.gnus.el} $(B$KFM$C9~$s$G!"$=$N%U%!%$%k$r%P%$%H%3%s%Q%$%k$9$k$Y$-(B
-$(B$G$9!#(B)
+$(B%P%$%H%3%s%Q%$%k$5$l!"$b$&0lEY:G9bB.EY$KI|5"$G$-$k$H$$$&;v$G$9!#$?$@$7(B
+T-gnus $(B$O$3$l$i$N%P%$%H%3%s%Q%$%k$5$l$?;XDj$r%U%!%$%k(B @file{.newsrc.eld}
+$(B$KJ]B8$7$^$;$s!#(B
 
 @table @code
 @item gnus-compile-user-specs
 @vindex gnus-compile-user-specs
 $(B$3$NCM$r(B @code{nil} $(B0J30$K$7$F$*$/$H!"MxMQ<T$,:n@.$7$?9T=qK!;EMMJQ?t$r<+(B
-$(BF0E*$K%3%s%Q%$%k$7$^$9!#4{DjCM$O(B @code{t} $(B$G!"(B
+$(BF0E*$K%3%s%Q%$%k$7$^$9!#=i4|CM$O(B @code{t} $(B$G!"(B
 @code{gnus-*-line-format-spec} $(B$N3FFbItJQ?t$NCM$K1F6A$7$^$9!#(B
 @end table
 

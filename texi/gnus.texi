@@ -16050,11 +16050,12 @@ than 6 characters to make it look nice in columns.)
 Ignoring is done first; then cutting; then maxing; and then as the very
 last operation, padding.
 
-If you use lots of these advanced thingies, you'll find that Gnus gets
-quite slow.  This can be helped enormously by running @kbd{M-x
-gnus-compile} when you are satisfied with the look of your lines.
-(By default of T-gnus, compilation will be done automatically when
-needed.)
+@vindex gnus-compile-user-specs
+If @code{gnus-compile-user-specs} is set to @code{nil} (@code{t} by
+default) with your strong personality, and use a lots of these advanced
+thingies, you'll find that Gnus gets quite slow.  This can be helped
+enormously by running @kbd{M-x gnus-compile} when you are satisfied with
+the look of your lines.
 @xref{Compilation}.
 
 
@@ -16395,7 +16396,9 @@ interface.
 
 Remember all those line format specification variables?
 @code{gnus-summary-line-format}, @code{gnus-group-line-format}, and so
-on.  Now, Gnus will of course heed whatever these variables are, but,
+on.  By default, T-gnus will use the byte-compiled codes of these
+variables and we can keep a slow-down to a minimum.  However, if you set
+@code{gnus-compile-user-specs} to @code{nil} (@code{t} by default),
 unfortunately, changing them will mean a quite significant slow-down.
 (The default values of these variables have byte-compiled functions
 associated with them, while the user-generated versions do not, of
@@ -16404,12 +16407,8 @@ course.)
 To help with this, you can run @kbd{M-x gnus-compile} after you've
 fiddled around with the variables and feel that you're (kind of)
 satisfied.  This will result in the new specs being byte-compiled, and
-you'll get top speed again.  T-gnus will not save these compiled specs
-in the @file{.newsrc.eld} file, but compilation will be done
-automatically when needed by the default value of
-@code{gnus-compile-user-specs}.  (User-defined functions aren't compiled
-by this function, though---you should compile them yourself by sticking
-them into the @code{.gnus.el} file and byte-compiling that file.)
+you'll get top speed again.  Note that T-gnus will not save these
+compiled specs in the @file{.newsrc.eld} file.
 
 @table @code
 @item gnus-compile-user-specs
