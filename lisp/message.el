@@ -2498,6 +2498,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	    (set-buffer tembuf)
 	    (erase-buffer)
 	    (insert-buffer message-encoding-buffer)
+	    (set-buffer-modified-p nil)
 	    ;; Remove some headers.
 	    (save-restriction
 	      (message-narrow-to-headers)
@@ -2735,6 +2736,7 @@ This sub function is for exclusive use of `message-send-news'."
 	    (buffer-disable-undo)
 	    (erase-buffer)
 	    (insert-buffer message-encoding-buffer)
+	    (set-buffer-modified-p nil)
 	    ;; Remove some headers.
 	    (save-restriction
 	      (message-narrow-to-headers)
