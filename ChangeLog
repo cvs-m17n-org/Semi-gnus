@@ -1,5 +1,18 @@
 1999-03-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Set up the
+	buffer local variable `default-mime-charset' of
+	`gnus-article-buffer' before `mime-display-message' is called.
+
+	* lisp/gnus-i18n.el (gnus-newsgroup-default-charset-alist): Be also
+	matched with the group name which has a method name and/or a
+	foreign server name.
+	(gnus-set-summary-default-charset): Cancel the last change.
+
+1999-03-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
 
 	* lisp/gnus-i18n.el (gnus-set-summary-default-charset): Strip
