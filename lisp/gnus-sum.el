@@ -1725,8 +1725,7 @@ increase the score of each group you read."
     "m" gnus-summary-toggle-mime
     "a" gnus-article-strip-headers-in-body ;; mnemonic: wash archive
     "p" gnus-article-verify-x-pgp-sig
-    "d" gnus-article-treat-dumbquotes
-    "s" gnus-smiley-display)
+    "d" gnus-article-treat-dumbquotes)
 
   (gnus-define-keys (gnus-summary-wash-hide-map "W" gnus-summary-wash-map)
     "a" gnus-article-hide

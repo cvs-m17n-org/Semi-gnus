@@ -7897,6 +7897,12 @@ HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$
 $B$N(B PGP $B$N80$O(B @uref{ftp://ftp.isc.org/pub/pgpcontrol/README.html} $B$+$iF~(B
 $B<j$9$k$3$H$,$G$-$^$9!#(B}
 
+@c @item W s
+@c @kindex W s (Summary)
+@c @findex gnus-summary-force-verify-and-decrypt
+@c Verify a signed (PGP, PGP/MIME or S/MIME) message
+@c (@code{gnus-summary-force-verify-and-decrypt}).
+
 @item W W H
 @kindex W W H ($B35N,(B)
 @findex gnus-article-strip-headers-from-body
