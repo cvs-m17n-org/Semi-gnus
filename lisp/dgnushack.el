@@ -614,6 +614,13 @@ dgnushack-compile-verbosely.  All other users should continue to use
 dgnushack-compile."
   (dgnushack-compile t))
 
+(defun dgnushack-compile-verbosely ()
+  "Call dgnushack-compile with warnings ENABLED.  If you are compiling
+patches to gnus, you should consider modifying make.bat to call
+dgnushack-compile-verbosely.  All other users should continue to use
+dgnushack-compile."
+  (dgnushack-compile t))
+
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
   (unless warn

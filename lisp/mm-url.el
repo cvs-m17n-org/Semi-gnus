@@ -37,6 +37,9 @@
 (eval-and-compile
   (autoload 'exec-installed-p "path-util"))
 
+(eval-when-compile
+  (require 'timer))
+
 (defgroup mm-url nil
   "A wrapper of url package and external url command for Gnus."
   :group 'gnus)
@@ -45,7 +48,7 @@
 				(condition-case nil
 				    (require 'url)
 				  (error nil)))
-  "*If not-nil, use external grab program `mm-url-program'."
+  "*If non-nil, use external grab program `mm-url-program'."
   :type 'boolean
   :group 'mm-url)
 

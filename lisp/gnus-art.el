@@ -4889,9 +4889,28 @@ If no internal viewer is available, use an external viewer."
 	      (narrow-to-region (point-min) (point))
 	      (gnus-treat-article 'head))))))))
 
-(defvar gnus-mime-display-multipart-as-mixed nil)
-(defvar gnus-mime-display-multipart-alternative-as-mixed nil)
-(defvar gnus-mime-display-multipart-related-as-mixed nil)
+(defcustom gnus-mime-display-multipart-as-mixed nil
+  "Display \"multipart\" parts as  \"multipart/mixed\".
+
+If `t', it overrides `nil' values of
+`gnus-mime-display-multipart-alternative-as-mixed' and
+`gnus-mime-display-multipart-related-as-mixed'."
+  :group 'gnus-article-mime
+  :type 'boolean)
+
+(defcustom gnus-mime-display-multipart-alternative-as-mixed nil
+  "Display \"multipart/alternative\" parts as  \"multipart/mixed\"."
+  :group 'gnus-article-mime
+  :type 'boolean)
+
+(defcustom gnus-mime-display-multipart-related-as-mixed nil
+  "Display \"multipart/related\" parts as  \"multipart/mixed\".
+
+If displaying \"text/html\" is discouraged \(see
+`mm-discouraged-alternatives'\) images or other material inside a
+\"multipart/related\" part might be overlooked when this variable is `nil'."
+  :group 'gnus-article-mime
+  :type 'boolean)
 
 (defun gnus-mime-display-part (handle)
   (cond
@@ -5267,14 +5286,31 @@ If given a numerical ARG, move forward ARG pages."
 (defun gnus-article-goto-next-page ()
   "Show the next page of the article."
   (interactive)
-  (gnus-eval-in-buffer-window gnus-summary-buffer
-    (gnus-summary-next-page)))
+  (when (gnus-article-next-page)
+    (goto-char (point-min))
+    (gnus-article-read-summary-keys nil (gnus-character-to-event ?n))))
+
 
 (defun gnus-article-goto-prev-page ()
   "Show the next page of the article."
   (interactive)
-  (gnus-eval-in-buffer-window gnus-summary-buffer
-    (gnus-summary-prev-page)))
+  (if (bobp)
+      (gnus-article-read-summary-keys nil (gnus-character-to-event ?p))
+    (gnus-article-prev-page nil)))
+
+;; This is cleaner but currently breaks `gnus-pick-mode':
+;;
+;; (defun gnus-article-goto-next-page ()
+;;   "Show the next page of the article."
+;;   (interactive)
+;;   (gnus-eval-in-buffer-window gnus-summary-buffer
+;;     (gnus-summary-next-page)))
+;;
+;; (defun gnus-article-goto-prev-page ()
+;;   "Show the next page of the article."
+;;   (interactive)
+;;   (gnus-eval-in-buffer-window gnus-summary-buffer
+;;     (gnus-summary-prev-page)))
 
 (defun gnus-article-next-page (&optional lines)
   "Show the next page of the current article.

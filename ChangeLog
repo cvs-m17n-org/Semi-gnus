@@ -1,3 +1,7 @@
+2003-04-28  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Fixed X-Draft-Headers entry.
+
 2003-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: Make sure `dolist' is available; require

@@ -101,7 +101,7 @@ note in the body for cross-postings and followups (see the variables
 `message-cross-post-*').
 
 ** References and X-Draft-Headers are no longer generated when you
-   start composing messages.
+   start composing messages and `message-generate-headers-first' is nil.
 
 ** Improved anti-spam features.
 
@@ -129,6 +129,8 @@ you have modified those variables from the default, you may want to
 add n-f-u-a-g-n-n again.  If you were happy with the estimate and want
 to save some (minimal) time when getting new mail, remove the
 function.
+
+** gnus-inews-mark-gcc-as-read has been renamed to gnus-gcc-mark-as-read.
 
 ** Group Carbon Copy (GCC) quoting
 
@@ -334,8 +336,10 @@ variables should change those regexps accordingly. For example:
 
 ** Gnus supports PGP (RFC 1991/2440), PGP/MIME (RFC 2015/3156) and
 ** S/MIME (RFC 2630-2633).
-It needs an external S/MIME and OpenPGP implementation, but no additional
-lisp libraries.
+It needs an external S/MIME and OpenPGP implementation, but no
+additional lisp libraries.  This add several menu items to the
+Attachments menu, and C-c RET key bindings, when composing messages.
+This also obsoletes `gnus-article-hide-pgp-hook'.
 
 ** Gnus inlines external parts (message/external).
 

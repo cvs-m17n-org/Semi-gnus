@@ -100,7 +100,7 @@
 				  "summarycontents" "bye"
 				  "top" "iftex" "cartouche" 
 				  "iflatex" "finalout" "vskip"
-				  "dircategory"))
+				  "dircategory" "group"))
 		(latexi-strip-line))
 	       ((member command '("menu" "tex" "ifinfo" "ignore" 
 				  "ifnottex" "direntry"))
@@ -117,6 +117,10 @@
 		(if as-a-chapter
 		    (latexi-switch-line "subsubsection*" arg)
 		  (latexi-switch-line "subsection*" arg)))
+	       ((member command '("subsubheading"))
+		(if as-a-chapter
+		    (latexi-switch-line "subsubsubsection*" arg)
+		  (latexi-switch-line "subsubsection*" arg)))
 	       ((member command '("chapter"))
 		(if (string-match "Index" arg)
 		    (latexi-strip-line)
@@ -151,7 +155,7 @@
 		)
 	       ((member command '("titlepage"))
 		(latexi-begin-command command))
-	       ((member command '("lisp" "example"))
+	       ((member command '("lisp" "example" "smallexample" "display"))
 		(latexi-strip-line)
 		(insert (format "\\begin{verbatim}\n"))
 		(setq verbatim (point)))
@@ -167,7 +171,7 @@
 		 ((equal arg "quotation")
 		  (latexi-strip-line)
 		  (insert (format "\\end{verse}\n")))
-		 ((member arg '("lisp" "example"))
+		 ((member arg '("lisp" "example" "smallexample" "display"))
 		  (latexi-strip-line)
 		  (save-excursion
 		    (save-restriction
@@ -188,7 +192,7 @@
 		  (setq item-string (pop item-stack))
 		  (latexi-strip-line)
 		  (insert (format "\\end{%s}\n" arg)))
-		 ((member arg '("iflatex" "iftex" "cartouche"))
+		 ((member arg '("iflatex" "iftex" "cartouche" "group"))
 		  (latexi-strip-line))
 		 ((member arg '("deffn" "defvar" "defun"))
 		  (latexi-strip-line))
