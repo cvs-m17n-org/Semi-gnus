@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.10 1998-11-24 07:42:46 yamaoka Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.11 1998-11-29 09:34:45 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -270,7 +270,7 @@ If value is nil , dialup line is disconnected status.")
   
   ;; To transfer Mail/News function.
   (cond ((eq gnus-offline-mail-treat-environ 'offline)
-	 ;; send mail under online environ.
+	 ;; send mail under offline environ.
 	 (gnus-offline-set-offline-sendmail-function))
 	((eq gnus-offline-mail-treat-environ 'online)
 	 ;; send mail under offline environ.
@@ -327,7 +327,7 @@ If value is nil , dialup line is disconnected status.")
 ;; Get new news jobs. (gnus-agent and nnspool)
 ;;
 (defun gnus-offline-gnus-get-new-news (&optional arg)
-  "*Override function \"gnus-grou-get-new-news\"."
+  "*Override function \"gnus-group-get-new-news\"."
   (interactive "P")
   (run-hooks 'gnus-offline-before-online-hook)
   (if (functionp gnus-offline-dialup-function)
