@@ -176,17 +176,17 @@
     (setup-9 . "News spool directory for sending: ")
     (setup-10 . "Mail spool directory for sending: ")
     (setup-11 . "How many mail sources will get mails from? : ")
-    (setup-12 . "Mail Account name : ")
-    (setup-13 . "Mail server : ")
-    (setup-14 . "Authentification Method ")
-    (setup-15 . "Do you use pop3.el to fetch mail? ")
-    (setup-16 . "movemail program name: ")
-    (setup-17 . "movemail options: ")
-    (setup-18 . "Do you save password information to newsrc file? ")
-    (setup-19 . "What type of the mail source? ")
+    (setup-12 . "What type of the mail source? ")
+    (setup-13 . "Mail Account name : ")
+    (setup-14 . "Mail server : ")
+    (setup-15 . "Authentification Method ")
+    (setup-16 . "Do you use pop3.el to fetch mail? ")
+    (setup-17 . "movemail program name: ")
+    (setup-18 . "movemail options: ")
+    (setup-19 . "What network stream? ")
     (setup-20 . "File: ")
     (setup-21 . "Directory: ")
-    (setup-22 . "What network stream? ")
+    (setup-22 . "Do you save password information to newsrc file? ")
 
     (param-news-method-1 . "News Method")
     (param-news-method-2 . "Gnus Agent")
@@ -283,17 +283,17 @@ restarted.")
     (setup-9 . "ニュースのスプールディレクトリ: ")
     (setup-10 . "メールのスプールディレクトリ: ")
     (setup-11 . "設定するメール取得先の数は? (後で追加できます): ")
-    (setup-12 . "メールのアカウント名: ")
-    (setup-13 . "そのアカウントのあるメールサーバ名: ")
-    (setup-14 . "認証方式は? ")
-    (setup-15 . "メールの受信には pop3.el を使いますか? ")
-    (setup-16 . "movemail プログラムの名前: ")
-    (setup-17 . "movemail プログラムに渡す引数: ")
-    (setup-18 . "newsrc ファイルに POP パスワードを保存しますか? ")
-    (setup-19 . "メール取得先のタイプは? ")
+    (setup-12 . "メール取得先のタイプは? ")
+    (setup-13 . "メールのアカウント名: ")
+    (setup-14 . "そのアカウントのあるメールサーバ名: ")
+    (setup-15 . "認証方式は? ")
+    (setup-16 . "メールの受信には pop3.el を使いますか? ")
+    (setup-17 . "movemail プログラムの名前: ")
+    (setup-18 . "movemail プログラムに渡す引数: ")
+    (setup-19 . "接続方式は? ")
     (setup-20 . "ファイル: ")
     (setup-21 . "ディレクトリ: ")
-    (setup-22 . "接続方式は? ")
+    (setup-22 . "newsrc ファイルに POP パスワードを保存しますか? ")
 
     (param-news-method-4 . "\
 ニュース記事を取得する方法です。")
@@ -473,7 +473,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	(let* ((j (- n (1- i)))
 	       (type (gnus-ofsetup-completing-read-symbol
 		      (format "<%d of %d> %s" j n
-			      (gnus-ofsetup-gettext 'setup-19))
+			      (gnus-ofsetup-gettext 'setup-12))
 		      'pop 'imap 'file 'directory 'maildir))
 	       user server authentication stream islisp source
 	       prog args program path)
@@ -481,32 +481,32 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	  (when (or (string= type "pop") (string= type "imap"))
 	    (setq user (read-from-minibuffer
 			(format "<%d of %d> %s" j n
-				(gnus-ofsetup-gettext 'setup-12))))
+				(gnus-ofsetup-gettext 'setup-13))))
 	    (setq server (read-from-minibuffer
 			  (format "<%d of %d> %s" j n
-				  (gnus-ofsetup-gettext 'setup-13)))))
+				  (gnus-ofsetup-gettext 'setup-14)))))
 	  (when (string= type "pop")
 	    (setq authentication (gnus-ofsetup-completing-read-symbol
 				  (format "<%d of %d> %s" j n
-					  (gnus-ofsetup-gettext 'setup-14))
+					  (gnus-ofsetup-gettext 'setup-15))
 				  'password 'apop))
 	    (setq islisp (y-or-n-p
 			  (format "<%d of %d> %s" j n
-				  (gnus-ofsetup-gettext 'setup-15))))
+				  (gnus-ofsetup-gettext 'setup-16))))
 	    (unless islisp
 	      (setq prog (read-file-name
 			  (format "<%d of %d> %s" j n
-				  (gnus-ofsetup-gettext 'setup-16))
+				  (gnus-ofsetup-gettext 'setup-17))
 			  exec-directory "movemail"))
 	      (setq args (read-from-minibuffer
 			  (format "<%d of %d> %s" j n
-				  (gnus-ofsetup-gettext 'setup-17) "-pf")))
+				  (gnus-ofsetup-gettext 'setup-18) "-pf")))
 	      (setq program (format "%s %s %s %s %s"
 				    prog args "po:%u" "%t" "%p"))))
 	  (when (string= type "imap")
 	    (setq stream (gnus-ofsetup-completing-read-symbol
 			  (format "<%d of %d> %s" j n
-				  (gnus-ofsetup-gettext 'setup-22))
+				  (gnus-ofsetup-gettext 'setup-19))
 			  'kerberos4 'ssl 'network))
 	    (setq authentication (gnus-ofsetup-completing-read-symbol
 				  (format "<%d of %d> %s" j n
@@ -535,7 +535,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	  (setq mail-source (nconc mail-source (list source))))
 	(setq i (1- i)))
       (setq save-passwd
-	    (y-or-n-p (gnus-ofsetup-gettext 'setup-18)))
+	    (y-or-n-p (gnus-ofsetup-gettext 'setup-22)))
       ;;
       (gnus-ofsetup-prepare gnus-ofsetup-update-setting-file)))
   (load gnus-offline-setting-file))
