@@ -1,5 +1,10 @@
 1998-10-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/nnheader.el (nnheader-file-coding-system): Restore the
+	previous default value.
+
+1998-10-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.027.
 
 	* Sync up with Pterodactyl Gnus 0.40.
