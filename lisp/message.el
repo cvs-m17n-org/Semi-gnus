@@ -437,7 +437,7 @@ The provided functions are:
   :type 'regexp)
 
 (defcustom message-cite-prefix-regexp
-  "^[]>»|:}+ ]*[]>»|:}+]\\(\\w*>»\\)?\\|^\\w*>"
+  "[ \t]*\\(\\(\\w\\|[_-\\.]\\)+>+[ \t]*\\|[]>»|:}+ ]*[]>»|:}+][ \t]*\\)+"
   "*Regexp matching the longest possible citation prefix on a line."
   :group 'message-insertion
   :type 'regexp)
@@ -1181,10 +1181,12 @@ See also the documentations for the following variables:
 
 (defvar message-font-lock-keywords-2
   (append message-font-lock-keywords-1
-	  '((message-font-lock-cited-text-matcher
+	  `((message-font-lock-cited-text-matcher
 	     (1 'message-cited-text-face)
 	     (2 'message-cited-text-face))
-	    ("<#/?\\(multipart\\|part\\|external\\).*>"
+	    (,(concat "^\\(" message-cite-prefix-regexp "\\).*")
+	     (0 'message-cited-text-face))
+	    ("<#/?\\(multipart\\|part\\|external\\|mml\\).*>"
 	     (0 'message-mml-face)))))
 
 (defvar message-font-lock-keywords message-font-lock-keywords-2
@@ -2137,7 +2139,7 @@ With the prefix argument FORCE, insert the header anyway."
     (insert "\n\n\n")
     (delete-region (point) (re-search-forward "[ \t]*"))
     (when quoted
-      (insert quoted " "))
+      (insert quoted))
     (fill-paragraph nil)
     (goto-char point)
     (forward-line 1)))
