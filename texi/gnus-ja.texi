@@ -1495,9 +1495,18 @@ Gnus $B$O%U%!%$%k(B @file{.newsrc} $B$r$"$k%5!<%P!<MQ$+$iJL$N%5!<%P!<MQ$KJQ49
 gnus-group-clear-data-on-native-groups} $B$r;H$C$F!"4pK\%0%k!<%W$K4X$9$k%G!<(B
 $B%?$r$9$Y$F>C5n$9$k$3$H$,$G$-$^$9!#$3$N%3%^%s%I$OCm0U$7$F;H$C$F$/$@$5$$!#(B
 
+@kindex M-x gnus-group-clear-data
+@findex gnus-group-clear-data
+$B8=:_$N%0%k!<%W$NA4$F$N%G!<%?$r%/%j%"$7$^$9!=!=%^!<%/$H4{FI5-;v$N%j%9%H$r(B
+$B>C$75n$j$^$9(B (@code{gnus-group-clear-data})$B!#(B
+
 $B%5!<%P!<$rJQ99$7$?8e$G!"%-%c%C%7%e3,AX$r0\F0$5$;$J$1$l$P(B@strong{$B$J$j$^$;(B
 $B$s(B}$B!#$H$$$&$N$O!"%-%c%C%7%e5-;v$O4V0c$C$?5-;vHV9f$K$J$C$F$*$j!"$=$l(B
 $B$O(B gnus $B$,$I$N5-;v$rFI$s$@$H$_$J$9$+$K1F6A$7$^$9!#(B
+@code{gnus-group-clear-data-on-native-groups} $B$O$=$l$r<+F0$G9T$J$C$F$7$^(B
+$B$&$+$I$&$+$r?R$M$^$9!#(B@code{gnus-group-clear-data} $B$G(B
+$B$O(B @kbd{M-x gnus-cache-move-cache} $B$,;H$($^$9(B ($B$G$b5$$rIU$1$F!"$=$l$O$9(B
+$B$Y$F$N%0%k!<%W$N%-%c%C%7%e$r0\F0$7$F$7$^$$$^$9$+$i(B)$B!#(B
 
 @node Startup Files
 @section $B5/F0%U%!%$%k(B
@@ -6725,6 +6734,11 @@ gnus $B$OJ*;v$r@5$7$/$9$k$?$a$KFs$D$N4X?t$r$*4+$a$7$^$9!#(B
 @kbd{M-x gnus-cache-generate-nov-databases} $B$O$9$Y$F$N(B @sc{nov} $B%U%!%$%k(B
 $B$r(B ($B:F(B) $B:n@.$7!"(B@kbd{gnus-cache-generate-active} $B$O%"%/%F%#%V%U%!%$%k(B
 $B$r(B ($B:F(B) $B:n@.$7$^$9!#(B
+
+@findex gnus-cache-move-cache
+@code{gnus-cache-move-cache} $B$O$9$Y$F$N(B @code{gnus-cache-directory} $B$r$I(B
+$B$3$+JL$N>l=j$K0\F0$7$^$9!#$"$J$?$O$I$3$K0\F0$5$;$k$+$r?R$M$i$l$^$9!#$=$l$C(B
+$B$F$+$C$3$$$$$G$7$g(B?
 
 @node Persistent Articles
 @section $B1JB35-;v(B
