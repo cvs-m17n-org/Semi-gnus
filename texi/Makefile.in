@@ -24,8 +24,8 @@ ja: gnus-ja message-ja
 
 # Rule for XEmacs package.
 add-info-suffix:
-	$(EMACS) -batch -q -no-site-file -l ../lisp/dgnushack.el \
-		-f dgnushack-add-info-suffix-maybe
+	cd ../lisp && $(EMACS) -batch -q -no-site-file \
+		-l dgnushack.el -f dgnushack-add-info-suffix-maybe
 
 remove-info-suffix:
 	for file in gnus message emacs-mime gnus-ja message-ja; do \
