@@ -762,14 +762,6 @@ the actual number of articles toggled is returned."
 	  (set-buffer nntp-server-buffer)
 	  (unless (eq 'nov (gnus-retrieve-headers articles group))
 	    (nnvirtual-convert-headers))
-	  ;; XXX: Is this still need?
-	  ;; To gnus-agent-expire work fine with no Xref field in .overview 
-	  ;; Tatsuya Ichikawa <ichikawa@hv.epson.co.jp>
-	  ;; (goto-char (point-min))
-	  ;; (while (not (eobp))
-	  ;;   (goto-char (point-at-eol))
-	  ;;   (insert "\t")
-	  ;;   (forward-line 1))
 	  ;; Save these headers for later processing.
 	  (copy-to-buffer gnus-agent-overview-buffer (point-min) (point-max))
 	  (let (file)
@@ -1310,14 +1302,14 @@ The following commands are available:
 				  (cdr (assq 'dormant
 					     (gnus-info-marks info)))))
 		   nov-file (gnus-agent-article-name ".overview" group))
- 	     (gnus-agent-load-alist group)
+	     (gnus-agent-load-alist group)
 	     (gnus-message 5 "Expiring articles in %s" group)
 	     (set-buffer overview)
 	     (erase-buffer)
 	     (when (file-exists-p nov-file)
 	       (nnheader-insert-file-contents nov-file))
 	     (goto-char (point-min))
- 	     (setq article 0)
+	     (setq article 0)
 	     (while (setq elem (pop articles))
 	       (setq article (car elem))
 	       (when (or (null low)
