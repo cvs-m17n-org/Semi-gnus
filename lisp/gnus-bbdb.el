@@ -87,14 +87,14 @@ the user confirms the creation."
 				 bbdb/news-auto-create-p)
 				offer-to-create)
 			    offer-to-create)))
-	    ;; XXX: BBDB 2.3x not only redefines
-	    ;; `bbdb-encache-message' as a macro but also the inherent
-	    ;; semantics of message caching functions is changed, so
-	    ;; the following calls are much the same here.
-	    (if (functionp 'bbdb-encache-message)
-		(car (bbdb-encache-message message-key (list record)))
-	      (bbdb-encache-message message-key record)))))))
-		 
+	    (when record
+	      ;; XXX: BBDB 2.3x not only redefines
+	      ;; `bbdb-encache-message' as a macro but also the inherent
+	      ;; semantics of message caching functions is changed, so
+	      ;; the following calls are much the same here.
+	      (if (functionp 'bbdb-encache-message)
+		  (car (bbdb-encache-message message-key (list record)))
+		(bbdb-encache-message message-key record))))))))
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)
