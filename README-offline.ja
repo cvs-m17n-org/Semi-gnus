@@ -63,7 +63,7 @@ T-gnus をお使いの場合、gnus-offline.el は特に何も考えなくても T-gnus
 
 ・.gnus に以下のコードを加えます。
 
-	(gnus-agent-toggle-plugged nil)
+	(setq gnus-plugged nil)
 
   これで Gnus を再起動すればグループバッファで“g”とタイプすることに
   より前記の動作をするはずです。

@@ -74,7 +74,7 @@ o At the first time, you must start Gnus in the "online" state and
 
 o Add the following code to ~/.gnus
 
-	(gnus-agent-toggle-plugged nil)
+	(setq gnus-plugged nil)
 
 That's all. Restart Gnus and try typing "g" in the *Group* buffer.
 
