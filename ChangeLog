@@ -1,3 +1,8 @@
+1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* README.ichikawa: Fix about the last version of T-gnus based on
+	Gnus 5.6.
+
 1999-02-01  Akihiro Arisawa   <ari@mei9.advantest.co.jp>
 
 	* lisp/nndoc.el (nndoc-mime-digest-type-p): Add the element of
