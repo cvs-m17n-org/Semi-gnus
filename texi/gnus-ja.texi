@@ -11207,43 +11207,43 @@ signing and the @kbd{C-c C-m c} key map for encryption, as follows.
 @table @kbd
 
 @item C-c C-m s s
-@kindex C-c C-m s s
+@kindex C-c C-m s s (Message)
 @findex mml-secure-message-sign-smime
 
 Digitally sign current message using @acronym{S/MIME}.
 
 @item C-c C-m s o
-@kindex C-c C-m s o
+@kindex C-c C-m s o (Message)
 @findex mml-secure-message-sign-pgp
 
 Digitally sign current message using @acronym{PGP}.
 
 @item C-c C-m s p
-@kindex C-c C-m s p
+@kindex C-c C-m s p (Message)
 @findex mml-secure-message-sign-pgp
 
 Digitally sign current message using @acronym{PGP/MIME}.
 
 @item C-c C-m c s
-@kindex C-c C-m c s
+@kindex C-c C-m c s (Message)
 @findex mml-secure-message-encrypt-smime
 
 Digitally encrypt current message using @acronym{S/MIME}.
 
 @item C-c C-m c o
-@kindex C-c C-m c o
+@kindex C-c C-m c o (Message)
 @findex mml-secure-message-encrypt-pgp
 
 Digitally encrypt current message using @acronym{PGP}.
 
 @item C-c C-m c p
-@kindex C-c C-m c p
+@kindex C-c C-m c p (Message)
 @findex mml-secure-message-encrypt-pgpmime
 
 Digitally encrypt current message using @acronym{PGP/MIME}.
 
 @item C-c C-m C-n
-@kindex C-c C-m C-n
+@kindex C-c C-m C-n (Message)
 @findex mml-unsecure-message
 Remove security related @acronym{MML} tags from message.
 
@@ -15554,7 +15554,7 @@ Nnmail で対応するもの: @code{nnmail-split-fancy}.
 @cindex editing imap acls
 @cindex Access Control Lists
 @cindex Editing @acronym{IMAP} ACLs
-@kindex G l
+@kindex G l (グループ)
 @findex gnus-group-nnimap-edit-acl
 
 ACL は Access Control List (使用制限一覧) の略です。@acronym{IMAP} で
@@ -15586,7 +15586,7 @@ ACL は Access Control List (使用制限一覧) の略です。@acronym{I
 
 @cindex expunge
 @cindex manual expunging
-@kindex G x
+@kindex G x (グループ)
 @findex gnus-group-nnimap-expunge
 
 @code{nnimap-expunge-on-close} に @code{never} を設定していれば、メール
