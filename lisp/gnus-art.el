@@ -4217,6 +4217,18 @@ For example:
 (set-alist 'mime-preview-following-method-alist
 	   'gnus-original-article-mode #'gnus-following-method)
 
+(set-alist 'mime-preview-over-to-previous-method-alist
+	   'gnus-original-article-mode
+	   (lambda ()
+	     (gnus-article-read-summary-keys
+	      nil (gnus-character-to-event ?P))))
+
+(set-alist 'mime-preview-over-to-next-method-alist
+	   'gnus-original-article-mode'
+	   (lambda ()
+	     (gnus-article-read-summary-keys
+	      nil (gnus-character-to-event ?N))))
+
 
 ;;; @ end
 ;;;
