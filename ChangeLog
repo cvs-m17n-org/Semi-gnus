@@ -1,3 +1,7 @@
+2000-05-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-debug): Add "nntp.el" and `defvoo'.
+
 2000-05-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (T-gnus): Update to 6.14.4.

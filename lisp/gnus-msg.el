@@ -1025,7 +1025,7 @@ The source file has to be in the Emacs load path."
   (let ((files '("gnus.el" "gnus-sum.el" "gnus-group.el"
 		 "gnus-art.el" "gnus-start.el" "gnus-async.el"
 		 "gnus-msg.el" "gnus-score.el" "gnus-win.el" "gnus-topic.el"
-		 "nnmail.el" "message.el"))
+		 "nnmail.el" "nntp.el" "message.el"))
 	(point (point))
 	file expr olist sym)
     (gnus-message 4 "Please wait while we snoop your variables...")
@@ -1046,7 +1046,8 @@ The source file has to be in the Emacs load path."
 	    (while (setq expr (ignore-errors (read (current-buffer))))
 	      (ignore-errors
 		(and (or (eq (car expr) 'defvar)
-			 (eq (car expr) 'defcustom))
+			 (eq (car expr) 'defcustom)
+			 (eq (car expr) 'defvoo))
 		     (stringp (nth 3 expr))
 		     (or (not (boundp (nth 1 expr)))
 			 (not (equal (eval (nth 2 expr))
