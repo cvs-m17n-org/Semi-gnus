@@ -1967,11 +1967,15 @@ commands:
 (defun gnus-article-display-mime-message ()
   "Article display method for MIME message."
   ;; called from `gnus-original-article-buffer'.
-  (let ((default-mime-charset (save-excursion
-				(set-buffer gnus-summary-buffer)
-				default-mime-charset)))
+  (let ((charset (with-current-buffer gnus-summary-buffer
+		   default-mime-charset)))
+    (make-local-variable 'default-mime-charset)
+    (setq default-mime-charset charset)
     (mime-display-message mime-message-structure
-			  gnus-article-buffer nil gnus-article-mode-map))
+			  gnus-article-buffer nil gnus-article-mode-map)
+    (make-local-variable 'default-mime-charset)
+    (setq default-mime-charset charset)
+    )
   ;; `mime-display-message' changes current buffer to `gnus-article-buffer'.
   (make-local-variable 'mime-button-mother-dispatcher)
   (setq mime-button-mother-dispatcher
@@ -1990,7 +1994,11 @@ commands:
   (let ((charset (save-excursion
 		   (set-buffer gnus-summary-buffer)
 		   default-mime-charset)))
+    (make-local-variable 'default-mime-charset)
+    (setq default-mime-charset charset)
     (gnus-article-display-traditional-message)
+    (make-local-variable 'default-mime-charset)
+    (setq default-mime-charset charset)
     (let (buffer-read-only)
       (eword-decode-header charset)
       (goto-char (point-min))
