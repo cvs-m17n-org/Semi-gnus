@@ -368,14 +368,23 @@ be used as possible file names."
   :group 'gnus-article-mime
   :type 'boolean)
 
-(defcustom gnus-show-mime-method 'gnus-article-preview-mime-message
-  "Function to process a MIME message.
+(defcustom gnus-article-display-method-for-mime
+  'gnus-article-display-mime-message
+  "Function to display a MIME message.
 The function is called from the article buffer."
   :group 'gnus-article-mime
   :type 'function)
 
-(defcustom gnus-decode-encoded-word-method 'gnus-article-decode-encoded-word
-  "*Function to decode MIME encoded words.
+(defcustom gnus-article-display-method-for-encoded-word
+  'gnus-article-display-message-with-encoded-word
+  "*Function to display a message with MIME encoded-words.
+The function is called from the article buffer."
+  :group 'gnus-article-mime
+  :type 'function)
+
+(defcustom gnus-article-display-method-for-traditional
+  'gnus-article-display-traditional-message
+  "*Function to display a traditional message.
 The function is called from the article buffer."
   :group 'gnus-article-mime
   :type 'function)
@@ -1948,7 +1957,8 @@ commands:
 ;;; @@ article filters
 ;;;
 
-(defun gnus-article-preview-mime-message ()
+(defun gnus-article-display-mime-message ()
+  "Article display method for MIME message."
   (make-local-variable 'mime-button-mother-dispatcher)
   (setq mime-button-mother-dispatcher
 	(function gnus-article-push-button))
@@ -1964,11 +1974,20 @@ commands:
   (run-hooks 'gnus-mime-article-prepare-hook)
   )
 
-(defun gnus-article-decode-encoded-word ()
-  "Header filter for gnus-article-mode."
+(defun gnus-article-display-traditional-message ()
+  "Article display method for traditional message."
+  (let (buffer-read-only)
+    (erase-buffer)
+    (insert-buffer-substring gnus-original-article-buffer)
+    ))
+
+(defun gnus-article-display-message-with-encoded-word ()
+  "Article display method for message with encoded-words."
   (let ((charset (save-excursion
 		   (set-buffer gnus-summary-buffer)
-		   default-mime-charset)))
+		   default-mime-charset))
+	buffer-read-only)
+    (gnus-article-display-traditional-message)
     (eword-decode-header charset)
     (goto-char (point-min))
     (if (search-forward "\n\n" nil t)
@@ -2000,14 +2019,14 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	   result)
       (save-excursion
 	(gnus-article-setup-buffer)
-	(set-buffer gnus-article-buffer)
+	(set-buffer gnus-original-article-buffer)
 	;; Deactivate active regions.
 	(when (and (boundp 'transient-mark-mode)
 		   transient-mark-mode)
 	  (setq mark-active nil))
-	(if (not (setq result (let ((buffer-read-only nil))
-				(gnus-request-article-this-buffer
-				 article group))))
+	(if (not (setq result
+		       (let ((buffer-read-only nil))
+			 (gnus-request-original-article article group))))
 	    ;; There is no such article.
 	    (save-excursion
 	      (when (and (numberp article)
@@ -2072,15 +2091,17 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (stringp article))
 	      ;; Hooks for getting information from the article.
 	      ;; This hook must be called before being narrowed.
-	      (let (buffer-read-only)
+	      (let ((method (if gnus-show-mime
+				(if (or (not gnus-strict-mime)
+					(gnus-fetch-field "Mime-Version"))
+				    gnus-article-display-method-for-mime
+				  gnus-article-display-method-for-encoded-word)
+			      gnus-article-display-method-for-traditional)))
 		(gnus-run-hooks 'internal-hook)
 		(gnus-run-hooks 'gnus-article-prepare-hook)
-		;; Decode MIME message.
-		(when gnus-show-mime
-		  (if (or (not gnus-strict-mime)
-			  (gnus-fetch-field "Mime-Version"))
-		      (funcall gnus-show-mime-method)
-		    (funcall gnus-decode-encoded-word-method)))
+		(set-buffer gnus-article-buffer)
+		;; Display message.
+		(funcall method)
 		;; Perform the article display hooks.
 		(gnus-run-hooks 'gnus-article-display-hook))
 	      ;; Do page break.
@@ -2500,6 +2521,124 @@ If given a prefix, show the hidden text instead."
 	    (erase-buffer)
 	    (insert-buffer-substring gnus-article-buffer))
 	  (setq gnus-original-article (cons group article))))
+
+      ;; Update sparse articles.
+      (when (and do-update-line
+		 (or (numberp article)
+		     (stringp article)))
+	(let ((buf (current-buffer)))
+	  (set-buffer gnus-summary-buffer)
+	  (gnus-summary-update-article do-update-line)
+	  (gnus-summary-goto-subject do-update-line nil t)
+	  (set-window-point (get-buffer-window (current-buffer) t)
+			    (point))
+	  (set-buffer buf))))))
+
+(defun gnus-request-original-article (article group)
+  "Get an article and insert it into original article buffer."
+  (let (do-update-line)
+    (prog1
+	(save-excursion
+	  (erase-buffer)
+	  (gnus-kill-all-overlays)
+	  (setq group (or group gnus-newsgroup-name))
+
+	  ;; Open server if it has closed.
+	  (gnus-check-server (gnus-find-method-for-group group))
+
+	  ;; Using `gnus-request-article' directly will insert the article into
+	  ;; `nntp-server-buffer' - so we'll save some time by not having to
+	  ;; copy it from the server buffer into the article buffer.
+
+	  ;; We only request an article by message-id when we do not have the
+	  ;; headers for it, so we'll have to get those.
+	  (when (stringp article)
+	    (let ((gnus-override-method gnus-refer-article-method))
+	      (gnus-read-header article)))
+
+	  ;; If the article number is negative, that means that this article
+	  ;; doesn't belong in this newsgroup (possibly), so we find its
+	  ;; message-id and request it by id instead of number.
+	  (when (and (numberp article)
+		     gnus-summary-buffer
+		     (get-buffer gnus-summary-buffer)
+		     (gnus-buffer-exists-p gnus-summary-buffer))
+	    (save-excursion
+	      (set-buffer gnus-summary-buffer)
+	      (let ((header (gnus-summary-article-header article)))
+		(when (< article 0)
+		  (cond
+		   ((memq article gnus-newsgroup-sparse)
+		    ;; This is a sparse gap article.
+		    (setq do-update-line article)
+		    (setq article (mail-header-id header))
+		    (let ((gnus-override-method gnus-refer-article-method))
+		      (gnus-read-header article))
+		    (setq gnus-newsgroup-sparse
+			  (delq article gnus-newsgroup-sparse)))
+		   ((vectorp header)
+		    ;; It's a real article.
+		    (setq article (mail-header-id header)))
+		   (t
+		    ;; It is an extracted pseudo-article.
+		    (setq article 'pseudo)
+		    (gnus-request-pseudo-article header))))
+
+		(let ((method (gnus-find-method-for-group
+			       gnus-newsgroup-name)))
+		  (when (and (eq (car method) 'nneething)
+			     (vectorp header))
+		    (let ((dir (concat (file-name-as-directory (nth 1 method))
+				       (mail-header-subject header))))
+		      (when (file-directory-p dir)
+			(setq article 'nneething)
+			(gnus-group-enter-directory dir))))))))
+
+	  (cond
+	   ;; Refuse to select canceled articles.
+	   ((and (numberp article)
+		 gnus-summary-buffer
+		 (get-buffer gnus-summary-buffer)
+		 (gnus-buffer-exists-p gnus-summary-buffer)
+		 (eq (cdr (save-excursion
+			    (set-buffer gnus-summary-buffer)
+			    (assq article gnus-newsgroup-reads)))
+		     gnus-canceled-mark))
+	    nil)
+	   ;; Check the backlog.
+	   ((and gnus-keep-backlog
+		 (gnus-backlog-request-article group article (current-buffer)))
+	    'article)
+	   ;; Check asynchronous pre-fetch.
+	   ((gnus-async-request-fetched-article group article (current-buffer))
+	    (gnus-async-prefetch-next group article gnus-summary-buffer)
+	    (when (and (numberp article) gnus-keep-backlog)
+	      (gnus-backlog-enter-article group article (current-buffer)))
+	    'article)
+	   ;; Check the cache.
+	   ((and gnus-use-cache
+		 (numberp article)
+		 (gnus-cache-request-article article group))
+	    'article)
+	   ;; Get the article and put into the article buffer.
+	   ((or (stringp article) (numberp article))
+	    (let ((gnus-override-method
+		   (and (stringp article) gnus-refer-article-method))
+		  (buffer-read-only nil))
+	      (erase-buffer)
+	      (gnus-kill-all-overlays)
+	      (when (gnus-request-article article group (current-buffer))
+		(when (numberp article)
+		  (gnus-async-prefetch-next group article gnus-summary-buffer)
+		  (when gnus-keep-backlog
+		    (gnus-backlog-enter-article
+		     group article (current-buffer))))
+		'article)))
+	   ;; It was a pseudo.
+	   (t article)))
+
+      ;; Associate this article with the current summary buffer.
+      (setq gnus-article-current-summary gnus-summary-buffer)
 
       ;; Update sparse articles.
       (when (and do-update-line
