@@ -119,7 +119,7 @@
      miee-popup-menu
      gnus-group-toolbar)))
 
-(static-if (eq system-type 'windows-nt)
+(if (eq system-type 'windows-nt)
     (define-process-argument-editing "/hang\\.exe\\'"
       (lambda (x)
 	(general-process-argument-editing-function
@@ -353,16 +353,18 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 (defun gnus-offline-setup ()
   "*Initialize gnus-offline function"
 
-  ;; Menu and keymap
-  (gnus-offline-define-menu-and-key)
+  (when (eq 'gnus-offline-drafts-queue-type 'agent)
+    (setq gnus-offline-connected gnus-plugged))
 
   ;; To transfer Mail/News function.
-  (cond ((eq gnus-offline-mail-treat-environ 'offline)
+  (cond	((or (and (eq 'gnus-offline-drafts-queue-type 'agent)
+		  gnus-offline-connected)
+	     (eq gnus-offline-mail-treat-environ 'online))
 	 ;; send mail under offline environ.
-	 (gnus-offline-set-offline-sendmail-function))
-	((eq gnus-offline-mail-treat-environ 'online)
+	 (gnus-offline-set-online-sendmail-function))
+	(t
 	 ;; send mail under offline environ.
-	 (gnus-offline-set-online-sendmail-function))))
+	 (gnus-offline-set-offline-sendmail-function))))
 
 ;;
 ;; Setting Error check.
@@ -825,27 +827,27 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	(gnus-offline-define-menu-on-miee))
     (add-hook 'gnus-group-mode-hook 'gnus-offline-define-menu-on-agent))
   (add-hook 'gnus-group-mode-hook
-	    '(lambda ()
-	       (local-set-key "\C-coh" 'gnus-offline-set-unplugged-state)
-	       (local-set-key "\C-cof" 'gnus-offline-toggle-articles-to-fetch)
-	       (local-set-key "\C-coo" 'gnus-offline-toggle-on/off-send-mail)
-	       (local-set-key "\C-cox" 'gnus-offline-set-auto-ppp)
-	       (local-set-key "\C-cos" 'gnus-offline-set-interval-time)
-	       (substitute-key-definition
-		'gnus-group-get-new-news 'gnus-offline-gnus-get-new-news
-		gnus-group-mode-map)
-	       (if (eq gnus-offline-news-fetch-method 'nnagent)
-		   (progn
-		     (substitute-key-definition
-		      'gnus-agent-toggle-plugged 'gnus-offline-toggle-plugged
-		      gnus-agent-group-mode-map)
-		     (local-set-key "\C-coe" 'gnus-offline-agent-expire)))))
+	    #'(lambda ()
+		(local-set-key "\C-coh" 'gnus-offline-set-unplugged-state)
+		(local-set-key "\C-cof" 'gnus-offline-toggle-articles-to-fetch)
+		(local-set-key "\C-coo" 'gnus-offline-toggle-on/off-send-mail)
+		(local-set-key "\C-cox" 'gnus-offline-set-auto-ppp)
+		(local-set-key "\C-cos" 'gnus-offline-set-interval-time)
+		(substitute-key-definition
+		 'gnus-group-get-new-news 'gnus-offline-gnus-get-new-news
+		 gnus-group-mode-map)
+		(if (eq gnus-offline-news-fetch-method 'nnagent)
+		    (progn
+		      (substitute-key-definition
+		       'gnus-agent-toggle-plugged 'gnus-offline-toggle-plugged
+		       gnus-agent-group-mode-map)
+		      (local-set-key "\C-coe" 'gnus-offline-agent-expire)))))
   (if (eq gnus-offline-news-fetch-method 'nnagent)
       (add-hook 'gnus-summary-mode-hook
-		'(lambda ()
-		   (substitute-key-definition
-		    'gnus-agent-toggle-plugged 'gnus-offline-toggle-plugged
-		    gnus-agent-summary-mode-map))))
+		#'(lambda ()
+		    (substitute-key-definition
+		     'gnus-agent-toggle-plugged 'gnus-offline-toggle-plugged
+		     gnus-agent-summary-mode-map))))
   (static-cond
    ((featurep 'xemacs)
     ;; Overwrite the toolbar spec for gnus-group-mode.
@@ -860,10 +862,10 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
    (t
     (add-hook
      'gnus-group-mode-hook
-     `(lambda ()
-	(define-key gnus-group-mode-map
-	  ,(static-if (eq system-type 'windows-nt) [S-mouse-2] [mouse-3])
-	  'gnus-offline-popup-menu))))))
+     #'(lambda ()
+	 (define-key gnus-group-mode-map
+	   (if (eq system-type 'windows-nt) [S-mouse-2] [mouse-3])
+	   'gnus-offline-popup-menu))))))
 ;;
 ;;
 (defun gnus-offline-popup (menu &optional title)
@@ -985,15 +987,13 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 			      gnus-offline-interval-time))
   (if (= gnus-offline-interval-time 0)
       (gnus-demon-remove-handler 'gnus-offline-gnus-get-new-news t)))
-
 ;;
-;; Code for making Gnus and Gnus Offline cooperate each other.
+;; Code for making Gnus and Gnus Offline cooperate with each other.
 ;;
 
-(defadvice gnus (after gnus-offline-ad activate)
-  "Synchronize `gnus-offline-connected' with `gnus-plugged'."
-  (and (featurep 'gnus-agent)
-       (setq gnus-offline-connected gnus-plugged)))
+;; Enable key and menu definitions here.
+(eval '(funcall 'gnus-offline-define-menu-and-key))
+
 ;;
 ;;
 ;;; gnus-offline.el ends here
