@@ -412,8 +412,8 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 		     msg
 		     (gnus-ofsetup-gettext 'completing-read-symbol-1))
 		    (mapcar
-		     (lambda (sym)
-		       (list (symbol-name sym)))
+		     #'(lambda (sym)
+			 (list (symbol-name sym)))
 		     syms)
 		    nil t nil)))
 
@@ -628,11 +628,11 @@ mail source specifier とか上記のようなキーワードについてもっとよく
   "Edit the gnus-offline parameters."
   (interactive)
   (let* ((params (gnus-ofsetup-find-parameters))
-	 (types (mapcar (lambda (entry)
-			 `(cons :format "%v%h\n"
-				:doc ,(nth 2 entry)
-				(const :format "" ,(nth 0 entry))
-				,(nth 1 entry)))
+	 (types (mapcar #'(lambda (entry)
+			    `(cons :format "%v%h\n"
+				   :doc ,(nth 2 entry)
+				   (const :format "" ,(nth 0 entry))
+				   ,(nth 1 entry)))
 			params)))
   (kill-buffer (gnus-get-buffer-create "*Gnus Offline Customize*"))
   (switch-to-buffer (gnus-get-buffer-create "*Gnus Offline Customize*"))
