@@ -1,5 +1,16 @@
 2000-05-10  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
 
+	* Nana-gnus: Version 7.1.0.20 (This is alpha status.)
+	Fix a bug.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.20.
+
+	* lisp/message.el (message-list-references): Do not insert
+	duplicate Message-Id, when specified
+	`message-list-references-add-position'.
+
+2000-05-10  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
 	* Nana-gnus: Version 7.1.0.19 (This is alpha status.)
 	`gnus-bbdb/split-mail' supports group address.
 
