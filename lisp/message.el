@@ -382,12 +382,16 @@ always query the user whether to use the value.  If it is the symbol
 		 (const ask)))
 
 (defcustom message-use-mail-followup-to 'ask
-  "*Specifies what to do with Mail-Followup-To header."
+  "*Specifies what to do with Mail-Followup-To header.
+If nil, ignore the header.  If it is t, use its value.  If it is the
+symbol `ask', always query the user whether to use the value."
+;;; If it is the symbol `use', always use the value.
   :group 'message-interface
   :type '(choice (const :tag "ignore" nil)
-		 (const use)
+		 ;; (const use)
 		 (const ask)))
 
+;;; Not implemented yet.
 (defcustom message-use-mail-reply-to 'ask
   "*Specifies what to do with Mail-Reply-To header."
   :group 'message-interface
@@ -2856,18 +2860,20 @@ to find out how to use this."
 (defun message-make-in-reply-to ()
   "Return the In-Reply-To header for this message."
   (when message-reply-headers
-    (let ((from (mail-header-from message-reply-headers))
+    (let ((mid (mail-header-message-id message-reply-headers))
+          (from (mail-header-from message-reply-headers))
 	  (date (mail-header-date message-reply-headers)))
-      (when from
-	(let ((stop-pos
-	       (string-match "  *at \\|  *@ \\| *(\\| *<" from)))
-	  (concat (if (and stop-pos
-			   (not (zerop stop-pos)))
-		      (substring from 0 stop-pos) from)
-		  "'s message of \""
-		  (if (or (not date) (string= date ""))
-		      "(unknown date)" date)
-		  "\""))))))
+      (when mid
+	(concat mid
+		(when from
+		  (let ((stop-pos 
+			 (string-match "  *at \\|  *@ \\| *(\\| *<" from)))
+		    (concat "\n ("
+			    (if stop-pos (substring from 0 stop-pos) from)
+			    "'s message of " 
+			    (if (or (not date) (string= date ""))
+				"(unknown date)" date)
+			    ")"))))))))
 
 (defun message-make-distribution ()
   "Make a Distribution header."
@@ -3428,7 +3434,7 @@ Headers already prepared in the buffer are not modified."
 	    mct (message-fetch-field "mail-copies-to")
 	    mft (message-fetch-field "mail-followup-to")
 	    reply-to (or (message-fetch-field "mail-reply-to")
-                         (unless ignore-reply-to (message-fetch-field "reply-to")))
+			 (unless ignore-reply-to (message-fetch-field "reply-to")))
 	    references (message-fetch-field "references")
 	    message-id (message-fetch-field "message-id" t))
       ;; Remove any (buggy) Re:'s that are present and make a
@@ -3452,12 +3458,27 @@ Headers already prepared in the buffer are not modified."
       (unless follow-to
 	(cond
 	 (to-address
-          (setq follow-to (list (cons 'To to-address)))
-          (when (and wide mct)
-            (push (cons 'Cc mct) follow-to)))
+	  (setq follow-to (list (cons 'To to-address)))
+	  (when (and wide mct)
+	    (push (cons 'Cc mct) follow-to)))
 	 ((not wide)
-          (setq follow-to (list (cons 'To (or reply-to from)))))
-	 ((and mft message-use-mail-followup-to)
+	  (setq follow-to (list (cons 'To (or reply-to from)))))
+	 ((and mft message-use-mail-followup-to
+	       (or (not (eq message-use-mail-followup-to 'ask))
+		   (message-y-or-n-p
+		    (concat "Obey Mail-Followup-To: " mft "? ") t "\
+You should normally obey the Mail-Followup-To: header.
+
+	`Mail-Followup-To: " mft "'
+directs your response to " (if (string-match "," mft)
+			       "the specified addresses"
+			     "that address only") ".
+
+A typical situation where Mail-Followup-To is used is when the author
+thinks that further discussion should take place only in "
+			     (if (string-match "," mft)
+				 "the specified mailing lists"
+			       "that mailing lists") ".")))
 	  (setq follow-to (list (cons 'To mft))))
 	 (t
 	  (let (ccalist)
@@ -3546,7 +3567,7 @@ If TO-NEWSGROUPS, use that as the new Newsgroups line."
 	    newsgroups (message-fetch-field "newsgroups")
 	    posted-to (message-fetch-field "posted-to")
 	    reply-to (or (message-fetch-field "mail-reply-to")
-                         (message-fetch-field "reply-to"))
+			 (message-fetch-field "reply-to"))
 	    distribution (message-fetch-field "distribution")
 	    mct (message-fetch-field "mail-copies-to")
 	    mft (message-fetch-field "mail-followup-to"))
@@ -3610,8 +3631,20 @@ Also, some source/announcement newsgroups are not indented for discussion;
 responses here are directed to other newsgroups."))
 		  (cons 'Newsgroups followup-to)
 		(cons 'Newsgroups newsgroups))))))
-          ((and mft message-use-mail-followup-to)
-           (list (cons 'To mft)))
+	  ((and mft message-use-mail-followup-to
+		(or (not (eq message-use-mail-followup-to 'ask))
+		    (message-y-or-n-p
+		     (concat "Obey Mail-Followup-To: " mft "? ") t "\
+You should normally obey the Mail-Followup-To: header.
+
+	`Mail-Followup-To: " mft "'
+directs your response to " (if (string-match "," mft)
+			       "the specified addresses"
+			     "that address only") " instead of news.
+
+A typical situation where Mail-Followup-To is used is when the poster
+thinks that further discussion should take place only via e-mail.")))
+	   (list (cons 'To mft)))
 	  (posted-to
 	   `((Newsgroups . ,posted-to)))
 	  (t
