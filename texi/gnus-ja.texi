@@ -1614,6 +1614,7 @@ gnus $B$,$I$N%0%k!<%W$,?7$7$$$+$N5-O?$r;}$C$F$$$J$$$3$H$K$J$j$^$9$N$G!"?7(B
 @end lisp
 
 @vindex gnus-init-file
+@vindex gnus-site-init-file
 Gnus $B$,5/F0$9$k$H!"(B@code{gnus-site-init-file} ($B=i4|@_Dj$G(B
 $B$O(B @file{.../site-lisp/gnus}) $B$H(B @code{gnus-init-file} ($B=i4|@_Dj$G(B
 $B$O(B @file{~/.gnus}) $B$N%U%!%$%k$rFI$_9~$_$^$9!#$3$l$i$OIaDL(B
@@ -3065,6 +3066,7 @@ form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
 $B%9$rDs6!$7$^$9(B)$B!#%H%T%C%/%Q%i%a!<%?$K$D$$$FFI$s$G$_$k$3$H$bLLGr$$$G$7$g(B
 $B$&(B (@pxref{Topic Parameters})$B!#(B
 
+@vindex gnus-parameters
 $B%0%k!<%W%Q%i%a!<%?$O(B @code{gnus-parameters} $BJQ?t$r2p:_$7$F@_Dj$9$k$3$H$b(B
 $B$G$-$^$9!#$G$b$$$/$D$+$N%Q%i%a!<%?!"Nc$($P(B @code{visible} $B$O8zNO$rH/4x$7(B
 $B$^$;$s!#Nc$G$9!#(B
@@ -9313,6 +9315,13 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @end menu
 
 @table @code
+@vindex gnus-summary-display-while-building
+@item gnus-summary-display-while-building
+$BHs(B-@code{nil} $B$@$C$?$i!"9=C[Cf$N35N,%P%C%U%!$r99?7$7$J$,$iI=<($7$^$9!#(B
+@code{t} $B$@$C$?>l9g$O!"9T$,A^F~$5$l$kEY$KKh2s%P%C%U%!$r99?7$7$^$9!#CM$,(B
+$B@0?t(B @var{n} $B$G$"$C$?>l9g$O!"(B@var{n} $B9TKh$KI=<($r99?7$7$^$9!#%G%#%U%)%k(B
+$B%H$O(B @code{nil} $B$G$9!#(B
+
 @vindex gnus-summary-mode-hook
 @item gnus-summary-mode-hook
 $B35N,%b!<%I%P%C%U%!$r:n@.$9$k$H$-$K$3$N%U%C%/$,8F$P$l$^$9!#(B
