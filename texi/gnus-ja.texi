@@ -12141,7 +12141,7 @@ LIST $B%3%^%s%I$N%*%W%7%g%s$K;H$C$F!"(B($B%5!<%P!<$N(B) $B%j%9%H=PNO$r@_Dj$
 @end lisp
 
 Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
-$B$O!"NI$$0F$G$O$"$j$^$;$s!#(B
+$B$O!"NI$$9M$($G$O$"$j$^$;$s!#(B
 @end table
 
 @node Indirect Functions
@@ -12180,9 +12180,42 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 $B$F2<$5$$!#(B
 @end table
 
+@code{nntp-end-of-line} $B$NCM$r(B @samp{\n} $B$KJQ99$9$kI,MW$,$"$k$G$"$m$&$3(B
+$B$H$KCm0U$7$F2<$5$$(B (@pxref{Common Variables})$B!#(B
+
+@item nntp-open-via-rlogin-and-netcat
+@findex nntp-open-via-rlogin-and-netcat
+$BK\<AE*$K$OF1$8$3$H$J$N$G$9$,!"Cf4V$N%[%9%H$+$iK\Ev$N(B @acronym{NNTP} $B%5!<(B
+$B%P!<$K@\B3$9$k$?$a$K!"(B@samp{telnet} $B$NBe$o$j$K(B @samp{netcat}
+(@uref{http://netcat.sourceforge.net/}) $B$r;H$$$^$9!#(B
+
+@code{nntp-open-via-rlogin-and-netcat}-$BMQ$NJQ?t(B:
+
+@table @code
+@item nntp-via-netcat-command
+@vindex nntp-via-netcat-command
+$BCf4V$N%[%9%H$+$iK\Ev$N(B @acronym{NNTP} $B%5!<%P!<$K@\B3$9$k$?$a$K;H$o$l$k%3(B
+$B%^%s%I$G$9!#%G%#%U%)%k%H$O(B @samp{nc} $B$G$9!#Be$o$j$K(B @samp{connect}
+(@uref{http://www.imasy.or.jp/~gotoh/ssh/connect.html}) $B$N$h$&$J!"B>$N%3(B
+$B%^%s%I$r;H$&$3$H$b$G$-$^$9!#(B
+
+@item nntp-via-netcat-switches
+@vindex nntp-via-netcat-switches
+@code{nntp-via-netcat-command} $B$N%3%^%s%I$N%9%$%C%A$H$7$F;H$o$l$kJ8;zNs(B
+$B$N%j%9%H$G$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G$9!#(B
+
+@item nntp-via-rlogin-command
+$BCf4V$N%[%9%H$K%m%0%$%s$9$k$?$a$K;H$o$l$k%3%^%s%I$G$9!#%G%#%U%)%k%H(B
+$B$O(B @samp{rsh} $B$G$9$,!"(B@samp{ssh} $B$,?M5$$N$"$kBeBX<jCJ$G$9!#(B
+
+@item nntp-via-rlogin-command-switches
+@code{nntp-via-rlogin-command} $B$N%3%^%s%I$N%9%$%C%A$H$7$F;H$o$l$kJ8;zNs(B
+$B$N%j%9%H$G$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G$9!#(B
+@end table
+
 @item nntp-open-via-telnet-and-telnet
 @findex nntp-open-via-telnet-and-telnet
-$BK\<AE*$K$OF1$8$3$H$J$N$G$9$,!"Cf4V$N%[%9%H$K@\B3$9$k$?$a(B
+$B$3$l$bK\<AE*$K$OF1$8$3$H$J$N$G$9$,!"Cf4V$N%[%9%H$K@\B3$9$k$?$a(B
 $B$K(B @samp{rlogin} $B$NBe$o$j$K(B @samp{telnet} $B$r;H$$$^$9!#(B
 
 @code{nntp-open-via-telnet-and-telnet}-$BMQ$NJQ?t(B:
@@ -12213,6 +12246,9 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 $BCf4V$N%[%9%H$G$N%7%'%k$N%W%m%s%W%H$K9gCW$9$k@55,I=8=$G$9!#%G%#%U%)%k%H(B
 $B$O(B @samp{bash\\|\$ *\r?$\\|> *\r?} $B$G$9!#(B
 @end table
+
+@code{nntp-end-of-line} $B$NCM$r(B @samp{\n} $B$KJQ99$9$kI,MW$,$"$k$G$"$m$&$3(B
+$B$H$KCm0U$7$F2<$5$$(B (@pxref{Common Variables})$B!#(B
 @end table
 
 $B$3$l$i$O>e5-$N4X?t$,;2>H$9$kIU2CE*$JJQ?t$G$9(B:
@@ -12259,7 +12295,7 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 @vindex nntp-end-of-line
 @acronym{NNTP} $B%5!<%P!<$H$*OC$r$7$F$$$k$H$-$K9T$N=*$o$j$N0u$H$7$F;H$o$l(B
 $B$kJ8;zNs$G$9!#$3$l$O%G%#%U%)%k%H$G(B @samp{\r\n} $B$G$9$,!"AG$G$O$J$$@\B3MQ(B
-$B$N4X?t$r;H$C$F$$$k$H$-$O(B @samp{\n} $B$G$"$k$Y$-$G$9!#(B
+$B$N(B telnet $B4X?t$r;H$C$F$$$k$H$-$O(B @samp{\n} $B$G$"$k$Y$-$G$9!#(B
 
 @item nntp-telnet-command
 @vindex nntp-telnet-command
