@@ -1767,8 +1767,8 @@ always hide."
 	    (when (and button (not (eobp)))
 	      (gnus-article-hide-text-type
 	       (1+ button)
-	       (or (next-single-property-change (1+ button) 'mime-view-entity)
-		   (point-max))
+	       (next-single-property-change (1+ button) 'mime-view-entity
+					    nil (point-max))
 	       'signature))))))))
 
 (defun article-strip-headers-in-body ()
@@ -3000,14 +3000,11 @@ If ALL-HEADERS is non-nil, no headers are hidden."
       (gnus-treat-article 'head)
       (put-text-property (point-min) (point-max) 'article-treated-header t)
       (goto-char (point-max)))
-    (while (and (not (eobp))
-		entity
-		(setq next
-		      (set-marker
-		       (make-marker)
-		       (or (next-single-property-change (point)
-							'mime-view-entity)
-			   (point-max)))))
+    (while (and (not (eobp)) entity)
+      (setq next (set-marker
+		  (make-marker)
+		  (next-single-property-change (point) 'mime-view-entity
+					       nil (point-max))))
       (let ((types (mime-entity-content-type entity)))
 	(while (eq 'multipart (mime-content-type-primary-type types))
 	  (setq entity (car (mime-entity-children entity))
@@ -3029,9 +3026,10 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 			      (get-text-property next 'mime-view-entity)))
 		     (setq next
 			   (next-single-property-change next
-							'mime-view-entity))))))
-	    (setq next (or (next-single-property-change next 'mime-view-entity)
-			   (point-max)))
+							'mime-view-entity
+							nil (point-max)))))))
+	    (setq next (next-single-property-change next 'mime-view-entity
+						    nil (point-max)))
 	    (save-restriction
 	      (narrow-to-region (point) next)
 	      (gnus-article-prepare-mime-display)
@@ -4743,8 +4741,8 @@ specified by `gnus-button-alist'."
     (set-buffer gnus-article-buffer)
     (let ((buffer-read-only nil)
 	  (inhibit-point-motion-hooks t)
-	  (limit (or (next-single-property-change end 'mime-view-entity)
-		     (point-max))))
+	  (limit (next-single-property-change end 'mime-view-entity
+					      nil (point-max))))
       (if (get-text-property end 'invisible)
 	  (gnus-article-unhide-text end limit)
 	(gnus-article-hide-text end limit gnus-hidden-properties)))))
