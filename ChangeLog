@@ -1,5 +1,10 @@
 2002-01-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/nnheader.el (std11-extract-addresses-components): Protect
+	against nil argument.
+
+2002-01-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/nnheader.el (mail-header-field-value): Alias to
 	`std11-field-value'.
 	(std11-field-value): New function.

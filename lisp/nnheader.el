@@ -1237,15 +1237,16 @@ find-file-hooks, etc.
 
   (defalias 'mail-header-fold-field 'std11-fold-field)
 
-  (defun-maybe std11-extract-addresses-components (string)
+  (defun std11-extract-addresses-components (string)
     "Extract a list of full name and canonical address from STRING.  Each
 element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
 If no name can be extracted, FULL-NAME will be nil."
-    (mapcar (function
-	     (lambda (structure)
-	       (list (std11-full-name-string structure)
-		     (std11-address-string structure))))
-	    (std11-parse-addresses-string (std11-unfold-string string))))
+    (when string
+      (mapcar (function
+	       (lambda (structure)
+		 (list (std11-full-name-string structure)
+		       (std11-address-string structure))))
+	      (std11-parse-addresses-string (std11-unfold-string string)))))
 
   (defun mail-header-parse-addresses (string)
     "Parse STRING and return a list of MAILBOX / DISPLAY-NAME pairs."
