@@ -31,6 +31,15 @@
 
 ;; Product information of this gnus.
 (product-provide 'gnus-vers
-    (product-define "Nana-gnus" nil '(7 1 0 14)))
+    (product-define "Nana-gnus" nil '(7 1 0 15)))
+
+(defconst gnus-product-name (product-name (product-find 'gnus-vers))
+  "Product name of this version of gnus.")
+
+(defconst gnus-version-number (mapconcat
+			       'number-to-string
+			       (product-version (product-find 'gnus-vers))
+			       ".")
+  "Version number for this version of gnus.")
 
 ;; gnus-vers.el ends here
