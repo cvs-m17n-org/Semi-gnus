@@ -1107,11 +1107,16 @@ the actual number of articles toggled is returned."
       (unless (eobp)
 	(gnus-agent-copy-nov-line (car articles))
 	(setq articles (cdr articles))))
+    (set-buffer nntp-server-buffer)
     (when articles
       (let (b e)
 	(set-buffer gnus-agent-overview-buffer)
 	(setq b (point)
 	      e (point-max))
+	(while (and (not (eobp))
+		    (<= (read (current-buffer)) (car articles)))
+	  (forward-line 1)
+	  (setq b (point)))
 	(set-buffer nntp-server-buffer)
 	(insert-buffer-substring gnus-agent-overview-buffer b e)))))
 
@@ -1809,8 +1814,9 @@ The following commands are available:
   (let ((init-file-user "")
 	(gnus-always-read-dribble-file t))
     (gnus))
-  (gnus-group-send-queue)
-  (gnus-agent-fetch-session))
+  (let ((gnus-agent-confirmation-function 'gnus-agent-batch-confirmation))
+    (gnus-group-send-queue)
+    (gnus-agent-fetch-session)))
 
 (defun gnus-agent-retrieve-headers (articles group &optional fetch-old)
   (save-excursion
@@ -1832,36 +1838,38 @@ The following commands are available:
 	      (push (read (current-buffer)) cached-articles))
 	    (forward-line 1))
 	  (setq cached-articles (sort cached-articles '<))))
-      (when (setq uncached-articles
-		  (gnus-set-difference articles cached-articles))
+      (if (setq uncached-articles
+		(gnus-set-difference articles cached-articles))
+	  (progn
+	    (set-buffer nntp-server-buffer)
+	    (erase-buffer)
+	    (let (gnus-agent-cache)
+	      (unless (eq 'nov
+			  (gnus-retrieve-headers
+			   uncached-articles group fetch-old))
+		(nnvirtual-convert-headers)))
+	    (set-buffer gnus-agent-overview-buffer)
+	    (erase-buffer)
+	    (set-buffer nntp-server-buffer)
+	    (copy-to-buffer gnus-agent-overview-buffer (point-min) (point-max))
+	    (when (and uncached-articles (file-exists-p file))
+	      (gnus-agent-braid-nov group uncached-articles file))
+	    (set-buffer nntp-server-buffer)
+	    (write-region-as-coding-system gnus-agent-file-coding-system
+					   (point-min) (point-max)
+					   file nil 'silent)
+	    (gnus-agent-load-alist group)
+	    (gnus-agent-save-alist group uncached-articles nil)
+	    (gnus-agent-open-history)
+	    (setq gnus-agent-current-history (gnus-agent-history-buffer))
+	    (gnus-agent-enter-history
+	     "last-header-fetched-for-session"
+	     (list (cons group (nth (- (length  articles) 1) articles)))
+	     (time-to-days (current-time)))
+	    (gnus-agent-save-history))
 	(set-buffer nntp-server-buffer)
 	(erase-buffer)
-	(let (gnus-agent-cache)
-	  (unless (eq 'nov
-		      (gnus-retrieve-headers
-		       uncached-articles group fetch-old))
-	    (nnvirtual-convert-headers)))
-	(set-buffer gnus-agent-overview-buffer)
-	(erase-buffer)
-	(set-buffer nntp-server-buffer)
-	(copy-to-buffer gnus-agent-overview-buffer (point-min) (point-max))
-	(when (and uncached-articles (file-exists-p file))
-	  (gnus-agent-braid-nov group uncached-articles file))
-	(write-region-as-coding-system gnus-agent-file-coding-system
-				       (point-min) (point-max)
-				       file nil 'silent)
-	(gnus-agent-load-alist group)
-	(gnus-agent-save-alist group uncached-articles nil)
-	(gnus-agent-open-history)
-	(setq gnus-agent-current-history (gnus-agent-history-buffer))
-	(gnus-agent-enter-history
-	 "last-header-fetched-for-session"
-	 (list (cons group (nth (- (length  articles) 1) articles)))
-	 (time-to-days (current-time)))
-	(gnus-agent-save-history)))
-    (set-buffer nntp-server-buffer)
-    (erase-buffer)
-    (insert-buffer-substring gnus-agent-overview-buffer)
+	(insert-buffer-substring gnus-agent-overview-buffer)))
     (if (and fetch-old
 	     (not (numberp fetch-old)))
 	t				; Don't remove anything.

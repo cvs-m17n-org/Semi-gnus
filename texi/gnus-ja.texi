@@ -15863,12 +15863,12 @@ file
 * Server Agent Commands::       
 @end menu
 
-完全な一括取得を行うには、コマンド行から以下のおまじないを
-実行すればできます。
+完全にバッチで動作させるには、コマンド行から以下のおまじないを実行すれば
+できます。
 
-@cindex gnus-agent-batch-fetch
+@cindex gnus-agent-batch
 @example
-$ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
+$ emacs -batch -l ~/.gnus.el -f gnus-agent-batch
 @end example
 
 @node Group Agent Commands
