@@ -6842,6 +6842,19 @@ If ARG is a positive number, turn MIME processing on."
 	  (> (prefix-numeric-value arg) 0)))
   (gnus-summary-select-article t 'force))
 
+(defun gnus-summary-set-default-charset (charset)
+  "Display the current article with MIME CHARSET."
+  (interactive
+   (list (completing-read "MIME-charset = "
+			  (mapcar (function
+				   (lambda (cs)
+				     (list (symbol-name cs))
+				     ))
+				  (mime-charset-list)))))
+  (let ((default-mime-charset charset))
+    (gnus-summary-select-article t 'force)
+    ))
+
 (defun gnus-summary-caesar-message (&optional arg)
   "Caesar rotate the current article by 13.
 The numerical prefix specifies how many places to rotate each letter
