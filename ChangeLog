@@ -1,5 +1,10 @@
 1998-12-07  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/message.el (message-get-parameter-with-eval): Call
+	`message-get-parameter' with arg `key' first.
+
+1998-12-07  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.050.
 
 	* Sync up with Pterodactyl Gnus 0.65.
