@@ -1,3 +1,9 @@
+1999-02-17  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* aclocal.m4: install .el files to site-lisp/gnus instead of
+	site-lisp.
+	* configure: Ditto.
+	
 1999-02-15  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Bug fix when
