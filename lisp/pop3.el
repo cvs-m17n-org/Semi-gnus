@@ -532,7 +532,7 @@ where
   (let ((start pop3-read-point) end)
     (set-buffer (process-buffer process))
     (goto-char start)
-    (while (not (re-search-forward "\\.\r\n" nil t))
+    (while (not (re-search-forward "^\\.\r\n" nil t))
       (accept-process-output process 3)
       (goto-char start))
     (setq pop3-read-point (point-marker))
