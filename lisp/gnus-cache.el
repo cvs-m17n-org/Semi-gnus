@@ -687,7 +687,7 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
 		 gnus-cache-active-altered))
     (gnus-write-active-file-as-coding-system
      gnus-cache-write-file-coding-system
-     gnus-cache-active-file gnus-cache-active-hashtb)
+     gnus-cache-active-file gnus-cache-active-hashtb t)
     ;; Mark the active hashtb as unaltered.
     (setq gnus-cache-active-altered nil)))
 

@@ -119,11 +119,19 @@ fetched will be limited to it. If not a positive integer, never consider it."
   (setq gnus-agent t)
   (gnus-agent-read-servers)
   (gnus-category-read)
-  (setq gnus-agent-overview-buffer
-	(gnus-get-buffer-create " *Gnus agent overview*"))
+  (gnus-agent-create-buffer)
   (add-hook 'gnus-group-mode-hook 'gnus-agent-mode)
   (add-hook 'gnus-summary-mode-hook 'gnus-agent-mode)
   (add-hook 'gnus-server-mode-hook 'gnus-agent-mode))
+
+(defun gnus-agent-create-buffer ()
+  (if (gnus-buffer-live-p gnus-agent-overview-buffer)
+      t
+    (setq gnus-agent-overview-buffer
+	  (gnus-get-buffer-create " *Gnus agent overview*"))
+    (with-current-buffer gnus-agent-overview-buffer
+      (set-buffer-multibyte t))
+    nil))
 
 (gnus-add-shutdown 'gnus-close-agent 'gnus)
 
@@ -166,7 +174,8 @@ fetched will be limited to it. If not a positive integer, never consider it."
 (defun gnus-agent-start-fetch ()
   "Initialize data structures for efficient fetching."
   (gnus-agent-open-history)
-  (setq gnus-agent-current-history (gnus-agent-history-buffer)))
+  (setq gnus-agent-current-history (gnus-agent-history-buffer))
+  (gnus-agent-create-buffer))
 
 (defun gnus-agent-stop-fetch ()
   "Save all data structures and clean up."
@@ -979,13 +988,7 @@ the actual number of articles toggled is returned."
 							   group)))
 		 ;; `gnus-agent-overview-buffer' may be killed for
 		 ;; timeout reason. If so, recreate it.
-		 (if (gnus-buffer-live-p gnus-agent-overview-buffer)
-		     t
-		   (setq gnus-agent-overview-buffer
-			 (gnus-get-buffer-create " *Gnus agent overview*"))
-		   (with-current-buffer gnus-agent-overview-buffer
-		     (set-buffer-multibyte t))
-		   nil)))
+		 (gnus-agent-create-buffer)))
       (setq category (gnus-group-category group))
       (setq predicate
 	    (gnus-get-predicate

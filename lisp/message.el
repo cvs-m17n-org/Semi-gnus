@@ -418,6 +418,13 @@ The provided functions are:
   :group 'message-interface
   :type 'regexp)
 
+
+(defcustom message-forward-ignored-headers nil
+  "*All headers that match this regexp will be deleted when forwarding a message."
+  :group 'message-forwarding
+  :type '(choice (const :tag "None" nil)
+		 regexp))
+
 (defcustom message-ignored-cited-headers "."
   "*Delete these headers from the messages you yank."
   :group 'message-insertion
@@ -823,6 +830,13 @@ Valid valued are `unique' and `unsent'."
   "Default charset used in non-MULE XEmacsen."
   :group 'message
   :type 'symbol)
+
+(defcustom message-dont-reply-to-names rmail-dont-reply-to-names
+  "*A regexp specifying names to prune when doing wide replies.
+A value of nil means exclude your own name only."
+  :group 'message
+  :type '(choice (const :tag "Yourself" nil)
+		 regexp))
 
 ;;; Internal variables.
 ;;; Well, not really internal.
@@ -1284,6 +1298,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 	(insert (car headers) ?\n))))
     (setq headers (cdr headers))))
 
+
 (defun message-fetch-reply-field (header)
   "Fetch FIELD from the message we're replying to."
   (let ((buffer (message-eval-parameter message-reply-buffer)))
@@ -1652,12 +1667,12 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
 	 '(message-font-lock-keywords t)))
   (make-local-variable 'adaptive-fill-regexp)
   (setq adaptive-fill-regexp
-	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|" adaptive-fill-regexp))
+	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|" adaptive-fill-regexp))
   (unless (boundp 'adaptive-fill-first-line-regexp)
     (setq adaptive-fill-first-line-regexp nil))
   (make-local-variable 'adaptive-fill-first-line-regexp)
   (setq adaptive-fill-first-line-regexp
-	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|"
+	(concat "[ \t]*[-a-z0-9A-Z]*\\(>[ \t]*\\)+[ \t]*\\|"
 		adaptive-fill-first-line-regexp))
   (make-local-variable 'indent-tabs-mode) ;Turn off tabs for indentation.
   (setq indent-tabs-mode nil)
@@ -2356,22 +2371,20 @@ the user from the mailer."
 	(message-fix-before-sending)
 	(while (and success
 		    (setq elem (pop alist)))
-	  (when (and (or (not (funcall (cadr elem)))
-			 (and (or (not (memq (car elem)
-					     message-sent-message-via))
-				  (y-or-n-p
-				   (format
-				    "Already sent message via %s; resend? "
-				    (car elem))))
-			      (setq success (funcall (caddr elem) arg)))))
+	  (when (or (not (funcall (cadr elem)))
+		    (and (or (not (memq (car elem)
+					message-sent-message-via))
+			     (y-or-n-p
+			      (format
+			       "Already sent message via %s; resend? "
+			       (car elem))))
+			 (setq success (funcall (caddr elem) arg))))
 	    (setq sent t))))
-      (unless sent
+      (unless (or sent (not success))
 	(error "No methods specified to send by"))
       (prog1
 	  (when (and success sent)
 	    (message-do-fcc)
-	    ;;(when (fboundp 'mail-hist-put-headers-into-history)
-	    ;; (mail-hist-put-headers-into-history))
 	    (save-excursion
 	      (run-hooks 'message-sent-hook))
 	    (message "Sending...done")
@@ -4069,9 +4082,9 @@ directs your response to " (if (string-match "," mft)
 
 A typical situation where Mail-Followup-To is used is when the author thinks
 that further discussion should take place only in "
-		  (if (string-match "," mft)
-		      "the specified mailing lists"
-		    "that mailing list") ".")))
+			     (if (string-match "," mft)
+				 "the specified mailing lists"
+			       "that mailing list") ".")))
 	(setq follow-to (list (cons 'To mft)))
 	(when mct
 	  (push (cons 'Cc mct) follow-to)))
@@ -4088,8 +4101,9 @@ that further discussion should take place only in "
 	    (while (re-search-forward "[ \t]+" nil t)
 	      (replace-match " " t t))
 	    ;; Remove addresses that match `rmail-dont-reply-to-names'.
-	    (insert (prog1 (rmail-dont-reply-to (buffer-string))
-		      (erase-buffer)))
+	    (let ((rmail-dont-reply-to-names message-dont-reply-to-names))
+	      (insert (prog1 (rmail-dont-reply-to (buffer-string))
+			(erase-buffer))))
 	    (goto-char (point-min))
 	    ;; Perhaps Mail-Copies-To: never removed the only address?
 	    (when (eobp)

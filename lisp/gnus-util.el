@@ -986,7 +986,8 @@ ARG is passed to the first function."
     t))
 
 (static-if (boundp 'MULE)
-    (defun gnus-write-active-file-as-coding-system (coding-system file hashtb)
+    (defun gnus-write-active-file-as-coding-system
+      (coding-system file hashtb &optional full-names)
       (let ((output-coding-system coding-system))
 	(with-temp-file file
 	  (mapatoms
@@ -995,11 +996,14 @@ ARG is passed to the first function."
 			(boundp sym)
 			(symbol-value sym))
 	       (insert (format "%s %d %d y\n"
-			       (gnus-group-real-name (symbol-name sym))
+			       (if full-names
+				   (symbol-name sym)
+				 (gnus-group-real-name (symbol-name sym)))
 			       (cdr (symbol-value sym))
 			       (car (symbol-value sym))))))
 	   hashtb))))
-  (defun gnus-write-active-file-as-coding-system (coding-system file hashtb)
+  (defun gnus-write-active-file-as-coding-system
+    (coding-system file hashtb &optional full-names)
     (let ((coding-system-for-write coding-system))
       (with-temp-file file
 	(mapatoms
@@ -1008,7 +1012,9 @@ ARG is passed to the first function."
 		      (boundp sym)
 		      (symbol-value sym))
 	     (insert (format "%s %d %d y\n"
-			     (gnus-group-real-name (symbol-name sym))
+			     (if full-names
+				 (symbol-name sym)
+			       (gnus-group-real-name (symbol-name sym)))
 			     (cdr (symbol-value sym))
 			     (car (symbol-value sym))))))
 	 hashtb))))

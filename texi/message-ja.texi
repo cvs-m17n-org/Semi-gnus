@@ -215,7 +215,7 @@ Message は返答が何処に行くかを決定するために普通の方法を使いますが、
 に使われます (@pxref{Reply})。
 
 
-@findex rmail-dont-reply-to-names
+@findex message-dont-reply-to-names
 正規表現 @code{rmail-dont-reply-to-names} に合致するアドレスは @code{Cc} 
 ヘッダーから取り除かれます。
 
@@ -271,26 +271,10 @@ Message はフォローアップがどこに行くかを普通の方法を使って決定しますが、
 ニュースを使います。
 
 @table @code
-@item message-forward-state-separator
-@vindex message-forward-start-separator
-転送されるメッセージの前に挿入される区切りです。初期値は @*
-@samp{------- Start of forwarded message -------\n} です。
-
-@vindex message-forward-end-separator
-@item message-forward-end-separator
-転送されるメッセージの後に挿入される区切りです。初期値は @*
-@samp{------- End of forwarded message -------\n} です。
-
-@item message-signature-before-forwarded-message
-@vindex message-signature-before-forwarded-message
-もしこの変数が @code{t} であると、それが初期値ですが、あなたの個人的な署
-名が転送されるメッセージの前に挿入されます。もしそうでなければ、転送され
-るメッセージは新しいメールの最初に挿入されます。
-
-@item message-included-forward-headers
-@vindex message-included-forward-headers
-これは正規表現で、それは転送されるメッセージに含まれるヘッダー行に合致す
-るものです。
+@item message-ignored-forward-headers
+@vindex message-ignored-forward-headers
+この正規表現に合致するすべてのヘッダーが、転送されるメッセージから削除さ
+れます。
 
 @end table
 
