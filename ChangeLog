@@ -1,3 +1,8 @@
+1998-12-11  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-find-file-noselect): Call
+	`find-file-noselect-as-specified-coding-system' directly.
+
 1998-12-10  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/pop3.el (pop3-movemail): Use `write-region-as-binary'
