@@ -1852,6 +1852,10 @@ Only applicable to spam groups.")
     "The ifile summary exit ham processor.
 Only applicable to non-spam (unclassified and ham) groups.")
 
+  (defvar gnus-group-ham-exit-processor-bogofilter "bogofilter-ham"
+    "The Bogofilter summary exit ham processor.
+Only applicable to non-spam (unclassified and ham) groups.")
+
   (defvar gnus-group-ham-exit-processor-stat "stat-ham"
     "The spam-stat summary exit ham processor.
 Only applicable to non-spam (unclassified and ham) groups.")
@@ -1875,6 +1879,7 @@ Only applicable to non-spam (unclassified and ham) groups.")
 				   (variable-item gnus-group-spam-exit-processor-stat)
 				   (variable-item gnus-group-spam-exit-processor-bogofilter)
 				   (variable-item gnus-group-spam-exit-processor-blacklist)
+				   (variable-item gnus-group-ham-exit-processor-bogofilter)
 				   (variable-item gnus-group-ham-exit-processor-ifile)
 				   (variable-item gnus-group-ham-exit-processor-stat)
 				   (variable-item gnus-group-ham-exit-processor-whitelist)
@@ -1898,6 +1903,7 @@ for mail groups."
 				      (variable-item gnus-group-spam-exit-processor-stat)
 				      (variable-item gnus-group-spam-exit-processor-bogofilter)
 				      (variable-item gnus-group-spam-exit-processor-blacklist)
+				      (variable-item gnus-group-ham-exit-processor-bogofilter)
 				      (variable-item gnus-group-ham-exit-processor-ifile)
 				      (variable-item gnus-group-ham-exit-processor-stat)
 				      (variable-item gnus-group-ham-exit-processor-whitelist)
