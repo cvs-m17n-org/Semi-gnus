@@ -335,7 +335,17 @@ agent minor mode in all Gnus buffers."
     (setq gnus-agent-send-mail-function message-send-mail-function
 	  message-send-mail-function 'gnus-agent-send-mail))
   (unless gnus-agent-covered-methods
-    (setq gnus-agent-covered-methods (list gnus-select-method))))
+    (setq gnus-agent-covered-methods (gnus-agent-covered-methods))))
+
+(defun gnus-agent-covered-methods ()
+  "Make a list of default covered methods."
+  (let ((methods (cons gnus-select-method gnus-secondary-select-methods))
+	method rest)
+    (while methods
+      (setq method (pop methods))
+      (when (get (car method) 'gnus-agent-covered-method)
+	(push method rest)))
+    rest))
 
 (defun gnus-agent-queue-setup ()
   "Make sure the queue group exists."
