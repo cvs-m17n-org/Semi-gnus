@@ -291,9 +291,6 @@ Within a string, %s is replaced with the server address and %p with
 port number on server.  The program should accept IMAP commands on
 stdin and return responses to stdout.")
 
-(eval-and-compile
-  (autoload 'mail-source-read-passwd "mail-source"))
-
 
 
 ;;; Internal functions.
@@ -1115,9 +1112,8 @@ If SEND-IF-FORCE, only send authinfo to the server if the
 	   (or passwd
 	       nntp-authinfo-password
 	       (setq nntp-authinfo-password
-		     (mail-source-read-passwd
-		      (format "NNTP (%s@%s) password: "
-			      user nntp-address))))))))))
+		     (read-passwd (format "NNTP (%s@%s) password: "
+					  user nntp-address))))))))))
 
 (defun nntp-send-nosy-authinfo ()
   "Send the AUTHINFO to the nntp server."
@@ -1126,8 +1122,8 @@ If SEND-IF-FORCE, only send authinfo to the server if the
       (nntp-send-command "^3.*\r?\n" "AUTHINFO USER" user)
       (when t				;???Should check if AUTHINFO succeeded
 	(nntp-send-command "^2.*\r?\n" "AUTHINFO PASS"
-			   (mail-source-read-passwd "NNTP (%s@%s) password: "
-						    user nntp-address))))))
+			   (read-passwd (format "NNTP (%s@%s) password: "
+						user nntp-address)))))))
 
 (defun nntp-send-authinfo-from-file ()
   "Send the AUTHINFO to the nntp server.
@@ -1752,7 +1748,7 @@ via telnet.")
 	 proc (concat
 	       (or nntp-telnet-passwd
 		   (setq nntp-telnet-passwd
-			 (mail-source-read-passwd "Password: ")))
+			 (read-passwd "Password: ")))
 	       "\n"))
 	(nntp-wait-for-string nntp-telnet-shell-prompt)
 	(process-send-string
@@ -1909,8 +1905,7 @@ Please refer to the following variables to customize the connection:
 			     (concat
 			      (or nntp-via-user-password
 				  (setq nntp-via-user-password
-					(mail-source-read-passwd
-					 "Password: ")))
+					(read-passwd "Password: ")))
 			      "\n"))
 	(nntp-wait-for-string nntp-via-shell-prompt)
 	(let ((real-telnet-command `("exec"

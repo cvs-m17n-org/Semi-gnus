@@ -133,7 +133,7 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     ;; query for password
     (if (and pop3-password-required (not pop3-password))
 	(setq pop3-password
-	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
+	      (read-passwd (format "Password for %s: " pop3-maildrop))))
     (cond ((equal 'apop pop3-authentication-scheme)
 	   (pop3-apop process pop3-maildrop))
 	  ((equal 'pass pop3-authentication-scheme)
@@ -185,7 +185,7 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     ;; query for password
     (if (and pop3-password-required (not pop3-password))
 	(setq pop3-password
-	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
+	      (read-passwd (format "Password for %s: " pop3-maildrop))))
     (cond ((equal 'apop pop3-authentication-scheme)
 	   (pop3-apop process pop3-maildrop))
 	  ((equal 'pass pop3-authentication-scheme)
@@ -304,17 +304,6 @@ Return the response string if optional second argument RETURN is non-nil."
 	      (buffer-substring (point) match-end)
 	    t)
 	  )))))
-
-(defvar pop3-read-passwd nil)
-(defun pop3-read-passwd (prompt)
-  (if (not pop3-read-passwd)
-      (if (fboundp 'read-passwd)
-	  (setq pop3-read-passwd 'read-passwd)
-	(if (load "passwd" t)
-	    (setq pop3-read-passwd 'read-passwd)
-	  (autoload 'ange-ftp-read-passwd "ange-ftp")
-	  (setq pop3-read-passwd 'ange-ftp-read-passwd))))
-  (funcall pop3-read-passwd prompt))
 
 (defun pop3-clean-region (start end)
   (setq end (set-marker (make-marker) end))
@@ -558,7 +547,7 @@ Check whether the 4th argument CODING-SYSTEM is allowed"
   (let ((pass pop3-password))
     (if (and pop3-password-required (not pass))
 	(setq pass
-	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
+	      (read-passwd (format "Password for %s: " pop3-maildrop))))
     (if pass
 	(let ((hash (pop3-md5 (concat pop3-timestamp pass))))
 	  (pop3-send-command process (format "APOP %s %s" user hash))
