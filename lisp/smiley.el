@@ -201,6 +201,16 @@ A list of images is returned."
 	(put-text-property beg (or end (point-max)) 'smilified nil)
 	images))))
 
+;;;###autoload
+(defun smiley-buffer (&optional buffer)
+  "Run `smiley-region' at the buffer, specified in the argument or
+interactively. If there's no argument, do it at the current buffer"
+  (interactive "bBuffer to run smiley-region: ")
+  (save-excursion
+    (if buffer
+	(set-buffer (get-buffer buffer)))
+    (smiley-region (point-min) (point-max))))
+
 (defun smiley-toggle-buffer (&optional arg)
   "Toggle displaying smiley faces in article buffer.
 With arg, turn displaying on if and only if arg is positive."
