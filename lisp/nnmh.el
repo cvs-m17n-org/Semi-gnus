@@ -145,6 +145,7 @@
 	 (string-to-int (file-name-nondirectory file)))))
 
 (deffoo nnmh-request-group (group &optional server dont-check)
+  (nnheader-init-server-buffer)
   (nnmh-possibly-change-directory group server)
   (let ((pathname (nnmail-group-pathname group nnmh-directory))
 	(pathname-coding-system 'binary)
@@ -186,6 +187,7 @@
 
 (deffoo nnmh-request-list (&optional server dir)
   (nnheader-insert "")
+  (nnmh-possibly-change-directory nil server)
   (let ((pathname-coding-system 'binary)
 	(nnmh-toplev
 	 (file-truename (or dir (file-name-as-directory nnmh-directory)))))
@@ -199,15 +201,14 @@
   ;; Recurse down all directories.
   (let ((dirs (and (file-readable-p dir)
 		   (> (nth 1 (file-attributes (file-chase-links dir))) 2)
-		   (directory-files dir t nil t)))
+		   (nnheader-directory-files dir t nil t)))
 	rdir)
     ;; Recurse down directories.
     (while (setq rdir (pop dirs))
-      (when (and (not (member (file-name-nondirectory rdir) '("." "..")))
-		 (file-directory-p rdir)
+      (when (and (file-directory-p rdir)
 		 (file-readable-p rdir)
-		 (not (string= (file-truename rdir)
-			       (file-truename dir))))
+		 (not (equal (file-truename rdir)
+			     (file-truename dir))))
 	(nnmh-request-list-1 rdir))))
   ;; For each directory, generate an active file line.
   (unless (string= (expand-file-name nnmh-toplev) dir)
