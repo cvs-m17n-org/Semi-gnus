@@ -1,3 +1,41 @@
+1999-01-31  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* Chaos: Version 1.12.4 was released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 1.12.4.
+
+	* lisp/gnus-sum.el: Abolish macro `gnus-nov-read-integer',
+	`gnus-nov-skip-field' and `gnus-nov-field'.
+	(gnus-nov-parse-line): Use `nnheader-nov-field' and
+	`nnheader-nov-read-integer' instead of `gnus-nov-field' and
+	`gnus-nov-read-integer'.
+	(gnus-get-newsgroup-headers-xover): Use
+	`gnus-retrieve-parsed-headers'.
+
+	* lisp/gnus-cache.el (gnus-cache-retrieve-parsed-headers): Use
+	`gnus-cache-braid-headers',
+	`nnheader-get-newsgroup-headers-xover*' and
+	`nnheader-retrieve-headers-from-directory*' instead of
+	`gnus-get-newsgroup-headers-xover', `gnus-cache-braid-parsed-nov'
+	nor `gnus-cache-braid-parsed-heads'; abolish function
+	`gnus-cache-braid-parsed-nov' and `gnus-cache-braid-parsed-nov'.
+	(gnus-cache-braid-headers): New function.
+
+	* lisp/nnheader.el (nnheader-file-name-translation-alist): Modify
+	DOC-string to sync with Pterodactyl Gnus v0.66.
+	(nnheader-nov-read-integer): Use `char-after' instead of
+	`following-char' <to sync with Pterodactyl Gnus v0.66>; use
+	`(search-forward "\t" eol 'move)' instead of `(forward-char 1)' as
+	same as `gnus-nov-read-integer'.
+	(nnheader-parse-nov): Use `char-after' instead of `following-char'
+	<to sync with Pterodactyl Gnus v0.66>.
+	(nnheader-retrieve-headers-from-directory*): New function.
+	(nnheader-retrieve-headers-from-directory): Use
+	`nnheader-retrieve-headers-from-directory*'.
+	(nnheader-get-newsgroup-headers-xover*): New function.
+	(nnheader-insert-references): Modify comment to sync with
+	Pterodactyl Gnus v0.66.
+
 1999-01-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* Chaos: Version 1.12.3 was released.
