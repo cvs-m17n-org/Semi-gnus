@@ -161,28 +161,15 @@ There are three ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
 
 USING emacs-w3m (and Emacs/W3)
 ==============================
-The web based backend `nnshimbun' uses the shimbun modules which are
-included in emacs-w3m package (and the other web based backends of T-
-gnus requires Emacs/W3).  emacs-w3m is an interface program to the
-external command w3m, visit the following pages for more information.
+The `nnshimbun' web based back end has been moved to the emacs-w3m
+package at 18 June 2003.  You need to download the latest version of
+emacs-w3m if you want to browse web newspapers using T-gnus as before.
+In that case, you *must* delete nnshimbun.el and nnshimbun.elc files
+originated by T-gnus.  Emacs-w3m is an Emacs interface to the external
+command w3m, visit the following pages for more information:
 
    http://emacs-w3m.namazu.org/
-   http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
+   http://w3m.sourceforge.net/
 
-If you wish to build T-gnus to be able to use emacs-w3m and nnshimbun,
-you have to specify the path where emacs-w3m is installed using the
-configure option `--with-addpath=' (for Emacs/W3, use the configure
-option `--with-w3=' or editing the file `~/.lpath.el').  Here is an
-example for that:
-
-   % ./configure --with-emacs=mule\
-     --with-addpath=~/elisp/emu/:~/elisp/apel/: ... :~/elisp/w3m/\
-     --with-w3=/usr/local/share/mule/site-lisp/w3/
-   % make install
-
-;; Don't mind if configure says "W3... not found".  It is currently
-;; malfunction when the configure option `--with-w3=' is not used even
-;; if the path of Emacs/W3 is specified in the file `~/.lpath.el'.
-
-;; By the way, does anyone know where do we find Emacs/W3 package
-;; which is suitable to Mule 2.3 based on Emacs 19.34?
+Please give up the idea to use Emacs/W3 under Mule 2.3.  There is no
+information, sorry.
