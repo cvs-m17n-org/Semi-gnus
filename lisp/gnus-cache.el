@@ -183,7 +183,8 @@ it's not cached."
 	    (when (> (buffer-size) 0)
 	      (gnus-write-buffer-as-coding-system
 	       gnus-cache-write-file-coding-system file)
-	      (setq headers (nnheader-parse-head t))
+	      (nnheader-remove-body)
+	      (setq headers (nnheader-parse-naked-head))
 	      (mail-header-set-number headers number)
 	      (gnus-cache-change-buffer group)
 	      (set-buffer (cdr gnus-cache-buffer))

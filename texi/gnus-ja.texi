@@ -5657,6 +5657,22 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 $B$9(B (@code{gnus-unseen-mark})$B!#(B@code{gnus-recent-mark} $B$H8+Hf$Y$F2<$5$$!#(B
 
 @item
+@vindex gnus-undownloaded-mark
+gnus $B%(!<%8%'%s%H(B @pxref{Agent Basics} $B$r;H$C$F$$$k$H$-!"$$$/$D$+$N5-;v(B
+$B$O%@%&%s%m!<%I$5$l$F$$$J$$$+$b$7$l$^$;$s!#%*%U%i%$%s(B (unplugged) $B$N>uBV(B
+$B$G$O$=$N$h$&$J5-;v$r8+$k$3$H$,$G$-$^$;$s!#$=$l$i$N5-;v$K$O:G=i$N7e(B
+$B$K(B @samp{@@} $B$N0u$,IU$-$^$9!#(B($BJQ?t(B @code{gnus-undownloaded-mark} $B$G$I$N(B
+$BJ8;z$r;H$&$+$r@)8f$7$^$9!#(B)
+
+@item
+@vindex gnus-downloadable-mark
+gnus $B%(!<%8%'%s%H(B @pxref{Agent Basics} $B$O$$$/$D$+$N5-;v$r<+F0E*$K%@%&%s(B
+$B%m!<%I$7$^$9$,!"<+F0E*$K%@%&%s%m!<%I$5$l$J$$5-;v$K$b%@%&%s%m!<%I$N$?$a$N(B
+$BL@<(E*$J0u$rIU$1$k$3$H$O2DG=$G$9!#$=$N$h$&$JL@<(E*$K0u$,IU$1$i$l$?5-;v$K(B
+$B$O!":G=i$N7e$K(B @samp{%} $B$N0u$,IU$-$^$9!#(B($BJQ(B
+$B?t(B @code{gnus-downloadable-mark} $B$G$I$NJ8;z$r;H$&$+$r@)8f$7$^$9!#(B)
+
+@item
 @vindex gnus-not-empty-thread-mark
 @vindex gnus-empty-thread-mark
 $B$b$7(B @samp{%e} $B$N;EMM$,;H$o$l$k$H!"%9%l%C%I$,$"$k$+$I$&$+$O!";07eL\(B
@@ -19024,7 +19040,12 @@ gnus $B$O4X?t(B @code{gnus-user-format-function-}@samp{foo} $B$r8F$S=P$7$^$9!
 $B%7%s%\%k$N$I$A$i$+$G$"$kI,MW$,$"$j$^$9!#%^%&%9$,%W%m%Q%F%#$N@_Dj$5$l$F$$(B
 $B$k%F%-%9%H$N>e$rDL2a$9$k$H!"%P%k!<%s%&%#%s%I%&$,8=$l$F!"J8;zNs$rI=<($7$^(B
 $B$9!#$3$l$N>\$7$$>pJs$O(B @ref{(emacs)Help Echo} (GNU Emacs) $B$^$?(B
-$B$O(B @code{balloon-help-mode} (XEmacs) $B$N@bL@J8;zNs$r;2>H$7$F$/$@$5$$!#(B
+$B$O(B @code{balloon-help-mode} (XEmacs) $B$N@bL@J8;zNs$r;2>H$7$F$/$@$5$$!#(B($B5;(B
+$B=QE*$JM}M3$N$?$a$K!"%.%#%a(B (guillemets: @footnote{guillemets ($BJ)8l(B) $B$O%.%e(B
+$B%a$H$bI=5-$5$l$^$9!#F|K\8l$N!V!W$KEv$?$k$b$N$G!"8}F,I=8=$rI=5-$7$?$j!"6/(B
+$BD4$7$?$$C18l$r0O$`!"2?$+$+$i$N0zMQItJ,$r0O$`!"=qJ*Ey$N%?%$%H%k$r5-$9EyMM!9(B
+$B$K;H$o$l$^$9!#(B}) $B$O$3$N@a$G$O(B @samp{<<} $B$*$h$S(B @samp{>>} $B$H$7$F6a;w$5$l(B
+$B$^$7$?!#(B)
 
 $B$3$l$O%0%k!<%W%P%C%U%!$NBeBX<jK!$G$9(B:
 

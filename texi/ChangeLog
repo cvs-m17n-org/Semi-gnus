@@ -1,3 +1,11 @@
+2002-10-17  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* gnus.texi (Other Marks): Document gnus-downloadable-mark and
+	gnus-undownloaded-mark.  Adapted idea from Sriram Karra
+	<karra@shakti.homelinux.net>.
+	(Formatting Fonts): Say that guillemets are wrong.  (How to enter
+	guillemets in Texinfo files?)
+
 2002-10-12  Simon Josefsson  <jas@extundo.com>
 
 	* message.texi (Movement): Add.
