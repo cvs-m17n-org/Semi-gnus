@@ -988,8 +988,8 @@ Thwarting Email Spam
 * Anti-Spam Basics::            $B$?$/$5$s$N(B spam $B$r8:$i$94JC1$JJ}K!(B
 * SpamAssassin::                Spam $BBP:v%D!<%k$N;H$$J}(B
 * Hashcash::                    CPU $B;~4V$rHq$d$7$F(B spam $BB`<#$9$k(B
-* Filtering Spam Using spam.el::  
-* Filtering Spam Using Statistics (spam-stat.el)::  
+* Filtering Spam Using The Spam ELisp Package::  
+* Filtering Spam Using Statistics with spam-stat::  
 
 Appendices
 
@@ -20640,8 +20640,8 @@ Gnus $B$O!"%9%3%"IU$1!"%9%l%C%I$N7A@.!"%9%l%C%IHf3S$J$I$r9T$&$H$-$K!"(B
 * Anti-Spam Basics::            $B$?$/$5$s$N(B spam $B$r8:$i$94JC1$JJ}K!(B
 * SpamAssassin::                Spam $BBP:v%D!<%k$N;H$$J}(B
 * Hashcash::                    CPU $B;~4V$rHq$d$7$F(B spam $BB`<#$9$k(B
-* Filtering Spam Using spam.el::  
-* Filtering Spam Using Statistics (spam-stat.el)::  
+* Filtering Spam Using The Spam ELisp Package::  
+* Filtering Spam Using Statistics with spam-stat::  
 @end menu
 
 @node The problem of spam
@@ -20932,10 +20932,10 @@ Spam $B$H@o$&$?$a$N?7$7$$5;K!$O!"%a%C%;!<%8$rAw?.$9$k:]$K$$$/$P$/$+$NIiC4(B
 $B<j:n6H$G%a!<%k$r$U$k$$$K$+$1$k%9%/%j%W%H$r%+%9%?%^%$%:$9$k$3$H$,5a$a$i$l(B
 $B$F$$$^$9!#$7$+$7!"$3$NJ,Ln$K$*$1$k2~NI$OM-MQ$J9W8%$K$J$k$G$7$g$&!#(B
 
-@node Filtering Spam Using spam.el
-@subsection spam.el $B$r;H$C$?(B spam $B$N_I2a(B
+@node Filtering Spam Using The Spam ELisp Package
+@subsection Spam ELisp $B%Q%C%1!<%8$r;H$C$?(B Spam $B$N_I2a(B
 @cindex spam filtering
-@cindex spam.el
+@cindex spam
 
 @code{spam.el} $B$N??$NL\E*$O(B spam $B8!=P$H_I2a$N$?$a$N41@)%;%s%?!<(B
 $B$r(B gnus $B$NCf$K;}$D$3$H$G$9!#$=$N$?$a$K(B @code{spam.el} $B$OFs$D$N$3$H$r9T$J(B
@@ -21096,7 +21096,7 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 * Bogofilter::                  
 * ifile spam filtering::        
 * spam-stat spam filtering::    
-* Extending spam.el::           
+* Extending the spam elisp package::  
 @end menu
 
 @node Blacklists and Whitelists
@@ -21104,7 +21104,7 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 @cindex spam filtering
 @cindex whitelists, spam filtering
 @cindex blacklists, spam filtering
-@cindex spam.el
+@cindex spam
 
 @defvar spam-use-blacklist
 $BF~$C$F$/$k%a!<%k$rJ,3d$9$k$H$-$K%V%i%C%/%j%9%H$r;H$$$?$$>l9g$O!"$3$NJQ?t(B
@@ -21164,7 +21164,7 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 @cindex spam filtering
 @cindex BBDB whitelists, spam filtering
 @cindex BBDB, spam filtering
-@cindex spam.el
+@cindex spam
 
 @defvar spam-use-BBDB
 
@@ -21190,7 +21190,7 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 @subsubsection $B%V%i%C%/%[!<%k(B
 @cindex spam filtering
 @cindex blackholes, spam filtering
-@cindex spam.el
+@cindex spam
 
 @defvar spam-use-blackholes
 
@@ -21230,7 +21230,7 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 @subsubsection Bogofilter
 @cindex spam filtering
 @cindex bogofilter, spam filtering
-@cindex spam.el
+@cindex spam
 
 @defvar spam-use-bogofilter
 
@@ -21268,7 +21268,7 @@ Path $B$K(B @code{bogofilter} $B$N<B9T%U%!%$%k$,L5$$>l9g!"(BBogofilter $B$N
 @subsubsection ifile $B$K$h$k(B spam $B$N_I2a(B
 @cindex spam filtering
 @cindex ifile, spam filtering
-@cindex spam.el
+@cindex spam
 
 @defvar spam-use-ifile
 
@@ -21309,10 +21309,10 @@ Spam $B$H(B ham $B$N%W%m%;%C%5!<!"$=$l$K(B spam-$BJ,3d(B (spam-split) $B$
 @subsubsection spam-$BE}7W(B (spam-stat) $B$K$h$k(B spam $B$N_I2a(B
 @cindex spam filtering
 @cindex spam-stat, spam filtering
-@cindex spam-stat.el
-@cindex spam.el
+@cindex spam-stat
+@cindex spam
 
-@xref{Filtering Spam Using Statistics (spam-stat.el)}.
+@xref{Filtering Spam Using Statistics with spam-stat}.
 
 @defvar spam-use-stat
 
@@ -21345,11 +21345,11 @@ spam-stat.el $B$O(B (Lisp $B$@$1$N(B) spam $BFbIt%G!<%?%Y!<%9$rDs6!$7$^$9$,
 Spam $B$H(B ham $B$N%W%m%;%C%5!<$H(B @code{spam-split} $B$N$?$a(B
 $B$N(B @code{spam-use-stat} $BJQ?t$,Ds6!$5$l$^$9!#(B
 
-@node Extending spam.el
-@subsubsection spam.el $B$N3HD%(B
+@node Extending the spam elisp package
+@subsubsection Spam elisp $B%Q%C%1!<%8$N3HD%(B
 @cindex spam filtering
-@cindex spam.el, extending
-@cindex extending spam.el
+@cindex spam elisp package, extending
+@cindex extending the spam elisp package
 
 $B?7$7$$%P%C%/%(%s%I(B blackbox $B$rDI2C$7$?$$$"$J$?$O!"F~$C$F$/$k%a!<%k$r_I2a(B
 $B$9$k$?$a$K0J2<$rMQ0U$7$F2<$5$$(B:
@@ -21434,8 +21434,8 @@ Spam $B$G$O$J$$(B ($BL$J,N`$^$?$O(B ham) $B%0%k!<%W$@$1$KE,MQ$5$l$k!#(B")
 
 @end enumerate
 
-@node Filtering Spam Using Statistics (spam-stat.el)
-@subsection Spam $B$N_I2a$KE}7W$r;H$&(B (spam-stat.el)
+@node Filtering Spam Using Statistics with spam-stat
+@subsection Spam $B$N_I2a$K(B spam-stat $B$K$h$kE}7W$r;H$&(B
 @cindex Paul Graham
 @cindex Graham, Paul
 @cindex naive Bayesian spam filtering
