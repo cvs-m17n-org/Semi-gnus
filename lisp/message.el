@@ -338,7 +338,7 @@ If t, use `message-user-organization-file'."
   :type 'string)
 
 (defcustom message-forward-end-separator
-  ""
+  (concat (mime-make-tag "text" "plain") "\n")
   "*Delimiter inserted after forwarded messages."
   :group 'message-forwarding
   :type 'string)
@@ -3080,6 +3080,57 @@ give as trustworthy answer as possible."
   (or mail-host-address
       (message-make-fqdn)))
 
+;; Dummy to avoid byte-compile warning.
+(defvar mule-version)
+(defvar emacs-beta-version)
+(defvar xemacs-codename)
+
+(defun message-make-user-agent ()
+  "Return user-agent info."
+  (let ((user-agent
+	 (concat
+	  ;; EMACS/VERSION
+	  (if (featurep 'xemacs)
+	      ;; XEmacs
+	      (concat
+	       (format "XEmacs/%d.%d" emacs-major-version emacs-minor-version)
+	       (if (and (boundp 'emacs-beta-version) emacs-beta-version)
+		   (format "beta%d" emacs-beta-version)
+		 "")
+	       (if (and (boundp 'xemacs-codename) xemacs-codename)
+		   (concat " (" xemacs-codename ")")
+		 "")
+	       )
+	    ;; not XEmacs
+	    (concat
+	     (format "Emacs/%d.%d" emacs-major-version emacs-minor-version)
+	     (if (>= emacs-major-version 20)
+		 (if (and (boundp 'enable-multibyte-characters)
+			  enable-multibyte-characters)
+		     ""			; Should return " (multibyte)"?
+		   " (unibyte)"))
+	     ))
+	  ;; MULE[/VERSION]
+	  (if (featurep 'mule)
+	      (if (and (boundp 'mule-version) mule-version)
+		  (concat " MULE/" mule-version)
+		" MULE")		; no mule-version
+	    "")				; not Mule
+	  ;; Meadow/VERSION
+	  (if (featurep 'meadow)
+	      (let ((version (Meadow-version)))
+		(if (string-match "\\`Meadow.\\([^ ]*\\)\\( (.*)\\)\\'" version)
+		    (concat " Meadow/"
+			    (match-string 1 version)
+			    (match-string 2 version)
+			    )
+		  "Meadow"))		; unknown format
+	    "")				; not Meadow
+	  )))
+    (if message-user-agent
+	(concat message-user-agent " " user-agent)
+      user-agent)))
+
 (defun message-generate-headers (headers)
   "Prepare article HEADERS.
 Headers already prepared in the buffer are not modified."
@@ -3096,7 +3147,7 @@ Headers already prepared in the buffer are not modified."
 	   (To nil)
 	   (Distribution (message-make-distribution))
 	   (Lines (message-make-lines))
-	   (User-Agent message-user-agent)
+	   (User-Agent (message-make-user-agent))
 	   (Expires (message-make-expires))
 	   (case-fold-search t)
 	   header value elem)
@@ -4378,6 +4429,7 @@ regexp varstr."
     (run-hooks 'mime-edit-exit-hook)
     ))
 
+;;; XXX: currently broken; message-yank-original resets message-reply-buffer.
 (defun message-mime-insert-article (&optional message)
   (interactive)
   (let ((message-cite-function 'mime-edit-inserted-message-filter)
