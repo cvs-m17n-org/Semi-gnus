@@ -1,5 +1,20 @@
 1999-02-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 08.
+
+	* lisp/score-mode.el (gnus-score-edit-exit): Use
+	`save-buffer-as-coding-system' instead of
+	`write-region-as-coding-system'.
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Ditto.
+
+	* lisp/gnus-start.el (save-buffer-as-coding-system): New function
+	defined with `defun-maybe'. NOTE: It should be deleted in the
+	future.
+
+	* lisp/gnus-sum.el (TopLevel): Require `mime-play' when compile.
+
+1999-02-09  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
 
 	* lisp/gnus-sum.el (gnus-mime-extract-message/rfc822): New
