@@ -1,32 +1,35 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
-;;;
-;;; Copyright (C) 1998 Tatsuya Ichikawa
-;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
-;;;      Tsukamoto Tetsuo <czkmt@remus.dti.ne.jp>
-;;;
-;;; This file is part of Semi-gnus.
-;;;
-;;; GNU Emacs is free software; you can redistribute it and/or modify
-;;; it under the terms of the GNU General Public License as published by
-;;; the Free Software Foundation; either version 2, or (at your option)
-;;; any later version.
 
-;;; GNU Emacs is distributed in the hope that it will be useful,
-;;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-;;; GNU General Public License for more details.
+;; Copyright (C) 1998 Tatsuya Ichikawa
 
-;;; You should have received a copy of the GNU General Public License
-;;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;;; Boston, MA 02111-1307, USA.
-;;;
-;;;; Commentary:
-;;; How to use.
-;;;
-;;;      M-x load[RET]gnus-ofsetup
-;;;      M-x gnus-setup-for-offline
-;;;
+;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
+;;	Tsukamoto Tetsuo <czkmt@remus.dti.ne.jp>
+;;
+;; This file is part of Semi-gnus.
+
+;; GNU Emacs is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published by
+;; the Free Software Foundation; either version 2, or (at your option)
+;; any later version.
+
+;; GNU Emacs is distributed in the hope that it will be useful,
+;; but WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+;; GNU General Public License for more details.
+
+;; You should have received a copy of the GNU General Public License
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
+;; Boston, MA 02111-1307, USA.
+;;
+
+;;; Commentary:
+
+;; How to use.
+;;
+;;      M-x load[RET]gnus-ofsetup
+;;      M-x gnus-setup-for-offline
+;;
 
 ;;; Code:
 
@@ -508,11 +511,12 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 	    (setq stream (gnus-ofsetup-completing-read-symbol
 			  (format "<%d of %d> %s" j n
 				  (gnus-ofsetup-gettext 'setup-19))
-			  'kerberos4 'ssl 'network))
+			  'kerberos4 'starttls 'ssl 'network))
 	    (setq authentication (gnus-ofsetup-completing-read-symbol
 				  (format "<%d of %d> %s" j n
 					  (gnus-ofsetup-gettext 'setup-14))
-				  'kerberos4 'cram-md5 'anonymous 'login)))
+				  'kerberos4 'digest-md5 'cram-md5 'login
+				  'anonymous)))
 	  (when (string= type "file")
 	    (setq path (read-file-name
 			(format "<%d of %d> %s" j n
@@ -758,4 +762,6 @@ mail source specifier とか上記のようなキーワードについてもっとよく
 (setq mail-source-read-passwd 'read-pw-read-passwd)
 (add-hook 'gnus-setup-news-hook 'read-pw-set-mail-source-passwd-cache)
 
-;; gnus-ofsetup.el Ends here.
+(provide 'gnus-ofsetup)
+
+;;; gnus-ofsetup.el ends here
