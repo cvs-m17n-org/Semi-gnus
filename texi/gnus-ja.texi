@@ -8512,56 +8512,54 @@ Gnus は合致したもののどの部分がハイライトされるのかを知らなければなりま
 埋め込まれた URL に合致する正規表現です。それは上の変数のディフォルトの
 値で使われます。
 
-@c TRANSLATEME
 @c Stuff related to gnus-button-man-level
 
 @item gnus-button-man-handler
 @vindex gnus-button-man-handler
-The function to use for displaying man pages.  It must take at least one
-argument with a string naming the man page.
+Man ページの表示に使う関数です。Man ページの名前の文字列で、少なくとも一
+つの引数を受け付けなければなりません。
 
 @c Stuff related to gnus-button-message-level
 
 @item gnus-button-mid-or-mail-regexp
 @vindex gnus-button-mid-or-mail-regexp
-Regular expression that matches a message ID or a mail address.
+Message-ID かメールアドレスに合致する正規表現です。
 
 @item gnus-button-prefer-mid-or-mail
 @vindex gnus-button-prefer-mid-or-mail
-This variable determines what to do when the button on a string as
-@samp{foo123@@bar.invalid} is pushed.  Strings like this can be either a
-message ID or a mail address.  If it is one of the symbols @code{mid} or
-@code{mail}, Gnus will always assume that the string is a message ID or
-a mail address, respectivly.  If this variable is set to the symbol
-@code{ask}, always query the user what do do.  If it is a function, this
-function will be called with the string as it's only argument.  The
-function must return @code{mid}, @code{mail}, @code{invalid} or
-@code{ask}.  The default value is the function
-@code{gnus-button-mid-or-mail-heuristic}.
+この変数は @samp{foo123@@bar.invalid} のような文字列のボタンが押されたと
+きに、何を行なうかを決める変数です。このような文字列は Message-ID かメー
+ルアドレスのいずれかです。もし @code{mid} か @code{mail} というシンボル
+のうちの一つだったら、gnus は常にそれぞれ文字列が Message-ID またはメー
+ルアドレスであると仮定します。この変数が @code{ask} に設定されると、
+gnus はいつもユーザが何をしたいかを尋ねます。それが関数だった場合、たっ
+た一つの引数である文字列が与えられて呼ばれます。その関数は @code{mid}、
+@code{mail}、@code{invalid} または @code{ask} を返さなければなりません。
+ディフォルト値は関数 @code{gnus-button-mid-or-mail-heuristic} です。
 
 @item gnus-button-mid-or-mail-heuristic
 @findex gnus-button-mid-or-mail-heuristic
-Function that guesses whether it's argument is a message ID or a mail
-address.  Returns @code{mid} it's a message IDs, @code{mail} if it's a
-mail address, @code{ask} if unsure and @code{invalid} if the string is
-invalid.
+その引数が Message-ID かメールアドレスであるかを推定する関数です。
+Message-ID だったら @code{mid} を、メールアドレスだったら @code{mail} を、
+不確かだったら @code{ask} を、そして無効な文字列だった
+ら @code{invalid} を返します。
 
 @item gnus-button-mid-or-mail-heuristic-alist
 @vindex gnus-button-mid-or-mail-heuristic-alist
-An alist of @code{(RATE . REGEXP)} pairs used by the function
-@code{gnus-button-mid-or-mail-heuristic}.
+関数 @code{gnus-button-mid-or-mail-heuristic} で使われる @code{(RATE
+. REGEXP)} 対の連想リストです。
 
 @c Stuff related to gnus-button-tex-level
 
 @item gnus-button-ctan-handler
 @findex gnus-button-ctan-handler
-The function to use for displaying CTAN links.  It must take one
-argument, the string naming the URL.
+CTAN リンクの表示に使う関数です。URL 名の文字列を引数として、一つ受け付
+けなければなりません。
 
 @item gnus-ctan-url
 @vindex gnus-ctan-url
-Top directory of a CTAN (Comprehensive TeX Archive Network) archive used
-by @code{gnus-button-ctan-handler}.
+@code{gnus-button-ctan-handler} で使われる CTAN (Comprehensive TeX
+Archive Network) アーカイブのディレクトリです。
 
 @c Misc stuff
 
@@ -8577,21 +8575,19 @@ by @code{gnus-button-ctan-handler}.
 記事を自動的にボタン化する方法は @xref{Customizing Articles} を参照して
 下さい。
 
-@c TRANSLATEME
 @node Article Button Levels
 @subsection Article button levels
 @cindex button levels
-The higher the value of the variables @code{gnus-button-@var{*}-level},
-the more buttons will appear.  If the level is zero, no corresponding
-buttons are displayed.  With the default value (which is 5) you should
-already see quite a lot of buttons.  With higher levels, you will see
-more buttons, but you may also get more false positives.  To avoid them,
-you can set the variables @code{gnus-button-@var{*}-level} local to
-specific groups (@pxref{Group Parameters}).  Here's an example for the
-variable @code{gnus-parameters}:
+変数 @code{gnus-button-@var{*}-level} の高い値によって、より多くのボタン
+が現れます。レベルがゼロだったらボタンは表示されません。ディフォルト
+値 (それは 5) では、とてもたくさんのボタンをすでに見ているはずです。高い
+レベルではより多くのボタンを見ることになりますが、多くの要らないものもあ
+るかもしれません。それらを避けるために、特定のグループに対して変
+数 @code{gnus-button-@var{*}-level} を設定しても良いでしょ
+う (@pxref{Group Parameters})。変数 @code{gnus-parameters} の例です:
 
 @lisp
-;; increase `gnus-button-*-level' in some groups:
+;; いくつかのグループで `gnus-button-*-level' を増やす:
 (setq gnus-parameters
       '(("\\<\\(emacs\\|gnus\\)\\>" (gnus-button-emacs-level 10))
         ("\\<unix\\>"               (gnus-button-man-level 10))
@@ -8599,17 +8595,15 @@ variable @code{gnus-parameters}:
 @end lisp
 
 @table @code
-
 @item gnus-button-browse-level
 @vindex gnus-button-browse-level
-Controls the display of references to message IDs, mail addresses and
-news URLs.  Related variables and functions include
-@code{gnus-button-url-regexp}, @code{browse-url}, and
-@code{browse-url-browser-function}.
+Message-ID、メールアドレスおよびニュースの URL に関する参考文献の表示を
+制御します。関連する変数と関数には @code{gnus-button-url-regexp}、
+@code{browse-url} および @code{browse-url-browser-function} があります。
 
 @item gnus-button-emacs-level
 @vindex gnus-button-emacs-level
-Controls the display of Emacs or Gnus references.  Related functions are
+Emacs または gnus の参考文献の表示を制御します。関連する関数は、
 @code{gnus-button-handle-custom},
 @code{gnus-button-handle-describe-function},
 @code{gnus-button-handle-describe-variable},
@@ -8618,30 +8612,29 @@ Controls the display of Emacs or Gnus references.  Related functions are
 @code{gnus-button-handle-apropos},
 @code{gnus-button-handle-apropos-command},
 @code{gnus-button-handle-apropos-variable},
-@code{gnus-button-handle-apropos-documentation}, and
-@code{gnus-button-handle-library}.
+@code{gnus-button-handle-apropos-documentation} およ
+び @code{gnus-button-handle-library} です。
 
 @item gnus-button-man-level
 @vindex gnus-button-man-level
-Controls the display of references to (Unix) man pages.
-See @code{gnus-button-man-handler}.
+(Unix の) man ページの表示を制御します。
+@code{gnus-button-man-handler} を参照して下さい。
 
 @item gnus-button-message-level
 @vindex gnus-button-message-level
-Controls the display of message IDs, mail addresses and news URLs.
-Related variables and functions include
-@code{gnus-button-mid-or-mail-regexp},
+Message-ID、メールアドレスおよびニュースの URL の表示を制御します。関連
+する変数と関数に
+は @code{gnus-button-mid-or-mail-regexp},
 @code{gnus-button-prefer-mid-or-mail},
-@code{gnus-button-mid-or-mail-heuristic}, and
-@code{gnus-button-mid-or-mail-heuristic-alist}.
+@code{gnus-button-mid-or-mail-heuristic} およ
+び @code{gnus-button-mid-or-mail-heuristic-alist} があります。
 
 @item gnus-button-tex-level
 @vindex gnus-button-tex-level
-Controls the display of references to TeX or LaTeX stuff, e.g. for CTAN
-URLs.  See the variables @code{gnus-ctan-url},
-@code{gnus-button-ctan-handler} and
-@code{gnus-button-handle-ctan-bogus-regexp}.
-
+Tex または LaTex に関する参考文献、例えば CTAN の URL、の表示を制御しま
+す。変数 @code{gnus-ctan-url},
+@code{gnus-button-ctan-handler} および
+@code{gnus-button-handle-ctan-bogus-regexp} を参照して下さい。
 @end table
 
 @node Article Date
