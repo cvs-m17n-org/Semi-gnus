@@ -1,3 +1,7 @@
+2001-09-16  Katsuhiro Hermit Endo  <hermit@koka-in.org>
+
+	* gnus-ja.texi (Drafts): Fix typo.
+
 2001-09-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-art.el (gnus-request-article-this-buffer): Make a copy

@@ -9588,7 +9588,7 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
 
 @cindex nndraft
 @vindex nndraft-directory
-下書きグループは @samp{nndraft:draftx} と呼ばれる特別なグループ です (も
+下書きグループは @samp{nndraft:drafts} と呼ばれる特別なグループ です (も
 しあなたが全てを知らなければならないのであれば、それは @code{nndraft} グ
 ループとして実装されています)。変数 @code{nndraft-directory} はそのファ
 イルを @code{nndraft} がどこに保管するべきかを指定します。このグループが
