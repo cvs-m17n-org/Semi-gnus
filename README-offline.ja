@@ -40,6 +40,11 @@ T-gnus をお使いの場合、gnus-offline.el は特に何も考えなくても T-gnus
 
 ・以下のコードを .emacs に加えます。
 
+        (autoload 'gnus-plugged "gnus-agent" nil t)
+        (autoload 'gnus-unplugged "gnus-agent" nil t)
+
+・以下のコードを .emacs に加えます。
+
 	(load "gnus-ofsetup")
 	(gnus-setup-for-offline)
 
@@ -58,15 +63,18 @@ T-gnus をお使いの場合、gnus-offline.el は特に何も考えなくても T-gnus
           れます。これにはよく考慮した上で答えてください。詳しくは 6)
           を参照して下さい。
 
-・このあと一旦オンラインでサーバーに接続して、購読するグループを決めて
-  ください。(詳しい方法は Gnus の info を見てください)
+・このあと一旦 M-x gnus-plugged で Gnus を起動して、購読するグループを
+  決めてください。(詳しい方法は Gnus の info を見てください)
 
-・.gnus に以下のコードを加えます。
+  そして 次回からは M-x gnus-unplugged で Gnus を起動してください。グルー
+  プバッファで“g”とタイプすることにより前記の動作をするはずです。
+
+・M-x gnus でもオフライン起動して欲しい場合は、.emacs に
 
 	(setq gnus-plugged nil)
 
-  これで Gnus を再起動すればグループバッファで“g”とタイプすることに
-  より前記の動作をするはずです。
+  を書いて下さい。もし M-x gnus-plugged を使わないならば、これを .gnus に
+  書くという手もあるでしょう。
 
 4) gnus-offline で設定可能な変数一覧
 

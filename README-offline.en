@@ -52,6 +52,11 @@ o First, you must do a general setup for T-gnus (See info about the
 
 o Add the following code to ~/.emacs
 
+        (autoload 'gnus-plugged "gnus-agent" nil t)
+        (autoload 'gnus-unplugged "gnus-agent" nil t)
+
+o Add the following code to ~/.emacs
+
 	(load "gnus-ofsetup")
     	(gnus-setup-for-offline)
 
@@ -69,14 +74,20 @@ o Restart Emacs. gnus-ofsetup.el will ask you some questions and
           ~/.newsrc.eld or not. Answer it carefully. See section 6)
           for details.
 
-o At the first time, you must start Gnus in the "online" state and
- decide which groups to subscribe (See info about subscribing).
+o At the first time, you must start Gnus in the online state
+ (by M-x gnus-plugged) and decide which groups to subscribe (See info
+ about subscribing).
 
-o Add the following code to ~/.gnus
+ From now on you can start Gnus as an offline reader by M-x gnus-unplugged.
+ Try typing "g" in the *Group* buffer.
+
+o You may want M-x gnus to start Gnus as an offline reader as
+ M-x gnus-unplugged. Then write the following code to ~/.emacs
 
 	(setq gnus-plugged nil)
 
-That's all. Restart Gnus and try typing "g" in the *Group* buffer.
+ you can put it into ~/.gnus if there's no need to start Gnus as an online
+ reader (by M-x gnus-plugged).
 
 4) User customizable variables in gnus-offline
 ==============================================
