@@ -1,3 +1,8 @@
+1998-06-24  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus.texi, texi/message.texi, texi/ChangeLog: Sync up with
+	Gnus 5.6.13.
+
 1998-06-14  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 	
 	* Sync up with Gnus 5.6.13.
