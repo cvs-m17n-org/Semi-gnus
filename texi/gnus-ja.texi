@@ -951,3 +951,30 @@ Gnus が起動すると、@code{gnus-site-init-file} (ディフォルトでは
 
 
 
+@node Auto Save
+@section Auto Save
+@cindex dribble file
+@cindex auto-save
+
+何か gnus のデータを変更すること (記事を読む、印を付ける、グループを削除
+または購読する) をしたとき、変更は特別な @dfn{ドリブルバッファ (dribble
+buffer)} に書き込まれます。このバッファはEmacs が普通するように自動保存
+されます。ファイル @file{.newsrc} を保存する前に Emacsが落ちたときは、す
+べての変更をこのファイルから回復することができるでしょう。
+
+起動時に gnus がこのファイルの存在を発見すると、gnus はそれを読み込むか
+どうかを利用者に尋ねます。本当の起動ファイルが保存されれば、自動保存ファ
+イルは削除されます。 
+
+@vindex gnus-use-dribble-file
+@code{gnus-use-dribble-file} が @code{nil} であると、gnus はドリブルバッ
+ファをつくったり、維持したりしません。ディフォルトは @code{t} です。
+
+@vindex gnus-dribble-directory
+Gnus はドリブルファイルを @code{gnus-dribble-directory} に置きます。ディ
+フォルトではそのようになっていますが、この変数が @code{nil} であると、
+gnus はファイル@file{.newsrc} の置かれているディレクトリ (これは普通は利
+用者のホームディレクトリです) に入っていってドリブルファイルを作ります。
+ドリブルファイルは @code{.newsrc} と同じ許可属性を与えられます。 
+
+
