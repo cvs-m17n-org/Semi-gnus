@@ -1,3 +1,38 @@
+1999-05-27  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.13.
+	(gnus-version): Modify for Gnus 5.7.
+
+	* configure: Regenerate by autoconf-2.14.1.
+
+	* lisp/message.el (message-mode): Don't manage the value of
+	`adaptive-fill-regexp' and `adaptive-fill-first-line-regexp' if the
+	latter does not exist.
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Run
+	`gnus-tmp-internal-hook' and `gnus-article-prepare-hook' before
+	displaying an article; strip `read-only' properties finally.
+
+	* lisp/gnus-spec.el: Avoid byte compile warning for FSF Emacsen.
+	* lisp/gnus-art.el: Likewise.
+	* lisp/dgnushack.el: Likewise.
+
+	* lisp/gnus-mh.el: Avoid byte compile warning.
+
+	* lisp/nnfolder.el (nnfolder-request-list): Bind
+	`file-name-coding-system' to `binary' as well.
+
+1999-05-27  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* Sync up with Gnus 5.7.  Modified files are:
+	lisp/	ChangeLog, gnus-agent.el, gnus-art.el, gnus-async.el,
+		gnus-cache.el, gnus-ems.el, gnus-mh.el, gnus-score.el,
+		gnus-sum.el, gnus-util.el, gnus-uu.el, gnus.el, message.el,
+		messcompat.el, nnfolder.el, nnlistserv.el, nnmail.el,
+		nnmh.el, nnml.el, nntp.el, nnvirtual.el, nnweb.el, pop3.el
+	texi/	gnus-faq-ja.texi, gnus-faq.texi, gnus-ja.texi, gnus.texi,
+		message-ja.texi, message.texi
+
 1999-05-22  Daiki Ueno  <daiki@kiss.kake.info.waseda.ac.jp>
 	    Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
