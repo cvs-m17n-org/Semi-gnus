@@ -1,3 +1,11 @@
+2003-05-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.24 (quimby) revision 00.
+
+2003-05-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.23 revision 00.
+
 2003-05-01  Simon Josefsson  <jas@extundo.com>
 
 	* GNUS-NEWS: Add prefix limit feature.
