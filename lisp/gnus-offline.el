@@ -408,18 +408,15 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 					     activate preactivate)
   "Also toggle gnus-offline `connected--disconnected' status."
   (interactive (list (not gnus-offline-connected)))
-  (cond ((interactive-p)
-	 (if (ad-get-arg 0)
-	     (progn
-	       (setq gnus-offline-connected (ad-get-arg 0))
-	       ad-do-it
-	       ;; Set send mail/news function to offline functions.
-	       (gnus-offline-set-online-sendmail-function)
-	       (gnus-offline-set-online-post-news-function))
-	   ;; Set to offline status
-	   (gnus-offline-set-unplugged-state)))
+  (cond ((ad-get-arg 0)
+	 (setq gnus-offline-connected (ad-get-arg 0))
+	 ad-do-it
+	 ;; Set send mail/news function to offline functions.
+	 (gnus-offline-set-online-sendmail-function)
+	 (gnus-offline-set-online-post-news-function))
 	(t
-	 ad-do-it)))
+	 ;; Set to offline status
+	 (gnus-offline-set-unplugged-state))))
 
 (defadvice gnus-agent-expire (around gnus-offline-advice activate preactivate)
   "Advice not to delete new articles."
@@ -639,7 +636,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
       (funcall gnus-offline-hangup-function))
   (setq gnus-offline-connected nil)
   (if (eq gnus-offline-news-fetch-method 'nnagent)
-      (gnus-agent-toggle-plugged nil))
+      (funcall 'ad-Orig-gnus-agent-toggle-plugged nil))
 
   ;; Set send mail/news function to offline functions.
   (gnus-offline-set-offline-sendmail-function)
@@ -809,9 +806,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
      (format (gnus-offline-gettext 'interval-time-3)
 	     gnus-offline-interval-time)))
   (gnus-offline-processed-by-timer))
-;;
-;; Expire articles using gnus-agent.
-;;
+
 ;;
 ;; Menu.
 ;;
