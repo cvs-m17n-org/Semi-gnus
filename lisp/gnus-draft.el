@@ -96,6 +96,8 @@
   (let ((article (gnus-summary-article-number)))
     (gnus-summary-mark-as-read article gnus-canceled-mark)
     (gnus-draft-setup-for-editing article gnus-newsgroup-name)
+    (set-buffer-modified-p t)
+    (save-buffer)
     (let ((gnus-verbose-backends nil))
       (gnus-request-expire-articles (list article) gnus-newsgroup-name t))
     (push

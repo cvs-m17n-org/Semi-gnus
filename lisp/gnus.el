@@ -253,10 +253,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.021"
+(defconst gnus-version-number "6.10.022"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.32"
+(defconst gnus-original-version-number "0.33"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -1675,7 +1675,10 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-summary-mail-forward gnus-summary-mail-other-window
       gnus-summary-resend-message gnus-summary-resend-bounced-mail
       gnus-summary-wide-reply gnus-summary-followup-to-mail
-      gnus-summary-followup-to-mail-with-original gnus-bug)
+      gnus-summary-followup-to-mail-with-original gnus-bug
+      gnus-summary-wide-reply-with-original
+      gnus-summary-post-forward gnus-summary-wide-reply-with-original
+      gnus-summary-post-forward)
      ("gnus-picon" :interactive t gnus-article-display-picons
       gnus-group-display-picons gnus-picons-article-display-x-face
       gnus-picons-display-x-face)

@@ -533,15 +533,10 @@ the actual number of articles toggled is returned."
   (let* ((gnus-command-method method)
 	 (file (gnus-agent-lib-file "groups")))
     (gnus-make-directory (file-name-directory file))
-    (let ((coding-system-for-write
-	   gnus-agent-file-coding-system))
+    (let ((coding-system-for-write gnus-agent-file-coding-system))
       (write-region (point-min) (point-max) file nil 'silent))
-
-    );;<-- correct?
-
     (when (file-exists-p (gnus-agent-lib-file "active"))
-      (delete-file (gnus-agent-lib-file "active"))))
-;  )
+      (delete-file (gnus-agent-lib-file "active")))))
 
 (defun gnus-agent-save-group-info (method group active)
   (when (gnus-agent-method-p method)
@@ -560,7 +555,7 @@ the actual number of articles toggled is returned."
 		     (concat "^" (regexp-quote group) " ") nil t)
 		(gnus-delete-line))
 	      (insert group " " (number-to-string (cdr active)) " "
-		      (number-to-string (car active)) "\n"))
+ 		      (number-to-string (car active)) " y\n"))
 	  (when (re-search-forward (concat (regexp-quote group) " ") nil t)
 	    (gnus-delete-line))
 	  (insert-buffer-substring nntp-server-buffer))))))
@@ -610,8 +605,7 @@ the actual number of articles toggled is returned."
   (save-excursion
     (set-buffer gnus-agent-current-history)
     (gnus-make-directory (file-name-directory gnus-agent-file-name))
-    (let ((coding-system-for-write
-	   gnus-agent-file-coding-system))
+    (let ((coding-system-for-write gnus-agent-file-coding-system))
       (write-region (1+ (point-min)) (point-max)
 		    gnus-agent-file-name nil 'silent))))
 
