@@ -406,6 +406,11 @@ The provided functions are:
   :group 'message-forwarding
   :type 'boolean)
 
+(defcustom message-forward-show-mml t
+  "*If non-nil, forward messages are shown as mml.  Otherwise, forward messages are unchanged."
+  :group 'message-forwarding
+  :type 'boolean)
+
 (defcustom message-forward-before-signature t
   "*If non-nil, put forwarded message before signature, else after."
   :group 'message-forwarding
