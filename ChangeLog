@@ -1,3 +1,8 @@
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-update-summary-mark-positions): Use
+	`make-full-mail-header'.
+
 1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/message.el (message-make-user-agent): New implementation.
