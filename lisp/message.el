@@ -7300,6 +7300,13 @@ which specify the range to operate on."
   :group 'message
   :type '(alist :key-type regexp :value-type function))
 
+(defcustom message-expand-name-databases
+  (list 'bbdb 'eudc 'lsdb)
+  "List of databases to try for name completion (`message-expand-name').
+Each element is a symbol and can be `bbdb', `eudc' or `lsdb'."
+  :group 'message
+  :type '(set (const bbdb) (const eudc) (const lsdb)))
+
 (defcustom message-expand-name-function
   (cond ((and (boundp 'eudc-protocol)
 	      eudc-protocol)
@@ -7309,9 +7316,15 @@ which specify the range to operate on."
 	((fboundp 'lsdb-complete-name)
 	 'lsdb-complete-name)
 	(t 'expand-abbrev))
-  "*A function called to expand addresses in field body."
+  "*A function called to expand addresses in field body.
+This variable is semi-obsolete, set it as nil and use
+`message-expand-name-databases' instead."
   :group 'message
-  :type 'function)
+  :type '(radio (const :format "Invalidate it: %v\n" nil)
+		(function-item :format "eudc: %v\n" eudc-expand-inline)
+		(function-item :format "bbdb: %v\n" bbdb-complete-name)
+		(function-item :format "lsdb: %v\n" lsdb-complete-name)
+		(function :size 0 :value expand-abbrev)))
 
 (defcustom message-tab-body-function nil
   "*Function to execute when `message-tab' (TAB) is executed in the body.
@@ -7378,7 +7391,19 @@ those headers."
 	    (delete-region (point) (progn (forward-line 3) (point))))))))))
 
 (defun message-expand-name ()
-  (funcall message-expand-name-function))
+  (cond (message-expand-name-function
+	 (funcall message-expand-name-function))
+	((and (memq 'eudc message-expand-name-databases)
+	      (boundp 'eudc-protocol)
+	      eudc-protocol)
+	 (eudc-expand-inline))
+	((and (memq 'bbdb message-expand-name-databases)
+	      (fboundp 'bbdb-complete-name))
+	 (bbdb-complete-name))
+	((and (memq 'lsdb message-expand-name-databases)
+	      (fboundp 'lsdb-complete-name))
+	 (lsdb-complete-name))
+	(t 'expand-abbrev)))
 
 ;;; Help stuff.
 

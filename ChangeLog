@@ -1,3 +1,7 @@
+2004-06-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/lpath.el: Fbind lsdb-complete-name.
+
 2004-06-03  Teodor Zlatanov  <tzz@lifelogs.com>
 
 	* etc/gnus/gnus-setup.ast (Setting up a NNTP server)
