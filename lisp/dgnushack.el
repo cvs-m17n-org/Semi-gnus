@@ -159,7 +159,8 @@
     :symbol-for-testing-whether-colon-keyword-is-available-or-not
   (void-variable
    ;; Bind keywords.
-   (dolist (keyword '(:button-keymap :data :file :mime-handle))
+   (dolist (keyword '(:button-keymap :data :file :mime-handle
+				     :key-type :value-type))
      (set keyword keyword))))
 
 ;; Unknown variables and functions.
