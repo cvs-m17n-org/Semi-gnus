@@ -8,21 +8,21 @@ AC_DEFUN(AM_PATH_LISPDIR,
   if test $EMACS != "no"; then
     AC_MSG_CHECKING([where .elc files should go])
     dnl Set default value
-    lispdir="\$(datadir)/emacs/site-lisp"
+    lispdir="\$(datadir)/emacs/site-lisp/gnus"
     if test "x$prefix" = "xNONE"; then
       if test -d $ac_default_prefix/share/emacs/site-lisp; then
-	lispdir="\$(prefix)/share/emacs/site-lisp"
+	lispdir="\$(prefix)/share/emacs/site-lisp/gnus"
       else
 	if test -d $ac_default_prefix/lib/emacs/site-lisp; then
-	  lispdir="\$(prefix)/lib/emacs/site-lisp"
+	  lispdir="\$(prefix)/lib/emacs/site-lisp/gnus"
 	fi
       fi
     else
       if test -d $prefix/share/emacs/site-lisp; then
-	lispdir="\$(prefix)/share/emacs/site-lisp"
+	lispdir="\$(prefix)/share/emacs/site-lisp/gnus"
       else
 	if test -d $prefix/lib/emacs/site-lisp; then
-	  lispdir="\$(prefix)/lib/emacs/site-lisp"
+	  lispdir="\$(prefix)/lib/emacs/site-lisp/gnus"
 	fi
       fi
     fi
