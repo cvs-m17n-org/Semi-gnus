@@ -5494,9 +5494,9 @@ subscribed address (and not the additional To and Cc header contents)."
     (when field
       (dolist (address (mail-header-parse-addresses field))
 	(setq address (car address)
-	      rhs (cadr (split-string address "@"))
-	      ace (idna-to-ascii rhs))
-	(when (and (not (equalp rhs ace))
+	      rhs (downcase (cadr (split-string address "@")))
+	      ace (downcase (idna-to-ascii rhs)))
+	(when (and (not (equal rhs ace))
 		   (or (not (eq message-use-idna 'ask))
 		       (y-or-n-p (format "Replace %s with %s? " rhs ace))))
 	  (goto-char (point-min))
@@ -5626,9 +5626,9 @@ Headers already prepared in the buffer are not modified."
 		      (if formatter
 			  (funcall formatter header value)
 			(insert header-string ": " value))
-		      (message-fill-field)
+		      (goto-char (message-fill-field))
 		      ;; We check whether the value was ended by a
-		      ;; newline.  If now, we insert one.
+		      ;; newline.  If not, we insert one.
 		      (unless (bolp)
 			(insert "\n"))
 		      (forward-line -1)))
@@ -5753,7 +5753,8 @@ If the current line has `message-yank-prefix', insert it on the new line."
       (message-narrow-to-field)
       (let ((field-name (message-field-name)))
 	(funcall (or (cadr (assq field-name message-field-fillers))
-		     'message-fill-field-general))))))
+		     'message-fill-field-general)))
+      (point-max))))
 
 (defun message-fill-field-address ()
   (while (not (eobp))

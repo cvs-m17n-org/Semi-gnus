@@ -1,11 +1,48 @@
 2004-05-18  Reiner Steib  <Reiner.Steib@gmx.de>
 
+	* gnus-group.el (gnus-group-jump-to-group-prompt): Allow an alist.
+	(gnus-group-jump-to-group): Added prefix argument using
+	`gnus-group-jump-to-group-prompt'.  Query before jumping to
+	non-active group.
+
+	* compface.el (uncompface): Be verbose when changing
+	`uncompface-use-external'.
+
+	* gnus-art.el (gnus-button-handle-man, gnus-button-alist): Try to
+	handle manual section.
+
+2004-05-18  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-button-alist): Revert previous change.
+
+2004-05-18  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* message.el (message-idna-to-ascii-rhs-1): Fix typo.
+
+2004-05-18  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-inews-do-gcc): Don't use read-only-p to see
+	whether backend can accept message.
+
+	* message.el (message-idna-to-ascii-rhs-1): Don't use equalp. 
+
+2004-05-18  Kai Grossjohann  <kgrossjo@eu.uu.net>
+
+	* nntp.el (nntp-request-set-mark, nntp-request-update-info):
+	Avoid creating directory when nntp-marks-is-evil is true.
+	Reported by Reiner Steib.
+
+2004-05-18  Reiner Steib  <Reiner.Steib@gmx.de>
+
 	* gnus-picon.el (gnus-picon-style): New variable.
 	(gnus-picon-insert-glyph): Added optional `nostring' argument.
 	(gnus-picon-transform-address): Support `gnus-picon-style'.  From
-	Jesper Harder <harder@ifa.au.dk>.	
+	Jesper Harder <harder@ifa.au.dk>.
 
 2004-05-18  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-fill-field): Return point.
+	(message-generate-headers): Go to end of field.
 
 	* gnus-start.el (gnus-get-unread-articles-in-group): Don't do
 	stuff for non-living groups.
