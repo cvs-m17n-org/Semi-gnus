@@ -1,3 +1,9 @@
+2000-05-17  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-texi-format): Use
+	`output-coding-system' instead of `coding-system-for-write' when
+	old Mule is used.
+
 2000-05-16  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-forward) Replace the use of `eolp' with
