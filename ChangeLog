@@ -1,3 +1,20 @@
+1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-send): Call
+	`message-send-news-function' or `message-send-mail-function'
+	instead of `message-send-and-exit'.
+
+1998-09-17  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-edit-message): Use
+	`gnus-draft-setup-for-editing' instead of `gnus-draft-setup'.
+	(gnus-draft-send): Use `gnus-draft-setup-for-sending' instead of
+	`gnus-draft-setup'.
+	(gnus-draft-setup-for-editing): New function (renamed from
+	`gnus-draft-setup').
+	(gnus-draft-setup-for-sending): New function.
+	(gnus-draft-send-draft-buffer): New variable.
+
 1998-10-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/pop3-fma.el (pop3-fma-movemail): Bug fix.
