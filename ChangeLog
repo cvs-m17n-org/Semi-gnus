@@ -1,5 +1,12 @@
 1999-09-12  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 04.
+
+	* lisp/gnus-ofsetup.el (gnus-offline-lang): Declare before loading
+	`gnus-offline'.
+
+1999-09-12  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
 	* README-offline.en: Do not refer to `gnus-agent-toggle-plugged'.
 	* README-offline.ja: Ditto.
 
