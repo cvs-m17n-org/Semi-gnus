@@ -1,3 +1,18 @@
+1999-08-27  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 15.
+
+	* lisp/dgnushack.el (char-before, char-after): Optimize byte code
+	for them before lpath.el is loaded.  Because lpath.el requires
+	`poe' via `path-util'.  [cf. <tm-ja:5051>]
+
+	* lisp/gnus-sum.el (gnus-summary-search-article): Search for
+	X-Face image if the regexp "^X-Face:" is specified.
+	(gnus-summary-search-article-highlight-matched-text): Use
+	`gnus-summary-search-article-highlight-goto-x-face'; maybe display
+	X-Face image if it is requested.
+	(gnus-summary-search-article-highlight-goto-x-face): New macro.
+
 1999-08-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 14.
