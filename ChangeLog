@@ -1,3 +1,7 @@
+1998-11-18  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-dont-send): Use `message-delete-frame'.
+
 1998-11-18  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.035.
