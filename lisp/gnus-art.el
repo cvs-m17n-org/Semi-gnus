@@ -211,8 +211,7 @@ regexp.  If it matches, the text in question is not a signature."
 (defcustom gnus-article-x-face-command
   (cond
    ((and (fboundp 'image-type-available-p)
-	 (or (image-type-available-p 'xpm)
-	     (image-type-available-p 'xbm)))
+	 (image-type-available-p 'xbm))
     'gnus-article-display-xface)
    ((and (not gnus-xemacs)
 	 window-system
@@ -2665,17 +2664,16 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 		 gfunc (cdr func))
 	 (setq afunc func
 	       gfunc (intern (format "gnus-%s" func))))
-       (fset gfunc
-	     (if (not (fboundp afunc))
-		 nil
-	       `(lambda (&optional interactive &rest args)
-		  ,(documentation afunc t)
-		  (interactive (list t))
-		  (save-excursion
-		    (set-buffer gnus-article-buffer)
-		    (if interactive
-			(call-interactively ',afunc)
-		      (apply ',afunc args))))))))
+       (defalias gfunc
+	 (if (fboundp afunc)
+	   `(lambda (&optional interactive &rest args)
+	      ,(documentation afunc t)
+	      (interactive (list t))
+	      (save-excursion
+		(set-buffer gnus-article-buffer)
+		(if interactive
+		    (call-interactively ',afunc)
+		  (apply ',afunc args))))))))
    '(article-hide-headers
      article-hide-boring-headers
      article-toggle-headers
@@ -3838,7 +3836,7 @@ In no internal viewer is available, use an external viewer."
 	      (if gnus-show-mime ?m ? )
 	      (if emphasis ?e ? )))))
 
-(fset 'gnus-article-hide-headers-if-wanted 'gnus-article-maybe-hide-headers)
+(defalias 'gnus-article-hide-headers-if-wanted 'gnus-article-maybe-hide-headers)
 
 (defun gnus-article-maybe-hide-headers ()
   "Hide unwanted headers if `gnus-have-all-headers' is nil.
