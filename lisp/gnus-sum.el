@@ -8739,7 +8739,7 @@ save those articles instead."
 				(lambda (f)
 				  (if (equal f " ")
 				      f
-				    (mm-quote-arg f)))
+				    (gnus-quote-arg-for-sh-or-csh f)))
 				files " ")))))
 	  (setq ps (cdr ps)))))
     (if (and gnus-view-pseudos (not not-view))

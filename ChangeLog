@@ -1,3 +1,12 @@
+1998-09-26  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-insert-pseudos): Use
+	`gnus-quote-arg-for-sh-or-csh' instead of `mm-quote-arg'.
+
+	* lisp/nndoc.el (nndoc-possibly-change-buffer): Don't eval
+	`mm-enable-multibyte'.
+	* lisp/nnmbox.el (nnmbox-possibly-change-newsgroup): Ditto.
+
 1998-09-25  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.022.
