@@ -1,3 +1,7 @@
+2003-04-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnmail.el (nnmail-split-it): Revoke the change of 1999-08-19.
+
 2003-04-03  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/pop3.el (pop3-uidl-support): Default to nil; change the
