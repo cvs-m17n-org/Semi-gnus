@@ -881,7 +881,7 @@ if test -z ""noecho""; then
 	echo "$ac_t""$w3_dir" 1>&6
 fi
 
-	EMACS_cv_ACCEPTABLE_W3=$EMACS_cv_SYS_w3_forms
+	EMACS_cv_ACCEPTABLE_W3=$EMACS_cv_SYS_w3_dir
 fi
 
 fi

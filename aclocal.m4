@@ -149,7 +149,7 @@ AC_DEFUN(AC_XEMACS_P, [
   AC_MSG_RESULT($XEMACSP)
   AC_SUBST(EMACS_FLAVOR)
 ])
-
+ye
 AC_DEFUN(AC_PATH_LISPDIR, [
   AC_XEMACS_P
   if test "$prefix" = "NONE"; then
@@ -217,7 +217,7 @@ fi
 
 if test "${EMACS_cv_ACCEPTABLE_W3}" = "yes"; then
 	AC_EMACS_LISP(w3_dir,(file-name-directory (locate-library \"w3-forms\")),"noecho")
-	EMACS_cv_ACCEPTABLE_W3=$EMACS_cv_SYS_w3_forms
+	EMACS_cv_ACCEPTABLE_W3=$EMACS_cv_SYS_w3_dir
 fi
 ])
    AC_ARG_WITH(w3,[  --with-w3=DIR           Specify where to find the w3 package], [ EMACS_cv_ACCEPTABLE_W3=`( cd $withval && pwd || echo "$withval" ) 2> /dev/null` ])
