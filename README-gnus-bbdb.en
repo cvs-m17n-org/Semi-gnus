@@ -43,9 +43,9 @@ though FLIM does not decode them, put the following lines in your
  This is a patch for bbdb.el / bbdb-hooks.el.
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
---- bbdb-2.33/lisp/bbdb-com.el~	Sat Sep  1 07:00:10 2001
-+++ bbdb-2.33/lisp/bbdb-com.el	Mon Sep 10 10:12:28 2001
-@@ -1654,7 +1654,7 @@
+--- bbdb-2.33/lisp/bbdb-com.el~	Sat Mar 24 08:00:29 2001
++++ bbdb-2.33/lisp/bbdb-com.el	Mon Sep 10 22:48:15 2001
+@@ -1625,7 +1625,7 @@
            ;; to be enclosed in quotes.  Double-quotes and backslashes have
            ;; already been escaped.  This quotes a few extra characters as
            ;; well (!,%, and $) just for common sense.
@@ -54,29 +54,30 @@ though FLIM does not decode them, put the following lines in your
             (format "\"%s\" <%s>" name net))
            (t
             (format "%s <%s>" name net)))))
---- bbdb-2.33/lisp/bbdb-hooks.el~	Sat Sep  1 07:00:10 2001
-+++ bbdb-2.33/lisp/bbdb-hooks.el	Mon Sep 10 10:12:28 2001
+--- bbdb-2.33/lisp/bbdb-hooks.el~	Tue Mar 20 08:00:09 2001
++++ bbdb-2.33/lisp/bbdb-hooks.el	Mon Sep 10 22:48:15 2001
 @@ -35,6 +35,8 @@
- ;; $Id: README-gnus-bbdb.en,v 1.1.2.5.12.4 2001-09-10 10:25:52 yamaoka Exp $
+ ;; $Id: README-gnus-bbdb.en,v 1.1.2.5.12.5 2001-09-10 22:51:50 yamaoka Exp $
  ;;
  
 +(eval-when-compile (require 'cl))
 +
  (require 'bbdb)
  
- (defvar rmail-buffer)
-@@ -384,13 +386,23 @@
+ (defmacro the-v18-byte-compiler-sucks-wet-farts-from-dead-pigeons ()
+@@ -367,14 +369,24 @@
           (marker (bbdb-header-start))
           field pairs fieldval  ; do all bindings here for speed
           regexp string notes-field-name notes
--         replace-p)
-+         replace-p extract-field-value-funtion)
+-         replace-p replace-or-add-msg)
++         replace-p replace-or-add-msg extract-field-value-funtion)
      (set-buffer (marker-buffer marker))
      (save-restriction
 -      (widen)
 -      (goto-char marker)
 -      (if (and (setq fieldval (bbdb-extract-field-value "From"))
 -               (string-match (bbdb-user-mail-names) fieldval))
+-          ;; Don't do anything if this message is from us.  Note that we have
 +      (let ((function-list bbdb-extract-field-value-function-list)
 +	    function)
 +	(or (progn
@@ -91,10 +92,11 @@ though FLIM does not decode them, put the following lines in your
 +	      (setq extract-field-value-funtion 'bbdb-extract-field-value))))
 +      (if (and (setq fieldval (funcall extract-field-value-funtion "From"))
 +	       (string-match (bbdb-user-mail-names) fieldval))
-           ;; Don't do anything if this message is from us.  Note that we have
++	  ;; Don't do anything if this message is from us.  Note that we have
            ;; to look at the message instead of the record, because the record
            ;; will be of the recipient of the message if it is from us.
-@@ -400,7 +412,7 @@
+           nil
+@@ -383,7 +395,7 @@
            (goto-char marker)
            (setq field (car (car ignore-all))
                  regexp (cdr (car ignore-all))
@@ -103,7 +105,7 @@ though FLIM does not decode them, put the following lines in your
            (if (and fieldval
                     (string-match regexp fieldval))
                (setq ignore t)
-@@ -413,7 +425,8 @@
+@@ -396,7 +408,8 @@
                  pairs (cdr (car rest))  ; (REGEXP . STRING) or
                                          ; (REGEXP FIELD-NAME STRING) or
                                          ; (REGEXP FIELD-NAME STRING REPLACE-P)
@@ -113,12 +115,12 @@ though FLIM does not decode them, put the following lines in your
            (when fieldval
              (while pairs
                (setq regexp (car (car pairs))
---- bbdb-2.33/lisp/bbdb.el~	Wed Sep  5 07:00:12 2001
-+++ bbdb-2.33/lisp/bbdb.el	Mon Sep 10 10:12:28 2001
-@@ -707,6 +707,7 @@
+--- bbdb-2.33/lisp/bbdb.el~	Tue Mar 27 08:00:31 2001
++++ bbdb-2.33/lisp/bbdb.el	Mon Sep 10 22:48:15 2001
+@@ -709,6 +709,7 @@
  (defvar bbdb-showing-changed-ones nil)
  (defvar bbdb-modified-p nil)
- (defvar bbdb-address-print-formatting-alist) ; "bbdb-print"
+ (defvar bbdb-elided-display nil)
 +(defvar bbdb-extract-field-value-function-list nil)
  
  (defvar bbdb-debug t)
