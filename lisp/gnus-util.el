@@ -1307,6 +1307,34 @@ SPEC is a predicate specifier that contains stuff like `or', `and',
       (and (featurep 'xemacs)
 	   t)))
 
+(put 'gnus-parse-without-error 'lisp-indent-function 0)
+(put 'gnus-parse-without-error 'edebug-form-spec '(body))
+
+(defmacro gnus-parse-without-error (&rest body)
+  "Allow continuing onto the next line even if an error occurs."
+  `(while (not (eobp))
+     (condition-case ()
+	 (progn
+	   ,@body
+	   (goto-char (point-max)))
+       (error
+	(gnus-error 4 "Invalid data on line %d"
+		    (count-lines (point-min) (point)))
+	(forward-line 1)))))
+
+(defun gnus-cache-file-contents (file variable function)
+  "Cache the contents of FILE in VARIABLE.  The contents come from FUNCTION."
+  (let ((time (nth 5 (file-attributes file)))
+	contents value)
+    (if (or (null (setq value (symbol-value variable)))
+	    (not (equal (car value) file))
+	    (not (equal (nth 1 value) time)))
+	(progn
+	  (setq contents (funcall function file))
+	  (set variable (list file time contents))
+	  contents)
+      (nth 2 value))))
+
 (provide 'gnus-util)
 
 ;;; gnus-util.el ends here

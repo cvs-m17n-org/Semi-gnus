@@ -1135,7 +1135,7 @@ See Info node `(gnus)Customizing Articles' and Info node
 	   (gnus-image-type-available-p 'xpm)
 	   (gnus-image-type-available-p 'pbm)))
   "If non-nil, gnus uses `smiley-mule' for displaying smileys rather than
-`smiley-ems'.  It defaults to t when Emacs 20 or earlier is running.
+`smiley'.  It defaults to t when Emacs 20 or earlier is running.
 `smiley-mule' is boundled in BITMAP-MULE package.  You can set it to t
 even if you are using Emacs 21+.  It has no effect on XEmacs."
   :group 'gnus-article-various
@@ -1153,7 +1153,7 @@ even if you are using Emacs 21+.  It has no effect on XEmacs."
 
 (defvar gnus-article-smiley-mule-loaded-p nil
   "Internal variable used to say whether `smiley-mule' is loaded (whether
-smiley functions are not overridden by `smiley-ems').")
+smiley functions are not overridden by `smiley').")
 
 (defcustom gnus-treat-display-smileys
   (if (or (and (featurep 'xemacs)
@@ -1283,7 +1283,11 @@ It is a string, such as \"PGP\". If nil, ask user."
   :type 'string
   :group 'mime-security)
 
-(defcustom gnus-article-wash-function 'gnus-article-wash-html-with-w3
+(defcustom gnus-article-wash-function
+  (cond ((locate-library "w3")
+	 'gnus-article-wash-html-with-w3)
+	((locate-library "w3m")
+	 'gnus-article-wash-html-with-w3m))
   "Function used for converting HTML into text."
   :type '(radio (function-item gnus-article-wash-html-with-w3)
 		(function-item gnus-article-wash-html-with-w3m))
@@ -1896,7 +1900,7 @@ unfolded."
     (when (and (>= emacs-major-version 21)
 	       (not gnus-article-should-use-smiley-mule)
 	       gnus-article-smiley-mule-loaded-p)
-      (load "smiley-ems" nil t)
+      (load "smiley" nil t)
       (setq gnus-article-smiley-mule-loaded-p nil))
     (when (and gnus-article-should-use-smiley-mule
 	       (not gnus-article-smiley-mule-loaded-p))
@@ -2287,9 +2291,10 @@ If READ-CHARSET, ask for a coding system."
 
 (defun gnus-article-wash-html-with-w3m ()
   "Wash the current buffer with w3m."
-  (shell-command-on-region
-   (point) (point-max) "w3m -T text/html" t t))
-  
+  (mm-setup-w3m)
+  (w3m-region (point) (point-max))
+  (setq mm-w3m-minor-mode t))
+
 (defun article-hide-list-identifiers ()
   "Remove list identifies from the Subject header.
 The `gnus-list-identifiers' variable specifies what to do."

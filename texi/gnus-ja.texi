@@ -13120,7 +13120,12 @@ rmail box のためのアクティブファイルの名前。既定値
 
 @item nnml-marks-file-name
 @vindex nnml-marks-file-name
-@sc{印} ファイルの名前です。ディフォルトは @file{.marks} です。
+@dfn{印} ファイルの名前です。ディフォルトは @file{.marks} です。
+
+@item nnml-use-compressed-files
+@vindex nnml-use-compressed-files
+非-@code{nil} だったら @code{nnml} は圧縮されたメッセージファイルを使う
+ことを考慮に入れます。
 @end table
 
 @findex nnml-generate-nov-databases

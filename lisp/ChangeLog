@@ -1,3 +1,99 @@
+2002-01-27  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-fetch-articles): Don't save empty articles.
+
+2002-01-27  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-util.el (gnus-cache-file-contents): Don't use equalp. 
+
+2002-01-26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnheader.el (nnheader-insert-nov-file): Increased cutoff to
+	32K.
+
+	* gnus-sum.el (gnus-summary-expire-articles): Clean up.
+
+	* nnmail.el (nnmail-article-group): Decode headers before running
+	split rules over them.
+	(nnmail-mail-splitting-charset): New variable.
+
+	* smiley.el: Replaced with smiley-ems.el.
+
+2002-01-26  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-url.el (mm-url-predefined-programs): Add w3m.
+	(mm-url-program): Ditto.
+
+2002-01-26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnml.el (nnml-use-compressed-files): New variable.
+	(nnml-filenames-are-evil): Removed.
+	(nnml-current-group-article-to-file-alist): Don't use.
+	(nnml-update-file-alist): Inhibit.
+	(nnml-article-to-file): Use new var.
+
+2002-01-26  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-util.el (gnus-parse-without-error): Add edebug-form-spec.
+
+	* nnagent.el (nnagent-retrieve-headers): loop until eobp.
+
+2002-01-26  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-agent.el (gnus-agent-load-alist): Use new caching
+	function. 
+
+	* gnus-util.el (gnus-cache-file-contents): New function.
+
+	* gnus-agent.el (gnus-agent-file-loading-cache): New variable.
+	(gnus-agent-load-alist): Use it.
+
+	* nnagent.el (nnagent-retrieve-headers): Use optimized function. 
+
+	* nnheader.el (nnheader-insert-nov-file): New function.
+
+	* gnus-util.el (gnus-parse-without-error): Correct the loop. 
+
+	* gnus-sum.el (gnus-dependencies-add-header): Use in-reply-to if
+	there are no references.
+	(gnus-extract-message-id-from-in-reply-to): New function.
+	(gnus-nov-parse-line): Use in-reply-to if there are no
+	references. 
+
+2002-01-25  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnagent.el (nnagent-retrieve-headers): Use new macro.
+
+	* gnus-util.el (gnus-parse-without-error): New macro.
+
+2002-01-25  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-article-wash-html-with-w3m): Call w3m-region.
+	(gnus-article-wash-function): use locate-library to decide which
+	to use.
+
+2002-01-25  Simon Josefsson  <jas@extundo.com>
+
+	* pop3.el (pop3-munge-message-separator): Work if no date.  From
+	Marius Vollmer <mvo@zagadka.ping.de>.
+
+2002-01-25  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-agent.el (gnus-agent-save-alist): Fix.
+
+	* nnagent.el (nnagent-retrieve-headers): Must have cut too much by
+	mistake.  Reinstated lost code.
+
+2002-01-25  Josh Huber  <huber@alum.wpi.edu>
+
+	* mml2015.el (mml2015-mailcrypt-decrypt): Display a signature if
+	one exists in the case of an encrypted message with an internal
+	signature.
+
+2002-01-25  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-agent.el (gnus-agent-save-alist): Optimized.
+
 2002-01-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* dgnushack.el: Commented out the experimental code.
@@ -40,7 +136,7 @@
 2002-01-24  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-agent.el (gnus-agent-request-article): Make sure it is not
-	empty file.
+	an empty file.
 
 	* nnweb.el (url): Ignore errors when request url.
 

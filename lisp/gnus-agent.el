@@ -155,6 +155,7 @@ If this is `ask' the hook will query the user."
 (defvar gnus-agent-file-name nil)
 (defvar gnus-agent-send-mail-function nil)
 (defvar gnus-agent-file-coding-system 'raw-text)
+(defvar gnus-agent-file-loading-cache nil)
 
 ;; Dynamic variables
 (defvar gnus-headers)
@@ -958,32 +959,33 @@ the actual number of articles toggled is returned."
 	  (while pos
 	    (narrow-to-region (cdar pos) (or (cdadr pos) (point-max)))
 	    (goto-char (point-min))
-	    (when (search-forward "\n\n" nil t)
-	      (when (search-backward "\nXrefs: " nil t)
-		;; Handle crossposting.
-		(skip-chars-forward "^ ")
-		(skip-chars-forward " ")
-		(setq crosses nil)
-		(while (looking-at "\\([^: \n]+\\):\\([0-9]+\\) +")
-		  (push (cons (buffer-substring (match-beginning 1)
-						(match-end 1))
-			      (buffer-substring (match-beginning 2)
-						(match-end 2)))
-			crosses)
-		  (goto-char (match-end 0)))
-		(gnus-agent-crosspost crosses (caar pos))))
-	    (goto-char (point-min))
-	    (if (not (re-search-forward "^Message-ID: *<\\([^>\n]+\\)>" nil t))
-		(setq id "No-Message-ID-in-article")
-	      (setq id (buffer-substring (match-beginning 1) (match-end 1))))
-	    (write-region-as-coding-system
-	     gnus-agent-file-coding-system
-	     (point-min) (point-max)
-	     (concat dir (number-to-string (caar pos))) nil 'silent)
-	    (when (setq elem (assq (caar pos) gnus-agent-article-alist))
-	      (setcdr elem t))
-	    (gnus-agent-enter-history
-	     id (or crosses (list (cons group (caar pos)))) date)
+	    (unless (eobp)  ;; Don't save empty articles.
+	      (when (search-forward "\n\n" nil t)
+		(when (search-backward "\nXrefs: " nil t)
+		  ;; Handle cross posting.
+		  (skip-chars-forward "^ ")
+		  (skip-chars-forward " ")
+		  (setq crosses nil)
+		  (while (looking-at "\\([^: \n]+\\):\\([0-9]+\\) +")
+		    (push (cons (buffer-substring (match-beginning 1)
+						  (match-end 1))
+				(buffer-substring (match-beginning 2)
+						  (match-end 2)))
+			  crosses)
+		    (goto-char (match-end 0)))
+		  (gnus-agent-crosspost crosses (caar pos))))
+	      (goto-char (point-min))
+	      (if (not (re-search-forward
+			"^Message-ID: *<\\([^>\n]+\\)>" nil t))
+		  (setq id "No-Message-ID-in-article")
+		(setq id (buffer-substring (match-beginning 1) (match-end 1))))
+	      (write-region-as-coding-system
+	       gnus-agent-file-coding-system (point-min) (point-max)
+	       (concat dir (number-to-string (caar pos))) nil 'silent)
+	      (when (setq elem (assq (caar pos) gnus-agent-article-alist))
+		(setcdr elem t))
+	      (gnus-agent-enter-history
+	       id (or crosses (list (cons group (caar pos)))) date))
 	    (widen)
 	    (pop pos)))
 	(gnus-agent-save-alist group)))))
@@ -1135,23 +1137,35 @@ the actual number of articles toggled is returned."
 
 (defun gnus-agent-load-alist (group &optional dir)
   "Load the article-state alist for GROUP."
-  (setq gnus-agent-article-alist
-	(gnus-agent-read-file
-	 (if dir
-	     (expand-file-name ".agentview" dir)
-	   (gnus-agent-article-name ".agentview" group)))))
+  (let ((file))
+    (setq gnus-agent-article-alist
+	  (gnus-cache-file-contents
+	   (if dir
+	       (expand-file-name ".agentview" dir)
+	     (gnus-agent-article-name ".agentview" group))
+	   'gnus-agent-file-loading-cache
+	   'gnus-agent-read-file))))
 
 (defun gnus-agent-save-alist (group &optional articles state dir)
   "Save the article-state alist for GROUP."
-  (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system)
-	print-level print-length item)
-    (dolist (art articles)
-      (if (setq item (memq art gnus-agent-article-alist))
-	  (setcdr item state)
-	(push  (cons art state) gnus-agent-article-alist)))
-    (setq gnus-agent-article-alist
-	  (sort gnus-agent-article-alist 'car-less-than-car))
+  (let* ((file-name-coding-system nnmail-pathname-coding-system)
+	 (pathname-coding-system nnmail-pathname-coding-system)
+	 (prev (cons nil gnus-agent-article-alist))
+	 (all prev)
+	 print-level print-length item article)
+    (while (setq article (pop articles))
+      (while (and (cdr prev)
+		  (< (caadr prev) article))
+	(setq prev (cdr prev)))
+      (cond
+       ((not (cdr prev))
+	(setcdr prev (list (cons article state))))
+       ((> (caadr prev) article)
+	(setcdr prev (cons (cons article state) (cdr prev))))
+       ((= (caadr prev) article)
+	(setcdr (cadr prev) state)))
+      (setq prev (cdr prev)))
+    (setq gnus-agent-article-alist (cdr all))
     (with-temp-file (if dir
 			(expand-file-name ".agentview" dir)
 		      (gnus-agent-article-name ".agentview" group))

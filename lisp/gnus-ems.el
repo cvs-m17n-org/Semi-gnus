@@ -50,7 +50,7 @@
 
 (if (or (featurep 'xemacs)
 	(>= emacs-major-version 21))
-    (autoload 'smiley-region "smiley-ems")
+    (autoload 'smiley-region "smiley")
   (autoload 'smiley-region "smiley-mule"))
 
 (defun gnus-kill-all-overlays ()

@@ -340,7 +340,7 @@ endings; the input data shall be treated as binary."
   :group 'gpg-commands)
 
 (defcustom gpg-command-decrypt
-  '(gpg . ("--decrypt" "--batch" "--passphrase-fd=0"))
+  '(gpg . ("--status-fd" "2" "--decrypt" "--batch" "--passphrase-fd=0"))
   "Command to decrypt a message.
 The invoked program has to read the passphrase from standard
 input, followed by the encrypted message.  It writes the decrypted
