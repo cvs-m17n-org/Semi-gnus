@@ -1,3 +1,8 @@
+2001-03-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-retrieve-url): Check if
+	`url-current-mime-charset' is bound.
+
 2001-03-04  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-info-find-node): Pretend to be

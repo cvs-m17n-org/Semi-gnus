@@ -338,7 +338,8 @@ for a charset indication")
 	(setq-default url-automatic-caching old-caching)
 	(setq-default url-standalone-mode old-mode)))
     (let ((charset
-	   (or url-current-mime-charset
+	   (or (and (boundp 'url-current-mime-charset)
+		    (symbol-value 'url-current-mime-charset))
 	       (let ((case-fold-search t))
 		 (goto-char (point-min))
 		 (if (or (re-search-forward
