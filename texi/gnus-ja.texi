@@ -2669,6 +2669,13 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 @samp{shaving group:alt.sysadmin.recovery} $B$N$h$&$J9gCW$9$kJ8;zNs$rMQ$$(B
 $B$k$3$H$K$h$C$F!"8!:wBP>]$rFCDj$N%0%k!<%W$K8BDj$9$k$3$H$,2DG=$G$9!#(B
 
+@item G R
+@kindex G R ($B%0%k!<%W(B)
+@findex gnus-group-make-rss-group
+@acronym{RSS} $B$N>pJs6!5k$K4p$E$/%0%k!<%W$r:n$j$^(B
+$B$9(B (@code{gnus-group-make-rss-group})$B!#(BURL $B$NF~NO$rB%$5$l$^$9!#(B
+@xref{RSS}.
+
 @item G DEL
 @kindex G DEL ($B%0%k!<%W(B)
 @findex gnus-group-delete-group
@@ -14811,16 +14818,16 @@ Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
 
 @item nnslashdot-active-url
 @vindex nnslashdot-active-url
-$B%K%e!<%95-;v$H%3%a%s%H$r<hF@$9$k$?$a$K;H$o$l$k(B @sc{url} $B$NJ8;zNs$G$9!#=i(B
-$B4|CM$O(B @samp{http://slashdot.org/search.pl?section=&min=%d} $B$G$9!#(B
+$B%K%e!<%95-;v$H%3%a%s%H$r<hF@$9$k$?$a$K;H$o$l$k(B @acronym{URL} $B$NJ8;zNs$G(B
+$B$9!#=i4|CM$O(B @samp{http://slashdot.org/search.pl?section=&min=%d} $B$G$9!#(B
 
 @item nnslashdot-comments-url
 @vindex nnslashdot-comments-url
-$B%3%a%s%H$r<hF@$9$k$?$a$K;HMQ$5$l$k(B @sc{url} $BJ8;zNs$G$9!#(B
+$B%3%a%s%H$r<hF@$9$k$?$a$K;HMQ$5$l$k(B @acronym{URL} $BJ8;zNs$G$9!#(B
 
 @item nnslashdot-article-url
 @vindex nnslashdot-article-url
-$B%K%e!<%95-;v$r<hF@$9$k$?$a$K;H$o$l$k(B @sc{url} $BJ8;zNs$G$9!#=i4|CM(B
+$B%K%e!<%95-;v$r<hF@$9$k$?$a$K;H$o$l$k(B @acronym{URL} $BJ8;zNs$G$9!#=i4|CM(B
 $B$O(B @samp{http://slashdot.org/article.pl?sid=%s&mode=nocomment} $B$G$9!#(B
 
 @item nnslashdot-threshold
@@ -14845,10 +14852,10 @@ Gnus $B$O$3$l$i$N%=!<%9$X$N3&LL$rDs6!$9$k%P%C%/%(%s%I72$r>/$7Hw$($D$D$"$j(B
 @code{nnultimate} $B$r;O$a$k$?$a$N0lHV4JC1$JJ}K!$O%0%k!<%W%P%C%U%!$G0J2<$N(B
 $B$h$&$J$b$N$r$9$k$3$H$G$9(B: @kbd{B nnultimate RET
 http://www.tcj.com/messboard.ubbcgi/ RET}$B!#(B($B6=L#$N$"$k2q5D<<(B
-$B$N(B @sc{url} (@samp{Ultimate.cgi} $BEy$r:G8e$K4^$s$G$$$J$$$b$N(B) $B$KJQ$($F$/(B
-$B$@$5$$!#(BUltimate $B%&%'%V%5%$%H$K$O$?$/$5$s5s$2$i$l$F$$$^$9!#(B) $B$=$l$+$i%5!<(B
-$B%P!<%P%C%U%!$G6=L#$N$"$k%0%k!<%W$r9XFI$7!"%0%k!<%W%P%C%U%!$+$i$=$l$i$rFI(B
-$B$s$G$/$@$5$$!#(B
+$B$N(B @acronym{URL} (@samp{Ultimate.cgi} $BEy$r:G8e$K4^$s$G$$$J$$$b$N(B) $B$KJQ$((B
+$B$F$/$@$5$$!#(BUltimate $B%&%'%V%5%$%H$K$O$?$/$5$s5s$2$i$l$F$$$^$9!#(B) $B$=$l$+(B
+$B$i%5!<%P!<%P%C%U%!$G6=L#$N$"$k%0%k!<%W$r9XFI$7!"%0%k!<%W%P%C%U%!$+$i$=$l(B
+$B$i$rFI$s$G$/$@$5$$!#(B
 
 $B0J2<$N(B @code{nnutimate} $BJQ?t$rJQ992DG=$G$9(B:
 
@@ -14926,13 +14933,22 @@ http://w3m.sourceforge.net/
 @cindex nnrss
 @cindex RSS
 
-$B$$$/$D$+$N%5%$%H$O(B RDF site summary (RSS) $B$r;}$C$F$$$^(B
-$B$9(B @uref{http://purl.org/rss/1.0/spec}$B!#$3$l$O$H$F$b5,B'E*$+$DNI<A$J%$%s(B
-$B%?!<%U%'!<%9$G!"(Bgnus $B$,%0%k!<%W$r>o$K?7$7$/$7$F$*$/$?$a$N>pJs$rF@$k$3$H(B
-$B$,$G$-$^$9!#(B
+@c TRANSLATEME!
+Some web sites have an RDF Site Summary (@acronym{RSS}).
+@acronym{RSS} is a format for summarizing headlines from news related
+sites (such as BBC or CNN).  But basically anything list-like can be
+presented as an @acronym{RSS} feed: weblogs, changelogs or recent
+changes to a wiki (e.g. @url{http://cliki.net/recent-changes.rdf}).
 
-$B4JC1$K(B @code{nnrss} $B$r;H$$;O$a$k$K$O!"%0%k!<%W%P%C%U%!(B
-$B$G(B @kbd{B nnrss RET RET} $B$H%?%$%W$7$F!"%0%k!<%W$r9VFI$7$F2<$5$$!#(B
+@acronym{RSS} has a quite regular and nice interface, and it's
+possible to get the information Gnus needs to keep groups updated.
+
+Use @kbd{G R} from the summary buffer to subscribe to a feed---you
+will be prompted for the location of the feed.
+
+An easy way to get started with @code{nnrss} is to say something like
+the following in the group buffer: @kbd{B nnrss RET y}, then
+subscribe to groups.
 
 $B0J2<$N(B @code{nnrss} $BJQ?t$,JQ992DG=$G$9(B:
 
@@ -14941,6 +14957,15 @@ http://w3m.sourceforge.net/
 @vindex nnrss-directory
 @code{nnrss} $B$,%U%!%$%k$r=q$-9~$`%G%#%l%/%H%j!<$G!"%G%#%U%)%k%H(B
 $B$O(B @file{~/News/rss/} $B$G$9!#(B
+
+@c TRANSLATEME!
+@item nnrss-use-local
+@vindex nnrss-use-local
+@findex nnrss-generate-download-script
+If you set @code{nnrss-use-local} to @code{t}, @code{nnrss} will read
+the feeds from local files in @code{nnrss-directory}.  You can use
+the command @code{nnrss-generate-download-script} to generate a
+download script using @command{wget}.
 @end table
 
 $B35N,%P%C%U%!$K@bL@$rI=<($5$;$?$$$J$i$P!"0J2<$N%3!<%I$,Lr$KN)$D$G$7$g$&!#(B
