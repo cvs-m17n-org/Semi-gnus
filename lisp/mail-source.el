@@ -312,7 +312,7 @@ If ARGS, PROMPT is used as an argument to `format'."
     (when prescript
       (if (and (symbolp prescript) (fboundp prescript))
 	  (funcall prescript)
-	(call-process shell-file-name nil nil nil
+	(call-process shell-file-name nil 0 nil
 		      shell-command-switch 
 		      (format-spec
 		       prescript
@@ -324,7 +324,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	    (when prescript
 	      (if (and (symbolp prescript) (fboundp prescript))
 		  (funcall prescript)
-		(call-process shell-file-name nil nil nil
+		(call-process shell-file-name nil 0 nil
 			      shell-command-switch 
 			      (format-spec
 			       postscript
