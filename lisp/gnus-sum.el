@@ -2694,7 +2694,7 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	      (and gnus-newsgroup-name
 		   (string-equal gnus-newsgroup-name group)))
     (gnus-summary-exit)
-    (gnus-summary-read-group group show-all)))
+    (gnus-summary-read-group group show-all t)))
 
 (defun gnus-summary-read-group-1 (group show-all no-article
 					kill-buffer no-display
