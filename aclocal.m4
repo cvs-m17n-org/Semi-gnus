@@ -95,11 +95,19 @@ AC_DEFUN(AC_PATH_LISPDIR, [
     if test "$theprefix" = NONE; then
 	theprefix=$ac_default_prefix
     fi
-    lispdir="\$(datadir)/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
+    if test "$EMACS_FLAVOR" = "xemacs"; then
+	lispdir="\$(datadir)/${EMACS_FLAVOR}/site-packages/lisp/${GNUS_PRODUCT_NAME}"
+    else
+	lispdir="\$(datadir)/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
+    fi
     for thedir in share lib; do
 	potential=
 	if test -d ${theprefix}/${thedir}/${EMACS_FLAVOR}/site-lisp; then
-	   lispdir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
+	   if test "$EMACS_FLAVOR" = "xemacs"; then
+	       lispdir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-packages/lisp/${GNUS_PRODUCT_NAME}"
+	   else
+	       lispdir="\$(prefix)/${thedir}/${EMACS_FLAVOR}/site-lisp/${GNUS_PRODUCT_NAME}"
+	   fi
 	   break
 	fi
     done
@@ -118,7 +126,11 @@ AC_DEFUN(AC_PATH_ETCDIR, [
   AC_MSG_CHECKING([where etc files should go])
   if test -z "$etcdir"; then
     dnl Set default value
+    if test "$EMACS_FLAVOR" = "xemacs"; then
+      etcdir="\$(lispdir)/../etc/gnus"
+    else
     etcdir="\$(lispdir)/../etc"
+    fi
   fi
   AC_MSG_RESULT($etcdir)
   AC_SUBST(etcdir)
@@ -251,13 +263,13 @@ if test -z "${USE_FONTS}"; then
       if echo "$retval" | grep 'Some font shapes were not available' >& AC_FD_CC 2>&1  ; then  
 	:
       else
-        if test -z "${USE_FONTS}"; then
+	 if test -z "${USE_FONTS}"; then
 	  USE_FONTS="Adobe Futura"
-        else
+	 else
 	  USE_FONTS="${USE_FONTS}, Adobe Futura"
-        fi
-        WITH_FONTS_pfu=
-        WITHOUT_FONTS_pfu='%'
+	 fi
+	 WITH_FONTS_pfu=
+	 WITHOUT_FONTS_pfu='%'
       fi
     fi
     echo '\nonstopmode\documentclass{article}\begin{document}{\fontfamily{bcr}\fontsize{10pt}{10}\selectfont test}\end{document}' > ${OUTPUT}
@@ -265,13 +277,13 @@ if test -z "${USE_FONTS}"; then
       if echo "$retval" | grep 'Some font shapes were not available' >& AC_FD_CC 2>&1  ; then  
 	:
       else
-        if test -z "${USE_FONTS}"; then
+	 if test -z "${USE_FONTS}"; then
 	  USE_FONTS="Bitstream Courier"
-        else
+	 else
 	  USE_FONTS="${USE_FONTS}, Bitstream Courier"
-        fi
-        WITH_FONTS_bcr=
-        WITHOUT_FONTS_bcr='%'
+	 fi
+	 WITH_FONTS_bcr=
+	 WITHOUT_FONTS_bcr='%'
       fi
     fi
     rm -f ${OUTPUT} ${OUTPUT}.aux ${OUTPUT}.log ${OUTPUT}.dvi
