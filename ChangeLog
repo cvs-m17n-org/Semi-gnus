@@ -1,3 +1,12 @@
+1999-11-27  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 06.
+
+	* lisp/gnus-art.el (gnus-signature-toggle): Specify the 4th arg of
+	`next-single-property-change' LIMIT as `point-max'.
+	(gnus-article-prepare-mime-display): Ditto.
+	(article-hide-signature): Ditto.
+
 1999-11-26  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
 
 	* lisp/gnus.el (gnus-version): Parentheses of gnus-revision-number
