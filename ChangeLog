@@ -1,3 +1,22 @@
+1999-08-23  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 10.
+
+	* lisp/gnus-sum.el (gnus-summary-search-article): Highlight
+	matched text after the searching is done; call
+	`gnus-summary-select-article' with the args nil and t; bind
+	`gnus-treat-*' to nil.
+	(gnus-summary-search-article-highlight-matched-text): New macro
+	for highlighting matched text.  It is bound at the compile time
+	only.
+	(gnus-summary-isearch-article): Call `gnus-summary-select-article'
+	with the args nil and t; bind `gnus-treat-*' to nil.
+
+	* lisp/gnus-ems.el (gnus-x-splash): Change the foreground color of
+	`gnus-splash' to "Brown"; use `with-temp-buffer' instead of
+	`with-temp-file'; use `insert-file-contents-as-binary' instead of
+	`insert-file-contents'.
+
 1999-08-20  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 09.
