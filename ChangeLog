@@ -1,3 +1,7 @@
+1998-10-07  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* TODO.ja: New file.
+
 1998-10-06  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/message.el (message-mime-insert-article): Don't refer to
@@ -119,7 +123,9 @@
 
 1998-10-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
-	* lisp/pop3-fma.el(pop3-fma-movemail): Bug fix.
+	* lisp/pop3-fma.el (pop3-fma-movemail): Bug fix.
+	Delete variable pop3-fma-movemail options.
+	Add new variabel pop3-fma-commandline-arguments.
 
 1998-10-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
