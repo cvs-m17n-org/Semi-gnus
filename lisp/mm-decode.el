@@ -28,6 +28,12 @@
 (require 'gnus-mailcap)
 (require 'mm-bodies)
 
+(defgroup mime-display ()
+  "Display of MIME in mail and news articles."
+  :link '(custom-manual "(emacs-mime)Customization")
+  :group 'mail
+  :group 'news)
+
 ;;; Convenience macros.
 
 (defmacro mm-handle-buffer (handle)
@@ -64,7 +70,7 @@
   `(list ,buffer ,type ,encoding ,undisplayer
 	 ,disposition ,description ,cache ,id))
 
-(defvar mm-inline-media-tests
+(defcustom mm-inline-media-tests
   '(("image/jpeg"
      mm-inline-image
      (lambda (handle)
@@ -132,32 +138,43 @@
     ("multipart/alternative" ignore identity)
     ("multipart/mixed" ignore identity)
     ("multipart/related" ignore identity))
-  "Alist of media types/test that say whether the media types can be displayed inline.")
+  "Alist of media types/tests saying whether types can be displayed inline."
+  :type '(repeat (list (string :tag "MIME type")
+		       (function :tag "Display function")
+		       (function :tag "Display test")))
+  :group 'mime-display)
 
-(defvar mm-inlined-types
+(defcustom mm-inlined-types
   '("image/.*" "text/.*" "message/delivery-status" "message/rfc822"
     "application/pgp-signature")
-  "List of media types that are to be displayed inline.")
+  "List of media types that are to be displayed inline."
+  :type '(repeat string)
+  :group 'mime-display)
   
-(defvar mm-automatic-display
+(defcustom mm-automatic-display
   '("text/plain" "text/enriched" "text/richtext" "text/html"
     "text/x-vcard" "image/.*" "message/delivery-status" "multipart/.*"
     "message/rfc822" "text/x-patch" "application/pgp-signature")
-  "A list of MIME types to be displayed automatically.")
+  "A list of MIME types to be displayed automatically."
+  :type '(repeat string)
+  :group 'mime-display)
 
-(defvar mm-attachment-override-types '("text/x-vcard")
-  "Types that should have \"attachment\" ignored if they can be displayed inline.")
+(defcustom mm-attachment-override-types '("text/x-vcard")
+  "Types to have \"attachment\" ignored if they can be displayed inline."
+  :type '(repeat string)
+  :group 'mime-display)
 
-(defvar mm-inline-override-types nil
-  "Types that should be treated as attachments even if they can be displayed inline.")
+(defcustom mm-inline-override-types nil
+  "Types to be treated as attachments even if they can be displayed inline."
+  :type '(repeat string)
+  :group 'mime-display)
 
-(defvar mm-inline-override-types nil
-  "Types that should be treated as attachments even if they can be displayed inline.")
+(defcustom mm-automatic-external-display nil
+  "List of MIME type regexps that will be displayed externally automatically."
+  :type '(repeat string)
+  :group 'mime-display)
 
-(defvar mm-automatic-external-display nil
-  "List of MIME type regexps that will be displayed externally automatically.")
-
-(defvar mm-discouraged-alternatives nil
+(defcustom mm-discouraged-alternatives nil
   "List of MIME types that are discouraged when viewing multipart/alternative.
 Viewing agents are supposed to view the last possible part of a message,
 as that is supposed to be the richest.  However, users may prefer other
@@ -166,7 +183,9 @@ for instance, text/html parts are very unwanted, and text/richtech are
 somewhat unwanted, then the value of this variable should be set
 to:
 
- (\"text/html\" \"text/richtext\")")
+ (\"text/html\" \"text/richtext\")"
+  :type '(repeat string)
+  :group 'mime-display)
 
 (defvar mm-tmp-directory
   (cond ((fboundp 'temp-directory) (temp-directory))
@@ -174,8 +193,10 @@ to:
 	("/tmp/"))
   "Where mm will store its temporary files.")
 
-(defvar mm-inline-large-images nil
-  "If non-nil, then all images fit in the buffer.")
+(defcustom mm-inline-large-images nil
+  "If non-nil, then all images fit in the buffer."
+  :type 'boolean
+  :group 'mime-display)
 
 ;;; Internal variables.
 
@@ -249,13 +270,13 @@ to:
 (defun mm-dissect-multipart (ctl)
   (goto-char (point-min))
   (let* ((boundary (concat "\n--" (mail-content-type-get ctl 'boundary)))
-	(close-delimiter (concat (regexp-quote boundary) "--[ \t]*$"))
-	start parts
-	(end (save-excursion
-	       (goto-char (point-max))
-	       (if (re-search-backward close-delimiter nil t)
-		   (match-beginning 0)
-		 (point-max)))))
+	 (close-delimiter (concat (regexp-quote boundary) "--[ \t]*$"))
+	 start parts
+	 (end (save-excursion
+		(goto-char (point-max))
+		(if (re-search-backward close-delimiter nil t)
+		    (match-beginning 0)
+		  (point-max)))))
     (while (search-forward boundary end t)
       (goto-char (match-beginning 0))
       (when start
@@ -308,88 +329,107 @@ external if displayed external."
 		  (mm-insert-inline handle (mm-get-part handle))
 		  'inline)
 	      (mm-display-external
-	       handle (or method 'mailcap-save-binary-file))
-	      'external)))))))
+	       handle (or method 'mailcap-save-binary-file)))))))))
 
 (defun mm-display-external (handle method)
   "Display HANDLE using METHOD."
-  (mm-with-unibyte-buffer
-    (if (functionp method)
-	(let ((cur (current-buffer)))
-	  (if (eq method 'mailcap-save-binary-file)
-	      (progn
-		(set-buffer (generate-new-buffer "*mm*"))
-		(setq method nil))
-	    (mm-insert-part handle)
-	    (let ((win (get-buffer-window cur t)))
-	      (when win
-		(select-window win)))
-	    (switch-to-buffer (generate-new-buffer "*mm*")))
-	  (buffer-disable-undo)
-	  (mm-set-buffer-file-coding-system mm-binary-coding-system)
-	  (insert-buffer-substring cur)
+  (let ((outbuf (current-buffer)))
+    (mm-with-unibyte-buffer
+      (if (functionp method)
+	  (let ((cur (current-buffer)))
+	    (if (eq method 'mailcap-save-binary-file)
+		(progn
+		  (set-buffer (generate-new-buffer "*mm*"))
+		  (setq method nil))
+	      (mm-insert-part handle)
+	      (let ((win (get-buffer-window cur t)))
+		(when win
+		  (select-window win)))
+	      (switch-to-buffer (generate-new-buffer "*mm*")))
+	    (buffer-disable-undo)
+	    (mm-set-buffer-file-coding-system mm-binary-coding-system)
+	    (insert-buffer-substring cur)
+	    (message "Viewing with %s" method)
+	    (let ((mm (current-buffer))
+		  (non-viewer (assq 'non-viewer
+				    (mailcap-mime-info
+				     (mm-handle-media-type handle) t))))
+	      (unwind-protect
+		  (if method
+		      (funcall method)
+		    (mm-save-part handle))
+		(when (and (not non-viewer)
+			   method)
+		  (mm-handle-set-undisplayer handle mm)))))
+	;; The function is a string to be executed.
+	(mm-insert-part handle)
+	(let* ((dir (make-temp-name (expand-file-name "emm." mm-tmp-directory)))
+	       (filename (mail-content-type-get
+			  (mm-handle-disposition handle) 'filename))
+	       (mime-info (mailcap-mime-info
+			   (mm-handle-media-type handle) t))
+	       (needsterm (or (assoc "needsterm" mime-info)
+			      (assoc "needsterminal" mime-info)))
+	       (copiousoutput (assoc "copiousoutput" mime-info))
+	       file buffer)
+	  ;; We create a private sub-directory where we store our files.
+	  (make-directory dir)
+	  (set-file-modes dir 448)
+	  (if filename
+	      (setq file (expand-file-name (file-name-nondirectory filename)
+					   dir))
+	    (setq file (make-temp-name (expand-file-name "mm." dir))))
+	  (let ((coding-system-for-write mm-binary-coding-system))
+	    (write-region (point-min) (point-max) file nil 'nomesg))
 	  (message "Viewing with %s" method)
-	  (let ((mm (current-buffer))
-		(non-viewer (assq 'non-viewer
-				  (mailcap-mime-info
-				   (mm-handle-media-type handle) t))))
-	    (unwind-protect
-		(if method
-		    (funcall method)
-		  (mm-save-part handle))
-	      (when (and (not non-viewer)
-			 method)
-		(mm-handle-set-undisplayer handle mm)))))
-      ;; The function is a string to be executed.
-      (mm-insert-part handle)
-      (let* ((dir (make-temp-name (expand-file-name "emm." mm-tmp-directory)))
-	     (filename (mail-content-type-get
-			(mm-handle-disposition handle) 'filename))
-	     (mime-info (mailcap-mime-info
-			 (mm-handle-media-type handle) t))
-	     (needsterm (or (assoc "needsterm" mime-info)
-			    (assoc "needsterminal" mime-info)))
-	     (copiousoutput (assoc "copiousoutput" mime-info))
-	     process file buffer)
-	;; We create a private sub-directory where we store our files.
-	(make-directory dir)
-	(set-file-modes dir 448)
-	(if filename
-	    (setq file (expand-file-name (file-name-nondirectory filename)
-					 dir))
-	  (setq file (make-temp-name (expand-file-name "mm." dir))))
-	(let ((coding-system-for-write mm-binary-coding-system))
-	  (write-region (point-min) (point-max) file nil 'nomesg))
-	(message "Viewing with %s" method)
-	(unwind-protect
-	    (setq process
-		  (cond (needsterm
-			 (start-process "*display*" nil
-					"xterm"
-					"-e" shell-file-name 
-					shell-command-switch
-					(mm-mailcap-command
-					 method file (mm-handle-type handle))))
-			(copiousoutput
-			 (start-process "*display*"
+	  (cond (needsterm
+		 (unwind-protect
+		     (start-process "*display*" nil
+				    "xterm"
+				    "-e" shell-file-name 
+				    shell-command-switch
+				    (mm-mailcap-command
+				     method file (mm-handle-type handle)))
+		   (mm-handle-set-undisplayer handle (cons file buffer)))
+		 (message "Displaying %s..." (format method file))
+		 'external)
+		(copiousoutput
+		 (with-current-buffer outbuf
+		   (forward-line 1)
+		   (mm-insert-inline
+		    handle
+		    (unwind-protect
+			(progn
+			  (call-process shell-file-name nil
 					(setq buffer 
 					      (generate-new-buffer "*mm*"))
-					shell-file-name
+					nil
 					shell-command-switch
 					(mm-mailcap-command
 					 method file (mm-handle-type handle)))
-			 (switch-to-buffer buffer))
-			(t
-			 (start-process "*display*"
-					(setq buffer
-					      (generate-new-buffer "*mm*"))
-					shell-file-name
-					shell-command-switch
-					(mm-mailcap-command
-					 method file (mm-handle-type handle))))))
-	  (mm-handle-set-undisplayer handle (cons file buffer)))
-	(message "Displaying %s..." (format method file))))))
-
+			  (if (buffer-live-p buffer)
+			      (save-excursion
+				(set-buffer buffer)
+				(buffer-string))))
+		      (progn
+			(ignore-errors (delete-file file))
+			(ignore-errors (delete-directory
+					(file-name-directory file)))
+			(ignore-errors (kill-buffer buffer))))))
+		 'inline)
+		(t
+		 (unwind-protect
+		     (start-process "*display*"
+				    (setq buffer
+					  (generate-new-buffer "*mm*"))
+				    shell-file-name
+				    shell-command-switch
+				    (mm-mailcap-command
+				     method file (mm-handle-type handle)))
+		   (mm-handle-set-undisplayer handle (cons file buffer)))
+		 (message "Displaying %s..." (format method file))
+		 'external)))))))
+  
 (defun mm-mailcap-command (method file type-list)
   (let ((ctl (cdr type-list))
 	(beg 0)
@@ -418,6 +458,7 @@ external if displayed external."
       (while (setq handle (pop handles))
 	(cond
 	 ((stringp handle)
+	  ;; Do nothing.
 	  )
 	 ((and (listp handle)
 	       (stringp (car handle)))
@@ -434,6 +475,7 @@ external if displayed external."
       (while (setq handle (pop handles))
 	(cond
 	 ((stringp handle)
+	  ;; Do nothing.
 	  )
 	 ((and (listp handle)
 	       (stringp (car handle)))
@@ -637,6 +679,8 @@ external if displayed external."
 	  (mapcar (lambda (i) (list (cdr (assoc 'viewer i))))
 		  (mailcap-mime-info type 'all)))
 	 (method (completing-read "Viewer: " methods)))
+    (when (string= method "")
+      (error "No method given"))
     (mm-display-external (copy-sequence handle) method)))
 
 (defun mm-preferred-alternative (handles &optional preferred)

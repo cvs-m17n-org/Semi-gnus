@@ -1,3 +1,705 @@
+2000-01-05 17:31:52  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-select-article): Return whether we
+	selected something new.
+	(gnus-summary-search-article): Start searching at the window
+	point.
+
+	* gnus-group.el (gnus-fetch-group): Complete over
+	gnus-active-hashtb. 
+
+Wed Jan  5 17:06:41 2000  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Pterodactyl Gnus v5.8.3 is released.
+
+2000-01-05 15:56:02  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-preserve-marks): New variable.
+	(gnus-summary-move-article): Use it.
+	(gnus-group-charset-alist): Added more entries.
+
+2000-01-03 01:18:36  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mm-decode.el (mm-inline-override-types): Removed duplicate.
+
+	* gnus-uu.el (gnus-uu-mark-over): Use gnus-summary-default-score
+	as the default score.
+
+	* gnus-score.el (gnus-score-delta-default): Changed name.
+
+2000-01-04  Simon Josefsson  <jas@pdc.kth.se>
+
+	* imap.el (imap-parse-literal): 
+	(imap-parse-flag-list): Don't care about props.
+	(imap-parse-string): Handle quoted characters.
+
+2000-01-02 08:37:03  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-summary-goto-unread): Doc fix.
+	(gnus-summary-mark-article): Doc fix.
+	(gnus-summary-mark-forward): Doc fix.
+	(t): Changed keystroke for gnus-summary-customize-parameters.
+
+	* gnus-art.el (gnus-article-mode-map): Use gnus-article-edit for
+	"e". 
+	(gnus-article-mode-map): No, don't.
+
+	* gnus-sum.el (gnus-summary-next-subject): Don't show the thread
+	of the final article.
+
+	* mm-decode.el (mm-interactively-view-part): Error on no method.
+
+2000-01-02 06:10:32  Stefan Monnier  <monnier+gnu/emacs@tequila.cs.yale.edu>
+
+	* gnus-score.el (gnus-score-insert-help): Something.
+
+	* gnus-art.el (gnus-button-alist): Exclude < from <URL:
+
+	* gnus-win.el (gnus-configure-frame): Ditto.
+
+	* gnus-mh.el (gnus-summary-save-in-folder): Use
+	with-current-buffer.
+
+2000-01-02 05:00:13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnwarchive.el: Changed file perms.
+
+1999-12-19 21:42:15  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-group.el (gnus-group-delete-groups): New command.
+	(gnus-group-delete-group): Extra no-prompt parameters.
+
+1999-12-14 10:18:30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnslashdot.el (nnslashdot-request-article): Translate <br> into
+	<p>. 
+
+1999-12-28 12:20:18  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el (webmail-hotmail-article): Don't insert message id.
+
+1999-12-28  Kai.Grossjohann@CS.Uni-Dortmund.DE (Kai Groﬂjohann)
+
+	* nnimap.el (nnimap-split-fancy): New variable.
+	(nnimap-split-fancy): New function.
+
+1999-12-28  Simon Josefsson  <jas@pdc.kth.se>
+
+	(nnimap-split-rule): Document symbol value.
+
+1999-12-28  Simon Josefsson  <jas@pdc.kth.se>
+
+	* nnimap.el (nnimap-retrieve-headers-progress): Let
+	`nnheader-parse-head' parse article.
+	(nnimap-retrieve-headers-from-server): Don't request ENVELOPE,
+	request headers needed by `nnheader-parse-head'.
+
+1999-12-23  Florian Weimer  <fw@s.netic.de>
+
+	* gnus-msg.el (gnus-group-posting-charset-alist): Correct default
+	value (crosspostings are handled), improve documentation.
+
+	* smiley.el: Declare file coding system as iso-8859-1.
+
+	* nnultimate.el: Dito.
+
+	* message.el: Dito.
+
+	* gnus-cite.el: Dito.
+
+	* gnus-spec.el: Dito.
+
+1999-12-21  Florian Weimer  <fw@s.netic.de>
+
+	* gnus-msg.el (gnus-group-posting-charset-alist): New layout.
+	(gnus-setup-message): No longer make `message-posting-charset'
+	buffer-local.
+	(gnus-setup-posting-charset): Reflect the new layout of
+	`gnus-group-posting-charset-alist' and `message-posting-charset'.
+
+	* message.el (message-send-mail): Bind `message-this-is-mail' and
+	`message-posting-charset'.
+	(message-send-news): Dito, and honour new layout of 
+	`message-posting-charset'.
+	(message-encode-message-body): Ignore `message-posting-charset'.
+	
+	* mm-bodies.el (mm-body-encoding): Consider
+	`message-posting-charset' when deciding whether to use 8bit.
+
+	* rfc2047.el (rfc2047-encode-message-header): Back out change.
+	(rfc2047-encodable-p): Now solely for headers; use
+	`message-posting-charset'.
+	
+1999-12-20 14:10:39  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnwarchive.el (nnwarchive-type-definition): Set default value.
+
+1999-12-19 22:49:13  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnagent.el (nnagent-server-opened): Optional.
+	(nnagent-status-message): Optional.
+
+1999-12-19  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus-cite.el (gnus-article-toggle-cited-text): Restore beg and
+	end (referenced by instructions in
+	`gnus-cited-opened-text-button-line-format-alist').
+	
+1999-12-18  Simon Josefsson  <jas@pdc.kth.se>
+
+	* imap.el (imap-starttls-open): Typo.
+
+1999-12-18 16:43:37  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-charset-after): Non-MULE case.
+	* mail-prsvr.el (mail-parse-mule-charset): New variable.
+	* rfc2047.el (rfc2047-dissect-region): Bind it.
+
+1999-12-18  Florian Weimer  <fw@s.netic.de>
+
+	* mml.el (mml-generate-multipart-alist): Correct default value.	
+
+	* mm-encode.el (mm-use-ultra-safe-encoding): New variable.
+	(mm-safer-encoding): New function.
+	(mm-content-transfer-encoding): Use both.
+
+	* mm-bodies.el (mm-body-encoding): Use mm-use-ultra-safe-encoding.
+	* qp.el (quoted-printable-encode-region): Dito.
+
+1999-12-18 14:08:48  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el (webmail-hotmail-article): Snarf the raw file.
+
+1999-12-18 14:08:12  Victor S. Miller  <victor@idaccr.org>
+
+	* webmail.el (webmail-hotmail-list): raw=0.
+
+1999-12-18 11:14:51  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-enter-history): Back-compatible in
+	group name.
+
+1999-12-18 11:02:00  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-expire): Convert to symbol if stringp.
+
+1999-12-18  Simon Josefsson  <jas@pdc.kth.se>
+
+	* imap.el: Don't autoload digest-md5.
+	(imap-starttls-open): Bind coding-system-for-{read,write}.
+	(imap-starttls-p): Check if we can find starttls.el.
+	(imap-digest-md5-p): Check if we can find digest-md5.el.
+
+1999-12-17   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* base64.el (base64-encode-string): Accept 2nd argument
+	`no-line-break'.
+
+	* imap.el: Require `digest-md5' when compiling; add autoload
+	settings for `digest-md5-parse-digest-challenge',
+	`digest-md5-digest-response', `starttls-open-stream' and
+	`starttls-negotiate'.
+	(imap-authenticators): Add `digest-md5'.
+	(imap-authenticator-alist): Setup for `digest-md5'.
+	(imap-digest-md5-p): New function.
+	(imap-digest-md5-auth): New function.
+	(imap-stream-alist): Add STARTTLS entry.
+	(imap-starttls-p): New function.
+	(imap-starttls-open): New function.
+
+1999-12-18 01:08:10  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-enter-history): Bad group name.
+
+1999-12-17 19:36:47  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-dissect-region): Use mapcar instead of
+	string-to-x function.
+
+1999-12-17 13:08:54  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-fold-region): Fold a line more than once.
+
+1999-12-17 11:54:41  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el: Enhance hotmail-snarf.
+
+1999-12-17 10:38:10  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-dissect-region): Rewrite.
+
+1999-12-16 22:59:22  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el (webmail-hotmail-list): Search no-error.
+
+1999-12-15 22:07:15  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnwarchive.el: Support nov-is-evil.
+	* gnus-bcklg.el (gnus-backlog-request-article): Buffer is optional.
+	Set it if non-nil.
+	* gnus-agent.el (gnus-agent-fetch-articles): Use it.
+
+1999-12-15 08:55:19  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnagent.el (nnagent-server-opened): Redefine.
+	(nnagent-status-message): Ditto.
+
+1999-12-14 23:37:44  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc1843.el (rfc1843-decode-region): Use
+	buffer-substring-no-properties.
+	* gnus-art.el (article-decode-HZ): New function.
+
+1999-12-14 22:07:26  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnheader.el (nnheader-translate-file-chars): Only in full path.
+
+1999-12-14 16:21:45  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-find-charset-region): mail-parse-charset is a
+	MIME charset not a MULE charset.
+
+1999-12-14 15:08:03  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-ems.el: Translate more ugly characters.
+	* nnheader.el (nnheader-translate-file-chars): Don't translate
+	the second ':'.
+
+1999-12-14 10:40:33  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-request-article-this-buffer): Use all refer
+	method if cannot find the article.
+
+1999-12-14 01:13:50  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-request-article-this-buffer): Don't use refer
+	method if overrided.
+
+1999-12-13 23:38:53  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mail-source.el (mail-source-fetch-webmail): Parameter
+	dontexpunge.
+
+1999-12-13 23:31:17  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el: Support my-deja. Better error report.
+
+1999-12-13 18:59:33  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnslashdot.el (nnslashdot-date-to-date): Error proof when input
+	is bad.
+	* gnus-sum.el (gnus-list-of-unread-articles): When (car read) 
+	is not 1.
+
+1999-12-13 18:22:08  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnslashdot.el (nnslashdot-request-article): A space.
+
+1999-12-13 17:20:25  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnagent.el: Support different backend with same name.
+
+1999-12-13 13:14:42  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnslashdot.el (nnslashdot-threaded-retrieve-headers): Support
+	archived group.
+	(nnslashdot-sane-retrieve-headers): Ditto.
+	(nnslashdot-request-article): Ditto.
+
+1999-12-13 11:41:32  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnweb.el (nnweb-insert): Narrow to point.
+
+1999-12-13 10:59:42  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnweb.el (nnweb-insert): Follow refresh url.
+	* nnslashdot.el: Use it.
+
+1999-12-13 10:39:53  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnweb.el (nnweb-decode-entities): Decode numerical entities.
+	(nnweb-decode-entities-string): New function.
+	
+	* nnwarchive.el (nnwarchive-decode-entities-string): Rename to
+	nnweb-* and move to nnweb.el.
+	* nnwarchive.el: Use nnweb-decode-entities, etc.
+	* webmail.el: Ditto.
+	
+	* nnslashdot.el: Use nnweb-decode-entities-string.
+	(nnslashdot-decode-entities): Remove.
+		
+1999-12-13 10:40:56  Eric Marsden <emarsden@mail.dotcom.fr>
+
+	* nnslashdot.el: Decode entities.
+
+1999-12-12  Dave Love  <fx@gnu.org>
+
+	* gnus-agent.el (gnus-category-edit-groups)
+	(gnus-category-edit-score, gnus-category-edit-predicate): Replace
+	expansion of setf, fixed.
+	
+1999-12-12 12:50:30  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el: Revoke last Dave Love's patch, because of
+	incompatibility of XEmacs.
+
+1999-12-12 12:27:03  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-uu.el: Change headers.
+	* rfc1843.el: Ditto.
+	* uudecode.el: Ditto.
+
+1999-12-07  Dave Love  <fx@gnu.org>
+
+	* gnus-agent.el (gnus-category-edit-predicate)
+	(gnus-category-edit-score, gnus-category-edit-score): Expand setf
+	inside backquote to avoid it at runtime.
+
+1999-12-07  Dave Love  <fx@gnu.org>
+
+	* binhex.el: Require cl when compiling.
+
+1999-12-04  Dave Love  <fx@gnu.org>
+
+	* gnus-cus.el (gnus-group-parameters): Allow nil for banner.
+
+1999-12-04  Dave Love  <fx@gnu.org>
+
+	* mm-util.el (mm-delete-duplicates): New function.
+	(mm-write-region): Use it.
+
+	* mml.el (mml-minibuffer-read-type): Use mm-delete-duplicates.
+
+	* mailcap.el (mailcap-mime-types): Require mm-util.  Use
+	mm-delete-duplicates.
+
+	* imap.el (imap-open, imap-debug): Avoid mapc.
+
+	* nnvirtual.el (nnvirtual-create-mapping): Likewise.
+
+	* gnus-sum.el (gnus-summary-exit-no-update): Avoid copy-list.
+	(gnus-multi-decode-encoded-word-string): Avoid mapc.
+
+	* gnus-start.el (gnus-site-init-file): Avoid ignore-errors at
+	runtime.
+
+	* gnus.el (gnus-select-method): Likewise.
+
+	* nnheader.el (nnheader-nov-read-integer): Likewise.
+
+	* mm-view.el (mm-inline-message): Require cl when compiling.
+	Avoid ignore-errors at runtime.
+	(mm-inline-text): Avoid mapc.
+	
+1999-12-12 10:36:51  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (article-decode-charset): Widen is bad.
+
+1999-12-12 10:17:42  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-charset-after): `charset-after' may not be defined.
+
+1999-12-12  Florian Weimer  <fw@s.netic.de>
+
+	* rfc2047.el (rfc2047-encodable-p): New parameter header used to
+	indicate that only US-ASCII is permitted.
+	(rfc2047-encode-message-header): Use it.  Now, Gnus should never
+	use unencoded 8-bit characters in message headers.
+
+1999-12-12 03:08:15  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* ietf-drums.el (ietf-drums-narrow-to-header): Make it work with
+	CRLF.
+
+1999-12-11 14:42:26  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el: Require url-cookie.
+
+1999-12-11 14:21:23  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnwarchive.el (nnwarchive-make-caesar-translation-table): A
+	new function to make modified caesar table.
+	(nnwarchive-from-r13): Use it.
+	(nnwarchive-mail-archive-article): Improved.
+
+1999-12-11 12:30:20  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el (webmail-url): Use mm-with-unibyte-current-buffer.
+
+1999-12-10 16:22:24  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnweb.el (nnweb-request-article): Return cons.
+
+1999-12-10 16:06:04  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-setup-default-charset): Typo.
+
+1999-12-10 12:14:04  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-with-unibyte): New macro.
+	* nnweb.el (nnweb-init): Use it.
+
+1999-12-09 20:39:49  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-charset-after): New function.
+	(mm-find-mime-charset-region): Set charsets after
+ 	delete-duplicates and use find-coding-systems-region.
+	(mm-find-charset-region): Remove composition.
+	
+	* mm-bodies.el (mm-encode-body): Use mm-charset-after.
+
+	* mml.el (mml-parse-singlepart-with-multiple-charsets): Ditto.
+	
+1999-12-09 17:47:56  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-find-mime-charset-region): Revoke last change.
+	* mml.el (mml-confirmation-set): New variable.
+	(mml-parse-1): Ask user to confirm.
+
+1999-12-09  Simon Josefsson  <jas@pdc.kth.se>
+
+	* gnus-start.el (gnus-get-unread-articles): Make sure all methods
+	are scanned when we have directory mail-sources (the mail source
+	is modified in that case, so we must scan it for all
+	groups/methods).
+
+1999-12-09 12:05:28  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnml.el (nnml-request-move-article): Save nnml-current-directory
+	and nnml-article-file-alist.
+
+1999-12-09 10:20:07  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-group.el (gnus-group-get-new-news-this-group): Binding
+	nnmail-fetched-sources.
+
+1999-12-09 10:19:01  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-find-charset-region): Use the last charset.
+
+1999-12-08  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnus.el (gnus-select-method): Made the option list prettier.
+
+1999-12-08  Florian Weimer  <fw@s.netic.de>
+
+	* gnus-msg.el (gnus-group-posting-charset-alist): Use iso-8859-1
+	for the `de' newsgroups hierarchy, as it is common practice there.
+	
+
+1999-12-07 16:17:12  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnwarchive.el (nnwarchive-mail-archive-article): Fix
+	buffer-string arguments. Fix references.
+
+1999-12-07 15:04:18  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-confirmation-function): New variable.
+	(gnus-agent-batch-fetch): Use it.
+	(gnus-agent-fetch-session): Use it.
+
+1999-12-07 12:32:43  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-find-mime-charset-region): Delete nil.
+
+1999-12-07 11:45:10  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-find-charset-region): Don't capitalize.  Delete
+ 	nil.
+
+1999-12-07  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* nnslashdot.el (nnslashdot-request-list): There were two
+	top-level body-forms.  Put a `progn' around them.
+
+	* gnus.el (gnus-select-method): Use `condition-case'
+	instead of `ignore-errors', since cl may not be loaded when the
+	form is evaluated.
+
+1999-12-06 23:57:47  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnwarchive.el: Support www.mail-archive.com.
+
+1999-12-06 23:55:55  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnmail.el (nnmail-get-new-mail): Remove fetched sources before
+	do anything.
+
+1999-12-06  Simon Josefsson  <jas@pdc.kth.se>
+
+	* utf7.el: New file, written by Jon K Hellan.
+
+	* imap.el (imap-use-utf7): Renamed from `imap-utf7-p', change
+	default to t.
+
+1999-12-06 04:40:24  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* nnslashdot.el (nnslashdot-request-delete-group): New function.
+
+	* gnus-sum.el (gnus-summary-refer-article): Work for lists with
+	current. 
+	(gnus-refer-article-methods): New function.
+	(gnus-summary-refer-article): Use it.
+
+1999-11-13  Simon Josefsson  <jas@pdc.kth.se>
+
+	* nnimap.el (nnimap-retrieve-groups): Return active format.
+
+	* nnimap.el (nnimap-replace-in-string): Removed.
+	(nnimap-request-list): 
+	(nnimap-retrieve-groups): 
+	(nnimap-request-newgroups): Quote group instead of escaping SPC.
+
+1999-12-05  Simon Josefsson  <jas@pdc.kth.se>
+
+	* imap.el: Use format-spec for ssl program.
+	* imap.el (imap-ssl-arguments): Removed.
+	(imap-ssl-open-{1,2}): Removed.
+
+1999-12-04  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnus-start.el (gnus-site-init-file): Use `condition-case'
+	instead of `ignore-errors', since cl may not be loaded when the
+	form is evaluated.
+
+1999-12-04 11:34:22  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-bodies.el (mm-8bit-char-regexps): Removed.
+	(mm-7bit-chars): New variable.
+	(mm-body-7-or-8): Use it in both cases.
+
+1999-12-04  Simon Josefsson  <jas@pdc.kth.se>
+
+	* mm-decode.el (mm-display-part): Let mm-display-external return
+	inline or external.
+	(mm-display-external): For copiousoutput methods, insert output in
+	buffer.
+
+1999-12-04 03:29:13  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nntp.el (nntp-retrieve-headers-with-xover): Goto the end of
+ 	buffer.
+
+1999-12-04 08:31:10  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-audio.el: An M too far.
+
+	* gnus-msg.el (gnus-setup-message): One backtick too many.
+
+	* gnus-art.el (gnus-mime-view-part-as-type): mailcap-mime-types is 
+	a function, not a variable.
+
+1999-12-04 08:14:08  Max Froumentin  <masmef@maths.bath.ac.uk>
+
+	* gnus-score.el (gnus-score-body): Widen before requesting.
+
+1999-12-04 08:06:13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-group.el (gnus-group-prepare-flat): Comment fix.
+
+1999-12-04 03:01:55  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mail-source.el (mail-source-fetch-webmail): Bind
+ 	mail-source-string.
+
+1999-12-04 07:18:23  Matt Swift  <swift@alum.mit.edu>
+
+	* gnus-uu.el (gnus-uu-mark-by-regexp): Doc fix.
+	(gnus-uu-unmark-by-regexp): Ditto.
+
+	* gnus-group.el (gnus-group-catchup-current): Would bug out on
+	dead groups.
+
+1999-12-04 01:34:31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-setup-message): Allow the charset setting to
+	do their real thing.
+
+	* nnmh.el (nnmh-be-safe): Doc fix.
+
+	* gnus-sum.el (gnus-summary-exit): Write cache active file. 
+
+	* nntp.el (nntp-retrieve-headers-with-xover): Make sure the entire 
+	status line has arrived before we count it.
+
+	* mailcap.el (mailcap-mime-data): Removed save-file from audio/*. 
+
+	* gnus-sum.el (gnus-thread-header): Fixed after indent.
+	Whitespace problems.
+
+	* gnus-win.el (gnus-configure-windows): Error fix.
+
+	* gnus-demon.el (gnus-demon-add-nntp-close-connection): Add the
+	right function.
+
+	* gnus.el: Fixed all the doc strings to match the FSF convetions.
+	Indent all functions.  Fix all comments to match the comment
+	conventions.  Double-space after full stop.
+
+1999-12-04 01:14:55  YAMAMOTO Kouji  <kouji@pobox.com>
+
+	* nnmail.el (nnmail-split-it): I redefined nnmail-split-fancy's
+ 	value to divide received mails into my favorite groups and I met
+ 	an error.  It takes place if the length of a element "VALUE" in
+ 	nnmail-split-fancy is less than two.
+
+1999-10-10  Robert Bihlmeyer  <robbe@orcus.priv.at>
+
+	* mml.el (mml-insert-part): New function.
+
+1999-09-29 04:48:14  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lpath.el: Add `sc-cite-regexp'.
+
+1999-12-02  Dave Love  <fx@gnu.org>
+
+	* mm-decode.el: Customize.
+
+1999-12-03  Dave Love  <fx@gnu.org>
+
+	* nnslashdot.el, nnultimate.el: Don't lose at compile time when
+	the W3 stuff isn't available.
+
+1999-12-03  Dave Love  <fx@gnu.org>
+
+	* imap.el, mailcap.el, nnvirtual.el, rfc2104.el: Don't require cl
+	at runtime.
+
+1999-12-04 00:47:35  Dan Christensen  <jdc@jhu.edu>
+
+	* gnus-score.el (gnus-score-headers): Fix orphan scoring.
+
+1999-12-01  Andrew Innes  <andrewi@gnu.org>
+
+	* nnmbox.el (nnmbox-read-mbox): Count messages correctly, and
+	don't be fooled by "From nobody" lines added by respooling.
+
+	* pop3.el (pop3-movemail): Write crashbox in binary.
+	(pop3-get-message-count): New function.
+
+	* mail-source.el (mail-source-primary-source): New variable.
+	(mail-source-report-new-mail-interval): New variable.
+	(mail-source-idle-time-delay): New variable.
+	(mail-source-new-mail-available): New internal variable.
+	(mail-source-fetch-pop): Clear new mail flag, when mail from
+	primary source has been fetched.
+	(mail-source-check-pop): New function.
+	(mail-source-new-mail-p): New function.
+	(mail-source-start-idle-timer): New function.
+	(mail-source-report-new-mail): New function.
+	(mail-source-report-new-mail): New internal variable.
+	(mail-source-report-new-mail-timer): New internal variable.
+	(mail-source-report-new-mail-idle-timer): New internal variables.
+
+1999-12-04 00:39:34  Andreas Schwab  <schwab@suse.de>
+
+	* gnus-cus.el (gnus-group-customize): Customize fix.
+
+1999-12-04 00:38:24  Andrea Arcangeli  <andrea@suse.de>
+
+	* message.el (message-send-mail-with-sendmail): Use
+	message-make-address. 
+
 Fri Dec  3 20:34:11 1999  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Pterodactyl Gnus v5.8.2 is released.
@@ -1138,10 +1840,15 @@ Mon Sep 27 15:18:05 1999  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus-art.el (gnus-treat-predicate): Work for (not 5).
 
-1999-08-27  Peter von der Ah-Ai  <pahe@daimi.au.dk>
+1999-08-27  Peter von der Ahe <pahe@daimi.au.dk>
 
 	* message.el (message-send): More helpful error message if sending
 	fails
+
+1999-09-06  Robert Bihlmeyer  <robbe@orcus.priv.at>
+
+	* gnus-score.el (gnus-summary-increase-score): "Lars" was broken
+	in newer emacsen, where ?r isn't equal 114.
 
 Fri Aug 27 13:17:48 1999  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
@@ -1287,6 +1994,7 @@ Fri Aug 27 13:17:48 1999  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus-agent.el (gnus-agent-fetch-group-1): Recreate agent
  	overview buffer if it is killed.
+
 1999-08-27 14:26:03  Eric Marsden  <emarsden@mail.dotcom.fr>
 
 	* gnus-art.el (article-babel): New version.
@@ -1340,7 +2048,7 @@ Fri Aug 27 13:17:48 1999  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 	* gnus-agent.el (gnus-agent-get-undownloaded-list): Don't
 	mark cached articles as `undownloaded'.
 
-Tue Jul 20 02:39:56 1999  Peter von der Ah-Ai  <peter@ahe.dk>
+Tue Jul 20 02:39:56 1999  Peter von der Ahe  <peter@ahe.dk>
 
 	* gnus-sum.el (gnus-summary-exit): Allow gnus-use-adaptive-scoring
 	to have buffer local values.
@@ -3892,7 +4600,7 @@ Mon Nov 30 23:38:02 1998  Shenghuo ZHU  <zsh@cs.rochester.edu>
 
 	* mm-uu.el (mm-uu-dissect): Use mm-make-handle.
 
-1998-12-01 01:53:49  Fran-Agois Pinard  <pinard@iro.umontreal.ca>
+1998-12-01 01:53:49  Francois Pinard  <pinard@iro.umontreal.ca>
 
 	* nndoc.el (nndoc-mime-parts-type-p): Do related.
 
@@ -5638,7 +6346,7 @@ Mon Sep 14 18:55:38 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* rfc2047.el (rfc2047-q-encode-region): Would bug out.
 
-1998-09-13  Fran-Agois Pinard  <pinard@iro.umontreal.ca>
+1998-09-13  Francois Pinard  <pinard@iro.umontreal.ca>
 
 	* nndoc.el: Make nndoc-dissection-alist simpler for MIME, adjust all
           related functions.  Handle message/rfc822 parts.  Display subject on

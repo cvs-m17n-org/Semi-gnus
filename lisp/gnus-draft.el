@@ -69,8 +69,8 @@
   (interactive "P")
   (when (eq major-mode 'gnus-summary-mode)
     (when (set (make-local-variable 'gnus-draft-mode)
-		  (if (null arg) (not gnus-draft-mode)
-		    (> (prefix-numeric-value arg) 0)))
+	       (if (null arg) (not gnus-draft-mode)
+		 (> (prefix-numeric-value arg) 0)))
       ;; Set up the menu.
       (when (gnus-visual-p 'draft-menu 'menu)
 	(gnus-draft-make-menu-bar))

@@ -33,6 +33,7 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
+
 (require 'custom)
 (require 'nnheader)
 (require 'message)
@@ -536,6 +537,7 @@ If N, return the Nth ancestor instead."
 	      first 't2
 	      last 't1))
        ((gnus-functionp function)
+	;; Do nothing.
 	)
        (t
 	(error "Invalid sort spec: %s" function))))

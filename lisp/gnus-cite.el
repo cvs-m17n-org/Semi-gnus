@@ -21,6 +21,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'gnus)
 (require 'gnus-art)
 (require 'gnus-range)
@@ -43,10 +44,10 @@ article has citations."
   :type 'string)
 
 (defcustom gnus-cite-always-check nil
-  "Check article always for citations. Set it t to check all articles."
+  "Check article always for citations.  Set it t to check all articles."
   :group 'gnus-cite
   :type '(choice (const :tag "no" nil)
-		  (const :tag "yes" t)))
+		 (const :tag "yes" t)))
 
 (defcustom gnus-cited-opened-text-button-line-format "%(%{[-]%}%)\n"
   "Format of opened cited text buttons."
@@ -239,8 +240,8 @@ It is merged with the face for the cited text belonging to the attribution."
 
 (defcustom gnus-cite-face-list
   '(gnus-cite-face-1 gnus-cite-face-2 gnus-cite-face-3 gnus-cite-face-4
-    gnus-cite-face-5 gnus-cite-face-6 gnus-cite-face-7 gnus-cite-face-8
-    gnus-cite-face-9 gnus-cite-face-10 gnus-cite-face-11)
+		     gnus-cite-face-5 gnus-cite-face-6 gnus-cite-face-7 gnus-cite-face-8
+		     gnus-cite-face-9 gnus-cite-face-10 gnus-cite-face-11)
   "*List of faces used for highlighting citations.
 
 When there are citations from multiple articles in the same message,
@@ -526,17 +527,19 @@ always hide."
 (defun gnus-article-toggle-cited-text (args)
   "Toggle hiding the text in REGION."
   (let* ((region (car args))
+	 (beg (car region))
+	 (end (cdr region))
 	 (start (cadr args))
 	 (hidden
 	  (text-property-any
-	   (car region) (1- (cdr region))
+	   beg (1- end)
 	   (car gnus-hidden-properties) (cadr gnus-hidden-properties)))
 	 (inhibit-point-motion-hooks t)
 	 buffer-read-only)
     (funcall
      (if hidden
 	 'remove-text-properties 'gnus-add-text-properties)
-     (car region) (cdr region) gnus-hidden-properties)
+     beg end gnus-hidden-properties)
     (save-excursion
       (goto-char start)
       (gnus-delete-line)
@@ -969,5 +972,9 @@ See also the documentation for `gnus-article-highlight-citation'."
 (gnus-ems-redefine)
 
 (provide 'gnus-cite)
+
+;; Local Variables:
+;; coding: iso-8859-1
+;; End:
 
 ;;; gnus-cite.el ends here

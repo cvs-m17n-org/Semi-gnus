@@ -29,6 +29,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'mail-utils)
 (require 'mime)
 
@@ -46,13 +47,13 @@ on your system, you could say something like:
 \(setq nnheader-file-name-translation-alist '((?: . ?_)))")
 
 (eval-and-compile
- (autoload 'nnmail-message-id "nnmail")
- (autoload 'mail-position-on-field "sendmail")
- (autoload 'message-remove-header "message")
- (autoload 'cancel-function-timers "timers")
- (autoload 'gnus-point-at-eol "gnus-util")
- (autoload 'gnus-delete-line "gnus-util")
- (autoload 'gnus-buffer-live-p "gnus-util"))
+  (autoload 'nnmail-message-id "nnmail")
+  (autoload 'mail-position-on-field "sendmail")
+  (autoload 'message-remove-header "message")
+  (autoload 'cancel-function-timers "timers")
+  (autoload 'gnus-point-at-eol "gnus-util")
+  (autoload 'gnus-delete-line "gnus-util")
+  (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;;; Header access macros.
 
@@ -297,7 +298,9 @@ on your system, you could say something like:
   '(prog1
        (if (eq (char-after) ?\t)
 	   0
-	 (let ((num (ignore-errors (read (current-buffer)))))
+	 (let ((num (condition-case nil
+			(read (current-buffer))
+		      (error nil))))
 	   (if (numberp num) num 0)))
      (unless (eobp)
        (search-forward "\t" eol 'move))))
@@ -806,7 +809,9 @@ If FULL, translate everything."
       (if full
 	  ;; Do complete translation.
 	  (setq leaf (copy-sequence file)
-		path "")
+		path ""
+		i (if (and (< 1 (length leaf)) (eq ?: (aref leaf 1))) 
+		      2 0))
 	;; We translate -- but only the file name.  We leave the directory
 	;; alone.
 	(if (string-match "/[^/]+\\'" file)
@@ -837,7 +842,7 @@ The first string in ARGS can be a format string."
   "Get the most recent report from BACKEND."
   (condition-case ()
       (nnheader-message 5 "%s" (symbol-value (intern (format "%s-status-string"
-						  backend))))
+							     backend))))
     (error (nnheader-message 5 ""))))
 
 (defun nnheader-insert (format &rest args)

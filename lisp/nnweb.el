@@ -29,6 +29,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'nnoo)
 (require 'message)
 (require 'gnus-util)
@@ -185,7 +186,7 @@ and `altavista'.")
 	  (funcall (nnweb-definition 'article))
 	  (nnweb-decode-entities))
 	(nnheader-report 'nnweb "Fetched article %s" article)
-	t))))
+	(cons group (and (numberp article) article))))))
 
 (deffoo nnweb-close-server (&optional server)
   (when (and (nnweb-server-opened server)
@@ -204,9 +205,7 @@ and `altavista'.")
     t))
 
 (deffoo nnweb-request-update-info (group info &optional server)
-  (nnweb-possibly-change-server group server)
-  ;;(setcar (cddr info) nil)
-  )
+  (nnweb-possibly-change-server group server))
 
 (deffoo nnweb-asynchronous-p ()
   t)
@@ -300,14 +299,10 @@ and `altavista'.")
   (unless (gnus-buffer-live-p nnweb-buffer)
     (setq nnweb-buffer
 	  (save-excursion
-	    (let ((multibyte (default-value 'enable-multibyte-characters)))
-	      (unwind-protect
-		  (progn
-		    (setq-default enable-multibyte-characters nil)
-		    (nnheader-set-temp-buffer
-		     (format " *nnweb %s %s %s*"
-			     nnweb-type nnweb-search server)))
-		(setq-default enable-multibyte-characters multibyte))
+	    (mm-with-unibyte
+	      (nnheader-set-temp-buffer
+	       (format " *nnweb %s %s %s*"
+		       nnweb-type nnweb-search server))
 	      (current-buffer))))))
 
 (defun nnweb-fetch-url (url)
@@ -484,7 +479,6 @@ and `altavista'.")
 	  (goto-char (point-min))
 	  (search-forward "</pre><hr>" nil t)
 	  (delete-region (point-min) (point))
-					;(nnweb-decode-entities)
 	  (goto-char (point-min))
 	  (while (re-search-forward "^ +[0-9]+\\." nil t)
 	    (narrow-to-region
@@ -724,11 +718,20 @@ and `altavista'.")
 (defun nnweb-decode-entities ()
   "Decode all HTML entities."
   (goto-char (point-min))
-  (while (re-search-forward "&\\([a-z]+\\);" nil t)
-    (replace-match (char-to-string (or (cdr (assq (intern (match-string 1))
-						  w3-html-entities))
-				       ?#))
+  (while (re-search-forward "&\\(#[0-9]+\\|[a-z]+\\);" nil t)
+    (replace-match (char-to-string 
+		    (if (eq (aref (match-string 1) 0) ?\#)
+			(string-to-number (substring (match-string 1) 1))
+		      (or (cdr (assq (intern (match-string 1))
+				     w3-html-entities))
+			  ?#)))
 		   t t)))
+
+(defun nnweb-decode-entities-string (str)
+  (with-temp-buffer
+    (insert str)
+    (nnweb-decode-entities)
+    (buffer-substring (point-min) (point-max))))
 
 (defun nnweb-remove-markup ()
   "Remove all HTML markup, leaving just plain text."
@@ -741,10 +744,24 @@ and `altavista'.")
   (while (re-search-forward "<[^>]+>" nil t)
     (replace-match "" t t)))
 
-(defun nnweb-insert (url)
-  "Insert the contents from an URL in the current buffer."
+(defun nnweb-insert (url &optional follow-refresh)
+  "Insert the contents from an URL in the current buffer.
+If FOLLOW-REFRESH is non-nil, redirect refresh url in META."
   (let ((name buffer-file-name))
-    (url-insert-file-contents url)
+    (if follow-refresh
+	(save-restriction
+	  (narrow-to-region (point) (point))
+	  (url-insert-file-contents url)
+	  (goto-char (point-min))
+	  (while (re-search-forward 
+		  "HTTP-EQUIV=\"Refresh\"[^>]*URL=\\([^\"]+\\)\""
+		  nil t)
+	    (let ((url (match-string 1)))
+	      (delete-region (point-min) (point-max))
+	      (nnweb-insert url))
+	    (goto-char (point-min)))
+	  (goto-char (point-max)))
+      (url-insert-file-contents url))
     (setq buffer-file-name name)))
 
 (defun nnweb-parse-find (type parse &optional maxdepth)

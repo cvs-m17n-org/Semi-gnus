@@ -27,6 +27,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'nnheader)
 (require 'nnmail)
 (require 'nnoo)
@@ -106,7 +107,7 @@ included.")
 	  (and large
 	       (zerop (% count 20))
 	       (nnheader-message 5 "nneething: Receiving headers... %d%%"
-			(/ (* count 100) number))))
+				 (/ (* count 100) number))))
 
 	(when large
 	  (nnheader-message 5 "nneething: Receiving headers...done"))
@@ -294,8 +295,7 @@ included.")
 	   (concat "Lines: " (int-to-string
 			      (count-lines (point-min) (point-max)))
 		   "\n"))
-       "")
-     )))
+       ""))))
 
 (defun nneething-from-line (uid &optional file)
   "Return a From header based of UID."

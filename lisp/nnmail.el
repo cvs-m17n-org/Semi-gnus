@@ -26,6 +26,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'nnheader)
 (require 'message)
 (require 'custom)
@@ -934,7 +935,7 @@ FUNC will be called with the group name to determine the article number."
 			   '("bogus"))
 		     (error
 		      (nnheader-message 5
-		       "Error in `nnmail-split-methods'; using `bogus' mail group")
+					"Error in `nnmail-split-methods'; using `bogus' mail group")
 		      (sit-for 1)
 		      '("bogus")))))
 	      (setq split (gnus-remove-duplicates split))
@@ -1400,6 +1401,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
   (let* ((sources (or mail-sources
 		      (if (listp nnmail-spool-file) nnmail-spool-file
 			(list nnmail-spool-file))))
+	 fetching-sources
 	 (group-in group)
 	 (i 0)
 	 (new 0)
@@ -1407,14 +1409,6 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	 incoming incomings source)
     (when (and (nnmail-get-value "%s-get-new-mail" method)
 	       nnmail-spool-file)
-      ;; We first activate all the groups.
-      (nnmail-activate method)
-      ;; Allow the user to hook.
-      (run-hooks 'nnmail-pre-get-new-mail-hook)
-      ;; Open the message-id cache.
-      (nnmail-cache-open)
-      ;; The we go through all the existing mail source specification
-      ;; and fetch the mail from each.
       (while (setq source (pop sources))
 	;; Be compatible with old values.
 	(cond
@@ -1446,21 +1440,31 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	(when nnmail-fetched-sources
 	  (if (member source nnmail-fetched-sources)
 	      (setq source nil)
-	    (push source nnmail-fetched-sources)))
-	(when source
-	  (nnheader-message 4 "%s: Reading incoming mail from %s..."
-			    method (car source))
-	  (when (setq new
-		      (mail-source-fetch
-		       source
-		       `(lambda (file orig-file)
-			  (nnmail-split-incoming
-			   file ',(intern (format "%s-save-mail" method))
-			   ',spool-func
-			   (nnmail-get-split-group orig-file source)
-			   ',(intern (format "%s-active-number" method))))))
-	    (incf total new)
-	    (incf i))))
+	    (push source nnmail-fetched-sources)
+	    (push source fetching-sources)))))
+    (when fetching-sources
+      ;; We first activate all the groups.
+      (nnmail-activate method)
+      ;; Allow the user to hook.
+      (run-hooks 'nnmail-pre-get-new-mail-hook)
+      ;; Open the message-id cache.
+      (nnmail-cache-open)
+      ;; The we go through all the existing mail source specification
+      ;; and fetch the mail from each.
+      (while (setq source (pop fetching-sources))
+	(nnheader-message 4 "%s: Reading incoming mail from %s..."
+			  method (car source))
+	(when (setq new
+		    (mail-source-fetch
+		     source
+		     `(lambda (file orig-file)
+			(nnmail-split-incoming
+			 file ',(intern (format "%s-save-mail" method))
+			 ',spool-func
+			 (nnmail-get-split-group orig-file source)
+			 ',(intern (format "%s-active-number" method))))))
+	  (incf total new)
+	  (incf i)))
       ;; If we did indeed read any incoming spools, we save all info.
       (if (zerop total)
 	  (nnheader-message 4 "%s: Reading incoming mail (no new mail)...done"

@@ -32,6 +32,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'gnus-art)
 
 (eval-when-compile

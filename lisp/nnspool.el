@@ -27,6 +27,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'nnheader)
 (require 'nntp)
 (require 'nnoo)
@@ -148,7 +149,7 @@ there.")
 	    (and do-message
 		 (zerop (% (incf count) 20))
 		 (nnheader-message 5 "nnspool: Receiving headers... %d%%"
-			  (/ (* count 100) number))))
+				   (/ (* count 100) number))))
 
 	  (when do-message
 	    (nnheader-message 5 "nnspool: Receiving headers...done"))
@@ -298,8 +299,8 @@ there.")
 			     (read (current-buffer)))
 			   seconds))
 		      (push (buffer-substring
-					  (match-beginning 1) (match-end 1))
-					 groups)
+			     (match-beginning 1) (match-end 1))
+			    groups)
 		      (zerop (forward-line -1))))
 	  (erase-buffer)
 	  (while groups

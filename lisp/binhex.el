@@ -1,14 +1,11 @@
 ;;; binhex.el -- elisp native binhex decode
-;; Copyright (c) 1998 by Shenghuo Zhu <zsh@cs.rochester.edu>
+;; Copyright (c) 1998 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Create Date: Oct 1, 1998
-;; $Revision: 1.1.2.7.6.1 $
-;; Time-stamp: <Tue Oct  6 23:48:38 EDT 1998 zsh>
-;; Keywords: binhex
+;; Keywords: binhex news
 
-;; This file is not part of GNU Emacs, but the same permissions
-;; apply.
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -28,6 +25,8 @@
 ;;; Commentary:
 
 ;;; Code:
+
+(eval-when-compile (require 'cl))
 
 (if (not (fboundp 'char-int))
     (fset 'char-int 'identity))
@@ -251,21 +250,21 @@ If HEADER-ONLY is non-nil only decode header and return filename."
 	     ((= counter 2)
 	      (binhex-push-char (logand (lsh bits -10) 255) 1 nil
 				work-buffer))))
-      (if header-only nil
-	(binhex-verify-crc work-buffer
-			   data-fork-start
-			   (+ data-fork-start (aref header 6) 2))
-	(or (markerp end) (setq end (set-marker (make-marker) end)))
-	(goto-char start)
-	(insert-buffer-substring work-buffer
-				 data-fork-start (+ data-fork-start
-						    (aref header 6)))
-	(delete-region (point) end)))
+	  (if header-only nil
+	    (binhex-verify-crc work-buffer
+			       data-fork-start
+			       (+ data-fork-start (aref header 6) 2))
+	    (or (markerp end) (setq end (set-marker (make-marker) end)))
+	    (goto-char start)
+	    (insert-buffer-substring work-buffer
+				     data-fork-start (+ data-fork-start
+							(aref header 6)))
+	    (delete-region (point) end)))
       (and work-buffer (kill-buffer work-buffer)))
     (if header (aref header 1))))
 
 (defun binhex-decode-region-external (start end)
-  "Binhex decode region between START and END using external decoder"
+  "Binhex decode region between START and END using external decoder."
   (interactive "r")
   (let ((cbuf (current-buffer)) firstline work-buffer status
 	(file-name (concat binhex-temporary-file-directory

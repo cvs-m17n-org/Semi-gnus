@@ -27,6 +27,7 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
+
 (require 'gnus)
 (require 'gnus-win)
 (require 'gnus-int)
@@ -53,7 +54,7 @@ If a file with the `.el' or `.elc' suffixes exists, it will be read instead."
 	       (directory-file-name installation-directory))
 	      "site-lisp/gnus-init")
     (error nil))
-  "*The site-wide Gnus Emacs-Lisp startup file name, or nil if none.
+  "The site-wide Gnus Emacs-Lisp startup file name, or nil if none.
 If a file with the `.el' or `.elc' suffixes exists, it will be read instead."
   :group 'gnus-start
   :type '(choice file (const nil)))
@@ -226,12 +227,12 @@ not match this regexp will be removed before saving the list."
   :type 'boolean)
 
 (defcustom gnus-ignored-newsgroups
- (mapconcat 'identity
-	    '("^to\\."			; not "real" groups
-	      "^[0-9. \t]+ "		; all digits in name
-	      "^[\"][]\"[#'()]"		; bogus characters
-	      )
-	    "\\|")
+  (mapconcat 'identity
+	     '("^to\\."			; not "real" groups
+	       "^[0-9. \t]+ "		; all digits in name
+	       "^[\"][]\"[#'()]"	; bogus characters
+	       )
+	     "\\|")
   "*A regexp to match uninteresting newsgroups in the active file.
 Any lines in the active file matching this regular expression are
 removed from the newsgroup list before anything else is done to it,
@@ -962,16 +963,16 @@ for new groups, and subscribe the new groups as zombies."
   (let* ((gnus-subscribe-newsgroup-method
 	  gnus-subscribe-newsgroup-method)
 	 (check (cond
-		((or (and (= (or arg 1) 4)
-			  (not (listp gnus-check-new-newsgroups)))
-		     (null gnus-read-active-file)
-		     (eq gnus-read-active-file 'some))
-		 'ask-server)
-		((= (or arg 1) 16)
-		 (setq gnus-subscribe-newsgroup-method
-		       'gnus-subscribe-zombies)
-		 t)
-		(t gnus-check-new-newsgroups))))
+		 ((or (and (= (or arg 1) 4)
+			   (not (listp gnus-check-new-newsgroups)))
+		      (null gnus-read-active-file)
+		      (eq gnus-read-active-file 'some))
+		  'ask-server)
+		 ((= (or arg 1) 16)
+		  (setq gnus-subscribe-newsgroup-method
+			'gnus-subscribe-zombies)
+		  t)
+		 (t gnus-check-new-newsgroups))))
     (unless (gnus-check-first-time-used)
       (if (or (consp check)
 	      (eq check 'ask-server))
@@ -1106,10 +1107,10 @@ for new groups, and subscribe the new groups as zombies."
 	 hashtb))
       (when new-newsgroups
 	(gnus-subscribe-hierarchical-interactive new-newsgroups)))
-     (if (> groups 0)
-	 (gnus-message 5 "%d new newsgroup%s arrived"
-		       groups (if (> groups 1) "s have" " has"))
-       (gnus-message 5 "No new newsgroups"))
+    (if (> groups 0)
+	(gnus-message 5 "%d new newsgroup%s arrived"
+		      groups (if (> groups 1) "s have" " has"))
+      (gnus-message 5 "No new newsgroups"))
     (when got-new
       (setq gnus-newsrc-last-checked-date new-date))
     got-new))
@@ -1263,14 +1264,14 @@ for new groups, and subscribe the new groups as zombies."
 	    (setq active (gnus-active group))
 	    (setq num
 		  (if active (- (1+ (cdr active)) (car active)) t))
-           ;; Shorten the select method if possible, if we need to
-           ;; store it at all (native groups).
-           (let ((method (gnus-method-simplify
-                          (or gnus-override-subscribe-method
-                              (gnus-group-method group)))))
-             (if method
-                 (setq info (list group level nil nil method))
-               (setq info (list group level nil)))))
+	    ;; Shorten the select method if possible, if we need to
+	    ;; store it at all (native groups).
+	    (let ((method (gnus-method-simplify
+			   (or gnus-override-subscribe-method
+			       (gnus-group-method group)))))
+	      (if method
+		  (setq info (list group level nil nil method))
+		(setq info (list group level nil)))))
 	  (unless previous
 	    (setq previous
 		  (let ((p gnus-newsrc-alist))
@@ -1388,7 +1389,7 @@ newsgroup."
 	   t)
 	 (condition-case ()
 	     (inline (gnus-request-group group dont-check method))
-	   ;(error nil)
+	   ;;(error nil)
 	   (quit nil))
 	 (setq active (gnus-parse-active))
 	 ;; If there are no articles in the group, the GROUP
@@ -1514,6 +1515,13 @@ newsgroup."
       ;; be reached) we just set the number of unread articles in this
       ;; newsgroup to t.  This means that Gnus thinks that there are
       ;; unread articles, but it has no idea how many.
+
+      ;; To be more explicit:
+      ;; >0 for an active group with messages
+      ;; 0 for an active group with no unread messages
+      ;; nil for non-foreign groups that the user has requested not be checked
+      ;; t for unchecked foreign groups or bogus groups, or groups that can't
+      ;;   be checked, for one reason or other.
       (if (and (setq method (gnus-info-method info))
 	       (not (inline
 		      (gnus-server-equal
@@ -1546,7 +1554,15 @@ newsgroup."
 		  (setcdr (assoc method retrievegroups)
 			  (cons group (cdr (assoc method retrievegroups))))
 		(push (list method group) retrievegroups))
-	    (if (member method scanned-methods)
+	    ;; hack: `nnmail-get-new-mail' changes the mail-source depending
+	    ;; on the group, so we must perform a scan for every group
+	    ;; if the users has any directory mail sources.
+	    (if (and (null (assq 'directory
+				 (or mail-sources
+				     (if (listp nnmail-spool-file) 
+					 nnmail-spool-file
+				       (list nnmail-spool-file)))))
+		     (member method scanned-methods))
 		(setq active (gnus-activate-group group))
 	      (setq active (gnus-activate-group group 'scan))
 	      (push method scanned-methods))
@@ -2381,6 +2397,7 @@ If FORCE is non-nil, the .newsrc file is read."
   "Insert Gnus variables such as gnus-newsrc-alist in lisp format."
   (let ((print-quoted t)
 	(print-escape-newlines t))
+
     (insert ";; -*- emacs-lisp -*-\n")
     (insert ";; Gnus startup file.\n")
     (insert "\

@@ -36,6 +36,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'mail-utils)
 
 (defconst pop3-version "1.3s")
@@ -155,6 +156,28 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     (kill-buffer crashbuf)
     message-count))
 
+(defun pop3-get-message-count ()
+  "Return the number of messages in the maildrop."
+  (let* ((process (pop3-open-server pop3-mailhost pop3-port))
+	 message-count
+	 (pop3-password pop3-password)
+	 )
+    ;; for debugging only
+    (if pop3-debug (switch-to-buffer (process-buffer process)))
+    ;; query for password
+    (if (and pop3-password-required (not pop3-password))
+	(setq pop3-password
+	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
+    (cond ((equal 'apop pop3-authentication-scheme)
+	   (pop3-apop process pop3-maildrop))
+	  ((equal 'pass pop3-authentication-scheme)
+	   (pop3-user process pop3-maildrop)
+	   (pop3-pass process))
+	  (t (error "Invalid POP3 authentication scheme.")))
+    (setq message-count (car (pop3-stat process)))
+    (pop3-quit process)
+    message-count))
+
 (defun pop3-open-server (mailhost port)
   "Open TCP connection to MAILHOST.
 Returns the process associated with the connection.
@@ -240,15 +263,15 @@ Args are NAME BUFFER HOST SERVICE."
     (insert output)))
 
 (defun pop3-send-command (process command)
-    (set-buffer (process-buffer process))
-    (goto-char (point-max))
-;;    (if (= (aref command 0) ?P)
-;;	(insert "PASS <omitted>\r\n")
-;;      (insert command "\r\n"))
-    (setq pop3-read-point (point))
-    (goto-char (point-max))
-    (process-send-string process (concat command "\r\n"))
-    )
+  (set-buffer (process-buffer process))
+  (goto-char (point-max))
+  ;;    (if (= (aref command 0) ?P)
+  ;;	(insert "PASS <omitted>\r\n")
+  ;;      (insert command "\r\n"))
+  (setq pop3-read-point (point))
+  (goto-char (point-max))
+  (process-send-string process (concat command "\r\n"))
+  )
 
 (defun pop3-read-response (process &optional return)
   "Read the response from the server PROCESS.

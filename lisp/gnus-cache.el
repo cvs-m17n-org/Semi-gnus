@@ -62,7 +62,7 @@ If a group matches both gnus-cacheable-groups and gnus-uncacheable-groups
 it's not cached."
   :group 'gnus-cache
   :type '(choice (const :tag "off" nil)
-                regexp))
+		 regexp))
 
 (defcustom gnus-uncacheable-groups nil
   "*Groups that match this regexp will not be cached.

@@ -62,14 +62,15 @@
 		    w3-meta-charset-content-type-regexp
 		    url-current-callback-func url-current-callback-data
 		    url-be-asynchronous temporary-file-directory
-		    babel-translations babel-history)))
+		    babel-translations babel-history
+		    display-time-mail-function)))
   (maybe-bind '(mail-mode-hook
 		enable-multibyte-characters browse-url-browser-function
 		adaptive-fill-first-line-regexp adaptive-fill-regexp
 		url-current-mime-headers help-echo-owns-message
 		w3-meta-content-type-charset-regexp
 		w3-meta-charset-content-type-regexp
-		babel-translations babel-history))
+		babel-translations babel-history display-time-mail-function))
   (maybe-fbind '(color-instance-rgb-components
 		 temp-directory
 		 glyph-width annotation-glyph window-pixel-width glyph-height
@@ -97,9 +98,10 @@
 		 url-generic-parse-url valid-image-instantiator-format-p
 		 babel-fetch babel-wash sc-cite-regexp
 		 coding-system-get find-coding-system
-		 find-coding-systems-for-charsets font-lock-set-defaults
-		 function-max-args get-charset-property toolbar-gnus
+		 find-coding-systems-for-charsets find-coding-systems-region
+		 font-lock-set-defaults function-max-args get-charset-property
 		 make-symbolic-link map-extents smiley-encode-buffer
+		 toolbar-gnus
 		 )))
 
 (setq load-path (cons "." load-path))

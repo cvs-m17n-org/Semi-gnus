@@ -36,6 +36,7 @@
 ;; The smilies were drawn by Joe Reiss <jreiss@vt.edu>.
 
 (eval-when-compile (require 'cl))
+
 (require 'annotations)
 (require 'messagexmas)
 (require 'custom)
@@ -154,7 +155,7 @@ above them."
 (defvar smiley-running-xemacs (string-match "XEmacs" emacs-version))
 
 (defvar smiley-map (make-sparse-keymap "smiley-keys")
- "Keymap to toggle smiley states.")
+  "Keymap to toggle smiley states.")
 
 (define-key smiley-map [(button2)] 'smiley-toggle-extent)
 (define-key smiley-map [(button3)] 'smiley-popup-menu)
@@ -256,13 +257,8 @@ above them."
 	  (while (re-search-forward regexp nd t)
 	    (let* ((start (match-beginning group))
 		   (end (match-end group))
-		   (glyph
-		    (and (or (eq start 1)
-			     (not (string-match "\\(\\^\\|;\\|_\\);)"
-						(buffer-substring
-						 (1- start) (+ start 2)))))
-			 (smiley-create-glyph (buffer-substring start end)
-					      file))))
+		   (glyph (smiley-create-glyph (buffer-substring start end)
+					       file)))
 	      (when glyph
 		(mapcar 'delete-annotation (annotations-at end))
 		(let ((ext (make-extent start end))
@@ -350,5 +346,9 @@ With arg, turn displaying on if and only if arg is positive."
       (smiley-toggle-buffer arg (current-buffer) (point) (point-max)))))
 
 (provide 'smiley)
+
+;; Local Variables:
+;; coding: iso-8859-1
+;; End:
 
 ;;; smiley.el ends here

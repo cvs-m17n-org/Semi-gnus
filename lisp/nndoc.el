@@ -27,6 +27,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'nnheader)
 (require 'message)
 (require 'nnmail)
@@ -292,7 +293,6 @@ from the document.")
       (setq nndoc-dissection-alist nil)
       (save-excursion
 	(set-buffer nndoc-current-buffer)
-	(mm-enable-multibyte)
 	(erase-buffer)
 	(if (stringp nndoc-address)
 	    (nnheader-insert-file-contents nndoc-address)
@@ -557,10 +557,7 @@ from the document.")
 (defun nndoc-transform-lanl-gov-announce (article)
   (goto-char (point-max))
   (when (re-search-backward "^\\\\\\\\ +(\\([^ ]*\\) , *\\([^ ]*\\))" nil t)
-    (replace-match "\n\nGet it at \\1 (\\2)" t nil))
-  ;;  (when (re-search-backward "^\\\\\\\\$" nil t)
-  ;;    (replace-match "" t t))
-  )
+    (replace-match "\n\nGet it at \\1 (\\2)" t nil)))
 
 (defun nndoc-generate-lanl-gov-head (article)
   (let ((entry (cdr (assq article nndoc-dissection-alist)))
@@ -578,8 +575,7 @@ from the document.")
  	  (when (re-search-forward "^Title: \\([^\f]*\\)\nAuthors?: \\(.*\\)"
  				   nil t)
  	    (setq subject (concat (match-string 1) subject))
- 	    (setq from (concat (match-string 2) " <" e-mail ">"))))
- 	))
+ 	    (setq from (concat (match-string 2) " <" e-mail ">"))))))
     (while (and from (string-match "(\[^)\]*)" from))
       (setq from (replace-match "" t t from)))
     (insert "From: "  (or from "unknown")

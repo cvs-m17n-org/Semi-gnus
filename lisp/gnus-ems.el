@@ -99,8 +99,9 @@
 		    (symbol-name system-type))
       (setq nnheader-file-name-translation-alist
 	    (append nnheader-file-name-translation-alist
-		    '((?: . ?_)
-		      (?+ . ?-))))))))
+		    (mapcar (lambda (c) (cons c ?_))
+			    '(?: ?* ?\" ?< ?> ??))
+		    '((?+ . ?-))))))))
 
 (defvar gnus-tmp-unread)
 (defvar gnus-tmp-replied)
@@ -122,7 +123,7 @@
 
     ;; [Note] Now there are three kinds of mule implementations,
     ;; original MULE, XEmacs/mule and beta version of Emacs including
-    ;; some mule features. Unfortunately these API are different. In
+    ;; some mule features.  Unfortunately these API are different.  In
     ;; particular, Emacs (including original MULE) and XEmacs are
     ;; quite different.
     ;; Predicates to check are following:
@@ -131,9 +132,9 @@
     ;; (featurep 'mule) is t when every mule variants are running.
 
     ;; These implementations may be able to share between original
-    ;; MULE and beta version of new Emacs. In addition, it is able to
+    ;; MULE and beta version of new Emacs.  In addition, it is able to
     ;; detect XEmacs/mule by (featurep 'mule) and to check variable
-    ;; `emacs-version'. In this case, implementation for XEmacs/mule
+    ;; `emacs-version'.  In this case, implementation for XEmacs/mule
     ;; may be able to share between XEmacs and XEmacs/mule.
 
     (defvar gnus-summary-display-table nil

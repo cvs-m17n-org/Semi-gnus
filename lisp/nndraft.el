@@ -26,6 +26,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'nnheader)
 (require 'nnmail)
 (require 'gnus-start)
@@ -134,8 +135,9 @@
    info
    (gnus-update-read-articles (gnus-group-prefixed-name group '(nndraft ""))
 			      (nndraft-articles) t))
-  (let (marks)
-    (when (setq marks (nth 3 info))
+  (let ((marks (nth 3 info)))
+    (when marks
+      ;; Nix out all marks except the `unsend'-able article marks.
       (setcar (nthcdr 3 info)
 	      (if (assq 'unsend marks)
 		  (list (assq 'unsend marks))
@@ -149,7 +151,7 @@
   (nndraft-possibly-change-group group)
   (let ((gnus-verbose-backends nil)
 	(buf (current-buffer))
-	 article file)
+	article file)
     (with-temp-buffer
       (insert-buffer-substring buf)
       (setq article (nndraft-request-accept-article

@@ -26,6 +26,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
 (require 'gnus)
 ;; (require 'xpm)
 (require 'annotations)
@@ -524,8 +525,8 @@ none, and whose CDR is the corresponding element of DOMAINS."
 (defun gnus-picons-parse-value (name)
   (goto-char (point-min))
   (if (re-search-forward (concat "<strong>"
-			     (regexp-quote name)
-			     "</strong> *= *<kbd> *\\([^ <][^<]*\\) *</kbd>")
+				 (regexp-quote name)
+				 "</strong> *= *<kbd> *\\([^ <][^<]*\\) *</kbd>")
 			 nil t)
       (buffer-substring (match-beginning 1) (match-end 1))))
 
@@ -696,8 +697,8 @@ none, and whose CDR is the corresponding element of DOMAINS."
 (defun gnus-picons-network-search (user addrs dbs sym-ann right-p marker)
   (let* ((host (mapconcat 'identity addrs "."))
 	 (key (list (or user "unknown") host (if user
-						  gnus-picons-user-directories
-						dbs)))
+						 gnus-picons-user-directories
+					       dbs)))
 	 (cache (assoc key gnus-picons-url-alist)))
     (if (null cache)
 	(gnus-picons-url-retrieve
