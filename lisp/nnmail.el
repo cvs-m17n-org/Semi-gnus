@@ -405,7 +405,7 @@ Example:
   :group 'nnmail-split
   :type '(repeat (cons :format "%v" symbol regexp)))
 
-(defcustom nnmail-delete-incoming t
+(defcustom nnmail-delete-incoming nil
   "*If non-nil, the mail backends will delete incoming files after
 splitting."
   :group 'nnmail-retrieve
@@ -475,7 +475,7 @@ parameter.  It should return nil, `warn' or `delete'."
   (mail-send-and-exit nil))
 
 ;; 1997/5/4 by MORIOKA Tomohiko <morioka@jaist.ac.jp>
-(defvar nnmail-file-coding-system nil
+(defvar nnmail-file-coding-system 'raw-text
   "Coding system used in nnmail.")
 
 (defun nnmail-find-file (file)
@@ -503,6 +503,7 @@ parameter.  It should return nil, `warn' or `delete'."
   "Make pathname for GROUP."
   (concat
    (let ((dir (file-name-as-directory (expand-file-name dir))))
+     (setq group (nnheader-translate-file-chars group))
      ;; If this directory exists, we use it directly.
      (if (or nnmail-use-long-file-names
 	     (file-directory-p (concat dir group)))
@@ -875,7 +876,9 @@ is a spool.  If not using procmail, return GROUP."
     (if (not (and (re-search-forward "^From " nil t)
 		  (goto-char (match-beginning 0))))
 	;; Possibly wrong format?
-	(error "Error, unknown mail format! (Possibly corrupted.)")
+	(progn
+	  (pop-to-buffer (current-buffer))
+	  (error "Error, unknown mail format! (Possibly corrupted.)"))
       ;; Carry on until the bitter end.
       (while (not (eobp))
 	(setq start (point)
@@ -960,7 +963,9 @@ is a spool.  If not using procmail, return GROUP."
     (if (not (and (re-search-forward delim nil t)
 		  (forward-line 1)))
 	;; Possibly wrong format?
-	(error "Error, unknown mail format! (Possibly corrupted.)")
+	(progn
+	  (pop-to-buffer (current-buffer))
+	  (error "Error, unknown mail format! (Possibly corrupted.)"))
       ;; Carry on until the bitter end.
       (while (not (eobp))
 	(setq start (point))
@@ -1038,14 +1043,13 @@ FUNC will be called with the buffer narrowed to each mail."
 	(funcall exit-func))
       (kill-buffer (current-buffer)))))
 
-;; Mail crossposts suggested by Brian Edmonds <edmonds@cs.ubc.ca>.
 (defun nnmail-article-group (func)
   "Look at the headers and return an alist of groups that match.
 FUNC will be called with the group name to determine the article number."
   (let ((methods nnmail-split-methods)
 	(obuf (current-buffer))
 	(beg (point-min))
-	end group-art method)
+	end group-art method regrepp)
     (if (and (sequencep methods) (= (length methods) 1))
 	;; If there is only just one group to put everything in, we
 	;; just return a list with just this one method in.
@@ -1092,21 +1096,31 @@ FUNC will be called with the group name to determine the article number."
 		       (lambda (group) (cons group (funcall func group)))
 		       split))))
 	  ;; Go through the split methods to find a match.
-	  (while (and methods (or nnmail-crosspost (not group-art)))
+	  (while (and methods
+		      (or nnmail-crosspost
+			  (not group-art)))
 	    (goto-char (point-max))
-	    (setq method (pop methods))
+	    (setq method (pop methods)
+		  regrepp nil)
 	    (if (or methods
 		    (not (equal "" (nth 1 method))))
 		(when (and
 		       (ignore-errors
 			 (if (stringp (nth 1 method))
-			     (re-search-backward (cadr method) nil t)
+			     (progn
+			       (setq regrepp
+				     (string-match "\\\\[0-9&]" (car method)))
+			       (re-search-backward (cadr method) nil t))
 			   ;; Function to say whether this is a match.
 			   (funcall (nth 1 method) (car method))))
 		       ;; Don't enter the article into the same
 		       ;; group twice.
 		       (not (assoc (car method) group-art)))
-		  (push (cons (car method) (funcall func (car method)))
+		  (push (cons (if regrepp
+				  (replace-match
+				   (car method) nil nil (car method))
+				(car method))
+			      (funcall func (car method)))
 			group-art))
 	      ;; This is the final group, which is used as a
 	      ;; catch-all.
@@ -1185,7 +1199,6 @@ Return the number of characters in the body."
 
 ;;; Utility functions
 
-;; Written by byer@mv.us.adobe.com (Scott Byer).
 (defun nnmail-make-complex-temp-name (prefix)
   (let ((newname (make-temp-name prefix))
 	(newprefix prefix))
@@ -1238,7 +1251,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 
    ;; Builtin : operation.
    ((eq (car split) ':)
-    (nnmail-split-it (eval (cdr split))))
+    (nnmail-split-it (save-excursion (eval (cdr split)))))
 
    ;; Check the cache for the regexp for this split.
    ;; FIX FIX FIX could avoid calling assq twice here
