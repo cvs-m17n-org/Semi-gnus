@@ -32,6 +32,7 @@
 (require 'mm-util)
 
 (require 'custom)
+(require 'gnus-vers)
 (eval-and-compile
   (if (< emacs-major-version 20)
       (require 'gnus-load)))
@@ -267,15 +268,9 @@ is restarted, and sometimes reloaded."
   (format "Gnus v%s" gnus-original-version-number)
   "Version string for this version of Gnus.")
 
-(defconst gnus-product-name "Nana-gnus"
-  "Product name of this version of gnus.")
-
-(defconst gnus-version-number "7.1.0.13"
-  "Version number for this version of gnus.")
-
 (defconst gnus-version
-  (format "%s %s (based on %s; for SEMI 1.13, FLIM 1.13)"
-          gnus-product-name gnus-version-number gnus-original-version)
+  (format "%s (based on %s; for SEMI 1.13, FLIM 1.13)"
+          (product-string 'gnus-vers) gnus-original-version)
   "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -1576,9 +1571,17 @@ If nil, no default charset is assumed when posting."
 			gnus-newsrc-last-checked-date
 			gnus-newsrc-alist gnus-server-alist
 			gnus-killed-list gnus-zombie-list
-			gnus-topic-topology gnus-topic-alist
-			gnus-format-specs)
+			gnus-topic-topology gnus-topic-alist)
   "Gnus variables saved in the quick startup file.")
+
+(defvar gnus-product-variable-file-list
+  '(("strict-cache" ((product-version (7 1 0 14)) (emacs-version))
+     binary
+     gnus-format-specs-compiled)
+    ("cache" ((product-version (7 1 0 14)))
+     ctext
+     gnus-format-specs))
+  "Gnus variables are saved in the produce depend quick startup files.")
 
 (defcustom gnus-compile-user-specs t
   "If non-nil, the user-defined format specs will be byte-compiled
@@ -2905,6 +2908,6 @@ prompt the user for the name of an NNTP server to use."
 
 (gnus-ems-redefine)
 
-(provide 'gnus)
+(product-provide (provide 'gnus) 'gnus-vers)
 
 ;;; gnus.el ends here
