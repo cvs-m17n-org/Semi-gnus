@@ -1,3 +1,16 @@
+1999-10-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/gnus-sum.el (gnus-read-move-group-name): Returns nil
+	instead of signaling an error if the destination group is not
+	newly created.
+	(gnus-summary-move-article): Do nothing if the destination group
+	is not newly created.
+
+	* lisp/gnus-msg.el (gnus-bug): Use text/plain for the snooped
+	environment part.
+
 1999-09-30   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* nnfolder.el (nnfolder-possibly-change-group): Don't create an
