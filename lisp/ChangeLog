@@ -1,3 +1,50 @@
+2003-01-12 22:02:49 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.12 is released.
+
+2003-01-12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* mail-source.el (mail-sources): Removed autoload to make it
+	compile under XEmacs.
+
+2003-01-12  Raymond Scholz  <ray-2003@zonix.de>
+
+	* gnus-msg.el (gnus-confirm-mail-reply-to-news):  May be a
+	regexp or a function too.
+	(gnus-confirm-treat-mail-like-news): New variable.  Ask for
+	confirmation even if the original article is mail.
+
+2003-01-12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-msg.el (gnus-inews-add-send-actions): Get the right
+	articles to be marked when not yanking.
+
+2003-01-12  Fran,Ag(Bois-David Collin  <Francois-David.Collin@curie.fr>
+
+	* mm-decode.el (mm-get-part): Use mm-with-unibyte-current-buffer.
+	
+2003-01-12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-fun.el (gnus-face-from-file): Autoload.
+
+	* gnus-cite.el (gnus-cite-delete-overlays): Protect against more
+	errors.
+
+2003-01-12  Simon Josefsson  <jas@extundo.com>
+
+	* sieve.el (sieve-upload-and-bury): New.  Suggested by
+	kai.grossjohann@uni-duisburg.de (Kai Gro,A_(Bjohann).
+
+	* sieve-mode.el (sieve-mode-map): Bind s-u-a-b to C-c C-c.
+	Suggested by kai.grossjohann@uni-duisburg.de (Kai Gro,A_(Bjohann).
+
+2003-01-12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-ignored-headers): Don't include the ^ and :
+	in every string.
+
+	* gnus.el (gnus-version-number): Bumped version number.
+
 2003-01-12 13:46:20 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
 	* gnus.el: Oort Gnus v0.11 is released.

@@ -1,5 +1,9 @@
 2003-01-12  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el: T-gnus 6.15.12 revision 00.
+
+2003-01-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el: T-gnus 6.15.11 revision 00.
 
 2003-01-11  Katsumi Yamaoka  <yamaoka@jpl.org>
@@ -40,10 +44,6 @@
 2003-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* etc/gnus/gnus.xpm (oort): Make the color replaceable.
-
-2003-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
-
-	* lisp/gnus-vers.el: T-gnus 6.15.11 (quimby) revision 00.
 
 2003-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 

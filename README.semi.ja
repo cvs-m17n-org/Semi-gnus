@@ -4,7 +4,7 @@ T-gnus とは？
 =============
 
   T-gnus は、SEMI を利用して Gnus に MIME 機能を追加するものです。
-T-gnus 6.15 は Oort Gnus v0.11 をベースにしています。SEMI は Emacs で
+T-gnus 6.15 は Oort Gnus v0.12 をベースにしています。SEMI は Emacs で
 MIME を使えるようにするもので、MIME message の構文の構造と利用者の間を
 つなぐインターフェースを提供します。詳しくは、SEMI の README.en を参照
 してください。
@@ -40,7 +40,7 @@ http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 (1) checkout
 
     % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root \
-	checkout -r t-gnus-6_15-quimby gnus
+	checkout -r t-gnus-6_15 gnus
 
 (2) compile
 
@@ -50,7 +50,7 @@ http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
 (3) update
 
-    % cvs update -r t-gnus-6_15-quimby gnus
+    % cvs update -r t-gnus-6_15 gnus
 
 主なタグは以下のようになっています:
 
