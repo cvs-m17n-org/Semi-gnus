@@ -1,5 +1,4 @@
-;;; -*- mode: Emacs-Lisp; coding: euc-japan; -*-
-;;; $Id: nnshimbun.el,v 1.1.2.1 2000-05-21 04:46:52 tsuchiya Exp $
+;;; -*- mode: Emacs-Lisp; coding: junet-unix -*-
 
 ;;; Author: TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 ;;; Keywords: news
@@ -433,8 +432,8 @@
 	  (insert (nnweb-decode-entities-string string))
 	  (rfc2047-encode-region (point-min) (point-max))
 	  (buffer-substring (point-min) (point-max)))
-	"\n"))
-      "")))
+	"\n")
+       ""))))
 
 (defun nnshimbun-lapse-seconds (time)
   (let ((now (current-time)))
@@ -451,15 +450,15 @@
    (if (fboundp 'string-to-char-list)
        'string-to-char-list
      'string-to-list) "\
-!)-_~}]:;',.?¡¢¡£¡¤¡¥¡¦¡§¡¨¡©¡ª¡«¡¬¡­¡®¡¯¡°¡±¡²¡³¡´¡µ¡¶¡·¡¸¡¹¡º¡»¡¼¡½¡¾¡¿¡À¡Á\
-¡Â¡Ã¡Ä¡Å¡Ç¡É¡Ë¡Í¡Ï¡Ñ¡Ó¡Õ¡×¡Ù¡Û¡ë¡ì¡í¡î¤¡¤£¤¥¤§¤©¤Ã¤ã¤å¤ç¤î¥¡¥£¥¥¥§¥©¥Ã¥ã¥å¥ç¥î¥õ¥ö"))
+!)-_~}]:;',.?$B!"!#!$!%!&!'!(!)!*!+!,!-!.!/!0!1!2!3!4!5!6!7!8!9!:!;!<!=!>!?!@!A(B\
+$B!B!C!D!E!G!I!K!M!O!Q!S!U!W!Y![!k!l!m!n$!$#$%$'$)$C$c$e$g$n%!%#%%%'%)%C%c%e%g%n%u%v(B"))
 
 (defconst nnshimbun-kinsoku-eol-list
   (funcall
    (if (fboundp 'string-to-char-list)
        'string-to-char-list
      'string-to-list)
-   "({[`¡Æ¡È¡Ê¡Ì¡Î¡Ð¡Ò¡Ô¡Ö¡Ø¡Ú¡ë¡ì¡í¡ø"))
+   "({[`$B!F!H!J!L!N!P!R!T!V!X!Z!k!l!m!x(B"))
 
 (defun nnshimbun-fill-line ()
   (forward-line 0)
@@ -502,7 +501,7 @@
 	(goto-char (point-min))
 	(let (headers)
 	  (while (re-search-forward
-		  "^¢£<a href=\"\\(\\([0-9][0-9][0-9][0-9]\\)/past/\\([A-z]*[0-9]*\\)\\.html\\)\"> *"
+		  "^$B"#(B<a href=\"\\(\\([0-9][0-9][0-9][0-9]\\)/past/\\([A-z]*[0-9]*\\)\\.html\\)\"> *"
 		  nil t)
 	    (let ((id (format "<%s%s%%%s>" (match-string 2) (match-string 3) group))
 		  (url (match-string 1)))
