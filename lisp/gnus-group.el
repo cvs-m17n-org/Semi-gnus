@@ -1,5 +1,6 @@
 ;;; gnus-group.el --- group mode commands for Gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -162,6 +163,7 @@ with some simple extensions.
 %n    Select from where (string)
 %z    A string that look like `<%s:%n>' if a foreign select method is used
 %d    The date the group was last entered.
+%E    Icon as defined by `gnus-group-icon-list'.
 %u    User defined specifier.  The next character in the format string should
       be a letter.  Gnus will call the function gnus-user-format-function-X,
       where X is the letter following %u.  The function will be passed the
@@ -361,6 +363,38 @@ ticked: The number of ticked articles."
   :group 'gnus-group-visual
   :type 'character)
 
+(defgroup gnus-group-icons nil
+  "Add Icons to your group buffer.  "
+  :group 'gnus-group-visual)
+
+(defcustom gnus-group-icon-list
+  nil
+  "*Controls the insertion of icons into group buffer lines.
+
+Below is a list of `Form'/`File' pairs.  When deciding how a
+particular group line should be displayed, each form is evaluated.
+The icon from the file field after the first true form is used.  You
+can change how those group lines are displayed by editing the file
+field.  The File will either be found in the
+`gnus-group-glyph-directory' or by designating absolute path to the
+file.
+
+It is also possible to change and add form fields, but currently that
+requires an understanding of Lisp expressions.  Hopefully this will
+change in a future release.  For now, you can use the following
+variables in the Lisp expression:
+
+group: The name of the group.
+unread: The number of unread articles in the group.
+method: The select method used.
+mailp: Whether it's a mail group or not.
+newsp: Whether it's a news group or not
+level: The level of the group.
+score: The score of the group.
+ticked: The number of ticked articles."
+  :group 'gnus-group-icons
+  :type '(repeat (cons (sexp :tag "Form") file)))
+
 ;;; Internal variables
 
 (defvar gnus-group-sort-alist-function 'gnus-group-sort-flat
@@ -405,6 +439,7 @@ ticked: The number of ticked articles."
     (?s gnus-tmp-news-server ?s)
     (?n gnus-tmp-news-method ?s)
     (?P gnus-group-indentation ?s)
+    (?E gnus-tmp-group-icon ?s)
     (?l gnus-tmp-grouplens ?s)
     (?z gnus-tmp-news-method-string ?s)
     (?m (gnus-group-new-mail gnus-tmp-group) ?c)
@@ -433,6 +468,10 @@ ticked: The number of ticked articles."
 (defvar gnus-group-marked nil)
 
 (defvar gnus-group-list-mode nil)
+
+
+(defvar gnus-group-icon-cache nil)
+(defvar gnus-group-running-xemacs (string-match "XEmacs" emacs-version))
 
 ;;;
 ;;; Gnus group mode
@@ -573,7 +612,8 @@ ticked: The number of ticked articles."
     "d" gnus-group-description-apropos
     "m" gnus-group-list-matching
     "M" gnus-group-list-all-matching
-    "l" gnus-group-list-level)
+    "l" gnus-group-list-level
+    "c" gnus-group-list-cached)
 
   (gnus-define-keys (gnus-group-score-map "W" gnus-group-mode-map)
     "f" gnus-score-flush-cache)
@@ -649,7 +689,8 @@ ticked: The number of ticked articles."
 	["Group and description apropos..." gnus-group-description-apropos t]
 	["List groups matching..." gnus-group-list-matching t]
 	["List all groups matching..." gnus-group-list-all-matching t]
-	["List active file" gnus-group-list-active t])
+	["List active file" gnus-group-list-active t]
+	["List groups with cached" gnus-group-list-cached t])
        ("Sort"
 	["Default sort" gnus-group-sort-groups t]
 	["Sort by method" gnus-group-sort-groups-by-method t]
@@ -1073,6 +1114,7 @@ If REGEXP, only list groups matching REGEXP."
 	      ?m ? ))
 	 (gnus-tmp-moderated-string
 	  (if (eq gnus-tmp-moderated ?m) "(m)" ""))
+	 (gnus-tmp-group-icon "==&&==")
 	 (gnus-tmp-method
 	  (gnus-server-get-method gnus-tmp-group gnus-tmp-method)) ;
 	 (gnus-tmp-news-server (or (cadr gnus-tmp-method) ""))
@@ -1108,8 +1150,8 @@ If REGEXP, only list groups matching REGEXP."
 		  gnus-marked ,gnus-tmp-marked-mark
 		  gnus-indentation ,gnus-group-indentation
 		  gnus-level ,gnus-tmp-level))
+    (forward-line -1)
     (when (inline (gnus-visual-p 'group-highlight 'highlight))
-      (forward-line -1)
       (gnus-run-hooks 'gnus-group-update-hook)
       (forward-line))
     ;; Allow XEmacs to remove front-sticky text properties.
@@ -2556,7 +2598,7 @@ sort in reverse order."
 ;; Group catching up.
 
 (defun gnus-group-catchup-current (&optional n all)
-  "Mark all articles not marked as unread in current newsgroup as read.
+  "Mark all unread articles in the current newsgroup as read.
 If prefix argument N is numeric, the next N newsgroups will be
 caught up.  If ALL is non-nil, marked articles will also be marked as
 read.  Cross references (Xref: header) of articles are ignored.
@@ -3535,6 +3577,54 @@ or `gnus-group-catchup-group-hook'."
     (if (not time)
 	""
       (gnus-time-iso8601 time))))
+
+(defun gnus-group-prepare-flat-predicate (level predicate &optional lowest)
+  "List all newsgroups with unread articles of level LEVEL or lower.
+If LOWEST is non-nil, list all newsgroups of level LOWEST or higher.
+If PREDICATE, only list groups which PREDICATE returns non-nil."
+  (set-buffer gnus-group-buffer)
+  (let ((buffer-read-only nil)
+	(newsrc (cdr gnus-newsrc-alist))
+	(lowest (or lowest 1))
+	info clevel unread group params)
+    (erase-buffer)
+    ;; List living groups.
+    (while newsrc
+      (setq info (car newsrc)
+	    group (gnus-info-group info)
+	    params (gnus-info-params info)
+	    newsrc (cdr newsrc)
+	    unread (car (gnus-gethash group gnus-newsrc-hashtb)))
+      (and unread			; This group might be unchecked
+	   (funcall predicate info)
+	   (<= (setq clevel (gnus-info-level info)) level)
+	   (>= clevel lowest)
+	   (gnus-group-insert-group-line
+	    group (gnus-info-level info)
+	    (gnus-info-marks info) unread (gnus-info-method info))))
+
+    (gnus-group-set-mode-line)
+    (setq gnus-group-list-mode (cons level t))
+    (gnus-run-hooks 'gnus-group-prepare-hook)
+    t))
+
+(defun gnus-group-list-cached (level &optional lowest)
+  "List all groups with cached articles.
+If the prefix LEVEL is non-nil, it should be a number that says which
+level to cut off listing groups.
+If LOWEST, don't list groups with level lower than LOWEST.
+
+This command may read the active file."
+  (interactive "P")
+  (when level
+    (setq level (prefix-numeric-value level)))
+  (gnus-group-prepare-flat-predicate (or level gnus-level-killed)
+				#'(lambda (info)
+				    (let ((marks (gnus-info-marks info)))
+				      (assq 'cache marks)))
+				lowest)
+  (goto-char (point-min))
+  (gnus-group-position-point))
 
 (provide 'gnus-group)
 

@@ -1,5 +1,5 @@
 ;;; gnus-art.el --- article mode commands for Semi-gnus
-;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -2811,7 +2811,6 @@ commands:
     (if (get-buffer name)
 	(save-excursion
 	  (set-buffer name)
-	  (kill-all-local-variables)
 	  (buffer-disable-undo)
 	  (setq buffer-read-only t)
 	  (unless (eq major-mode 'gnus-article-mode)
@@ -2943,8 +2942,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		      (message "Message marked for downloading"))
 		  (gnus-summary-mark-article article gnus-canceled-mark)
 		  (unless (memq article gnus-newsgroup-sparse)
-		    (gnus-error 1
-				"No such article (may have expired or been canceled)")))))
+		    (gnus-error 1 "No such article (may have expired or been canceled)")))))
 	  (if (or (eq result 'pseudo)
 		  (eq result 'nneething))
 	      (progn
@@ -4004,7 +4002,8 @@ Argument LINES specifies lines to be scrolled down."
             ;; We disable the pick minor mode commands.
             (let (gnus-pick-mode)
               (setq func (lookup-key (current-local-map) keys))))
-          (if (not func)
+          (if (or (not func)
+		  (numberp func))
               (ding)
             (unless (member keys nosave-in-article)
               (set-buffer gnus-article-current-summary))
@@ -4474,7 +4473,7 @@ after replacing with the original article."
 
 ;;; Internal Variables:
 
-(defcustom gnus-button-url-regexp "\\b\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\):\\(//[-a-zA-Z0-9_.]+:[0-9]*\\)?\\([-a-zA-Z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-zA-Z0-9_=#$@~`%&*+|\\/]\\|\\w\\)"
+(defcustom gnus-button-url-regexp "\\b\\(\\(s?https?\\|ftp\\|file\\|gopher\\|news\\|telnet\\|wais\\|mailto\\):\\(//[-a-zA-Z0-9_.]+:[0-9]*\\)?\\([-a-zA-Z0-9_=!?#$@~`%&*+|\\/:;.,]\\|\\w\\)+\\([-a-zA-Z0-9_=#$@~`%&*+|\\/]\\|\\w\\)\\)\\|[-a-zA-Z0-9_]+\\.[-a-zA-Z0-9_]+\\(\\.[-a-zA-Z0-9_]+[-a-zA-Z0-9_/]+\\)+"
   "Regular expression that matches URLs."
   :group 'gnus-article-buttons
   :type 'regexp)
@@ -5124,7 +5123,8 @@ For example:
     (gnus-run-hooks 'gnus-part-display-hook)
     (unless gnus-inhibit-treatment
       (while (setq elem (pop alist))
-	(setq val (symbol-value (car elem)))
+	(with-current-buffer gnus-summary-buffer
+	  (setq val (symbol-value (car elem))))
 	(when (and (or (consp val)
 		       treated-type)
 		   (gnus-treat-predicate val)
