@@ -414,8 +414,8 @@ Modify to suit your needs."))
 	  (delete-region (point-min) (point))
 	  (unless (re-search-forward
 		   "^[\t ]*(autoload[\t\n ]+\\('\\|(quote[\t\n ]+\\)custom-add-loads[\t\n ]" nil t)
-	    (insert "\n(autoload 'custom-add-loads \"cus-load\")\n")
-	    (goto-char (point-min)))
+	    (insert "\n(autoload 'custom-add-loads \"cus-load\")\n"))
+	  (goto-char (point-min))
 	  (insert "\
 ;;; gnus-load.el --- automatically extracted custom dependencies and autoload
 ;;
