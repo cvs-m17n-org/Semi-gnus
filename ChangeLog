@@ -1,3 +1,9 @@
+1999-03-27  MORIOKA Tomohiko  <tomo@etl.go.jp>
+
+	* lisp/message.el (message-yank-original): Don't call
+	`gnus-copy-article-buffer' to avoid problem to yank assembled
+	(FULL) message of message/partial pieces.
+
 1999-01-31  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* Chaos: Version 1.12.4 was released.
