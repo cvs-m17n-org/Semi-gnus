@@ -3,6 +3,7 @@
 ;; Copyright (C) 1996-1999 Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
+;;      Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 ;; Keywords: mail, pop3
 ;; Version: 1.3s
 
@@ -62,6 +63,23 @@ values are 'apop.")
   "Timestamp returned when initially connected to the POP server.
 Used for APOP authentication.")
 
+(defvar pop3-leave-mail-on-server nil
+  "Non-nil if mail is to be left on the server and UIDL used for 
+message retrieval.")
+
+(defvar pop3-maximum-message-size nil
+  "If non-nil only download messages smaller than this.")
+
+(defvar pop3-uidl-file-name "~/.uidls"
+  "File in which to store the UIDL of processed messages.")
+
+(defvar pop3-uidl-support 'dont-know
+  "Whether the server supports UIDL.
+Nil means no, t means yes, not-nil-or-t means yet to be determined.")
+
+(defvar pop3-uidl-obarray (make-vector 31 0)
+  "Uidl hash table.")
+
 (defvar pop3-read-point nil)
 (defvar pop3-debug nil)
 
@@ -78,9 +96,12 @@ Used for APOP authentication.")
   (let* ((process (pop3-open-server pop3-mailhost pop3-port))
 	 (crashbuf (get-buffer-create " *pop3-retr*"))
 	 (n 1)
+	 (msgid 1)
+	 (msglen 0)
 	 message-count
 	 (pop3-password pop3-password)
-	 )
+	 (retrieved-messages nil)
+	 messages)
     ;; for debugging only
     (if pop3-debug (switch-to-buffer (process-buffer process)))
     ;; query for password
@@ -93,29 +114,44 @@ Used for APOP authentication.")
 	   (pop3-user process pop3-maildrop)
 	   (pop3-pass process))
 	  (t (error "Invalid POP3 authentication scheme.")))
-    (setq message-count (car (pop3-stat process)))
+    ;; get messages that are suitable for download
+    (message "Retrieving message list...")
+    (setq messages (pop3-get-message-numbers process)
+	  message-count (length messages))
+    (message (format "Retrieving message list...%d unread" message-count))
     (unwind-protect
-	(while (<= n message-count)
-	  (message (format "Retrieving message %d of %d from %s..."
-			   n message-count pop3-mailhost))
-	  (pop3-retr process n crashbuf)
-	  (save-excursion
-	    (set-buffer crashbuf)
+	(progn
+	  (while (<= n message-count)
+	    (setq msgid (caar messages)
+		  msglen (cdar messages)
+		  messages (cdr messages))
+	    ;; only retrieve messages matching our regexp or in the uidl list
+	    (unless (or (not msgid)
+			;; don't download messages that are too large
+			(and pop3-maximum-message-size 
+			     (> msglen pop3-maximum-message-size)))
+	      (message (format "Retrieving message %d of %d from %s..."
+			       n message-count pop3-mailhost))
+	      (pop3-retr process msgid crashbuf)
+	      (setq retrieved-messages (cons msgid retrieved-messages)))
+	    (setq n (1+ n)))
+	  (with-current-buffer crashbuf
 	    (write-region-as-binary (point-min) (point-max)
 				    crashbox 'append 'nomesg)
-	    (set-buffer (process-buffer process))
-	    (while (> (buffer-size) 5000)
-	      (goto-char (point-min))
-	      (forward-line 50)
-	      (delete-region (point-min) (point))))
-	  (pop3-dele process n)
-	  (setq n (+ 1 n))
-	  (if pop3-debug (sit-for 1) (sit-for 0.1))
+	    )
+	  ;; mark messages as read
+	  (when pop3-leave-mail-on-server
+	    (pop3-save-uidls))
+	  ;; now delete the messages we have retrieved
+	  (unless pop3-leave-mail-on-server
+	    (dolist (n retrieved-messages)
+	      (message (format "Deleting message %d of %d from %s..."
+			       n message-count pop3-mailhost))
+	      (pop3-dele process n)))
 	  )
       (pop3-quit process))
     (kill-buffer crashbuf)
-    )
-  t)
+    t))
 
 (defun pop3-open-server (mailhost port)
   "Open TCP connection to MAILHOST.
@@ -125,9 +161,7 @@ Returns the process associated with the connection."
 	(process))
     (save-excursion
       (set-buffer process-buffer)
-      (erase-buffer)
-      (setq pop3-read-point (point-min))
-      )
+      (erase-buffer))
     (setq
      process
      (cond
@@ -135,6 +169,7 @@ Returns the process associated with the connection."
        (pop3-open-ssl-stream "POP" process-buffer mailhost port))
       (t
        (open-network-stream-as-binary "POP" process-buffer mailhost port))))
+    (setq pop3-read-point (point-min))
     (let ((response (pop3-read-response process t)))
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
@@ -143,8 +178,8 @@ Returns the process associated with the connection."
 
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
   (let* ((ssl-program-arguments 
-	  (` ((,@ pop3-ssl-program-arguments) (, extra-arg) 
-	      "-connect" (, (format "%s:%d" host service)))))
+	  `(,@pop3-ssl-program-arguments ,extra-arg
+	    "-connect" ,(format "%s:%d" host service)))
          (process (open-ssl-stream name buffer host service)))
     (when process
       (with-current-buffer buffer
@@ -225,6 +260,9 @@ Return the response string if optional second argument is non-nil."
     (while (and (< (point) end) (search-forward "\r\n" end t))
       (replace-match "\n" t t))
     (goto-char start)
+    (while (re-search-forward "\n\n\\(From \\)" end t)
+      (replace-match "\n\n>\\1" t nil))
+    (goto-char start)
     (while (and (< (point) end) (re-search-forward "^\\." end t))
       (replace-match "" t t)
       (forward-char)))
@@ -262,15 +300,85 @@ Return the response string if optional second argument is non-nil."
 	      (setq From_ (concat (substring From_ 0 (match-beginning 0))
 				  (substring From_ (match-end 0)))))
 	    (goto-char (point-min))
-	    (insert From_)
-	    (re-search-forward "\n\n")
-	    (narrow-to-region (point) (point-max))
-	    (let ((size (- (point-max) (point-min))))
-	      (goto-char (point-min))
-	      (widen)
-	      (forward-line -1)
-	      (insert (format "Content-Length: %s\n" size)))
-	    )))))
+	    (insert From_))))))
+
+;; UIDL support
+
+(defun pop3-get-message-numbers (process)
+  "Get the list of message numbers and lengths to retrieve via PROCESS."
+  ;; we use the LIST comand first anyway to get the message lengths.
+  ;; then if we're leaving mail on the server, see if the UIDL command
+  ;; is implemented. if so, we use it to get the message number list.
+  (let ((messages (pop3-list process))
+	(uidl (if pop3-leave-mail-on-server
+		  (pop3-get-uidl process))))
+    (when messages
+      (pop messages)
+      (cond
+       ((eq pop3-uidl-support t)
+	;; remove elements not in the uidl, this assumes the uidl is short
+	(remove-if-not
+	 (lambda (message) (memq (car message) uidl))
+	 (reverse messages)))
+       (t messages)))))
+
+(defun pop3-get-list (process)
+  "Use PROCESS to get a list of message numbers."
+  (let ((messages (pop3-list process)))
+    (when messages
+      (reverse messages))))
+
+(defun pop3-get-uidl (process)
+  "Use PROCESS to get a list of unread message numbers."
+  (let ((messages (pop3-uidl process)) uidl)
+    (if (or (null messages) (null pop3-uidl-support))
+	(setq pop3-uidl-support nil)
+      (setq pop3-uidl-support t)
+      (save-excursion
+	(with-temp-buffer
+	  (when (file-readable-p pop3-uidl-file-name)
+	    (insert-file-contents pop3-uidl-file-name))
+	  (goto-char (point-min))
+	  (while (looking-at "\\([^ \n\t]+\\)")
+	    (set (intern (match-string 1) pop3-uidl-obarray)
+		 (cons nil t))
+	    (forward-line 1))))
+      (dolist (message (cdr messages))
+	(if (setq uidl (intern-soft (cdr message) pop3-uidl-obarray))
+	    (setcar (symbol-value uidl) (car message))
+	  (set (intern (cdr message) pop3-uidl-obarray)
+	       (cons (car message) nil))))
+      (pop3-get-unread-message-numbers))))
+	    
+(defun pop3-get-unread-message-numbers ()
+  "Return a sorted list of unread msg numbers to retrieve."
+  (let (nums)
+    (mapatoms (lambda (atom)
+		(if (not (cdr (symbol-value atom)))
+		    (push (car (symbol-value atom)) nums)))
+	      pop3-uidl-obarray)
+    (sort nums '<)))
+
+(defun pop3-save-uidls ()
+  "Save the updated UIDLs to disk for use next time."
+  (when (and pop3-leave-mail-on-server 
+	     pop3-uidl-obarray
+	     (catch 'found
+	       (dotimes (i (length pop3-uidl-obarray))
+		 (if (symbolp (aref pop3-uidl-obarray i))
+		     (throw 'found t)))))
+    (save-excursion
+      (with-temp-buffer
+        (when (file-readable-p pop3-uidl-file-name)
+          (copy-file pop3-uidl-file-name
+                     (concat pop3-uidl-file-name ".old")
+                     'overwrite 'keeptime))
+        (mapatoms 
+	 (lambda (atom)
+	   (when (car (symbol-value atom))
+	     (insert (format "%s\n" atom))))
+	 pop3-uidl-obarray)
+        (write-file pop3-uidl-file-name)))))
 
 ;; The Command Set
 
@@ -309,50 +417,16 @@ Return the response string if optional second argument is non-nil."
 	  (string-to-int (nth 2 (split-string response))))
     ))
 
-(defun pop3-list (process &optional msg)
-  "Scan listing of available messages.
-This function currently does nothing.")
-
 (defun pop3-retr (process msg crashbuf)
   "Retrieve message-id MSG to buffer CRASHBUF."
   (pop3-send-command process (format "RETR %s" msg))
   (pop3-read-response process)
-  (let ((start pop3-read-point) end)
-    (save-excursion
-      (set-buffer (process-buffer process))
-      (while (not (re-search-forward "^\\.\r\n" nil t))
-	(accept-process-output process 3)
-	;; bill@att.com ... to save wear and tear on the heap
-	;; uncommented because the condensed version below is a problem for
-	;; some.
-	(if (> (buffer-size)  20000) (sleep-for 1))
-	(if (> (buffer-size)  50000) (sleep-for 1))
-	(if (> (buffer-size) 100000) (sleep-for 1))
-	(if (> (buffer-size) 200000) (sleep-for 1))
-	(if (> (buffer-size) 500000) (sleep-for 1))
-	;; bill@att.com
-	;; condensed into:
-	;; (sometimes causes problems for really large messages.)
-;	(if (> (buffer-size) 20000) (sleep-for (/ (buffer-size) 20000)))
-	(goto-char start))
-      (setq pop3-read-point (point-marker))
-;; this code does not seem to work for some POP servers...
-;; and I cannot figure out why not.
-;      (goto-char (match-beginning 0))
-;      (backward-char 2)
-;      (if (not (looking-at "\r\n"))
-;	  (insert "\r\n"))
-;      (re-search-forward "\\.\r\n")
-      (goto-char (match-beginning 0))
-      (setq end (point-marker))
-      (pop3-clean-region start end)
-      (pop3-munge-message-separator start end)
-      (save-excursion
-	(set-buffer crashbuf)
-	(erase-buffer))
-      (copy-to-buffer crashbuf start end)
-      (delete-region start end)
-      )))
+  (save-excursion
+    (save-restriction
+      (apply 'narrow-to-region (pop3-get-extended-response process))
+      (pop3-munge-message-separator (point-min) (point-max))
+      (append-to-buffer crashbuf (point-min) (point-max))
+      (delete-region (point-min) (point-max)))))
 
 (defun pop3-dele (process msg)
   "Mark message-id MSG as deleted."
@@ -389,6 +463,87 @@ and close the connection."
 	(set-buffer (process-buffer process))
 	(goto-char (point-max))
 	(delete-process process))))
+
+(defun pop3-uidl (process &optional msgno)
+  "Return the results of a UIDL command in PROCESS for optional MSGNO.
+If UIDL is unsupported on this mail server or if msgno is invalid, return nil.
+Otherwise, return a list in the form
+
+   (N (1 UIDL-1) (2 UIDL-2) ... (N UIDL-N))
+
+where
+
+   N is an integer for the number of UIDLs returned (could be 0)
+   UIDL-n is a string."
+
+  (if msgno
+      (pop3-send-command process (format "UIDL %d" msgno))
+    (pop3-send-command process "UIDL"))
+  
+  (let ((uidl-not-supported 
+	 (condition-case nil
+	     (progn (pop3-read-response process t) nil)
+	   (error t))))
+    (unless uidl-not-supported
+      (let (pairs uidl)
+        (save-excursion
+	  (save-restriction
+	    (apply 'narrow-to-region (pop3-get-extended-response process))
+	    (goto-char (point-min))
+	    (while (looking-at "\\([^ \n\t]*\\) \\([^ \n\t]*\\)")
+	      (setq msgno (string-to-int (match-string 1))
+		    uidl (match-string 2))
+	      (push (cons msgno uidl) pairs)
+	      (beginning-of-line 2))
+	    (cons (length pairs) (nreverse pairs))))))))
+
+(defun pop3-list (process &optional msgno)
+  "Return the results of a LIST command for PROCESS and optional MSGNO.
+If (optional) msgno is invalid, return nil.  Otherwise, return a list
+in the form
+
+   (N (1 LEN-1) (2 LEN-2) ... (N LEN-N))
+
+where
+
+   N is an integer for the number of msg/len pairs (could be 0)
+   LEN-n is an integer."
+  (if msgno
+      (pop3-send-command process (format "LIST %d" msgno))
+    (pop3-send-command process "LIST"))
+
+  (let ((bad-msgno 
+	 (condition-case nil
+	     (progn (pop3-read-response process t) nil)
+	   (error t))))
+    (unless bad-msgno
+      (let (pairs len)
+	(save-excursion
+	  (save-restriction
+	    (apply 'narrow-to-region (pop3-get-extended-response process))
+	    (goto-char (point-min))
+	    (while (looking-at "\\([^ \n\t]*\\) \\([^ \n\t]*\\)")
+	      (setq msgno (string-to-int (match-string 1))
+		    len (string-to-int (match-string 2)))
+	      (push (cons msgno len) pairs)
+	      (beginning-of-line 2))
+	    (cons (length pairs) (nreverse pairs))))))))
+
+;;; Utility code
+
+(defun pop3-get-extended-response (process)
+  "Get the extended pop3 response in the PROCESS buffer."
+  (let ((start pop3-read-point) end)
+    (set-buffer (process-buffer process))
+    (while (not (re-search-forward "^\\.\r\n" nil t))
+      (accept-process-output process)
+      (goto-char start))
+    (setq pop3-read-point (point-marker))
+    (goto-char (match-beginning 0))
+    (setq end (point-marker))
+    (pop3-clean-region start end)
+    (list start end)))
+
 
 ;; Summary of POP3 (Post Office Protocol version 3) commands and responses
 
@@ -428,6 +583,13 @@ and close the connection."
 ;; Restrictions: transaction state; msg must not be deleted
 ;; Possible responses:
 ;;  +OK [scan listing follows]
+;;  -ERR [no such message]
+
+;; UIDL [msg]
+;; Arguments: a message-id (optional)
+;; Restrictions: transaction state; msg must not be deleted
+;; Possible responses:
+;;  +OK [uidl listing follows]
 ;;  -ERR [no such message]
 
 ;; RETR msg

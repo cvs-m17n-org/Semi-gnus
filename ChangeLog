@@ -1,3 +1,23 @@
+1999-08-15  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* pop3.el: Sync up with pop3.el version 2.04.
+	(pop3-leave-mail-on-server): New variable.
+	(pop3-maximum-message-size): New variable.
+	(pop3-uidl-file-name): New variable.
+	(pop3-uidl-support): New variable.
+	(pop3-uidl-obarray): New variable.
+	(pop3-movemail): Check message size on every retrieval.
+	(pop3-open-ssl-stream-1): Use new style macro.
+	(pop3-get-message-numbers): New function.
+	(pop3-get-list): New function.
+	(pop3-get-uidl): New function.
+	(pop3-get-unread-message-numbers): New function.
+	(pop3-save-uidls): New function.
+	(pop3-retr): Use `pop3-get-extended-response'.
+	(pop3-list): New implementation.
+	(pop3-uidl): New function.
+	(pop3-get-extended-response): New function.
+
 1999-08-04  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el: T-gnus 6.13.0 is released.
