@@ -10814,25 +10814,29 @@ If REVERSE, save parts that do not match TYPE."
   "Burst a forwarded article."
   (save-excursion
     (set-buffer gnus-summary-buffer)
+    (gnus-summary-goto-subject gnus-current-article)
     (let* ((group (completing-read "Group: " gnus-active-hashtb
 				   nil (gnus-read-active-file-p)
 				   gnus-newsgroup-name 'gnus-group-history))
 	   (old (cdr (gnus-active group)))
-	   article summary buffers)
-      (gnus-summary-goto-subject gnus-current-article)
+	   (gnus-group-marked (list group))
+	   article info read)
       (gnus-summary-copy-article 1 group)
-      (setq article (cdr (gnus-active group)))
-      (unless (> article old)
+      (unless (= (setq article (cdr (gnus-active group))) (1+ old))
 	(error "Something wrong on bursting; check articles in %s" group))
       (with-temp-buffer
 	(mime-insert-entity-content entity)
 	(gnus-request-replace-article article group (current-buffer) t))
+      (setq info (gnus-get-info group)
+	    read (gnus-info-read info))
+      (gnus-info-set-read info (gnus-remove-from-range read (list article)))
       (when (string-equal group gnus-newsgroup-name)
-	(gnus-summary-goto-subject gnus-current-article)
 	(forward-line 1)
 	(let (gnus-show-threads)
 	  (gnus-summary-goto-subject article t))
-	(gnus-summary-clear-mark-forward 1)))))
+	(gnus-summary-clear-mark-forward 1))
+      (set-buffer gnus-group-buffer)
+      (gnus-group-get-new-news-this-group nil t))))
 
 (mime-add-condition
  'action '((type . message)(subtype . rfc822)
