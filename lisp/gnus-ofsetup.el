@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.4.6 1999-02-18 20:30:25 czkmt Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.4.7 1999-03-04 15:21:21 czkmt Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -360,7 +360,7 @@
 	      (insert (prin1-to-string pop3-fma-movemail-type))
 	      (insert ")\n")
 	      (if save-passwd
-		  (insert "(add-hook 'gnus-setup-news-hook \n    (lambda ()\n        (add-to-list 'gnus-variable-list 'pop3-fma-password)))\n"))
+		  (insert "(add-hook 'gnus-setup-news-hook \n    (lambda ()\n        (setq pop3-fma-save-password-information t)\n        (add-to-list 'gnus-variable-list 'pop3-fma-password)))\n"))
 	      (if (eq pop3-fma-movemail-type 'exe)
 		  (progn
 		    (insert "(setq pop3-fma-movemail-arguments '")

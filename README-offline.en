@@ -256,6 +256,7 @@ password will be saved in ~/.newsrc.eld. (*)
 
             (add-hook 'gnus-setup-news-hook 
              (lambda ()
+              (setq pop3-fma-save-password-information t)
               (add-to-list 'gnus-variable-list 'pop3-fma-password)))
 
            [T-gnus 6.10.56 or later]
@@ -277,7 +278,7 @@ For Semi-gnus with pop3-fma.el, add the following code in
 
          (setq pop3-fma-save-password-information t)
 
-In this way, Once you enter the password at the startup of Gnus, it
+In this way, once you enter the password at the startup of Gnus, it
 will be kept as a variable `pop3-fma-password' until you quit Gnus.
 
 Under T-gnus 6.10.56 or later, the password will be kept as a variable

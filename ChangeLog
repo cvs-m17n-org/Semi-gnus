@@ -1,3 +1,12 @@
+1999-03-04  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-ofsetup.el: Modify for Semi-gnus 6.10.xx so that
+	`pop3-fma-password' can be saved in .newsrc.eld.
+	* lisp/pop3-fma.el: Ditto.
+
+	* README-offline.en: Update.
+	* README-offline.ja: Ditto.
+
 1999-03-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-install-package): Don't refer to

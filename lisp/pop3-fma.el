@@ -195,13 +195,17 @@ If there is any problem , please set this variable to nil(default).
   "Function to move mail from INBOX on a pop3 server to file CRASHBOX."
   (if (string-match "^po:" inbox)
       (progn
+	(if (and pop3-fma-save-password-information
+		 (not pop3-fma-password))
+	    (pop3-fma-set-pop3-password))
 	(let ((pop3-maildrop
 	       (substring inbox (match-end (string-match "^po:" inbox))
 			  (- (match-end (string-match "^.*@" inbox)) 1)))
 	      (pop3-mailhost
 	       (substring inbox (match-end (string-match "^.*@" inbox))))
 	      (pop3-password
-	       (if pop3-fma-save-password-information
+	       (if (and pop3-fma-save-password-information
+			pop3-fma-password)
 		   (pop3-fma-read-passwd (substring inbox (match-end (string-match "^.*@" inbox))))
 		 (pop3-fma-input-password
 		  (substring inbox (match-end (string-match "^.*@" inbox)))
