@@ -668,13 +668,8 @@ If this variable is `t', do not use password cache.")
 	  ;; We don't try to move an already moved inbox.
 	  nil
 	(if popmail
-	    (progn
-	      (when (and (not nnmail-internal-password-cache)
-			 nnmail-pop-password)
-		(nnmail-set-password nil nnmail-pop-password))
-	      (setq nnmail-internal-password (nnmail-get-password inbox))
-	      (nnheader-message 5 "Getting mail from the post office %s..."
-				inbox))
+	    (nnheader-message 5 "Getting mail from the post office %s..."
+				inbox)
 	  (when (or (and (file-exists-p tofile)
 			 (/= 0 (nnheader-file-size tofile)))
 		    (and (file-exists-p inbox)
@@ -694,6 +689,11 @@ If this variable is `t', do not use password cache.")
 	  ;; If getting from mail spool directory, use movemail to move
 	  ;; rather than just renaming, so as to interlock with the
 	  ;; mailer.
+	  (when popmail
+	    (when (and (not nnmail-internal-password-cache)
+		       nnmail-pop-password)
+	      (nnmail-set-password nil nnmail-pop-password))
+	    (setq nnmail-internal-password (nnmail-get-password inbox)))
 	  (unwind-protect
 	      (save-excursion
 		(setq errors (generate-new-buffer " *nnmail loss*"))
@@ -710,13 +710,14 @@ If this variable is `t', do not use password cache.")
 			 (insert (prin1-to-string err))
 			 (setq result 255))))
 		  (setq result (nnmail-exec-movemail-program
-				inbox tofile popmail errors inbox-options))))
+				inbox tofile popmail errors inbox-options)))
 		(push inbox nnmail-moved-inboxes)
 		(if (and (not (buffer-modified-p errors))
 			 (zerop result))
 		    ;; No output => movemail won
 		    (progn
-		      (unless popmail
+		      (if popmail
+			  (nnmail-set-password inbox nnmail-internal-password)
 			(when (file-exists-p tofile)
 			  (set-file-modes tofile nnmail-default-file-modes))))
 		  (set-buffer errors)
@@ -743,13 +744,12 @@ If this variable is `t', do not use password cache.")
 		    (unless (yes-or-no-p
 			     (format "movemail: %s (%d return).  Continue? "
 				     (buffer-string) result))
-			     (error "%s" (buffer-string)))
-		    (setq tofile nil))))))
-	(nnmail-set-password inbox nnmail-internal-password)
+		      (error "%s" (buffer-string)))
+		    (setq tofile nil))))
+	    (and errors
+		 (buffer-name errors)
+		 (kill-buffer errors)))))
 	(nnheader-message 5 "Getting mail from %s...done" inbox)
-	(and errors
-	     (buffer-name errors)
-	     (kill-buffer errors))
 	tofile))))
 
 (defun nnmail-get-active ()
