@@ -93,4 +93,123 @@ message-mail-follow-up-address-checker (Default: nil)
 これらは Reply-to をつけないメイリング・リストに参加しているときなどに
 便利かも知れません。
 
+--
+message-locale-*
+
+送信先によって生成するメッセージの MIME charset を制限する等の機能を実
+現するため、 locale の概念を導入しました。
+
+現在サポートしているものは、 MIME charset を制限する機能のみですが、将
+来は MIME サポートのレベルも制御できるようにしたいと思っています。
+
+定義済の locale には次のものがあります。
+
+nil     : 特に制限をしません。
+
+fj      : fj.* に投稿しても文句をいわれない(:-p)であろうと思われるメッ
+          セージに制限します。
+          MIME encoded header に対応していて、かつ日本語対応といわれて
+          いる MUA であればこれを使えばおおむね大丈夫ではないかと思い
+          ます。
+
+none    : すべての機能を制限します。
+          自分で MIME charset を指定したい、どんな MIME charset が選択
+          されたのかわからないのは不安だ、という偏執狂^H^H^Hの方には良
+          いかもしれません。
+
+message-locale-default (Default: nil)
+
+すべての送信先に対して locale がしていされていない場合にはこの locale
+を使用します。 Default では nil です。
+
+主に日本語のメッセージを書くことが多いかたは、 fj にしておくと良いかも
+しれません。
+
+message-locale-detect-for-mail (Default: nil)
+
+To / Cc / Bcc field に含まれるメイル・アドレスから locale を得るための
+関数を指定します。 Default では nil でメイル・アドレスに関するチェック
+は行いません。現在、この変数に与えるための関数としては、
+message-locale-detect-with-mail-address-alist
+が定義済です。
+
+message-locale-detect-for-mail (Default: nil)
+
+Newsgroup field に含まれるニュース・グループ名から locale を得るための
+関数を指定します。 Default では
+message-locale-detect-with-newsgroup-alist です。現在、この変数に与え
+るための関数としては、
+message-locale-detect-with-newsgroup-alist
+が定義済です。
+
+message-locale-newsgroup-alist (Default: 下記参照)
+message-locale-detect-with-newsgroup-alist()
+
+message-locale-detect-with-newsgroup-alist() は、この alist からニュー
+ス・グループの locale を決定します。
+この変数は、 (regexp . locale) という形式の alist で、
+message-locale-detect-with-newsgroup-alist() は、この alist の先頭から
+検索を行いニュース・グループ名が regexp と合致した時点で、 locale を決
+定します。また、合致するものがない場合には locale として nil を返しま
+す。
+Default では ("^fj\\." . fj) を定義してあります。
+
+message-locale-mail-address-alist (Default: nil)
+message-locale-detect-with-mail-address-alist()
+
+message-locale-detect-with-mail-address-alist() は、この alist からメ
+イル・アドレスの locale を決定します。
+この変数の形式は、 (regexp . locale) という形式の alistで、
+message-locale-detect-with-mail-address-alist() は、この alist の先頭
+から検索を行いメイル・アドレスが regexp と合致した時点で、 locale 
+を決定します。また、合致するものがない場合には locale として nil を返
+します。
+
+message-locale-mime-charsets-alist (Default: 下記参照)
+
+ある locale で使用可能な MIME charset を指定します。
+この変数の形式は、 (locale . MIME-charset-list) という形式の alist で、
+locale は対象となる locale で、 MIME-charset-list はその locale で使
+用可能な MIME charset のリストです。
+Default では次のように定義してあります。
+
+((fj . (us-ascii iso-2022-jp iso-2022-jp-2))
+ (none . nil)
+ )
+
+iso-2022-jp-2 はまずいんじゃないのという方は次のようにしてください。
+
+(modify-alist '((fj . (us-ascii iso-2022-jp)))
+           message-locale-mime-charsets-alist)
+
+一つのメッセージ中に複数の送信先が存在し、複数の locale がしていされて
+いる場合には、すべての locale に共通の MIME charset のみが使用可能と見
+なします。
+
+---
+message-mime-charset-recover-*
+
+message-mime-charset-recover-function (Default: 下記参照)
+
+送信先の locale によって許可された MIME charset では decode できなかっ
+た場合にこの変数に設定された関数を呼び出します。このための関数としては
+次のものが定義済です。
+
+message-mime-charset-recover-by-ask() (Default)
+
+Decode 対象の範囲に narrowing した buffer を表示し、
+message-mime-charset-recover-ask-function に設定された関数を呼び出しま
+す。実際の recover 処理は呼び出される関数で定義します。このための関数
+としては、次のものが定義済です。
+
+message-mime-charset-recover-ask-y-or-n () (Default)
+
+自動判定した MIME charset を表示し、 y / n でユーザーに確認をとります。 
+n が選択された場合には送信処理を中断します。
+
+message-mime-charset-recover-ask-charset ()
+
+ユーザーに使用する charset を指定することを促します。その際の default
+値は自動判定した結果になります。
+
 ;; Nana-TIPS.ja ends here.
