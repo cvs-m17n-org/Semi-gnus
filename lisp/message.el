@@ -583,6 +583,13 @@ conjunction with `message-subscribed-regexps' and
   :group 'message-interface
   :type '(repeat sexp))
 
+(defcustom message-subscribed-address-file nil
+  "*A file containing addresses the user is subscribed to.
+If nil, do not look at any files to determine list subscriptions.  If
+non-nil, each line of this file should be a mailing list address."
+  :group 'message-interface
+  :type 'string)
+
 (defcustom message-subscribed-addresses nil
   "*Specifies a list of addresses the user is subscribed to.
 If nil, do not use any predefined list subscriptions.  This list of
@@ -3231,6 +3238,7 @@ This sub function is for exclusive use of `message-send-mail'."
       ;; Generate the Mail-Followup-To header if the header is not there...
       (if (and (or message-subscribed-regexps
 		   message-subscribed-addresses
+		   message-subscribed-address-file
 		   message-subscribed-address-functions)
 	       (not (mail-fetch-field "mail-followup-to")))
 	  (setq headers
@@ -4394,9 +4402,25 @@ give as trustworthy answer as possible."
 	 (recipients
 	  (mapcar 'mail-strip-quoted-names
 		  (message-tokenize-header msg-recipients)))
+	 (file-regexps
+	  (if message-subscribed-address-file
+	      (let (begin end item re)
+		(save-excursion
+		  (with-temp-buffer
+		    (insert-file-contents message-subscribed-address-file)
+		    (while (not (eobp))
+		      (setq begin (point))
+		      (forward-line 1)
+		      (setq end (point))
+		      (if (bolp) (setq end (1- end)))
+		      (setq item (regexp-quote (buffer-substring begin end)))
+		      (if re (setq re (concat re "\\|" item))
+			(setq re (concat "\\`\\(" item))))
+		    (and re (list (concat re "\\)\\'"))))))))
 	 (mft-regexps (apply 'append message-subscribed-regexps
 			     (mapcar 'regexp-quote
 				     message-subscribed-addresses)
+			     file-regexps
 			     (mapcar 'funcall
 				     message-subscribed-address-functions))))
     (save-match-data
@@ -5923,8 +5947,9 @@ which specify the range to operate on."
   :group 'message
   :type '(alist :key-type regexp :value-type function))
 
-(defcustom message-tab-body-function 'indent-relative
-  "*Function to execute when `message-tab' (TAB) is executed in the body."
+(defcustom message-tab-body-function nil
+  "*Function to execute when `message-tab' (TAB) is executed in the body.
+If nil, the function bound in `text-mode-map' or `global-map' is executed."
   :group 'message
   :type 'function)
 
@@ -5938,7 +5963,10 @@ those headers."
 		(let ((mail-abbrev-mode-regexp (caar alist)))
 		  (not (mail-abbrev-in-expansion-header-p))))
       (setq alist (cdr alist)))
-    (funcall (or (cdar alist) message-tab-body-function))))
+    (funcall (or (cdar alist) message-tab-body-function
+		 (lookup-key text-mode-map "\t")
+		 (lookup-key global-map "\t")
+		 'indent-relative))))
 
 (defun message-expand-group ()
   "Expand the group name under point."
