@@ -708,7 +708,7 @@ the actual number of articles toggled is returned."
     (insert "\n")
     (let ((file (gnus-agent-lib-file "history")))
       (when (file-exists-p file)
-	(insert-file file))
+	(nnheader-insert-file-contents file))
       (set (make-local-variable 'gnus-agent-file-name) file))))
 
 (defun gnus-agent-save-history ()
