@@ -1,5 +1,7 @@
 1998-11-04  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
+	* lisp/message.el (format-alist): Change REGEXP.
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.4.
 
 	* TODO.ja: Update.
