@@ -21638,12 +21638,12 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 $B%U%)%k%H$G$O$=$N%0%k!<%WL>$O(B @samp{spam} $B$G$9$,!"(B
 @code{spam-split-group} $B$r%+%9%?%^%$%:$9$k$3$H$,2DG=$G$9!#(B
 
-@c TRANSLATEME
-You can also give @code{spam-split} a parameter,
-e.g. @samp{'spam-use-regex-headers}.  Why is this useful?
+$B$^$?!"(B@code{spam-split} $B$K%Q%i%a!<%?!"Nc$((B
+$B$P(B @samp{spam-use-regex-headers} $B$rM?$($k$3$H$b$G$-$^$9!#$J$<$3$l$,M-MQ(B
+$B$J$N$G$7$g$&$+(B?
 
-Take these split rules (with @code{spam-use-regex-headers} and
-@code{spam-use-blackholes} set):
+$B$3$l$i$N(B (@code{spam-use-regex-headers} $B$H(B @code{spam-use-blackholes} $B$N(B
+$B@_Dj$K$h$k(B) $BJ,3d$N5,B'$r8+$F2<$5$$(B:
 
 @example
  nnimap-split-fancy '(|
@@ -21653,16 +21653,16 @@ Take these split rules (with @code{spam-use-regex-headers} and
 		      "mail")
 @end example
 
-Now, the problem is that you want all ding messages to make it to the
-ding folder.  But that will let obvious spam (for example, spam
-detected by SpamAssassin, and @code{spam-use-regex-headers}) through,
-when it's sent to the ding list.  On the other hand, some messages to
-the ding list are from a mail server in the blackhole list, so the
-invocation of @code{spam-split} can't be before the ding rule.
+$B$5$F!"LdBj$O(B ding $B08$F$N%a%C%;!<%8$r$9$Y$F(B ding $B%U%)%k%@!<$KF~$l$h$&$H$7(B
+$B$F$$$k$3$H$G$9!#$G$b$=$l$O(B ding $B%a!<%j%s%0%j%9%H08$F$KAw$i$l$?(B spam ($BNc(B
+$B$($P(B SpamAssassin $B$H(B @code{spam-use-regex-headers} $B$K$h$C$F8!=P$5$l(B
+$B$k(B spam) $B$r5v$7$F$7$^$&$G$7$g$&!#0lJ}!"$$$/$D$+$N(B ding $B08$F$N%a%C%;!<%8(B
+$B$O%V%i%C%/%[!<%k%j%9%H$K:\$C$F$$$k%a!<%k%5!<%P!<$+$i$d$C$FMh$k$N$G!"(B
+ding $B$N5,B'$h$jA0$K(B @code{spam-split} $B$rH/F0$9$k$3$H$,$G$-$^$;$s!#(B
 
-You can let SpamAssassin headers supercede ding rules, but all other
-@code{spam-split} rules (including a second invocation of the
-regex-headers check) will be after the ding rule:
+SpamAssassin $B%X%C%@!<$K(B ding $B$N5,B'$rCV$-49$($5$;$k$3$H$O$G$-$^$9$,!"B>(B
+$B$N$9$Y$F$N(B @code{spam-split} $B$N5,B'(B ($BBhFs$N@55,I=8=%X%C%@!<8!::$r4^(B
+$B$`(B) $B$O(B ding $B$N5,B'$N8e$K$J$C$F$7$^$&$G$7$g$&!#(B
 
 @example
  nnimap-split-fancy '(|
@@ -21673,19 +21673,18 @@ regex-headers check) will be after the ding rule:
 		      "mail")
 @end example
 
-Basically, this lets you invoke specific @code{spam-split} checks
-depending on your particular needs.  You don't have to throw all mail
-into all the spam tests.  Another reason why this is nice is that
-messages to mailing lists you have rules for don't have to have
-resource-intensive blackhole checks performed on them.  You could also
-specify different spam checks for your nnmail split vs. your nnimap
-split.  Go crazy.
+$B4pK\E*$K!"$3$l$OFC$K$"$J$?$NI,MW$K0MB8$7$?FCDj$N(B @code{spam-split} $B8!(B
+$B::$r5/F0$5$;$^$9!#$9$Y$F$N%a!<%k$r$9$Y$F$N(B spam $B%F%9%H$KEj$2$kI,MW$O$"$j(B
+$B$^$;$s!#$3$l$,NI$$JL$NM}M3$O!"5,B'$r;}$C$F$$$k%a!<%j%s%0%j%9%H$X$N%a%C%;!<(B
+$B%8$KBP$7$F!";q8;=8LsE*$J%V%i%C%/%[!<%k!&%A%'%C%/$r<B9T$9$kI,MW$,$J$$$H$$(B
+$B$&$3$H$G$9!#$5$i$K(B nnmail $BJ,3d$KBP$7$F(B nnimap $BJ,3d$N$?$a$N!"0[$J$k(B spam
+$B8!::$r;XDj$9$k$3$H$b$G$-$^$9!#5$$,68$&!<!#(B
 
-You still have to have specific checks such as
-@code{spam-use-regex-headers} set to t, even if you specifically
-invoke @code{spam-split} with the check.  The reason is that when
-loading @code{spam.el}, some conditional loading is done depending on
-what @code{spam-use-xyz} variables you have set.
+$B8!::$HF1;~$KL@$i$+$K(B @code{spam-split} $B$r<B9T$9$k$H$7$F$b!":#$^$G$H$*(B
+$B$j(B @code{spam-use-regex-headers} $B$r(B t $B$K@_Dj$9$k$h$&$J8!::$r9T$C$F$$$J$1(B
+$B$l$P$J$j$^$;$s!#$J$<$J$i(B @file{spam.el} $B$rFI$_9~$`$H$-$K!"$"$J$?$,2?(B
+$B$N(B @code{spam-use-xyz} $BJQ?t$r@_Dj$7$F$$$k$+$K1~$8$?!"$$$/$D$+$N>r7oIU$-(B
+$B$NFI$_9~$_$,9T$o$l$k$+$i$G$9!#(B
 
 @emph{@acronym{IMAP} $BMxMQ<T$X$NCm0U(B}
 
