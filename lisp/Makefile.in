@@ -33,13 +33,11 @@ install: clever
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
 	@for p in \
 	`$(EMACS) $(FLAGS) -f dgnushack-exported-files 2>/dev/null`; do \
-	  if test "$$p" != "dgnuspath.el" -a "$$p" != "ptexinfmt.el"; then \
-	    echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
-	    $(INSTALL_DATA) $$p $(lispdir)/$$p; \
-	    if test -f $$p"c"; then \
-	      echo " $(INSTALL_DATA) $$p""c"" $(lispdir)/$$p""c"; \
-	      $(INSTALL_DATA) $$p"c" $(lispdir)/$$p"c"; \
-	    fi; \
+	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
+	  if test -f $$p"c"; then \
+	    echo " $(INSTALL_DATA) $$p""c"" $(lispdir)/$$p""c"; \
+	    $(INSTALL_DATA) $$p"c" $(lispdir)/$$p"c"; \
 	  fi; \
 	done
 

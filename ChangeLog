@@ -1,3 +1,7 @@
+2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/Makefile.in (install): Don't check for the file names.
+
 2000-11-04  Hermit  <hermit@koka-in.org>
 
 	* lisp/gnus-topic.el (gnus-group-topic-map): Define "T" prefix
