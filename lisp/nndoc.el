@@ -341,6 +341,9 @@ from the document.")
 		(setq entry (pop alist)))
       (when (memq subtype (or (cdr (assq 'subtype entry)) '(guess)))
 	(goto-char (point-min))
+	;; Remove blank lines.
+	(while (eq (following-char) ?\n)
+	  (delete-char 1))
 	(when (numberp (setq result (funcall (intern
 					      (format "nndoc-%s-type-p"
 						      (car entry))))))
@@ -581,6 +584,9 @@ from the document.")
     (save-excursion
       (set-buffer nndoc-current-buffer)
       (goto-char (point-min))
+      ;; Remove blank lines.
+      (while (eq (following-char) ?\n)
+	(delete-char 1))
       ;; Find the beginning of the file.
       (when nndoc-file-begin
 	(nndoc-search nndoc-file-begin))
