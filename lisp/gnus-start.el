@@ -305,6 +305,7 @@ claim them."
 (defcustom gnus-subscribe-newsgroup-hooks nil
   "*Hooks run after you subscribe to a new group.
 The hooks will be called with new group's name as argument."
+  :version "21.4"
   :group 'gnus-group-new
   :type 'hook)
 
@@ -411,6 +412,7 @@ This hook is called as the first thing when Gnus is started."
 
 (defcustom gnus-get-top-new-news-hook nil
   "A hook run just before Gnus checks for new news globally."
+  :version "21.4"
   :group 'gnus-group-new
   :type 'hook)
 
