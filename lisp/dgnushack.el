@@ -49,56 +49,6 @@
 (fset 'facep 'ignore)
 
 (require 'cl)
-
-;; Define cl functions as compiler macros.
-(unless (and (fboundp 'copy-list)
-	     (subrp (symbol-function 'copy-list)))
-  (define-compiler-macro copy-list (list)
-    (` (let ((list (, list)))
-	 (if (consp list)
-	     (let ((res nil))
-	       (while (consp list) (push (pop list) res))
-	       (prog1 (nreverse res) (setcdr res list)))
-	   (car list)))))
-  )
-
-(unless (and (fboundp 'union)
-	     (subrp (symbol-function 'union)))
-  (define-compiler-macro union (cl-list1 cl-list2 &rest cl-keys)
-    (let ((adjoin (symbol-function 'adjoin)))
-      (if cl-keys
-	  (` (let ((list1 (, cl-list1))
-		   (list2 (, cl-list2))
-		   (keys (, cl-keys)))
-	       (cond ((null list1) list2) ((null list2) list1)
-		     ((equal list1 list2) list1)
-		     (t
-		      (or (>= (length list1) (length list2))
-			  (setq list1 (prog1 list2 (setq list2 list1))))
-		      (while list2
-			(if (or keys (numberp (car list2)))
-			    (setq list1 (apply (, adjoin)
-					       (car list2) list1 keys))
-			  (or (memq (car list2) list1)
-			      (push (car list2) list1)))
-			(pop list2))
-		      list1))))
-	(` (let ((list1 (, cl-list1))
-		 (list2 (, cl-list2)))
-	     (cond ((null list1) list2) ((null list2) list1)
-		   ((equal list1 list2) list1)
-		   (t
-		    (or (>= (length list1) (length list2))
-			(setq list1 (prog1 list2 (setq list2 list1))))
-		    (while list2
-		      (if (numberp (car list2))
-			  (setq list1 (funcall (, adjoin) (car list2) list1))
-			(or (memq (car list2) list1)
-			    (push (car list2) list1)))
-		      (pop list2))
-		    list1)))))))
-  )
-
 (require 'bytecomp)
 
 ;; Attempt to pickup the additional load-path(s).
