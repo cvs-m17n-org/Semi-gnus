@@ -1,5 +1,15 @@
 1999-03-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* texi/gnus-ja.texi: Sync up with Semi-gnus 6.10.
+
+	* lisp/dgnushack.el (dgnushack-install-package): Don't refer to
+	`configure-package-path'. Use `early-packages', `late-packages' or
+	`last-packages' instead.
+
+1999-03-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
 
 	* lisp/message.el (messgage-inhibit-body-encoding): Default to t.
