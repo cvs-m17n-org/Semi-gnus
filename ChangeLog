@@ -1,5 +1,10 @@
 2000-05-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-msg.el (gnus-debug): Break MIME tags from the snoopies.
+	(gnus-bug): Insert text/plain tag at the end of the buffer.
+
+2000-05-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
 
 2000-05-10  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
