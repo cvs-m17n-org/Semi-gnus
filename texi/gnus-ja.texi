@@ -638,7 +638,7 @@ Marking Articles
 Marking Articles
 
 * Setting Marks::               印の付け方と消し方
-* Generic Mark Commands::       印をどのようにカスタマイズするか
+* Generic Marking Commands::    印をどのようにカスタマイズするか
 * Setting Process Marks::       後の実行のための記事の印の付け方
 
 Threading
@@ -5618,7 +5618,7 @@ News, , message, Message Manual}) を使って、あなただけがあなたのメッセー
 
 @menu
 * Setting Marks::               印の付け方と消し方
-* Generic Mark Commands::       印をどのようにカスタマイズするか
+* Generic Marking Commands::    印をどのようにカスタマイズするか
 * Setting Process Marks::       後の実行のための記事の印の付け方
 @end menu
 
