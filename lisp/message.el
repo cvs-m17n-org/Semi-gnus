@@ -4997,9 +4997,9 @@ If NOW, use that time instead."
 			       (lsh (% message-unique-id-char 25) 16)) 4)
      (message-number-base36 (+ (nth 1 tm)
 			       (lsh (/ message-unique-id-char 25) 16)) 4)
-     ;; Append the newsreader name, because while the generated
-     ;; ID is unique to this newsreader, other newsreaders might
-     ;; otherwise generate the same ID via another algorithm.
+     ;; Append a given name, because while the generated ID is unique
+     ;; to this newsreader, other newsreaders might otherwise generate
+     ;; the same ID via another algorithm.
      ".fsf")))
 
 (defun message-number-base36 (num len)
