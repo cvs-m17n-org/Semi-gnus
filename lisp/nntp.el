@@ -175,7 +175,7 @@ server there that you can connect to.  See also
 If this variable is nil, which is the default, no timers are set.")
 
 (defvoo nntp-prepare-post-hook nil
-  "*Hook run just before postting an article. It is supposed to be used for
+  "*Hook run just before posting an article. It is supposed to be used for
 inserting Cancel-Lock headers, signing with Gpg, etc.")
 
 ;;; Internal variables.
