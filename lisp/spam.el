@@ -40,16 +40,6 @@
 (require 'gnus)	; for the definitions of group content classification and spam processors
 (require 'message)			;for the message-fetch-field functions
 
-;; Attempt to load BBDB macros
-(eval-when-compile
-  (condition-case nil
-      (require 'bbdb-com)
-    (file-error 
-     (defalias 'spam-BBDB-register-routine 'ignore)
-     (defalias 'spam-enter-ham-BBDB 'ignore)
-     (defalias 'bbdb-search 'ignore)
-     (defalias 'bbdb-create-internal 'ignore))))
-
 ;; autoload executable-find
 (eval-and-compile
   ;; executable-find is not autoloaded in Emacs 20
@@ -532,9 +522,9 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	(if (not (eobp))
 	    (setq category (buffer-substring (point) (spam-point-at-eol))))
 	(when (not (zerop (length category))) ; we need a category here
-	  (if spam-ifile-all-categories
-	      (when (string-equal spam-ifile-spam-category category)
-		(setq return spam-split-group))
+	  (unless spam-ifile-all-categories
+	    (when (string-equal spam-ifile-spam-category category)
+	      (setq return spam-split-group))
 	    (setq return category)))))	; always accept the ifile category
     return))
 
