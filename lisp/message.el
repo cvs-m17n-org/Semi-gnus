@@ -7289,11 +7289,14 @@ which specify the range to operate on."
   :type '(alist :key-type regexp :value-type function))
 
 (defcustom message-expand-name-function
-  (if (fboundp 'bbdb-complete-name)
-      'bbdb-complete-name
-    (if (fboundp 'lsdb-complete-name)
-	'lsdb-complete-name
-      'expand-abbrev))
+  (cond ((and (boundp 'eudc-protocol)
+	      eudc-protocol)
+	 'eudc-expand-inline)
+	((fboundp 'bbdb-complete-name)
+	 'bbdb-complete-name)
+	((fboundp 'lsdb-complete-name)
+	 'lsdb-complete-name)
+	(t 'expand-abbrev))
   "*A function called to expand addresses in field body."
   :group 'message
   :type 'function)
