@@ -1,5 +1,9 @@
 2001-06-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+2001-06-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Use
 	`nnshimbun-find-parameter'.
 	(nnshimbun-generate-nov-database): Bind a full group name while
