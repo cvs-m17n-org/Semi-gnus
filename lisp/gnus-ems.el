@@ -233,15 +233,11 @@
     (fset 'gnus-summary-set-display-table (lambda ()))
     (fset 'gnus-encode-coding-string 'encode-coding-string)
     (fset 'gnus-decode-coding-string 'decode-coding-string)
-<<<<<<< gnus-ems.el
-    
-=======
 
     (and window-system
 	 (module-installed-p 'bitmap)
 	 (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message))
 
->>>>>>> 1.3
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting
 	    (delq 'long-lines
