@@ -209,6 +209,15 @@ Possible values in this list are:
 	      (const :tag "Multiple To and/or Cc headers." many-to))
   :group 'gnus-article-hiding)
 
+(defcustom gnus-article-skip-boring nil
+  "Skip over text that is not worth reading.
+By default, if you set this t, then Gnus will display citations and
+signatures, but will never scroll down to show you a page consisting
+only of boring text.  Boring text is controlled by
+`gnus-article-boring-faces'."
+  :type 'boolean
+  :group 'gnus-article-hiding)
+
 (defcustom gnus-signature-separator '("^-- $" "^-- *$")
   "Regexp matching signature separator.
 This can also be a list of regexps.  In that case, it will be checked
@@ -5050,15 +5059,14 @@ If given a numerical ARG, move forward ARG pages."
 (defun gnus-article-goto-next-page ()
   "Show the next page of the article."
   (interactive)
-  (when (gnus-article-next-page)
-    (goto-char (point-min))
-    (gnus-article-read-summary-keys nil (gnus-character-to-event ?n))))
+  (gnus-eval-in-buffer-window gnus-summary-buffer
+    (gnus-summary-next-page)))
 
 (defun gnus-article-goto-prev-page ()
   "Show the next page of the article."
   (interactive)
-  (if (bobp) (gnus-article-read-summary-keys nil (gnus-character-to-event ?p))
-    (gnus-article-prev-page nil)))
+  (gnus-eval-in-buffer-window gnus-summary-buffer
+    (gnus-summary-prev-page)))
 
 (defun gnus-article-next-page (&optional lines)
   "Show the next page of the current article.
@@ -5115,6 +5123,27 @@ Argument LINES specifies lines to be scrolled down."
 		 (scroll-down lines))
 	     (beginning-of-buffer
 	      (goto-char (point-min))))))))
+
+(defun gnus-article-only-boring-p ()
+  "Decide whether there is only boring text remaining in the article.
+Something \"interesting\" is a word of at least two letters that does
+not have a face in `gnus-article-boring-faces'."
+  (when (and gnus-article-skip-boring
+	     gnus-article-boring-faces)
+    (save-excursion
+      (catch 'only-boring
+	(while (re-search-forward "\\b\\w\\w" nil t)
+	  (forward-char -1)
+	  (when (not (gnus-intersection
+		      (cons (plist-get (text-properties-at (point))
+				       'face)
+			    (mapcar-extents
+			     '(lambda (extent)
+				(extent-property extent 'face))
+			     nil (current-buffer) (point) (point)))
+		      gnus-article-boring-faces))
+	    (throw 'only-boring nil)))
+	(throw 'only-boring t)))))
 
 (defun gnus-article-refer-article ()
   "Read article specified by message-id around point."

@@ -1,3 +1,36 @@
+2003-02-13  Michael Shields  <shields@msrl.com>
+
+	* gnus-cite.el
+	(gnus-cite-attribution-suffix, gnus-cite-parse):
+	Better handling for Microsoft citation styles.
+	(gnus-unsightly-citation-regexp): New.
+
+2003-02-12  Michael Shields  <shields@msrl.com>
+
+	* gnus-art.el (article-strip-banner): Strip both per-group and
+	per-user-address banners.
+	(article-really-strip-banner): New.
+
+2003-02-12  Michael Shields  <shields@msrl.com>
+
+	* gnus-sum.el (gnus-article-goto-next-page,
+	gnus-article-goto-prev-page): Call gnus-summary-*-page, instead of
+	relying on the summary bindings of `n' and `p'.
+
+2003-02-12  Michael Shields  <shields@msrl.com>
+
+	* gnus-art.el (gnus-article-only-boring-p): New.
+	(gnus-article-skip-boring): New.
+	* gnus-cite.el (gnus-article-boring-faces): New.
+	* gnus-sum.el (gnus-summary-next-page): Use
+	gnus-article-only-boring-p.
+
+2003-02-12  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-mark-spam-as-expired-and-move-routine)
+	(spam-ham-move-routine): unmark all articles before marking those
+	of interest and calling gnus-summary-move-article
+
 2003-02-12  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnus.el (gnus-kill-buffer): Move to gnus.el because it's

@@ -4935,6 +4935,10 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 $B8=:_$N5-;v$+!"$=$l$,4{$KFI$^$l$F$$$k>l9g$O<!$NL$FI5-;v$rA*Br$7$^(B
 $B$9(B (@code{gnus-summary-next-page})$B!#(B
 
+$B$9$G$K5-;v%&%#%s%I%&$r3+$$$F$$$k$H$-$K:FEY(B @kbd{SPACE} $B$r2!$9$H!"$=$N5-(B
+$B;v$O%9%/%m!<%k$5$l$^$9!#%K%e!<%9%0%k!<%WA4BN$r(B @kbd{SPACE} $B$GJXMx$KDLFI(B
+$B$G$-$^$9!#(B@pxref{Paging the Article}$B!#(B
+
 @item G n
 @itemx n
 @kindex n ($B35N,(B)
@@ -5064,6 +5068,14 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 @findex gnus-summary-next-page
 @kbd{SPACE} $B$O5-;v$r0l%Z!<%8@h$K%9%/%m!<%k$7$^$9!#5-;v$N:G8e$K$$$k>l9g$O(B
 $B<!$N5-;v$rA*Br$7$^$9(B (@code{gnus-summary-next-page})$B!#(B
+
+@vindex gnus-article-boring-faces
+$B5-;v$N;D$j$K0zMQ$H=pL>$7$+L5$$>l9g!"$=$l$O%9%-%C%W$5$l!"Be$o$j$K<!$N5-;v(B
+$B$,I=<($5$l$^$9!#(B@code{gnus-article-boring-faces} $B$G!"$D$^$i$J$$$H;W$&$b(B
+$B$N$r%+%9%?%^%$%:$9$k$+!"$^$?$O(B @code{nil} $B$K@_Dj$9$k$3$H$K$h$C$F!"$3$N5!(B
+$BG=$rF/$+$J$$$h$&$K$9$k$3$H$,$G$-$^$9!#$I$s$J$K$&$s$6$j$9$k$b$N$G$b!"5-;v(B
+$B%P%C%U%!$G(B @kbd{C-v} $B$r;H$&$3$H$K$h$C$F!"<jF0$G5-;v$N%Z!<%8$r8+$k$3$H$O(B
+$B$G$-$^$9!#(B
 
 @item DEL
 @kindex DEL ($B35N,(B)
@@ -10213,12 +10225,14 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @item SPACE
 @kindex SPACE ($B5-;v(B)
 @findex gnus-article-next-page
-$B0lJGA0$K$a$/$j$^$9(B (@code{gnus-article-next-page})$B!#(B
+$B0lJGA0$K$a$/$j$^$9(B (@code{gnus-article-next-page})$B!#(B@kbd{h SPACE h} $B$H$^$C(B
+$B$?$/F1$8$G$9!#(B
 
 @item DEL
 @kindex DEL ($B5-;v(B)
 @findex gnus-article-prev-page
-$B0lJG8e$m$KLa$7$^$9(B (@code{gnus-article-prev-page})$B!#(B
+$B0lJG8e$m$KLa$7$^$9(B (@code{gnus-article-prev-page})$B!#(B@kbd{h DEL h} $B$H$^$C(B
+$B$?$/F1$8$G$9!#(B
 
 @item C-c ^
 @kindex C-c ^ ($B5-;v(B)
