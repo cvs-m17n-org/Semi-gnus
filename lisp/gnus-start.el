@@ -1998,16 +1998,20 @@ If FORCE is non-nil, the .newsrc file is read."
     (gnus-message 5 "Reading %s..." ding-file)
     (let (gnus-newsrc-assoc)
       (when (file-exists-p ding-file)
-	(condition-case nil
-	    (with-temp-buffer
-	      (insert-file-contents-as-coding-system
-	       gnus-startup-file-coding-system ding-file)
-	      (eval-region (point-min) (point-max)))
-	  (error
-	   (ding)
-	   (unless (gnus-yes-or-no-p
-		    (format "Error in %s; continue? " ding-file))
-	     (error "Error in %s" ding-file))))
+	(with-temp-buffer
+	  (condition-case nil
+	      (progn
+		(insert-file-contents-as-coding-system
+		 gnus-startup-file-coding-system ding-file)
+		(eval-region (point-min) (point-max)))
+	    (error
+	     (ding)
+	     (or (not (or (zerop (buffer-size))
+			  (eq 'binary gnus-startup-file-coding-system)
+			  (gnus-re-read-newsrc-el-file ding-file)))
+		 (gnus-yes-or-no-p
+		  (format "Error in %s; continue? " ding-file))
+		 (error "Error in %s" ding-file)))))
 	(when gnus-newsrc-assoc
 	  (setq gnus-newsrc-alist gnus-newsrc-assoc))))
     (gnus-make-hashtable-from-newsrc-alist)
@@ -2023,6 +2027,35 @@ If FORCE is non-nil, the .newsrc file is read."
       (while list
 	(apply 'gnus-product-read-variable-file-1 (car list))
 	(setq list (cdr list))))))
+
+(defun gnus-re-read-newsrc-el-file (file)
+  "Attempt to re-read .newsrc.eld file.  Returns `nil' if successful.
+The backup file \".newsrc.eld_\" will be created before re-reading."
+  (message "Error in %s; retrying..." file)
+  (if (and
+       (condition-case nil
+	   (let ((backup (concat file "_")))
+	     (copy-file file backup 'ok-if-already-exists 'keep-time)
+	     (message " (The backup file %s has been created)" backup)
+	     t)
+	 (error nil))
+       (progn
+	 (insert-file-contents-as-binary file nil nil nil 'replace)
+	 (when (re-search-forward
+		"^[\t ]*([\t\n\r ]*setq[\t\n\r ]+gnus-format-specs" nil t)
+	   (delete-region (goto-char (match-beginning 0)) (forward-list 1))
+	   (decode-coding-region (point-min) (point-max)
+				 gnus-startup-file-coding-system)
+	   (condition-case nil
+	       (progn
+		 (eval-region (point-min) (point-max))
+		 t)
+	     (error nil)))))
+      (prog1
+	  nil
+	(message "Error in %s; retrying...done" file))
+    (message "Error in %s; retrying...failed" file)
+    t))
 
 (defun gnus-product-read-variable-file-1 (file checking-methods coding
 					       &rest variables)
