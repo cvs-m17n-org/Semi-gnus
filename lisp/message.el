@@ -2195,7 +2195,8 @@ the user from the mailer."
       (let ((message-deletable-headers
 	     (if news nil message-deletable-headers)))
 	(message-generate-headers message-required-mail-headers))
-      (mm-encode-message-header)
+      (if (featurep 'mm-encode)
+	  (mm-encode-message-header))
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
     (unwind-protect
@@ -2397,7 +2398,8 @@ to find out how to use this."
       (message-narrow-to-headers)
       ;; Insert some headers.
       (message-generate-headers message-required-news-headers)
-      (mm-encode-message-header)
+      (if (featurep 'mm-encode)
+	  (mm-encode-message-header))
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
     (message-cleanup-headers)
