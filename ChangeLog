@@ -1,3 +1,19 @@
+1999-06-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.065.
+	(gnus-revision-number): Fresh start from 00.
+
+	* texi/{gnus.texi,gnus-ja.texi,ChangeLog}: Sync up with Pterodactyl
+	Gnus v0.86
+	* lisp/{nnmail.el,nnheader.el,nndoc.el,mml.el,mm-view.el,
+	mm-decode.el,mm-bodies.el,message.el,mail-source.el,lpath.el,
+	gnus.el,gnus-xmas.el,gnus-uu.el,gnus-util.el,gnus-sum.el,
+	gnus-start.el,gnus-score.el,gnus-range.el,gnus-msg.el,
+	gnus-mailcap.el,gnus-group.el,gnus-cus.el,gnus-cite.el,
+	gnus-cache.el,gnus-art.el,gnus-agent.el,ChangeLog}: Ditto.
+
+	* etc/gnus/x-splash: New file copied from pgnus 0.86.
+
 1999-06-12  Daiki Ueno        <daiki@kiss.kake.info.waseda.ac.jp>
 
 	* lisp/gnus-msg.el (gnus-copy-article-buffer): Bind
