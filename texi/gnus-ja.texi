@@ -17185,32 +17185,13 @@ Gnus はこのグループリストから NoCeM メッセージを探します。初期設定値
 @item gnus-nocem-issuers
 @vindex gnus-nocem-issuers
 NoCeM メッセージを発行する人はたくさんいます。このリストでは、誰の言うこ
-とに従いたいかを指定します。初期設定値
-は @code{("Automoose-1" "rbraver@@ohww.norman.ok.us" "clewis@@ferret.ocunix.on.ca" "jem@@xpat.com" "snowhare@@xmission.com" "red@@redpoll.mrfs.oh.us (Richard E. Depew)")} で
-す。彼らはみんな、立派で高潔な市民です。
+とに従いたいかを指定します。初期設定値は @code{(("Automoose-1"
+"clewis@@ferret.ocunix.on.ca" "cosmo.roadkill" "SpamHippo"
+"hweede@@snafu.de")} です。彼らはみんな、立派で高潔な市民です。
 
-このリストに含められる有名な反スパム家は以下です。
-
-@table @samp
-@item clewis@@ferret.ocunix.on.ca;
-@cindex Chris Lewis
-Chris Lewis --- 主要なカナダの反スパム家。おそらく誰よりも多く、ネットニュー
-スの濫用を取り消しています。
-
-@item Automoose-1
-@cindex CancelMoose[tm]
-自動運転の CancelMoose[tm]。CancelMoose[tm] はノルウェー人とされ、
-NoCeM を発明した人でした。
-
-@item jem@@xpat.com;
-@cindex Jem
-John Milburn --- 韓国の反スパム家。最近はかなり忙しくなってきているよう
-です。
-
-@item red@@redpoll.mrfs.oh.us (Richard E. Depew)
-Richard E. Depew --- アメリカの単独反スパム家。主に非バイナリグループへ
-のバイナリ投稿の取り消しと、spew (逆流記事) を削除しています。
-@end table
+このリストに含められる有名な反スパム家たち
+は @uref{http://www.xs4all.nl/~rosalind/nocemreg/nocemreg.html} に載って
+います。
 
 これら全ての人々の NoCeM メッセージに留意する必要はありません --- 言うこ
 とを聞きたい人だけでいいんです。またその人からの NoCeMメッセージ全てを受
@@ -17273,6 +17254,19 @@ Richard E. Depew --- アメリカの単独反スパム家。主に非バイナリグループへ
 古い NoCeM 項目をキャッシュから消すまでの日数。初期設定値は 15 です。こ
 れを短くするほど gnus は速くなりますが、古いスパムを見ることになってしま
 うかもしれません。
+
+@item gnus-nocem-check-from
+@vindex gnus-nocem-check-from
+非@code{nil} では、記事のボディにある発行人の正当性を調べます。そうでな
+い場合は、著者が正しい発行人でなくても気にせずに記事を取り込みますが、も
+しあなたが正しい発行人を見分けられるならば、そうした方がとても速くなるで
+しょう。
+
+@item gnus-nocem-check-article-limit
+@vindex gnus-nocem-check-article-limit
+非@code{nil} で、全ての NoCeM グループにおけるチェックする記事の最大数を
+指定します。NoCeM グループは巨大になることがあり、そうなると処理がとても
+遅くなります。
 
 @end table
 
