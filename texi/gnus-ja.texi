@@ -8122,7 +8122,7 @@ Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=
 @item B M-C-e
 @kindex B M-C-e ($B35N,(B)
 @findex gnus-summary-expire-articles-now
-$B%0%k!<%W$N$9$Y$F$N4|8B:o=|2DG=$J5-;v:o=|$7$^(B
+$B%0%k!<%W$N$9$Y$F$N4|8B:o=|2DG=$J5-;v$r:o=|$7$^(B
 $B$9(B (@code{gnus-summay-expire-articles-now})$B!#$3$l$O8=:_$N%0%k!<%W$N3:Ev(B
 $B$9$k(B @strong{$BA4$F(B}$B$N4|8B:o=|5-;v$O1J1s$K6u$NBg$-$J(B @file{/dev/null} $B$X>C(B
 $B$(5n$k$H$$$&;v$G$9!#(B
