@@ -751,8 +751,8 @@ always hide."
 		       from reply-to
 		       (ignore-errors
 			 (equal
-			  (nth 1 (mail-extract-address-components from))
-			  (nth 1 (mail-extract-address-components reply-to)))))
+			  (nth 1 (funcall gnus-extract-address-components from))
+			  (nth 1 (funcall gnus-extract-address-components reply-to)))))
 		  (gnus-article-hide-header "reply-to"))))
 	     ((eq elem 'date)
 	      (let ((date (message-fetch-field "date")))
