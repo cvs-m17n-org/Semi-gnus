@@ -4720,7 +4720,8 @@ OTHER-HEADERS is an alist of header/value pairs."
 	  mrt (when message-use-mail-reply-to
 		(message-fetch-field "mail-reply-to"))
 	  mft (when (and (not (or to-address mrt reply-to))
-			 message-use-mail-followup-to)
+			 (or message-use-followup-to
+			     message-use-mail-followup-to))
 		(message-fetch-field "mail-followup-to")))
 
     ;; Handle special values of Mail-Copies-To.
@@ -4761,7 +4762,8 @@ sends a copy of your response to " (if (string-match "," mct)
 
     ;; Handle Mail-Followup-To.
     (when (and mft
-	       (eq message-use-mail-followup-to 'ask)
+	       (eq (or message-use-followup-to
+		       message-use-mail-followup-to) 'ask)
 	       (not (message-y-or-n-p
 		     (concat "Obey Mail-Followup-To: " mft "? ") t "\
 You should normally obey the Mail-Followup-To: header.
@@ -4778,15 +4780,14 @@ that further discussion should take place only in "
 			       "that mailing list") ".")))
       (setq mft nil))
 
-    (if (and (or (not message-use-followup-to)
-                 (not mft))
-             (or (not wide)
-                 to-address))
+    (if (and (not mft)
+	     (or (not wide)
+		 to-address))
 	(progn
 	  (setq follow-to (list (cons 'To
 				      (or to-address mrt reply-to mft from))))
-	  (when (and wide (or mft mct)
-		     (not (member (cons 'To (or mft mct)) follow-to)))
+	  (when (and wide mct
+		     (not (member (cons 'To mct) follow-to)))
 	    (push (cons 'Cc mct) follow-to)))
       (let (ccalist)
 	(save-excursion
@@ -4844,7 +4845,6 @@ responses here are directed to other addresses.")))
 	      (setcdr ccs (substring (cdr ccs) (match-end 0))))
 	    (push ccs follow-to)))))
     follow-to))
-
 
 ;;;###autoload
 (defun message-reply (&optional to-address wide)
@@ -4949,7 +4949,8 @@ If TO-NEWSGROUPS, use that as the new Newsgroups line."
 	    distribution (message-fetch-field "distribution")
 	    mct (when message-use-mail-copies-to
 		  (message-fetch-field "mail-copies-to"))
-	    mft (when message-use-mail-followup-to
+	    mft (when (or message-use-followup-to
+			  message-use-mail-followup-to)
 		  (message-fetch-field "mail-followup-to")))
       (when (and (setq gnus-warning (message-fetch-field "gnus-warning"))
 		 (string-match "<[^>]+>" gnus-warning))
@@ -5036,7 +5037,8 @@ responses here are directed to other newsgroups."))
 	    (setq follow-to (list (cons 'Newsgroups newsgroups)))))))
        ;; Handle Mail-Followup-To, followup via e-mail.
        ((and mft
-	     (or (not (eq message-use-mail-followup-to 'ask))
+	     (or (not (eq (or message-use-followup-to
+			      message-use-mail-followup-to) 'ask))
 		 (message-y-or-n-p
 		  (concat "Obey Mail-Followup-To: " mft "? ") t "\
 You should normally obey the Mail-Followup-To: header.
