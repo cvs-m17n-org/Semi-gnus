@@ -15547,10 +15547,11 @@ nnimap $B$K5-;v$NFbItE*$JF|IU$NBe$o$j$K(B Date: $B$r;H$&$h$&$K$5$;$^$9!#$5$i$
 machine students.uio.no login larsi password geheimnis port imap
 @end example
 
-$B0BA4$J(B imap $B$G;H$o$l$k<B:]$N%]!<%HHV9f$O(B port 993 $B$G$9$,!"(B
+$B0BA4$J(B IMAP $B$G;H$o$l$k<B:]$N%]!<%HHV9f$O(B port 993 $B$G$9$,!"(B
 @code{nnimap-stream} $B$H$7$F(B @code{tls} $B$^$?$O(B @code{ssl} $B$r;H$&>l9g!"$=(B
 $B$l$O(B @code{port imap} $B$^$?$O(B @code{port 143} $B$G$J$1$l$P$J$i$J$$$3$H$KCm(B
-$B0U$7$F2<$5$$!#(B
+$B0U$7$F2<$5$$!#JX59>e(B Gnus $B$O(B @code{port imap} $B$NF15A8l$H$7(B
+$B$F(B @code{port imaps} $B$r<u$1F~$l$^$9!#(B
 
 @item nnimap-need-unselect-to-notice-new-mail
 @vindex nnimap-need-unselect-to-notice-new-mail
