@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.22 1998-12-16 13:21:50 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.23 1999-01-06 22:22:40 yamaoka Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -588,7 +588,7 @@ If value is nil , dialup line is disconnected status.")
   (if (eq gnus-offline-articles-to-fetch 'mail)
       (gnus-offline-restore-mail-group-level))
   (if (eq gnus-offline-news-fetch-method 'nnagent)
-      (or (featurep 'xemacs)
+      (or gnus-agent-expire-all
 	  (gnus-offline-agent-expire)))
   (if (and (featurep 'xemacs)
 	   (fboundp 'play-sound-file))
@@ -739,7 +739,11 @@ If value is nil , dialup line is disconnected status.")
 		     (substitute-key-definition
 		      'gnus-agent-toggle-plugged 'gnus-offline-toggle-plugged
 		      gnus-agent-group-mode-map)
-		     (local-set-key "\C-coe" 'gnus-offline-agent-expire)))))
+		     (local-set-key "\C-coe" 'gnus-offline-agent-expire)))
+	       (or (featurep 'xemacs)
+		   (define-key gnus-group-mode-map 
+		     (if (eq system-type 'windows-nt) [S-mouse-2] [mouse-3])
+		     'gnus-offline-popup-menu))))
   (if (eq gnus-offline-news-fetch-method 'nnagent)
       (add-hook 'gnus-summary-mode-hook
 		'(lambda ()
@@ -760,6 +764,7 @@ If value is nil , dialup line is disconnected status.")
 ;;
 (defun gnus-offline-define-menu-on-miee ()
   "*Set and change menu bar on MIEE menu."
+  (let ((menu
   (if (featurep 'meadow)
       (easy-menu-change
        nil
@@ -802,7 +807,9 @@ If value is nil , dialup line is disconnected status.")
 	["Set interval time" gnus-offline-set-interval-time t]
 	"----"
 	["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected]
-	)))))
+	))))))
+  (and (featurep 'xemacs)
+       (easy-menu-add menu))))
 ;;
 ;; define menu without miee.
 ;;
@@ -835,6 +842,19 @@ If value is nil , dialup line is disconnected status.")
        ["Hang up Line." gnus-offline-set-unplugged-state gnus-offline-connected])))
   (and (featurep 'xemacs)
        (easy-menu-add gnus-offline-menu-on-agent)))
+;;
+;; Popup menu within the group buffer (under Emacs).
+;;
+(defun gnus-offline-popup-menu (event)
+  "Popup menu for Gnus offline."
+  (interactive "e")
+  (let* ((menu (or
+		(and (boundp 'miee-popup-menu)
+		     (assoc 'keymap (assoc 'Miee (assoc 'menu-bar global-map))))
+		gnus-offline-menu-on-agent))
+	 (pop (x-popup-menu t menu))
+	 (func (and pop (lookup-key menu (apply 'vector pop)))))
+    (and pop func (funcall func))))
 
 ;;
 ;; Timer Function
