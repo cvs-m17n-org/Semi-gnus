@@ -1884,7 +1884,7 @@ unfolded."
 	(goto-char (point-max))))))
 
 (defun gnus-treat-smiley ()
-  "Display textual emoticons (\"smileys\") as small graphical icons."
+  "Toggle display of textual emoticons (\"smileys\") as small graphical icons."
   (interactive)
   (unless (featurep 'xemacs)
     (when (and (>= emacs-major-version 21)

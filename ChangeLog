@@ -1,5 +1,14 @@
 2002-01-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el: T-gnus 6.15.6 revision 00.
+
+	* lisp/nnheader.el (std11-unfold-region): New function copied from
+	`rfc2047-unfold-region'.
+	(std11-unfold-field): New function.
+	(mail-header-unfold-field): Alias to `std11-unfold-field'.
+
+2002-01-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02 (synch
 	with the released version of Oort Gnus v0.05).
 

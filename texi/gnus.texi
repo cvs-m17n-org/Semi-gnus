@@ -6359,6 +6359,22 @@ slower and more awkward.
 If non-@code{nil}, all threads will be hidden when the summary buffer is
 generated.
 
+This can also be a predicate specifier (@pxref{Predicate Specifiers}).
+Avaliable predicates are @code{gnus-article-unread-p} and
+@code{gnus-article-unseen-p}).
+
+Here's an example:
+
+@lisp
+(setq gnus-thread-hide-subtree
+      '(or gnus-article-unread-p
+           gnus-article-unseen-p))
+@end lisp
+
+(It's a pretty nonsensical example, since all unseen articles are also
+unread, but you get my drift.)
+
+
 @item gnus-thread-expunge-below
 @vindex gnus-thread-expunge-below
 All threads that have a total score (as defined by
@@ -15086,6 +15102,36 @@ MIME multipart messages.
 @item standard-digest
 The standard (RFC 1153) digest format.
 
+@item mime-digest
+A MIME digest of messages.
+
+@item lanl-gov-announce
+Announcement messages from LANL Gov Announce.
+
+@item rfc822-forward
+A message forwarded according to RFC822.
+
+@item outlook
+The Outlook mail box.
+
+@item oe-dbx
+The Outlook Express dbx mail box.
+
+@item exim-bounce
+A bounce message from the Exim MTA.
+
+@item forward
+A message forwarded according to informal rules.
+
+@item rfc934
+An RFC934-forwarded message.
+
+@item mailman
+A mailman digest.
+
+@item clari-briefs
+A digest of Clarinet brief news items.
+
 @item slack-digest
 Non-standard digest format---matches most things, but does it badly.
 @end table
@@ -22303,21 +22349,6 @@ want to read them anyway.
 @item gnus-thread-hide-subtree
 If this is non-@code{nil}, all threads in the summary buffer will be
 hidden initially.
-
-This can also be a predicate specifier (@pxref{Predicate Specifiers}).
-Avaliable predicates are @code{gnus-article-unread-p} and
-@code{gnus-article-unseen-p}.
-
-Here's an example:
-
-@lisp
-(setq gnus-thread-hide-subtree
-      '(or gnus-article-unread-p
-           gnus-article-unseen-p))
-@end lisp
-
-(It's a pretty nonsensical example, since all unseen articles are also
-unread, but you get my drift.)
 
 
 @item gnus-updated-mode-lines

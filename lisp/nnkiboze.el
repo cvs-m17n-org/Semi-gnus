@@ -269,8 +269,9 @@ Finds out what articles are to be part of the nnkiboze groups."
 		(not (assoc gname nnkiboze-newsrc)) ; It isn't registered
 		(numberp (car (symbol-value group))) ; It is active
 		(or (> nnkiboze-level 7)
-		    (and (setq glevel (nth 1 (nth 2 (gnus-gethash
-						     gname gnus-newsrc-hashtb))))
+		    (and (setq glevel
+			       (nth 1 (nth 2 (gnus-gethash
+					      gname gnus-newsrc-hashtb))))
 			 (>= nnkiboze-level glevel)))
 		(not (string-match "^nnkiboze:" gname)) ; Exclude kibozes
 		(push (cons gname (1- (car (symbol-value group))))

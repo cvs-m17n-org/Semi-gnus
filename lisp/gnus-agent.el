@@ -1036,7 +1036,8 @@ the actual number of articles toggled is returned."
 	   (setq articles (nthcdr i articles))))
     ;; add article with marks to list of article headers we want to fetch.
     (dolist (arts (gnus-info-marks (gnus-get-info group)))
-      (setq articles (gnus-range-add articles (cdr arts))))
+      (unless (memq (car arts) '(seen recent))
+	(setq articles (gnus-range-add articles (cdr arts)))))
     (setq articles (sort (gnus-uncompress-sequence articles) '<))
     ;; Remove known articles.
     (when (gnus-agent-load-alist group)

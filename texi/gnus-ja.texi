@@ -6307,6 +6307,21 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 $B$3$l$,(B @code{nil} $B$G$J$$$H!"$9$Y$F$N%9%l%C%I$O35N,%P%C%U%!$,@8@.$5$l$?$H(B
 $B$-$K1#$l$^$9!#(B
 
+$B$3$l$O=R8l;X<(;R$G$"$k$3$H$b$G$-$^$9(B (@pxref{Predicate Specifiers})$B!#Mx(B
+$BMQ$G$-$k=R8l(B
+$B$O(B @code{gnus-article-unread-p} $B$H(B @code{gnus-article-unseen-p} $B$G$9!#(B
+
+$B$3$l$ONc$G$9(B:
+
+@lisp
+(setq gnus-thread-hide-subtree
+      '(or gnus-article-unread-p
+           gnus-article-unseen-p))
+@end lisp
+
+($B$3$l$O$+$J$j$P$+$2$?Nc$G$9!#$J$<$J$i$9$Y$F$N$^$@FI$^$l$?$3$H$,L5$$5-;v(B
+$B$OL$FI$G$b$"$k$+$i$J$N$G$9$,!"<g;]$O5b$_<h$C$F2<$5$$!#(B)
+
 @item gnus-thread-expunge-below
 @vindex gnus-thread-expunge-below
 $B$3$N?t;z$h$j>/$J$$Am9gE*%9%3%"(B (@code{gnus-thread-score-function}) $B$r;}(B
@@ -14665,14 +14680,43 @@ rnews $B$N%P%C%AE>Aw7A<0!#(B
 $BE>Aw$5$l$?5-;v!#(B
 
 @item nsmail
-Netscape mail box$B!#(B
+Netscape $B$N%a!<%k%\%C%/%9!#(B
 
-@item mime-digest
 @item mime-parts
-MIME $BB>ItJ,%a%C%;!<%8(B (multipart) $B$G$9!#(B
+MIME $BItJ,%a%C%;!<%8(B (multipart)$B!#(B
 
 @item standard-digest
 $BI8=`(B (RFC 1153) $B$^$H$aAw$j7A<0!#(B
+
+@item mime-digest
+MIME $B$N$^$H$aAw$j%a%C%;!<%8!#(B
+
+@item lanl-gov-announce
+$B%m%9%"%i%b%99qN)8&5f=j(B (LANL) Gov Announce $B$+$i$NH/I=%a%C%;!<%8!#(B
+
+@item rfc822-forward
+RFC822 $B$GE>Aw$5$l$?%a%C%;!<%8!#(B
+
+@item outlook
+Outlook $B$N%a!<%k%\%C%/%9!#(B
+
+@item oe-dbx
+Outlook Express $B$N(B dbx $B%a!<%k%\%C%/%9!#(B
+
+@item exim-bounce
+Exim MTA $B$+$iD7$MJV$5$l$?%a%C%;!<%8!#(B
+
+@item forward
+$BHs8x<0$N5,B'$GE>Aw$5$l$?%a%C%;!<%8!#(B
+
+@item rfc934
+RFC934 $B7A<0$GE>Aw$5$l$?%a%C%;!<%8!#(B
+
+@item mailman
+mailman $B$N$^$H$aAw$j!#(B
+
+@item clari-briefs
+Clarinet $B$N%K%e!<%99`L\$rMWLs$7$?$^$H$aAw$j!#(B
 
 @item slack-digest
 $BHsI8=`$^$H$aAw$j7A<0(B --- $B$@$$$?$$$O$&$^$/%^%C%A$9$k$,!"$G$b07$$$O2<<j!#(B
@@ -21838,24 +21882,9 @@ Gnus $B$,>o$K35N,%P%C%U%!$rCf?4:F@_Dj$r$9$k$3$H$r6X;_$9$k$?$a$K$3$l(B
 $B$9!#$3$l$OAm$8$F$=$s$J$K8:$i$7$^$;$s!#$3$l$O!"5-;v$r$I$C$A$K$7$mFI$_$?$/(B
 $B$J$$$H$$$&;v$r7hDj$9$kA0$K!">/$7$NItJ,$7$+8+$kI,MW$,L5$$$H$$$&;v$G$9!#(B
 
-@item gnus-threada-hide-subtree
+@item gnus-thread-hide-subtree
 $B$3$l$,(B @code{nil} $B$G$J$1$l$P!"A4$F$N35N,%P%C%U%!$N%9%l%C%I$O=i$a$K1#$5$l(B
 $B$^$9!#(B
-
-$B$3$l$O=R8l;X<(;R$G$"$k$3$H$b$G$-$^$9(B (@pxref{Predicate Specifiers})$B!#Mx(B
-$BMQ$G$-$k=R8l(B
-$B$O(B @code{gnus-article-unread-p} $B$H(B @code{gnus-article-unseen-p} $B$G$9!#(B
-
-$B$3$l$ONc$G$9(B:
-
-@lisp
-(setq gnus-thread-hide-subtree
-      '(or gnus-article-unread-p
-           gnus-article-unseen-p))
-@end lisp
-
-($B$3$l$O$+$J$j$P$+$2$?Nc$G$9!#$J$<$J$i$9$Y$F$N$^$@FI$^$l$?$3$H$,L5$$5-;v(B
-$B$OL$FI$G$b$"$k$+$i$J$N$G$9$,!"<g;]$O5b$_<h$C$F2<$5$$!#(B)
 
 @item gnus-updated-mode-lines
 $B$3$l$,(B @code{nil} $B$G$"$k$H!"(Bgnus $B$O%P%C%U%!$N%b!<%I9T$K>pJs$rF~$l$^$;$s(B

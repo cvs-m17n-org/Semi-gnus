@@ -2893,7 +2893,8 @@ The text will also be indented the normal way."
       t)))
 
 (defun message-dont-send ()
-  "Don't send the message you have been editing."
+  "Don't send the message you have been editing.
+Instead, just auto-save the buffer and then bury it."
   (interactive)
   (message-save-drafts)
   (let ((actions message-postpone-actions)

@@ -1334,6 +1334,39 @@ Use unibyte mode for this."
 
   (defalias 'mail-header-fold-field 'std11-fold-field)
 
+  (defun-maybe std11-unfold-region (b e)
+    "Unfold lines in region B to E."
+    (save-restriction
+      (narrow-to-region b e)
+      (goto-char (point-min))
+      (let ((bol (save-restriction
+		   (widen)
+		   (gnus-point-at-bol)))
+	    (eol (gnus-point-at-eol))
+	    leading)
+	(forward-line 1)
+	(while (not (eobp))
+	  (looking-at "[ \t]*")
+	  (setq leading (- (match-end 0) (match-beginning 0)))
+	  (if (< (- (gnus-point-at-eol) bol leading) 76)
+	      (progn
+		(goto-char eol)
+		(delete-region eol (progn
+				     (skip-chars-forward " \t\n\r")
+				     (1- (point)))))
+	    (setq bol (gnus-point-at-bol)))
+	  (setq eol (gnus-point-at-eol))
+	  (forward-line 1)))))
+
+  (defun-maybe std11-unfold-field ()
+    "Fold the current line."
+    (save-excursion
+      (save-restriction
+	(std11-narrow-to-field)
+	(std11-unfold-region (point-min) (point-max)))))
+
+  (defalias 'mail-header-unfold-field 'std11-unfold-field)
+
   (defun-maybe std11-extract-addresses-components (string)
     "Extract a list of full name and canonical address from STRING.  Each
 element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
