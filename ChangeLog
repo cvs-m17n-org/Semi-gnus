@@ -1,3 +1,20 @@
+1999-08-09  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/nnmail.el (nnmail-movemail-program-pop-password-required):
+	New variable.
+	(nnmail-exec-movemail-program): Require password, when needed.
+	(TopLevel): Remove autoload cookie.
+	(nnmail-pop3-movemail): Require `pop3'.
+
+	* lisp/gnus-ofsetup.el (gnus-ofsetup-read-pop-account): Fix bug.
+	(gnus-setup-for-offline): Generate nnmail-pop-password-required's
+	value.
+
+	* lisp/gnus-offline.el: Do not use pop3-fma.el. (Thank you,
+	Tsukamoto Tetsuo <czkmt@remus.dti.ne.jp>)
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.4b4.
+
 1999-08-06  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.4b3.
