@@ -1,5 +1,12 @@
 1999-03-04  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el  (gnus-revision-number): Increment to 01.
+	(gnus-other-frame): Rewrite on the model of `toolbar-gnus'.
+	(gnus-frame): New internal variable.
+	(gnus-frame-properties): New user option.
+
+1999-03-04  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.062.
 	(gnus-revision-number): Fresh start from 00.
 
