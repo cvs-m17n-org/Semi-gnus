@@ -5214,12 +5214,6 @@ The state which existed when entering the ephemeral is reset."
   (select-window (get-buffer-window gnus-article-buffer))
   )
 
-(defun gnus-summary-scroll-down ()
-  "Scroll down one line current article."
-  (interactive)
-  (gnus-summary-scroll-up -1)
-  )
-
 ;;; Dead summaries.
 
 (defvar gnus-dead-summary-mode-map nil)
