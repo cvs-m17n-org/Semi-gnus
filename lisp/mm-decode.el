@@ -418,6 +418,16 @@ The original alist is not modified.  See also `destructive-alist-to-plist'."
       (insert-buffer-substring obuf beg)
       (current-buffer))))
 
+(defun mm-display-parts (handle &optional no-default)
+  (if (stringp (car handle))
+      (mapcar 'mm-display-parts (cdr handle))
+    (if (bufferp (car handle))
+	(save-restriction
+	  (narrow-to-region (point) (point))
+	  (mm-display-part handle)
+	  (goto-char (point-max)))
+      (mapcar 'mm-display-parts handle))))
+
 (defun mm-display-part (handle &optional no-default)
   "Display the MIME part represented by HANDLE.
 Returns nil if the part is removed; inline if displayed inline;
@@ -984,8 +994,17 @@ If RECURSIVE, search recursively."
 	    (setq result (buffer-substring (point-min) (point-max)))))))
     result))
 
+(defvar mm-security-handle nil)
+
+(defsubst mm-set-handle-multipart-parameter (handle parameter value)
+  ;; HANDLE could be a CTL.
+  (if handle
+      (put-text-property 0 (length (car handle)) parameter value 
+			 (car handle))))
+
 (defun mm-possibly-verify-or-decrypt (parts ctl)
   (let ((subtype (cadr (split-string (car ctl) "/")))
+	(mm-security-handle ctl) ;; (car CTL) is the type.
 	protocol func functest)
     (cond 
      ((equal subtype "signed")
@@ -1014,14 +1033,12 @@ If RECURSIVE, search recursively."
 	       (format "Verify signed (%s) part? "
 		       (or (nth 2 (assoc protocol mm-verify-function-alist))
 			   (format "protocol=%s" protocol))))))
-	  (condition-case err
-	      (save-excursion
-		(if func
-		    (funcall func parts ctl)
-		  (error (format "Unknown sign protocol (%s)" protocol))))
-	    (error
-	     (unless (y-or-n-p (format "%s, continue? " err))
-	       (error "Verify failure."))))))
+	  (save-excursion
+	    (if func
+		(funcall func parts ctl)
+	      (mm-set-handle-multipart-parameter 
+	       mm-security-handle 'gnus-details 
+	       (format "Unknown sign protocol (%s)" protocol))))))
      ((equal subtype "encrypted")
       (unless (setq protocol (mail-content-type-get ctl 'protocol))
 	;; The message is broken.
@@ -1046,14 +1063,12 @@ If RECURSIVE, search recursively."
 	       (format "Decrypt (%s) part? "
 		       (or (nth 2 (assoc protocol mm-decrypt-function-alist))
 			   (format "protocol=%s" protocol))))))
-	  (condition-case err
-	      (save-excursion
-		(if func
-		    (setq parts (funcall func parts ctl))
-		  (error (format "Unknown encrypt protocol (%s)" protocol))))
-	    (error
-	     (unless (y-or-n-p (format "%s, continue? " err))
-	       (error "Decrypt failure."))))))
+	  (save-excursion
+	    (if func
+		(setq parts (funcall func parts ctl))
+	      (mm-set-handle-multipart-parameter 
+	       mm-security-handle 'gnus-details 
+	       (format "Unknown encrypt protocol (%s)" protocol))))))
      (t nil))
     parts))
 
