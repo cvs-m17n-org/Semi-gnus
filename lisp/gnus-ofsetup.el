@@ -1,6 +1,6 @@
 ;;; gnus-ofsetup.el --- Setup advisor for Offline reading for Mail/News.
 ;;;
-;;; $Id: gnus-ofsetup.el,v 1.1.2.17 1999-03-22 18:13:33 czkmt Exp $
+;;; $Id: gnus-ofsetup.el,v 1.1.2.18 1999-05-13 02:36:22 yamaoka Exp $
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -218,43 +218,33 @@
 		    (server (read-from-minibuffer "Mail server : "))
 		    (auth (completing-read
 			  "Authentification Method (TAB to completion): "
-			  '(("pop" 1) ("apop" 2)) nil t nil))
-		    (islisp (y-or-n-p "Do you use pop3.el to fetch mail? ")))
+			  '(("password") ("apop")) nil t nil))
+		    (islisp (y-or-n-p "Do you use pop3.el to fetch mail? "))
+		    source)
 		(if (not islisp)
 		    (let ((prog (read-file-name "movemail program name: "
 						exec-directory "movemail"))
-			  (args (read-from-minibuffer "movemail options: " "-pf")))
-		      (setq mail-source
-			    (append mail-source
-				    (list
-				     (list
-				      'pop
-				      :user user
-				      :server server
-				      :program
-				      (format "%s %s %s %s %s"
-					      prog
-					      args
-					      "po:%u"
-					      "%t"
-					      "%p")
-					      :authentication auth)))))
-		  (setq mail-source
-			(append mail-source
-				(list
-				 (list
-				  'pop
-				  :user user
-				  :server server
-				  :authentication auth))))))
-	      (setq i (- i 1)))
-	    ;; Replace "hoge" -> 'hoge
-	    (mapcar
-	     (lambda (x)
-	       (if (string-equal (car (last x)) "pop")
-		   (setcar (last x) (quote 'pop))
-		 (setcar (last x) (quote 'apop))))
-	     mail-source)
+			  (args (read-from-minibuffer "movemail options: "
+						      "-pf")))
+		      (setq source (list 'pop
+					 :user user
+					 :server server
+					 :program (format "%s %s %s %s %s"
+							  prog
+							  args
+							  "po:%u"
+							  "%t"
+							  "%p"))))
+		  (setq source (list 'pop
+				     :user user
+				     :server server)))
+		(setq mail-source
+		      (nconc mail-source
+			     (list
+			      (if (string-equal "apop" auth)
+				  (nconc source '(:authentication apop))
+				source)))))
+	      (setq i (1- i)))
 	    (setq gnus-offline-mail-source mail-source)))
 
 	(setq save-passwd
