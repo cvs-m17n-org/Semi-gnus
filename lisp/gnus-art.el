@@ -107,7 +107,7 @@ If `gnus-visible-headers' is non-nil, this variable will be ignored."
   :group 'gnus-article-hiding)
 
 (defcustom gnus-visible-headers
-  "From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^\\(Mail-\\)?Followup-To:\\|^\\(Mail-\\)?Reply-To:\\|^Mail-Copies-To:\\|^Organization:\\|^Summary:\\|^Keywords:\\|^To:\\|^Cc:\\|^Posted-To:\\|^Apparently-To:\\|^Gnus-Warning:\\|^Resent-From:\\|X-Sent:"
+  "From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^Followup-To:\\|^Reply-To:\\|^Organization:\\|^Summary:\\|^Keywords:\\|^To:\\|^Cc:\\|^Posted-To:\\|^Mail-Copies-To:\\|^Apparently-To:\\|^Gnus-Warning:\\|^Resent-From:\\|X-Sent:"
   "*All headers that do not match this regexp will be hidden.
 This variable can also be a list of regexp of headers to remain visible.
 If this variable is non-nil, `gnus-ignored-headers' will be ignored."
@@ -760,8 +760,8 @@ always hide."
 		       from reply-to
 		       (ignore-errors
 			 (equal
-			  (nth 1 (funcall gnus-extract-address-components from))
-			  (nth 1 (funcall gnus-extract-address-components reply-to)))))
+			  (nth 1 (mail-extract-address-components from))
+			  (nth 1 (mail-extract-address-components reply-to)))))
 		  (gnus-article-hide-header "reply-to"))))
 	     ((eq elem 'date)
 	      (let ((date (message-fetch-field "date")))

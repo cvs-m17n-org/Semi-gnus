@@ -34,7 +34,6 @@
 (require 'gnus-range)
 (require 'gnus-int)
 (require 'gnus-undo)
-(require 'gnus-util)
 (require 'mime-view)
 
 (autoload 'gnus-summary-limit-include-cached "gnus-cache" nil t)
@@ -3056,7 +3055,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 (defsubst gnus-nov-parse-line (number dependencies &optional force-new)
   (let ((eol (gnus-point-at-eol))
 	(buffer (current-buffer))
-	header rawtext decoded)
+	header)
 
     ;; overview: [num subject from date id refs chars lines misc]
     (unwind-protect
@@ -3068,22 +3067,10 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	  (setq header
 		(make-full-mail-header
 		 number			; number
-		 (progn
-		   (setq rawtext (gnus-nov-field) ; subject
-			 decoded (funcall
-				  gnus-unstructured-field-decoder rawtext))
-		   (if (string= rawtext decoded)
-		       rawtext
-		     (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
-		     decoded))
-		 (progn
-		   (setq rawtext (gnus-nov-field) ; from
-			 decoded (funcall
-				  gnus-structured-field-decoder rawtext))
-		   (if (string= rawtext decoded)
-		       rawtext
-		     (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
-		     decoded))
+		 (funcall
+		  gnus-unstructured-field-decoder (gnus-nov-field)) ; subject
+		 (funcall
+		  gnus-structured-field-decoder (gnus-nov-field)) ; from
 		 (gnus-nov-field)	; date
 		 (or (gnus-nov-field)
 		     (nnheader-generate-fake-message-id)) ; id
@@ -4399,7 +4386,6 @@ The resulting hash table is returned, or nil if no Xrefs were found."
       (subst-char-in-region (point-min) (point-max) ?\t ?  t)
       (gnus-run-hooks 'gnus-parse-headers-hook)
       (let ((case-fold-search t)
-	    rawtext decoded
 	    in-reply-to header p lines chars)
 	(goto-char (point-min))
 	;; Search to the beginning of the next header.	Error messages
@@ -4429,27 +4415,15 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nsubject: " nil t)
-		  (progn
-		    (setq rawtext (nnheader-header-value)
-			  decoded (funcall
-				   gnus-unstructured-field-decoder rawtext))
-		    (if (string-equal rawtext decoded)
-			rawtext
-		      (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
-		      decoded))
+		  (funcall
+		   gnus-unstructured-field-decoder (nnheader-header-value))
 		"(none)"))
 	    ;; From.
 	    (progn
 	      (goto-char p)
 	      (if (search-forward "\nfrom: " nil t)
-		  (progn
-		    (setq rawtext (nnheader-header-value)
-			  decoded (funcall
-				   gnus-structured-field-decoder rawtext))
-		    (if (string-equal rawtext decoded)
-			rawtext
-		      (put-text-property 0 (length decoded) 'raw-text rawtext decoded)
-		      decoded))
+		  (funcall
+		   gnus-structured-field-decoder (nnheader-header-value))
 		"(nobody)"))
 	    ;; Date.
 	    (progn
