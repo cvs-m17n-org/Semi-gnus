@@ -388,7 +388,7 @@ Can be used to turn version control on or off."
   :group 'gnus-newsrc
   :type 'boolean)
 
-(defvar gnus-startup-file-coding-system 'binary
+(defvar gnus-startup-file-coding-system 'ctext
   "*Coding system for startup file.")
 
 ;;; Internal variables
@@ -2277,7 +2277,8 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (gnus-message 5 "Saving %s.eld..." gnus-current-startup-file)
 	  (gnus-gnus-to-quick-newsrc-format)
 	  (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
-	  (save-buffer)
+	  (let ((coding-system-for-write gnus-startup-file-coding-system))
+	    (save-buffer))
 	  (kill-buffer (current-buffer))
 	  (gnus-message
 	   5 "Saving %s.eld...done" gnus-current-startup-file))

@@ -1,3 +1,12 @@
+1998-08-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Bind
+	`coding-system-for-write' by `gnus-startup-file-coding-system'
+	while saving the quick newsrc file.
+
+	* lisp/gnus-start.el (gnus-startup-file-coding-system): Change
+	default value to `ctext'.
+
 1998-08-13  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.11.
