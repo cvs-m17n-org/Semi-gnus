@@ -4612,7 +4612,11 @@ string."
       (goto-char (point-min))
       (let ((case-fold-search t)
 	    user-agent start p end)
-	(if (re-search-forward "^User-Agent:[\t ]*" nil t)
+	(if (re-search-forward
+	     (concat "^User-Agent:[\t ]*\\("
+		     (regexp-quote gnus-product-name)
+		     "/[0-9.]+\\([ \t\r\n]*([^)]+)\\)*\\)?[\t ]*")
+	     nil t)
 	    (progn
 	      (setq start (match-beginning 0)
 		    p (match-end 0)
