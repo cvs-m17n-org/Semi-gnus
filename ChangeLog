@@ -1,5 +1,7 @@
 1999-08-27  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
+	* README-offline.ja : Fix.
+
 	* lisp/gnus-offline.el (gnus-offline-agent-automatic-expire):
 	Fix typo.
 
