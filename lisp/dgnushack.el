@@ -2,6 +2,7 @@
 ;; Copyright (C) 1994,95,96,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Katsumi Yamaoka <yamaoka@jpl.org>
 ;; Version: 4.19
 ;; Keywords: news, path
 
@@ -60,7 +61,7 @@ You also then need to add the following to the lisp/dgnushack.el file:
      (push \"~/lisp/custom\" load-path)
 
 Modify to suit your needs."))
-  (let ((files (delete "_pkg.el" (directory-files "." nil "^[^=].*\\.el$")))
+  (let ((files (directory-files "." nil "^[^=].*\\.el$"))
 	(xemacs (string-match "XEmacs" emacs-version))
 	;;(byte-compile-generate-call-tree t)
 	file elc)
@@ -98,32 +99,10 @@ Modify to suit your needs."))
   "^\\(gnus\\|message\\|emacs-mime\\|gnus-ja\\|message-ja\\)\\(-[0-9]+\\)?$")
 
 (defun dgnushack-make-package ()
-  (mapcar
-   (lambda (file)
-     (condition-case nil
-	 (delete-file file)
-       (error nil)))
-   '("auto-autoloads.el" "auto-autoloads.elc"))
-
   (require 'gnus)
-  (let ((version
-	 (split-string
-	  (if (boundp 'gnus-revision-number)
-	      (concat gnus-version-number "." gnus-revision-number)
-	    gnus-version-number)
-	  "\\."))
-	(product-name (downcase gnus-product-name))
-	lisp-dir make-backup-files)
-    (setq version (apply 'concat (car version) "." (cdr version))
-	  lisp-dir (concat "lisp/" product-name "/"))
-
-    (with-temp-buffer
-      (insert ";;;###autoload
-\(package-provide '" product-name "
-		 :version " version "
-		 :type 'regular)
-")
-      (write-file "_pkg.el"))
+  (let* ((product-name (downcase gnus-product-name))
+	 (lisp-dir (concat "lisp/" product-name "/"))
+	 make-backup-files)
 
     (message "Updating autoloads for directory %s..." default-directory)
     (let ((generated-autoload-file "auto-autoloads.el")
@@ -165,7 +144,7 @@ Modify to suit your needs."))
 			     (car package-path)))))
 	 (info-dir (expand-file-name "info/" package-dir))
 	 (pkginfo-dir (expand-file-name "pkginfo/" package-dir))
-	 product-name lisp-dir manifest)
+	 product-name lisp-dir manifest files)
     (require 'gnus)
     (setq product-name (downcase gnus-product-name)
 	  lisp-dir (expand-file-name (concat "lisp/" product-name "/")
@@ -179,11 +158,21 @@ Modify to suit your needs."))
     (unless (file-directory-p pkginfo-dir)
       (make-directory pkginfo-dir))
 
+    (setq files (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
+    (mapcar
+     (lambda (file)
+       (unless (member file files)
+	 (setq file (expand-file-name file lisp-dir))
+	 (message "Removing %s..." file)
+	 (condition-case nil
+	     (delete-file file)
+	   (error nil))))
+     (directory-files lisp-dir nil nil nil t))
     (mapcar
      (lambda (file)
        (message "Copying %s to %s..." file lisp-dir)
        (copy-file file (expand-file-name file lisp-dir) t t))
-     (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
+     files)
 
     (mapcar
      (lambda (file)
