@@ -4618,7 +4618,7 @@ when could not found legal MIME charset for sending message."
 	    (setq dest (cons (car lc) dest)
 		  lc (delq (car lc) lc)))
 	  (or dest
-	      (list message-locale-default))
+	      (and message-locale-default (list message-locale-default)))
 	  )))))
 
 (defvar message-locale-newsgroup-alist
