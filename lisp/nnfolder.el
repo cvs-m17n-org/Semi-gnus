@@ -1028,9 +1028,7 @@ This command does not work if you use short group names."
       (when (not (message-mail-file-mbox-p file))
 	(ignore-errors
 	  (delete-file file)))))
-  (let ((files (directory-files nnfolder-directory))
-	file)
-    (while (setq file (pop files))
+    (dolist (file (directory-files nnfolder-directory))
       (when (and (not (backup-file-name-p file))
 		 (message-mail-file-mbox-p
 		  (nnheader-concat nnfolder-directory file)))
@@ -1045,7 +1043,7 @@ This command does not work if you use short group names."
 	  (nnfolder-possibly-change-folder file)
 	  (nnfolder-possibly-change-group file)
 	  (nnfolder-close-group file))))
-    (nnheader-message 5 "")))
+    (nnheader-message 5 ""))
 
 (defun nnfolder-group-pathname (group)
   "Make file name for GROUP."
