@@ -1091,7 +1091,7 @@ newsgroups that match the regexp."
   t)
 
 (deffoo nntp-request-set-mark (group actions &optional server)
-  (nntp-possibly-change-group group server)
+  (nntp-possibly-create-directory group server)
   (unless nntp-marks-is-evil
     (nntp-open-marks group server)
     (dolist (action actions)
@@ -1111,8 +1111,8 @@ newsgroups that match the regexp."
   nil)
 
 (deffoo nntp-request-update-info (group info &optional server)
-  (nntp-possibly-change-group group server)
-  (when (and (not nntp-marks-is-evil) (nntp-marks-changed-p group))
+  (nntp-possibly-create-directory group server)
+  (when (and (not nntp-marks-is-evil) (nntp-marks-changed-p group server))
     (nnheader-message 8 "Updating marks for %s..." group)
     (nntp-open-marks group server)
     ;; Update info using `nntp-marks'.
@@ -2051,7 +2051,7 @@ Please refer to the following variables to customize the connection:
       (make-directory (directory-file-name dir) t)
       (nnheader-message 5 "Creating nntp marks directory %s" dir))))
 
-(defun nntp-marks-changed-p (group)
+(defun nntp-marks-changed-p (group server)
   (let ((file (expand-file-name
 	       nntp-marks-file-name 
 	       (nnmail-group-pathname
