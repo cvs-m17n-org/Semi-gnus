@@ -42,11 +42,11 @@
 		     find-charset-region
 		     find-coding-systems-region get-charset-property
 		     coding-system-get w3-region
-		     w3-coding-system-for-mime-charset 
+		     w3-coding-system-for-mime-charset
 		     rmail-summary-exists rmail-select-summary
 		     rmail-update-summary url-retrieve
-		     temp-directory babel-fetch babel-wash babel-as-string
-		     sc-cite-regexp))
+		     temp-directory babel-fetch babel-wash
+		     find-coding-systems-for-charsets sc-cite-regexp))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table
@@ -72,7 +72,7 @@
   (maybe-fbind '(color-instance-rgb-components
 		 temp-directory
 		 glyph-width annotation-glyph window-pixel-width glyph-height
-		 window-pixel-height
+		 window-pixel-height map-extents
 		 make-color-instance color-instance-name specifier-instance
 		 device-type device-class get-popup-menu-response event-object
 		 x-defined-colors read-color add-submenu set-font-family
@@ -94,8 +94,9 @@
 		 w3-coding-system-for-mime-charset
 		 rmail-summary-exists rmail-select-summary rmail-update-summary
 		 url-generic-parse-url valid-image-instantiator-format-p
-		 babel-fetch babel-wash babel-as-string sc-cite-regexp
-		 smiley-encode-buffer function-max-args)))
+		 babel-fetch babel-wash find-coding-systems-for-charsets
+		 sc-cite-regexp smiley-encode-buffer function-max-args
+		 map-extents)))
 
 (setq load-path (cons "." load-path))
 (require 'custom)

@@ -276,8 +276,8 @@ variable."
 	    (eval `(nndoc-address
 		    ,(let ((file (nnheader-find-etc-directory
 				  "gnus-tut.txt" t)))
-		       (or file
-			   (error "Couldn't find doc group"))
+		       (unless file
+			 (error "Couldn't find doc group"))
 		       file))))))
   "*Alist of useful group-server pairs."
   :group 'gnus-group-listing
@@ -1611,7 +1611,7 @@ ephemeral group.
 If REQUEST-ONLY, don't actually read the group; just request it.
 If SELECT-ARTICLES, only select those articles.
 
-Return the name of the group is selection was successful."
+Return the name of the group if selection was successful."
   ;; Transform the select method into a unique server.
   (when (stringp method)
     (setq method (gnus-server-to-method method)))
@@ -1819,10 +1819,11 @@ ADDRESS."
 
   (when (stringp method)
     (setq method (or (gnus-server-to-method method) method)))
-  (let* ((meth (when (and method
-			  (not (gnus-server-equal method gnus-select-method)))
-		 (if address (list (intern method) address)
-		   method)))
+  (let* ((meth (gnus-method-simplify
+		(when (and method
+			   (not (gnus-server-equal method gnus-select-method)))
+		  (if address (list (intern method) address)
+		    method))))
 	 (nname (if method (gnus-group-prefixed-name name meth) name))
 	 backend info)
     (when (gnus-gethash nname gnus-newsrc-hashtb)
@@ -2107,6 +2108,42 @@ If SOLID (the prefix), create a solid group."
        group method t
        (cons (current-buffer)
 	     (if (eq major-mode 'gnus-summary-mode) 'summary 'group))))))
+
+(defvar nnwarchive-type-definition)
+(defvar gnus-group-warchive-type-history nil)
+(defvar gnus-group-warchive-login-history nil)
+(defvar gnus-group-warchive-address-history nil)
+
+(defun gnus-group-make-warchive-group ()
+  "Create a nnwarchive group."
+  (interactive)
+  (require 'nnwarchive)
+  (let* ((group (gnus-read-group "Group name: "))
+	 (default-type (or (car gnus-group-warchive-type-history)
+			   (symbol-name (caar nnwarchive-type-definition))))
+	 (type
+	  (gnus-string-or
+	   (completing-read
+	    (format "Warchive type (default %s): " default-type)
+	    (mapcar (lambda (elem) (list (symbol-name (car elem))))
+		    nnwarchive-type-definition)
+	    nil t nil 'gnus-group-warchive-type-history)
+	   default-type))
+	 (address (read-string "Warchive address: "
+			       nil 'gnus-group-warchive-address-history))
+	 (default-login (or (car gnus-group-warchive-login-history)
+			    user-mail-address))
+	 (login
+	  (gnus-string-or
+	   (read-string
+	    (format "Warchive login (default %s): " user-mail-address)
+	    default-login 'gnus-group-warchive-login-history)
+	   user-mail-address))
+	 (method
+	  `(nnwarchive ,address 
+		       (nnwarchive-type ,(intern type))
+		       (nnwarchive-login ,login))))
+    (gnus-group-make-group group method)))
 
 (defun gnus-group-make-archive-group (&optional all)
   "Create the (ding) Gnus archive group of the most recent articles.
@@ -2934,7 +2971,8 @@ entail asking the server for the groups."
   (interactive)
   ;; First we make sure that we have really read the active file.
   (unless (gnus-read-active-file-p)
-    (let ((gnus-read-active-file t))
+    (let ((gnus-read-active-file t)
+	  (gnus-agent nil)) ; Trick the agent into ignoring the active file.
       (gnus-read-active-file)))
   ;; Find all groups and sort them.
   (let ((groups

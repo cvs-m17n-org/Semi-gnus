@@ -90,7 +90,8 @@ This variable is a list of mail source specifiers."
        (:connection)
        (:authentication password))
       (maildir
-       (:path "~/Maildir/new/"))
+       (:path "~/Maildir/new/")
+       (:function))
       (imap
        (:server (getenv "MAILHOST"))
        (:port)
@@ -99,7 +100,14 @@ This variable is a list of mail source specifiers."
        (:user (or (user-login-name) (getenv "LOGNAME") (getenv "USER")))
        (:password)
        (:mailbox "INBOX")
-       (:predicate "UNSEEN UNDELETED")))
+       (:predicate "UNSEEN UNDELETED")
+       (:fetchflag "\Deleted")
+       (:dontexpunge))
+      (webmail
+       (:subtype hotmail)
+       (:user (or (user-login-name) (getenv "LOGNAME") (getenv "USER")))
+       (:password)
+       (:authentication password)))
     "Mapping from keywords to default values.
 All keywords that can be used must be listed here."))
 
@@ -108,7 +116,8 @@ All keywords that can be used must be listed here."))
     (directory mail-source-fetch-directory)
     (pop mail-source-fetch-pop)
     (maildir mail-source-fetch-maildir)
-    (imap mail-source-fetch-imap))
+    (imap mail-source-fetch-imap)
+    (webmail mail-source-fetch-webmail))
   "A mapping from source type to fetcher function.")
 
 (defvar mail-source-password-cache nil)
@@ -295,6 +304,12 @@ Pass INFO on to CALLBACK."
       ;; Return whether we moved successfully or not.
       to)))
 
+(defun mail-source-movemail-and-remove (from to)
+  "Move FROM to TO using movemail, then remove FROM if empty."
+  (or (not (mail-source-movemail from to))
+      (not (zerop (nth 7 (file-attributes from))))
+      (delete-file from)))
+
 (defvar mail-source-read-passwd nil)
 (defun mail-source-read-passwd (prompt &rest args)
   "Read a password using PROMPT.
@@ -427,7 +442,9 @@ If ARGS, PROMPT is used as an argument to `format'."
 	  (mail-source-string (format "maildir:%s" path)))
       (dolist (file (directory-files path t))
 	(when (and (file-regular-p file)
-		   (not (rename-file file mail-source-crash-box)))
+		   (not (if function
+			    (funcall function file mail-source-crash-box)
+			  (rename-file file mail-source-crash-box))))
 	  (incf found (mail-source-callback callback file))))
       found)))
 
@@ -435,11 +452,14 @@ If ARGS, PROMPT is used as an argument to `format'."
   (autoload 'imap-open "imap")
   (autoload 'imap-authenticate "imap")
   (autoload 'imap-mailbox-select "imap")
+  (autoload 'imap-mailbox-unselect "imap")
+  (autoload 'imap-mailbox-close "imap")
   (autoload 'imap-search "imap")
   (autoload 'imap-fetch "imap")
-  (autoload 'imap-mailbox-unselect "imap")
   (autoload 'imap-close "imap")
   (autoload 'imap-error-text "imap")
+  (autoload 'imap-message-flags-add "imap")
+  (autoload 'imap-list-to-message-set "imap")
   (autoload 'nnheader-ms-strip-cr "nnheader"))
 
 (defun mail-source-fetch-imap (source callback)
@@ -447,7 +467,8 @@ If ARGS, PROMPT is used as an argument to `format'."
   (mail-source-bind (imap source)
     (let ((found 0)
 	  (buf (get-buffer-create (generate-new-buffer-name " *imap source*")))
-	  (mail-source-string (format "imap:%s:%s" server mailbox)))
+	  (mail-source-string (format "imap:%s:%s" server mailbox))
+	  remove)
       (if (and (imap-open server port stream authentication buf)
 	       (imap-authenticate user password buf)
 	       (imap-mailbox-select mailbox nil buf))
@@ -455,7 +476,8 @@ If ARGS, PROMPT is used as an argument to `format'."
 	    (with-temp-file mail-source-crash-box
 	      ;; if predicate is nil, use all uids
 	      (dolist (uid (imap-search (or predicate "1:*") buf))
-		(when (setq str (imap-fetch uid "RFC822" 'RFC822 nil buf))
+		(when (setq str (imap-fetch uid "RFC822.PEEK" 'RFC822 nil buf))
+		  (push uid remove)
 		  (insert "From imap " (current-time-string) "\n")
 		  (save-excursion
 		    (insert str "\n\n"))
@@ -464,12 +486,31 @@ If ARGS, PROMPT is used as an argument to `format'."
 		  (goto-char (point-max))))
 	      (nnheader-ms-strip-cr))
 	    (incf found (mail-source-callback callback server))
-	    (imap-mailbox-unselect buf)
+	    (when (and remove fetchflag)
+	      (imap-message-flags-add
+	       (imap-list-to-message-set remove) fetchflag nil buf))
+	    (if dontexpunge
+		(imap-mailbox-unselect buf)
+	      (imap-mailbox-close buf))
 	    (imap-close buf))
 	(imap-close buf)
 	(error (imap-error-text buf)))
       (kill-buffer buf)
       found)))
+
+(eval-and-compile
+  (autoload 'webmail-fetch "webmail"))
+
+(defun mail-source-fetch-webmail (source callback)
+  "Fetch for webmail source."
+  (mail-source-bind (webmail source)
+    (when (eq authentication 'password)
+      (setq password
+	    (or password
+		(mail-source-read-passwd
+		 (format "Password for %s at %s: " user subtype)))))
+    (webmail-fetch mail-source-crash-box subtype user password)
+    (mail-source-callback callback (symbol-name subtype))))
 
 (provide 'mail-source)
 

@@ -255,7 +255,7 @@ restrict visible folders.")
 
 ;; Internal variables:
 
-(defvar nnimap-debug "*nnimap-debug*")
+(defvar nnimap-debug nil) ;; "*nnimap-debug*")
 (defvar nnimap-current-move-server nil)
 (defvar nnimap-current-move-group nil)
 (defvar nnimap-current-move-article nil)
@@ -558,9 +558,8 @@ If EXAMINE is non-nil the group is selected read-only."
 		      (cadr (assq 'nnimap-server-address defs))) defs)
 	(push (list 'nnimap-address server) defs)))
     (nnoo-change-server 'nnimap server defs)
-    (if (null nnimap-server-buffer)
-	(error "this shouldn't happen"))
-    (or (imap-opened nnimap-server-buffer)
+    (or (and nnimap-server-buffer
+	     (imap-opened nnimap-server-buffer))
 	(nnimap-open-connection server))))
 
 (deffoo nnimap-server-opened (&optional server)

@@ -57,6 +57,13 @@ contents of this part.")
     (modify-syntax-entry ?\' " " table)
     table))
 
+(defvar mml-boundary-function 'mml-make-boundary
+  "A function called to suggest a boundary.
+The function may be called several times, and should try to make a new
+suggestion each time.  The function is called with one parameter,
+which is a number that says how many times the function has been
+called for this message.")
+
 (defun mml-parse ()
   "Parse the current buffer as an MML document."
   (goto-char (point-min))
@@ -304,7 +311,8 @@ contents of this part.")
 
 (defun mml-compute-boundary (cont)
   "Return a unique boundary that does not exist in CONT."
-  (let ((mml-boundary (mml-make-boundary)))
+  (let ((mml-boundary (funcall mml-boundary-function
+			       (incf mml-multipart-number))))
     ;; This function tries again and again until it has found
     ;; a unique boundary.
     (while (not (catch 'not-unique
@@ -327,16 +335,17 @@ contents of this part.")
 	(goto-char (point-min))
 	(when (re-search-forward (concat "^--" (regexp-quote mml-boundary))
 				 nil t)
-	  (setq mml-boundary (mml-make-boundary))
+	  (setq mml-boundary (funcall mml-boundary-function
+				      (incf mml-multipart-number)))
 	  (throw 'not-unique nil))))
      ((eq (car cont) 'multipart)
       (mapcar 'mml-compute-boundary-1 (cddr cont))))
     t))
 
-(defun mml-make-boundary ()
-  (concat (make-string (% (incf mml-multipart-number) 60) ?=)
-	  (if (> mml-multipart-number 17)
-	      (format "%x" mml-multipart-number)
+(defun mml-make-boundary (number)
+  (concat (make-string (% number 60) ?=)
+	  (if (> number 17)
+	      (format "%x" number)
 	    "")
 	  mml-base-boundary))
 
@@ -628,7 +637,8 @@ contents of this part.")
       ;; Quote parts.
       (while (re-search-forward
 	      "<#/?!*\\(multipart\\|part\\|external\\)" nil t)
-	(goto-char (match-beginning 1))
+	;; Insert ! after the #.
+	(goto-char (+ (match-beginning 0) 2))
 	(insert "!")))))
 
 (defun mml-insert-tag (name &rest plist)
@@ -707,6 +717,9 @@ If RAW, don't highlight the article."
                                "*MIME preview of ") (buffer-name))))
    (erase-buffer)
    (insert-buffer buf)
+   (if (re-search-forward
+	(concat "^" (regexp-quote mail-header-separator) "\n") nil t)
+       (replace-match "\n"))
    (mml-to-mime)
    (unless raw
      (run-hooks 'gnus-article-decode-hook)

@@ -94,13 +94,13 @@ Some people may want to add \"unknown\" to this list."
   :group 'picons)
 
 (defcustom gnus-picons-file-suffixes
-  (if (featurep 'x)
-      (let ((types (list "xbm")))
-	(if (featurep 'gif)
-	    (setq types (cons "gif" types)))
-	(if (featurep 'xpm)
-	    (setq types (cons "xpm" types)))
-	types))
+  (when (featurep 'x)
+    (let ((types (list "xbm")))
+      (when (featurep 'gif)
+	(setq types (cons "gif" types)))
+      (when (featurep 'xpm)
+	(setq types (cons "xpm" types)))
+      types))
   "*List of suffixes on picon file names to try."
   :type '(repeat string)
   :group 'picons)

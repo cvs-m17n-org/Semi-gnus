@@ -91,15 +91,35 @@
 	   (pop x))
 	 x))))
 
+;; If we are building w3 in a different directory than the source
+;; directory, we must read *.el from source directory and write *.elc
+;; into the building directory.  For that, we define this function
+;; before loading bytecomp.  Bytecomp doesn't overwrite this function.
+(defun byte-compile-dest-file (filename)
+  "Convert an Emacs Lisp source file name to a compiled file name.
+ In addition, remove directory name part from FILENAME."
+  (setq filename (byte-compiler-base-file-name filename))
+  (setq filename (file-name-sans-versions filename))
+  (setq filename (file-name-nondirectory filename))
+  (if (memq system-type '(win32 w32 mswindows windows-nt))
+      (setq filename (downcase filename)))
+  (cond ((eq system-type 'vax-vms)
+	 (concat (substring filename 0 (string-match ";" filename)) "c"))
+	((string-match emacs-lisp-file-regexp filename)
+	 (concat (substring filename 0 (match-beginning 0)) ".elc"))
+	(t (concat filename ".elc"))))
+
 (require 'bytecomp)
 
+(defvar srcdir (or (getenv "srcdir") "."))
+
+(push srcdir load-path)
+
 ;; Attempt to pickup the additional load-path(s).
-(load (expand-file-name "./dgnuspath.el") nil nil t)
+(load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
 (condition-case err
     (load "~/.lpath.el" t nil t)
   (error (message "Error in \"~/.lpath.el\" file: %s" err)))
-
-(push "." load-path)
 
 (condition-case nil
     (char-after)
@@ -124,7 +144,7 @@
 
 ;; `char-after' and `char-before' must be well-behaved before lpath.el
 ;; is loaded.  Because it requires `poe' via `path-util'.
-(load "./lpath.el" nil t)
+(load (expand-file-name "lpath.el" srcdir) nil t t)
 
 (unless (fboundp 'byte-compile-file-form-custom-declare-variable)
   ;; Bind defcustom'ed variables.
@@ -202,23 +222,29 @@ You also then need to add the following to the lisp/dgnushack.el file:
 
 Modify to suit your needs."))
   (let ((files (delete "dgnuspath.el"
-		       (directory-files "." nil "^[^=].*\\.el$")))
+		       (directory-files srcdir nil "^[^=].*\\.el$")))
 	(xemacs (string-match "XEmacs" emacs-version))
 	;;(byte-compile-generate-call-tree t)
 	file elc)
     (condition-case ()
 	(require 'w3-forms)
-      (error (setq files (delete "nnweb.el" (delete "nnlistserv.el" files)))))
+      (error
+       (dolist (file '("nnweb.el" "nnlistserv.el" "nnultimate.el"
+		       "nnslashdot.el" "nnwarchive.el" "webmail.el"))
+	 (setq files (delete file files)))))
     (condition-case ()
 	(require 'bbdb)
       (error (setq files (delete "gnus-bbdb.el" files))))
     (while (setq file (pop files))
-      (when (or (and (not xemacs)
-		     (not (member file '("gnus-xmas.el" "gnus-picon.el"
-					 "messagexmas.el" "nnheaderxm.el"
-					 "smiley.el" "x-overlay.el"))))
-		(and xemacs
-		     (not (member file '("md5.el")))))
+      (unless (or (and (not xemacs)
+		       (member file
+			       '("gnus-xmas.el" "gnus-picon.el"
+				 "messagexmas.el" "nnheaderxm.el"
+				 "smiley.el" "x-overlay.el")))
+		  (and (string-equal file "md5.el")
+		       (not (and (fboundp 'md5)
+				 (subrp (symbol-function 'md5))))))
+	(setq file (expand-file-name file srcdir))
 	(when (or (not (file-exists-p (setq elc (concat file "c"))))
 		  (file-newer-than-file-p file elc))
 	  (ignore-errors

@@ -120,8 +120,9 @@ on your system, you could say something like:
 			    field-name)
 			  mode max-column))
 
-(defun make-full-mail-header
-  (&optional number subject from date id references chars lines xref extra)
+(defsubst make-full-mail-header (&optional number subject from date id
+					   references chars lines xref
+					   extra)
   "Create a new mail header structure initialized with the parameters given."
   (luna-make-entity (mm-expand-class-name 'gnus)
 		    :location number
@@ -139,7 +140,7 @@ on your system, you could say something like:
 					   (cons 'From from))
 		    :extra extra))
 
-(defun make-full-mail-header-from-decoded-header
+(defsubst make-full-mail-header-from-decoded-header
   (&optional number subject from date id references chars lines xref extra)
   "Create a new mail header structure initialized with the parameters given."
   (luna-make-entity (mm-expand-class-name 'gnus)
@@ -154,7 +155,7 @@ on your system, you could say something like:
 		    :xref xref
 		    :extra extra))
 
-(defun make-mail-header (&optional init)
+(defsubst make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
   (make-full-mail-header init init init init init
 			 init init init init init))
@@ -360,6 +361,17 @@ on your system, you could say something like:
 		": " (cdar extra) "\t")
         (pop extra))))
   (insert "\n"))
+
+(defun nnheader-insert-header (header)
+  (insert
+   "Subject: " (or (mail-header-subject header) "(none)") "\n"
+   "From: " (or (mail-header-from header) "(nobody)") "\n"
+   "Date: " (or (mail-header-date header) "") "\n"
+   "Message-ID: " (or (mail-header-id header) (nnmail-message-id)) "\n"
+   "References: " (or (mail-header-references header) "") "\n"
+   "Lines: ")
+  (princ (or (mail-header-lines header) 0) (current-buffer))
+  (insert "\n\n"))
 
 (defun nnheader-insert-article-line (article)
   (goto-char (point-min))
@@ -849,6 +861,21 @@ without formatting."
     (while (< idx len)
       (when (= (aref string idx) from)
 	(aset string idx to))
+      (setq idx (1+ idx)))
+    string))
+
+(defun nnheader-replace-duplicate-chars-in-string (string from to)
+  "Replace characters in STRING from FROM to TO."
+  (let ((string (substring string 0))	;Copy string.
+	(len (length string))
+	(idx 0) prev i)
+    ;; Replace all occurrences of FROM with TO.
+    (while (< idx len)
+      (setq i (aref string idx))
+      (when (and (eq prev from) (= i from))
+	(aset string (1- idx) to)
+	(aset string idx to))
+      (setq prev i)
       (setq idx (1+ idx)))
     string))
 

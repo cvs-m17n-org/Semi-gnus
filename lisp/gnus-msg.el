@@ -38,12 +38,12 @@
 (require 'message)
 (require 'gnus-art)
 
-(defcustom gnus-post-method nil
+(defcustom gnus-post-method 'current
   "*Preferred method for posting USENET news.
 
 If this variable is `current', Gnus will use the \"current\" select
 method when posting.  If it is nil (which is the default), Gnus will
-use the native posting method of the server.
+use the native select method when posting.
 
 This method will not be used in mail groups and the like, only in
 \"real\" newsgroups.
@@ -176,6 +176,7 @@ Thank you for your help in stamping out bugs.
   "c" gnus-summary-cancel-article
   "s" gnus-summary-supersede-article
   "r" gnus-summary-reply
+  "y" gnus-summary-yank-message
   "R" gnus-summary-reply-with-original
   "w" gnus-summary-wide-reply
   "W" gnus-summary-wide-reply-with-original
@@ -974,6 +975,19 @@ If YANK is non-nil, include the original article."
   (when (get-buffer "*Gnus Help Bug*")
     (kill-buffer "*Gnus Help Bug*")))
 
+(defun gnus-summary-yank-message (buffer n)
+  "Yank the current article into a composed message."
+  (interactive
+   (list (completing-read "Buffer: " (mapcar 'list (message-buffers)) nil t)
+	 current-prefix-arg))
+  (gnus-summary-iterate n
+    (let ((gnus-display-mime-function nil)
+	  (gnus-inhibit-treatment t))
+      (gnus-summary-select-article))
+    (save-excursion
+      (set-buffer buffer)
+      (message-yank-buffer gnus-article-buffer))))
+
 (defun gnus-debug ()
   "Attempts to go through the Gnus source file and report what variables have been changed.
 The source file has to be in the Emacs load path."
@@ -1219,10 +1233,15 @@ this is a reply."
       ;; Go through all styles and look for matches.
       (dolist (style styles)
 	(setq match (pop style))
+	(goto-char (point-min))
 	(when (cond
 	       ((stringp match)
 		;; Regexp string match on the group name.
 		(string-match match group))
+	       ((eq match 'header)
+		(let ((header (message-fetch-field (pop style))))
+		  (and header
+		       (string-match (pop style) header))))
 	       ((or (symbolp match)
 		    (gnus-functionp match))
 		(cond
@@ -1267,7 +1286,7 @@ this is a reply."
 	      (setq element 'signature
 		    filep t))
 	    ;; Get the contents of file elems.
-	    (when filep
+	    (when (and filep v)
 	      (setq v (with-temp-buffer
 			(insert-file-contents v)
 			(buffer-string))))
@@ -1295,7 +1314,8 @@ this is a reply."
 		      `(lambda ()
 			 (save-excursion
 			   (let ((message-signature ,(cdr result)))
-			     (message-insert-signature)))))
+			     (when message-signature
+			       (message-insert-signature))))))
 		     (t
 		      (let ((header
 			     (if (symbolp (car result))
@@ -1309,7 +1329,7 @@ this is a reply."
       (when (or name address)
 	(add-hook 'message-setup-hook
 		  `(lambda ()
-		     (let ((user-full-name ,(or (cdr name) user-full-name))
+		     (let ((user-full-name ,(or (cdr name) (user-full-name)))
 			   (user-mail-address
 			    ,(or (cdr address) user-mail-address)))
 		       (save-excursion
