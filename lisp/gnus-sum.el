@@ -4956,6 +4956,10 @@ If SELECT-ARTICLES, only select those articles from GROUP."
        ((eq mark-type 'range)
 	(cond
 	 ((eq mark 'seen)
+	  ;; T-gnus change: Fix the record for `seen' if it looks like
+	  ;; (seen NUM1 . NUM2).  It should be (seen (NUM1 . NUM2)).
+	  (when (numberp (cddr marks))
+	    (setcdr marks (list (cdr marks))))
 	  (setq articles (cdr marks))
 	  (while (and articles
 		      (or (and (consp (car articles))
