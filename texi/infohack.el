@@ -191,20 +191,25 @@ Both characters must have the same length of multi-byte form."
 	  (texinfo-every-node-update)
 	  (set-buffer-modified-p nil)
 	  (message "texinfo formatting %s..." file)
-	  (if (featurep 'mule)
-	      ;; Encode messages to terminal.
-	      (let ((si:message (symbol-function 'message)))
-		(fset 'message
-		      (byte-compile
-		       `(lambda (fmt &rest args)
-			  (funcall ,si:message "%s"
-				   (encode-coding-string
-				    (apply 'format fmt args)
-				    'iso-2022-7bit)))))
-		(unwind-protect
-		    (texinfo-format-buffer nil)
-		  (fset 'message si:message)))
-	    (texinfo-format-buffer nil))
+	  (let ((si:message (symbol-function 'message)))
+	    ;; Encode messages to terminal.
+	    (fset
+	     'message
+	     (byte-compile
+	      (if (featurep 'xemacs)
+		  `(lambda (fmt &rest args)
+		     (unless (and (string-equal fmt "%s clean")
+				  (equal (car args) buffer-file-name))
+		       (funcall ,si:message "%s"
+				(encode-coding-string (apply 'format fmt args)
+						      'iso-2022-7bit))))
+		`(lambda (fmt &rest args)
+		   (funcall ,si:message "%s"
+			    (encode-coding-string (apply 'format fmt args)
+						  'iso-2022-7bit))))))
+	    (unwind-protect
+		(texinfo-format-buffer nil)
+	      (fset 'message si:message)))
 	  (if (buffer-modified-p)
 	      (progn (message "Saving modified %s" (buffer-file-name))
 		     (save-buffer))))
