@@ -930,6 +930,12 @@ For example: ((1 . cn-gb-2312) (2 . big5))."
   :type 'function
   :group 'gnus-summary)
 
+(defcustom gnus-orphan-score nil
+  "*All orphans get this score added.  Set in the score file."
+  :group 'gnus-score-default
+  :type '(choice (const nil)
+		 integer))
+
 ;;; Internal variables
 
 (defvar gnus-article-mime-handles nil)
@@ -1156,6 +1162,7 @@ end position and text.")
     gnus-score-alist gnus-current-score-file
     (gnus-summary-expunge-below . global)
     (gnus-summary-mark-below . global)
+    (gnus-orphan-score . global)
     gnus-newsgroup-active gnus-scores-exclude-files
     gnus-newsgroup-history gnus-newsgroup-ancient
     gnus-newsgroup-sparse gnus-newsgroup-process-stack
