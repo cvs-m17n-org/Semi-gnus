@@ -335,7 +335,7 @@
 	    (nnheader-nov-delete-outside-range
 	     (if fetch-old (max 1 (- (car articles) fetch-old))
 	       (car articles))
-	     (and articles (nth (1- (length articles)) articles)))
+	     (nth (1- (length articles)) articles))
 	    t))))))
 
 
