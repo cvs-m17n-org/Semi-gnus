@@ -1,3 +1,142 @@
+2001-06-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+2001-06-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Use
+	`nnshimbun-find-parameter'.
+	(nnshimbun-generate-nov-database): Bind a full group name while
+	processing.
+	(nnshimbun-find-parameter): New implementation to refer to the
+	nnshimbun group parameters.
+	(nnshimbun-index-range): Add a document that it's just a default.
+	(nnshimbun-pre-fetch-article): Ditto.
+	(nnshimbun-group-parameters): Specify a parameter type as `list'.
+	(TopLevel): Remove the local variable "-*- coding: junet; -*-".
+
+2001-06-13  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-group-parameters): New group
+	parameter.  It also provides the user option
+	`nnshimbun-group-parameters-alist' and the function
+	`nnshimbun-find-group-parameters'.
+	(nnshimbun-group-parameters-custom): New variable.
+	(TopLevel): Require `gnus' expressly.
+
+2001-06-12  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-find-parameter): New macro.
+	(nnshimbun-generate-nov-database): Use `nnshimbun-find-parameter'.
+	(nnshimbun-request-expire-articles): Fixed.
+
+2001-06-12  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (Gnus-p): Use `file-exists-p' instead of
+	`locate-library' to check for the existence of mailcap.el in the
+	same directory of gnus.el.
+	(nnshimbun-retrieve-headers-with-nov): Remove a redundant check
+	that I made.
+
+2001-06-11  Akihiro Arisawa  <ari@atesoft.advantest.co.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Fix
+	inhibiting the expiring when `nnshimbun-keep-unparsable-dated-articles'
+	is nil.
+
+2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/gnus-group.el (toplevel): Removed autoload code for
+	"nnshimbun".
+
+	* texi/gnus-ja.texi (Web Newspaper): Add documents about
+	`nnshimbun-index-range'.
+
+2001-06-11  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Don't
+	refer to the variable `nnshimbun-keep-last-article', we should
+	keep the last article anyway.
+	(nnshimbun-keep-last-article): Abolished.
+
+	* lisp/gnus.el: Autoload "nnshimbun" for the command `gnus-group-
+	make-shimbun-group'.
+
+2001-06-11  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el: Remove some garbage.
+
+2001-06-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* texi/message-ja.texi: Use `iso-2022-7bit' instead of
+	`iso-2022-7bit-ss2' to keep a compatibility between XEmacsen and
+	FSF Emacsen.
+	* texi/gnus-ja.texi: Ditto.
+
+2001-06-09  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (top-level): Updated comments.
+	(nnshimbun): New customize group.
+	(nnshimbun-keep-last-article): Defined as customize variable.
+	(nnshimbun-keep-unparsable-dated-articles): Ditto.
+	(nnshimbun-insert-nov): Use `when' instead of `if'.
+	(gnus-group-shimbun-server-history): Imported from
+	`gnus-group.el'.
+	(gnus-group-make-shimbun-group): Ditto.
+
+	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Its real
+	definition is moved to `nnshimbun.el' and autload code is added.
+	(gnus-group-shimbun-server-history): Its definition is moved to
+	`nnshimbun.el'.
+
+2001-06-08  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-use-entire-index): Removed.
+	(nnshimbun-index-range): New variable.
+	(nnshimbun-close-server): Check status strictly to close server
+	safely.
+	(nnshimbun-generate-nov-database): Refer the group paramter
+	`nnshimbun-index-range' as the second parameter of
+	`shimbun-headers'.
+	(shimbun-mua-use-entire-index): Removed.
+	(nnshimbun-request-article-1): Replace a date string in
+	`gnus-newsgroup-data' only when article header has non-nil value.
+	(nnshimbun-insert-nov): Fixed condition to decide whether
+	`X-Nnshimbun-Id' should be inseted or not.
+
+2001-06-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-expire-nov-databases): Removed.
+	(nnshimbun-request-expire-articles): Simplified; refer to the
+	shimbun's default expiration days.
+
+2001-06-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Prefer the
+	group parameter `expiry-wait' when expiring a closed group.
+
+2001-06-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-request-article-1): Replace a date
+	string in `gnus-newsgroup-data' based on the newly retrieved
+	article.
+
+2001-06-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Fix
+	inhibiting the expiring.
+
+2001-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-expire-nov-databases): New command.
+	(nnshimbun-request-expire-articles): New function.
+	(nnshimbun-keep-unparsable-dated-articles): New variable.
+	(nnshimbun-keep-last-article): New variable.
+	(nnshimbun-insert-nov): Rewrite using `nnshimbun-string-or'.
+	(nnshimbun-string-or): New macro.
+	(nnshimbun-tmp-string): New internal variable.
+	(TopLevel): Require `message' for `message-make-date'.
+
 2001-05-30  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-clfns.el (find-cl-run-time-functions): Remove a
