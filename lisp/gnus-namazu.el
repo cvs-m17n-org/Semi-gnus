@@ -6,8 +6,6 @@
 ;; Author: TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;; Keywords: mail searching namazu
 
-;; This file is a part of Semi-Gnus.
-
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
@@ -37,26 +35,30 @@
 
 ;;; Quick Start:
 
-;; If this module has already been installed, only 3 steps are
+;; If this module has already been installed, only four steps are
 ;; required to search articles with this module.
 ;;
 ;;   (1) Install Namazu.
-;;   (2) Start Gnus and type M-x gnus-namazu-create-index RET to make
+;;
+;;   (2) Put this expression into your ~/.gnus.
+;;
+;;          (gnus-namazu-insinuate)
+;;
+;;   (3) Start Gnus and type M-x gnus-namazu-create-index RET to make
 ;;       index of articles.
-;;   (3) In group buffer or in summary buffer, type C-c C-n query RET.
+;;
+;;   (4) In group buffer or in summary buffer, type C-c C-n query RET.
 
 
 ;;; Install:
 
 ;; Before installing this module, you must install Namazu.
 ;;
-;; This file is a part of T-gnus but is not *YET* a part of Gnus.
-;; When you would like to use this module in Gnus (not T-gnus), put
-;; this file into the lisp/ directory in the Gnus source tree and run
-;; `make install'.  And then, put the following expression into your
+;; When you would like to byte-compile this module in Gnus, put this
+;; file into the lisp/ directory in the Gnus source tree and run `make
+;; install'.  And then, put the following expression into your
 ;; ~/.gnus.
 ;;
-;;      (require 'gnus-namazu)
 ;;      (gnus-namazu-insinuate)
 ;;
 ;; In order to make index of articles with Namazu before using this
@@ -225,7 +227,7 @@ options make any sense in this context."
 
 (defcustom gnus-namazu-remote-groups nil
   "*Alist of regular expressions matching remote groups and their base paths.
-If you use an IMAP server and have a apecial index, set this option as
+If you use an IMAP server and have a special index, set this option as
 follows:
 
     (setq gnus-namazu-remote-groups
