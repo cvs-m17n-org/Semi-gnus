@@ -13160,16 +13160,18 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 @lisp
 (defun split-on-body ()
   (save-excursion
-    (set-buffer
-     (or (get-buffer " *nnmail incoming*")
-         (get-buffer " *nnml move*")))
+    (widen)
     (goto-char (point-min))
     (when (re-search-forward "Some.*string" nil t)
       "string.group")))
 @end lisp
 
 @var{function} が走らされるとき、バッファはメッセージの部分に狭められま
-す。
+す。それが、上記の例で @code{save-excursion} の後で @code{(widen)} が呼
+ばれる必要がある理由です。さらに nnimap バックエンドの場合、ディフォルト
+では記事のボディがダウンロードされないことに注意して下さい。それをするた
+めには、@code{nnimap-split-download-body} を t に設定する必要がありま
+す (@pxref{Splitting in IMAP})。
 
 @item (! @var{func} @var{split})
 分割がリストで、最初の要素が @code{!} であると @var{split} が実行され、
@@ -21335,15 +21337,16 @@ Spam を避けるための前項のヒントが十分だった日々は過ぎ去りました。今では
                              ...))
 (defun kevin-spamassassin ()
   (save-excursion
-    (let ((buf (or (get-buffer " *nnmail incoming*")
-                   (get-buffer " *nnml move*"))))
-      (if (not buf)
-          (progn (message "Oops, cannot find message buffer") nil)
-        (set-buffer buf)
-        (if (eq 1 (call-process-region (point-min) (point-max)
-                                       "spamc" nil nil nil "-c"))
-            "spam")))))
+    (widen)
+    (if (eq 1 (call-process-region (point-min) (point-max)
+				   "spamc" nil nil nil "-c"))
+	"spam")))
 @end lisp
+
+さらに nnimap バックエンドの場合、ディフォルトでは記事のボディがダウンロー
+ドされないことに注意して下さい。それをするためには、
+@code{nnimap-split-download-body} を t に設定する必要がありま
+す (@pxref{Splitting in IMAP})。
 
 以上がこれに関することです。いくつかの spam はどうしても素通りしてしまう
 ので、spam を読むはめになったときに呼ぶための気の利いた関数が欲しいでしょ
