@@ -6726,14 +6726,14 @@ which specify the range to operate on."
 		'message-kill-buffer "close" tool-bar-map message-mode-map)
 	       (message-tool-bar-local-item-from-menu
 		'message-dont-send "cancel" tool-bar-map message-mode-map)
-	       (message-tool-bar-local-item-from-menu
-		'mime-edit-insert-file "attach"
-		tool-bar-map mime-edit-mode-map)
+;;	       (message-tool-bar-local-item-from-menu
+;;		'mime-edit-insert-file "attach"
+;;		tool-bar-map mime-edit-mode-map)
 	       (message-tool-bar-local-item-from-menu
 		'ispell-message "spell" tool-bar-map message-mode-map)
-	       (message-tool-bar-local-item-from-menu
-		'mime-edit-preview-message "preview"
-		tool-bar-map mime-edit-mode-map)
+;;	       (message-tool-bar-local-item-from-menu
+;;		'mime-edit-preview-message "preview"
+;;		tool-bar-map mime-edit-mode-map)
 	       (message-tool-bar-local-item-from-menu
 		'message-insert-importance-high "important"
 		tool-bar-map message-mode-map)
