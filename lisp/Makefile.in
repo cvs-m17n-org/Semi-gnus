@@ -62,6 +62,7 @@ gnus-load.el:
 
 distclean:
 	rm -f *.orig *.rej *.elc *~ Makefile
+	rm -f auto-autoload.el custom-load.el
 
 Makefile: $(srcdir)/Makefile.in ../config.status
 	cd .. \
