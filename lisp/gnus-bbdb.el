@@ -81,13 +81,20 @@ the user confirms the creation."
 	  (when (setq sender
 		      (funcall gnus-bbdb/extract-message-sender-function))
 	    (save-excursion
-	      (bbdb-encache-message
-	       message-key
-	       (bbdb-annotate-message-sender sender t
-					     (or (bbdb-invoke-hook-for-value
-						  bbdb/news-auto-create-p)
-						 offer-to-create)
-					     offer-to-create))))))))
+	      (setq record (bbdb-annotate-message-sender
+			    sender t
+			    (or (bbdb-invoke-hook-for-value
+				 bbdb/news-auto-create-p)
+				offer-to-create)
+			    offer-to-create)))
+	    ;; XXX: BBDB 2.3x not only redefines
+	    ;; `bbdb-encache-message' as a macro but also the inherent
+	    ;; semantics of message caching functions is changed, so
+	    ;; the following calls are much the same here.
+	    (if (functionp 'bbdb-encache-message)
+		(car (bbdb-encache-message message-key (list record)))
+	      (bbdb-encache-message message-key record)))))))
+		 
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)
