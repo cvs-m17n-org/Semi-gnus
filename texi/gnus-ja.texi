@@ -4615,8 +4615,8 @@ Gnus は変数 @code{gnus-extract-address-components} の値を @code{From
 @item u
 利用者定義指定子。フォーマット文字列の中の次の文字が英字である必要があり
 ます。これにより gnus は関
-数 @code{gnus-user-format-function-}@samp{X} を呼び出しますが、ここ
-で @samp{X} は @samp{%U} の次の文字です。関数には現在の記事のヘッダーが
+数 @code{gnus-user-format-function-}@var{x} を呼び出しますが、ここ
+で @var{x} は @samp{%u} の次の文字です。関数には現在の記事のヘッダーが
 引数として渡されます。関数は文字列を返し、他の概略指定と同様に概略に挿入
 されます。
 @end table
