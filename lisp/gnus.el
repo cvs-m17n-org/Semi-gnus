@@ -264,10 +264,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.054"
+(defconst gnus-version-number "6.10.055"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.71"
+(defconst gnus-original-version-number "0.72"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -1783,6 +1783,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
      ("gnus-picon" :interactive t gnus-article-display-picons
       gnus-group-display-picons gnus-picons-article-display-x-face
       gnus-picons-display-x-face)
+     ("gnus-picon" gnus-picons-buffer-name)
      ("gnus-gl" bbb-login bbb-logout bbb-grouplens-group-p
       gnus-grouplens-mode)
      ("smiley" :interactive t gnus-smiley-display)
@@ -2532,7 +2533,7 @@ You should probably use `gnus-find-method-for-group' instead."
   (let ((methods gnus-secondary-select-methods)
 	(gmethod (gnus-server-get-method nil method)))
     (while (and methods
-               (not (gnus-method-equal 
+               (not (gnus-method-equal
                      (gnus-server-get-method nil (car methods))
                      gmethod)))
       (setq methods (cdr methods)))

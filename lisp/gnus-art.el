@@ -593,7 +593,7 @@ displayed by the first non-nil matching CONTENT face."
     ("\224" "''")
     ("\225" "*")
     ("\226" "-")
-    ("\227" "-") 
+    ("\227" "-")
     ("\231" "(TM)")
     ("\233" ">")
     ("\234" "oe")
@@ -620,6 +620,9 @@ displayed by the first non-nil matching CONTENT face."
 ;;;
 ;;; The treatment variables
 ;;;
+
+(defvar gnus-part-display-hook nil
+  "Hook called on parts that are to receive treatment.")
 
 (defvar gnus-article-treat-custom
   '(choice (const :tag "Off" nil)
@@ -750,7 +753,8 @@ displayed by the first non-nil matching CONTENT face."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
 
-(defcustom gnus-treat-display-xface (if gnus-xemacs 'head nil)
+(defcustom gnus-treat-display-xface (if (and gnus-xemacs (featurep 'xface))
+					'head nil)
   "Display X-Face headers."
   :group 'gnus-article-treat
   :type gnus-article-treat-custom)
@@ -762,10 +766,12 @@ displayed by the first non-nil matching CONTENT face."
 
 (defcustom gnus-treat-display-picons (if gnus-xemacs 'head nil)
   "Display picons."
-  :group 'gnus-article
+  :group 'gnus-article-treat
   :type gnus-article-treat-custom)
  
 ;;; Internal variables
+
+(defvar article-goto-body-goes-to-point-min-p nil)
 
 (defvar gnus-article-mime-handle-alist-1 nil)
 (defvar gnus-treatment-function-alist
@@ -797,7 +803,8 @@ displayed by the first non-nil matching CONTENT face."
     (gnus-treat-strip-blank-lines gnus-article-strip-blank-lines)
     (gnus-treat-overstrike gnus-article-treat-overstrike)
     (gnus-treat-display-xface gnus-article-display-x-face)
-    (gnus-treat-display-smileys gnus-smiley-display)))
+    (gnus-treat-display-smileys gnus-smiley-display)
+    (gnus-treat-display-picons gnus-article-display-picons)))
 
 (defvar gnus-article-mime-handle-alist nil)
 (defvar article-lapsed-timer nil)
@@ -1434,12 +1441,16 @@ always hide."
 	  (gnus-delete-line))))))
 
 (defun article-goto-body ()
-  "Place point at the start of the body."  
+  "Place point at the start of the body."
   (goto-char (point-min))
-  (if (search-forward "\n\n" nil t)
-      t
+  (cond
+   (article-goto-body-goes-to-point-min-p
+    t)
+   ((search-forward "\n\n" nil t)
+    t)
+   (t
     (goto-char (point-max))
-    nil))
+    nil)))
 
 (defun article-strip-multiple-blank-lines ()
   "Replace consecutive blank lines with one empty line."
@@ -2628,8 +2639,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
       (set-buffer (window-buffer (posn-window pos)))
       (goto-char (posn-point pos))
       (gnus-article-check-buffer)
-      (let ((response (x-popup-menu 
-		       t `("MIME Part" 
+      (let ((response (x-popup-menu
+		       t `("MIME Part"
 			   ("" ,@(mapcar (lambda (c)
 					   (cons (caddr c) (car c)))
 					 gnus-mime-button-commands))))))
@@ -2703,7 +2714,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 	(mm-remove-part data)
       (setq contents (mm-get-part data))
       (forward-line 2)
-      (when charset 
+      (when charset
 	(unless (symbolp charset)
 	  (setq charset (mm-read-coding-system "Charset: ")))
 	(setq contents (mm-decode-coding-string contents charset)))
@@ -2746,17 +2757,17 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   "Pipe MIME part N, which is the numerical prefix."
   (interactive "p")
   (gnus-article-part-wrapper n 'mm-pipe-part))
-  
+
 (defun gnus-article-save-part (n)
   "Save MIME part N, which is the numerical prefix."
   (interactive "p")
   (gnus-article-part-wrapper n 'mm-save-part))
-  
+
 (defun gnus-article-interactively-view-part (n)
   "Pipe MIME part N, which is the numerical prefix."
   (interactive "p")
   (gnus-article-part-wrapper n 'mm-interactively-view-part))
-  
+
 (defun gnus-article-copy-part (n)
   "Pipe MIME part N, which is the numerical prefix."
   (interactive "p")
@@ -2766,7 +2777,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   "Pipe MIME part N, which is the numerical prefix."
   (interactive "p")
   (gnus-article-part-wrapper n 'gnus-mime-externalize-part))
-  
+
 (defun gnus-article-view-part (n)
   "View MIME part N, which is the numerical prefix."
   (interactive "p")
@@ -2786,9 +2797,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   (let ((id (get-text-property (point) 'gnus-part))
 	(point (point))
 	buffer-read-only)
-    (delete-region (gnus-point-at-bol) (progn (forward-line 1) (point)))
-    (gnus-insert-mime-button
-     handle id (list (not (mm-handle-displayed-p handle))))
+    (forward-line 1)
     (prog1
 	(let ((window (selected-window))
 	      (mail-parse-charset gnus-newsgroup-charset))
@@ -2801,6 +2810,7 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		  (goto-char point)
 		  (forward-line)
 		  (if (mm-handle-displayed-p handle)
+		      ;; This will remove the part.
 		      (mm-display-part handle)
 		    (save-restriction
 		      (narrow-to-region (point) (1+ (point)))
@@ -2810,6 +2820,10 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		       (1- (length gnus-article-mime-handles))
 		       (car (mm-handle-type handle))))))
 	      (select-window window))))
+      (goto-char point)
+      (delete-region (gnus-point-at-bol) (progn (forward-line 1) (point)))
+      (gnus-insert-mime-button
+       handle id (list (mm-handle-displayed-p handle)))
       (goto-char point))))
 
 (defun gnus-article-goto-part (n)
@@ -4382,13 +4396,16 @@ For example:
 (defun gnus-treat-article (condition &optional part-number total-parts type)
   (let ((length (- (point-max) (point-min)))
 	(alist gnus-treatment-function-alist)
+	(article-goto-body-goes-to-point-min-p t)
 	val elem)
-    (when (or (not type)
-	      (catch 'found
-		(let ((list gnus-article-treat-types))
-		  (while list
-		    (when (string-match (pop list) type)
-		      (throw 'found t))))))
+    (when (and (gnus-visual-p 'article-highlight 'highlight)
+	       (or (not type)
+		   (catch 'found
+		     (let ((list gnus-article-treat-types))
+		       (while list
+			 (when (string-match (pop list) type)
+			   (throw 'found t)))))))
+      (gnus-run-hooks 'gnus-part-display-hook)
       (while (setq elem (pop alist))
 	(setq val (symbol-value (car elem)))
 	(when (cond

@@ -137,7 +137,7 @@ base64-encoder-program.")
 	       ((> (skip-chars-forward base64-alphabet end) 0)
 		(setq lim (point))
 		(while (< inputpos lim)
-		  (setq bits (+ bits 
+		  (setq bits (+ bits
 				(aref base64-alphabet-decoding-vector
 				      (char-int (char-after inputpos)))))
 		  (setq counter (1+ counter)
@@ -266,7 +266,7 @@ base64-encoder-program.")
     (delete-region (point-max) (point))
     (prog1
 	(buffer-string)
-      (kill-buffer (current-buffer)))))  
+      (kill-buffer (current-buffer)))))
 
 (fset 'base64-decode-string 'base64-decode)
 

@@ -96,11 +96,8 @@ If nil, only read articles will be expired."
 (defvar gnus-agent-file-coding-system 'binary)
 
 (defconst gnus-agent-scoreable-headers
-  (list
-   "subject" "from" "date" "message-id" 
-   "references" "chars" "lines" "xref")
-  "Headers that are considered when scoring articles
-for download via the Agent.")
+  '("subject" "from" "date" "message-id" "references" "chars" "lines" "xref")
+  "Headers that are considered when scoring articles for download via the Agent.")
 
 ;; Dynamic variables
 (defvar gnus-headers)
@@ -320,7 +317,7 @@ agent minor mode in all Gnus buffers."
   (interactive)
   (gnus-open-agent)
   (add-hook 'gnus-setup-news-hook 'gnus-agent-queue-setup)
-  (unless gnus-agent-send-mail-function 
+  (unless gnus-agent-send-mail-function
     (setq gnus-agent-send-mail-function message-send-mail-function
 	  message-send-mail-function 'gnus-agent-send-mail))
   (unless gnus-agent-covered-methods
@@ -513,12 +510,21 @@ the actual number of articles toggled is returned."
     (when (and (not gnus-plugged)
 	       (gnus-agent-method-p gnus-command-method))
       (gnus-agent-load-alist gnus-newsgroup-name)
+      ;; First mark all undownloaded articles as undownloaded.
       (let ((articles gnus-newsgroup-unreads)
 	    article)
 	(while (setq article (pop articles))
 	  (unless (or (cdr (assq article gnus-agent-article-alist))
 		  (memq article gnus-newsgroup-downloadable))
-	    (push article gnus-newsgroup-undownloaded)))))))
+	    (push article gnus-newsgroup-undownloaded))))
+      ;; Then mark downloaded downloadable as not-downloadable,
+      ;; if you get my drift.
+      (let ((articles gnus-newsgroup-downloadable)
+	    article)
+	(while (setq article (pop articles))
+	  (when (cdr (assq article gnus-agent-article-alist))
+	    (setq gnus-newsgroup-downloadable
+		  (delq article gnus-newsgroup-downloadable))))))))
 
 (defun gnus-agent-catchup ()
   "Mark all undownloaded articles as read."
@@ -784,7 +790,7 @@ the actual number of articles toggled is returned."
 			      (cdr (gnus-active group)))))
   		    (gnus-list-of-unread-articles group)))
  	(gnus-decode-encoded-word-function 'identity)
- 	(file (gnus-agent-article-name ".overview" group))) 
+ 	(file (gnus-agent-article-name ".overview" group)))
     ;; Fetch them.
     (gnus-make-directory (nnheader-translate-file-chars
 			  (file-name-directory file)))
@@ -925,7 +931,7 @@ the actual number of articles toggled is returned."
       ;; Parse them and see which articles we want to fetch.
       (setq gnus-newsgroup-dependencies
 	    (make-vector (length articles) 0))
-      ;; No need to call `gnus-get-newsgroup-headers-xover' with 
+      ;; No need to call `gnus-get-newsgroup-headers-xover' with
       ;; the entire .overview for group as we still have the just
       ;; downloaded headers in `gnus-agent-overview-buffer'.
       (let ((nntp-server-buffer gnus-agent-overview-buffer))
@@ -933,21 +939,21 @@ the actual number of articles toggled is returned."
 	      (gnus-get-newsgroup-headers-xover articles nil nil group)))
       (setq category (gnus-group-category group))
       (setq predicate
-	    (gnus-get-predicate 
+	    (gnus-get-predicate
 	     (or (gnus-group-get-parameter group 'agent-predicate t)
 		 (cadr category))))
       ;; Do we want to download everything, or nothing?
       (if (or (eq (caaddr predicate) 'gnus-agent-true)
 	      (eq (caaddr predicate) 'gnus-agent-false))
 	  ;; Yes.
-	  (setq arts (symbol-value 
-		      (cadr (assoc (caaddr predicate) 
+	  (setq arts (symbol-value
+		      (cadr (assoc (caaddr predicate)
 				   '((gnus-agent-true articles)
 				     (gnus-agent-false nil))))))
 	;; No, we need to decide what we want.
 	(setq score-param
 	      (let ((score-method
-		     (or 
+		     (or
 		      (gnus-group-get-parameter group 'agent-score t)
 		      (caddr category))))
 		(when score-method
@@ -965,7 +971,7 @@ the actual number of articles toggled is returned."
 					  gnus-agent-scoreable-headers)
 			      (push (car list) score-file))
 			    (setq list (cdr list)))
-			  (setq score-param 
+			  (setq score-param
 				(append score-param (list (nreverse score-file)))
 				score-file nil entries (cdr entries)))
 			(list score-param))
@@ -1151,7 +1157,7 @@ The following commands are available:
 	(or (gnus-agent-read-file
 	     (nnheader-concat gnus-agent-directory "lib/categories"))
 	    (list (list 'default 'short nil nil)))))
-    
+
 (defun gnus-category-write ()
   "Write the category alist."
   (setq gnus-category-predicate-cache nil
@@ -1170,7 +1176,7 @@ The following commands are available:
 	(setf (cadr (assq ',category gnus-category-alist)) predicate)
 	(gnus-category-write)
 	(gnus-category-list)))))
-  
+
 (defun gnus-category-edit-score (category)
   "Edit the score expression for CATEGORY."
   (interactive (list (gnus-category-name)))
@@ -1285,7 +1291,7 @@ The following commands are available:
 (defun gnus-agent-false ()
   "Return nil."
   nil)
-  
+
 (defun gnus-category-make-function-1 (cat)
   "Make a function from category CAT."
   (cond

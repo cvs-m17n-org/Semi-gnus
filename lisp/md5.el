@@ -11,7 +11,7 @@
 ;; This is a direct translation into Emacs LISP of the reference C
 ;; implementation of the MD5 Message-Digest Algorithm written by RSA
 ;; Data Security, Inc.
-;; 
+;;
 ;; The algorithm takes a message (that is, a string of bytes) and
 ;; computes a 16-byte checksum or "digest" for the message.  This digest
 ;; is supposed to be cryptographically strong in the sense that if you
@@ -20,7 +20,7 @@
 ;; space of messages.  However, the robustness of the algorithm has not
 ;; been proven, and a similar algorithm (MD4) was shown to be unsound,
 ;; so treat with caution!
-;; 
+;;
 ;; The C algorithm uses 32-bit integers; because GNU Emacs
 ;; implementations provide 28-bit integers (with 24-bit integers on
 ;; versions prior to 19.29), the code represents a 32-bit integer as the
@@ -33,12 +33,12 @@
 
 ;; To compute the MD5 Message Digest for a message M (represented as a
 ;; string or as a vector of bytes), call
-;; 
+;;
 ;;   (md5-encode M)
-;; 
+;;
 ;; which returns the message digest as a vector of 16 bytes.  If you
 ;; need to supply the message in pieces M1, M2, ... Mn, then call
-;; 
+;;
 ;;   (md5-init)
 ;;   (md5-update M1)
 ;;   (md5-update M2)
@@ -50,17 +50,17 @@
 
 ;; Copyright (C) 1995 by Gareth Rees
 ;; Derived from the RSA Data Security, Inc. MD5 Message-Digest Algorithm
-;; 
+;;
 ;; md5.el is free software; you can redistribute it and/or modify it
 ;; under the terms of the GNU General Public License as published by the
 ;; Free Software Foundation; either version 2, or (at your option) any
 ;; later version.
-;; 
+;;
 ;; md5.el is distributed in the hope that it will be useful, but WITHOUT
 ;; ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
 ;; FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
 ;; for more details.
-;; 
+;;
 ;; The original copyright notice is given below, as required by the
 ;; licence for the original code.  This code is distributed under *both*
 ;; RSA's original licence and the GNU General Public Licence.  (There
@@ -155,9 +155,9 @@ Returns a vector of 16 bytes containing the message digest."
 ;; for rounds 1, 2, 3 and 4 respectively.  Each function follows this
 ;; pattern of computation (where ROTATE(x,y) means rotate 32-bit value x
 ;; by y bits to the left):
-;; 
+;;
 ;;   FF(a,b,c,d,x,s,ac) = ROTATE(a + F(b,c,d) + x + ac,s) + b
-;; 
+;;
 ;; so we use the macro `md5-make-step' to construct each one.  The
 ;; helper functions F, G, H and I operate on 16-bit numbers; the full
 ;; operation splits its inputs, operates on the halves separately and

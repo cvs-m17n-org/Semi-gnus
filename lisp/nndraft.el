@@ -151,7 +151,7 @@
 	(buf (current-buffer))
 	 article file)
     (with-temp-buffer
-      (insert-buffer buf)
+      (insert-buffer-substring buf)
       (setq article (nndraft-request-accept-article
 		     group (nnoo-current-server 'nndraft) t 'noinsert)
 	    file (nndraft-article-filename article)))
@@ -233,7 +233,7 @@
    nnmh-retrieve-headers
    nnmh-request-group
    nnmh-close-group
-   nnmh-request-list 
+   nnmh-request-list
    nnmh-request-newsgroups
    nnmh-request-move-article
    nnmh-request-replace-article))
