@@ -98,13 +98,13 @@
   (let ((article (gnus-summary-article-number))
 	(group gnus-newsgroup-name))
     (gnus-summary-mark-as-read article gnus-canceled-mark)
-    (gnus-draft-setup-for-editing article group)
+    (gnus-draft-setup article group t)
     (set-buffer-modified-p t)
     (save-excursion
       (save-restriction
 	(message-narrow-to-headers)
 	(message-remove-header "date")))
-    (message-save-drafts)
+    (save-buffer)
     (let ((gnus-verbose-backends nil))
       (gnus-request-expire-articles (list article) group t))
     (push
@@ -135,11 +135,14 @@
   (let ((message-syntax-checks (if interactive message-syntax-checks
 				 'dont-check-for-anything-just-trust-me))
 	(message-inhibit-body-encoding (or (not group)
+					   (equal group "nndraft:queue")
 					   message-inhibit-body-encoding))
-	(message-send-hook (and group message-send-hook))
-	(message-setup-hook (and group message-setup-hook))
+	(message-send-hook (and group (not (equal group "nndraft:queue"))
+				message-send-hook))
+	(message-setup-hook (and group (not (equal group "nndraft:queue"))
+				 message-setup-hook))
 	type method)
-    (gnus-draft-setup-for-editing article (or group "nndraft:queue"))
+    (gnus-draft-setup article (or group "nndraft:queue"))
     ;; We read the meta-information that says how and where
     ;; this message is to be sent.
     (save-restriction
@@ -191,7 +194,7 @@
 	  (let ((message-sending-message
 		 (format "Sending message %d of %d..."
 			 (- total (length articles)) total)))
-	    (gnus-draft-send article "nndraft:queue" t)))))))
+	    (gnus-draft-send article)))))))
 
 ;;;###autoload
 (defun gnus-draft-reminder ()
@@ -220,7 +223,7 @@
 ;;;!!!This has been fixed in recent versions of Emacs and XEmacs,
 ;;;!!!but for the time being, we'll just run this tiny function uncompiled.
 
-(defun gnus-draft-setup-for-editing (narticle group)
+(defun gnus-draft-setup (narticle group &optional restore)
   (let (ga)
     (gnus-setup-message 'forward
       (let ((article narticle))
@@ -228,7 +231,9 @@
 	(erase-buffer)
 	(if (not (gnus-request-restore-buffer article group))
 	    (error "Couldn't restore the article")
-	  (funcall gnus-draft-decoding-function)
+	  (when (and restore
+		     (equal group "nndraft:queue"))
+	    (funcall gnus-draft-decoding-function))
 	  ;; Insert the separator.
 	  (goto-char (point-min))
 	  (search-forward "\n\n")
@@ -252,16 +257,6 @@
 	    (gnus-request-set-mark ,(car ga) (list (list (list ,(cadr ga))
 							 'add '(reply)))))
 	 'send)))))
-
-(defvar gnus-draft-send-draft-buffer " *send draft*")
-(defun gnus-draft-setup-for-sending (narticle group)
-  (let ((article narticle))
-    (if (not (get-buffer gnus-draft-send-draft-buffer))
-	(get-buffer-create gnus-draft-send-draft-buffer))
-    (set-buffer gnus-draft-send-draft-buffer)
-    (erase-buffer)
-    (if (not (gnus-request-restore-buffer article group))
-	(error "Couldn't restore the article"))))
 
 (defun gnus-draft-article-sendable-p (article)
   "Say whether ARTICLE is sendable."

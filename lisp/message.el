@@ -1248,15 +1248,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 		 (const :tag "ask" ask)))
 
 (defvar message-draft-coding-system
-  (cond
-   ((boundp 'MULE) '*junet*)
-   ((not (fboundp 'find-coding-system)) nil)
-   ((find-coding-system 'emacs-mule)
-    (if (memq system-type '(windows-nt ms-dos ms-windows))
-	'emacs-mule-dos 'emacs-mule))
-   ((find-coding-system 'escape-quoted) 'escape-quoted)
-   ((find-coding-system 'no-conversion) 'no-conversion)
-   (t nil))
+  nnheader-auto-save-coding-system
   "Coding system to compose mail.")
 
 (defcustom message-send-mail-partially-limit 1000000
@@ -1837,7 +1829,6 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\t" 'message-tab)
   (define-key message-mode-map "\M-;" 'comment-region)
 
-  (define-key message-mode-map "\C-x\C-s" 'message-save-drafts)
   (define-key message-mode-map "\C-xk" 'message-mimic-kill-buffer))
 
 (easy-menu-define
@@ -2950,7 +2941,8 @@ The text will also be indented the normal way."
   "Don't send the message you have been editing.
 Instead, just auto-save the buffer and then bury it."
   (interactive)
-  (message-save-drafts)
+  (set-buffer-modified-p t)
+  (save-buffer)
   (let ((actions message-postpone-actions)
 	(frame (selected-frame))
 	(org-frame message-original-frame))
@@ -6429,22 +6421,6 @@ regexp varstr."
 (when (featurep 'xemacs)
   (require 'messagexmas)
   (message-xmas-redefine))
-
-(defun message-save-drafts ()
-  "Postponing the message."
-  (interactive)
-  (message "Saving %s..." buffer-file-name)
-  (let ((reply-headers message-reply-headers)
-	(buffer (current-buffer)))
-    (with-temp-file buffer-file-name
-      (insert-buffer-substring buffer)
-      (setq message-reply-headers reply-headers)
-      (message-generate-headers '((optional . In-Reply-To)))
-      (let ((mime-header-encode-method-alist
-	     '((eword-encode-unstructured-field-body))))
-	(mime-edit-translate-buffer)))
-    (set-buffer-modified-p nil))
-  (message "Saving %s...done" buffer-file-name))
 
 (provide 'message)
 

@@ -135,7 +135,7 @@ DELAY is a string, giving the length of the time.  Possible values are:
   (nndraft-request-create-group gnus-delay-group)
   (message-disassociate-draft)
   (nndraft-request-associate-buffer gnus-delay-group)
-  (message-save-drafts)
+  (save-buffer 0)
   (kill-buffer (current-buffer))
   (message-do-actions message-postpone-actions))
 
