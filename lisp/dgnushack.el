@@ -632,15 +632,11 @@ dgnushack-compile-verbosely.  All other users should continue to use
 dgnushack-compile."
   (dgnushack-compile t))
 
-(defun dgnushack-compile-verbosely ()
-  "Call dgnushack-compile with warnings ENABLED.  If you are compiling
-patches to gnus, you should consider modifying make.bat to call
-dgnushack-compile-verbosely.  All other users should continue to use
-dgnushack-compile."
-  (dgnushack-compile t))
-
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
+  (when (and (not (featurep 'xemacs))
+	     (< emacs-major-version 21))
+    (setq max-specpdl-size 1200))
   (unless warn
     (setq byte-compile-warnings
 	  '(free-vars unresolved callargs redefine)))
