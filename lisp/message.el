@@ -143,6 +143,11 @@ mailbox format."
   :group 'message-sending
   :type 'string)
 
+(defcustom message-8bit-encoding-list '(8bit binary)
+  "*8bit encoding type in Content-Transfer-Encoding field."
+  :group 'message-sending
+  :type '(repeat (symbol :tag "Type")))
+
 (defcustom message-courtesy-message
   "The following message is a courtesy copy of an article\nthat has been posted to %s as well.\n\n"
   "*This is inserted at the start of a mailed copy of a posted message.
@@ -2824,27 +2829,26 @@ to find out how to use this."
 
 (defun message-check-encoding ()
   "Check content encoding type."
-  (save-excursion
-    (set-buffer message-encoding-buffer)
-    (message-narrow-to-headers)
-    (let* ((case-fold-search t)
-	   (encoding-string
-	    (message-fetch-field "content-transfer-encoding"))
-	   (encoding (or encoding-string
-			 message-default-encoding)))
-      (message "%s %s" encoding-string encoding)
-      (if (string-match "^8bit" encoding)
-	  t
-	(widen)
-	(set-buffer (get-buffer-create " message syntax"))
-	(erase-buffer)
-	(set-buffer-multibyte nil)
-	(insert-buffer message-encoding-buffer)
-	(goto-char (point-min))
-	(if (re-search-forward "[\200-\377]" nil t)
-	    (y-or-n-p
-	     "The article contains 8bit characters.  Really post? ")
-	  t)))))
+  (let ((case-fold-search t)
+	field-value exist)
+    (save-excursion
+      (set-buffer message-encoding-buffer)
+      (message-narrow-to-headers)
+      (widen)
+      (set-buffer (get-buffer-create " message syntax"))
+      (erase-buffer)
+      (goto-char (point-min))
+      (set-buffer-multibyte nil)
+      (insert-buffer message-encoding-buffer)
+      (setq exist (re-search-forward "[^\x00-\x7f]" nil t))
+      (message-narrow-to-headers)
+      (message-fetch-field "content-transfer-encoding")
+      (or (not exist)
+	  (assq (intern
+		 (downcase (or field-value message-default-encoding)))
+		message-8bit-encoding-list)
+	  (y-or-n-p
+	   "The article contains 8bit characters.  Really post? ")))))
 
 (defun message-checksum ()
   "Return a \"checksum\" for the current buffer."
@@ -2874,12 +2878,7 @@ to find out how to use this."
 	(message-narrow-to-headers)
 	(while (setq file (message-fetch-field "fcc"))
 	  (push file list)
-	  (message-remove-header "fcc" nil t))
-	(run-hooks 'message-header-hook)
-	(when (functionp message-header-encode-function)
-	  (funcall message-header-encode-function))
-	(run-hooks 'message-header-encoded-hook))
-      (run-hooks 'message-before-do-fcc-hook)
+	  (message-remove-header "fcc" nil t)))
       (goto-char (point-min))
       (re-search-forward (concat "^" (regexp-quote mail-header-separator) "$"))
       (replace-match "" t t)
