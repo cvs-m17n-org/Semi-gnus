@@ -1,6 +1,6 @@
 ;;; hashcash.el --- Add hashcash payments to email
 
-;; $Revision: 1.1.2.3 $
+;; $Revision: 1.1.2.4 $
 ;; Copyright (C) 1997,2001 Paul E. Foley
 
 ;; Maintainer: Paul Foley <mycroft@actrix.gen.nz>

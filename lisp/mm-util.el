@@ -43,7 +43,6 @@
      (coding-system-list . ignore)
      (decode-coding-region . ignore)
      (char-int . identity)
-     (device-type . ignore)
      (coding-system-equal . equal)
      (annotationp . ignore)
      (set-buffer-file-coding-system . ignore)
@@ -283,7 +282,7 @@ prefer iso-2022-jp to japanese-shift-jis:
 \(setq mm-coding-system-priorities
   '(iso-2022-jp iso-2022-jp-2 japanese-shift-jis iso-latin-1 utf-8))
 "
-  :type '(repeat (coding-system :tag "Coding system"))
+  :type '(repeat (symbol :tag "Coding system"))
   :group 'mime)
 
 (defvar mm-use-find-coding-systems-region

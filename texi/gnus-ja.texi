@@ -6578,6 +6578,7 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 @findex gnus-thread-sort-by-subject
 @findex gnus-thread-sort-by-author
 @findex gnus-thread-sort-by-number
+@findex gnus-thread-sort-by-random
 @vindex gnus-thread-sort-functions
 @findex gnus-thread-sort-by-most-recent-thread
 $B$b$7%9%l%C%I$N35N,I=<($r;H$C$F$$$k$N$G$"$l$P!"(B
@@ -6589,8 +6590,9 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 @code{gnus-thread-sort-by-subject}, @code{gnus-thread-sort-by-date},
 @code{gnus-thread-sort-by-score},
 @code{gnus-thread-sort-by-most-recent-number},
-@code{gnus-thread-sort-by-most-recent-date} $B$*$h$S(B
-@code{gnus-thread-sort-by-total-score} $B$G$9!#(B
+@code{gnus-thread-sort-by-most-recent-date},
+@code{gnus-thread-sort-by-random} $B$*$h(B
+$B$S(B @code{gnus-thread-sort-by-total-score} $B$G$9!#(B
 
 $B3F4X?t$OFs$D$N%9%l%C%I$r$H$j!":G=i$N%9%l%C%I$,B>$N%9%l%C%I$h$j@h$KJB$SBX(B
 $B$($i$l$k$Y$-$G$"$l$P!"(B@code{nil} $B$G$J$$CM$r$+$($7$^$9!#IaDL!"JB$SBX$($O(B
@@ -6635,13 +6637,17 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 @findex gnus-article-sort-by-score
 @findex gnus-article-sort-by-subject
 @findex gnus-article-sort-by-author
+@findex gnus-article-sort-by-random
 @findex gnus-article-sort-by-number
 $B2?$+4qL/$JM}M3$J$I$G%9%l%C%II=<($r;H$C$F$$$J$$$N$J$i!"JQ(B
 $B?t(B @code{gnus-article-sort-functions} $B$r$$$8$/$kI,MW$,$"$j$^$9!#$3$l(B
 $B$O(B @code{gnus-thread-sort-functions} $B$HHs>o$K;w$F$$$^$9$,!"5-;v$NHf3S$K(B
 $B$O>/!90c$C$?4X?t$r;H$$$^$9!#;HMQ2DG=$JJB$SBX$(=R8l4X?t(B
-$B$O(B @code{gnus-article-sort-by-number}, @code{gnus-article-sort-by-author}, @code{gnus-article-sort-by-subject}, @code{gnus-article-sort-by-date} $B$*(B
-$B$h$S(B @code{gnus-article-sort-by-score} $B$G$9!#(B
+$B$O(B @code{gnus-article-sort-by-number},
+@code{gnus-article-sort-by-author},
+@code{gnus-article-sort-by-subject}, @code{gnus-article-sort-by-date},
+@code{gnus-article-sort-by-random} $B$*$h(B
+$B$S(B @code{gnus-article-sort-by-score} $B$G$9!#(B
 
 $B%9%l%C%I$r;H$C$F$$$J$$I=Bj$N35N,I=<($rJB$SBX$($?$$$N$G$"$l$P!"<!$N$h$&$J(B
 $B$3$H$r$9$k$3$H$,$G$-$^$9(B:
@@ -8539,12 +8545,17 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 @item C-c C-s C-c
 @kindex C-c C-s C-c ($B35N,(B)
 @findex gnus-summary-sort-by-chars
-$B5-;v$ND9$5$GJB$S49$($^$9(B (@code{gnus-summary-sort-by-chars})$B!#(B
+$B5-;v$ND9$5$GJB$SBX$($^$9(B (@code{gnus-summary-sort-by-chars})$B!#(B
 
 @item C-c C-s C-i
 @kindex C-c C-s C-i ($B35N,(B)
 @findex gnus-summary-sort-by-score
 $B%9%3%"$K$h$C$FJB$SBX$($^$9(B (@code{gnus-summary-sort-by-score})$B!#(B
+
+@item C-c C-s C-r
+@kindex C-c C-s C-r (Summary)
+@findex gnus-summary-sort-by-random
+$B%i%s%@%`$KJB$SBX$($^$9(B (@code{gnus-summary-sort-by-random})$B!#(B
 
 @item C-c C-s C-o
 @kindex C-c C-s C-o ($B35N,(B)
