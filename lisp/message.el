@@ -1645,6 +1645,10 @@ no, only reply back to the author."
   `(delete-region (progn (beginning-of-line) (point))
 		  (progn (forward-line ,(or n 1)) (point))))
 
+(defun message-mark-active-p ()
+  "Non-nil means the mark and region are currently active in this buffer."
+  mark-active)
+
 (defun message-unquote-tokens (elems)
   "Remove double quotes (\") from strings in list ELEMS."
   (mapcar (lambda (item)
@@ -2293,9 +2297,15 @@ Point is left at the beginning of the narrowed-to region."
    ["Fill Yanked Message" message-fill-yanked-message t]
    ["Insert Signature" message-insert-signature t]
    ["Caesar (rot13) Message" message-caesar-buffer-body t]
-   ["Caesar (rot13) Region" message-caesar-region (mark t)]
-   ["Elide Region" message-elide-region (mark t)]
-   ["Delete Outside Region" message-delete-not-region (mark t)]
+   ["Caesar (rot13) Region" message-caesar-region (message-mark-active-p)]
+   ["Elide Region" message-elide-region
+    :active (message-mark-active-p)
+    ,@(if (featurep 'xemacs) nil
+	'(:help "Replace text in region with an ellipsis"))]
+   ["Delete Outside Region" message-delete-not-region
+    :active (message-mark-active-p)
+    ,@(if (featurep 'xemacs) nil
+	'(:help "Delete all quoted text outside region"))]
    ["Kill To Signature" message-kill-to-signature t]
    ["Newline and Reformat" message-newline-and-reformat t]
    ["Rename buffer" message-rename-buffer t]
@@ -2307,7 +2317,8 @@ Point is left at the beginning of the narrowed-to region."
 	'(:help "Attach a file at point"))]
    "----"
    ["Insert Region Marked" message-mark-inserted-region
-    ,@(if (featurep 'xemacs) '(t)
+    :active (message-mark-active-p)
+    ,@(if (featurep 'xemacs) nil
 	'(:help "Mark region with enclosing tags"))]
    ["Insert File Marked..." message-mark-insert-file
     ,@(if (featurep 'xemacs) '(t)
