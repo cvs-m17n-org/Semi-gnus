@@ -1279,7 +1279,7 @@ The following commands are available:
 	     (set-buffer overview)
 	     (erase-buffer)
 	     (when (file-exists-p nov-file)
-	       (insert-file-contents nov-file))
+	       (nnheader-insert-file-contents nov-file))
 	     (goto-char (point-min))
 	     (while (setq elem (pop articles))
 	       (setq article (car elem))
