@@ -50,10 +50,13 @@
 
 (require 'cl)
 (require 'bytecomp)
+
+;; Attempt to pickup the additional load-path(s).
+(load "./paths.el" nil nil t)
 (condition-case err
-    ;; Attempt to pickup the additional load-path(s).
-    (load "~/.lpath.el" t)
+    (load "~/.lpath.el" t nil t)
   (error (message "Error in \"~/.lpath.el\" file: %s" err)))
+
 (push "." load-path)
 (load "./lpath.el" nil t)
 
