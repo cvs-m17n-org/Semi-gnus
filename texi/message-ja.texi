@@ -445,8 +445,8 @@ gnus $B$OB>$N?M$N%a%C%;!<%8$K$"$k(B MFT $B%X%C%@!<$rB:=E$7(B ($B$9$J$o$A!"$
 gnus $B$K$O$3$NJQ?t$N9%E,$J8uJd$G$"$k$H$3$m$N!"$"$i$+$8$aDj5A$5$l$F$$$k4X(B
 $B?t$,$"$j$^$9!#4X?t(B @code{gnus-find-subscribed-addresses} $B$O!"(B
 @code{subscribed} (@pxref{(gnus)subscribed}) $B%0%k!<%W%Q%i%a!<%?$,(B
-$BHs(B-nil $B$K@_Dj$5$l$F$$$k%0%k!<%W$KBP1~$9$k%"%I%l%9$N%j%9%H$rJV$7$^$9!#$3(B
-$B$s$J$U$&$K$7$^$7$g$&!#(B
+$BHs(B-@code{nil} $B$K@_Dj$5$l$F$$$k%0%k!<%W$KBP1~$9$k%"%I%l%9$N%j%9%H$rJV$7$^(B
+$B$9!#$3$s$J$U$&$K$7$^$7$g$&!#(B
 
 @lisp
 (setq message-subscribed-address-functions
@@ -717,8 +717,8 @@ MFT $B$rB:=E$9$k$3$H$ONI$$%M%A%1%C%H(B (nettiquette) $B$G$"$k$H9M$($i$l$F$$$^
 @cindex cross-post
 $B%/%m%9%]%9%H$9$k$?$a$KDI2C$9(B
 $B$k(B @samp{Newsgroups} $B$H(B @samp{FollowUp-To} $B$r?R$M$^$9!#(B
-@code{message-cross-post-followup-to} $B$O(B @samp{FollowUp-To} $B$H(B @samp{Newsgroups} $B$r!"(B
-$B%0%k!<%W$r;X$7<($9$h$&$K@Z$jNv$-$^$9!#(B
+@code{message-cross-post-followup-to} $B$O(B @samp{FollowUp-To} $B$*$h(B
+$B$S(B @samp{Newsgroups} $B$r!"%0%k!<%W$r;X$7<($9$h$&$K@Z$jNv$-$^$9!#(B
 @code{message-cross-post-default} $B$,(B @code{nil} $B$@$C$?$j@\F,0z(B
 $B?t(B @samp{Follow-Up} $BIU$-$G8F$P$l$k$H!"%a%C%;!<%8$O%/%m%9%]%9%H$5$l$^$;(B
 $B$s!#(B
