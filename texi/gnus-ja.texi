@@ -19723,9 +19723,11 @@ Redmondo $B$,>C$($?7$2<$K$D$$$F=q$$$?$H$-$K%U%)%m!<%"%C%W$7$?A4$F$N?M$O%9(B
 Gnus $B$O$3$NLdBj$N2r7h$r=u$1$k$?$a$K%9%3%"$rIe$i$;$k5!9=$rDs6!$7$^$9!#%9(B
 $B%3%"%U%!%$%k$OFI$_9~$^$l!"(B@code{gnus-decay-scores} $B$,(B @code{nil} $B$G$J$$(B
 $B$H!"(Bgnus $B$O%9%3%"%U%!%$%k$rIeGT5!9=$rDL$7!"A4$F$N1JB3$G$J$$%9%3%"K!B'$N(B
-$B%9%3%"$r2<$2$^$9!#IeGT<+?H$O4X?t(B @code{gnus-decay-score-function} $B$K$h$C(B
-$B$F<B9T$5$l!"=i4|@_Dj$O(B @code{gnus-decay-score} $B$G$9!#0J2<$O$=$N4X?t$NDj(B
-$B5A$G$9(B:
+$B%9%3%"$r2<$2$^$9!#$b$7(B @code{gnus-decay-scores} $B$,@55,I=8=$@$C$?$i!"$=$l(B
+$B$K9gCW$9$k%9%3%"%U%!%$%k$@$1$,07$o$l$^$9!#Nc$($P(B @emph{adaptive} $B%9%3%"(B
+$B%U%!%$%k$@$1$rIeGT$5$;$k$?$a$K!"$=$l$r(B @samp{\\.ADAPT\\'} $B$K@_Dj$9$k$3$H(B
+$B$,$G$-$^$9!#IeGT<+?H$O4X?t(B @code{gnus-decay-score-function} $B$K$h$C$F<B9T(B
+$B$5$l!"=i4|@_Dj$O(B @code{gnus-decay-score} $B$G$9!#0J2<$O$=$N4X?t$NDj5A$G$9(B:
 
 @lisp
 (defun gnus-decay-score (score)
@@ -21284,11 +21286,16 @@ Picon $B$NI=<($,$G$-$k$h$&$K$9$k$?$a$K$O!"(Bpicon $B%G!<%?%Y!<%9$,$"$k%G%#%l%
 $B%H%j$,!"$?$@C1$K(B @code{gnus-picon-databases} $B$K@_Dj$5$l$F$$$k$h$&$K$7$F(B
 $B2<$5$$!#(B
 
+@vindex gnus-picon-style
+$BJQ?t(B @code{gnus-picon-style} $B$O(B picon $B$r$I$N$h$&$KI=<($9$k$+$r@)8f$7$^$9!#(B
+@code{inline} $B$@$C$?$i%F%-%9%H7A<0$NI=8=$,CV$-49$($i$l$^$9!#(B
+@code{right} $B$@$C$?$i!"%F%-%9%H7A<0$NI=8=$N1&B&$K(B picon $B$,2C$($i$l$^$9!#(B
+
 $B$b$N$4$H$N=j:_$r4IM}$9$k$?$a$K!"0J2<$NJQ?t$r@_$1$F$$$^$9!#(B
 
 @table @code
-@item gnus-picon-database
-@vindex gnus-picon-database
+@item gnus-picon-databases
+@vindex gnus-picon-databases
 Picon $B%G!<%?%Y!<%9$N>l=j$G$9!#$3$l$O(B @file{news}, @file{domains},
 @file{users} ($B$J$I$J$I(B) $B$N%5%V%G%#%l%/%H%j!<$,4^$^$l$F$$$k%G%#%l%/%H%j!<(B
 $B$N%j%9%H$G$9!#(B@code{("/usr/lib/picon" "/usr/local/faces")} $B$,%G%#%U%)%k(B
@@ -21296,18 +21303,18 @@ Picon $B%G!<%?%Y!<%9$N>l=j$G$9!#$3$l$O(B @file{news}, @file{domains},
 
 @item gnus-picon-news-directories
 @vindex gnus-picon-news-directories
-@code{gnus-picon-database} $B$+$i%K%e!<%9%0%k!<%WMQ$N%U%'!<%9$rC5$9$?$a$N(B
+@code{gnus-picon-databases} $B$+$i%K%e!<%9%0%k!<%WMQ$N%U%'!<%9$rC5$9$?$a$N(B
 $B%5%V%G%#%l%/%H%j!<$N%j%9%H$G$9!#%G%#%U%)%k%H$O(B @code{("news")} $B$G$9!#(B
 
 @item gnus-picon-user-directories
 @vindex gnus-picon-user-directories
-@code{gnus-picon-database} $B$+$i%f!<%6$N%U%'!<%9$rC5$9$?$a$N%5%V%G%#%l%/(B
+@code{gnus-picon-databases} $B$+$i%f!<%6$N%U%'!<%9$rC5$9$?$a$N%5%V%G%#%l%/(B
 $B%H%j!<$N%j%9%H$G$9!#(B@code{("local" "users" "usenix" "misc")} $B$,%G%#%U%)(B
 $B%k%H$G$9!#(B
 
 @item gnus-picon-domain-directories
 @vindex gnus-picon-domain-directories
-@code{gnus-picon-database} $B$+$i%I%a%$%sL>$N%U%'!<%9$rC5$9$?$a$N%5%V%G%#(B
+@code{gnus-picon-databases} $B$+$i%I%a%$%sL>$N%U%'!<%9$rC5$9$?$a$N%5%V%G%#(B
 $B%l%/%H%j!<$N%j%9%H$G$9!#%G%#%U%)%k%H$O(B @code{("domains")} $B$G$9!#$3$N%j%9(B
 $B%H$K(B @samp{"unknown"} $B$rDI2C$7$F$*$-$?$/$J$k?M$b$$$k$G$7$g$&!#(B
 

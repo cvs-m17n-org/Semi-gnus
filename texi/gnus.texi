@@ -20534,9 +20534,12 @@ Gnus provides a mechanism for decaying scores to help with this problem.
 When score files are loaded and @code{gnus-decay-scores} is
 non-@code{nil}, Gnus will run the score files through the decaying
 mechanism thereby lowering the scores of all non-permanent score rules.
-The decay itself if performed by the @code{gnus-decay-score-function}
-function, which is @code{gnus-decay-score} by default.  Here's the
-definition of that function:
+If @code{gnus-decay-scores} is a regexp, only score files matching this
+regexp are treated.  E.g. you may set it to @samp{\\.ADAPT\\'} if only
+@emph{adaptive} score files should be decayed.  The decay itself if
+performed by the @code{gnus-decay-score-function} function, which is
+@code{gnus-decay-score} by default.  Here's the definition of that
+function:
 
 @lisp
 (defun gnus-decay-score (score)
@@ -22178,6 +22181,11 @@ picons.*} will install the picons where Gnus can find them.
 To enable displaying picons, simply make sure that
 @code{gnus-picon-databases} points to the directory containing the
 Picons databases.
+
+@vindex gnus-picon-style
+The variable @code{gnus-picon-style} controls how picons are displayed.
+If @code{inline}, the textual representation is replaced.  If
+@code{right}, picons are added right to the textual representation.
 
 The following variables offer control over where things are located.
 
