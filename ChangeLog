@@ -1,3 +1,10 @@
+2001-02-28  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-mime-edit-article-setup): Leave
+	the forwarded parts undecoded.
+	(gnus-article-decode-article-as-default-mime-charset): Set the
+	value of `default-mime-charset' buffer-locally.
+
 2001-02-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el: Add autoloads for
