@@ -250,11 +250,11 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "6.7.3"
+(defconst gnus-version-number "6.7.5"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Gnus 5.6.15; for SEMI 1.8)"
+  (format "Semi-gnus %s (based on Gnus 5.6.20; for SEMI 1.8)"
           gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -2462,7 +2462,7 @@ also examines the topic parameters."
 	(when params
 	  (setq params (delq name params))
 	  (while (assq name params)
-	    (setq params (delq (assq name params) params)))
+	    (gnus-pull name params))
 	  (gnus-info-set-params info params))))))
 
 (defun gnus-group-add-score (group &optional score)

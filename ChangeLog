@@ -1,3 +1,8 @@
+1998-06-27    Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.7.4.
+	* Sync up with Gnus 5.6.13.
+
 1998-06-26  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.7.3.
@@ -27,7 +32,7 @@
 	* texi/gnus.texi, texi/message.texi, texi/ChangeLog: Sync up with
 	Gnus 5.6.13.
 
-1998-06-14  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+1998-06-24  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 	
 	* Sync up with Gnus 5.6.13.
 	

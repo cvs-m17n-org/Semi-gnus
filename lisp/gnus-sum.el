@@ -513,6 +513,7 @@ with some simple extensions:
 %G  Group name
 %p  Unprefixed group name
 %A  Current article number
+%z  Current article score
 %V  Gnus version
 %U  Number of unread articles in the group
 %e  Number of unselected articles in the group
@@ -874,6 +875,7 @@ variable (string, integer, character, etc).")
     (?d (length gnus-newsgroup-dormant) ?d)
     (?t (length gnus-newsgroup-marked) ?d)
     (?r (length gnus-newsgroup-reads) ?d)
+    (?z (gnus-summary-article-score gnus-tmp-article-number) ?d)
     (?E gnus-newsgroup-expunged-tally ?d)
     (?s (gnus-current-score-file-nondirectory) ?s)))
 
@@ -3266,13 +3268,13 @@ If LINE, insert the rebuilt thread starting on line LINE."
 	(headers in-headers)
 	references)
     (while (and parent
-		headers
 		(not (zerop generation))
 		(setq references (mail-header-references headers)))
-      (when (and references
-		 (setq parent (gnus-parent-id references))
-		 (setq headers (car (gnus-id-to-thread parent))))
-	(decf generation)))
+      (setq headers (if (and references
+			     (setq parent (gnus-parent-id references)))
+			(car (gnus-id-to-thread parent))
+		      nil))
+      (decf generation))
     (and (not (eq headers in-headers))
 	 headers)))
 
@@ -4359,7 +4361,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
       (subst-char-in-region (point-min) (point-max) ?\t ?  t)
       (gnus-run-hooks 'gnus-parse-headers-hook)
       (let ((case-fold-search t)
-	    in-reply-to header p lines)
+	    in-reply-to header p lines chars)
 	(goto-char (point-min))
 	;; Search to the beginning of the next header.	Error messages
 	;; do not begin with 2 or 3.
@@ -4448,7 +4450,12 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 			  (setq ref ref2))))
 		  (setq ref nil))))
 	    ;; Chars.
-	    0
+	    (progn
+	      (goto-char p)
+	      (if (search-forward "\nchars: " nil t)
+		  (if (numberp (setq chars (ignore-errors (read cur))))
+		      chars 0)
+		0))
 	    ;; Lines.
 	    (progn
 	      (goto-char p)
@@ -7645,9 +7652,7 @@ returned."
 	       (push article gnus-newsgroup-dormant))
 	      (t
 	       (push article gnus-newsgroup-unreads)))
-	(setq gnus-newsgroup-reads
-	      (delq (assq article gnus-newsgroup-reads)
-		    gnus-newsgroup-reads))
+	(gnus-pull article gnus-newsgroup-reads)
 
 	;; See whether the article is to be put in the cache.
 	(and gnus-use-cache
@@ -7788,9 +7793,7 @@ marked."
 	     (push article gnus-newsgroup-dormant))
 	    (t
 	     (push article gnus-newsgroup-unreads)))
-      (setq gnus-newsgroup-reads
-	    (delq (assq article gnus-newsgroup-reads)
-		  gnus-newsgroup-reads))
+      (gnus-pull article gnus-newsgroup-reads)
       t)))
 
 (defalias 'gnus-summary-mark-as-unread-forward

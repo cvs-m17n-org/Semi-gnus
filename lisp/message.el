@@ -1241,7 +1241,8 @@ Return the number of headers removed."
    ["Spellcheck" ispell-message t]
    "----"
    ["Send Message" message-send-and-exit t]
-   ["Abort Message" message-dont-send t]))
+   ["Abort Message" message-dont-send t]
+   ["Kill Message" message-kill-buffer t]))
 
 (easy-menu-define
  message-mode-field-menu message-mode-map ""
@@ -1314,19 +1315,18 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
 	facemenu-remove-face-function t)
   (make-local-variable 'paragraph-separate)
   (make-local-variable 'paragraph-start)
+  ;; `-- ' precedes the signature.  `-----' appears at the start of the
+  ;; lines that delimit forwarded messages.
+  ;; Lines containing just >= 3 dashes, perhaps after whitespace,
+  ;; are also sometimes used and should be separators.
   (setq paragraph-start
 	(concat (regexp-quote mail-header-separator)
-		"$\\|[ \t]*[-_][-_][-_]+$\\|"
-		"-- $\\|"
+		"$\\|[ \t]*[a-z0-9A-Z]*>+[ \t]*$\\|[ \t]*$\\|"
+		"-- $\\|---+$\\|"
+		page-delimiter
 		;;!!! Uhm... shurely this can't be right?
-		"[> " (regexp-quote message-yank-prefix) "]+$\\|"
-		paragraph-start))
-  (setq paragraph-separate
-	(concat (regexp-quote mail-header-separator)
-		"$\\|[ \t]*[-_][-_][-_]+$\\|"
-		"-- $\\|"
-		"[> " (regexp-quote message-yank-prefix) "]+$\\|"
-		paragraph-separate))
+		"[> " (regexp-quote message-yank-prefix) "]+$"))
+  (setq paragraph-separate paragraph-start)
   (make-local-variable 'message-reply-headers)
   (setq message-reply-headers nil)
   (make-local-variable 'message-newsreader)
@@ -1346,7 +1346,7 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (when (eq message-mail-alias-type 'abbrev)
     (if (fboundp 'mail-abbrevs-setup)
 	(mail-abbrevs-setup)
-      (funcall (intern "mail-aliases-setup"))))
+      (mail-aliases-setup)))
   (message-set-auto-save-file-name)
   (unless (string-match "XEmacs" emacs-version)
     (set (make-local-variable 'font-lock-defaults)
@@ -1732,7 +1732,7 @@ prefix, and don't delete any headers."
       (unless (bolp)
 	(insert ?\n))
       (unless modified
-	(setq message-checksum (cons (message-checksum) (buffer-size)))))))
+	(setq message-checksum (message-checksum))))))
 
 (defun message-cite-original-without-signature ()
   "Cite function in the standard Message manner."
@@ -2614,8 +2614,7 @@ to find out how to use this."
    (message-check 'new-text
      (or
       (not message-checksum)
-      (not (and (eq (message-checksum) (car message-checksum))
-		(eq (buffer-size) (cdr message-checksum))))
+      (not (eq (message-checksum) message-checksum))
       (y-or-n-p
        "It looks like no new text has been added.  Really post? ")))
    ;; Check the length of the signature.
