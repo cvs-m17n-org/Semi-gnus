@@ -312,7 +312,7 @@ If ARGS, PROMPT is used as an argument to `format'."
     (when prescript
       (if (and (symbolp prescript) (fboundp prescript))
 	  (funcall prescript)
-	(call-process shell-file-name nil 0 nil
+	(call-process shell-file-name nil nil nil
 		      shell-command-switch 
 		      (format-spec
 		       prescript
@@ -324,7 +324,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	    (when prescript
 	      (if (and (symbolp prescript) (fboundp prescript))
 		  (funcall prescript)
-		(call-process shell-file-name nil 0 nil
+		(call-process shell-file-name nil nil nil
 			      shell-command-switch 
 			      (format-spec
 			       postscript
@@ -351,8 +351,8 @@ If ARGS, PROMPT is used as an argument to `format'."
       (if (and (symbolp prescript)
 	       (fboundp prescript))
 	  (funcall prescript)
-	(call-process shell-file-name nil nil nil
-		      shell-command-switch
+	(call-process shell-file-name nil 0 nil
+		      shell-command-switch 
 		      (format-spec
 		       prescript
 		       (format-spec-make ?p password ?t mail-source-crash-box
@@ -360,13 +360,14 @@ If ARGS, PROMPT is used as an argument to `format'."
     (let ((from (format "%s:%s:%s" server user port))
 	  (mail-source-string (format "pop:%s@%s" user server))
 	  result)
-      (setq password
-	    (or password
-		(cdr (assoc from mail-source-password-cache))
-		(mail-source-read-passwd
-		 (format "Password for %s at %s: " user server))))
-      (unless (assoc from mail-source-password-cache)
-	(push (cons from password) mail-source-password-cache))
+      (when (eq authentication 'password)
+	(setq password
+	      (or password
+		  (cdr (assoc from mail-source-password-cache))
+		  (mail-source-read-passwd
+		   (format "Password for %s at %s: " user server))))
+	(unless (assoc from mail-source-password-cache)
+	  (push (cons from password) mail-source-password-cache)))
       (when server
 	(setenv "MAILHOST" server))
       (setq result
@@ -395,8 +396,8 @@ If ARGS, PROMPT is used as an argument to `format'."
 	      (if (and (symbolp postscript)
 		       (fboundp postscript))
 		  (funcall prescript)
-		(call-process shell-file-name nil nil nil
-			      shell-command-switch
+		(call-process shell-file-name nil 0 nil
+			      shell-command-switch 
 			      (format-spec
 			       postscript
 			       (format-spec-make
