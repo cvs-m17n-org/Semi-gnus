@@ -42,6 +42,8 @@
 ;;
 ;; `sieve-manage-authenticate'
 ;; `sieve-manage-listscripts'
+;; `sieve-manage-deletescript'
+;; `sieve-manage-getscript'
 ;; performs managesieve protocol actions
 ;;
 ;; and that's it.  Example of a managesieve session in *scratch*:
@@ -64,6 +66,7 @@
 ;; Release history:
 ;;
 ;; 2001-10-31 Committed to Oort Gnus.
+;; 2002-07-27 Added DELETESCRIPT.  Suggested by Ned Ludd.
 
 ;;; Code:
 
@@ -339,7 +342,7 @@ Returns t if login was successful, nil otherwise."
   (let* ((done (sieve-manage-interactive-login
 		buffer
 		(lambda (user passwd)
-		  (sieve-manage-send "AUTHENTICATE \"CRAM-MD5\" \"\"")
+		  (sieve-manage-send "AUTHENTICATE \"CRAM-MD5\"")
 		  (sieve-manage-send
 		   (concat
 		    "\""
@@ -499,6 +502,11 @@ password is remembered in the buffer."
     (sieve-manage-send (format "PUTSCRIPT \"%s\" {%d+}%s%s" name
 			       (sieve-string-bytes content)
 			       sieve-manage-client-eol content))
+    (sieve-manage-parse-okno)))
+
+(defun sieve-manage-deletescript (name &optional buffer)
+  (with-current-buffer (or buffer (current-buffer))
+    (sieve-manage-send (format "DELETESCRIPT \"%s\"" name))
     (sieve-manage-parse-okno)))
 
 (defun sieve-manage-getscript (name output-buffer &optional buffer)

@@ -1,3 +1,85 @@
+2002-08-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.7 revision 00.
+
+2002-08-06  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu-update-index): Handle error
+	messages printed by Namazu.
+	(gnus-namazu/update-sentinel): Likewise.
+	(gnus-namazu-need-path-normalization): Change its default value.
+	(gnus-namazu/normalize-results): Remove `file://' prefix.
+
+	* texi/gnus-ja.texi (Namazu Groups): Update documents.
+
+	* lisp/gnus-namazu.el (gnus-namazu/update-p): Print error
+	messages.
+	(gnus-namazu-update-index): Small clean up.
+	(gnus-namazu-update-all-indices): Ditto.
+
+2002-08-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el: Bug fix of updating multiple indices.
+	(gnus-namazu/setup): Call `gnus-namazu-update-all-indices' without
+	arguments.
+	(gnus-namazu-create-index): Clean temporary files even if an
+	indexer is killed.
+	(gnus-namazu/update-p): New function.
+	(gnus-namazu-update-all-indices): Reimplemented.
+	(gnus-namazu-update-index): Call `gnus-namazu/update-p' to decide
+	whether the specified index will be updated.
+	(gnus-namazu/update-sentinel): Follow the change of
+	`gnus-namazu-update-all-indices'.
+
+2002-08-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus.el (toplevel): Add autoloads for
+	`gnus-namazu-create-index', and `gnus-namazu-update-all-indices'
+	and `gnus-namazu-update-index'.
+
+	* lisp/gnus-namazu.el: Support automatically updating multiple
+	indices.
+	(gnus-namazu-make-index-interval): Abolished.
+	(gnus-namazu-index-update-interval): New option.
+	(gnus-namazu/setup): Call `gnus-namazu-update-all-indices' instead
+	of `gnus-namazu-make-index'.
+	(gnus-namazu/mknmz-process): Abolished.
+	(gnus-namazu/status-file-name): New macro.
+	(gnus-namazu-make-index, gnus-namazu-make-index-stop,
+	gnus-namazu/mknmz-sentinel): Removed.
+	(gnus-namazu/mknmz-cleanup, gnus-namazu/index-old-p): New function.
+	(gnus-namazu-create-index, gnus-namazu-update-all-indices,
+	gnus-namazu-update-index, gnus-namazu-stop-update): New command.
+	(gnus-namazu/update-directories, gnus-namazu/update-process): New
+	internal variable.
+
+2002-07-31  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el: Support automatically updating index.
+	(gnus-namazu-default-index-directory): New constant.
+	(gnus-namazu-make-index-interval, gnus-namazu-make-index-command,
+	gnus-namazu-make-index-arguments): New options.
+	(gnus-namazu/setup): Call `gnus-namazu-make-index'.
+	(gnus-namazu/real-group-name): Renamed from
+	`gnus-namazu/check-cache-group'.
+	(gnus-namazu/cache-group-candidates): Renamed from
+	`gnus-namazu/cache-group-candidates'.
+	(gnus-namazu/search): Experimental support of articles covered by
+	agent.
+	(gnus-namazu/default-index-directory, gnus-namazu/lapse-seconds,
+	gnus-namazu/mknmz-sentinel): New internal functions.
+	(gnus-namazu/mknmz-process): New internal variable.
+	(gnus-namazu/lock-file-name, gnus-namazu/index-file-name): New
+	macros.
+	(gnus-namazu-make-index, gnus-namazu-make-index-stop): New
+	commands.
+
+2002-07-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/request-list): Removed.
+	(gnus-namazu/get-current-to): New function.
+	(gnus-namazu/complete-query): Call the above.
+
 2002-07-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/pop3.el: Don't autoload "ssl".
@@ -8,11 +90,22 @@
 	* lisp/gnus-namazu.el (gnus-namazu/truncate-article-list): Remove
 	a redundancy.
 
-2002-06-25  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+2002-07-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
-	* lisp/gnus-namazu.el (gnus-namazu/truncate-article-list): When
-	`gnus-large-newsgroup' is equal to nil, no confirmation is
-	required.
+	* texi/gnus-ja.texi (Web Newspaper): Update the url of w3m.
+
+2002-07-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-mode-map): Replace
+	`gnus-article-toggle-headers' with `gnus-summary-toggle-header'.
+	(gnus-summary-wash-map): Ditto.
+	(gnus-summary-wash-hide-map): Replace
+	`gnus-article-toggle-headers' with `gnus-article-hide-headers'.
+	(gnus-summary-article-menu): Ditto.
+
+	* lisp/gnus.el: Remove autoload for `gnus-article-toggle-headers'.
+
+	* lisp/gnus-art.el (article-toggle-headers): Abolished.
 
 2002-07-04  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -31,11 +124,29 @@
 	workaround I installed on 1999-12-28, i.e. also call
 	`as-binary-process' in windows-nt.
 
+2002-06-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* contrib/hashcash.el: Require `cl' when compiling.
+	(hashcash-strip-quoted-names): Replace `subseq' with `substring'.
+	(mail-add-payment): Allow no `mail-header-separator' in the buffer;
+	don't use `mapc'.
+
+2002-06-25  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/truncate-article-list): When
+	`gnus-large-newsgroup' is equal to nil, no confirmation is
+	required.
+
 2002-06-23  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
 
 	* lisp/pop3.el (pop3-open-ssl-stream): Do away with w32-related
 	workaround I installed on 1999-12-27, i.e. also call
 	`as-binary-process' in windows-nt.
+
+2002-06-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-send): Kill `message-encoding-buffer'
+	even if sending failed.
 
 2002-06-11  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -46,6 +157,36 @@
 	(gnus-summary-supersede-article): Don't bind the value for
 	`gnus-message-setup-hook'.
 	(gnus-summary-resend-bounced-mail): Ditto.
+
+	* lisp/dns.el (dns-make-network-process): Bind
+	`default-process-coding-system' to `(binary . binary)'; bind
+	`program-coding-system-alist' to nil.
+
+	* lisp/gnus-fun.el (gnus-convert-gray-x-face-to-xpm): Bind
+	`input-coding-system' and `output-coding-system' to `binary'.
+
+	* lisp/gnus-namazu.el (gnus-namazu/call-namazu): Bind
+	`input-coding-system' and `output-coding-system' to the velue of
+	`gnus-namazu-coding-system'.
+
+	* lisp/imap.el (imap-ssl-open): Don't bind the values for
+	`input-coding-system' and `output-coding-system'.
+
+	* lisp/nnmaildir.el (nnmaildir-request-scan): Bind
+	`output-coding-system' to the value of
+	`nnheader-file-coding-system'; bind `file-coding-system' to nil.
+	(nnmaildir-request-rename-group): Ditto.
+	(nnmaildir-request-replace-article): Ditto.
+	(nnmaildir-request-accept-article): Ditto.
+	(nnmaildir-request-set-mark): Ditto.
+
+	* lisp/nnmbox.el (nnmbox-save-buffer): Simplify the source code.
+
+	* lisp/nnrss.el (nnrss-read-server-data): Bind
+	`input-coding-system' to `binary'.
+	(nnrss-save-server-data): Bind `output-coding-system' to `binary'.
+	(nnrss-read-group-data): Bind `input-coding-system' to `binary'.
+	(nnrss-save-group-data): Bind `output-coding-system' to `binary'.
 
 2002-06-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -67,8 +208,6 @@
 
 	* contrib/gpg-ring.el: Remove RCS magic cookie.
 	* lisp/nnir.el: Ditto.
-	* lisp/sieve-manage.el: Ditto.
-	* lisp/sieve-mode.el: Ditto.
 
 	* texi/ptexinfmt.el (texinfo-discard-command-and-arg): New
 	function.
@@ -78,6 +217,12 @@
 	* texi/ptexinfmt.el: discard @cartouche.  @anchor discard for Mule
 	2.3.  Support @., @:, @-.
 	(texinfo-format-inforef): New function.
+
+2002-05-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-unfold-fws): New function copied from
+	`ietf-drums-unfold-fws'.
+	(ietf-drums-unfold-fws): Alias to `nnheader-unfold-fws'.
 
 2002-04-30  Daiki Ueno  <ueno@unixuser.org>
 

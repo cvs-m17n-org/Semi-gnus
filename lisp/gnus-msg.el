@@ -241,8 +241,22 @@ See also the `mml-default-encrypt-method' variable."
   :type 'boolean)
 
 (defcustom gnus-message-replysignencrypted
-  nil
+  t
   "Setting this causes automatically encryped messages to also be signed."
+  :group 'gnus-message
+  :type 'boolean)
+
+(defcustom gnus-confirm-mail-reply-to-news nil
+  "If non-nil, Gnus requests confirmation when replying to news.
+This is done because new users often reply by mistake when reading
+news."
+  :group 'gnus-message
+  :type 'boolean)
+
+(defcustom gnus-summary-resend-default-address t
+  "If non-nil, Gnus tries to suggest a default address to resend to.
+If nil, the address field will always be empty after invoking
+`gnus-summary-resend-message'."
   :group 'gnus-message
   :type 'boolean)
 
@@ -492,6 +506,8 @@ If ARG is 1, prompt for a group name to find the posting style."
   ;; We can't `let' gnus-newsgroup-name here, since that leads
   ;; to local variables leaking.
   (let ((group gnus-newsgroup-name)
+	;; make sure last viewed article doesn't affect posting styles:
+	(gnus-article-copy)
 	(buffer (current-buffer)))
     (unwind-protect
 	(progn
@@ -521,6 +537,8 @@ network.  The corresponding backend must have a 'request-post method."
   ;; We can't `let' gnus-newsgroup-name here, since that leads
   ;; to local variables leaking.
   (let ((group gnus-newsgroup-name)
+	;; make sure last viewed article doesn't affect posting styles:
+	(gnus-article-copy)
 	(buffer (current-buffer)))
     (unwind-protect
 	(progn
@@ -552,7 +570,9 @@ a news."
 		 (completing-read "Newsgroup: " gnus-active-hashtb nil
 				  (gnus-read-active-file-p))
 	       (gnus-group-group-name))
-	   "")))
+	   ""))
+	;; make sure last viewed article doesn't affect posting styles:
+	(gnus-article-copy))
     (gnus-post-news 'post gnus-newsgroup-name)))
 
 (defun gnus-summary-mail-other-window (&optional arg)
@@ -564,6 +584,8 @@ posting style."
   ;; We can't `let' gnus-newsgroup-name here, since that leads
   ;; to local variables leaking.
   (let ((group gnus-newsgroup-name)
+	;; make sure last viewed article doesn't affect posting styles:
+	(gnus-article-copy)
 	(buffer (current-buffer)))
     (unwind-protect
 	(progn
@@ -593,6 +615,8 @@ network.  The corresponding backend must have a 'request-post method."
   ;; We can't `let' gnus-newsgroup-name here, since that leads
   ;; to local variables leaking.
   (let ((group gnus-newsgroup-name)
+	;; make sure last viewed article doesn't affect posting styles:
+	(gnus-article-copy)
 	(buffer (current-buffer)))
     (unwind-protect
 	(progn
@@ -624,7 +648,9 @@ a news."
 		 (completing-read "Newsgroup: " gnus-active-hashtb nil
 				  (gnus-read-active-file-p))
 	       "")
-	   gnus-newsgroup-name)))
+	   gnus-newsgroup-name))
+	;; make sure last viewed article doesn't affect posting styles:
+	(gnus-article-copy))
     (gnus-post-news 'post gnus-newsgroup-name)))
 
 
@@ -650,7 +676,8 @@ yanked."
     ;; Send a followup.
     (gnus-post-news nil gnus-newsgroup-name
 		    headers gnus-article-buffer
-		    yank nil force-news)))
+		    yank nil force-news)
+    (gnus-summary-handle-replysign)))
 
 (defun gnus-summary-followup-with-original (n &optional force-news)
   "Compose a followup to an article and include the original article."
@@ -699,7 +726,10 @@ yanked."
 	    (message-reply-headers
 	     ;; The headers are decoded.
 	     (with-current-buffer gnus-article-copy
-	       (nnheader-parse-head t))))
+	       (save-restriction
+		 (nnheader-narrow-to-headers)
+		 (ietf-drums-unfold-fws)
+		 (nnheader-parse-head t)))))
 	(message-yank-original)
 	(setq beg (or beg (mark t))))
       (when articles
@@ -1091,51 +1121,59 @@ If VERY-WIDE, make a very wide reply."
   (interactive
    (list (and current-prefix-arg
 	      (gnus-summary-work-articles 1))))
-  (let* ((article
-	  (if (listp (car yank))
-	      (caar yank)
-	    (car yank)))
-	 (gnus-article-reply (or article (gnus-summary-article-number)))
-	 (headers ""))
-    ;; Stripping headers should be specified with mail-yank-ignored-headers.
-    (when yank
-      (gnus-summary-goto-subject article))
-    (gnus-setup-message (if yank 'reply-yank 'reply)
-      (if (not very-wide)
-	  (gnus-summary-select-article)
-	(dolist (article very-wide)
-	  (gnus-summary-select-article nil nil nil article)
-	  (save-excursion
-	    (set-buffer (gnus-copy-article-buffer))
-	    (gnus-msg-treat-broken-reply-to)
-	    (save-restriction
-	      (message-narrow-to-head)
-	      (setq headers (concat headers (buffer-string)))))))
-      (set-buffer (gnus-copy-article-buffer))
-      (gnus-msg-treat-broken-reply-to gnus-msg-force-broken-reply-to)
-      (save-restriction
-	(message-narrow-to-head)
-	(when very-wide
-	  (erase-buffer)
-	  (insert headers))
-	(goto-char (point-max)))
-      (message-reply nil wide)
+  ;; Allow user to require confirmation before replying by mail to the
+  ;; author of a news article.
+  (when (or (not (gnus-news-group-p gnus-newsgroup-name))
+	    (not gnus-confirm-mail-reply-to-news)
+	    (y-or-n-p "Really reply by mail to article author? "))
+    (let* ((article
+	    (if (listp (car yank))
+		(caar yank)
+	      (car yank)))
+	   (gnus-article-reply (or article (gnus-summary-article-number)))
+	   (headers ""))
+      ;; Stripping headers should be specified with mail-yank-ignored-headers.
       (when yank
-	(gnus-inews-yank-articles yank))
-;;      (when (or gnus-message-replysign gnus-message-replyencrypt)
-;;	(let (signed encrypted)
-;;	  (save-excursion
-;;	    (set-buffer gnus-article-buffer)
-;;	    (setq signed (memq 'signed gnus-article-wash-types))
-;;	    (setq encrypted (memq 'encrypted gnus-article-wash-types)))
-;;	  (cond ((and gnus-message-replysign signed)
-;;		 (mml-secure-message mml-default-sign-method 'sign))
-;;		((and gnus-message-replyencrypt encrypted)
-;;		 (mml-secure-message mml-default-encrypt-method
-;;				     (if gnus-message-replysignencrypted
-;;					 'signencrypt
-;;				       'encrypt))))))
-      )))
+	(gnus-summary-goto-subject article))
+      (gnus-setup-message (if yank 'reply-yank 'reply)
+	(if (not very-wide)
+	    (gnus-summary-select-article)
+	  (dolist (article very-wide)
+	    (gnus-summary-select-article nil nil nil article)
+	    (save-excursion
+	      (set-buffer (gnus-copy-article-buffer))
+	      (gnus-msg-treat-broken-reply-to)
+	      (save-restriction
+		(message-narrow-to-head)
+		(setq headers (concat headers (buffer-string)))))))
+	(set-buffer (gnus-copy-article-buffer))
+	(gnus-msg-treat-broken-reply-to gnus-msg-force-broken-reply-to)
+	(save-restriction
+	  (message-narrow-to-head)
+	  (when very-wide
+	    (erase-buffer)
+	    (insert headers))
+	  (goto-char (point-max)))
+	(message-reply nil wide)
+	(when yank
+	  (gnus-inews-yank-articles yank))
+	(gnus-summary-handle-replysign)))))
+
+(defun gnus-summary-handle-replysign ()
+  "Check the various replysign variables and take action accordingly."
+  (when nil;;(or gnus-message-replysign gnus-message-replyencrypt)
+    (let (signed encrypted)
+      (save-excursion
+	(set-buffer gnus-article-buffer)
+	(setq signed (memq 'signed gnus-article-wash-types))
+	(setq encrypted (memq 'encrypted gnus-article-wash-types)))
+      (cond ((and gnus-message-replysign signed)
+	     (mml-secure-message mml-default-sign-method 'sign))
+	    ((and gnus-message-replyencrypt encrypted)
+	     (mml-secure-message mml-default-encrypt-method
+				 (if gnus-message-replysignencrypted
+				     'signencrypt
+				   'encrypt)))))))
 
 (defun gnus-summary-reply-with-original (n &optional wide)
   "Start composing a reply mail to the current message.
@@ -1275,7 +1313,8 @@ forward those articles instead."
   (interactive
    (list (message-read-from-minibuffer
 	  "Resend message(s) to: "
-	  (when (gnus-buffer-live-p gnus-original-article-buffer)
+	  (when (and gnus-summary-resend-default-address
+		     (gnus-buffer-live-p gnus-original-article-buffer))
 	    ;; If some other article is currently selected, the
 	    ;; initial-contents is wrong. Whatever, it is just the
 	    ;; initial-contents.

@@ -79,7 +79,18 @@ Integer values will in effect be rounded up to the nearest multiple of
 (defvar nnheader-head-chop-length 2048
   "*Length of each read operation when trying to fetch HEAD headers.")
 
-(defvar nnheader-file-name-translation-alist nil
+(defvar nnheader-file-name-translation-alist
+  (let ((case-fold-search t))
+    (cond
+     ((string-match "windows-nt\\|os/2\\|emx\\|cygwin32"
+		    (symbol-name system-type))
+      (append (mapcar (lambda (c) (cons c ?_))
+		      '(?: ?* ?\" ?< ?> ??))
+	      (if (string-match "windows-nt\\|cygwin32"
+				(symbol-name system-type))
+		  nil
+		'((?+ . ?-)))))
+     (t nil)))
   "*Alist that says how to translate characters in file names.
 For instance, if \":\" is invalid as a file character in file names
 on your system, you could say something like:
@@ -457,6 +468,18 @@ given, the return value will not contain the last newline."
       value))
 
   (defalias 'mail-header-field-value 'std11-field-value))
+
+;; ietf-drums stuff.
+(unless (featurep 'ietf-drums)
+  ;; Should keep track of `ietf-drums-unfold-fws' in ietf-drums.el.
+  (defun nnheader-unfold-fws ()
+    "Unfold folding white space in the current buffer."
+    (goto-char (point-min))
+    (while (re-search-forward "[ \t]*\n[ \t]+" nil t)
+      (replace-match " " t t))
+    (goto-char (point-min)))
+
+  (defalias 'ietf-drums-unfold-fws 'nnheader-unfold-fws))
 
 ;;; Header access macros.
 

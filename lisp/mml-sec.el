@@ -46,6 +46,37 @@
 (defvar mml-default-encrypt-method (caar mml-encrypt-alist)
   "Default encryption method.")
 
+(defvar mml-signencrypt-style-alist
+  '(("smime"   separate)
+    ("pgp"     separate)
+    ("pgpmime" separate))
+  "Alist specifying whether or not a single sign & encrypt
+operation should be perfomed when requesting signencrypt.
+Note that combined sign & encrypt is NOT supported by pgp v2!
+Also note that you should access this with mml-signencrypt-style")
+
+;;; Configuration/helper functions
+
+(defun mml-signencrypt-style (method &optional style)
+  "Function for setting/getting the signencrypt-style used.  Takes two
+arguments, the method (e.g. \"pgp\") and optionally the mode
+(e.g. combined).  If the mode is omitted, the current value is returned.
+
+For example, if you prefer to use combined sign & encrypt with
+smime, putting the following in your Gnus startup file will
+enable that behavior:
+
+ (mml-set-signencrypt-style \"smime\" combined)"
+  (let ((style-item (assoc method mml-signencrypt-style-alist)))
+    (if style-item
+	(if (or (eq style 'separate)
+		(eq style 'combined))
+	    ;; valid style setting?
+	    (setf (second style-item) style)
+	  ;; otherwise, just return the current value
+	  (second style-item))
+      (gnus-message 3 "Warning, attempt to set invalid signencrypt-style"))))
+
 ;;; Security functions
 
 (defun mml-smime-sign-buffer (cont)
@@ -68,8 +99,8 @@
   (or (mml2015-sign cont)
       (error "Signing failed... inspect message logs for errors")))
 
-(defun mml-pgpmime-encrypt-buffer (cont)
-  (or (mml2015-encrypt cont)
+(defun mml-pgpmime-encrypt-buffer (cont &optional sign)
+  (or (mml2015-encrypt cont sign)
       (error "Encryption failed... inspect message logs for errors")))
 
 (defun mml-secure-part (method &optional sign)
@@ -174,21 +205,17 @@ If called with a prefix argument, only encrypt (do NOT sign)."
   (interactive "P")
   (mml-secure-message "smime" (if dontsign 'encrypt 'signencrypt)))
 
-;;; NOTE: this should be switched to use signencrypt
-;;; once it does something sensible
 (defun mml-secure-message-encrypt-pgp (&optional dontsign)
   "Add MML tag to encrypt and sign the entire message.
 If called with a prefix argument, only encrypt (do NOT sign)."
   (interactive "P")
-  (mml-secure-message "pgp" (if dontsign 'encrypt 'encrypt)))
+  (mml-secure-message "pgp" (if dontsign 'encrypt 'signencrypt)))
 
-;;; NOTE: this should be switched to use signencrypt
-;;; once it does something sensible
 (defun mml-secure-message-encrypt-pgpmime (&optional dontsign)
   "Add MML tag to encrypt and sign the entire message.
 If called with a prefix argument, only encrypt (do NOT sign)."
   (interactive "P")
-  (mml-secure-message "pgpmime" (if dontsign 'encrypt 'encrypt)))
+  (mml-secure-message "pgpmime" (if dontsign 'encrypt 'signencrypt)))
 
 (provide 'mml-sec)
 

@@ -1,3 +1,21 @@
+2002-06-22  Simon Josefsson  <jas@extundo.com>
+
+	* hashcash.el: New file.
+	(hashcash-default-payment, hashcash-payment-alist, hashcash):
+	Defcustom.
+	(hashcash-generate-payment): Update to recent hashcode command
+	line syntax.
+	(hashcash-insert-payment): Use X-Hashcode:.
+	(mail-add-payment): Also look at Newsgroups.
+	(top-level): Add provide and EOF comment.
+	(mail-add-payment): Autoload.
+	(hashcash-insert-payment): s/Hashcode/Hashcash/
+	(mail-add-payment): Doc fix.
+
+2002-05-20  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-mdrtn.el (gnus-moderated-groups): Removed (require 'gnus-load).
+
 2002-04-24  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* ucs-tables.el (featurep): Barf on XEmacs.

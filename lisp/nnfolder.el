@@ -160,7 +160,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
   (save-excursion
     (set-buffer nntp-server-buffer)
     (erase-buffer)
-    (let (article start stop)
+    (let (article start stop num)
       (nnfolder-possibly-change-group group server)
       (when nnfolder-current-buffer
 	(set-buffer nnfolder-current-buffer)
@@ -175,16 +175,53 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 			    (nnfolder-existing-articles)))
 	    (while (setq article (pop articles))
 	      (set-buffer nnfolder-current-buffer)
-	      (when (nnfolder-goto-article article)
-		(setq start (point))
-		(setq stop (if (search-forward "\n\n" nil t)
-			       (1- (point))
-			     (point-max)))
-		(set-buffer nntp-server-buffer)
-		(insert (format "221 %d Article retrieved.\n" article))
-		(insert-buffer-substring nnfolder-current-buffer start stop)
-		(goto-char (point-max))
-		(insert ".\n")))
+	      (cond ((nnfolder-goto-article article)
+		     (setq start (point))
+		     (setq stop (if (search-forward "\n\n" nil t)
+				    (1- (point))
+				  (point-max)))
+		     (set-buffer nntp-server-buffer)
+		     (insert (format "221 %d Article retrieved.\n" article))
+		     (insert-buffer-substring nnfolder-current-buffer
+					      start stop)
+		     (goto-char (point-max))
+		     (insert ".\n"))
+
+		    ;; If we couldn't find this article, skip over ranges
+		    ;; of missing articles so we don't search the whole file
+		    ;; for each of them.
+		    ((numberp article)
+		     (setq start (point))
+		     (and
+		      ;; Check that we are either at BOF or after an
+		      ;; article with a lower number.  We do this so we
+		      ;; won't be confused by out-of-order article numbers,
+		      ;; as caused by active file bogosity.
+		      (cond
+		       ((bobp))
+		       ((search-backward (concat "\n" nnfolder-article-marker)
+					 nil t)
+			(goto-char (match-end 0))
+			(setq num (string-to-int
+				   (buffer-substring
+				    (point) (progn (end-of-line) (point)))))
+			(goto-char start)
+			(< num article)))
+		      ;; Check that we are before an article with a
+		      ;; higher number.
+		      (search-forward (concat "\n" nnfolder-article-marker)
+				      nil t)
+		      (progn
+			(setq num (string-to-int
+				   (buffer-substring
+				    (point) (progn (end-of-line) (point)))))
+			(> num article))
+		      ;; Discard any article numbers before the one we're
+		      ;; now looking at.
+		      (while (and articles
+				  (< (car articles) num))
+			(setq articles (cdr articles))))
+		     (goto-char start))))
 	    (set-buffer nntp-server-buffer)
 	    (nnheader-fold-continuation-lines)
 	    'headers))))))
@@ -491,7 +528,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 	(while (re-search-backward (concat "^" nnfolder-article-marker) nil t)
 	  (delete-region (point) (progn (forward-line 1) (point))))
 	(when nnmail-cache-accepted-message-ids
-	  (nnmail-cache-insert (nnmail-fetch-field "message-id")))
+	  (nnmail-cache-insert (nnmail-fetch-field "message-id") group))
 	(setq result (if (stringp group)
 			 (list (cons group (nnfolder-active-number group)))
 		       (setq art-group

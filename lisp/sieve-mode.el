@@ -47,8 +47,8 @@
 
 ;;; Code:
 
-(autoload 'sieve-manage "sieve-manage")
-(autoload 'sieve-upload "sieve-manage")
+(autoload 'sieve-manage "sieve")
+(autoload 'sieve-upload "sieve")
 (require 'easymenu)
 (eval-when-compile
   (require 'font-lock))

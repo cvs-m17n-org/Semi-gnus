@@ -1,4 +1,4 @@
-;;; gnus-namazu.el --- Search mail with Namazu. -*- coding: iso-2022-7bit; -*-
+;;; gnus-namazu.el --- Search mail with Namazu -*- coding: iso-2022-7bit; -*-
 
 ;; Copyright (C) 2000,2001,2002 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 
@@ -26,43 +26,71 @@
 ;;; Commentary:
 
 ;; This file defines the command to search mails and persistent
-;; articles with Namazu and browse its results with Gnus.  This module
-;; requires the external command, Namazu.  Visit the following page
-;; for more information.
+;; articles with Namazu and to browse its results with Gnus.
+;;
+;; Namazu is a full-text search engine intended for easy use.  For
+;; more detail about Namazu, visit the following page:
 ;;
 ;;     http://namazu.org/
 
 
+;;; Quick Start:
+
+;; If this module has already been installed, only 3 steps are
+;; required to search articles with this module.
+;;
+;;   (1) Install Namazu.
+;;   (2) Start Gnus and type M-x gnus-namazu-create-index RET to make
+;;       index of articles.
+;;   (3) In group buffer or in summary buffer, type C-c C-n query RET.
+
+
 ;;; Install:
 
-;; Make index of articles with Namzu before using this module.
+;; Before installing this module, you must install Namazu.
 ;;
-;;	 % mkdir ~/News/namazu
-;;       % mknmz -a -h -O ~/News/namazu ~/Mail ~/News/cache
+;; This file is a part of T-gnus but is not *YET* a part of Gnus.
+;; When you would like to use this module in Gnus (not T-gnus), put
+;; this file into the lisp/ directory in the Gnus source tree and run
+;; `make install'.  And then, put the following expression into your
+;; ~/.gnus.
+;;
+;;      (require 'gnus-namazu)
+;;      (gnus-namazu-insinuate)
+;;
+;; In order to make index of articles with Namazu before using this
+;; module, type M-x gnus-namazu-create-index RET.  Otherwise, you can
+;; create index by yourself with the following commands:
+;;
+;;      % mkdir ~/News/namazu
+;;      % mknmz -a -h -O ~/News/namazu ~/Mail ~/News/cache
 ;;
 ;; The first command makes the directory for index files, and the
 ;; second command generates index files of mails and persistent
 ;; articles.
 ;;
-;; When you put index files of Namazu into the directory other than
-;; the default one (~/News/namazu), it is necessary to put this
-;; expression to your ~/.gnus, in order to set the path of index files
-;; to `gnus-namazu-index-directories'.
+;; In order to update indices for incoming articles, this module
+;; automatically runs mknmz, the indexer of Namazu, at an interval of
+;; 3 days; this period is set to `gnus-namazu-index-update-interval'.
+;;
+;; Indices will be updated when `gnus-namazu-search' is called.  If
+;; you want to update indices everywhen Gnus is started, you can put
+;; the following expression to your ~/.gnus.
+;;
+;;      (add-hook 'gnus-startup-hook 'gnus-namazu-update-all-indices)
+;;
+;; In order to control mknmz closely, disable the automatic updating
+;; feature and run mknmz by yourself.  In this case, set nil to the
+;; above option.
+;;
+;;      (setq gnus-namazu-index-update-interval nil)
+;;
+;; When your index is put into the directory other than the default
+;; one (~/News/namazu), it is necessary to set its place to
+;; `gnus-namazu-index-directories' as follows:
 ;;
 ;;      (setq gnus-namazu-index-directories
 ;;            (list (expand-file-name "~/namazu")))
-;;
-;; If you would like to use this module in Gnus (not T-gnus), put this
-;; file into the lisp/ directory in the Gnus source tree and run `make
-;; install'.  And then, put the following expressions into your ~/.gnus.
-;;
-;;      (require 'gnus-namazu)
-;;      (gnus-namazu-insinuate)
-
-
-;;; Usage:
-
-;; In group buffer or in summary buffer, type C-c C-n query RET.
 
 
 ;;; Code:
@@ -80,9 +108,7 @@
 ;; To suppress byte-compile warning.
 (eval-when-compile
   (defvar nnml-directory)
-  (defvar nnml-group-alist)
-  (defvar nnmh-directory)
-  (defvar nnmh-group-alist))
+  (defvar nnmh-directory))
 
 
 (defgroup gnus-namazu nil
@@ -91,14 +117,18 @@
   :group 'gnus
   :prefix "gnus-namazu-")
 
+(defconst gnus-namazu-default-index-directory
+  (expand-file-name "namazu" gnus-directory)
+  "Default place of Namazu index files.")
+
 (defcustom gnus-namazu-index-directories
   (list
    (or (and (boundp 'gnus-namazu-index-directory)
 	    (symbol-value 'gnus-namazu-index-directory))
        (and (boundp 'nnir-namazu-index-directory)
 	    (symbol-value 'nnir-namazu-index-directory))
-       (expand-file-name "namazu" gnus-directory)))
-  "*Index directory of Namazu."
+       gnus-namazu-default-index-directory))
+  "*Places of Namazu index files."
   :type '(repeat directory)
   :group 'gnus-namazu)
 
@@ -109,13 +139,37 @@
 	   (symbol-value 'nnir-namazu-program))
       "namazu")
   "*Name of the executable file of Namazu."
-  :group 'gnus-namazu
-  :type 'string)
+  :type 'string
+  :group 'gnus-namazu)
 
 (defcustom gnus-namazu-additional-arguments nil
   "*Additional arguments of Namazu.
 The options `-q', `-a', and `-l' are always used, very few other
 options make any sense in this context."
+  :type '(repeat string)
+  :group 'gnus-namazu)
+
+(defcustom gnus-namazu-index-update-interval
+  259200				; 3 days == 259200 seconds.
+  "*Number of seconds between running the indexer of Namazu."
+  :type '(choice (const :tag "Never run the indexer" nil)
+		 (integer :tag "Number of seconds"))
+  :group 'gnus-namazu)
+
+(defcustom gnus-namazu-make-index-command "mknmz"
+  "*Name of the executable file of the indexer of Namazu."
+  :type 'string
+  :group 'gnus-namazu)
+
+(defcustom gnus-namazu-make-index-arguments
+  (nconc
+   (list "--all" "--mailnews" "--deny=^.*[^0-9].*$")
+   (when (or (and (boundp 'current-language-environment)
+		  (string= "Japanese"
+			   (symbol-value 'current-language-environment)))
+	     (boundp 'MULE))
+     (list "--indexing-lang=ja")))
+  "*Arguments of the indexer of Namazu."
   :type '(repeat string)
   :group 'gnus-namazu)
 
@@ -134,8 +188,8 @@ options make any sense in this context."
   :group 'gnus-namazu)
 
 (defcustom gnus-namazu-need-path-normalization
-  (eq system-type 'windows-nt)
-  "*Non-nil means that outputs of namazu may contain a not normalized path."
+  (and (memq system-type '(windows-nt OS/2 emx)) t)
+  "*Non-nil means that outputs of namazu may contain drive letters."
   :type 'boolean
   :group 'gnus-namazu)
 
@@ -194,6 +248,12 @@ options make any sense in this context."
    (gnus-servers-using-backend 'nnml)
    (gnus-servers-using-backend 'nnmh)))
 
+(defsubst gnus-namazu/default-index-directory ()
+  (if (member gnus-namazu-default-index-directory
+	      gnus-namazu-index-directories)
+      gnus-namazu-default-index-directory
+    (car gnus-namazu-index-directories)))
+
 (defun gnus-namazu/setup ()
   (and (boundp 'gnus-group-name-charset-group-alist)
        (not (member (cons gnus-namazu/group-name-regexp
@@ -205,17 +265,8 @@ options make any sense in this context."
 	     (setcdr pair gnus-namazu-coding-system)
 	   (push (cons gnus-namazu/group-name-regexp
 		       gnus-namazu-coding-system)
-		 gnus-group-name-charset-group-alist)))))
-
-(defun gnus-namazu/request-list (server)
-  "Return groups of the server SERVER."
-  (and (memq (car server) '(nnml nnmh))
-       (nnoo-change-server (car server) (nth 1 server) (nthcdr 2 server))
-       (gnus-request-list server)
-       (mapcar (function car)
-	       (if (eq 'nnml (car server))
-		   nnml-group-alist
-		 nnmh-group-alist))))
+		 gnus-group-name-charset-group-alist))))
+  (gnus-namazu-update-all-indices))
 
 (defun gnus-namazu/server-directory (server)
   "Return the top directory of the server SERVER."
@@ -231,6 +282,8 @@ options make any sense in this context."
   "Normalize file names returned by Namazu in this current buffer."
   (goto-char (point-min))
   (while (not (eobp))
+    (when (looking-at "file://")
+      (delete-region (point) (match-end 0)))
     (when (if gnus-namazu-need-path-normalization
 	      (or (not (looking-at "/\\(.\\)|/"))
 		  (replace-match "\\1:/"))
@@ -243,8 +296,11 @@ options make any sense in this context."
 (defsubst gnus-namazu/call-namazu (query)
   (let ((coding-system-for-read gnus-namazu-coding-system)
 	(coding-system-for-write gnus-namazu-coding-system)
+	(input-coding-system gnus-namazu-coding-system)
+	(output-coding-system gnus-namazu-coding-system)
 	(default-process-coding-system
 	  (cons gnus-namazu-coding-system gnus-namazu-coding-system))
+	program-coding-system-alist
 	(file-name-coding-system gnus-namazu-coding-system)
 	(pathname-coding-system gnus-namazu-coding-system))
     (apply 'call-process
@@ -272,17 +328,17 @@ options make any sense in this context."
 		  gnus-newsrc-hashtb)
 	orig))))
 
-(defun gnus-namazu/check-cache-group (str)
-  "Get the news group from the partial path STR of the cached article."
-  (if (gnus-use-long-file-name 'not-cache)
+(defun gnus-namazu/real-group-name (cond str)
+  "Generate the real group name from the partial path, STR."
+  (if cond
       str
     (catch 'found-group
-      (dolist (group (gnus-namazu/cache-group-candidates
+      (dolist (group (gnus-namazu/possible-real-groups
 		      (nnheader-replace-chars-in-string str ?/ ?.)))
 	(when (gnus-gethash group gnus-newsrc-hashtb)
 	  (throw 'found-group group))))))
 
-(defun gnus-namazu/cache-group-candidates (str)
+(defun gnus-namazu/possible-real-groups (str)
   "Regard the string STR as the partial path of the cached article and
 generate possible group names from it."
   (if (string-match "_\\(_\\(_\\)?\\)?" str)
@@ -291,14 +347,14 @@ generate possible group names from it."
 	(cond
 	 ((match-beginning 2) ;; The number of discoverd underscores = 3
 	  (nconc
-	   (gnus-namazu/cache-group-candidates (concat prefix "/__" suffix))
-	   (gnus-namazu/cache-group-candidates (concat prefix ".._" suffix))))
+	   (gnus-namazu/possible-real-groups (concat prefix "/__" suffix))
+	   (gnus-namazu/possible-real-groups (concat prefix ".._" suffix))))
 	 ((match-beginning 1) ;; The number of discoverd underscores = 2
 	  (nconc
-	   (gnus-namazu/cache-group-candidates (concat prefix "//" suffix))
-	   (gnus-namazu/cache-group-candidates (concat prefix ".." suffix))))
+	   (gnus-namazu/possible-real-groups (concat prefix "//" suffix))
+	   (gnus-namazu/possible-real-groups (concat prefix ".." suffix))))
 	 (t ;; The number of discoverd underscores = 1
-	  (gnus-namazu/cache-group-candidates (concat prefix "/" suffix)))))
+	  (gnus-namazu/possible-real-groups (concat prefix "/" suffix)))))
     (if (string-match "\\." str)
 	;; Handle the first occurence of period.
 	(list (concat (substring str 0 (match-beginning 0))
@@ -326,6 +382,11 @@ generate possible group names from it."
 			    (regexp-quote
 			     (file-name-as-directory
 			      (expand-file-name gnus-cache-directory)))
+			    "\\(.*\\)/\\([0-9]+\\)$"))
+	     (agent-regexp (concat
+			    (regexp-quote
+			     (file-name-as-directory
+			      (expand-file-name gnus-agent-directory)))
 			    "\\(.*\\)/\\([0-9]+\\)$")))
 	(gnus-namazu/normalize-results)
 	(goto-char (point-min))
@@ -335,7 +396,14 @@ generate possible group names from it."
 		  ;; Check the discoverd file is the persistent article.
 		  (and (looking-at cache-regexp)
 		       (setq file (match-string-no-properties 2)
-			     group (gnus-namazu/check-cache-group
+			     group (gnus-namazu/real-group-name
+				    (gnus-use-long-file-name 'not-cache)
+				    (match-string-no-properties 1))))
+		  ;; Check the discoverd file is covered by the agent.
+		  (and (looking-at agent-regexp)
+		       (setq file (match-string-no-properties 2)
+			     group (gnus-namazu/real-group-name
+				    nnmail-use-long-file-names
 				    (match-string-no-properties 1))))
 		  ;; Check the discovered file is managed by Gnus servers.
 		  (and (looking-at topdir-regexp)
@@ -350,7 +418,10 @@ generate possible group names from it."
 			       file (match-string 1 file))
 			 (setq group
 			       (gnus-namazu/group-prefixed-name
-				(nnheader-replace-chars-in-string group ?/ ?.)
+				(if nnmail-use-long-file-names
+				    group
+				  (nnheader-replace-chars-in-string group
+								    ?/ ?.))
 				server)))))
 		 (or (not groups)
 		     (member group groups))
@@ -417,6 +488,15 @@ generate possible group names from it."
 	   (cadr (mail-extract-address-components
 		  (mail-header-from
 		   (gnus-summary-article-header))))))))
+
+(defun gnus-namazu/get-current-to ()
+  (and gnus-namazu/read-query-original-buffer
+       (bufferp gnus-namazu/read-query-original-buffer)
+       (with-current-buffer gnus-namazu/read-query-original-buffer
+	 (when (eq major-mode 'gnus-summary-mode)
+	   (cadr (mail-extract-address-components
+		  (cdr (assq 'To (mail-header-extra
+				  (gnus-summary-article-header))))))))))
 
 (defmacro gnus-namazu/minibuffer-prompt-end ()
   (if (fboundp 'minibuffer-prompt-end)
@@ -485,6 +565,13 @@ generate possible group names from it."
 	(when f
 	  (goto-char pos)
 	  (insert "\"" f "\"")
+	  (setq pos (point)))))
+     ((and (looking-at "\\+to:")
+	   (= pos (match-end 0)))
+      (let ((to (gnus-namazu/get-current-to)))
+	(when to
+	  (goto-char pos)
+	  (insert "\"" to "\"")
 	  (setq pos (point))))))
     (goto-char pos)))
 
@@ -597,6 +684,186 @@ and make a virtual group contains its results."
 		 '<)))
       (message "No entry."))))
 
+(defmacro gnus-namazu/lock-file-name (&optional directory)
+  `(expand-file-name "NMZ.lock2" ,directory))
+
+(defmacro gnus-namazu/status-file-name (&optional directory)
+  `(expand-file-name "NMZ.status" ,directory))
+
+(defmacro gnus-namazu/index-file-name (&optional directory)
+  `(expand-file-name "NMZ.i" ,directory))
+
+(defun gnus-namazu/mknmz-cleanup (directory)
+  (let ((lockfile (gnus-namazu/lock-file-name directory)))
+    (when (file-exists-p lockfile)
+      (delete-file lockfile)
+      (dolist (tmpfile (directory-files directory t "\\`NMZ\\..*\\.tmp\\'" t))
+	(delete-file tmpfile)))))
+
+;;;###autoload
+(defun gnus-namazu-create-index (directory &optional target-directories force)
+  "Create index under DIRECTORY."
+  (interactive
+   (list
+    (if (and current-prefix-arg (> (length gnus-namazu-index-directories) 1))
+	(completing-read "Directory: "
+			 (mapcar 'list gnus-namazu-index-directories) nil t)
+      (gnus-namazu/default-index-directory))
+    nil t))
+  (setq directory (file-name-as-directory (expand-file-name directory)))
+  (unless target-directories
+    (setq target-directories
+	  (delq nil
+		(mapcar (lambda (dir)
+			  (when (file-directory-p dir) dir))
+			(append
+			 (mapcar 'gnus-namazu/server-directory
+				 (gnus-namazu/indexed-servers))
+			 (list
+			  (expand-file-name gnus-cache-directory)
+			  (expand-file-name gnus-agent-directory)))))))
+  (if (file-exists-p (gnus-namazu/lock-file-name directory))
+      (when force
+	(error "Found lock file: %s" (gnus-namazu/lock-file-name directory)))
+    (with-current-buffer
+	(get-buffer-create (concat " *mknmz*" directory))
+      (erase-buffer)
+      (unless (file-directory-p directory)
+	(make-directory directory t))
+      (setq default-directory directory)
+      (let ((args (append gnus-namazu-make-index-arguments
+			  target-directories)))
+	(insert "% " gnus-namazu-make-index-command " "
+		(mapconcat 'identity args " ") "\n")
+	(goto-char (point-max))
+	(when force
+	  (pop-to-buffer (current-buffer)))
+	(message "Make index at %s..." directory)
+	(unwind-protect
+	    (apply 'call-process gnus-namazu-make-index-command nil t t args)
+	  (gnus-namazu/mknmz-cleanup directory))
+	(message "Make index at %s...done" directory)
+	(unless force
+	  (kill-buffer (current-buffer)))))))
+
+(defun gnus-namazu/lapse-seconds (start end)
+  "Return lapse seconds from START to END.
+START and END are lists which represent time in Emacs-style."
+  (+ (* (- (car end) (car start)) 65536)
+     (cadr end)
+     (- (cadr start))))
+
+(defun gnus-namazu/index-old-p (directory)
+  "Return non-nil value when the index under the DIRECTORY is older
+than the period that is set to `gnus-namazu-index-update-interval'"
+  (let ((file (gnus-namazu/index-file-name directory)))
+    (or (not (file-exists-p file))
+	(and (integerp gnus-namazu-index-update-interval)
+	     (>= (gnus-namazu/lapse-seconds
+		  (nth 5 (file-attributes file))
+		  (current-time))
+		 gnus-namazu-index-update-interval)))))
+
+(defvar gnus-namazu/update-directories nil)
+(defvar gnus-namazu/update-process nil)
+
+(defun gnus-namazu/update-p (directory &optional force)
+  "Return the DIRECTORY when the index undef the DIRECTORY should be updated."
+  (setq directory (file-name-as-directory (expand-file-name directory)))
+  (labels ((error-message (format &rest args)
+			  (apply (if force 'error 'message) format args)
+			  nil))
+    (if gnus-namazu/update-process
+	(error-message "%s" "Can not run two update processes simultaneously")
+      (and (or force
+	       (gnus-namazu/index-old-p directory))
+	   (let ((status-file (gnus-namazu/status-file-name directory)))
+	     (or (file-exists-p status-file)
+		 (error-message "Can not find status file: %s" status-file)))
+	   (let ((lock-file (gnus-namazu/lock-file-name directory)))
+	     (or (not (file-exists-p lock-file))
+		 (error-message "Found lock file: %s" lock-file)))
+	   directory))))
+
+;;;###autoload
+(defun gnus-namazu-update-index (directory &optional force)
+  "Update the index under the DIRECTORY."
+  (interactive
+   (list
+    (if (and current-prefix-arg (> (length gnus-namazu-index-directories) 1))
+	(completing-read "Directory: "
+			 (mapcar 'list gnus-namazu-index-directories) nil t)
+      (gnus-namazu/default-index-directory))
+    t))
+  (when (setq directory (gnus-namazu/update-p directory force))
+    (with-current-buffer (get-buffer-create (concat " *mknmz*" directory))
+      (buffer-disable-undo)
+      (erase-buffer)
+      (unless (file-directory-p directory)
+	(make-directory directory t))
+      (setq default-directory directory)
+      (let ((proc (start-process gnus-namazu-make-index-command
+				 (current-buffer)
+				 gnus-namazu-make-index-command
+				 (format "--update=%s" directory))))
+	(if (processp proc)
+	    (prog1 (setq gnus-namazu/update-process proc)
+	      (process-kill-without-query proc)
+	      (set-process-sentinel proc 'gnus-namazu/update-sentinel)
+	      (add-hook 'kill-emacs-hook 'gnus-namazu-stop-update)
+	      (message "Update index at %s..." directory))
+	  (goto-char (point-min))
+	  (if (re-search-forward "^ERROR:.*$" nil t)
+	      (progn
+		(pop-to-buffer (current-buffer))
+		(funcall (if force 'error 'message)
+			 "Update index at %s...%s" directory (match-string 0)))
+	    (kill-buffer (current-buffer))
+	    (funcall (if force 'error 'message)
+		     "Can not start %s" gnus-namazu-make-index-command))
+	  nil)))))
+
+;;;###autoload
+(defun gnus-namazu-update-all-indices (&optional directories force)
+  "Update all indices which is set to `gnus-namazu-index-directories'."
+  (interactive (list nil t))
+  (when (setq directories
+	      (delq nil (mapcar
+			 (lambda (d) (gnus-namazu/update-p d force))
+			 (or directories gnus-namazu-index-directories))))
+    (setq gnus-namazu/update-directories (cdr directories))
+    (gnus-namazu-update-index (car directories))))
+
+(defun gnus-namazu/update-sentinel (process event)
+  (let ((buffer (process-buffer process)))
+    (when (buffer-name buffer)
+      (with-current-buffer buffer
+	(gnus-namazu/mknmz-cleanup default-directory)
+	(goto-char (point-min))
+	(cond
+	 ((re-search-forward "^ERROR:.*$" nil t)
+	  (pop-to-buffer (current-buffer))
+	  (message "Update index at %s...%s"
+		   default-directory (match-string 0))
+	  (setq gnus-namazu/update-directories nil))
+	 ((and (eq 'exit (process-status process))
+	       (zerop (process-exit-status process)))
+	  (message "Update index at %s...done" default-directory)
+	  (unless (or debug-on-error debug-on-quit)
+	    (kill-buffer buffer)))))))
+  (setq gnus-namazu/update-process nil)
+  (when gnus-namazu/update-directories
+    (gnus-namazu-update-all-indices gnus-namazu/update-directories)))
+
+;;;###autoload
+(defun gnus-namazu-stop-update ()
+  "Stop the running indexer of Namazu."
+  (interactive)
+  (setq gnus-namazu/update-directories nil)
+  (and gnus-namazu/update-process
+       (processp gnus-namazu/update-process)
+       (kill-process gnus-namazu/update-process)))
+
 (let (current-load-list)
   (defadvice gnus-offer-save-summaries
     (before gnus-namazu-kill-summary-buffers activate compile)
@@ -614,6 +881,7 @@ is called."
 	  (kill-buffer (car buffers)))
 	(setq buffers (cdr buffers))))))
 
+;;;###autoload
 (defun gnus-namazu-insinuate ()
   (add-hook
    'gnus-group-mode-hook

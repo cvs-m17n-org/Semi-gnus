@@ -322,6 +322,7 @@ directly.")
 	 '(("\\*" "\\*" bold)
 	   ("_" "_" underline)
 	   ("/" "/" italic)
+	   ("-" "-" strikethru)
 	   ("_/" "/_" underline-italic)
 	   ("_\\*" "\\*_" underline-bold)
 	   ("\\*/" "/\\*" bold-italic)
@@ -387,7 +388,11 @@ and the latter avoids underlining any whitespace at all."
 (defface gnus-emphasis-underline-bold-italic
   '((t (:bold t :italic t :underline t)))
   "Face used for displaying underlined bold italic emphasized text.
-Esample: (_/*word*/_)."
+Example: (_/*word*/_)."
+  :group 'gnus-article-emphasis)
+
+(defface gnus-emphasis-strikethru '((t (:strikethru t)))
+  "Face used for displaying strike-through text (-word-)."
   :group 'gnus-article-emphasis)
 
 (defface gnus-emphasis-highlight-words
@@ -1388,8 +1393,8 @@ It is a string, such as \"PGP\". If nil, ask user."
   (let ((table (copy-syntax-table text-mode-syntax-table)))
     ;; This causes the citation match run O(2^n).
     ;; (modify-syntax-entry ?- "w" table)
-    (modify-syntax-entry ?> ")" table)
-    (modify-syntax-entry ?< "(" table)
+    (modify-syntax-entry ?> ")<" table)
+    (modify-syntax-entry ?< "(>" table)
     table)
   "Syntax table used in article mode buffers.
 Initialized from `text-mode-syntax-table.")
@@ -1694,91 +1699,6 @@ always hide."
 	     (match-beginning 0)
 	   (point-max)))
        'boring-headers))))
-
-(defun article-toggle-headers (&optional arg)
-  "Toggle hiding of headers.  If given a negative prefix, always show;
-if given a positive prefix, always hide."
-  (interactive (gnus-article-hidden-arg))
-  (let ((force (when (numberp arg)
-		 (cond ((> arg 0) 'always-hide)
-		       ((< arg 0) 'always-show))))
-	(window (get-buffer-window gnus-article-buffer))
-	(header-end (point-min))
-	header-start field-end field-start
-	(inhibit-point-motion-hooks t)
-	(inhibit-read-only t))
-    (save-restriction
-      (widen)
-      (while (and (setq header-start
-			(text-property-any header-end (point-max)
-					   'article-treated-header t))
-		  (setq header-end
-			(text-property-not-all header-start (point-max)
-					       'article-treated-header t)))
-	(setq field-end header-start)
-	(cond
-	 (;; Hide exposed invisible fields.
-	  (and (not (eq 'always-show force))
-	       (setq field-start
-		     (text-property-any field-end header-end
-					'exposed-invisible-field t)))
-	  (while (and field-start
-		      (setq field-end (text-property-not-all
-				       field-start header-end
-				       'exposed-invisible-field t)))
-	    (add-text-properties field-start field-end gnus-hidden-properties)
-	    (setq field-start (text-property-any field-end header-end
-						 'exposed-invisible-field t)))
-	  (put-text-property header-start header-end
-			     'exposed-invisible-field nil))
-	 (;; Expose invisible fields.
-	  (and (not (eq 'always-hide force))
-	       (setq field-start
-		     (text-property-any field-end header-end 'invisible t)))
-	  (while (and field-start
-		      (setq field-end (text-property-not-all
-				       field-start header-end
-				       'invisible t)))
-	    ;; If the invisible text is not terminated with newline, we
-	    ;; won't expose it.  Because it may be created by x-face-mule.
-	    ;; BTW, XEmacs sometimes fail in putting an invisible text
-	    ;; property with `gnus-article-hide-text' (really?).  In that
-	    ;; case, the invisible text might be started from the middle of
-	    ;; a line, so we will expose the sort of thing.
-	    (when (or (not (or (eq header-start field-start)
-			       (eq ?\n (char-before field-start))))
-		      (eq ?\n (char-before field-end))
-		      ;; Expose a boundary line anyway.
-		      (string-equal
-		       "\nX-Boundary: "
-		       (buffer-substring (max (- field-end 13) header-start)
-					 field-end)))
-	      (remove-text-properties field-start field-end
-				      gnus-hidden-properties)
-	      (put-text-property field-start field-end
-				 'exposed-invisible-field t))
-	    (setq field-start (text-property-any field-end header-end
-						 'invisible t))))
-	 (;; Hide fields.
-	  (not (eq 'always-show force))
-	  (narrow-to-region header-start header-end)
-	  (article-hide-headers)
-	  ;; Re-display X-Face image under XEmacs.
-	  (when (and (featurep 'xemacs)
-		     (gnus-functionp gnus-article-x-face-command))
-	    (let ((func (cadr (assq 'gnus-treat-display-xface
-				    gnus-treatment-function-alist)))
-		  (condition 'head))
-	      (when (and (not gnus-inhibit-treatment)
-			 func
-			 (gnus-treat-predicate gnus-treat-display-xface))
-		(funcall func)
-		(put-text-property header-start header-end 'read-only nil))))
-	  (widen))
-	 ))
-      (goto-char (point-min))
-      (when window
-	(set-window-start window (point-min))))))
 
 (defvar gnus-article-normalized-header-length 40
   "Length of normalized headers.")
@@ -2297,7 +2217,10 @@ If READ-CHARSET, ask for a coding system."
       (goto-char (point-min))
       (while (re-search-forward
 	      "^\\(\\(https?\\|ftp\\)://\\S-+\\) *\n\\(\\S-+\\)" nil t)
-	(replace-match "\\1\\3" t)))))
+	(replace-match "\\1\\3" t)))
+    (when (and gnus-display-mime-function (interactive-p))
+      (funcall gnus-display-mime-function))))
+
 
 (defun article-wash-html (&optional read-charset)
   "Format an html article.
@@ -2910,7 +2833,7 @@ should replace the \"Date:\" one, or should be added below it."
 	     ":"
 	     (format "%02d" (nth 1 dtime)))))))
     (error
-     (format "Date: %s (from Oort)" date))))
+     (format "Date: %s (from T-gnus)" date))))
 
 (defun article-date-local (&optional highlight)
   "Convert the current article date to the local timezone."
@@ -3481,7 +3404,6 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-verify-cancel-lock
      article-monafy
      article-hide-boring-headers
-     article-toggle-headers
      article-treat-overstrike
      article-fill-long-lines
      article-capitalize-sentences
@@ -3591,7 +3513,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      gnus-article-treatment-menu gnus-article-mode-map ""
      ;; Fixme: this should use :active (and maybe :visible).
      '("Treatment"
-       ["Hide headers" gnus-article-toggle-headers t]
+       ["Hide headers" gnus-article-hide-headers t]
        ["Hide signature" gnus-article-hide-signature t]
        ["Hide citation" gnus-article-hide-citation t]
        ["Treat overstrike" gnus-article-treat-overstrike t]
@@ -5408,6 +5330,8 @@ If given a prefix, show the hidden text instead."
 	    (let ((gnus-override-method gnus-override-method)
 		  (methods (and (stringp article)
 				gnus-refer-article-method))
+		  (backend (car (gnus-find-method-for-group
+				 gnus-newsgroup-name)))
 		  result
 		  (buffer-read-only nil))
 	      (if (or (not (listp methods))
@@ -5426,7 +5350,8 @@ If given a prefix, show the hidden text instead."
 		(gnus-kill-all-overlays)
 		(let ((gnus-newsgroup-name group))
 		  (gnus-check-group-server))
-		(when (gnus-request-article article group (current-buffer))
+		(cond
+		 ((gnus-request-article article group (current-buffer))
 		  (when (numberp article)
 		    (gnus-async-prefetch-next group article
 					      gnus-summary-buffer)
@@ -5434,10 +5359,13 @@ If given a prefix, show the hidden text instead."
 		      (gnus-backlog-enter-article
 		       group article (current-buffer))))
 		  (setq result 'article))
-		(if (not result)
-		    (if methods
-			(setq gnus-override-method (pop methods))
-		      (setq result 'done))))
+		 (methods
+		  (setq gnus-override-method (pop methods)))
+		 ((not (string-match "^400 "
+				     (nnheader-get-report backend)))
+		  ;; If we get 400 server disconnect, reconnect and
+		  ;; retry; otherwise, assume the article has expired.
+		  (setq result 'done))))
 	      (and (eq result 'article) 'article)))
 	   ;; It was a pseudo.
 	   (t article)))
