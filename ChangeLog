@@ -1,3 +1,8 @@
+1998-12-09  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-after-jobs-done): Don't call
+	`gnus-offline-agent-expire' under XEmacs.
+
 1998-12-08  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* texi/gnus-ja.texi: Fix latin chars.
