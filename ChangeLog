@@ -1,4 +1,10 @@
-1999-06-15  Keiichi Suzuki  <keiichi@nanap.org>
+1999-06-18  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.18.
+
+	* Sync up with nana-gnus-6_13_2.
+
+* 1999-06-15  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-TIPS.ja: New section `Cancel sending message from hooks'.
 
@@ -8,28 +14,15 @@
 	use `error'.
 	(message-mime-charset-recover-ask-y-or-n): Ditto.
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.13.2.
-
 	* lisp/gnus-sum.el (gnus-simplify-buffer-fuzzy): New
 	implementation for MIME en/decoding.
 
-1999-06-02  Keiichi Suzuki  <keiichi@nanap.org>
+* 1999-06-02  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/nnheader.el (nnheader-find-file-noselect): Fix typo.
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.13.1.
-
 	* lisp/nnmail.el (nnmail-move-inbox): Fix for getting local spool
 	file.
-
-1999-06-01  Keiichi Suzuki  <keiichi@nanap.org>
-
-	* Nana-TIPS.ja: Change required version of SEMI/FLIM.
-
-	* lisp/gnus.el (gnus-version-number): Update to 6.13.0.
-	(gnus-version): Change required version of SEMI/FLIM.
-
-	* Sync up with Chaos-1_13.
 
 1999-06-01  Keiichi Suzuki  <keiichi@nanap.org>
 
