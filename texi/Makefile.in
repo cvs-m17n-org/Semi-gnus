@@ -61,7 +61,7 @@ most: texi2latex.elc latex latexps
 
 .texi:
 	if test "x$(MAKEINFO)" != "xno" ; then \
-	  makeinfo -o $* $<; \
+	  makeinfo -I $(srcdir) -o $* $<; \
 	else \
 	  cd ../lisp && $(EMACSINFO) -eval '(find-file "$<")' \
 	    $(EMACSINFOHACK) $(INFOSWI) ../texi/$<; \
