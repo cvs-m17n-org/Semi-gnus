@@ -3,7 +3,7 @@
 ;;                                                           Yasuo Okabe
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
 ;;         Yasuo OKABE <okabe@kuis.kyoto-u.ac.jp>
-;; Version: 0.21
+;; Version: 1.00
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
@@ -91,8 +91,8 @@
 ;;  "On the road"		; 0.12
 ;;  "Rock'n Roll city"		; 0.13
 ;;  "Money"			; 0.20
-  "Still 19"       		; 0.21
-;;  "J boy"          		; 0.xx
+;;  "Still 19"       		; 0.21
+  "J boy"          		; 1.00
 ;;  "Blood line"		; 0.xx
 ;;  "Star ring"			; 0.xx
 ;;  "Goodbye Game"		; 0.xx

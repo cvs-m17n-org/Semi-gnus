@@ -1,3 +1,7 @@
+1998-07-19  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/pop3-fma.el: Change version No. to 1.00.
+
 1998-06-30  Keisuke Mori   <ksk@ntts.com>
 
 	* texi/gnus-ja.texi: Add "Scroing".
