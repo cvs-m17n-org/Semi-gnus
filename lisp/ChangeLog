@@ -1,5 +1,7 @@
 2004-05-17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
+	* imap.el (imap-authenticators): Comment out sasl.
+
 	* message.el (message-skip-to-next-address): New function.
 	(message-fill-header-address): Refactor.
 	(message-fill-address): Use it.
@@ -7,6 +9,10 @@
 	(message-fill-header-general): Refactor.
 	(message-fill-field-address): Rename.
 	(message-narrow-to-field): Find the start of the header. 
+	(message-header-format-alist): Don't pre-fill.
+	(message-fill-header): Removed.
+	(message-insert-header): New function.
+	(message-shorten-references): Use it.
 
 	* rfc2047.el (rfc2047-field-value): Strip props.
 
