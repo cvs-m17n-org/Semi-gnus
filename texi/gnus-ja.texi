@@ -2775,9 +2775,6 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B<+F0E*$KIU2C$5$l$^$9!#(B
 @vindex gnus-add-to-list
 
-$B$b$7(B @kbd{a} $B%3%^%s%I$r%a!<%k%0%k!<%W$G<B9T$7$?$H$-!"(B@code{to-list} $B%0%k!<(B
-$B%W%Q%i%a!<%?$,$J$1$l$P!"Aw?.;~$K<+F0E*$KIU2C$5$l$^$9!#(B
-
 @findex gnus-mailing-list-mode
 @cindex mail list groups
 $B$b$7$3$N%0%k!<%W%Q%i%a!<%?$,@_Dj$5$l$F$$$k$H!"35N,%P%C%U%!$KF~$C$?$H$-(B
@@ -2789,16 +2786,21 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 @item subscribed
 @cindex subscribed
 @cindex Mail-Followup-To
+@findex gnus-find-subscribed-addresses
 $B$b$7$3$N%Q%i%a!<%?$,(B @code{t} $B$K@_Dj$5$l$F$$$k$H!"(Bgnus $B$O$"$J$?$,$3$N%0(B
 $B%k!<%W$r(B to-address $B$H(B to-list $B%Q%i%a!<%?$N%"%I%l%9$G9XFI$7$F$$$k%a!<%j(B
 $B%s%0%j%9%H$G$"$k$H2r<a$7$^$9!#$3$N>pJs$r(B gnus $B$KM?$($k$3$H$O!"$"$J$?$,$=(B
 $B$l$i$N%a!<%j%s%0%j%9%H$KEj9F$9$k$H$-$K@5$7$$(B Mail-Followup-To $B%X%C%@!<$r(B
-$B@8@.$9$k$?$a$N(B ($B$[$s$N(B) $BBh0lJb$G$9!#MxMQ$G$-$k(B MFT $BBP1~5!G=$r40A4$K07$&(B
-$B$K$O!"$3$3(B (@pxref{Mailing Lists, , Mailing Lists, message-ja, The
-Message Manual}) $B$r8+$F2<$5$$!#(B
+$B@8@.$9$k$?$a$N(B ($B$[$s$N(B) $BBh0lJb$G$9!#FsJbL\$O(B @file{.gnus.el} $B$K0J2<$rF~(B
+$B$l$k$3$H$G$9!#(B
 
-@code{gnus-find-subscribed-addresses} $B$b;2>H$7$F2<$5$$!#$3$N4X?t$O$3$N%0(B
-$B%k!<%W%Q%i%a!<%?$rD>@\$K;H$$$^$9!#(B
+@lisp
+(setq message-subscribed-address-functions
+      '(gnus-find-subscribed-addresses))
+@end lisp
+
+$BMxMQ$G$-$k(B MFT $BBP1~5!G=$r40A4$K07$&$K$O!"$3$3(B (@pxref{Mailing Lists, ,
+Mailing Lists, message-ja, The Message Manual}) $B$r8+$F2<$5$$!#(B
 
 @item visible
 @cindex visible
