@@ -1,4 +1,4 @@
-2000-09-19  Kai Grossjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2000-09-19  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus.texi (IMAP): Add pointer to description of ~/.authinfo file
 	format.
@@ -47,14 +47,6 @@
 	`nnmail-expiry-target' and of group parameter `expiry-target'.
 	Explain interaction between these.  Add Lisp example for setting
 	`nnmail-expiry-target'.
-
-2000-05-07  Pavel Janik  <Pavel.Janik@inet.cz>
-
-	* gnus.texi: direntry added.
-
-	* message.texi: direntry added.
-
-	* emacs-mime.texi: direntry added.
 
 2000-08-04  Andreas Oeldenberger <andreas.oeldenberger@gmx.net>
 
@@ -754,3 +746,7 @@ Thu Feb 25 00:28:49 1999  Shenghuo ZHU  <zsh@cs.rochester.edu>
 1998-08-27 07:29:17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Mail Folders): Addition.
+	
+;; Local Variables:
+;; coding: iso-2022-7bit
+;; End:
