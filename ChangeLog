@@ -1,3 +1,24 @@
+1999-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.3.
+	(gnus-revision-number): Clear to 00.
+
+	* README.T-gnus: Update.
+
+	* lisp/{rfc1843.el,qp.el,nntp.el,nnmail.el,nnfolder.el,nnagent.el,
+	mml.el,mm-view.el,mm-uu.el,mm-util.el,mm-decode.el,mm-bodies.el,
+	message.el,mail-source.el,lpath.el,gnus-util.el,gnus-topic.el,
+	gnus-sum.el,gnus-start.el,gnus-srvr.el,gnus-msg.el,gnus-mailcap.el,
+	gnus-group.el,gnus-art.el,gnus-agent.el,dgnushack.el,binhex.el,
+	ChangeLog}: Sync up with Pterodactyl Gnus v0.98.
+
+	* lisp/{rfc2104.el,nnimap.el,imap.el}: New files.
+
+	* texi/gnus-ja.texi: Sync up with Pterodactyl Gnus v0.98 without
+	translation.
+
+	* texi/{gnus.texi,ChangeLog}: Sync up with Pterodactyl Gnus v0.98.
+
 1999-11-08  Kinji Itoh  <kinji-i@ma.neweb.ne.jp>
 
 	* lisp/gnus-draft.el (gnus-draft-edit-message): Use
@@ -12,6 +33,17 @@
 
 	* lisp/pop3.el (pop3-progress-message): New function.
 	(pop3-movemail): Use it.
+
+1999-10-28  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (TopLevel): Autolaod "gnus-msg" for the function
+	`gnus-following-method'.
+
+	* lisp/gnus-msg.el (gnus-following-method): Move from gnus-msg.el;
+	wide reply as a mail if the message is not a news; use the macro
+	`gnus-setup-message'.
+
+	* lisp/gnus-art.el (gnus-following-method): Move to gnus-msg.el.
 
 1999-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
 
