@@ -990,7 +990,7 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 @item message-ignored-mail-headers
 @vindex message-ignored-mail-headers
 $B%a!<%k$r=P$9A0$K<h$j=|$+$l$k%X%C%@!<$N@55,I=8=$G$9!#=i4|CM(B
-$B$O(B @samp{^[GF]cc:\\|^Resent-Fcc:} $B$G$9!#(B
+$B$O(B @samp{^[GF]cc:\\|^Resent-Fcc:\\|^Xref:\\|^X-Draft-From:} $B$G$9!#(B
 
 @item message-default-mail-headers
 @vindex message-default-mail-headers
@@ -1187,7 +1187,7 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 @item message-ignored-news-headers
 @vindex message-ignored-news-headers
 $BEj9F$9$kA0$K<h$j=|$+$l$k%X%C%@!<$N@55,I=8=$G$9!#=i4|CM$O(B @*
-@samp{^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:} $B$G$9!#(B
+@samp{^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:\\|^X-Draft-From:} $B$G$9!#(B
 
 @item message-default-news-headers
 @vindex message-default-news-headers
