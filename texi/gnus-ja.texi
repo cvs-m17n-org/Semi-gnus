@@ -12840,9 +12840,9 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 @subsubsection 関数インターフェース
 
 上記のいくつかのキーワードは、実行するための Lisp 関数を指定します。関数
-が実行されている間だけ、それぞれのキーワード @code{:foo} の値として Lisp
- 変数 @code{foo} が使われます。例えば、以下のメールソースの設定例につい
-て考えてみて下さい。
+が実行されている間だけ、それぞれのキーワード @code{:foo} の値とし
+て Lisp 変数 @code{foo} が使われます。例えば、以下のメールソースの設定例
+について考えてみて下さい。
 
 @lisp
 (setq mail-sources '((pop :user "jrl"
@@ -13139,9 +13139,21 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 
 @vindex nnmail-split-abbrev-alist
 @var{field} と @var{value} は Lisp シンボル (symbol) である事もでき、そ
-の場合はそれらは @code{nnmail-split-abbrev-alist} で指定されているように
-展開されます。これはセルの @code{car} がキーを含んでいて、@code{cdr} が
-関連付けられた値を持っているコンスセル (cons cell) の連想リストです。
+の場合それらは @code{nnmail-split-abbrev-alist} で指定されているように展
+開されます。これはセルの @code{car} がキーを含んでいて、@code{cdr} が関
+連付けられた値を持っているコンスセル (cons cell) の連想リストです。以下
+の項目が、あらかじめ @code{nnmail-split-abbrev-alist} に定義されています:
+
+@table @code
+@item from
+@samp{From}、@samp{Sender} および @samp{Resent-From} の各フィールドに合
+致します。
+@item to
+@samp{To}、@samp{Cc}、@samp{Apparently-To}、@samp{Resent-To} およ
+び @samp{Resent-Cc} の各フィールドに合致します。
+@item any
+@code{from} と @code{to} を統合したものです。
+@end table
 
 @vindex nnmail-split-fancy-syntax-table
 @code{nnmail-split-fancy-syntax-table} がこれらの全ての分割が実行されて
