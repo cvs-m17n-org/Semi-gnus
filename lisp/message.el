@@ -4924,7 +4924,6 @@ the message."
   "Return a Subject header suitable for the message in the current buffer."
   (save-excursion
     (save-restriction
-      (current-buffer)
       (message-narrow-to-head)
       (let ((funcs message-make-forward-subject-function)
 	    (subject (message-fetch-field "Subject")))
