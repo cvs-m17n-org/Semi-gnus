@@ -34,7 +34,8 @@
 (require 'std11)
 (eval-when-compile
   (defvar bbdb-pop-up-elided-display)	; default unbound.
-  (require 'gnus-win))
+  (require 'gnus-win)
+  (require 'cl))
 
 (defvar gnus-bbdb/decode-field-body-function 'nnheader-decode-field-body
   "*Field body decoder.")
@@ -181,15 +182,31 @@ BBDB-FEILD values is returned.  Otherwise, GROUP is returned."
 						(std11-field-end))
 				  header-values)))
       (let ((address-regexp
-	     (mapconcat
-	      (lambda (lal)
-		(regexp-quote (std11-address-string lal)))
-	      (apply 'nconc
-		     (mapcar #'std11-parse-addresses-string
-			     header-values))
-	      "\\|")))
+	     (with-temp-buffer
+	       (let (lal)
+		 (while header-values
+		   (setq lal (std11-parse-addresses-string
+			      (pop header-values)))
+		   (while lal
+		     (gnus-bbdb/insert-address-regexp (pop lal)))))
+	       (buffer-string))))
 	(unless (zerop (length address-regexp))
 	  (gnus-bbdb/split-mail-1 address-regexp bbdb-field regexp group))))))
+
+(defun gnus-bbdb/insert-address-regexp (address)
+  "Insert string of address part from parsed ADDRESS of RFC 822."
+  (cond ((eq (car address) 'group)
+	 (setq address (cdr address))
+	 (while address
+	   (gnus-bbdb/insert-address-regexp (pop address))))
+	((eq (car address) 'mailbox)
+	 (unless (eq (point) (point-min))
+	   (insert "\\|"))
+	 (let ((addr (nth 1 address)))
+	   (insert (std11-addr-to-string
+		    (if (eq (car addr) 'phrase-route-addr)
+			(nth 2 addr)
+		      (cdr addr))))))))
 
 (defun gnus-bbdb/split-mail-1 (address-regexp bbdb-field regexp group)
   (let ((records (bbdb-search (bbdb-records) nil nil address-regexp))
