@@ -49,6 +49,29 @@
     (fset 'x-defined-colors 'ignore)
     (fset 'read-color 'ignore)))
 
+(eval-and-compile
+  (put 'buffer-string 'byte-optimizer 'byte-optimize-buffer-string)
+  (defun byte-optimize-buffer-string (form)
+    (if (null (cdr form))
+	(list 'buffer-substring (list 'point-min)(list 'point-max))
+      form))
+
+  (put 'backward-char 'byte-optimizer 'byte-optimize-backward-char)
+  (defun byte-optimize-backward-char (form)
+    (if (null (cdr form))
+	(list 'forward-char -1)
+      (list 'forward-char (list '- (nth 1 form)))))
+
+  (when (or (featurep 'xemacs)
+	    (and (= emacs-major-version 20)
+		 (> emacs-minor-version 2)))
+    ;; this optimization is not safe under Emacs 20.2 and before.
+    (put 'char-before 'byte-optimizer 'byte-optimize-char-before)
+    (defun byte-optimize-char-before (form)
+      (if (null (cdr form))
+	  (list 'char-after (list '1- (list 'point)))
+	(list 'char-after (list '1- (nth 1 form)))))))
+
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
   (unless warn
