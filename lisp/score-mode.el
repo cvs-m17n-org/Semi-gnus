@@ -52,9 +52,7 @@
     table)
   "Syntax table used in score-mode buffers.")
 
-(defvar score-mode-coding-system (static-if (boundp 'MULE)
-				     '*ctext*
-				   'ctext))
+(defvar score-mode-coding-system 'ctext)
 
 ;;;###autoload
 (defun gnus-score-mode ()

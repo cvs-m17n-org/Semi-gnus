@@ -37,8 +37,6 @@
        (if (memq 'shift-jis (coding-priority-list))
 	   (set-coding-priority-list
 	    (append (delq 'shift-jis (coding-priority-list)) '(shift-jis)))))
-      ((boundp 'MULE)
-       (put '*coding-category-sjis* 'priority (length *predefined-category*)))
       ((featurep 'mule)
        (if (memq 'coding-category-sjis coding-category-list)
 	   (set-coding-priority
@@ -58,6 +56,7 @@
   (load "cl-macs" nil t))
 
 (defvar srcdir (or (getenv "srcdir") "."))
+(defvar loaddir (and load-file-name (file-name-directory load-file-name)))
 
 (defvar dgnushack-w3-directory (let ((w3dir (getenv "W3DIR")))
 				 (unless (zerop (length w3dir))
@@ -136,49 +135,13 @@ than subr.el."
 	      (put 'car 'side-effect-free tmp)))
 	ad-do-it))))
 
-(when (boundp 'MULE)
-  (let (current-load-list)
-    ;; Make the function to be silent at compile-time.
-    (defun locate-library (library &optional nosuffix)
-      "Show the full path name of Emacs library LIBRARY.
-This command searches the directories in `load-path' like `M-x load-library'
-to find the file that `M-x load-library RET LIBRARY RET' would load.
-Optional second arg NOSUFFIX non-nil means don't add suffixes `.elc' or `.el'
-to the specified name LIBRARY (a la calling `load' instead of `load-library')."
-      (interactive "sLocate library: ")
-      (catch 'answer
-	(mapcar
-	 '(lambda (dir)
-	    (mapcar
-	     '(lambda (suf)
-		(let ((try (expand-file-name (concat library suf) dir)))
-		  (and (file-readable-p try)
-		       (null (file-directory-p try))
-		       (progn
-			 (or noninteractive
-			     (message "Library is file %s" try))
-			 (throw 'answer try)))))
-	     (if nosuffix '("") '(".elc" ".el" ""))))
-	 load-path)
-	(or noninteractive
-	    (message "No library %s in search path" library))
-	nil))
-    (byte-compile 'locate-library)))
-
-(setq max-specpdl-size 3000)
-
-(when (equal
-       (cadr
-	(byte-optimize-form
-	 '(and
-	   (< 0 1)
-	   (message "The subform `(< 0 1)' should be optimized to t"))
-	 'for-effect))
-       '(< 0 1))
+(when (and (not (featurep 'xemacs))
+	   (byte-optimize-form '(and (> 0 1) foo) t))
   (defadvice byte-optimize-form-code-walker
     (around fix-bug-in-and/or-forms (form for-effect) activate)
-    "Fix a bug in the optimizing and/or forms.
-It has already been fixed in XEmacs since 1999-12-06."
+    "Optimize the rest of the and/or forms.
+It has been fixed in XEmacs before releasing 21.4 and also has been
+fixed in Emacs after 21.3."
     (if (and for-effect (memq (car-safe form) '(and or)))
 	(let ((fn (car form))
 	      (backwards (reverse (cdr form))))
@@ -195,27 +158,36 @@ It has already been fixed in XEmacs since 1999-12-06."
 	  (setq ad-return-value (cons fn (nreverse backwards))))
       ad-do-it)))
 
-(condition-case nil
-    (char-after)
-  (wrong-number-of-arguments
-   ;; Optimize byte code for `char-after'.
-   (put 'char-after 'byte-optimizer 'byte-optimize-char-after)
-   (defun byte-optimize-char-after (form)
-     (if (null (cdr form))
-	 '(char-after (point))
-       form))))
+;; Add `early-package-load-path' to `load-path' for XEmacs.  Those paths
+;; won't appear in `load-path' when XEmacs starts with the `-no-autoloads'
+;; option because of a bug. :<
+(when (and (featurep 'xemacs)
+	   (string-match "--package-path=\\([^ ]+\\)"
+			 system-configuration-options))
+  (let ((paths
+	 (apply 'nconc
+		(mapcar
+		 (lambda (path)
+		   (when (file-directory-p
+			  (setq path (expand-file-name "lisp" path)))
+		     (directory-files path t)))
+		 (split-string (match-string 1 system-configuration-options)
+			       "::"))))
+	path adds)
+    (while paths
+      (setq path (car paths)
+	    paths (cdr paths))
+      (when (and path
+		 (not (or (string-match "/\\.\\.?\\'" path)
+			  (member (file-name-as-directory path) load-path)
+			  (member path load-path)))
+		 (file-directory-p path))
+	(push (file-name-as-directory path) adds)))
+    (setq load-path (nconc (nreverse adds) load-path))))
 
-(condition-case nil
-    (char-before)
-  (wrong-number-of-arguments
-   ;; Optimize byte code for `char-before'.
-   (put 'char-before 'byte-optimizer 'byte-optimize-char-before)
-   (defun byte-optimize-char-before (form)
-     (if (null (cdr form))
-	 '(char-before (point))
-       form))))
-
-(load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
+(if (file-exists-p (expand-file-name "dgnuspath.el" srcdir))
+    (load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
+  (message "  ** There's no dgnuspath.el file"))
 
 (condition-case err
     (load "~/.lpath.el" t nil t)
@@ -274,18 +246,30 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	   load-path)))
 (add-path "semi")
 
+(when (and (featurep 'xemacs)
+	   (let ((table (copy-syntax-table emacs-lisp-mode-syntax-table)))
+	     (modify-syntax-entry ?= " " table)
+	     (with-temp-buffer
+	       (with-syntax-table table
+		 (insert "foo=bar")
+		 (goto-char (point-min))
+		 (forward-sexp 1)
+		 (eolp)))))
+  ;; The original `with-syntax-table' uses `copy-syntax-table' which
+  ;; doesn't seem to copy modified syntax entries in XEmacs 21.5.
+  (defmacro with-syntax-table (syntab &rest body)
+    "Evaluate BODY with the SYNTAB as the current syntax table."
+    `(let ((stab (syntax-table)))
+       (unwind-protect
+	   (progn
+	     ;;(set-syntax-table (copy-syntax-table ,syntab))
+	     (set-syntax-table ,syntab)
+	     ,@body)
+	 (set-syntax-table stab)))))
+
 (push srcdir load-path)
-(load (expand-file-name "lpath.el" srcdir) nil t t)
-
-(load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
-
-(when (boundp 'MULE)
-  ;; Bind the function `base64-encode-string' before loading canlock.
-  ;; Since canlock will bind it as an autoloaded function, it causes
-  ;; damage to define the function by MEL.
-  (load (expand-file-name "base64.el" srcdir) nil t t)
-  ;; Load special macros for compiling canlock.el.
-  (load (expand-file-name "canlock-om.el" srcdir) nil t t))
+(push loaddir load-path)
+(load (expand-file-name "lpath.el" loaddir) nil t)
 
 (require 'custom)
 
@@ -300,198 +284,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 		  byte-compile-function-environment)))
   form)
 
-(condition-case nil
-    :symbol-for-testing-whether-colon-keyword-is-available-or-not
-  (void-variable
-   (defun dgnushack-bind-colon-keywords ()
-     "Bind all the colon keywords for old Emacsen."
-     (let ((cache (expand-file-name "dgnuskwds.el" srcdir))
-	   (makefile (expand-file-name "Makefile" srcdir))
-	   (buffer (get-buffer-create " *colon keywords*"))
-	   keywords ignores files file dirs dir form elem make-backup-files)
-       (save-excursion
-	 (set-buffer buffer)
-	 (let (buffer-file-format
-	       format-alist
-	       insert-file-contents-post-hook
-	       insert-file-contents-pre-hook
-	       jam-zcat-filename-list
-	       jka-compr-compression-info-list)
-	   (if (and (file-exists-p cache)
-		    (file-exists-p makefile)
-		    (file-newer-than-file-p cache makefile))
-	       (progn
-		 (insert-file-contents cache nil nil nil t)
-		 (setq keywords (read buffer)))
-	     (setq
-	      ignores
-	      '(:symbol-for-testing-whether-colon-keyword-is-available-or-not
-		;; The following keywords will be bound by CUSTOM.
-		:get :group :initialize :link :load :options :prefix
-		:require :set :tag :type)
-	      files (list (locate-library "semi-def")
-			  (locate-library "mailcap")
-			  (locate-library "mime-def")
-			  (locate-library "path-util")
-			  (locate-library "poem"))
-	      dirs (list (file-name-as-directory (expand-file-name srcdir))))
-	     (while files
-	       (when (setq file (pop files))
-		 (setq dir (file-name-directory file))
-		 (unless (member dir dirs)
-		   (push dir dirs))))
-	     (message "Searching for all the colon keywords in:")
-	     (while dirs
-	       (setq dir (pop dirs))
-	       (message " %s..." dir)
-	       (setq files (directory-files dir t
-					    "\\.el\\(\\.gz\\|\\.bz2\\)?$"))
-	       (while files
-		 (setq file (pop files))
-		 (if (string-match "\\(\\.gz$\\)\\|\\.bz2$" file)
-		     (let ((temp (expand-file-name "dgnustemp.el" srcdir)))
-		       (when
-			   (let* ((binary (if (boundp 'MULE)
-					      '*noconv*
-					    'binary))
-				  (coding-system-for-read binary)
-				  (coding-system-for-write binary)
-				  (input-coding-system binary)
-				  (output-coding-system binary)
-				  (default-process-coding-system
-				    (cons binary binary))
-				  call-process-hook)
-			     (insert-file-contents file nil nil nil t)
-			     (when
-				 (condition-case code
-				     (progn
-				       (if (match-beginning 1)
-					   (call-process-region
-					    (point-min) (point-max)
-					    "gzip" t buffer nil "-cd")
-					 (call-process-region
-					  (point-min) (point-max)
-					  "bzip2" t buffer nil "-d"))
-				       t)
-				   (error
-				    (erase-buffer)
-				    (message "In file %s: %s" file code)
-				    nil))
-			       (write-region (point-min) (point-max) temp
-					     nil 'silent)
-			       t))
-			 (unwind-protect
-			     (insert-file-contents temp nil nil nil t)
-			   (delete-file temp))))
-		   (insert-file-contents file nil nil nil t))
-		 (while (setq form (condition-case nil
-				       (read buffer)
-				     (error nil)))
-		   (when (listp form)
-		     (while form
-		       (setq elem (car-safe form)
-			     form (cdr-safe form))
-		       (unless (memq (car-safe elem)
-				     '(defcustom defface defgroup
-				       define-widget quote))
-			 (while (consp elem)
-			   (push (car elem) form)
-			   (setq elem (cdr elem)))
-			 (when (and elem
-				    (symbolp elem)
-				    (not (eq ': elem))
-				    (eq ?: (aref (symbol-name elem) 0))
-				    (not (memq elem ignores))
-				    (not (memq elem keywords)))
-			   (push elem keywords))))))))
-	     (setq keywords (sort keywords
-				  (lambda (a b)
-				    (string-lessp (symbol-name a)
-						  (symbol-name b)))))
-	     (erase-buffer)
-	     (insert (format "%s" keywords))
-	     (write-region (point-min) (point) cache nil 'silent)
-	     (message
-	      "The following colon keywords will be bound at run-time:\n %s"
-	      keywords))))
-       (kill-buffer buffer)
-       (defconst dgnushack-colon-keywords keywords)
-       (while keywords
-	 (set (car keywords) (car keywords))
-	 (setq keywords (cdr keywords)))))
-   (byte-compile 'dgnushack-bind-colon-keywords)
-   (dgnushack-bind-colon-keywords)))
-
-(when (boundp 'MULE)
-  (setq :version ':version
-	:set-after ':set-after)
-  (require 'custom)
-  (defadvice custom-handle-keyword
-    (around dont-signal-an-error-even-if-unsupported-keyword-is-given
-	    activate)
-    "Don't signal an error even if unsupported keyword is given."
-    (if (not (memq (ad-get-arg 1) '(:version :set-after)))
-	ad-do-it)))
-
-(when (boundp 'MULE)
-  (put 'custom-declare-face 'byte-optimizer
-       'byte-optimize-ignore-unsupported-custom-keywords)
-  (put 'custom-declare-group 'byte-optimizer
-       'byte-optimize-ignore-unsupported-custom-keywords)
-  (defun byte-optimize-ignore-unsupported-custom-keywords (form)
-    (if (or (memq ':version (nthcdr 4 form))
-	    (memq ':set-after (nthcdr 4 form)))
-	(let ((newform (list (car form) (nth 1 form)
-			     (nth 2 form) (nth 3 form)))
-	      (args (nthcdr 4 form)))
-	  (while args
-	    (or (memq (car args) '(:version :set-after))
-		(setq newform (nconc newform (list (car args)
-						   (car (cdr args))))))
-	    (setq args (cdr (cdr args))))
-	  newform)
-      form))
-
-  (put 'custom-declare-variable 'byte-hunk-handler
-       'byte-compile-file-form-custom-declare-variable)
-  (defun byte-compile-file-form-custom-declare-variable (form)
-    ;; Bind defcustom'ed variables.
-    (if (memq 'free-vars byte-compile-warnings)
-	(setq byte-compile-bound-variables
-	      (cons (nth 1 (nth 1 form)) byte-compile-bound-variables)))
-    (if (memq ':version (nthcdr 4 form))
-	;; Make the variable uncustomizable.
-	`(defvar ,(nth 1 (nth 1 form)) ,(nth 1 (nth 2 form))
-	   ,(substring (nth 3 form) (if (string-match "^[\t *]+" (nth 3 form))
-					(match-end 0)
-				      0)))
-      ;; Ignore unsupported keyword(s).
-      (if (memq ':set-after (nthcdr 4 form))
-	  (let ((newform (list (car form) (nth 1 form)
-			       (nth 2 form) (nth 3 form)))
-		(args (nthcdr 4 form)))
-	    (while args
-	      (or (eq (car args) ':set-after)
-		  (setq newform (nconc newform (list (car args)
-						     (car (cdr args))))))
-	      (setq args (cdr (cdr args))))
-	    newform)
-	form)))
-
-  (defadvice byte-compile-inline-expand (around ignore-built-in-functions
-						(form) activate)
-    "Ignore built-in functions."
-    (let* ((name (car form))
-	   (fn (and (fboundp name)
-		    (symbol-function name))))
-      (if (subrp fn)
-	  ;; Give up on inlining.
-	  (setq ad-return-value form)
-	ad-do-it))))
-
 ;; Unknown variables and functions.
-(unless (boundp 'buffer-file-coding-system)
-  (defvar buffer-file-coding-system (symbol-value 'file-coding-system)))
 (unless (featurep 'xemacs)
   (defalias 'Custom-make-dependencies 'ignore)
   (defalias 'update-autoloads-from-directory 'ignore))
@@ -505,11 +298,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 
 (eval-and-compile
   (when (featurep 'xemacs)
-    ;; XEmacs 21.1 needs some extra hand holding
-    (when (eq emacs-minor-version 1)
-      (autoload 'custom-declare-face "cus-face" nil t)
-      (autoload 'cl-compile-time-init "cl-macs" nil t)
-      (autoload 'defadvice "advice" nil nil 'macro))
     (unless (fboundp 'defadvice)
       (autoload 'defadvice "advice" nil nil 'macro))
     (autoload 'Info-directory "info" nil t)
@@ -519,12 +307,15 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (autoload 'apropos-command "apropos" nil t)
     (autoload 'bbdb-complete-name "bbdb-com" nil t)
     (autoload 'browse-url "browse-url" nil t)
+    (autoload 'c-mode "cc-mode" nil t)
     (autoload 'customize-apropos "cus-edit" nil t)
     (autoload 'customize-save-variable "cus-edit" nil t)
     (autoload 'customize-variable "cus-edit" nil t)
     (autoload 'delete-annotation "annotations")
     (autoload 'dolist "cl-macs" nil nil 'macro)
     (autoload 'enriched-decode "enriched")
+    (autoload 'executable-find "executable")
+    (autoload 'font-lock-fontify-buffer "font-lock" nil t)
     (autoload 'info "info" nil t)
     (autoload 'make-annotation "annotations")
     (autoload 'make-display-table "disp-table")
@@ -538,6 +329,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (if (emacs-version>= 21 5)
 	(autoload 'setenv "process" nil t)
       (autoload 'setenv "env" nil t))
+    (autoload 'sgml-mode "psgml" nil t)
     (autoload 'smtpmail-send-it "smtpmail")
     (autoload 'sort-numeric-fields "sort" nil t)
     (autoload 'sort-subr "sort")
@@ -573,7 +365,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
   (autoload 'std11-unfold-region "nnheader"))
 
 (defconst dgnushack-unexporting-files
-  (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el")
+  (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el"
+	    "legacy-gnus-agent.el")
 	  (unless (or (condition-case code
 			  (require 'w3-parse)
 			(error
@@ -629,17 +422,13 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			""))
 	     '("gnus-bbdb.el")))
 	  (unless (featurep 'xemacs)
-	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"))
-	  (when (and (not (featurep 'xemacs))
-		     (<= emacs-major-version 20))
-	    '("smiley.el"))
+	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"
+	      "run-at-time.el"))
 	  (when (and (fboundp 'base64-decode-string)
 		     (subrp (symbol-function 'base64-decode-string)))
 	    '("base64.el"))
 	  (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
 	    '("md5.el"))
-	  (unless (boundp 'MULE)
-	    '("canlock-om.el"))
 	  (when (featurep 'xemacs)
 	    '("gnus-load.el")))
   "Files which will not be installed.")
@@ -671,20 +460,9 @@ dgnushack-compile."
 
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
-  (when (and (not (featurep 'xemacs))
-	     (< emacs-major-version 21))
-    (setq max-specpdl-size 1200))
   (unless warn
     (setq byte-compile-warnings
 	  '(free-vars unresolved callargs redefine)))
-  (unless (locate-library "cus-edit")
-    (error "You do not seem to have Custom installed.
-Fetch it from <URL:http://www.dina.kvl.dk/~abraham/custom/>.
-You also then need to add the following to the lisp/dgnushack.el file:
-
-     (push \"~/lisp/custom\" load-path)
-
-Modify to suit your needs."))
 
   ;; Show `load-path'.
   (message "load-path=(\"%s\")"
@@ -729,22 +507,14 @@ Modify to suit your needs."))
     (expand-file-name "cus-load.el" srcdir)))
 
 (defun dgnushack-make-cus-load ()
-  (when (condition-case nil
-	    (load "cus-dep")
-	  (error
-	   (when (boundp 'MULE)
-	     (if (file-exists-p "../contrib/cus-dep.el")
-		 ;; Use cus-dep.el of the version of Emacs 20.7.
-		 (load-file "../contrib/cus-dep.el")
-	       (error "\
-You need contrib/cus-dep.el to build T-gnus with Mule 2.3@19.34; exiting.")))))
-    (let ((cusload-base-file dgnushack-cus-load-file))
-      (if (fboundp 'custom-make-dependencies)
-	  (custom-make-dependencies)
-	(Custom-make-dependencies))
-      (when (featurep 'xemacs)
-	(message "Compiling %s..." dgnushack-cus-load-file)
-	(byte-compile-file dgnushack-cus-load-file)))))
+  (load "cus-dep")
+  (let ((cusload-base-file dgnushack-cus-load-file))
+    (if (fboundp 'custom-make-dependencies)
+	(custom-make-dependencies)
+      (Custom-make-dependencies))
+    (when (featurep 'xemacs)
+      (message "Compiling %s..." dgnushack-cus-load-file)
+      (byte-compile-file dgnushack-cus-load-file))))
 
 (defun dgnushack-make-auto-load ()
   (require 'autoload)
@@ -920,20 +690,5 @@ You need contrib/cus-dep.el to build T-gnus with Mule 2.3@19.34; exiting.")))))
 		    'string-lessp))
 	(while (setq file (pop files))
 	  (insert "info/" file "\n"))))))
-
-
-(define-compiler-macro describe-key-briefly (&whole form key &optional insert)
-  (if (condition-case nil
-	  (progn
-	    (describe-key-briefly '((())) nil)
-	    t)
-	(wrong-number-of-arguments nil);; Old Emacsen.
-	(error t))
-      form
-    (if insert
-	`(if ,insert
-	     (insert (funcall 'describe-key-briefly ,key))
-	   (funcall 'describe-key-briefly ,key))
-      `(funcall 'describe-key-briefly ,key))))
 
 ;;; dgnushack.el ends here

@@ -31,7 +31,6 @@
 (require 'gnus)				; for macro gnus-kill-buffer, at least
 (require 'nnheader)
 (require 'message)
-(require 'custom)
 (require 'gnus-util)
 (require 'mail-source)
 
@@ -381,12 +380,8 @@ This is copy of the `lazy' widget in Emacs 21.4 provided for compatibility."
                   (widget-apply (car (widget-get widget :children))
                                 :value-inline))
   :default-get (lambda (widget)
-                 ;;(widget-default-get
-                 ;; (widget-convert (widget-get widget :type))))
-		 ;; `widget-default-get' isn't available in Mule 2.
-		 (let ((w (widget-convert (widget-get widget :type))))
-		   (or (widget-get w :value)
-		       (widget-apply w :default-get))))
+                 (widget-default-get
+                  (widget-convert (widget-get widget :type))))
   :match (lambda (widget value)
            (widget-apply (widget-convert (widget-get widget :type))
                          :match value))
@@ -406,13 +401,13 @@ This is copy of the `lazy' widget in Emacs 21.4 provided for compatibility."
                             (const :format "" &)
                             (editable-list :inline t nnmail-split-fancy))
                       (list :tag "Function with fixed arguments (:)"
-                            :value (: nil)
+                            :value (:)
                             (const :format "" :value :)
                             function 
                             (editable-list :inline t (sexp :tag "Arg"))
                             )
                       (list :tag "Function with split arguments (!)"
-                            :value (! nil)
+                            :value (!)
                             (const :format "" !)
                             function
                             (editable-list :inline t nnmail-split-fancy))
@@ -470,7 +465,7 @@ FIELD must match a complete field name.  VALUE must match a complete
 word according to the `nnmail-split-fancy-syntax-table' syntax table.
 You can use \".*\" in the regexps to match partial field names or words.
 
-FIELD and VALUE can also be lisp symbols, in that case they are expanded
+FIELD and VALUE can also be Lisp symbols, in that case they are expanded
 as specified in `nnmail-split-abbrev-alist'.
 
 GROUP can contain \\& and \\N which will substitute from matching
@@ -622,8 +617,7 @@ by anything."
 	(after-insert-file-functions nil))
     (condition-case ()
 	(let ((auto-mode-alist (nnheader-auto-mode-alist))
-	      (file-name-coding-system nnmail-pathname-coding-system)
-	      (pathname-coding-system nnmail-pathname-coding-system))
+	      (file-name-coding-system nnmail-pathname-coding-system))
 	  (insert-file-contents-as-coding-system
 	   nnmail-file-coding-system file)
 	  t)
@@ -671,7 +665,7 @@ nn*-request-list should have been called before calling this function."
     (while (not (eobp))
       (condition-case err
 	  (progn
-	    (narrow-to-region (point) (gnus-point-at-eol))
+	    (narrow-to-region (point) (point-at-eol))
 	    (setq group (read buffer))
 	    (unless (stringp group)
 	      (setq group (symbol-name group)))
@@ -689,8 +683,7 @@ nn*-request-list should have been called before calling this function."
 
 (defun nnmail-save-active (group-assoc file-name)
   "Save GROUP-ASSOC in ACTIVE-FILE."
-  (let ((coding-system-for-write nnmail-active-file-coding-system)
-	(output-coding-system nnmail-active-file-coding-system))
+  (let ((coding-system-for-write nnmail-active-file-coding-system))
     (when file-name
       (with-temp-file file-name
 	(nnmail-generate-active group-assoc)))))
@@ -1110,7 +1103,7 @@ FUNC will be called with the group name to determine the article number."
 	(while (not (eobp))
 	  (unless (< (move-to-column nnmail-split-header-length-limit)
 		     nnmail-split-header-length-limit)
-	    (delete-region (point) (gnus-point-at-eol)))
+	    (delete-region (point) (point-at-eol)))
 	  (forward-line 1))
 	;; Allow washing.
 	(goto-char (point-min))
@@ -1312,12 +1305,8 @@ to actually put the message in the right group."
 (defun nnmail-split-fancy ()
   "Fancy splitting method.
 See the documentation for the variable `nnmail-split-fancy' for details."
-  (let ((syntab (syntax-table)))
-    (unwind-protect
-	(progn
-	  (set-syntax-table nnmail-split-fancy-syntax-table)
-	  (nnmail-split-it nnmail-split-fancy))
-      (set-syntax-table syntab))))
+  (with-syntax-table nnmail-split-fancy-syntax-table
+    (nnmail-split-it nnmail-split-fancy)))
 
 (defvar nnmail-split-cache nil)
 ;; Alist of split expressions their equivalent regexps.
@@ -1619,7 +1608,7 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 	(skip-chars-forward "^\n\r\t")
 	(unless (looking-at "[\r\n]")
 	  (forward-char 1)
-	  (buffer-substring (point) (gnus-point-at-eol)))))))
+	  (buffer-substring (point) (point-at-eol)))))))
 
 ;; Function for nnmail-split-fancy: look up all references in the
 ;; cache and if a match is found, return that group.
@@ -1889,8 +1878,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 
 (defun nnmail-write-region (start end filename &optional append visit lockname)
   "Do a `write-region', and then set the file modes."
-  (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system))
+  (let ((file-name-coding-system nnmail-pathname-coding-system))
     (write-region-as-coding-system
      nnmail-file-coding-system start end filename append visit lockname)
     (set-file-modes filename nnmail-default-file-modes)))

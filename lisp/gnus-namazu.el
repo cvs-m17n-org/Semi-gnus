@@ -1,6 +1,7 @@
 ;;; gnus-namazu.el --- Search mail with Namazu -*- coding: iso-2022-7bit; -*-
 
-;; Copyright (C) 2000,2001,2002,2003 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004
+;; TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 
 ;; Author: TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;; Keywords: mail searching namazu
@@ -101,10 +102,6 @@
 (require 'nnmail)
 (require 'gnus-sum)
 
-;; It is required for Mule 2.3.  See the file Mule23@1934.en.
-(eval-and-compile
-  (autoload 'regexp-opt "regexp-opt"))
-
 ;; To suppress byte-compile warning.
 (eval-when-compile
   (defvar nnml-directory)
@@ -164,10 +161,9 @@ options make any sense in this context."
 (defcustom gnus-namazu-make-index-arguments
   (nconc
    (list "--all" "--mailnews" "--deny=^.*[^0-9].*$")
-   (when (or (and (boundp 'current-language-environment)
-		  (string= "Japanese"
-			   (symbol-value 'current-language-environment)))
-	     (boundp 'MULE))
+   (when (and (boundp 'current-language-environment)
+	      (string= "Japanese"
+		       (symbol-value 'current-language-environment)))
      (list "--indexing-lang=ja")))
   "*Arguments of the indexer of Namazu."
   :type '(repeat string)
@@ -181,8 +177,8 @@ options make any sense in this context."
 
 (defcustom gnus-namazu-coding-system
   (if (memq system-type '(windows-nt OS/2 emx))
-      (if (boundp 'MULE) '*sjis* 'shift_jis)
-    (if (boundp 'MULE) '*euc-japan* 'euc-japan))
+      'shift_jis
+    'euc-japan)
   "*Coding system for Namazu process."
   :type 'coding-system
   :group 'gnus-namazu)
@@ -215,6 +211,24 @@ options make any sense in this context."
   "Face used for namazu query matching words."
   :group 'gnus-namazu)
 
+(defcustom gnus-namazu-command-prefix nil
+  "*Prefix command, 
+if set '(\"ssh\" \"-x\" \"host\"),
+then execute \"ssh -x host namazu ...\""
+  :type '(repeat string)
+  :group 'gnus-namazu)
+
+(defcustom gnus-namazu-imap-group-prefix nil
+  "*Prefix of imap group name.
+ex. nnimap+server:INBOX."
+  :type 'string
+  :group 'gnus-namazu)
+
+(defcustom gnus-namazu-imap-maildir nil
+  "*Maildir directory name."
+  :type 'string
+  :group 'gnus-namazu)
+
 ;;; Internal Variable:
 (defconst gnus-namazu/group-name-regexp "\\`nnvirtual:namazu-search\\?")
 
@@ -223,9 +237,8 @@ options make any sense in this context."
  (fboundp 'gnus-group-decoded-name)
  (let ((gnus-group-name-charset-group-alist
 	(list (cons gnus-namazu/group-name-regexp gnus-namazu-coding-system)))
-       (query (decode-coding-string
-	       (string 27 36 66 52 65 59 122 27 40 66)
-	       (if (boundp 'MULE) '*iso-2022-jp* 'iso-2022-7bit))))
+       (query (decode-coding-string (string 27 36 66 52 65 59 122 27 40 66)
+				    'iso-2022-7bit)))
    (not (string-match query
 		      (gnus-summary-buffer-name
 		       (encode-coding-string
@@ -289,31 +302,41 @@ options make any sense in this context."
 		  (replace-match "\\1:/"))
 	    (eq ?~ (char-after (point))))
       (insert (expand-file-name
-	       (buffer-substring (gnus-point-at-bol) (gnus-point-at-eol))))
-      (delete-region (point) (gnus-point-at-eol)))
+	       (buffer-substring (point-at-bol) (point-at-eol))))
+      (delete-region (point) (point-at-eol)))
     (forward-line 1)))
 
 (defsubst gnus-namazu/call-namazu (query)
   (let ((coding-system-for-read gnus-namazu-coding-system)
 	(coding-system-for-write gnus-namazu-coding-system)
-	(input-coding-system gnus-namazu-coding-system)
-	(output-coding-system gnus-namazu-coding-system)
 	(default-process-coding-system
 	  (cons gnus-namazu-coding-system gnus-namazu-coding-system))
 	program-coding-system-alist
-	(file-name-coding-system gnus-namazu-coding-system)
-	(pathname-coding-system gnus-namazu-coding-system))
-    (apply 'call-process
-	   `(,gnus-namazu-command
-	     nil			; input from /dev/null
-	     t				; output
-	     nil			; don't redisplay
-	     "-q"			; don't be verbose
-	     "-a"			; show all matches
-	     "-l"			; use list format
-	     ,@gnus-namazu-additional-arguments
-	     ,query
-	     ,@gnus-namazu-index-directories))))
+	(file-name-coding-system gnus-namazu-coding-system))
+    (if gnus-namazu-command-prefix
+	(apply 'call-process
+	       (append
+		(list (car gnus-namazu-command-prefix))
+		'(nil t nil)
+		(cdr gnus-namazu-command-prefix)
+		`(,gnus-namazu-command
+		  "-q"			; don't be verbose
+		  "-a"			; show all matches
+		  "-l"			; use list format
+		  ,@gnus-namazu-additional-arguments
+		  ,query
+		  ,@gnus-namazu-index-directories)))
+      (apply 'call-process
+	     `(,gnus-namazu-command
+	       nil			; input from /dev/null
+	       t			; output
+	       nil			; don't redisplay
+	       "-q"			; don't be verbose
+	       "-a"			; show all matches
+	       "-l"			; use list format
+	       ,@gnus-namazu-additional-arguments
+	       ,query
+	       ,@gnus-namazu-index-directories)))))
 
 (defvar gnus-namazu/directory-table nil)
 (defun gnus-namazu/make-directory-table (&optional force)
@@ -369,19 +392,29 @@ options make any sense in this context."
 		       ;; as file names of articles.
 		       (skip-chars-backward "0-9")
 		       (point))))
-	(and (setq group
-		   (symbol-value
-		    (intern-soft (if gnus-namazu-case-sensitive-filesystem
-				     group
-				   (downcase group))
-				 (cdr gnus-namazu/directory-table))))
+	(and (if (not gnus-namazu-imap-maildir)
+		 (setq group
+		       (symbol-value
+			(intern-soft (if gnus-namazu-case-sensitive-filesystem
+					 group
+				       (downcase group))
+				     (cdr gnus-namazu/directory-table))))
+	       ;; FIXME:
+	       ;; gnus-select-method is '(nnimap "server")
+	       ;; nnimap+server:INBOX.group = ~/Maildir/.group 
+	       ;; Namazu resault: ~/Maildir/.group/123
+	       (setq group (and (string-match 
+				 (concat gnus-namazu-imap-maildir
+					 "/\\.\\(.*\\)/") group)
+				(concat gnus-namazu-imap-group-prefix 
+					(match-string 1 group)))))
 	     (or (not groups)
 		 (member group groups))
 	     (push (gnus-namazu/make-article
 		    group
 		    (string-to-number
 		     (buffer-substring-no-properties (point)
-						     (gnus-point-at-eol))))
+						     (point-at-eol))))
 		   articles))
 	(forward-line 1))
       (nreverse articles))))
@@ -761,7 +794,8 @@ than the period that is set to `gnus-namazu-index-update-interval'"
 			 (mapcar 'list gnus-namazu-index-directories) nil t)
       (gnus-namazu/default-index-directory))
     t))
-  (when (setq directory (gnus-namazu/update-p directory force))
+  (when (and (not gnus-namazu-imap-maildir)
+	     (setq directory (gnus-namazu/update-p directory force)))
     (with-current-buffer (get-buffer-create (concat " *mknmz*" directory))
       (buffer-disable-undo)
       (erase-buffer)
@@ -796,9 +830,11 @@ than the period that is set to `gnus-namazu-index-update-interval'"
   (gnus-namazu-update-indices gnus-namazu-index-directories force))
 
 (defun gnus-namazu-update-indices (&optional directories force)
-  (when (setq directories
-	      (delq nil (mapcar (lambda (d) (gnus-namazu/update-p d force))
-				directories)))
+  (when (and (not gnus-namazu-imap-maildir)
+	     (setq directories
+		   (delq nil (mapcar (lambda (d) 
+				       (gnus-namazu/update-p d force)) 
+				     directories))))
     (setq gnus-namazu/update-directories (cons force (cdr directories)))
     (gnus-namazu-update-index (car directories) force)))
 

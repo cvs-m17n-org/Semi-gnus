@@ -100,12 +100,7 @@ DOCSTRING will be printed if ASSERTION is nil and
 ;; sort -fd
 (ptexinfmt-broken-facility texinfo-format-printindex
   "Can't sort on Mule for Windows."
-  (if (and (memq system-type '(windows-nt ms-dos))
-;;; I don't know version threshold.
-;;;	   (string< texinfmt-version "2.37 of 24 May 1997")
-	   (boundp 'MULE) (not (featurep 'meadow))) ; Mule for Windows
-      nil
-    t))
+  t)
 
 ;; @var
 (ptexinfmt-broken-facility texinfo-format-var
@@ -263,6 +258,9 @@ DOCSTRING will be printed if ASSERTION is nil and
 (put 'ifnotplaintext 'texinfo-format 'texinfo-discard-line)
 (put 'ifnotplaintext 'texinfo-end 'texinfo-discard-command)
 
+;; @ifnotdocbook ... @end ifnotdocbook (makeinfo 4.7 or later)
+(put 'ifnotdocbook 'texinfo-format 'texinfo-discard-line)
+(put 'ifnotdocbook 'texinfo-end 'texinfo-discard-command)
 
 ;; @ifnotinfo ... @end ifnotinfo (makeinfo 3.11 or later)
 (put 'ifnotinfo 'texinfo-format 'texinfo-format-ifnotinfo)
@@ -276,6 +274,13 @@ DOCSTRING will be printed if ASSERTION is nil and
 (ptexinfmt-defun-if-void texinfo-format-html ()
   (delete-region texinfo-command-start
 		 (progn (re-search-forward "@end html[ \t]*\n")
+			(point))))
+
+;; @docbook ... @end docbook (makeinfo 4.7 or later)
+(put 'docbook 'texinfo-format 'texinfo-format-docbook)
+(ptexinfmt-defun-if-void texinfo-format-docbook ()
+  (delete-region texinfo-command-start
+		 (progn (re-search-forward "@end docbook[ \t]*\n")
 			(point))))
 
 ;; @ifhtml ... @end ifhtml (makeinfo 3.8 or later)
@@ -292,13 +297,21 @@ DOCSTRING will be printed if ASSERTION is nil and
 		 (progn (re-search-forward "@end ifplaintext[ \t]*\n")
 			(point))))
 
+;; @ifdocbook ... @end ifdocbook (makeinfo 4.7 or later)
+(put 'ifdocbook 'texinfo-format 'texinfo-format-ifdocbook)
+(ptexinfmt-defun-if-void texinfo-format-ifdocbook ()
+  (delete-region texinfo-command-start
+		 (progn (re-search-forward "@end ifdocbook[ \t]*\n")
+			(point))))
 
 
 ;;; Marking
-;; @url, @env, @command
-(put 'url 'texinfo-format 'texinfo-format-code)
+;; @indicateurl, @url, @env, @command, 
 (put 'env 'texinfo-format 'texinfo-format-code)
 (put 'command 'texinfo-format 'texinfo-format-code)
+
+(put 'indicateurl 'texinfo-format 'texinfo-format-code)
+(put 'url 'texinfo-format 'texinfo-format-uref)	; Texinfo 4.7
 
 ;; @acronym
 (put 'acronym 'texinfo-format 'texinfo-format-var)
@@ -361,12 +374,35 @@ For example, @verb\{|@|\} results in @ and
   (delete-char 1))
 
 
+;;; @LaTeX, @registeredsymbol{}
+(put 'LaTeX 'texinfo-format 'texinfo-format-LaTeX)
+(ptexinfmt-defun-if-void texinfo-format-LaTeX ()
+  (texinfo-parse-arg-discard)
+  (insert "LaTeX"))
+
+(put 'registeredsymbol 'texinfo-format 'texinfo-format-registeredsymbol)
+(ptexinfmt-defun-if-void texinfo-format-registeredsymbol ()
+  (texinfo-parse-arg-discard)
+  (insert "(R)"))
+
 ;;; Accents and Special characters
 ;; @pounds{}	==>	#	Pounds Sterling
 (put 'pounds 'texinfo-format 'texinfo-format-pounds)
 (ptexinfmt-defun-if-void texinfo-format-pounds ()
   (texinfo-parse-arg-discard)
   (insert "#"))
+
+;; @ordf{}	==>	a	Spanish feminine
+(put 'ordf 'texinfo-format 'texinfo-format-ordf)
+(ptexinfmt-defun-if-void texinfo-format-ordf ()
+  (texinfo-parse-arg-discard)
+  (insert "o"))
+
+;; @ordm{}	==>	o	Spanish masculine
+(put 'ordm 'texinfo-format 'texinfo-format-ordm)
+(ptexinfmt-defun-if-void texinfo-format-ordm ()
+  (texinfo-parse-arg-discard)
+  (insert "o"))
 
 ;; @OE{}	==>	OE	French-OE-ligature
 (put 'OE 'texinfo-format 'texinfo-format-French-OE-ligature)

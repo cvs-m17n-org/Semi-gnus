@@ -41,12 +41,7 @@
   (require 'smtp)
   (defvar gnus-message-group-art)
   (defvar gnus-list-identifiers)) ; gnus-sum is required where necessary
-(eval-and-compile
-  (if (boundp 'MULE)
-      (progn
-	(require 'base64)
-	(require 'canlock-om))
-    (require 'canlock)))
+(require 'canlock)
 (require 'mailheader)
 (require 'nnheader)
 ;; This is apparently necessary even though things are autoloaded.
@@ -64,12 +59,6 @@
   (require 'mml))
 
 (require 'rfc822)
-(eval-and-compile
-  (autoload 'customize-save-variable "cus-edit") ;; for Mule 2.
-  (autoload 'sha1 "sha1-el")
-  (autoload 'gnus-find-method-for-group "gnus")
-  (autoload 'nnvirtual-find-group-art "nnvirtual")
-  (autoload 'gnus-group-decoded-name "gnus-group"))
 
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
@@ -667,15 +656,13 @@ Done before generating the new subject of a forward."
   (if (string-match "[[:digit:]]" "1") ;; support POSIX?
       "\\([ \t]*[-_.[:word:]]+>+\\|[ \t]*[]>|}+]\\)+"
     ;; ?-, ?_ or ?. MUST NOT be in syntax entry w.
-    (let ((old-table (syntax-table))
-	  non-word-constituents)
-      (set-syntax-table text-mode-syntax-table)
-      (setq non-word-constituents
-	    (concat
-	     (if (string-match "\\w" "-")  "" "-")
-	     (if (string-match "\\w" "_")  "" "_")
-	     (if (string-match "\\w" ".")  "" ".")))
-      (set-syntax-table old-table)
+    (let (non-word-constituents)
+      (with-syntax-table text-mode-syntax-table
+	(setq non-word-constituents
+	      (concat
+	       (if (string-match "\\w" "-")  "" "-")
+	       (if (string-match "\\w" "_")  "" "_")
+	       (if (string-match "\\w" ".")  "" "."))))
       (if (equal non-word-constituents "")
 	  "\\([ \t]*\\(\\w\\)+>+\\|[ \t]*[]>|}+]\\)+"
 	(concat "\\([ \t]*\\(\\w\\|["
@@ -888,11 +875,6 @@ might set this variable to '(\"-f\" \"you@some.where\")."
   :type '(choice (function)
 		 (repeat string)))
 
-(defvar message-cater-to-broken-inn t
-  "Non-nil means Gnus should not fold the `References' header.
-Folding `References' makes ancient versions of INN create incorrect
-NOV lines.")
-
 (eval-when-compile
   (defvar gnus-post-method)
   (defvar gnus-select-method))
@@ -919,7 +901,7 @@ variable isn't used."
 ;; is nil.  See: http://article.gmane.org/gmane.emacs.gnus.general/51138
 (defcustom message-generate-headers-first '(references)
   "Which headers should be generated before starting to compose a message.
-If `t', generate all required headers.  This can also be a list of headers to
+If t, generate all required headers.  This can also be a list of headers to
 generate.  The variables `message-required-news-headers' and
 `message-required-mail-headers' specify which headers to generate.
 
@@ -1205,9 +1187,6 @@ actually occur."
 ;;; XXX: This symbol is overloaded!  See below.
 (defvar message-user-agent nil
   "String of the form of PRODUCT/VERSION.  Used for User-Agent header field.")
-
-(static-when (boundp 'MULE)
-  (require 'reporter));; `define-mail-user-agent' is here.
 
 ;;;###autoload
 (define-mail-user-agent 'message-user-agent
@@ -1749,30 +1728,35 @@ no, only reply back to the author."
   :type 'regexp)
 
 (eval-and-compile
-  (autoload 'message-setup-toolbar "messagexmas")
-  (autoload 'mh-new-draft-name "mh-comp")
-  (autoload 'mh-send-letter "mh-comp")
-  (autoload 'gnus-point-at-eol "gnus-util")
-  (autoload 'gnus-point-at-bol "gnus-util")
-  (autoload 'gnus-output-to-rmail "gnus-util")
-  (autoload 'gnus-output-to-mail "gnus-util")
-  (autoload 'nndraft-request-associate-buffer "nndraft")
-  (autoload 'nndraft-request-expire-articles "nndraft")
-  (autoload 'gnus-open-server "gnus-int")
-  (autoload 'gnus-request-post "gnus-int")
-  (autoload 'gnus-copy-article-buffer "gnus-msg")
   (autoload 'gnus-alive-p "gnus-util")
-  (autoload 'gnus-server-string "gnus")
+  (autoload 'gnus-delay-article "gnus-delay")
+  (autoload 'gnus-extract-address-components "gnus-util")
+  (autoload 'gnus-find-method-for-group "gnus")
+  (autoload 'gnus-group-decoded-name "gnus-group")
   (autoload 'gnus-group-name-charset "gnus-group")
   (autoload 'gnus-group-name-decode "gnus-group")
   (autoload 'gnus-groups-from-server "gnus")
-  (autoload 'rmail-output "rmailout")
-  (autoload 'gnus-delay-article "gnus-delay")
   (autoload 'gnus-make-local-hook "gnus-util")
-  (autoload 'gnus-extract-address-components "gnus-util"))
+  (autoload 'gnus-open-server "gnus-int")
+  (autoload 'gnus-output-to-mail "gnus-util")
+  (autoload 'gnus-output-to-rmail "gnus-util")
+  (autoload 'gnus-request-post "gnus-int")
+  (autoload 'gnus-server-string "gnus")
+  (autoload 'idna-to-ascii "idna")
+  (autoload 'message-setup-toolbar "messagexmas")
+  (autoload 'mh-new-draft-name "mh-comp")
+  (autoload 'mh-send-letter "mh-comp")
+  (autoload 'mu-cite-original "mu-cite")
+  (autoload 'nndraft-request-associate-buffer "nndraft")
+  (autoload 'nndraft-request-expire-articles "nndraft")
+  (autoload 'nnvirtual-find-group-art "nnvirtual")
+  (autoload 'rmail-dont-reply-to "mail-utils")
+  (autoload 'rmail-msg-is-pruned "rmail")
+  (autoload 'rmail-msg-restore-non-pruned-header "rmail")
+  (autoload 'rmail-output "rmailout"))
 
-(eval-and-compile
-  (autoload 'mu-cite-original "mu-cite"))
+(eval-when-compile
+  (autoload 'sha1 "sha1-el"))
 
 
 
@@ -1868,7 +1852,6 @@ is used by default."
 The buffer is expected to be narrowed to just the header of the message;
 see `message-narrow-to-headers-or-head'."
   (let* ((inhibit-point-motion-hooks t)
-	 (case-fold-search t)
 	 (value (mail-fetch-field header nil (not not-all))))
     (when value
       (while (string-match "\n[\t ]+" value)
@@ -1891,9 +1874,7 @@ see `message-narrow-to-headers-or-head'."
    (progn
      (forward-line 1)
      (if (re-search-forward "^[^ \n\t]" nil t)
-	 (progn
-	   (beginning-of-line)
-	   (point))
+	 (point-at-bol)
        (point-max))))
   (goto-char (point-min)))
 
@@ -2692,11 +2673,6 @@ M-RET    `message-newline-and-reformat' (break the line and reformat)."
   (setq message-parameter-alist
 	(copy-sequence message-startup-parameter-alist))
   (message-setup-fill-variables)
-  (set
-   (make-local-variable 'paragraph-separate)
-   (format "\\(%s\\)\\|\\(%s\\)"
-	   paragraph-separate
-	   "<#!*/?\\(multipart\\|part\\|external\\|mml\\|secure\\)"))
   ;; Allow using comment commands to add/remove quoting.
   (set (make-local-variable 'comment-start) message-yank-prefix)
   (if (featurep 'xemacs)
@@ -2743,7 +2719,8 @@ M-RET    `message-newline-and-reformat' (break the line and reformat)."
 	   "---+$\\|"                   ; delimiters for forwarded messages
 	   page-delimiter "$\\|"        ; spoiler warnings
 	   ".*wrote:$\\|"               ; attribution lines
-	   quote-prefix-regexp "$"))    ; empty lines in quoted text
+	   quote-prefix-regexp "$\\|"   ; empty lines in quoted text
+	   mime-edit-tag-regexp))       ; MIME-Edit tags
     (setq paragraph-separate paragraph-start)
     (setq adaptive-fill-regexp
 	  (concat quote-prefix-regexp "\\|" adaptive-fill-regexp))
@@ -3032,16 +3009,23 @@ or in the synonym headers, defined by `message-header-synonyms'."
   (when (message-goto-signature)
     (forward-line -2)))
 
-(defun message-kill-to-signature ()
-  "Deletes all text up to the signature."
-  (interactive)
-  (let ((point (point)))
-    (message-goto-signature)
-    (unless (eobp)
-      (end-of-line -1))
-    (kill-region point (point))
-    (unless (bolp)
-      (insert "\n"))))
+(defun message-kill-to-signature (&optional arg)
+  "Kill all text up to the signature.
+If a numberic argument or prefix arg is given, leave that number
+of lines before the signature intact."
+  (interactive "p")
+  (save-excursion
+    (save-restriction
+      (let ((point (point)))
+	(narrow-to-region point (point-max))
+	(message-goto-signature)
+	(unless (eobp)
+	  (if (and arg (numberp arg))
+	      (forward-line (- -1 arg))
+	    (end-of-line -1)))
+	(unless (= point (point))
+	  (kill-region point (point))
+	  (insert "\n"))))))
 
 (defun message-newline-and-reformat (&optional arg not-break)
   "Insert four newlines, and then reformat if inside quoted text.
@@ -3743,10 +3727,9 @@ Instead, just auto-save the buffer and then bury it."
 
 (defun message-delete-frame (frame org-frame)
   "Delete frame for editing message."
-  (when (and (or (static-if (featurep 'xemacs)
-		     (device-on-window-system-p)
-		   window-system)
-		 (>= emacs-major-version 20))
+  (when (and (static-if (featurep 'xemacs)
+		 (device-on-window-system-p)
+	       window-system)
 	     (or (and (eq message-delete-frame-on-exit t)
 		      (select-frame frame)
 		      (or (eq frame org-frame)
@@ -3951,7 +3934,7 @@ used to distinguish whether the invisible text is a MIME part or not."
 					   font-lock-face highlight))))
       (when hidden-start
 	(goto-char hidden-start)
-	(set-window-start (selected-window) (gnus-point-at-bol))
+	(set-window-start (selected-window) (point-at-bol))
 	(unless (yes-or-no-p
 		 "Invisible text found and made visible; continue sending? ")
 	  (error "Invisible text found and made visible")))))
@@ -4428,14 +4411,15 @@ This sub function is for exclusive use of `message-send-news'."
   "Send the prepared message buffer with `smtpmail-send-it'.
 This only differs from `smtpmail-send-it' that this command evaluates
 `message-send-mail-hook' just before sending a message.  It is useful
-if your ISP requires the POP-before-SMTP authentication.  See the
-documentation for the function `mail-source-touch-pop'."
+if your ISP requires the POP-before-SMTP authentication.  See the Gnus
+manual for details."
   (run-hooks 'message-send-mail-hook)
   (smtpmail-send-it))
 
 (defun message-canlock-generate ()
   "Return a string that is non-trivial to guess.
 Do not use this for anything important, it is cryptographically weak."
+  (require 'sha1-el)
   (let (sha1-maximum-internal-length)
     (sha1 (concat (message-unique-id)
 		  (format "%x%x%x" (random) (random t) (random))
@@ -5023,7 +5007,6 @@ Otherwise, generate and save a value for `canlock-password' first."
   "Process Fcc headers in the current buffer."
   (let ((case-fold-search t)
 	(coding-system-for-write 'raw-text)
-	(output-coding-system 'raw-text)
 	list file
 	(mml-externalize-attachments message-fcc-externalize-attachments))
     (save-excursion
@@ -5507,8 +5490,6 @@ I.e., calling it on a Subject: header is useless."
 	  (incf paren))
 	(and (= (% dquote 2) 1) (= (% paren 2) 1))))))
 
-(autoload 'idna-to-ascii "idna")
-
 (defun message-idna-to-ascii-rhs-1 (header)
   "Interactively potentially IDNA encode domain names in HEADER."
   (let (rhs ace start startpos endpos ovl)
@@ -5665,7 +5646,7 @@ Headers already prepared in the buffer are not modified."
 		      (forward-line -1)))
 		;; The value of this header was empty, so we clear
 		;; totally and insert the new value.
-		(delete-region (point) (gnus-point-at-eol))
+		(delete-region (point) (point-at-eol))
 		;; If the header is optional, and the header was
 		;; empty, we can't insert it anyway.
 		(unless optionalp
@@ -5801,8 +5782,9 @@ If the current line has `message-yank-prefix', insert it on the new line."
 
 (defun message-shorten-references (header references)
   "Trim REFERENCES to be 21 Message-ID long or less, and fold them.
-If folding is disallowed, also check that the REFERENCES are less
-than 988 characters long, and if they are not, trim them until they are."
+When sending via news, also check that the REFERENCES are less
+than 988 characters long, and if they are not, trim them until
+they are."
   (let ((maxcount 21)
 	(count 0)
 	(cut 2)
@@ -5824,33 +5806,25 @@ than 988 characters long, and if they are not, trim them until they are."
 	(message-shorten-1 refs cut surplus)
 	(decf count surplus)))
 
-    ;; If folding is disallowed, make sure the total length (including
-    ;; the spaces between) will be less than MAXSIZE characters.
+    ;; When sending via news, make sure the total folded length will
+    ;; be less than 998 characters.  This is to cater to broken INN
+    ;; 2.3 which counts the total number of characters in a header
+    ;; rather than the physical line length of each line, as it shuld.
     ;;
-    ;; Only disallow folding for News messages. At this point the headers
-    ;; have not been generated, thus we use message-this-is-news directly.
-    (when (and message-this-is-news message-cater-to-broken-inn)
-      (let ((maxsize 988)
-	    (totalsize (+ (apply #'+ (mapcar #'length refs))
-			  (1- count)))
-	    (surplus 0)
-	    (ptr (nthcdr (1- cut) refs)))
-	;; Decide how many elements to cut off...
-	(while (> totalsize maxsize)
-	  (decf totalsize (1+ (length (car ptr))))
-	  (incf surplus)
-	  (setq ptr (cdr ptr)))
-	;; ...and do it.
-	(when (> surplus 0)
-	  (message-shorten-1 refs cut surplus))))
-
+    ;; This hack should be removed when it's believed than INN 2.3 is
+    ;; no longer widely used.
+    ;;
+    ;; At this point the headers have not been generated, thus we use
+    ;; message-this-is-news directly.
+    (when message-this-is-news
+      (while (< 998
+		(with-temp-buffer
+		  (message-fill-header header (mapconcat #'identity refs " "))
+		  (buffer-size)))
+	(message-shorten-1 refs cut 1)))
     ;; Finally, collect the references back into a string and insert
     ;; it into the buffer.
-    (let ((refstring (mapconcat #'identity refs " ")))
-      (if (and message-this-is-news message-cater-to-broken-inn)
-	  (insert (capitalize (symbol-name header)) ": "
-		  refstring "\n")
-	(message-fill-header header refstring)))))
+    (message-fill-header header (mapconcat #'identity refs " "))))
 
 (defun message-position-point ()
   "Move point to where the user probably wants to find it."
@@ -5899,7 +5873,7 @@ beginning of line."
 	   (message-point-in-header-p))
       (let* ((here (point))
 	     (bol (progn (beginning-of-line n) (point)))
-	     (eol (gnus-point-at-eol))
+	     (eol (point-at-eol))
 	     (eoh (re-search-forward ": *" eol t)))
 	(if (or (not eoh) (equal here eoh))
 	    (goto-char bol)
@@ -5950,10 +5924,9 @@ beginning of line."
 (defun message-pop-to-buffer (name)
   "Pop to buffer NAME, and warn if it already exists and is modified."
   (let ((buffer (get-buffer name))
-	(pop-up-frames (and (or (static-if (featurep 'xemacs)
-				    (device-on-window-system-p)
-				  window-system)
-				(>= emacs-major-version 20))
+	(pop-up-frames (and (static-if (featurep 'xemacs)
+				(device-on-window-system-p)
+			      window-system)
 			    message-use-multi-frames)))
     (if (and buffer
 	     (buffer-name buffer))
@@ -6096,12 +6069,7 @@ are not included."
   (when message-default-headers
     (insert message-default-headers)
     (or (bolp) (insert ?\n)))
-  (put-text-property
-   (point)
-   (progn
-     (insert mail-header-separator "\n")
-     (1- (point)))
-   'read-only nil)
+  (insert mail-header-separator "\n")
   (forward-line -1)
   (when (message-news-p)
     (when message-default-news-headers
@@ -6160,9 +6128,7 @@ are not included."
 			      message-auto-save-directory))
       (setq buffer-auto-save-file-name (make-auto-save-file-name)))
     (clear-visited-file-modtime)
-    (static-if (boundp 'MULE)
-	(set-file-coding-system message-draft-coding-system)
-      (setq buffer-file-coding-system message-draft-coding-system))))
+    (setq buffer-file-coding-system message-draft-coding-system)))
 
 (defun message-disassociate-draft ()
   "Disassociate the message buffer from the drafts directory."
@@ -7002,8 +6968,6 @@ Optional NEWS will use news to forward instead of mail."
 (defun message-forward-rmail-make-body (forward-buffer)
   (save-window-excursion
     (set-buffer forward-buffer)
-    ;; Rmail doesn't have rmail-msg-restore-non-pruned-header in Emacs
-    ;; 20.  FIXIT, or we drop support for rmail in Emacs 20.
     (if (rmail-msg-is-pruned)
 	(rmail-msg-restore-non-pruned-header)))
   (message-forward-make-body forward-buffer))
@@ -7225,7 +7189,13 @@ which specify the range to operate on."
 	(if (eq (char-after) (char-after (- (point) 2)))
 	    (delete-char -2))))))
 
-(defalias 'message-exchange-point-and-mark 'exchange-point-and-mark)
+(defun message-exchange-point-and-mark ()
+  "Exchange point and mark, but don't activate region if it was inactive."
+  (unless (prog1
+	      (message-mark-active-p)
+	    (exchange-point-and-mark))
+    (setq mark-active nil)))
+
 (defalias 'message-make-overlay 'make-overlay)
 (defalias 'message-delete-overlay 'delete-overlay)
 (defalias 'message-overlay-put 'overlay-put)
@@ -7306,11 +7276,14 @@ which specify the range to operate on."
   :type '(alist :key-type regexp :value-type function))
 
 (defcustom message-expand-name-function
-  (if (fboundp 'bbdb-complete-name)
-      'bbdb-complete-name
-    (if (fboundp 'lsdb-complete-name)
-	'lsdb-complete-name
-      'expand-abbrev))
+  (cond ((and (boundp 'eudc-protocol)
+	      eudc-protocol)
+	 'eudc-expand-inline)
+	((fboundp 'bbdb-complete-name)
+	 'bbdb-complete-name)
+	((fboundp 'lsdb-complete-name)
+	 'lsdb-complete-name)
+	(t 'expand-abbrev))
   "*A function called to expand addresses in field body."
   :group 'message
   :type 'function)

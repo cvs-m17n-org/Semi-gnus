@@ -1,7 +1,7 @@
 ;;; ssl.el,v --- ssl functions for emacsen without them builtin
 ;; Author: $Author: yamaoka $
-;; Created: $Date: 2004-01-05 00:54:29 $
-;; Version: $Revision: 1.1.6.1.6.1 $
+;; Created: $Date: 2004-05-02 00:24:54 $
+;; Version: $Revision: 1.1.6.1.6.2 $
 ;; Keywords: comm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

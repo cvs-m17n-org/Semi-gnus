@@ -35,27 +35,49 @@
 
 ;; This program was inspired by Kyle E. Jones's vm-pop program.
 
-;; You have to set the variable `pop3-connection-type' to `ssl' or
-;; `tls' expressly, if you would like to use this module with Gnus
-;; (not T-gnus) for those connection types.  For examples:
+;;; Gnus:
+
+;; You can use this program for Gnus, without needing any modification.
+;; There are two ways to do that; one is to replace Gnus' pop3.el with
+;; it when installing Gnus; the other is to replace Gnus' pop3.el which
+;; has been installed with this module and byte-compile it.
+
+;; Note: you should not modify the value for the `pop' section of the
+;; `mail-source-keyword-map' variable.
+
+;; This program provides the following features in addition to Gnus:
+
+;; 1. You can use SSL or STARTTLS stream to connect to mail servers.
+;;    For example, specify the `:connection' keyword and the value pair
+;;    in a mail-source as follows:
 ;;
-;;(setq mail-sources '((pop :server "POPSERVER" :port 995 :connection ssl
-;;                          :authentication apop)))
-;;(setq pop3-connection-type 'ssl)
+;;(setq mail-sources '((pop :server "pop3.mail.server" :port 995
+;;			  :connection ssl :authentication apop)))
+;;
+;;    For STARTTLS stream, use `tls' isntead of `ssl'.  The default
+;;    connection type is defined by `pop3-connection-type' which
+;;    defaults to nil.
+
+;; 2. You can fetch mails without deleting them in mail servers.  To do
+;;    that, specify the `:leave' keyword with the value t as follows:
+;;
+;;(setq mail-sources '((pop :server "pop3.mail.server" :leave t)))
+;;
+;;    Already read mails are registered into the ~/.uidls-SERVER file
+;;    (which is the default, see `pop3-uidl-file-name'), and you will
+;;    never need to fetch them twice.  The default value for the
+;;    `:leave' keyword is specified by the `pop3-leave-mail-on-server'
+;;    variable.  You have no need to modify that value normally.
+
+;; 3. See the source code for some other miscellaneous extended features.
 
 ;;; Code:
 
 (eval-when-compile
-  (require 'cl)
-  ;; For compiling this module in Gnus with XEmacs -no-autoloads.
-  (require 'advice))
-
-;; as-binary-process, open-network-stream-as-binary, write-region-as-binary
-(require 'pces)
-;; exec-installed-p
-(require 'path-util)
+  (require 'cl))
 
 (require 'mail-utils)
+(require 'nnheader)
 
 (defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
@@ -107,7 +129,7 @@ Users don't have to set this value.")
   (autoload 'starttls-negotiate "starttls"))
 
 (defvar pop3-ssl-program-name
-  (if (exec-installed-p "openssl")
+  (if (executable-find "openssl")
       "openssl"
     "ssleay")
   "The program to run in a subprocess to open an SSL connection.")
@@ -161,8 +183,10 @@ Users don't have to set this value.")
 	    (setq messages (cdr messages)
 		  n (1+ n)))
 	  (with-current-buffer crashbuf
-	    (write-region-as-binary (point-min) (point-max)
-				    crashbox 'append 'nomesg))
+	    (let ((coding-system-for-write 'binary)
+		  jka-compr-compression-info-list jam-zcat-filename-list)
+	      (write-region (point-min) (point-max)
+			    crashbox 'append 'nomesg)))
 	  ;; mark messages as read
 	  (when pop3-leave-mail-on-server
 	    (pop3-save-uidls))
@@ -217,8 +241,9 @@ Argument PORT specifies connecting port."
 	((eq pop3-connection-type 'tls)
 	 (pop3-open-tls-stream "POP" (current-buffer) mailhost port))
 	(t
-	 (open-network-stream-as-binary "POP" (current-buffer)
-					mailhost port))))
+	 (let ((coding-system-for-read 'binary)
+	       (coding-system-for-write 'binary))
+	   (open-network-stream "POP" (current-buffer) mailhost port)))))
       (let ((response (pop3-read-response process t)))
 	(setq pop3-timestamp
 	      (substring response (or (string-match "<" response) 0)
@@ -254,17 +279,20 @@ Argument PORT specifies connecting port."
   "Open a SSL connection for a service to a host.
 Returns a subprocess-object to represent the connection.
 Args are NAME BUFFER HOST SERVICE."
-  (as-binary-process
-   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
-       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
+  (let (selective-display ;; Disable ^M to nl translation.
+	(coding-system-for-read 'binary)
+	(coding-system-for-write 'binary))
+    (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+	(pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
 
 (defun pop3-open-tls-stream (name buffer host service)
   "Open a TLSv1 connection for a service to a host.
 Returns a subprocess-object to represent the connection.
 Args are NAME BUFFER HOST SERVICE."
-  (let ((process
-	 (as-binary-process (starttls-open-stream
-			     name buffer host service))))
+  (let* (selective-display ;; Disable ^M to nl translation.
+	 (coding-system-for-read 'binary)
+	 (coding-system-for-write 'binary)
+	 (process (starttls-open-stream name buffer host service)))
     (pop3-stls process)
     (starttls-negotiate process)
     process))
@@ -511,45 +539,6 @@ If NOW, use that time instead."
     (if (not (and response (string-match "+OK" response)))
 	(pop3-quit process))))
 
-;; When this file is being compiled in the Gnus (not T-gnus) source
-;; tree, `md5' might have been defined in w3/md5.el, ./lpath.el or one
-;; of some other libraries and `md5' will accept only 3 arguments.  We
-;; will deceive the byte-compiler not to say warnings.
-(eval-when-compile
-  (if (boundp 'byte-compile-function-environment)
-      (let ((def (assq 'md5 byte-compile-function-environment)))
-	(if def
-	    (setcdr def '(lambda (object &optional start end
-					 coding-system noerror)))
-	  (setq byte-compile-function-environment
-		(cons '(md5 . (lambda (object &optional start end
-					      coding-system noerror)))
-		      byte-compile-function-environment))))))
-
-;; Note that `pop3-md5' should never encode a given string to use for
-;; the apop authentication.
-(eval-and-compile
-  (if (fboundp 'md5)
-      (if (condition-case nil
-	      (md5 "\
-Check whether the 4th argument CODING-SYSTEM is allowed"
-		   nil nil 'binary)
-	    (error nil))
-	  ;; Emacs 21 or XEmacs 21
-	  ;; (md5 OBJECT &optional START END CODING-SYSTEM NOERROR)
-	  (defun pop3-md5 (string)
-	    (md5 string nil nil 'binary))
-	;; The reason why the program reaches here:
-	;; 1. XEmacs 20 is running and the built-in `md5' doesn't
-	;;    allow the 4th argument.
-	;; 2. `md5' has been defined by one of some lisp libraries.
-	;; 3. This file is being compiled in the Gnus source tree,
-	;;    and `md5' has been defined in lpath.el.
-	(defalias 'pop3-md5 'md5))
-    ;; The lisp function will be provided by FLIM or other libraries.
-    (autoload 'md5 "md5")
-    (defalias 'pop3-md5 'md5)))
-
 (defun pop3-apop (process user)
   "Send alternate authentication information to the server."
   (let ((pass pop3-password))
@@ -557,7 +546,9 @@ Check whether the 4th argument CODING-SYSTEM is allowed"
 	(setq pass
 	      (read-passwd (format "Password for %s: " pop3-maildrop))))
     (if pass
-	(let ((hash (pop3-md5 (concat pop3-timestamp pass))))
+	;; Note that `md5' should never encode a given string to use for
+	;; the apop authentication, so we should specify `binary'.
+	(let ((hash (md5 (concat pop3-timestamp pass) nil nil 'binary)))
 	  (pop3-send-command process (format "APOP %s %s" user hash))
 	  (let ((response (pop3-read-response process t)))
 	    (if (not (and response (string-match "+OK" response)))
@@ -715,6 +706,23 @@ If msgno is invalid, return nil.  Otherwise, return a string."
     (setq end (point-marker))
     (pop3-clean-region start end)
     (list start end)))
+
+;;; Advise the mail-source function in order to use this module in Gnus.
+
+(eval-after-load "mail-source"
+  '(if (member '(:connection)
+	       (assq 'pop (symbol-value 'mail-source-keyword-map)))
+       nil ;; T-gnus is running.
+     (defadvice mail-source-fetch-pop (around bind-t-gnus-keywords activate)
+       "Bind `pop3-connection-type' and `pop3-leave-mail-on-server' according
+to `mail-sources' while fetching mails with Gnus."
+       (let ((pop3-connection-type (or (plist-get (cdr (ad-get-arg 0))
+						  :connection)
+				       pop3-connection-type))
+	     (pop3-leave-mail-on-server (or (plist-get (cdr (ad-get-arg 0))
+						       :leave)
+					    pop3-leave-mail-on-server)))
+	 ad-do-it))))
 
 
 ;; Summary of POP3 (Post Office Protocol version 3) commands and responses

@@ -29,12 +29,11 @@
 (eval-when-compile
   (require 'cl)
   (require 'imap)
-  (defvar display-time-mail-function)
-  (autoload 'pop3-movemail "pop3")
-  (autoload 'pop3-get-message-count "pop3"))
+  (defvar display-time-mail-function))
 (eval-and-compile
-  (autoload 'nnheader-cancel-timer "nnheader")
-  (autoload 'nnheader-run-at-time "nnheader"))
+  (autoload 'pop3-movemail "pop3")
+  (autoload 'pop3-get-message-count "pop3")
+  (autoload 'nnheader-cancel-timer "nnheader"))
 (require 'format-spec)
 (require 'message) ;; for `message-directory'
 
@@ -834,12 +833,14 @@ Pass INFO on to CALLBACK."
   "Open and close a POP connection shortly.
 POP server should be defined in `mail-source-primary-source' (which is
 preferred) or `mail-sources'.  You may use it for the POP-before-SMTP
-authentication.  To do that, you need to set the option
-`message-send-mail-function' to `message-send-mail-with-smtp' or
-`message-smtpmail-send-it' and put the following line in .gnus file:
+authentication.  To do that, you need to set the
+`message-send-mail-function' variable as `message-send-mail-with-smtp'
+or `message-smtpmail-send-it' and put the following line in your
+~/.gnus.el file:
 
 \(add-hook 'message-send-mail-hook 'mail-source-touch-pop)
-"
+
+See the Gnus manual for details."
   (let ((sources (if mail-source-primary-source
 		     (list mail-source-primary-source)
 		   mail-sources)))
@@ -909,7 +910,7 @@ This only works when `display-time' is enabled."
 	  (setq display-time-mail-function #'mail-source-new-mail-p)
 	  ;; Set up the main timer.
 	  (setq mail-source-report-new-mail-timer
-		(nnheader-run-at-time
+		(run-at-time
 		 (* 60 mail-source-report-new-mail-interval)
 		 (* 60 mail-source-report-new-mail-interval)
 		 #'mail-source-start-idle-timer))
@@ -939,10 +940,6 @@ This only works when `display-time' is enabled."
 			      (let ((coding-system-for-write
 				     nnheader-text-coding-system)
 				    (coding-system-for-read
-				     nnheader-text-coding-system)
-				    (output-coding-system
-				     nnheader-text-coding-system)
-				    (input-coding-system
 				     nnheader-text-coding-system))
 				(with-temp-file mail-source-crash-box
 				  (insert-file-contents file)
@@ -997,7 +994,6 @@ This only works when `display-time' is enabled."
 			 password) buf)
 	       (imap-mailbox-select mailbox nil buf))
 	  (let ((coding-system-for-write mail-source-imap-file-coding-system)
-		(output-coding-system mail-source-imap-file-coding-system)
 		str)
 	    (with-temp-file mail-source-crash-box
 	      ;; Avoid converting 8-bit chars from inserted strings to

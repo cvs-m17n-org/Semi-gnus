@@ -190,9 +190,8 @@
 		       (car active) (cdr active) group)))))
 
 (defun nnmbox-save-buffer ()
-  (let* ((coding-system-for-write (or nnmbox-file-coding-system-for-write
-				      nnmbox-file-coding-system))
-	 (output-coding-system coding-system-for-write))
+  (let ((coding-system-for-write (or nnmbox-file-coding-system-for-write
+				     nnmbox-file-coding-system)))
     (save-buffer)))
 
 (defun nnmbox-save-active (group-alist active-file)

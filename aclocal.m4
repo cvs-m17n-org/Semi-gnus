@@ -62,18 +62,15 @@ AC_DEFUN(AC_CHECK_EMACS_FLAVOR,
   unset EMACS_cv_SYS_flavor;
 
   AC_EMACS_LISP(flavor,
-    (cond ((featurep (quote xemacs)) \"XEmacs\")\
-          ((boundp (quote MULE)) \"MULE\")\
-          (t \"FSF Emacs\")),
+    (if (featurep (quote xemacs))\
+        \"XEmacs\"\
+      \"Emacs\"),
     "noecho")
-  case $EMACS_cv_SYS_flavor in
-  XEmacs)
-    EMACS_FLAVOR=xemacs;;
-  MULE)
-    EMACS_FLAVOR=mule;;
-  *)
-    EMACS_FLAVOR=emacs;;
-  esac
+  if test $EMACS_cv_SYS_flavor = XEmacs; then
+    EMACS_FLAVOR=xemacs
+  else
+    EMACS_FLAVOR=emacs
+  fi
   AC_MSG_RESULT($EMACS_cv_SYS_flavor)])
 
 AC_DEFUN(AC_PATH_LISPDIR, [

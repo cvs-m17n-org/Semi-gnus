@@ -229,7 +229,6 @@ by nnmaildir-request-article.")
 (defmacro nnmaildir--nov-dir   (dir) `(nnmaildir--subdir ,dir "nov"))
 (defmacro nnmaildir--marks-dir (dir) `(nnmaildir--subdir ,dir "marks"))
 (defmacro nnmaildir--num-dir   (dir) `(nnmaildir--subdir ,dir "num"))
-(defmacro nnmaildir--num-file  (dir) `(concat ,dir ":"))
 
 (defmacro nnmaildir--unlink (file-arg)
   `(let ((file ,file-arg))
@@ -237,20 +236,36 @@ by nnmaildir-request-article.")
 (defun nnmaildir--mkdir (dir)
   (or (file-exists-p (file-name-as-directory dir))
       (make-directory-internal (directory-file-name dir))))
+(defun nnmaildir--mkfile (file)
+  (write-region "" nil file nil 'no-message))
 (defun nnmaildir--delete-dir-files (dir ls)
   (when (file-attributes dir)
     (mapcar 'delete-file (funcall ls dir 'full "\\`[^.]" 'nosort))
     (delete-directory dir)))
 
 (defun nnmaildir--group-maxnum (server group)
-  (if (zerop (nnmaildir--grp-count group)) 0
-    (let ((x (nnmaildir--srvgrp-dir (nnmaildir--srv-dir server)
-				    (nnmaildir--grp-name group))))
-      (setq x (nnmaildir--nndir x)
-	    x (nnmaildir--num-dir x)
-	    x (nnmaildir--num-file x)
-	    x (file-attributes x))
-      (if x (1- (nth 1 x)) 0))))
+  (catch 'return
+    (if (zerop (nnmaildir--grp-count group)) (throw 'return 0))
+    (let ((dir (nnmaildir--srvgrp-dir (nnmaildir--srv-dir server)
+				    (nnmaildir--grp-name group)))
+	  (number-opened 1)
+	  attr ino-opened nlink number-linked)
+      (setq dir (nnmaildir--nndir dir)
+	    dir (nnmaildir--num-dir dir))
+      (while t
+	(setq attr (file-attributes
+		    (concat dir (number-to-string number-opened))))
+	(or attr (throw 'return (1- number-opened)))
+	(setq ino-opened (nth 10 attr)
+	      nlink (nth 1 attr)
+	      number-linked (+ number-opened nlink))
+	(if (or (< nlink 1) (< number-linked nlink))
+	    (signal 'error '("Arithmetic overflow")))
+	(setq attr (file-attributes
+		    (concat dir (number-to-string number-linked))))
+	(or attr (throw 'return (1- number-linked)))
+	(if (/= ino-opened (nth 10 attr))
+	    (setq number-opened number-linked))))))
 
 ;; Make the given server, if non-nil, be the current server.  Then make the
 ;; given group, if non-nil, be the current group of the current server.  Then
@@ -286,6 +301,56 @@ by nnmaildir-request-article.")
       (aset string (match-beginning 0) ? )
       (setq pos (match-end 0))))
   string)
+
+(defun nnmaildir--emlink-p (err)
+  (and (eq (car err) 'file-error)
+       (string= (caddr err) "too many links")))
+
+(defun nnmaildir--eexist-p (err)
+  (eq (car err) 'file-already-exists))
+
+(defun nnmaildir--new-number (nndir)
+  "Allocate a new article number by atomically creating a file under NNDIR."
+  (let ((numdir (nnmaildir--num-dir nndir))
+	(make-new-file t)
+	(number-open 1)
+	number-link previous-number-link path-open path-link ino-open)
+    (nnmaildir--mkdir numdir)
+    (catch 'return
+      (while t
+	(setq path-open (concat numdir (number-to-string number-open)))
+	(if (not make-new-file)
+	    (setq previous-number-link number-link)
+	  (nnmaildir--mkfile path-open)
+	  ;; If Emacs had O_CREAT|O_EXCL, we could return number-open here.
+	  (setq make-new-file nil
+		previous-number-link 0))
+	(let* ((attr (file-attributes path-open))
+	       (nlink (nth 1 attr)))
+	  (setq ino-open (nth 10 attr)
+		number-link (+ number-open nlink))
+	  (if (or (< nlink 1) (< number-link nlink))
+	      (signal 'error '("Arithmetic overflow"))))
+	(if (= number-link previous-number-link)
+	    ;; We've already tried this number, in the previous loop iteration,
+	    ;; and failed.
+	    (signal 'error `("Corrupt internal nnmaildir data" ,path-open)))
+	(setq path-link (concat numdir (number-to-string number-link)))
+	(condition-case err
+	    (progn
+	      (add-name-to-file path-open path-link)
+	      (throw 'return number-link))
+	  (error
+	   (cond
+	    ((nnmaildir--emlink-p err)
+	     (setq make-new-file t
+		   number-open number-link))
+	    ((nnmaildir--eexist-p err)
+	     (let ((attr (file-attributes path-link)))
+	       (if (/= (nth 10 attr) ino-open)
+		   (setq number-open number-link
+			 number-link 0))))
+	    (t (signal (car err) (cdr err))))))))))
 
 (defun nnmaildir--update-nov (server group article)
   (let ((nnheader-file-coding-system 'binary)
@@ -398,30 +463,7 @@ by nnmaildir-request-article.")
 				      nnmaildir--extra)
 	      num (nnmaildir--art-num article))
 	(unless num
-	  ;; Allocate a new article number.
-	  (erase-buffer)
-	  (setq numdir (nnmaildir--num-dir dir)
-		file (nnmaildir--num-file numdir)
-		num -1)
-	  (nnmaildir--mkdir numdir)
-	  (write-region "" nil file nil 'no-message)
-	  (while file
-	    ;; Get the number of links to file.
-	    (setq attr (nth 1 (file-attributes file)))
-	    (if (= attr num)
-		;; We've already tried this number, in the previous loop
-		;; iteration, and failed.
-		(signal 'error `("Corrupt internal nnmaildir data" ,numdir)))
-	    ;; If attr is 123, try to link file to "123".  This atomically
-	    ;; increases the link count and creates the "123" link, failing
-	    ;; if that link was already created by another Gnus, just after
-	    ;; we stat()ed file.
-	    (condition-case nil
-		(progn
-		  (add-name-to-file file (concat numdir (format "%x" attr)))
-		  (setq file nil)) ;; Stop looping.
-	      (file-already-exists nil))
-	    (setq num attr))
+	  (setq num (nnmaildir--new-number dir))
 	  (setf (nnmaildir--art-num article) num))
 	;; Store this new NOV data in a file
 	(erase-buffer)
@@ -682,8 +724,7 @@ by nnmaildir-request-article.")
 	      group (make-nnmaildir--grp :name gname :index 0))
 	(nnmaildir--mkdir nndir)
 	(nnmaildir--mkdir (nnmaildir--nov-dir   nndir))
-	(nnmaildir--mkdir (nnmaildir--marks-dir nndir))
-	(write-region "" nil (concat nndir "markfile") nil 'no-message))
+	(nnmaildir--mkdir (nnmaildir--marks-dir nndir)))
       (setq read-only (nnmaildir--param pgname 'read-only)
 	    ls (or (nnmaildir--param pgname 'directory-files) srv-ls))
       (unless read-only
@@ -768,9 +809,7 @@ by nnmaildir-request-article.")
 
 (defun nnmaildir-request-scan (&optional scan-group server)
   (let ((coding-system-for-write nnheader-file-coding-system)
-	(output-coding-system nnheader-file-coding-system)
 	(buffer-file-coding-system nil)
-	(file-coding-system nil)
 	(file-coding-system-alist nil)
 	(nnmaildir-get-new-mail t)
 	(nnmaildir-group-alist nil)
@@ -1007,9 +1046,7 @@ by nnmaildir-request-article.")
 (defun nnmaildir-request-rename-group (gname new-name &optional server)
   (let ((group (nnmaildir--prepare server gname))
 	(coding-system-for-write nnheader-file-coding-system)
-	(output-coding-system nnheader-file-coding-system)
 	(buffer-file-coding-system nil)
-	(file-coding-system nil)
 	(file-coding-system-alist nil)
 	srv-dir x groups)
     (catch 'return
@@ -1221,9 +1258,7 @@ by nnmaildir-request-article.")
 (defun nnmaildir-request-replace-article (number gname buffer)
   (let ((group (nnmaildir--prepare nil gname))
 	(coding-system-for-write nnheader-file-coding-system)
-	(output-coding-system nnheader-file-coding-system)
 	(buffer-file-coding-system nil)
-	(file-coding-system nil)
 	(file-coding-system-alist nil)
 	dir file article suffix tmpfile deactivate-mark)
     (catch 'return
@@ -1299,9 +1334,7 @@ by nnmaildir-request-article.")
 (defun nnmaildir-request-accept-article (gname &optional server last)
   (let ((group (nnmaildir--prepare server gname))
 	(coding-system-for-write nnheader-file-coding-system)
-	(output-coding-system nnheader-file-coding-system)
 	(buffer-file-coding-system nil)
-	(file-coding-system nil)
 	(file-coding-system-alist nil)
 	srv-dir dir file time tmpfile curfile 24h article)
     (catch 'return
@@ -1489,12 +1522,10 @@ by nnmaildir-request-article.")
 (defun nnmaildir-request-set-mark (gname actions &optional server)
   (let ((group (nnmaildir--prepare server gname))
 	(coding-system-for-write nnheader-file-coding-system)
-	(output-coding-system nnheader-file-coding-system)
 	(buffer-file-coding-system nil)
-	(file-coding-system nil)
 	(file-coding-system-alist nil)
-	del-mark del-action add-action set-action marksdir markfile nlist
-	ranges begin end article all-marks todo-marks did-marks mdir mfile
+	del-mark del-action add-action set-action marksdir nlist
+	ranges begin end article all-marks todo-marks mdir mfile
 	pgname ls permarkfile deactivate-mark)
     (setq del-mark
 	  (lambda (mark)
@@ -1509,17 +1540,22 @@ by nnmaildir-request-article.")
 	       (setq mdir (nnmaildir--subdir marksdir (symbol-name mark))
 		     permarkfile (concat mdir ":")
 		     mfile (concat mdir (nnmaildir--art-prefix article)))
-	       (unless (memq mark did-marks)
-		 (setq did-marks (cons mark did-marks))
-		 (nnmaildir--mkdir mdir)
-		 (unless (file-attributes permarkfile)
-		   (condition-case nil
-		       (add-name-to-file markfile permarkfile)
-		     (file-error
-		      ;; AFS can't make hard links in separate directories
-		      (write-region "" nil permarkfile nil 'no-message)))))
-	       (unless (file-exists-p mfile)
-		 (add-name-to-file permarkfile mfile)))
+	       (condition-case err
+		   (add-name-to-file permarkfile mfile)
+		 (error
+		  (cond
+		   ((nnmaildir--eexist-p err))
+		   ((and (eq (car err) 'file-error)
+			 (string= (caddr err) "no such file or directory"))
+		    (nnmaildir--mkdir mdir)
+		    (nnmaildir--mkfile permarkfile)
+		    (add-name-to-file permarkfile mfile))
+		   ((nnmaildir--emlink-p err)
+		    (let ((permarkfilenew (concat permarkfile "{new}")))
+		      (nnmaildir--mkfile permarkfilenew)
+		      (rename-file permarkfilenew permarkfile 'replace)
+		      (add-name-to-file permarkfile mfile)))
+		   (t (signal (car err) (cdr err)))))))
 	     todo-marks))
 	  set-action (lambda (article)
 		       (funcall add-action)
@@ -1539,7 +1575,6 @@ by nnmaildir-request-article.")
 	    marksdir (nnmaildir--srv-dir nnmaildir--cur-server)
 	    marksdir (nnmaildir--srvgrp-dir marksdir gname)
 	    marksdir (nnmaildir--nndir marksdir)
-	    markfile (concat marksdir "markfile")
 	    marksdir (nnmaildir--marks-dir marksdir)
 	    gname (nnmaildir--grp-name group)
             pgname (nnmaildir--pgname nnmaildir--cur-server gname)

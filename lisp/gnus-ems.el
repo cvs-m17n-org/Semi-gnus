@@ -1,5 +1,5 @@
 ;;; gnus-ems.el --- functions for making Semi-gnus work under different Emacsen
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -38,8 +38,7 @@
 (defvar gnus-down-mouse-2 [down-mouse-2])
 (defvar gnus-widget-button-keymap nil)
 (defvar gnus-mode-line-modified
-  (if (or (featurep 'xemacs)
-	  (< emacs-major-version 20))
+  (if (featurep 'xemacs)
       '("--**-" . "-----")
     '("**" "--")))
 
@@ -50,11 +49,7 @@
   (autoload 'gnus-get-buffer-create "gnus")
   (autoload 'nnheader-find-etc-directory "nnheader"))
 
-(if (or (featurep 'xemacs)
-	(>= emacs-major-version 21))
-    (autoload 'smiley-region "smiley")
-  (autoload 'smiley-region "smiley-mule"))
-
+(autoload 'smiley-region "smiley")
 ;; Fixme: shouldn't require message
 (autoload 'message-text-with-property "message")
 
@@ -67,12 +62,6 @@
       (delete-overlay (pop overlays)))))
 
 ;;; Mule functions.
-
-(eval-and-compile
-  (defalias 'gnus-char-width
-    (if (fboundp 'char-width)
-	'char-width
-      (lambda (ch) 1)))) ;; A simple hack.
 
 (eval-and-compile
   (if (featurep 'xemacs)
@@ -102,16 +91,13 @@
    ((featurep 'mule)
     ;; Mule and new Emacs definitions
 
-    ;; [Note] Now there are three kinds of mule implementations,
-    ;; original MULE, XEmacs/mule and Emacs 20+ including
-    ;; MULE features.  Unfortunately these APIs are different.  In
-    ;; particular, Emacs (including original Mule) and XEmacs are
-    ;; quite different.  However, this version of Gnus doesn't support
-    ;; anything other than XEmacs 20+ and Emacs 20.3+.
+    ;; [Note] Now there are two kinds of mule implementations,
+    ;; XEmacs/mule and Emacs 20+ including Mule features.
+    ;; Unfortunately these APIs are different.  In particular, Emacs
+    ;; and XEmacs are quite different.  However, this version of Gnus
+    ;; doesn't support anything other than XEmacs 21+ and Emacs 21+.
 
-    ;; Predicates to check are following:
-    ;; (boundp 'MULE) is t only if Mule (original; anything older than
-    ;;                     Mule 2.3) is running.
+    ;; Predicate to check is the following:
     ;; (featurep 'mule) is t when other mule variants are running.
 
     ;; It is possible to detect XEmacs/mule by (featurep 'mule) and
@@ -172,16 +158,6 @@
 (defun gnus-mark-active-p ()
   "Non-nil means the mark and region are currently active in this buffer."
   mark-active) ; aliased to region-exists-p in XEmacs.
-
-(if (fboundp 'add-minor-mode)
-    (defalias 'gnus-add-minor-mode 'add-minor-mode)
-  (defun gnus-add-minor-mode (mode name map &rest rest)
-    (set (make-local-variable mode) t)
-    (unless (assq mode minor-mode-alist)
-      (push `(,mode ,name) minor-mode-alist))
-    (unless (assq mode minor-mode-map-alist)
-      (push (cons mode map)
-	    minor-mode-map-alist))))
 
 (defun gnus-x-splash ()
   "Show a splash screen using a pixmap in the current buffer."

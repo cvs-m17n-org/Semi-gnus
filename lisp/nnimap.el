@@ -61,7 +61,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 (require 'imap)
 
 (require 'nnoo)
@@ -404,6 +403,43 @@ just like \"ticked\" articles, in other IMAP clients.")
 If this is 'imap-mailbox-lsub, then use a server-side subscription list to
 restrict visible folders.")
 
+(defcustom nnimap-id nil
+  "Plist with client identity to send to server upon login.
+Nil means no information is sent, symbol `no' to disable ID query
+alltogheter, or plist with identifier-value pairs to send to
+server.  RFC 2971 describes the list as follows:
+
+   Any string may be sent as a field, but the following are defined to
+   describe certain values that might be sent.  Implementations are free
+   to send none, any, or all of these.  Strings are not case-sensitive.
+   Field strings MUST NOT be longer than 30 octets.  Value strings MUST
+   NOT be longer than 1024 octets.  Implementations MUST NOT send more
+   than 30 field-value pairs.
+
+     name            Name of the program
+     version         Version number of the program
+     os              Name of the operating system
+     os-version      Version of the operating system
+     vendor          Vendor of the client/server
+     support-url     URL to contact for support
+     address         Postal address of contact/vendor
+     date            Date program was released, specified as a date-time
+                       in IMAP4rev1
+     command         Command used to start the program
+     arguments       Arguments supplied on the command line, if any
+                       if any
+     environment     Description of environment, i.e., UNIX environment
+                       variables or Windows registry settings
+
+   Implementations MUST NOT send the same field name more than once.
+
+An example plist would be '(\"name\" \"Gnus\" \"version\" gnus-version-number
+\"os\" system-configuration \"vendor\" \"GNU\")."
+  :group 'nnimap
+  :type '(choice (const :tag "No information" nil)
+		 (const :tag "Disable ID query" no)
+		 (plist :key-type string :value-type string)))
+
 (defcustom nnimap-debug nil
   "If non-nil, random debug spews are placed in *nnimap-debug* buffer."
   :group 'nnimap
@@ -733,6 +769,7 @@ If EXAMINE is non-nil the group is selected read-only."
 	  (prog1
 	      (push (list server nnimap-server-buffer)
 		    nnimap-server-buffer-alist)
+	    (imap-id nnimap-id nnimap-server-buffer)
 	    (nnimap-possibly-change-server server))
 	(imap-close nnimap-server-buffer)
 	(kill-buffer nnimap-server-buffer)
@@ -794,8 +831,8 @@ Return nil if the server couldn't be closed for some reason."
 All buffers that have been created by that
 backend should be killed.  (Not the nntp-server-buffer, though.) This
 function is generally only called when Gnus is shutting down."
-  (mapcar (lambda (server) (nnimap-close-server (car server)))
-	  nnimap-server-buffer-alist)
+  (mapc (lambda (server) (nnimap-close-server (car server)))
+	nnimap-server-buffer-alist)
   (setq nnimap-server-buffer-alist nil))
 
 (deffoo nnimap-status-message (&optional server)
@@ -1181,11 +1218,11 @@ function is generally only called when Gnus is shutting down."
 	      (if (memq 'dormant cmdmarks)
 		  (setq cmdmarks (cons 'tick cmdmarks))))
 	    ;; remove stuff we are forbidden to store
-	    (mapcar (lambda (mark)
-		      (if (imap-message-flag-permanent-p
-			   (nnimap-mark-to-flag mark))
-			  (setq marks (cons mark marks))))
-		    cmdmarks)
+	    (mapc (lambda (mark)
+		    (if (imap-message-flag-permanent-p
+			 (nnimap-mark-to-flag mark))
+			(setq marks (cons mark marks))))
+		  cmdmarks)
 	    (when (and range marks)
 	      (cond ((eq what 'del)
 		     (imap-message-flags-del
@@ -1514,21 +1551,21 @@ function is generally only called when Gnus is shutting down."
       (error "Your server does not support ACL editing"))
     (with-current-buffer nnimap-server-buffer
       ;; delete all removed identifiers
-      (mapcar (lambda (old-acl)
-		(unless (assoc (car old-acl) new-acls)
-		  (or (imap-mailbox-acl-delete (car old-acl) mailbox)
-		      (error "Can't delete ACL for %s" (car old-acl)))))
-	      old-acls)
+      (mapc (lambda (old-acl)
+	      (unless (assoc (car old-acl) new-acls)
+		(or (imap-mailbox-acl-delete (car old-acl) mailbox)
+		    (error "Can't delete ACL for %s" (car old-acl)))))
+	    old-acls)
       ;; set all changed acl's
-      (mapcar (lambda (new-acl)
-		(let ((new-rights (cdr new-acl))
-		      (old-rights (cdr (assoc (car new-acl) old-acls))))
-		  (unless (and old-rights new-rights
-			       (string= old-rights new-rights))
-		    (or (imap-mailbox-acl-set (car new-acl) new-rights mailbox)
-			(error "Can't set ACL for %s to %s" (car new-acl)
-			       new-rights)))))
-	      new-acls)
+      (mapc (lambda (new-acl)
+	      (let ((new-rights (cdr new-acl))
+		    (old-rights (cdr (assoc (car new-acl) old-acls))))
+		(unless (and old-rights new-rights
+			     (string= old-rights new-rights))
+		  (or (imap-mailbox-acl-set (car new-acl) new-rights mailbox)
+		      (error "Can't set ACL for %s to %s" (car new-acl)
+			     new-rights)))))
+	    new-acls)
       t)))
 
 

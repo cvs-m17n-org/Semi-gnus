@@ -1,6 +1,182 @@
-2004-01-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+2004-04-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/nnshimbun.el: Accidentaly revivaled.  Remove again.
+	* lisp/dgnushack.el (describe-key-briefly): Remove compiler macro.
+
+2004-04-12  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* texi/ptexinfmt.el: Support @indicateurl, @LaTeX, @ordf, @ordm.
+	@url is now a synonym for @uref.
+
+2004-04-08  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-util.el (gnus-set-work-buffer): Set buffer multibyte.
+	(gnus-select-frame-set-input-focus): Don't check whether
+	`focus-follows-mouse' is bound.
+	(frame-parameter): Remove.
+
+2004-03-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/pop3.el: Don't require `advice', `pces' and `path-util'.
+	(pop3-ssl-program-name): Use `executable-find' instead of
+	`exec-installed-p'.
+	(pop3-movemail): Don't use `write-region-as-binary'.
+	(pop3-open-server): Don't use `open-network-stream-as-binary'.
+	(pop3-open-ssl-stream): Don't use `as-binary-process'.
+	(pop3-open-tls-stream): Ditto.
+	(mail-source-fetch-pop): In Gnus, advise it to bind
+	`pop3-connection-type' and `pop3-leave-mail-on-server' while
+	fetching mails, according to `mail-sources'.
+
+2004-03-24  KOSEKI Yoshinori  <kose@meadowy.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/directory-table-use): Remove.
+	(gnus-namazu-imap-maildir): New variable.
+
+2004-03-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-unexporting-files): Add
+	legacy-gnus-agent.el.
+
+2004-03-08  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* make.bat: Make sure that gnus-load.el and sieve are writable to
+	avoid breakage.
+
+2004-03-04  KOSEKI Yoshinori  <kose@meadowy.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu-command-prefix): New variable.
+	(gnus-namazu-imap-group-prefix): Ditto.
+	(gnus-namazu/directory-table-use): Ditto.
+	(gnus-namazu/call-namazu): Use gnus-namazu-imap-group-prefix.
+	(gnus-namazu/search): Support Maildir.
+
+2004-03-01  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* make.bat: Fix directory test for Windows 9x/ME.  From Michael
+	Schierl <schierlm-public@gmx.de> (tiny change).
+
+2004-02-11  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* texi/ptexinfmt.el: Support @docbook, @ifdocbook, @ifnotdocbook,
+	and @registeredsymbol.
+
+2004-02-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Fix misplaced `)'.
+
+2004-02-03  Hiroshi Fujishima  <pooh@nature.tsukuba.ac.jp>
+
+	* texi/gnus-ja.texi (Contributors): Fix typo.
+
+2004-01-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/canlock.el: Reload sha1-el provided by FLIM when an old
+	version (maybe provided by the XEmacs ecrypt package) was loaded.
+
+	* lisp/dgnushack.el (max-specpdl-size): Don't modify the value.
+	(byte-optimize-form-code-walker): Simplify the test form; doc fix.
+	(char-after): Don't byte-optimize it.
+	(char-before): Ditto.
+	(dgnushack-bind-colon-keywords): Remove.
+
+2004-01-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/smime.el: Remove.
+
+2004-01-14  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-add-button): Remove Mule 2 stuff.
+	* lisp/gnus-namazu.el: Don't autoload regexp-opt.
+	* lisp/gnus-util.el (gnus-read-event-char): Remove Mule 2 stuff.
+	* lisp/nnmail.el (nnmail-lazy): Ditto.
+
+2004-01-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-treat-smiley): Ignore Emacs version
+	number.
+
+	* lisp/gnus-cite.el (gnus-cite-add-face): Don't support old
+	Emacsen.
+
+	* lisp/gnus.el: Always autoload `x-face-decode-message-header' and
+	`x-face-mule-gnus-article-display-x-face'.
+
+	* lisp/pop3.el (pop3-md5): Always use the built-in `md5'.
+
+2004-01-07  Hiroshi Fujishima  <pooh@nature.tsukuba.ac.jp>
+
+	* etc/gnus-tut.txt: `G m' instead of `G V' (tiny patch).
+
+2004-01-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-clfns.el: Abolish.
+	* lisp/nnshimbun.el: Abolish.
+
+	* lisp/dgnushack.el: Allow loading dgnushack.el w/o dgnuspath.el.
+
+2004-01-05  Jesper Harder  <harder@ifa.au.dk>
+
+	* make.bat: Add missing parens.  From Robert Marshall
+	<spam@chezmarshall.freeserve.co.uk>.
+
+2004-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* aclocal.m4 (AC_CHECK_EMACS_FLAVOR): Don't check for Mule 2.
+	* sample.lpath.el: Remove.
+	* contrib/cus-dep.el: Remove.
+	* contrib/gnus-idna.el: Remove.
+	* contrib/passwd.el: Remove.
+	* contrib/regexp-opt.el: Remove.
+	* contrib/timer.el: Remove.
+	* lisp/canlock-om.el: Remove.
+	* lisp/dgnushack.el: Add `early-package-load-path' to `load-path'
+	for XEmacs 21.5; remove Mule 2 stuff.
+	* lisp/gnus-agent.el: Remove Mule 2 stuff.
+	* lisp/gnus-art.el: Ditto.
+	* lisp/gnus-cite.el: Ditto.
+	* lisp/gnus-ems.el: Ditto.
+	* lisp/gnus-msg.el: Ditto.
+	* lisp/gnus-namazu.el: Ditto.
+	* lisp/gnus-offline.el: Ditto.
+	* lisp/gnus-start.el: Ditto.
+	* lisp/gnus-util.el: Ditto.
+	* lisp/gnus-uu.el: Ditto.
+	* lisp/gnus.el: Ditto.
+	* lisp/lpath.el: Ditto.
+	* lisp/mail-source.el: Ditto.
+	* lisp/message.el: Ditto.
+	* lisp/mm-url.el: Ditto.
+	* lisp/nnfolder.el: Ditto.
+	* lisp/nnheader.el: Ditto.
+	* lisp/nnkiboze.el: Ditto.
+	* lisp/nnmail.el: Ditto.
+	* lisp/nnmaildir.el: Ditto.
+	* lisp/nnmbox.el: Ditto.
+	* lisp/nnmh.el: Ditto.
+	* lisp/nnml.el: Ditto.
+	* lisp/nnrss.el: Ditto.
+	* lisp/nnshimbun.el: Ditto.
+	* lisp/nntp.el: Ditto.
+	* lisp/score-mode.el: Ditto.
+	* texi/infohack.el: Ditto.
+	* texi/ptexinfmt.el: Ditto.
+
+2004-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/hex-util.el: Remove.
+	* lisp/md5.el: Remove.
+	* lisp/sha1-el.el: Remove.
+
+2004-01-05  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Mention SASL, and that sieve-manage uses it.
+	Mention password.el.
+	Mention NTLM.
+
+2004-01-04  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Add IMAP ID (RFC 2971) support.
+	Mention `W e' for editing all.SCORE.
 
 2004-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 

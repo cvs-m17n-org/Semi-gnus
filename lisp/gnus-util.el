@@ -31,19 +31,23 @@
 ;; Gnus first.
 
 ;; [Unfortunately, it does depend on other parts of Gnus, e.g. the
-;; autoloads below...]
+;; autoloads and defvars below...]
 
 ;;; Code:
 
 (eval-when-compile
   (require 'cl)
   ;; Fixme: this should be a gnus variable, not nnmail-.
-  (defvar nnmail-pathname-coding-system))
-(eval-when-compile (require 'static))
+  (defvar nnmail-pathname-coding-system)
 
-(require 'custom)
+  ;; Inappropriate references to other parts of Gnus.
+  (defvar gnus-emphasize-whitespace-regexp)
+  )
+
 (require 'time-date)
 (require 'netrc)
+
+(eval-when-compile (require 'static))
 
 (eval-and-compile
   (autoload 'message-fetch-field "message")
@@ -60,15 +64,7 @@
     (defalias 'gnus-replace-in-string 'replace-in-string))
    ((fboundp 'replace-regexp-in-string)
     (defun gnus-replace-in-string  (string regexp newtext &optional literal)
-      (replace-regexp-in-string regexp newtext string nil literal)))
-   (t
-    (defun gnus-replace-in-string (string regexp newtext &optional literal)
-      (let ((start 0) tail)
-	(while (string-match regexp string start)
-	  (setq tail (- (length string) (match-end 0)))
-	  (setq string (replace-match newtext nil literal string))
-	  (setq start (- (length string) tail))))
-      string))))
+      (replace-regexp-in-string regexp newtext string nil literal)))))
 
 ;;; bring in the netrc functions as aliases
 (defalias 'gnus-netrc-get 'netrc-get)
@@ -130,35 +126,6 @@
        (funcall (if (stringp buffer) 'get-buffer 'buffer-name)
 		buffer))))
 
-(static-cond
- ((fboundp 'point-at-bol)
-  (defalias 'gnus-point-at-bol 'point-at-bol))
- ((fboundp 'line-beginning-position)
-  (defalias 'gnus-point-at-bol 'line-beginning-position))
- (t
-  (defun gnus-point-at-bol ()
-    "Return point at the beginning of the line."
-    (let ((p (point)))
-      (beginning-of-line)
-      (prog1
-	  (point)
-	(goto-char p))))
-  ))
-(static-cond
- ((fboundp 'point-at-eol)
-  (defalias 'gnus-point-at-eol 'point-at-eol))
- ((fboundp 'line-end-position)
-  (defalias 'gnus-point-at-eol 'line-end-position))
- (t
-  (defun gnus-point-at-eol ()
-    "Return point at the end of the line."
-    (let ((p (point)))
-      (end-of-line)
-      (prog1
-	  (point)
-	(goto-char p))))
-  ))
-
 ;; The LOCAL arg to `add-hook' is interpreted differently in Emacs and
 ;; XEmacs.  In Emacs we don't need to call `make-local-hook' first.
 ;; It's harmless, though, so the main purpose of this alias is to shut
@@ -183,7 +150,7 @@
 
 ;; Delete the current line (and the next N lines).
 (defmacro gnus-delete-line (&optional n)
-  `(delete-region (gnus-point-at-bol)
+  `(delete-region (point-at-bol)
 		  (progn (forward-line ,(or n 1)) (point))))
 
 (defun gnus-byte-code (func)
@@ -233,8 +200,7 @@ is slower."
   "Return the value of the header FIELD of current article."
   (save-excursion
     (save-restriction
-      (let ((case-fold-search t)
-	    (inhibit-point-motion-hooks t))
+      (let ((inhibit-point-motion-hooks t))
 	(nnheader-narrow-to-headers)
 	(message-fetch-field field)))))
 
@@ -246,7 +212,7 @@ is slower."
 
 (defun gnus-goto-colon ()
   (beginning-of-line)
-  (let ((eol (gnus-point-at-eol)))
+  (let ((eol (point-at-eol)))
     (goto-char (or (text-property-any (point) eol 'gnus-position t)
 		   (search-forward ":" eol t)
 		   (point)))))
@@ -570,13 +536,7 @@ If N, return the Nth ancestor instead."
 
 (defun gnus-read-event-char (&optional prompt)
   "Get the next event."
-  (let ((event (condition-case nil
-		   (read-event prompt)
-		 ;; `read-event' doesn't allow arguments in Mule 2.3
-		 (wrong-number-of-arguments
-		  (when prompt
-		    (message "%s" prompt))
-		  (read-event)))))
+  (let ((event (read-event prompt)))
     ;; should be gnus-characterp, but this can't be called in XEmacs anyway
     (cons (and (numberp event) event) event)))
 
@@ -605,7 +565,8 @@ If N, return the Nth ancestor instead."
 	(set-buffer gnus-work-buffer)
 	(erase-buffer))
     (set-buffer (gnus-get-buffer-create gnus-work-buffer))
-    (kill-all-local-variables)))
+    (kill-all-local-variables)
+    (set-buffer-multibyte t)))
 
 (defmacro gnus-group-real-name (group)
   "Find the real name of a foreign newsgroup."
@@ -681,8 +642,7 @@ and `print-level' to nil."
 (defun gnus-make-directory (directory)
   "Make DIRECTORY (and all its parents) if it doesn't exist."
   (require 'nnmail)
-  (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system))
+  (let ((file-name-coding-system nnmail-pathname-coding-system))
     (when (and directory
 	       (not (file-exists-p directory)))
       (make-directory directory t)))
@@ -692,8 +652,7 @@ and `print-level' to nil."
   "Write the current buffer's contents to FILE."
   ;; Make sure the directory exists.
   (gnus-make-directory (file-name-directory file))
-  (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system))
+  (let ((file-name-coding-system nnmail-pathname-coding-system))
     ;; Write the buffer.
     (write-region (point-min) (point-max) file nil 'quietly)))
 
@@ -902,8 +861,7 @@ with potentially long computations."
       ;; Decide whether to append to a file or to an Emacs buffer.
       (let ((outbuf (get-file-buffer filename)))
 	(if (not outbuf)
-	    (let ((file-name-coding-system nnmail-pathname-coding-system)
-		  (pathname-coding-system nnmail-pathname-coding-system))
+	    (let ((file-name-coding-system nnmail-pathname-coding-system))
 	      (write-region-as-binary (point-min) (point-max)
 				      filename 'append))
 	  ;; File has been visited, in buffer OUTBUF.
@@ -974,8 +932,7 @@ with potentially long computations."
 		    (insert "\n"))
 		  (insert "\n"))
 		(goto-char (point-max))
-		(let ((file-name-coding-system nnmail-pathname-coding-system)
-		      (pathname-coding-system nnmail-pathname-coding-system))
+		(let ((file-name-coding-system nnmail-pathname-coding-system))
 		  (write-region-as-binary (point-min) (point-max)
 					  filename 'append))))
 	  ;; File has been visited, in buffer OUTBUF.
@@ -1089,8 +1046,7 @@ Return the modified alist."
     t))
 
 (defun gnus-write-active-file (file hashtb &optional full-names)
-  (let ((output-coding-system nnmail-active-file-coding-system)
-	(coding-system-for-write nnmail-active-file-coding-system))
+  (let ((coding-system-for-write nnmail-active-file-coding-system))
     (with-temp-file file
       (mapatoms
        (lambda (sym)
@@ -1291,32 +1247,12 @@ SPEC is a predicate specifier that contains stuff like `or', `and',
 	`(,(car spec) ,@(mapcar 'gnus-make-predicate-1 (cdr spec)))
       (error "Invalid predicate specifier: %s" spec)))))
 
-(defun gnus-local-map-property (map)
-  "Return a list suitable for a text property list specifying keymap MAP."
-  (cond
-   ((featurep 'xemacs)
-    (list 'keymap map))
-   ((>= emacs-major-version 21)
-    (list 'keymap map))
-   (t
-    (list 'local-map map))))
-
-(defmacro gnus-completing-read-maybe-default (prompt table &optional predicate
-					      require-match initial-contents
-					      history default)
-  "Like `completing-read', allowing for non-existent 7th arg in older XEmacsen."
-  `(completing-read ,prompt ,table ,predicate ,require-match
-                    ,initial-contents ,history
-                    ,@(if (and (featurep 'xemacs) (< emacs-minor-version 2))
-                          ()
-                        (list default))))
-
 (defun gnus-completing-read (prompt table &optional predicate require-match
 				    history)
   (when (and history
 	     (not (boundp history)))
     (set history nil))
-  (gnus-completing-read-maybe-default
+  (completing-read
    (if (symbol-value history)
        (concat prompt " (" (car (symbol-value history)) "): ")
      (concat prompt ": "))
@@ -1434,16 +1370,8 @@ CHOICE is a list of the choice char and help message at IDX."
 		(x-focus-frame frame))
 	       ((eq window-system 'w32)
 		(w32-focus-frame frame)))
-	 (when (or (not (boundp 'focus-follows-mouse))
-		   (symbol-value 'focus-follows-mouse))
+	 (when focus-follows-mouse
 	   (set-mouse-position frame (1- (frame-width frame)) 0)))))
-
-(unless (fboundp 'frame-parameter)
-  (defalias 'frame-parameter
-    (lambda (frame parameter)
-      "Return FRAME's value for parameter PARAMETER.
-If FRAME is nil, describe the currently selected frame."
-      (cdr (assq parameter (frame-parameters frame))))))
 
 (defun gnus-frame-or-window-display-name (object)
   "Given a frame or window, return the associated display name.
@@ -1526,10 +1454,7 @@ predicate on the elements."
      ((eq gnus-user-agent 'gnus)
       nil)
      ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$" emacs-version)
-      (concat (format (if (boundp 'MULE)
-			  "Mule/2.3 (based on Emacs %s)"
-			"Emacs/%s")
-		      (match-string 1 emacs-version))
+      (concat "Emacs/" (match-string 1 emacs-version)
 	      (if system-v
 		  (concat " (" system-v ")")
 		"")))
@@ -1550,6 +1475,28 @@ predicate on the elements."
 	      ")"))
 	 "")))
      (t emacs-version))))
+
+(defun gnus-rename-file (old-path new-path &optional trim)
+  "Rename OLD-PATH as NEW-PATH.  If TRIM, recursively delete
+empty directories from OLD-PATH."
+  (when (file-exists-p old-path)
+    (let* ((old-dir (file-name-directory old-path))
+	   (old-name (file-name-nondirectory old-path))
+	   (new-dir (file-name-directory new-path))
+	   (new-name (file-name-nondirectory new-path))
+	   temp)
+      (gnus-make-directory new-dir)
+      (rename-file old-path new-path t)
+      (when trim
+	(while (progn (setq temp (directory-files old-dir))
+		      (while (member (car temp) '("." ".."))
+			(setq temp (cdr temp)))
+		      (= (length temp) 0))
+	  (delete-directory old-dir)
+	  (setq old-dir (file-name-as-directory 
+			 (file-truename 
+			  (concat old-dir "..")))))))))
+
 
 (provide 'gnus-util)
 

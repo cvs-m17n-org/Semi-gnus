@@ -1,5 +1,6 @@
 ;;; mm-view.el --- functions for viewing MIME objects
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003,
+;; 2004 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -34,9 +35,7 @@
   (autoload 'vcard-parse-string "vcard")
   (autoload 'vcard-format-string "vcard")
   (autoload 'fill-flowed "flow-fill")
-  (autoload 'html2text "html2text")
-  (unless (fboundp 'diff-mode)
-    (autoload 'diff-mode "diff-mode" "" t nil)))
+  (autoload 'html2text "html2text"))
 
 (defvar mm-text-html-renderer-alist
   '((w3  . mm-inline-text-html-render-with-w3)
@@ -64,6 +63,11 @@
     (html2text  html2text))
   "The attributes of washer types for text/html.")
 
+(defcustom mm-fill-flowed t
+  "If non-nil a format=flowed article will be displayed flowed."
+  :type 'boolean
+  :group 'mime-display)
+
 ;;; Internal variables.
 
 ;;;
@@ -74,7 +78,6 @@
   (let ((b (point-marker))
 	buffer-read-only)
     (put-image (mm-get-image handle) b)
-    (insert "\n\n")
     (mm-handle-set-undisplayer
      handle
      `(lambda ()
@@ -198,44 +201,21 @@
   (setq w3m-display-inline-images mm-inline-text-html-with-images))
 
 (defun mm-w3m-cid-retrieve-1 (url handle)
-  (dolist (elem handle)
-    (when (and (listp elem)
-	       (equal url (mm-handle-id elem)))
-      (mm-insert-part elem)
-      (throw 'found-handle (mm-handle-media-type elem)))))
+  (if (mm-multiple-handles handle)
+      (dolist (elem handle)
+	(mm-w3m-cid-retrieve-1 url elem))
+    (when (and (listp handle)
+	       (equal url (mm-handle-id handle)))
+      (mm-insert-part handle)
+      (throw 'found-handle (mm-handle-media-type handle)))))
 
 (defun mm-w3m-cid-retrieve (url &rest args)
   "Insert a content pointed by URL if it has the cid: scheme."
   (when (string-match "\\`cid:" url)
-    (setq url (concat "<" (substring url (match-end 0)) ">"))
     (catch 'found-handle
-      (let ((handles (with-current-buffer w3m-current-buffer
-		       gnus-article-mime-handles)))
-	(if (mm-multiple-handles handles)
-	    (dolist (handle handles)
-	      (mm-w3m-cid-retrieve-1 url handle))
-	  (mm-w3m-cid-retrieve-1 url handles))))))
-
-(eval-and-compile
-  (unless (or (featurep 'xemacs)
-	      (>= emacs-major-version 21))
-    (defvar mm-w3m-mode-map nil
-      "Keymap for text/html parts rendered by emacs-w3m.
-This keymap will be bound only when Emacs 20 is running and overwritten
-by the value of `w3m-minor-mode-map'.  In order to add some commands to
-this keymap, add them to `w3m-minor-mode-map' instead of this keymap.")))
-
-(defun mm-w3m-local-map-property ()
-  (when (and (boundp 'w3m-minor-mode-map) w3m-minor-mode-map)
-    (if (or (featurep 'xemacs)
-	    (>= emacs-major-version 21))
-	(list 'keymap w3m-minor-mode-map)
-      (list 'local-map
-	    (or mm-w3m-mode-map
-		(progn
-		  (setq mm-w3m-mode-map (copy-keymap w3m-minor-mode-map))
-		  (set-keymap-parent mm-w3m-mode-map gnus-article-mode-map)
-		  mm-w3m-mode-map))))))
+      (mm-w3m-cid-retrieve-1 (concat "<" (substring url (match-end 0)) ">")
+			     (with-current-buffer w3m-current-buffer
+			       gnus-article-mime-handles)))))
 
 (defun mm-inline-text-html-render-with-w3m (handle)
   "Render a text/html part using emacs-w3m."
@@ -257,12 +237,14 @@ this keymap, add them to `w3m-minor-mode-map' instead of this keymap.")))
 	(let ((w3m-safe-url-regexp mm-w3m-safe-url-regexp)
 	      w3m-force-redisplay)
 	  (w3m-region (point-min) (point-max)))
-	(when mm-inline-text-html-with-w3m-keymap
+	(when (and mm-inline-text-html-with-w3m-keymap
+		   (boundp 'w3m-minor-mode-map)
+		   w3m-minor-mode-map)
 	  (add-text-properties
 	   (point-min) (point-max)
-	   (nconc (mm-w3m-local-map-property)
-		  ;; Put the mark meaning this part was rendered by emacs-w3m.
-		  '(mm-inline-text-html-with-w3m t)))))
+	   (list 'keymap w3m-minor-mode-map
+		 ;; Put the mark meaning this part was rendered by emacs-w3m.
+		 'mm-inline-text-html-with-w3m t))))
       (mm-handle-set-undisplayer
        handle
        `(lambda ()
@@ -366,7 +348,8 @@ this keymap, add them to `w3m-minor-mode-map' instead of this keymap.")))
 	  (mm-insert-part handle)
 	  (goto-char (point-max)))
       (insert (mm-decode-string (mm-get-part handle) charset)))
-    (when (and (equal type "plain")
+    (when (and mm-fill-flowed
+	       (equal type "plain")
 	       (equal (cdr (assoc 'format (mm-handle-type handle)))
 		      "flowed"))
       (save-restriction
@@ -516,23 +499,21 @@ this keymap, add them to `w3m-minor-mode-map' instead of this keymap.")))
 ;;          us(840) rsadsi(113549) pkcs(1) pkcs7(7) 2 }
 (defvar mm-pkcs7-signed-magic
   (mm-string-as-unibyte
-   (apply 'concat
-	  (mapcar 'char-to-string
-		  (list ?\x30 ?\x5c ?\x28 ?\x80 ?\x5c ?\x7c ?\x81 ?\x2e ?\x5c
-			?\x7c ?\x82 ?\x2e ?\x2e ?\x5c ?\x7c ?\x83 ?\x2e ?\x2e
-			?\x2e ?\x5c ?\x29 ?\x06 ?\x09 ?\x5c ?\x2a ?\x86 ?\x48
-			?\x86 ?\xf7 ?\x0d ?\x01 ?\x07 ?\x02)))))
+   (mapconcat 'char-to-string
+	      (list ?\x30 ?\x5c ?\x28 ?\x80 ?\x5c ?\x7c ?\x81 ?\x2e ?\x5c
+		    ?\x7c ?\x82 ?\x2e ?\x2e ?\x5c ?\x7c ?\x83 ?\x2e ?\x2e
+		    ?\x2e ?\x5c ?\x29 ?\x06 ?\x09 ?\x5c ?\x2a ?\x86 ?\x48
+		    ?\x86 ?\xf7 ?\x0d ?\x01 ?\x07 ?\x02) "")))
 
 ;;      id-envelopedData OBJECT IDENTIFIER ::= { iso(1) member-body(2)
 ;;          us(840) rsadsi(113549) pkcs(1) pkcs7(7) 3 }
 (defvar mm-pkcs7-enveloped-magic
   (mm-string-as-unibyte
-   (apply 'concat
-	  (mapcar 'char-to-string
-		  (list ?\x30 ?\x5c ?\x28 ?\x80 ?\x5c ?\x7c ?\x81 ?\x2e ?\x5c
-			?\x7c ?\x82 ?\x2e ?\x2e ?\x5c ?\x7c ?\x83 ?\x2e ?\x2e
-			?\x2e ?\x5c ?\x29 ?\x06 ?\x09 ?\x5c ?\x2a ?\x86 ?\x48
-			?\x86 ?\xf7 ?\x0d ?\x01 ?\x07 ?\x03)))))
+   (mapconcat 'char-to-string
+	      (list ?\x30 ?\x5c ?\x28 ?\x80 ?\x5c ?\x7c ?\x81 ?\x2e ?\x5c
+		    ?\x7c ?\x82 ?\x2e ?\x2e ?\x5c ?\x7c ?\x83 ?\x2e ?\x2e
+		    ?\x2e ?\x5c ?\x29 ?\x06 ?\x09 ?\x5c ?\x2a ?\x86 ?\x48
+		    ?\x86 ?\xf7 ?\x0d ?\x01 ?\x07 ?\x03) "")))
 
 (defun mm-view-pkcs7-get-type (handle)
   (mm-with-unibyte-buffer
@@ -566,8 +547,6 @@ this keymap, add them to `w3m-minor-mode-map' instead of this keymap.")))
   (sit-for 1)
   t)
 
-(autoload 'gnus-completing-read-maybe-default "gnus-util" nil nil 'macro)
-
 (defun mm-view-pkcs7-decrypt (handle)
   (insert-buffer-substring (mm-handle-buffer handle))
   (goto-char (point-min))
@@ -578,7 +557,7 @@ this keymap, add them to `w3m-minor-mode-map' instead of this keymap.")))
    (if (= (length smime-keys) 1)
        (cadar smime-keys)
      (smime-get-key-by-email
-      (gnus-completing-read-maybe-default
+      (completing-read
        (concat "Decipher using which key? "
 	       (if smime-keys (concat "(default " (caar smime-keys) ") ")
 		 ""))

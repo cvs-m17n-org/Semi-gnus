@@ -24,11 +24,11 @@
 
 ;;; Commentary:
 
-;; This is the gnus-registry.el package, works with other backends
-;; besides nnmail.  The major issue is that it doesn't go across
-;; backends, so for instance if an article is in nnml:sys and you see
-;; a reference to it in nnimap splitting, the article will end up in
-;; nnimap:sys
+;; This is the gnus-registry.el package, which works with all
+;; backends, not just nnmail (e.g. NNTP).  The major issue is that it
+;; doesn't go across backends, so for instance if an article is in
+;; nnml:sys and you see a reference to it in nnimap splitting, the
+;; article will end up in nnimap:sys
 
 ;; gnus-registry.el intercepts article respooling, moving, deleting,
 ;; and copying for all backends.  If it doesn't work correctly for
@@ -84,7 +84,8 @@ The group names are matched, they don't have to be fully qualified."
 
 (defcustom gnus-registry-clean-empty t
   "Whether the empty registry entries should be deleted.
-Registry entries are considered empty when they have no groups."
+Registry entries are considered empty when they have no groups
+and no extra data."
   :group 'gnus-registry
   :type 'boolean)
 
@@ -118,7 +119,10 @@ way."
   :group 'gnus-registry
   :type 'boolean)
 
-(defcustom gnus-registry-cache-file "~/.gnus.registry.eld"
+(defcustom gnus-registry-cache-file 
+  (nnheader-concat 
+   (or gnus-dribble-directory gnus-home-directory "~/") 
+   ".gnus.registry.eld")
   "File where the Gnus registry will be stored."
   :group 'gnus-registry
   :type 'file)
@@ -128,13 +132,6 @@ way."
   :group 'gnus-registry
   :type '(radio (const :format "Unlimited " nil)
 		(integer :format "Maximum number: %v\n" :size 0)))
-
-;; Function(s) missing in Emacs 20
-(when (memq nil (mapcar 'fboundp '(puthash)))
-  (require 'cl)
-  (unless (fboundp 'puthash)
-    ;; alias puthash is missing from Emacs 20 cl-extra.el
-    (defalias 'puthash 'cl-puthash)))
 
 (defun gnus-registry-track-subject-p ()
   (memq 'subject gnus-registry-track-extra))
@@ -216,7 +213,7 @@ way."
 ;; Idea from Dan Christensen <jdc@chow.mat.jhu.edu>
 ;; Save the gnus-registry file with extra line breaks.
 (defun gnus-registry-cache-whitespace (filename)
-  (gnus-message 5 "Adding whitespace to %s" filename)
+  (gnus-message 7 "Adding whitespace to %s" filename)
   (save-excursion
     (goto-char (point-min))
     (while (re-search-forward "^(\\|(\\\"" nil t)
@@ -252,7 +249,11 @@ way."
   (let ((count 0))
     (maphash
      (lambda (key value)
-       (unless (gnus-registry-fetch-group key)
+       (unless (or
+		(gnus-registry-fetch-group key)
+		;; TODO: look for specific extra data here!
+		;; in this example, we look for 'label
+		(gnus-registry-fetch-extra key 'label)) 
 	 (incf count)
 	 (remhash key gnus-registry-hashtb)))
      gnus-registry-hashtb)
@@ -315,7 +316,7 @@ way."
 	 (to (if to (gnus-group-guess-full-name-from-command-method to) nil))
 	 (to-name (if to to "the Bit Bucket"))
 	 (old-entry (gethash id gnus-registry-hashtb)))
-    (gnus-message 5 "Registry: article %s %s from %s to %s"
+    (gnus-message 7 "Registry: article %s %s from %s to %s"
 		  id
 		  (if method "respooling" "going")
 		  from
@@ -333,7 +334,7 @@ way."
   (let ((group (gnus-group-guess-full-name-from-command-method group)))
     (when (and (stringp id) (string-match "\r$" id))
       (setq id (substring id 0 -1)))
-    (gnus-message 5 "Registry: article %s spooled to %s"
+    (gnus-message 7 "Registry: article %s spooled to %s"
 		  id
 		  group)
     (gnus-registry-add-group id group subject sender)))
@@ -345,6 +346,10 @@ way."
 is obtained from the registry.  This function can be used as an entry
 in `nnmail-split-fancy' or `nnimap-split-fancy', for example like
 this: (: gnus-registry-split-fancy-with-parent) 
+
+This function tracks ALL backends, unlike
+`nnmail-split-fancy-with-parent' which tracks only nnmail
+messages.
 
 For a message to be split, it looks for the parent message in the
 References or In-Reply-To header and then looks in the registry to
@@ -391,13 +396,14 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		 (unless (equal res (gnus-registry-fetch-group key))
 		   (setq single-match nil))
 		 (setq res (gnus-registry-fetch-group key))
-		 (gnus-message
-		  ;; raise level of messaging if gnus-registry-track-extra
-		  (if gnus-registry-track-extra 5 9)
-		  "%s (extra tracking) traced sender %s to group %s"
-		  "gnus-registry-split-fancy-with-parent"
-		  sender
-		  (if res res "nil")))))
+		 (when (and sender res)
+		   (gnus-message
+		    ;; raise level of messaging if gnus-registry-track-extra
+		    (if gnus-registry-track-extra 7 9)
+		    "%s (extra tracking) traced sender %s to group %s"
+		    "gnus-registry-split-fancy-with-parent"
+		    sender
+		    res)))))
 	   gnus-registry-hashtb))
 	(when (and single-match
 		   (gnus-registry-track-subject-p)
@@ -414,24 +420,26 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		 (unless (equal res (gnus-registry-fetch-group key))
 		   (setq single-match nil))
 		 (setq res (gnus-registry-fetch-group key))
-		 (gnus-message
-		  ;; raise level of messaging if gnus-registry-track-extra
-		  (if gnus-registry-track-extra 5 9)
-		  "%s (extra tracking) traced subject %s to group %s"
-		  "gnus-registry-split-fancy-with-parent"
-		  subject
-		  (if res res "nil")))))
+		 (when (and subject res)
+		   (gnus-message
+		    ;; raise level of messaging if gnus-registry-track-extra
+		    (if gnus-registry-track-extra 7 9)
+		    "%s (extra tracking) traced subject %s to group %s"
+		    "gnus-registry-split-fancy-with-parent"
+		    subject
+		    res)))))
 	   gnus-registry-hashtb))
 	(unless single-match
 	  (gnus-message
-	   5
+	   3
 	   "gnus-registry-split-fancy-with-parent: too many extra matches for %s"
 	   refstr)
 	  (setq res nil))))
-    (gnus-message
-     5 
-     "gnus-registry-split-fancy-with-parent traced %s to group %s"
-     refstr (if res res "nil"))
+    (when (and refstr res)
+      (gnus-message
+       5
+       "gnus-registry-split-fancy-with-parent traced %s to group %s"
+       refstr res))
 
     (when (and res gnus-registry-use-long-group-names)
       (let ((m1 (gnus-find-method-for-group res))
@@ -448,7 +456,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	    (setq res short-res))
 	;; else...
 	(gnus-message
-	 5 
+	 7
 	 "gnus-registry-split-fancy-with-parent ignored foreign group %s"
 	 res)
 	(setq res nil))))

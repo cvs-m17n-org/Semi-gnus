@@ -1,7 +1,7 @@
 ;;; nntp.el --- nntp access for Gnus
 
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1992, 1993, 1994, 1995, 1996,
-;; 1997, 1998, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+;; 1997, 1998, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         Katsumi Yamaoka <yamaoka@jpl.org>
@@ -28,7 +28,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 
 (require 'nnheader)
 (require 'nnoo)
@@ -116,6 +115,7 @@ Direct connections:
 
 Indirect connections:
 - `nntp-open-via-rlogin-and-telnet',
+- `nntp-open-via-rlogin-and-netcat',
 - `nntp-open-via-telnet-and-telnet'.")
 
 (defvoo nntp-pre-command nil
@@ -124,20 +124,22 @@ This is where you would put \"runsocks\" or stuff like that.")
 
 (defvoo nntp-telnet-command "telnet"
   "*Telnet command used to connect to the nntp server.
-This command is used by the various nntp-open-via-* methods.")
+This command is used by the methods `nntp-open-telnet-stream',
+`nntp-open-via-rlogin-and-telnet' and `nntp-open-via-telnet-and-telnet'.")
 
 (defvoo nntp-telnet-switches '("-8")
   "*Switches given to the telnet command `nntp-telnet-command'.")
 
 (defvoo nntp-end-of-line "\r\n"
   "*String to use on the end of lines when talking to the NNTP server.
-This is \"\\r\\n\" by default, but should be \"\\n\" when
-using and indirect connection method (nntp-open-via-*).")
+This is \"\\r\\n\" by default, but should be \"\\n\" when using and
+indirect telnet connection method (nntp-open-via-*-and-telnet).")
 
 (defvoo nntp-via-rlogin-command "rsh"
   "*Rlogin command used to connect to an intermediate host.
-This command is used by the `nntp-open-via-rlogin-and-telnet' method.
-The default is \"rsh\", but \"ssh\" is a popular alternative.")
+This command is used by the methods `nntp-open-via-rlogin-and-telnet'
+and `nntp-open-via-rlogin-and-netcat'.  The default is \"rsh\", but \"ssh\"
+is a popular alternative.")
 
 (defvoo nntp-via-rlogin-command-switches nil
   "*Switches given to the rlogin command `nntp-via-rlogin-command'.
@@ -153,9 +155,16 @@ This command is used by the `nntp-open-via-telnet-and-telnet' method.")
 (defvoo nntp-via-telnet-switches '("-8")
   "*Switches given to the telnet command `nntp-via-telnet-command'.")
 
+(defvoo nntp-via-netcat-command "nc"
+  "*Netcat command used to connect to the nntp server.
+This command is used by the `nntp-open-via-rlogin-and-netcat' method.")
+
+(defvoo nntp-via-netcat-switches nil
+  "*Switches given to the netcat command `nntp-via-netcat-command'.")
+
 (defvoo nntp-via-user-name nil
   "*User name to log in on an intermediate host with.
-This variable is used by the `nntp-open-via-telnet-and-telnet' method.")
+This variable is used by the various nntp-open-via-* methods.")
 
 (defvoo nntp-via-user-password nil
   "*Password to use to log in on an intermediate host with.
@@ -163,8 +172,7 @@ This variable is used by the `nntp-open-via-telnet-and-telnet' method.")
 
 (defvoo nntp-via-address nil
   "*Address of an intermediate host to connect to.
-This variable is used by the `nntp-open-via-rlogin-and-telnet' and
-`nntp-open-via-telnet-and-telnet' methods.")
+This variable is used by the various nntp-open-via-* methods.")
 
 (defvoo nntp-via-envuser nil
   "*Whether both telnet client and server support the ENVIRON option.
@@ -387,6 +395,11 @@ be restored and the command retried."
     (kill-buffer buffer)
     (nnheader-init-server-buffer)))
 
+(defun nntp-erase-buffer (buffer)
+  "Erase contents of BUFFER."
+  (with-current-buffer buffer
+    (erase-buffer)))
+
 (defsubst nntp-find-connection (buffer)
   "Find the connection delivering to BUFFER."
   (let ((alist nntp-connection-alist)
@@ -421,9 +434,7 @@ be restored and the command retried."
     (if process
         (progn
           (unless (or nntp-inhibit-erase nnheader-callback-function)
-            (save-excursion
-              (set-buffer (process-buffer process))
-              (erase-buffer)))
+	    (nntp-erase-buffer (process-buffer process)))
           (condition-case err
               (progn
                 (when command
@@ -450,9 +461,7 @@ be restored and the command retried."
   "Send STRINGS to server and wait until WAIT-FOR returns."
   (when (and (not nnheader-callback-function)
 	     (not nntp-inhibit-output))
-    (save-excursion
-      (set-buffer nntp-server-buffer)
-      (erase-buffer)))
+    (nntp-erase-buffer nntp-server-buffer))
   (let* ((command (mapconcat 'identity strings " "))
 	 (process (nntp-find-connection nntp-server-buffer))
 	 (buffer (and process (process-buffer process)))
@@ -475,7 +484,7 @@ be restored and the command retried."
 	      (goto-char pos)
 	      (if (looking-at (regexp-quote command))
 		  (delete-region pos (progn (forward-line 1)
-					    (gnus-point-at-bol)))))))
+					    (point-at-bol)))))))
       (nnheader-report 'nntp "Couldn't open connection to %s."
 		       nntp-address))))
 
@@ -499,7 +508,7 @@ be restored and the command retried."
 	      (goto-char pos)
 	      (if (looking-at (regexp-quote command))
 		  (delete-region pos (progn (forward-line 1)
-					    (gnus-point-at-bol))))
+					    (point-at-bol))))
 	      )))
       (nnheader-report 'nntp "Couldn't open connection to %s."
 		       nntp-address))))
@@ -508,9 +517,7 @@ be restored and the command retried."
   "Send STRINGS to server and wait until WAIT-FOR returns."
   (when (and (not nnheader-callback-function)
 	     (not nntp-inhibit-output))
-    (save-excursion
-      (set-buffer nntp-server-buffer)
-      (erase-buffer)))
+    (nntp-erase-buffer nntp-server-buffer))
   (let* ((command (mapconcat 'identity strings " "))
 	 (process (nntp-find-connection nntp-server-buffer))
 	 (buffer (and process (process-buffer process)))
@@ -525,11 +532,11 @@ be restored and the command retried."
 	  (unless wait-for
 	    (nntp-accept-response)
 	    (save-excursion
-	  (set-buffer buffer)
-	  (goto-char pos)
-	  (if (looking-at (regexp-quote command))
-	      (delete-region pos (progn (forward-line 1) (gnus-point-at-bol))))
-	  )))
+	      (set-buffer buffer)
+	      (goto-char pos)
+	      (if (looking-at (regexp-quote command))
+		  (delete-region pos (progn (forward-line 1) (point-at-bol))))
+	      )))
       (nnheader-report 'nntp "Couldn't open connection to %s."
 		       nntp-address))))
 
@@ -537,15 +544,14 @@ be restored and the command retried."
   "Send the current buffer to server and wait until WAIT-FOR returns."
   (when (and (not nnheader-callback-function)
 	     (not nntp-inhibit-output))
-    (save-excursion
-      (set-buffer (nntp-find-connection-buffer nntp-server-buffer))
-      (erase-buffer)))
+    (nntp-erase-buffer
+     (nntp-find-connection-buffer nntp-server-buffer)))
   (nntp-encode-text)
   (let ((multibyte (and (boundp 'enable-multibyte-characters)
 			(symbol-value 'enable-multibyte-characters))))
     (unwind-protect
 	;; Some encoded unicode text contains character 0x80-0x9f e.g. Euro.
-	(let (default-enable-multibyte-characters mc-flag)
+	(let (default-enable-multibyte-characters)
 	  ;; `set-buffer-multibyte' will be provided by APEL for all Emacsen.
 	  (set-buffer-multibyte nil)
 	  (process-send-region (nntp-find-connection nntp-server-buffer)
@@ -607,7 +613,7 @@ command whose response triggered the error."
 
 	      (let ((timer
 		     (and nntp-connection-timeout
-			  (nnheader-run-at-time
+			  (run-at-time
 			   nntp-connection-timeout nil
 			   '(lambda ()
 			      (let ((process (nntp-find-connection
@@ -709,8 +715,7 @@ command whose response triggered the error."
      (catch 'done
        (save-excursion
          ;; Erase nntp-server-buffer before nntp-inhibit-erase.
-         (set-buffer nntp-server-buffer)
-         (erase-buffer)
+	 (nntp-erase-buffer nntp-server-buffer)
          (set-buffer (nntp-find-connection-buffer nntp-server-buffer))
          ;; The first time this is run, this variable is `try'.  So we
          ;; try.
@@ -1130,7 +1135,7 @@ password contained in '~/.nntp-authinfo'."
       (nntp-send-command "^3.*\r?\n" "AUTHINFO USER" (user-login-name))
       (nntp-send-command
        "^2.*\r?\n" "AUTHINFO PASS"
-       (buffer-substring (point) (gnus-point-at-eol))))))
+       (buffer-substring (point) (point-at-eol))))))
 
 ;;; Internal functions.
 
@@ -1140,9 +1145,7 @@ password contained in '~/.nntp-authinfo'."
     (funcall nntp-authinfo-function)
     ;; We have to re-send the function that was interrupted by
     ;; the authinfo request.
-    (save-excursion
-      (set-buffer nntp-server-buffer)
-      (erase-buffer))
+    (nntp-erase-buffer nntp-server-buffer)
     (nntp-send-string process last)))
 
 (defun nntp-make-process-buffer (buffer)
@@ -1167,7 +1170,7 @@ password contained in '~/.nntp-authinfo'."
   (let* ((pbuffer (nntp-make-process-buffer buffer))
 	 (timer
 	  (and nntp-connection-timeout
-	       (nnheader-run-at-time
+	       (run-at-time
 		nntp-connection-timeout nil
 		`(lambda ()
 		   (nntp-kill-buffer ,pbuffer)))))
@@ -1276,7 +1279,7 @@ password contained in '~/.nntp-authinfo'."
   ;; doesn't trigger after-change-functions.
   (unless nntp-async-timer
     (setq nntp-async-timer
-	  (nnheader-run-at-time 1 1 'nntp-async-timer-handler)))
+	  (run-at-time 1 1 'nntp-async-timer-handler)))
   (add-to-list 'nntp-async-process-list process))
 
 (defun nntp-async-timer-handler ()
@@ -1404,9 +1407,7 @@ password contained in '~/.nntp-authinfo'."
                (nntp-send-command "^[245].*\n" "GROUP" group)
                (setcar (cddr entry) group)
                (erase-buffer)
-               (save-excursion
-                 (set-buffer nntp-server-buffer)
-                 (erase-buffer))))))))
+	       (nntp-erase-buffer nntp-server-buffer)))))))
 
 (defun nntp-decode-text (&optional cr-only)
   "Decode the text in the current buffer."
@@ -1615,10 +1616,8 @@ password contained in '~/.nntp-authinfo'."
 	  (setq commands (cdr commands)))
 	;; If none of the commands worked, we disable XOVER.
 	(when (eq nntp-server-xover 'try)
-	  (save-excursion
-	    (set-buffer nntp-server-buffer)
-	    (erase-buffer)
-	    (setq nntp-server-xover nil)))
+	  (nntp-erase-buffer nntp-server-buffer)
+	  (setq nntp-server-xover nil))
         nntp-server-xover))))
 
 (defun nntp-find-group-and-number (&optional group)
@@ -1871,6 +1870,36 @@ Please refer to the following variables to customize the connection:
       (forward-line 1)
       (delete-region (point) (point-max)))
     proc))
+
+(defun nntp-open-via-rlogin-and-netcat (buffer)
+  "Open a connection to an nntp server through an intermediate host.
+First rlogin to the remote host, and then connect to the real news
+server from there using the netcat command.
+
+Please refer to the following variables to customize the connection:
+- `nntp-pre-command',
+- `nntp-via-rlogin-command',
+- `nntp-via-rlogin-command-switches',
+- `nntp-via-user-name',
+- `nntp-via-address',
+- `nntp-via-netcat-command',
+- `nntp-via-netcat-switches',
+- `nntp-address',
+- `nntp-port-number',
+- `nntp-end-of-line'."
+  (let ((command `(,@(when nntp-pre-command
+		       (list nntp-pre-command))
+		   ,nntp-via-rlogin-command
+		   ,@(when nntp-via-rlogin-command-switches
+		       nntp-via-rlogin-command-switches)
+		   ,@(when nntp-via-user-name
+		       (list "-l" nntp-via-user-name))
+		   ,nntp-via-address
+		   ,nntp-via-netcat-command
+		   ,@nntp-via-netcat-switches
+		   ,nntp-address
+		   ,nntp-port-number)))
+    (apply 'start-process "nntpd" buffer command)))
 
 (defun nntp-open-via-telnet-and-telnet (buffer)
   "Open a connection to an nntp server through an intermediate host.

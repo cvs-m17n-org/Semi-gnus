@@ -28,7 +28,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 
 (require 'gnus)
 (require 'gnus-group)
@@ -105,16 +104,16 @@ See Info node `(gnus)Formatting Variables'."
 
 (defun gnus-group-topic-name ()
   "The name of the topic on the current line."
-  (let ((topic (get-text-property (gnus-point-at-bol) 'gnus-topic)))
+  (let ((topic (get-text-property (point-at-bol) 'gnus-topic)))
     (and topic (symbol-name topic))))
 
 (defun gnus-group-topic-level ()
   "The level of the topic on the current line."
-  (get-text-property (gnus-point-at-bol) 'gnus-topic-level))
+  (get-text-property (point-at-bol) 'gnus-topic-level))
 
 (defun gnus-group-topic-unread ()
   "The number of unread articles in topic on the current line."
-  (get-text-property (gnus-point-at-bol) 'gnus-topic-unread))
+  (get-text-property (point-at-bol) 'gnus-topic-unread))
 
 (defun gnus-topic-unread (topic)
   "Return the number of unread articles in TOPIC."
@@ -127,7 +126,7 @@ See Info node `(gnus)Formatting Variables'."
 
 (defun gnus-topic-visible-p ()
   "Return non-nil if the current topic is visible."
-  (get-text-property (gnus-point-at-bol) 'gnus-topic-visible))
+  (get-text-property (point-at-bol) 'gnus-topic-visible))
 
 (defun gnus-topic-articles-in-topic (entries)
   (let ((total 0)
@@ -196,9 +195,7 @@ If TOPIC, start with that topic."
 
 (defun gnus-group-active-topic-p ()
   "Say whether the current topic comes from the active topics."
-  (save-excursion
-    (beginning-of-line)
-    (get-text-property (point) 'gnus-active)))
+  (get-text-property (point-at-bol) 'gnus-active))
 
 (defun gnus-topic-find-groups (topic &optional level all lowest recursive)
   "Return entries for all visible groups in TOPIC.
@@ -210,7 +207,7 @@ If RECURSIVE is t, return groups in its subtopics too."
     ;; We go through the newsrc to look for matches.
     (while groups
       (when (setq group (pop groups))
-	(setq entry (gnus-gethash group gnus-newsrc-hashtb)
+	(setq entry (gnus-group-entry group)
 	      info (nth 2 entry)
 	      params (gnus-info-params info)
 	      active (gnus-active group)
@@ -465,7 +462,7 @@ If LOWEST is non-nil, list all newsgroups of level LOWEST or higher."
 	  (gnus-make-hashtable-from-killed))
 	(gnus-group-prepare-flat-list-dead
 	 (gnus-remove-if (lambda (group)
-			   (or (gnus-gethash group gnus-newsrc-hashtb)
+			   (or (gnus-group-entry group)
 			       (gnus-gethash group gnus-killed-hashtb)))
 			 not-in-list)
 	 gnus-level-killed ?K regexp)))
@@ -843,8 +840,7 @@ articles in the topic and its subtopics."
       (pop topics)))
   ;; Go through all living groups and make sure that
   ;; they belong to some topic.
-  (let* ((tgroups (apply 'append (mapcar (lambda (entry) (cdr entry))
-					 gnus-topic-alist)))
+  (let* ((tgroups (apply 'append (mapcar 'cdr gnus-topic-alist)))
 	 (entry (last (assoc (caar gnus-topic-topology) gnus-topic-alist)))
 	 (newsrc (cdr gnus-newsrc-alist))
 	 group)
@@ -858,7 +854,7 @@ articles in the topic and its subtopics."
     (while (setq topic (pop alist))
       (while (cdr topic)
 	(if (and (cadr topic)
-		 (gnus-gethash (cadr topic) gnus-newsrc-hashtb))
+		 (gnus-group-entry (cadr topic)))
 	    (setq topic (cdr topic))
 	  (setcdr topic (cddr topic)))))))
 
@@ -888,7 +884,7 @@ articles in the topic and its subtopics."
       (let ((topic-name (pop topic))
 	    group filtered-topic)
 	(while (setq group (pop topic))
-	  (when (and (or (gnus-gethash group gnus-active-hashtb)
+	  (when (and (or (gnus-active group)
 			 (gnus-info-method (gnus-get-info group)))
 		     (not (gnus-gethash group gnus-killed-hashtb)))
 	    (push group filtered-topic)))
@@ -1137,7 +1133,7 @@ articles in the topic and its subtopics."
       (when (gnus-visual-p 'topic-menu 'menu)
 	(gnus-topic-make-menu-bar))
       (gnus-set-format 'topic t)
-      (gnus-add-minor-mode 'gnus-topic-mode " Topic"
+      (add-minor-mode 'gnus-topic-mode " Topic"
 			   gnus-topic-mode-map nil (lambda (&rest junk)
 						     (interactive)
 						     (gnus-topic-mode nil t)))
@@ -1316,7 +1312,7 @@ If COPYP, copy the groups instead."
   (let ((use-marked (and (not n) (not (gnus-region-active-p))
 			 gnus-group-marked t))
 	(groups (gnus-group-process-prefix n)))
-    (mapcar
+    (mapc
      (lambda (group)
        (gnus-group-remove-mark group use-marked)
        (let ((topicl (assoc (gnus-current-topic) gnus-topic-alist))

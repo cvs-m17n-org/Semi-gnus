@@ -37,7 +37,12 @@
 (require 'gnus-util)
 (autoload 'message-make-date "message")
 (autoload 'gnus-agent-read-servers-validate "gnus-agent")
+(autoload 'gnus-agent-save-local "gnus-agent")
 (autoload 'gnus-agent-possibly-alter-active "gnus-agent")
+(eval-when-compile
+  (defvar gnus-agent-covered-methods nil)
+  (defvar gnus-agent-file-loading-local nil)
+  (defvar gnus-agent-file-loading-cache nil))
 
 (defcustom gnus-startup-file (nnheader-concat gnus-home-directory ".newsrc")
   "Your `.newsrc' file.
@@ -454,9 +459,7 @@ Can be used to turn version control on or off."
 
 ;;; Internal variables
 
-(defvar gnus-ding-file-coding-system (static-if (boundp 'MULE)
-					 '*ctext*
-				       'ctext)
+(defvar gnus-ding-file-coding-system 'ctext
   "Coding system for ding file.")
 ;; Note that the ding file for T-gnus ought not to have byte-codes.
 
@@ -626,8 +629,7 @@ the first newsgroup."
     ;; We subscribe the group by changing its level to `subscribed'.
     (gnus-group-change-level
      newsgroup gnus-level-default-subscribed
-     gnus-level-killed (gnus-gethash (or next "dummy.group")
-				     gnus-newsrc-hashtb))
+     gnus-level-killed (gnus-group-entry (or next "dummy.group")))
     (gnus-message 5 "Subscribe newsgroup: %s" newsgroup)
     (run-hook-with-args 'gnus-subscribe-newsgroup-hooks newsgroup)
     t))
@@ -684,6 +686,8 @@ the first newsgroup."
   (setq gnus-list-of-killed-groups nil
 	gnus-have-read-active-file nil
         gnus-agent-covered-methods nil
+        gnus-agent-file-loading-local nil
+        gnus-agent-file-loading-cache nil
         gnus-server-method-cache nil
 	gnus-newsrc-alist nil
 	gnus-newsrc-hashtb nil
@@ -791,11 +795,6 @@ prompt the user for the name of an NNTP server to use."
 	  (when (or gnus-slave gnus-use-dribble-file)
 	    (gnus-dribble-read-file))
 
-	  ;; Allow using GroupLens predictions.
-	  (when gnus-use-grouplens
-	    (bbb-login)
-	    (add-hook 'gnus-summary-mode-hook 'gnus-grouplens-mode))
-
 	  ;; Do the actual startup.
 	  (if gnus-agent
 	      (gnus-request-create-group "queue" '(nndraft "")))
@@ -815,7 +814,7 @@ prompt the user for the name of an NNTP server to use."
 (defun gnus-start-draft-setup ()
   "Make sure the draft group exists."
   (gnus-request-create-group "drafts" '(nndraft ""))
-  (unless (gnus-gethash "nndraft:drafts" gnus-newsrc-hashtb)
+  (unless (gnus-group-entry "nndraft:drafts")
     (let ((gnus-level-default-subscribed 1))
       (gnus-subscribe-group "nndraft:drafts" nil '(nndraft "")))
     (gnus-group-set-parameter
@@ -1320,16 +1319,16 @@ for new groups, and subscribe the new groups as zombies."
     (when (and (stringp entry)
 	       oldlevel
 	       (< oldlevel gnus-level-zombie))
-      (setq entry (gnus-gethash entry gnus-newsrc-hashtb)))
+      (setq entry (gnus-group-entry entry)))
     (if (and (not oldlevel)
 	     (consp entry))
 	(setq oldlevel (gnus-info-level (nth 2 entry)))
       (setq oldlevel (or oldlevel gnus-level-killed)))
     (when (stringp previous)
-      (setq previous (gnus-gethash previous gnus-newsrc-hashtb)))
+      (setq previous (gnus-group-entry previous)))
 
     (if (and (>= oldlevel gnus-level-zombie)
-	     (gnus-gethash group gnus-newsrc-hashtb))
+	     (gnus-group-entry group))
 	;; We are trying to subscribe a group that is already
 	;; subscribed.
 	()				; Do nothing.
@@ -1353,8 +1352,7 @@ for new groups, and subscribe the new groups as zombies."
 		   entry)
 	  (gnus-sethash (car (nth 2 entry)) nil gnus-newsrc-hashtb)
 	  (when (nth 3 entry)
-	    (setcdr (gnus-gethash (car (nth 3 entry))
-				  gnus-newsrc-hashtb)
+	    (setcdr (gnus-group-entry (car (nth 3 entry)))
 		    (cdr entry)))
 	  (setcdr (cdr entry) (cdddr entry)))))
 
@@ -1414,7 +1412,7 @@ for new groups, and subscribe the new groups as zombies."
 	    (gnus-sethash group (cons num previous)
 			  gnus-newsrc-hashtb))
 	  (when (cdr entry)
-	    (setcdr (gnus-gethash (caadr entry) gnus-newsrc-hashtb) entry))
+	    (setcdr (gnus-group-entry (caadr entry)) entry))
 	  (gnus-dribble-enter
 	   (format
 	    "(gnus-group-set-info '%S)" info)))))
@@ -1425,7 +1423,7 @@ for new groups, and subscribe the new groups as zombies."
 (defun gnus-kill-newsgroup (newsgroup)
   "Obsolete function.  Kills a newsgroup."
   (gnus-group-change-level
-   (gnus-gethash newsgroup gnus-newsrc-hashtb) gnus-level-killed))
+   (gnus-group-entry newsgroup) gnus-level-killed))
 
 (defun gnus-check-bogus-newsgroups (&optional confirm)
   "Remove bogus newsgroups.
@@ -1453,14 +1451,14 @@ newsgroup."
 	   (lambda (group)
 	     ;; Remove all bogus subscribed groups by first killing them, and
 	     ;; then removing them from the list of killed groups.
-	     (when (setq entry (gnus-gethash group gnus-newsrc-hashtb))
+	     (when (setq entry (gnus-group-entry group))
 	       (gnus-group-change-level entry gnus-level-killed)
 	       (setq gnus-killed-list (delete group gnus-killed-list))))
 	   bogus '("group" "groups" "remove"))
 	(while (setq group (pop bogus))
 	  ;; Remove all bogus subscribed groups by first killing them, and
 	  ;; then removing them from the list of killed groups.
-	  (when (setq entry (gnus-gethash group gnus-newsrc-hashtb))
+	  (when (setq entry (gnus-group-entry group))
 	    (gnus-group-change-level entry gnus-level-killed)
 	    (setq gnus-killed-list (delete group gnus-killed-list)))))
       ;; Then we remove all bogus groups from the list of killed and
@@ -1534,6 +1532,15 @@ newsgroup."
 		    (gnus-active group))
 	       (gnus-active group)
 
+             ;; If a cache is present, we may have to alter the active info.
+             (when gnus-use-cache
+               (inline (gnus-cache-possibly-alter-active
+                        group active)))
+
+             ;; If the agent is enabled, we may have to alter the active info.
+             (when gnus-agent
+               (gnus-agent-possibly-alter-active group active))
+
 	     (gnus-set-active group active)
 	     ;; Return the new active info.
 	     active)))))
@@ -1549,6 +1556,10 @@ newsgroup."
 
     (let* ((range (gnus-info-read info))
 	   (num 0))
+
+      ;; These checks are present in gnus-activate-group but skipped
+      ;; due to setting dont-check in the preceeding call.
+
       ;; If a cache is present, we may have to alter the active info.
       (when (and gnus-use-cache info)
 	(inline (gnus-cache-possibly-alter-active
@@ -1556,8 +1567,7 @@ newsgroup."
 
       ;; If the agent is enabled, we may have to alter the active info.
       (when (and gnus-agent info)
-	(gnus-agent-possibly-alter-active
-	 (gnus-info-group info) active))
+	(gnus-agent-possibly-alter-active (gnus-info-group info) active info))
 
       ;; Modify the list of read articles according to what articles
       ;; are available; then tally the unread articles and add the
@@ -1626,8 +1636,8 @@ newsgroup."
 	(setq num (max 0 (- (cdr active) num)))))
       ;; Set the number of unread articles.
       (when (and info
-		 (gnus-gethash (gnus-info-group info) gnus-newsrc-hashtb))
-	(setcar (gnus-gethash (gnus-info-group info) gnus-newsrc-hashtb) num))
+		 (gnus-group-entry (gnus-info-group info)))
+	(setcar (gnus-group-entry (gnus-info-group info)) num))
       num)))
 
 ;; Go though `gnus-newsrc-alist' and compare with `gnus-active-hashtb'
@@ -1653,7 +1663,7 @@ newsgroup."
 
     (while newsrc
       (setq active (gnus-active (setq group (gnus-info-group
-					     (setq info (pop newsrc))))))
+						  (setq info (pop newsrc))))))
 
       ;; Check newsgroups.  If the user doesn't want to check them, or
       ;; they can't be checked (for instance, if the news server can't
@@ -1676,61 +1686,60 @@ newsgroup."
       (when (and method
 		 (not (setq method-type (cdr (assoc method type-cache)))))
 	(setq method-type
-	      (cond
-	       ((gnus-secondary-method-p method)
-		'secondary)
-	       ((inline (gnus-server-equal gnus-select-method method))
-		'primary)
-	       (t
-		'foreign)))
+		   (cond
+		    ((gnus-secondary-method-p method)
+		     'secondary)
+		    ((inline (gnus-server-equal gnus-select-method method))
+		     'primary)
+		    (t
+		     'foreign)))
 	(push (cons method method-type) type-cache))
-      (if (and method
-	       (eq method-type 'foreign))
-	  ;; These groups are foreign.  Check the level.
-	  (when (and (<= (gnus-info-level info) foreign-level)
-		     (setq active (gnus-activate-group group 'scan)))
-	    ;; Let the Gnus agent save the active file.
-	    (when (and gnus-agent active (gnus-online method))
-	      (gnus-agent-save-group-info
-	       method (gnus-group-real-name group) active))
-	    (unless (inline (gnus-virtual-group-p group))
-	      (inline (gnus-close-group group)))
-	    (when (fboundp (intern (concat (symbol-name (car method))
-					   "-request-update-info")))
-	      (inline (gnus-request-update-info info method))))
-	;; These groups are native or secondary.
-	(cond
-	 ;; We don't want these groups.
-	 ((> (gnus-info-level info) level)
-	  (setq active 'ignore))
-	 ;; Activate groups.
-	 ((not gnus-read-active-file)
-	  (if (gnus-check-backend-function 'retrieve-groups group)
-	      ;; if server support gnus-retrieve-groups we push
-	      ;; the group onto retrievegroups for later checking
-	      (if (assoc method retrieve-groups)
-		  (setcdr (assoc method retrieve-groups)
-			  (cons group (cdr (assoc method retrieve-groups))))
-		(push (list method group) retrieve-groups))
-	    ;; hack: `nnmail-get-new-mail' changes the mail-source depending
-	    ;; on the group, so we must perform a scan for every group
-	    ;; if the users has any directory mail sources.
-	    ;; hack: if `nnmail-scan-directory-mail-source-once' is non-nil,
-	    ;; for it scan all spool files even when the groups are
-	    ;; not required.
-	    (if (and
-		 (or nnmail-scan-directory-mail-source-once
-		     (null (assq 'directory
-				 (or mail-sources
-				     (if (listp nnmail-spool-file)
-					 nnmail-spool-file
-				       (list nnmail-spool-file))))))
-		 (member method scanned-methods))
-		(setq active (gnus-activate-group group))
-	      (setq active (gnus-activate-group group 'scan))
-	      (push method scanned-methods))
-	    (when active
-	      (gnus-close-group group))))))
+
+      (cond ((and method (eq method-type 'foreign))
+	     ;; These groups are foreign.  Check the level.
+	     (when (and (<= (gnus-info-level info) foreign-level)
+			(setq active (gnus-activate-group group 'scan)))
+	       ;; Let the Gnus agent save the active file.
+	       (when (and gnus-agent active (gnus-online method))
+		 (gnus-agent-save-group-info
+		  method (gnus-group-real-name group) active))
+	       (unless (inline (gnus-virtual-group-p group))
+		 (inline (gnus-close-group group)))
+	       (when (fboundp (intern (concat (symbol-name (car method))
+					      "-request-update-info")))
+		 (inline (gnus-request-update-info info method)))))
+	    ;; These groups are native or secondary.
+	    ((> (gnus-info-level info) level)
+	     ;; We don't want these groups.
+	     (setq active 'ignore))
+	    ;; Activate groups.
+	    ((not gnus-read-active-file)
+	     (if (gnus-check-backend-function 'retrieve-groups group)
+		 ;; if server support gnus-retrieve-groups we push
+		 ;; the group onto retrievegroups for later checking
+		 (if (assoc method retrieve-groups)
+		     (setcdr (assoc method retrieve-groups)
+			     (cons group (cdr (assoc method retrieve-groups))))
+		   (push (list method group) retrieve-groups))
+	       ;; hack: `nnmail-get-new-mail' changes the mail-source depending
+	       ;; on the group, so we must perform a scan for every group
+	       ;; if the users has any directory mail sources.
+	       ;; hack: if `nnmail-scan-directory-mail-source-once' is non-nil,
+	       ;; for it scan all spool files even when the groups are
+	       ;; not required.
+	       (if (and
+		    (or nnmail-scan-directory-mail-source-once
+			(null (assq 'directory
+				    (or mail-sources
+					(if (listp nnmail-spool-file)
+					    nnmail-spool-file
+					  (list nnmail-spool-file))))))
+		    (member method scanned-methods))
+		   (setq active (gnus-activate-group group))
+		 (setq active (gnus-activate-group group 'scan))
+		 (push method scanned-methods))
+	       (when active
+		 (gnus-close-group group)))))
 
       ;; Get the number of unread articles in the group.
       (cond
@@ -1743,7 +1752,7 @@ newsgroup."
 	;; The group couldn't be reached, so we nix out the number of
 	;; unread articles and stuff.
 	(gnus-set-active group nil)
-	(let ((tmp (gnus-gethash group gnus-newsrc-hashtb)))
+	(let ((tmp (gnus-group-entry group)))
 	  (when tmp
 	    (setcar tmp t))))))
 
@@ -1757,8 +1766,8 @@ newsgroup."
 	  (when (gnus-check-backend-function 'request-scan (car method))
 	    (gnus-request-scan nil method))
 	  (gnus-read-active-file-2
-	   (mapcar (lambda (group) (gnus-group-real-name group)) groups)
-	   method)
+		(mapcar (lambda (group) (gnus-group-real-name group)) groups)
+		method)
 	  (dolist (group groups)
 	    (cond
 	     ((setq active (gnus-active (gnus-info-group
@@ -1768,7 +1777,7 @@ newsgroup."
 	      ;; The group couldn't be reached, so we nix out the number of
 	      ;; unread articles and stuff.
 	      (gnus-set-active group nil)
-	      (setcar (gnus-gethash group gnus-newsrc-hashtb) t)))))))
+	      (setcar (gnus-group-entry group) t)))))))
 
     (gnus-message 6 "Checking new news...done")))
 
@@ -1820,9 +1829,9 @@ newsgroup."
 
 (defun gnus-make-articles-unread (group articles)
   "Mark ARTICLES in GROUP as unread."
-  (let* ((info (nth 2 (or (gnus-gethash group gnus-newsrc-hashtb)
-			  (gnus-gethash (gnus-group-real-name group)
-					gnus-newsrc-hashtb))))
+  (let* ((info (nth 2 (or (gnus-group-entry group)
+			  (gnus-group-entry
+			   (gnus-group-real-name group)))))
 	 (ranges (gnus-info-read info))
 	 news article)
     (while articles
@@ -1842,9 +1851,8 @@ newsgroup."
 
 (defun gnus-make-ascending-articles-unread (group articles)
   "Mark ascending ARTICLES in GROUP as unread."
-  (let* ((entry (or (gnus-gethash group gnus-newsrc-hashtb)
-                    (gnus-gethash (gnus-group-real-name group)
-                                  gnus-newsrc-hashtb)))
+  (let* ((entry (or (gnus-group-entry group)
+                    (gnus-group-entry (gnus-group-real-name group))))
          (info (nth 2 entry))
 	 (ranges (gnus-info-read info))
          (r ranges)
@@ -2003,10 +2011,10 @@ newsgroup."
 	  (while (setq info (pop newsrc))
 	    (when (inline
 		    (gnus-server-equal
-		     (inline
-		       (gnus-find-method-for-group
-			(gnus-info-group info) info))
-		     gmethod))
+			  (inline
+			    (gnus-find-method-for-group
+				  (gnus-info-group info) info))
+			  gmethod))
 	      (push (gnus-group-real-name (gnus-info-group info))
 		    groups)))
 	  (gnus-read-active-file-2 groups method)))
@@ -2093,7 +2101,7 @@ newsgroup."
       (while (not (eobp))
 	(condition-case ()
 	    (progn
-	      (narrow-to-region (point) (gnus-point-at-eol))
+	      (narrow-to-region (point) (point-at-eol))
 	      ;; group gets set to a symbol interned in the hash table
 	      ;; (what a hack!!) - jwz
 	      (setq group (let ((obarray hashtb)) (read cur)))
@@ -2125,7 +2133,7 @@ newsgroup."
 	   (unless ignore-errors
 	     (gnus-message 3 "Warning - invalid active: %s"
 			   (buffer-substring
-			    (gnus-point-at-bol) (gnus-point-at-eol))))))
+			    (point-at-bol) (point-at-eol))))))
 	(widen)
 	(forward-line 1)))))
 
@@ -2150,7 +2158,7 @@ newsgroup."
 	     (gnus-online method)
 	     (gnus-agent-method-p method))
 	(progn
-	  (gnus-agent-save-groups method)
+	  (gnus-agent-save-active method)
 	  (gnus-active-to-gnus-format method hashtb nil real-active))
 
       (goto-char (point-min))
@@ -2218,6 +2226,108 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (gnus-newsrc-to-gnus-format)
 	  (kill-buffer (current-buffer))
 	  (gnus-message 5 "Reading %s...done" newsrc-file))))))
+
+(quote (;; T-gnus doesn't provide those functions.
+(defun gnus-convert-old-newsrc ()
+  "Convert old newsrc formats into the current format, if needed."
+  (let ((fcv (and gnus-newsrc-file-version
+		  (gnus-continuum-version gnus-newsrc-file-version))))
+    (when fcv
+      ;; A .newsrc.eld file was loaded.
+      (let (prompt-displayed
+            (converters
+             (sort
+              (mapcar (lambda (date-func)
+                        (cons (gnus-continuum-version (car date-func))
+                              date-func))
+                      ;; This is a list of converters that must be run
+                      ;; to bring the newsrc file up to the current
+                      ;; version.  If you create an incompatibility
+                      ;; with older versions, you should create an
+                      ;; entry here.  The entry should consist of the
+                      ;; current gnus version (hardcoded so that it
+                      ;; doesn't change with each release) and the
+                      ;; function that must be applied to convert the
+                      ;; previous version into the current version.
+                      '(("September Gnus v0.1" nil 
+                         gnus-convert-old-ticks)
+                        ("Oort Gnus v0.08"     "legacy-gnus-agent"
+                         gnus-agent-convert-to-compressed-agentview)
+                        ("No Gnus v0.2"        "legacy-gnus-agent"
+                         gnus-agent-unlist-expire-days)
+                        ("No Gnus v0.2"        "legacy-gnus-agent" 
+                         gnus-agent-unhook-expire-days)))
+              #'car-less-than-car)))
+        ;; Skip converters older than the file version
+        (while (and converters (>= fcv (caar converters)))
+          (pop converters))
+
+        ;; Perform converters to bring older version up to date.
+	(when (and converters (< fcv (caar converters)))
+	  (while (and converters (< fcv (caar converters)))
+            (let* ((converter-spec  (pop converters))
+                   (convert-to      (nth 1 converter-spec))
+                   (load-from       (nth 2 converter-spec))
+                   (func            (nth 3 converter-spec)))
+              (when (and load-from
+                         (not (fboundp func)))
+                (load load-from t))
+              
+              (or prompt-displayed
+                  (not (gnus-convert-converter-needs-prompt func))
+                  (while (let (c
+                               (cursor-in-echo-area t)
+                               (echo-keystrokes 0))
+                           (message "Convert newsrc from version '%s' to '%s'? (n/y/?)"
+                                    gnus-newsrc-file-version gnus-version)
+                           (setq c (read-char-exclusive))
+
+                           (cond ((or (eq c ?n) (eq c ?N))
+                                  (error "Can not start gnus using old (unconverted) newsrc"))
+                                 ((or (eq c ?y) (eq c ?Y))
+                                  (setq prompt-displayed t)
+                                  nil)
+                                 ((eq c ?\?)
+                                  (message "This conversion is irreversible. \
+ You should backup your files before proceeding.")
+                                  (sit-for 5)
+                                  t)
+                                 (t
+                                  (gnus-message 3 "Ignoring unexpected input")
+                                  (sit-for 3)
+                                  t)))))
+
+              (funcall func convert-to)))
+          (gnus-dribble-enter 
+           (format ";Converted newsrc from version '%s' to '%s'? (n/y/?)"
+                   gnus-newsrc-file-version gnus-version)))))))
+
+(defun gnus-convert-mark-converter-prompt (converter no-prompt)
+  (setplist converter
+            (let* ((symbol 'gnus-convert-no-prompt)
+                   (value (delq symbol (symbol-plist converter))))
+            (if no-prompt
+                (cons symbol value)
+              value))))
+
+(defun gnus-convert-converter-needs-prompt (converter)
+  (not (memq 'gnus-convert-no-prompt (symbol-plist converter))))
+
+(defun gnus-convert-old-ticks (converting-to)
+  (let ((newsrc (cdr gnus-newsrc-alist))
+	marks info dormant ticked)
+    (while (setq info (pop newsrc))
+      (when (setq marks (gnus-info-marks info))
+	(setq dormant (cdr (assq 'dormant marks))
+	      ticked (cdr (assq 'tick marks)))
+	(when (or dormant ticked)
+	  (gnus-info-set-read
+	   info
+	   (gnus-add-to-range
+	    (gnus-info-read info)
+	    (nconc (gnus-uncompress-range dormant)
+		   (gnus-uncompress-range ticked)))))))))
+))
 
 (defun gnus-load (file &optional coding-system)
   "Load FILE, but in such a way that read errors can be reported."
@@ -2303,8 +2413,7 @@ If FORCE is non-nil, the .newsrc file is read."
 					       &rest variables)
   (let (error gnus-product-file-version method file-ver)
     (when (or (condition-case err
-		  (let ((coding-system-for-read coding)
-			(input-coding-system coding))
+		  (let ((coding-system-for-read coding))
 		    (load (expand-file-name file gnus-product-directory)
 			  nil nil t)
 		    nil)
@@ -2446,10 +2555,10 @@ If FORCE is non-nil, the .newsrc file is read."
 	      ;; don't give a damn, frankly, my dear.
 	      (concat gnus-newsrc-options
 		      (buffer-substring
-		       (gnus-point-at-bol)
+		       (point-at-bol)
 		       ;; Options may continue on the next line.
 		       (or (and (re-search-forward "^[^ \t]" nil 'move)
-				(progn (beginning-of-line) (point)))
+				(point-at-bol))
 			   (point)))))
 	(forward-line -1))
        (symbol
@@ -2517,8 +2626,8 @@ If FORCE is non-nil, the .newsrc file is read."
 		;; The line was buggy.
 		(setq group nil)
 		(gnus-error 3.1 "Mangled line: %s"
-			    (buffer-substring (gnus-point-at-bol)
-					      (gnus-point-at-eol))))
+			    (buffer-substring (point-at-bol)
+					      (point-at-eol))))
 	      nil))
 	  ;; Skip past ", ".  Spaces are invalid in these ranges, but
 	  ;; we allow them, because it's a common mistake to put a
@@ -2627,9 +2736,9 @@ If FORCE is non-nil, the .newsrc file is read."
       (while (re-search-forward "[ \t]-n" nil t)
 	(setq eol
 	      (or (save-excursion
-		    (and (re-search-forward "[ \t]-n" (gnus-point-at-eol) t)
+		    (and (re-search-forward "[ \t]-n" (point-at-eol) t)
 			 (- (point) 2)))
-		  (gnus-point-at-eol)))
+		  (point-at-eol)))
 	;; Search for all "words"...
 	(while (re-search-forward "[^ \t,\n]+" eol t)
 	  (if (eq (char-after (match-beginning 0)) ?!)
@@ -2662,6 +2771,10 @@ If FORCE is non-nil, the .newsrc file is read."
   ;; from the variable gnus-newsrc-alist.
   (when (and (or gnus-newsrc-alist gnus-killed-list)
 	     gnus-current-startup-file)
+    ;; Save agent range limits for the currently active method.
+    (when gnus-agent
+      (gnus-agent-save-local force))
+
     (save-excursion
       (if (and (or gnus-use-dribble-file gnus-slave)
 	       (not force)
@@ -2679,6 +2792,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	    (gnus-message 8 "Saving %s..." gnus-current-startup-file)
 	    (gnus-gnus-to-newsrc-format)
 	    (gnus-message 8 "Saving %s...done" gnus-current-startup-file))
+
 	  ;; Save .newsrc.eld.
 	  (set-buffer (gnus-get-buffer-create " *Gnus-newsrc*"))
 	  (make-local-variable 'version-control)
@@ -2692,13 +2806,11 @@ If FORCE is non-nil, the .newsrc file is read."
 
           (if gnus-save-startup-file-via-temp-buffer
               (let ((coding-system-for-write gnus-ding-file-coding-system)
-		    (output-coding-system gnus-ding-file-coding-system)
                     (standard-output (current-buffer)))
                 (gnus-gnus-to-quick-newsrc-format)
                 (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
                 (save-buffer))
             (let ((coding-system-for-write gnus-ding-file-coding-system)
-		  (output-coding-system gnus-ding-file-coding-system)
                   (version-control gnus-backup-startup-file)
                   (startup-file (concat gnus-current-startup-file ".eld"))
                   (working-dir (file-name-directory gnus-current-startup-file))
@@ -2951,7 +3063,7 @@ If FORCE is non-nil, the .newsrc file is read."
 
 (defun gnus-slave-mode ()
   "Minor mode for slave Gnusae."
-  (gnus-add-minor-mode 'gnus-slave-mode " Slave" (make-sparse-keymap))
+  (add-minor-mode 'gnus-slave-mode " Slave" (make-sparse-keymap))
   (gnus-run-hooks 'gnus-slave-mode-hook))
 
 (defun gnus-slave-save-newsrc ()

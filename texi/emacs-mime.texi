@@ -9,6 +9,7 @@
 @direntry
 * Emacs MIME: (emacs-mime).   The MIME de/composition library.
 @end direntry
+@documentencoding ISO-8859-1
 @iftex
 @finalout
 @end iftex
@@ -18,7 +19,7 @@
 
 This file documents the Emacs MIME interface functionality.
 
-Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
           Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -409,15 +410,15 @@ The program used to start an external terminal.
 
 @item mm-enable-external
 @vindex mm-enable-external
-Indicate whether external MIME handlers should be used.
+Indicate whether external @acronym{MIME} handlers should be used.
 
-If @code{t}, all defined external MIME handlers are used.  If
+If @code{t}, all defined external @acronym{MIME} handlers are used.  If
 @code{nil}, files are saved to disk (@code{mailcap-save-binary-file}).
 If it is the symbol @code{ask}, you are prompted before the external
 @acronym{MIME} handler is invoked.
 
 When you launch an attachment through mailcap (@pxref{mailcap}) an
-attempt is made to use a safe viewer with the safest options--this isn't
+attempt is made to use a safe viewer with the safest options---this isn't
 the case if you save it to disk and launch it in a different way
 (command line or double-clicking).  Anyhow, if you want to be sure not
 to launch any external programs, set this variable to @code{nil} or
@@ -972,7 +973,11 @@ together and wrapped after the column decided by
 @code{fill-flowed-display-column}.  The default is to wrap after
 @code{fill-column}.
 
-
+@table @code
+@item mm-fill-flowed
+@vindex mm-fill-flowed
+If non-@code{nil} a format=flowed article will be displayed flowed.
+@end table
 
 
 @node Interface Functions
@@ -1135,7 +1140,7 @@ Return the value of the field under point.
 @item mail-encode-encoded-word-region
 @findex mail-encode-encoded-word-region
 Encode the non-@acronym{ASCII} words in the region.  For instance,
-@samp{Naïve} is encoded as @samp{=?iso-8859-1?q?Na=EFve?=}.
+@samp{Na@"{@dotless{i}}ve} is encoded as @samp{=?iso-8859-1?q?Na=EFve?=}.
 
 @item mail-encode-encoded-word-buffer
 @findex mail-encode-encoded-word-buffer
@@ -1148,7 +1153,7 @@ Encode the words that need encoding in a string, and return the result.
 
 @example
 (mail-encode-encoded-word-string
- "This is naïve, baby")
+ "This is na@"{@dotless{i}}ve, baby")
 @result{} "This is =?iso-8859-1?q?na=EFve,?= baby"
 @end example
 
@@ -1163,7 +1168,7 @@ Decode the encoded words in the string and return the result.
 @example
 (mail-decode-encoded-word-string
  "This is =?iso-8859-1?q?na=EFve,?= baby")
-@result{} "This is naïve, baby"
+@result{} "This is na@"{@dotless{i}}ve, baby"
 @end example
 
 @end table

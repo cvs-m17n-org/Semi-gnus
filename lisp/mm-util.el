@@ -1,5 +1,5 @@
 ;;; mm-util.el --- Utility functions for Mule and low level things
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;   Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -25,9 +25,9 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
-(eval-when-compile (require 'static))
+(eval-when-compile
+  (require 'cl)
+  (require 'static))
 
 (require 'mail-prsvr)
 
@@ -47,9 +47,6 @@
      (coding-system-equal . equal)
      (annotationp . ignore)
      (set-buffer-file-coding-system . ignore)
-     (make-char
-      . (lambda (charset int)
-	  (int-to-char int)))
      (read-charset
       . (lambda (prompt)
 	  "Return a charset."
@@ -60,9 +57,10 @@
 		    mm-mime-mule-charset-alist)
 	    nil t))))
      (subst-char-in-string
-      . (lambda (from to string) ;; stolen (and renamed) from nnheader.el
-	  "Replace characters in STRING from FROM to TO."
-	  (let ((string (substring string 0)) ;Copy string.
+      . (lambda (from to string &optional inplace) ;; stolen (and renamed) from nnheader.el
+	  "Replace characters in STRING from FROM to TO.
+	  Unless optional argument INPLACE is non-nil, return a new string."
+	  (let ((string (if inplace string (copy-sequence string)))
 		(len (length string))
 		(idx 0))
 	    ;; Replace all occurrences of FROM with TO.
@@ -136,15 +134,9 @@ In XEmacs, also return non-nil if CS is a coding system object."
 
 (defvar mm-charset-synonym-alist
   `(
-    ;; Perfectly fine?  A valid MIME name, anyhow.
-    ,@(unless (mm-coding-system-p 'big5)
-       '((big5 . cn-big5)))
     ;; Not in XEmacs, but it's not a proper MIME charset anyhow.
     ,@(unless (mm-coding-system-p 'x-ctext)
        '((x-ctext . ctext)))
-    ;; Apparently not defined in Emacs 20, but is a valid MIME name.
-    ,@(unless (mm-coding-system-p 'gb2312)
-       '((gb2312 . cn-gb-2312)))
     ;; ISO-8859-15 is very similar to ISO-8859-1.  But it's _different_!
     ,@(unless (mm-coding-system-p 'iso-8859-15)
        '((iso-8859-15 . iso-8859-1)))
@@ -163,6 +155,11 @@ In XEmacs, also return non-nil if CS is a coding system object."
     ,@(if (and (not (mm-coding-system-p 'windows-1250))
 	       (mm-coding-system-p 'cp1250))
 	  '((windows-1250 . cp1250)))
+    ;; A Microsoft misunderstanding.
+    ,@(unless (mm-coding-system-p 'ks_c_5601-1987)
+	(if (mm-coding-system-p 'cp949)
+	    '((ks_c_5601-1987 . cp949))
+	  '((ks_c_5601-1987 . euc-kr))))
     )
   "A mapping from invalid charset names to the real charset names.")
 
@@ -401,9 +398,6 @@ used as the line break code type of the coding system."
 	    (setq cs c)))
       cs))))
 
-(defsubst mm-replace-chars-in-string (string from to)
-  (mm-subst-char-in-string from to string))
-
 (eval-and-compile
   (defvar mm-emacs-mule (and (not (featurep 'xemacs))
 			     (boundp 'default-enable-multibyte-characters)
@@ -635,11 +629,18 @@ Equivalent to `progn' in XEmacs"
 (put 'mm-with-unibyte-current-buffer 'edebug-form-spec '(body))
 
 (defmacro mm-with-unibyte (&rest forms)
-  "Eval the FORMS with the default value of `enable-multibyte-characters' nil, ."
+  "Eval the FORMS with the default value of `enable-multibyte-characters' nil."
   `(let (default-enable-multibyte-characters)
      ,@forms))
 (put 'mm-with-unibyte 'lisp-indent-function 0)
 (put 'mm-with-unibyte 'edebug-form-spec '(body))
+
+(defmacro mm-with-multibyte (&rest forms)
+  "Eval the FORMS with the default value of `enable-multibyte-characters' t."
+  `(let ((default-enable-multibyte-characters t))
+     ,@forms))
+(put 'mm-with-multibyte 'lisp-indent-function 0)
+(put 'mm-with-multibyte 'edebug-form-spec '(body))
 
 (defun mm-find-charset-region (b e)
   "Return a list of Emacs charsets in the region B to E."
@@ -674,21 +675,6 @@ Equivalent to `progn' in XEmacs"
 		      (car (last (assq mail-parse-charset
 				       mm-mime-mule-charset-alist)))))
 	    (list 'ascii (or charset 'latin-iso8859-1)))))))))
-
-(static-if (fboundp 'shell-quote-argument)
-    (defalias 'mm-quote-arg 'shell-quote-argument)
-  (defun mm-quote-arg (arg)
-    "Return a version of ARG that is safe to evaluate in a shell."
-    (let ((pos 0) new-pos accum)
-      ;; *** bug: we don't handle newline characters properly
-      (while (setq new-pos (string-match "[]*[;!'`\"$\\& \t{} |()<>]" arg pos))
-	(push (substring arg pos new-pos) accum)
-	(push "\\" accum)
-	(push (list (aref arg new-pos)) accum)
-	(setq pos (1+ new-pos)))
-      (if (= pos 0)
-	  arg
-	(apply 'concat (nconc (nreverse accum) (list (substring arg pos))))))))
 
 (defun mm-auto-mode-alist ()
   "Return an `auto-mode-alist' with only the .gz (etc) thingies."
@@ -772,11 +758,12 @@ If INHIBIT is non-nil, inhibit `mm-inhibit-file-name-handlers'."
 (defun mm-image-load-path (&optional package)
   (let (dir result)
     (dolist (path load-path (nreverse result))
-      (if (file-directory-p
-	   (setq dir (concat (file-name-directory
-			      (directory-file-name path))
-			     "etc/" (or package "gnus/"))))
-	  (push dir result))
+      (when (and path
+		 (file-directory-p
+		  (setq dir (concat (file-name-directory
+				     (directory-file-name path))
+				    "etc/" (or package "gnus/")))))
+	(push dir result))
       (push path result))))
 
 ;; Fixme: This doesn't look useful where it's used.

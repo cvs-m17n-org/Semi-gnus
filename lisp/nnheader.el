@@ -119,7 +119,6 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 
 (defvar nnheader-auto-save-coding-system
   (cond
-   ((boundp 'MULE) '*junet*)
    ((not (fboundp 'find-coding-system)) nil)
    ((find-coding-system 'emacs-mule)
     (if (memq system-type '(windows-nt ms-dos ms-windows))
@@ -137,7 +136,6 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (autoload 'nnmail-message-id "nnmail")
   (autoload 'mail-position-on-field "sendmail")
   (autoload 'message-remove-header "message")
-  (autoload 'gnus-point-at-eol "gnus-util")
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;; mm-util stuff.
@@ -155,13 +153,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defalias 'mm-image-load-path 'nnheader-image-load-path)
 
   ;; Should keep track of `mm-read-coding-system' in mm-util.el.
-  (defalias 'mm-read-coding-system
-    (if (or (and (featurep 'xemacs)
-		 (<= (string-to-number emacs-version) 21.1))
-	    (boundp 'MULE))
-	(lambda (prompt &optional default-coding-system)
-	  (read-coding-system prompt))
-      'read-coding-system))
+  (defalias 'mm-read-coding-system 'read-coding-system)
 
   ;; Should keep track of `mm-%s' in mm-util.el.
   (defalias 'mm-multibyte-string-p
@@ -174,10 +166,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
   (defun nnheader-detect-coding-region (start end)
     "Like 'detect-coding-region' except returning the best one."
-    (let ((coding-systems
-	   (static-if (boundp 'MULE)
-	       (code-detect-region (point) (point-max))
-	     (detect-coding-region (point) (point-max)))))
+    (let ((coding-systems (detect-coding-region (point) (point-max))))
       (or (car-safe coding-systems)
 	  coding-systems)))
   (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
@@ -194,7 +183,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defmacro nnheader-with-unibyte-buffer (&rest forms)
   "Create a temporary buffer, and evaluate FORMS there like `progn'.
 Use unibyte mode for this."
-  `(let (default-enable-multibyte-characters default-mc-flag)
+  `(let (default-enable-multibyte-characters)
      (with-temp-buffer ,@forms)))
   (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
   (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
@@ -212,15 +201,6 @@ Equivalent to `progn' in XEmacs"
       (cond ((featurep 'xemacs)
 	     `(let (default-enable-multibyte-characters)
 		,@forms))
-	    ((boundp 'MULE)
-	     `(let ((,multibyte mc-flag)
-		    (,buffer (current-buffer)))
-		(unwind-protect
-		    (let (default-enable-multibyte-characters default-mc-flag)
-		      (setq mc-flag nil)
-		      ,@forms)
-		  (set-buffer ,buffer)
-		  (setq mc-flag ,multibyte))))
 	    (t
 	     `(let ((,multibyte enable-multibyte-characters)
 		    (,buffer (current-buffer)))
@@ -284,8 +264,6 @@ nil, ."
 		  (lambda nil t))
 		 ((featurep 'xemacs)
 		  (lambda nil nil))
-		 ((boundp 'MULE)
-		  (lambda nil mc-flag))
 		 (t
 		  (lambda nil enable-multibyte-characters))))
 
@@ -349,7 +327,7 @@ nil, ."
 		(first t)
 		(bol (save-restriction
 		       (widen)
-		       (gnus-point-at-bol))))
+		       (point-at-bol))))
 	    (while (not (eobp))
 	      (when (and (or break qword-break)
 			 (> (- (point) bol) 76))
@@ -425,18 +403,18 @@ nil, ."
 	  (goto-char (point-min))
 	  (let ((bol (save-restriction
 		       (widen)
-		       (gnus-point-at-bol)))
-		(eol (gnus-point-at-eol)))
+		       (point-at-bol)))
+		(eol (point-at-eol)))
 	    (forward-line 1)
 	    (while (not (eobp))
 	      (if (and (looking-at "[ \t]")
-		       (< (- (gnus-point-at-eol) bol) 76))
+		       (< (- (point-at-eol) bol) 76))
 		  (delete-region eol (progn
 				       (goto-char eol)
 				       (skip-chars-forward "\r\n")
 				       (point)))
-		(setq bol (gnus-point-at-bol)))
-	      (setq eol (gnus-point-at-eol))
+		(setq bol (point-at-bol)))
+	      (setq eol (point-at-eol))
 	      (forward-line 1)))))))
 
   (unless (fboundp 'std11-unfold-field)
@@ -685,9 +663,9 @@ given, the return value will not contain the last newline."
 	   (goto-char p)
 	   (if (search-forward "\nmessage-id:" nil t)
 	       (buffer-substring
-		(1- (or (search-forward "<" (gnus-point-at-eol) t)
+		(1- (or (search-forward "<" (point-at-eol) t)
 			(point)))
-		(or (search-forward ">" (gnus-point-at-eol) t) (point)))
+		(or (search-forward ">" (point-at-eol) t) (point)))
 	     ;; If there was no message-id, we just fake one to make
 	     ;; subsequent routines simpler.
 	     (nnheader-generate-fake-message-id)))
@@ -796,7 +774,7 @@ given, the return value will not contain the last newline."
        (nnheader-generate-fake-message-id))))
 
 (defun nnheader-parse-nov ()
-  (let ((eol (gnus-point-at-eol)))
+  (let ((eol (point-at-eol)))
     (make-full-mail-header
      (nnheader-nov-read-integer)	; number
      (nnheader-nov-field)		; subject
@@ -951,7 +929,6 @@ the line could be found."
 	   (number (length articles))
 	   (count 0)
 	   (file-name-coding-system 'binary)
-	   (pathname-coding-system 'binary)
 	   (case-fold-search t)
 	   (cur (current-buffer))
 	   article
@@ -1200,7 +1177,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
       ;; This is invalid, but not all articles have Message-IDs.
       ()
     (mail-position-on-field "References")
-    (let ((begin (gnus-point-at-bol))
+    (let ((begin (point-at-bol))
 	  (fill-column 78)
 	  (fill-prefix "\t"))
       (when references
@@ -1273,8 +1250,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
 
 (defvar nnheader-directory-files-is-safe
   (or (eq system-type 'windows-nt)
-      (and (not (featurep 'xemacs))
-	   (> emacs-major-version 20)))
+      (not (featurep 'xemacs)))
   "If non-nil, Gnus believes `directory-files' is safe.
 It has been reported numerous times that `directory-files' fails with
 an alarming frequency on NFS mounted file systems. If it is nil,
@@ -1626,7 +1602,6 @@ find-file-hooks, etc.
   "Strip all \r's from the current buffer."
   (nnheader-skeleton-replace "\r"))
 
-(defalias 'nnheader-run-at-time 'run-at-time)
 (defalias 'nnheader-cancel-timer 'cancel-timer)
 (defalias 'nnheader-cancel-function-timers 'cancel-function-timers)
 (defalias 'nnheader-string-as-multibyte 'string-as-multibyte)

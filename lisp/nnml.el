@@ -33,7 +33,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 
 (require 'gnus)
 (require 'nnheader)
@@ -126,7 +125,6 @@ marks file will be regenerated properly by Gnus.")
 	     (number (length sequence))
 	     (count 0)
 	     (file-name-coding-system nnmail-pathname-coding-system)
-	     (pathname-coding-system nnmail-pathname-coding-system)
 	     beg article)
 	(if (stringp (car sequence))
 	    'headers
@@ -188,7 +186,6 @@ marks file will be regenerated properly by Gnus.")
   (nnml-possibly-change-directory group server)
   (let* ((nntp-server-buffer (or buffer nntp-server-buffer))
 	 (file-name-coding-system nnmail-pathname-coding-system)
-	 (pathname-coding-system nnmail-pathname-coding-system)
 	 path gpath group-num)
     (if (stringp id)
 	(when (and (setq group-num (nnml-find-group-number id))
@@ -219,8 +216,7 @@ marks file will be regenerated properly by Gnus.")
 	    (string-to-int (file-name-nondirectory path)))))))
 
 (deffoo nnml-request-group (group &optional server dont-check)
-  (let ((file-name-coding-system nnmail-pathname-coding-system)
-	(pathname-coding-system nnmail-pathname-coding-system))
+  (let ((file-name-coding-system nnmail-pathname-coding-system))
     (cond
      ((not (nnml-possibly-change-directory group server))
       (nnheader-report 'nnml "Invalid group (no such directory)"))
@@ -278,8 +274,7 @@ marks file will be regenerated properly by Gnus.")
 (deffoo nnml-request-list (&optional server)
   (save-excursion
     (let ((nnmail-file-coding-system nnmail-active-file-coding-system)
-	  (file-name-coding-system nnmail-pathname-coding-system)
-	  (pathname-coding-system nnmail-pathname-coding-system))
+	  (file-name-coding-system nnmail-pathname-coding-system))
       (nnmail-find-file nnml-active-file))
     (setq nnml-group-alist (nnmail-get-active))
     t))
@@ -578,7 +573,7 @@ marks file will be regenerated properly by Gnus.")
 		  (search-forward id nil t)) ; We find the ID.
 	;; And the id is in the fourth field.
 	(if (not (and (search-backward "\t" nil t 4)
-		      (not (search-backward"\t" (gnus-point-at-bol) t))))
+		      (not (search-backward "\t" (point-at-bol) t))))
 	    (forward-line 1)
 	  (beginning-of-line)
 	  (setq found t)
@@ -612,8 +607,7 @@ marks file will be regenerated properly by Gnus.")
   (if (not group)
       t
     (let ((pathname (nnmail-group-pathname group nnml-directory))
-	  (file-name-coding-system nnmail-pathname-coding-system)
-	  (pathname-coding-system nnmail-pathname-coding-system))
+	  (file-name-coding-system nnmail-pathname-coding-system))
       (when (not (equal pathname nnml-current-directory))
 	(setq nnml-current-directory pathname
 	      nnml-current-group group
@@ -706,7 +700,7 @@ marks file will be regenerated properly by Gnus.")
     (nnheader-insert-nov headers)))
 
 (defsubst nnml-header-value ()
-  (buffer-substring (match-end 0) (gnus-point-at-eol)))
+  (buffer-substring (match-end 0) (point-at-eol)))
 
 (defun nnml-parse-head (chars &optional number)
   "Parse the head of the current buffer."
@@ -930,7 +924,7 @@ Use the nov database for the current group if available."
       (let ((range (nth 0 action))
 	    (what  (nth 1 action))
 	    (marks (nth 2 action)))
-	(assert (or (eq what 'add) (eq what 'del)) t
+	(assert (or (eq what 'add) (eq what 'del)) nil
 		"Unknown request-set-mark action: %s" what)
 	(dolist (mark marks)
 	  (setq nnml-marks (gnus-update-alist-soft
@@ -948,16 +942,16 @@ Use the nov database for the current group if available."
     (nnheader-message 8 "Updating marks for %s..." group)
     (nnml-open-marks group server)
     ;; Update info using `nnml-marks'.
-    (mapcar (lambda (pred)
-	      (unless (memq (cdr pred) gnus-article-unpropagated-mark-lists)
-		(gnus-info-set-marks
-		 info
-		 (gnus-update-alist-soft
-		  (cdr pred)
-		  (cdr (assq (cdr pred) nnml-marks))
-		  (gnus-info-marks info))
-		 t)))
-	    gnus-article-mark-lists)
+    (mapc (lambda (pred)
+	    (unless (memq (cdr pred) gnus-article-unpropagated-mark-lists)
+	      (gnus-info-set-marks
+	       info
+	       (gnus-update-alist-soft
+		(cdr pred)
+		(cdr (assq (cdr pred) nnml-marks))
+		(gnus-info-marks info))
+	       t)))
+	  gnus-article-mark-lists)
     (let ((seen (cdr (assq 'read nnml-marks))))
       (gnus-info-set-read info
 			  (if (and (integerp (car seen))
@@ -991,7 +985,7 @@ Use the nov database for the current group if available."
 			nnml-marks-modtime))
       (error (or (gnus-yes-or-no-p
 		  (format "Could not write to %s (%s).  Continue? " file err))
-		 (error "Cannot write to %s (%s)" err))))))
+		 (error "Cannot write to %s (%s)" file err))))))
 
 (defun nnml-open-marks (group server)
   (let ((file (expand-file-name

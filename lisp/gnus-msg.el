@@ -354,11 +354,7 @@ Thank you for your help in stamping out bugs.
 	    ", a modified version of Semi-gnus")))
 
 (eval-and-compile
-  (autoload 'gnus-uu-post-news "gnus-uu" nil t)
-  (autoload 'news-setup "rnewspost")
-  (autoload 'news-reply-mode "rnewspost")
-  (autoload 'rmail-dont-reply-to "mail-utils")
-  (autoload 'rmail-output "rmailout"))
+  (autoload 'gnus-uu-post-news "gnus-uu" nil t))
 
 
 ;;;
@@ -434,8 +430,13 @@ Thank you for your help in stamping out bugs.
        ;; added an optional argument to `gnus-configure-posting-styles' to
        ;; make sure that the correct value for the group name is used. -- drv
        (add-hook 'message-mode-hook
-		 (lambda ()
-		   (gnus-configure-posting-styles ,group)))
+		 (if (memq ,config '(reply-yank reply))
+		     (lambda ()
+		       (gnus-configure-posting-styles ,group))
+		   (lambda ()
+		     ;; There may be an old " *gnus article copy*" buffer.
+		     (let (gnus-article-copy)
+		       (gnus-configure-posting-styles ,group)))))
        (gnus-pull ',(intern gnus-draft-meta-information-header)
 		  message-required-headers)
        (when (and ,group
@@ -704,9 +705,9 @@ network.  The corresponding back end must have a 'request-post method."
 	    (progn
 	      (message-news (gnus-group-real-name gnus-newsgroup-name))
 	      (set (make-local-variable 'gnus-discouraged-post-methods)
-		   (delq
+		   (remove
 		    (car (gnus-find-method-for-group gnus-newsgroup-name))
-		    (copy-sequence gnus-discouraged-post-methods))))))
+		    gnus-discouraged-post-methods)))))
       (save-excursion
 	(set-buffer buffer)
 	(setq gnus-newsgroup-name group)))))
@@ -991,7 +992,9 @@ header line with the old Message-ID."
 		     (not to-address)))
 	    ;; This is news.
 	    (if post
-		(message-news (or to-group group))
+		(message-news
+		 (or to-group
+		     (and (not (gnus-virtual-group-p pgroup)) group)))
 	      (set-buffer gnus-article-copy)
 	      (gnus-msg-treat-broken-reply-to)
 	      (message-followup (if (or newsgroup-p force-news)
@@ -1604,7 +1607,7 @@ The current group name will be inserted at \"%s\".")
 		 (not (gnus-group-read-only-p group)))
       (setq group (read-string "Put in group: " nil (gnus-writable-groups))))
 
-    (when (gnus-gethash group gnus-newsrc-hashtb)
+    (when (gnus-group-entry group)
       (error "No such group: %s" group))
     (save-excursion
       (save-restriction
@@ -1830,7 +1833,6 @@ this is a reply."
       (message-narrow-to-headers)
       (let ((gcc (or gcc (mail-fetch-field "gcc" nil t)))
 	    (coding-system-for-write 'raw-text)
-	    (output-coding-system 'raw-text)
 	    groups group method group-art
 	    mml-externalize-attachments)
 	(when gcc

@@ -846,35 +846,13 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
    ((featurep 'xemacs)
     (popup-menu menu))
    (t
-    (let ((menu-func (or (and (fboundp 'easy-menu-create-menu)
-			      'easy-menu-create-menu)
-			 'easy-menu-create-keymaps))
-	  keymap pop func)
-      (static-cond ((< emacs-major-version 20)
-		    ;; For Emacsen from 19.34 down to 19.28.
-		    ;; Seems the first item in MENU will be ignored.
-		    (or (keymapp menu)
-			(setq menu
-			      (append (list ""  ;; This will be ignored.
-					    (or title "Popup Menu")
-					    "-----"
-					    "-----")
-				      (cdr menu))))
-		    (setq keymap
-			  (if (keymapp menu)
-			      (append (list 'keymap
-					    (if title
-						`(nil ,title)
-					      '(nil "Popup Menu"))
-					    '(nil "")
-					    '(nil ""))
-				      (cdr menu))
-			    (funcall menu-func (car menu) (cdr menu)))))
-		   (t
-		    (setq keymap
-			  (if (keymapp menu)
-			      menu
-			    (funcall menu-func (car menu) (cdr menu))))))
+    (let* ((menu-func (or (and (fboundp 'easy-menu-create-menu)
+			       'easy-menu-create-menu)
+			  'easy-menu-create-keymaps))
+	   (keymap (if (keymapp menu)
+		       menu
+		     (funcall menu-func (car menu) (cdr menu))))
+	   pop func)
       ;; Display the popup menu.
       (if (and (setq pop (x-popup-menu t keymap))
 	       (setq func (lookup-key keymap

@@ -32,7 +32,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-(eval-when-compile (require 'gnus-clfns))
 
 (require 'nntp)
 (require 'nnheader)
@@ -150,8 +149,7 @@
   ;; Remove NOV lines of articles that are marked as read.
   (when (and (file-exists-p (nnkiboze-nov-file-name))
 	     nnkiboze-remove-read-articles)
-    (let ((coding-system-for-write nnkiboze-file-coding-system)
-	  (output-coding-system nnkiboze-file-coding-system))
+    (let ((coding-system-for-write nnkiboze-file-coding-system))
       (with-temp-file (nnkiboze-nov-file-name)
 	(let ((cur (current-buffer))
 	      (nnheader-file-coding-system nnkiboze-file-coding-system))
@@ -229,7 +227,7 @@ Finds out what articles are to be part of the nnkiboze groups."
 			  "." gnus-score-file-suffix))))))
 
 (defun nnkiboze-generate-group (group &optional inhibit-list-groups)
-  (let* ((info (nth 2 (gnus-gethash group gnus-newsrc-hashtb)))
+  (let* ((info (gnus-get-info group))
 	 (newsrc-file (concat nnkiboze-directory
 			      (nnheader-translate-file-chars
 			       (concat group ".newsrc"))))
@@ -255,8 +253,7 @@ Finds out what articles are to be part of the nnkiboze groups."
     (mm-with-unibyte
      (when (file-exists-p newsrc-file)
        (load newsrc-file))
-     (let ((coding-system-for-write nnkiboze-file-coding-system)
-	   (output-coding-system nnkiboze-file-coding-system))
+     (let ((coding-system-for-write nnkiboze-file-coding-system))
        (gnus-make-directory (file-name-directory nov-file))
        (with-temp-file nov-file
 	 (when (file-exists-p nov-file)
@@ -272,8 +269,7 @@ Finds out what articles are to be part of the nnkiboze groups."
 		 (numberp (car (symbol-value group))) ; It is active
 		 (or (> nnkiboze-level 7)
 		     (and (setq glevel
-				(nth 1 (nth 2 (gnus-gethash
-					       gname gnus-newsrc-hashtb))))
+				(gnus-info-level (gnus-get-info gname)))
 			  (>= nnkiboze-level glevel)))
 		 (not (string-match "^nnkiboze:" gname)) ; Exclude kibozes
 		 (push (cons gname (1- (car (symbol-value group))))
@@ -285,8 +281,7 @@ Finds out what articles are to be part of the nnkiboze groups."
 	 ;; number that has been kibozed in GROUP in this kiboze group.
 	 (setq newsrc nnkiboze-newsrc)
 	 (while newsrc
-	   (if (not (setq active (gnus-gethash
-				  (caar newsrc) gnus-active-hashtb)))
+	   (if (not (setq active (gnus-active (caar newsrc))))
 	       ;; This group isn't active after all, so we remove it from
 	       ;; the list of component groups.
 	       (setq nnkiboze-newsrc (delq (car newsrc) nnkiboze-newsrc))
@@ -297,8 +292,7 @@ Finds out what articles are to be part of the nnkiboze groups."
 	     (gnus-message 3 "nnkiboze: Checking %s..." (caar newsrc))
 	     (setq ginfo (gnus-get-info (gnus-group-group-name))
 		   orig-info (gnus-copy-sequence ginfo)
-		   num-unread (car (gnus-gethash (caar newsrc)
-						 gnus-newsrc-hashtb)))
+		   num-unread (gnus-group-unread (caar newsrc)))
 	     (unwind-protect
 		 (progn
 		   ;; We set all list of article marks to nil.  Since we operate
@@ -341,8 +335,7 @@ Finds out what articles are to be part of the nnkiboze groups."
 	       ;; Restore the proper info.
 	       (when ginfo
 		 (setcdr ginfo (cdr orig-info)))
-	       (setcar (gnus-gethash (caar newsrc) gnus-newsrc-hashtb)
-		       num-unread)))
+	       (setcar (gnus-group-entry (caar newsrc)) num-unread)))
 	   (setcdr (car newsrc) (cdr active))
 	   (gnus-message 3 "nnkiboze: Checking %s...done" (caar newsrc))
 	   (setq newsrc (cdr newsrc)))))

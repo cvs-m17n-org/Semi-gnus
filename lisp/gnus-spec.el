@@ -136,7 +136,7 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
   (gnus-byte-code 'gnus-group-line-format-spec))
 
 (defvar gnus-format-specs
-  `((group ("%M\%S\%p\%P\%5y: %(%g%)%l\n" ,gnus-group-line-format-spec))
+  `((group ("%M\%S\%p\%P\%5y: %(%g%)\n" ,gnus-group-line-format-spec))
     (summary-dummy ("*  %(:                          :%) %S\n"
 		    ,gnus-summary-dummy-line-format-spec))
     (summary ("%U%R%z%I%(%[%4L: %-23,23f%]%) %s\n"
@@ -234,6 +234,14 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 	  gnus-format-specs-compiled nil)
     (gnus-product-variable-touch 'gnus-format-specs
 				 'gnus-format-specs-compiled))
+  ;; Flush the group format spec cache if there's the grouplens stuff.
+  (let ((spec (assq 'group gnus-format-specs)))
+    (when (and (memq 'group types)
+	       (string-match " gnus-tmp-grouplens[ )]"
+			     (gnus-prin1-to-string (cdr spec))))
+      (setq gnus-format-specs (delq spec gnus-format-specs)
+	    spec (assq 'group gnus-format-specs-compiled)
+	    gnus-format-specs-compiled (delq spec gnus-format-specs-compiled))))
 
   ;; Go through all the formats and see whether they need updating.
   (let (type val)
@@ -321,7 +329,7 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 (defun gnus-correct-length (string)
   "Return the correct width of STRING."
   (let ((length 0))
-    (mapcar (lambda (char) (incf length (gnus-char-width char))) string)
+    (mapcar (lambda (char) (incf length (char-width char))) string)
     length))
 
 (defun gnus-correct-substring (string start &optional end)
@@ -334,14 +342,14 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
     ;; Find the start position.
     (while (and (< seek length)
 		(< wseek start))
-      (incf wseek (gnus-char-width (aref string seek)))
+      (incf wseek (char-width (aref string seek)))
       (incf seek))
     (setq wstart seek)
     ;; Find the end position.
     (while (and (<= seek length)
 		(or (not end)
 		    (<= wseek end)))
-      (incf wseek (gnus-char-width (aref string seek)))
+      (incf wseek (char-width (aref string seek)))
       (incf seek))
     (setq wend seek)
     (substring string wstart (1- wend))))
@@ -646,6 +654,9 @@ are supported for %s."
 		   ?s)))
 	   ;; Find the specification from `spec-alist'.
 	   ((setq elem (cdr (assq (or extended-spec spec) spec-alist))))
+	   ;; We used to use "%l" for displaying the grouplens score.
+	   ((eq spec ?l)
+	    (setq elem '("" ?s)))
 	   (t
 	    (setq elem '("*" ?s))))
 	  (setq elem-type (cadr elem))
@@ -696,7 +707,7 @@ are supported for %s."
        (list (car flist)))
       ;; A single number.
       ((string= fstring "%d")
-       (setq dontinsert)
+       (setq dontinsert t)
        (if insert
 	   (list `(princ ,(car flist)))
 	 (list `(int-to-string ,(car flist)))))

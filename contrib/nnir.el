@@ -298,7 +298,7 @@
 
 ;;; Setup Code:
 
-(defconst nnir-version "$Id: nnir.el,v 1.1.6.1 2004-01-04 23:51:01 yamaoka Exp $"
+(defconst nnir-version "$Id: nnir.el,v 1.1.6.1.2.1 2004-05-02 00:24:53 yamaoka Exp $"
   "Version of NNIR.")
 
 (require 'cl)
@@ -692,7 +692,17 @@ that it is for Namazu, not Glimpse."
     'gnus-group-make-nnir-group))
 (add-hook 'gnus-group-mode-hook 'nnir-group-mode-hook)
 
-
+(defmacro nnir-group-server (group)
+  "Return the server for a foreign newsgroup GROUP.
+The returned format is as `gnus-server-to-method' needs it.  See
+`gnus-group-real-prefix' and `gnus-group-real-name'."
+  `(let ((gname ,group))
+     (if (string-match "^\\([^:]+\\):" gname)
+	 (setq gname (match-string 1 gname))
+       nil)
+     (if (string-match "^\\([^+]+\\)\\+\\(.+\\)$" gname)
+	 (format "%s:%s" (match-string 1 gname) (match-string 2 gname))
+       (concat gname ":"))))
 
 ;; Summary mode commands.
 
@@ -865,7 +875,7 @@ pairs (also vectors, actually)."
     (let ((artlist nil)
           (groupspec (cdr (assq 'group query)))
           (qstring (cdr (assq 'query query)))
-	  (prefix (nnir-read-server-parm 'nnir-glimps-remove-prefix server))
+	  (prefix (nnir-read-server-parm 'nnir-glimpse-remove-prefix server))
 	  artno dirnam)
       (when (and group groupspec)
         (error (concat "It does not make sense to use a group spec"
@@ -1194,7 +1204,7 @@ Tested with swish-e-2.0.1 on Windows NT 4.0."
 		  (error "Missing parameter `nnir-swish-e-index-file'")))
 	     (additional-switches
 	      (nnir-read-server-parm
-	       'nnir-swish++-additional-switches server))
+	       'nnir-swish-e-additional-switches server))
 	     (cp-list `(,nnir-swish-e-program
 			nil		; input from /dev/null
 			t		; output
@@ -1485,17 +1495,6 @@ form 'backend:name'."
 ;; 	(symbol-value key))
 ;;       (symbol-value key))
 ;;     ))
-
-(defmacro nnir-group-server (group)
-  "Returns the server for a foreign newsgroup in the format as gnus-server-to-method needs it. Compare to gnus-group-real-prefix and gnus-group-real-name."
-  `(let ((gname ,group))
-    (if (string-match "^\\([^:]+\\):" gname)
-	(setq gname (match-string 1 gname))
-      nil)
-    (if (string-match "^\\([^+]+\\)\\+\\(.+\\)$" gname)
-	(format "%s:%s" (match-string 1 gname) (match-string 2 gname))
-      (concat gname ":"))
-    ))
 
 (defun nnir-group-full-name (shortname server)
   "For the given group name, return a full Gnus group name.

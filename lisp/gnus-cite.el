@@ -374,7 +374,7 @@ Lines matching `gnus-cite-attribution-suffix' and perhaps
 	(goto-char (point-min))
 	(forward-line (1- number))
 	(when (re-search-forward gnus-cite-attribution-suffix
-				 (gnus-point-at-eol)
+				 (point-at-eol)
 				 t)
 	  (gnus-article-add-button (match-beginning 1) (match-end 1)
 				   'gnus-cite-toggle prefix))
@@ -722,13 +722,13 @@ See also the documentation for `gnus-article-highlight-citation'."
 	       (gnus-article-search-signature)
 	       (point)))
 	(prefix-regexp (concat "^\\(" message-cite-prefix-regexp "\\)"))
-	alist entry start begin end numbers prefix guess-limit mc-flag)
+	alist entry start begin end numbers prefix guess-limit)
     ;; Get all potential prefixes in `alist'.
     (while (< (point) max)
       ;; Each line.
       (setq begin (point)
 	    guess-limit (progn (skip-chars-forward "^> \t\r\n") (point))
-	    end (gnus-point-at-bol 2)
+	    end (point-at-bol 2)
 	    start end)
       (goto-char begin)
       ;; Ignore standard Supercite attribution prefix.
@@ -744,7 +744,7 @@ See also the documentation for `gnus-article-highlight-citation'."
 	;; Each prefix.
 	(setq end (match-end 0)
 	      prefix (buffer-substring begin end))
-	(gnus-set-text-properties 0 (length prefix) nil prefix)
+	(set-text-properties 0 (length prefix) nil prefix)
 	(setq entry (assoc prefix alist))
 	(if entry
 	    (setcdr entry (cons line (cdr entry)))
@@ -826,11 +826,10 @@ See also the documentation for `gnus-article-highlight-citation'."
 	(let ((al (buffer-substring (save-excursion (beginning-of-line 0)
 						    (1+ (point)))
 				    end)))
-	  (if (not (assoc al al-alist))
-	      (progn
-		(push (list wrote in prefix tag)
-		      gnus-cite-loose-attribution-alist)
-		(push (cons al t) al-alist))))))))
+	  (when (not (assoc al al-alist))
+	    (push (list wrote in prefix tag)
+		  gnus-cite-loose-attribution-alist)
+	    (push (cons al t) al-alist)))))))
 
 (defun gnus-cite-connect-attributions ()
   ;; Connect attributions to citations
@@ -979,12 +978,7 @@ See also the documentation for `gnus-article-highlight-citation'."
 	  from to overlay)
       (goto-char (point-min))
       (when (zerop (forward-line (1- number)))
-	(static-if (or (featurep 'xemacs)
-		       (and (eq emacs-major-version 20)
-			    (>= emacs-minor-version 3))
-		       (>= emacs-major-version 21))
-	    (forward-char (length prefix))
-	  (move-to-column (string-width prefix)))
+	(forward-char (length prefix))
 	(skip-chars-forward " \t")
 	(setq from (point))
 	(end-of-line 1)
