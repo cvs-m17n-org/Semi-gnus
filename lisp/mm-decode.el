@@ -1048,7 +1048,10 @@ like underscores."
 		      ;; Avoid testing `make-glyph' since W3 may define
 		      ;; a bogus version of it.
 		      (if (fboundp 'create-image)
-			  (create-image (buffer-string) (intern type) 'data-p)
+			  (or
+			   (create-image (buffer-string) nil 'data-p)
+			   (create-image (buffer-string) (intern type)
+					 'data-p))
 			(cond
 			 ((equal type "xbm")
 			  ;; xbm images require special handling, since
