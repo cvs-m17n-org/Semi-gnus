@@ -1,3 +1,15 @@
+1999-01-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* Chaos: Version 1.12.3 was released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 1.12.3.
+
+	* lisp/nnmh.el (nnmh-retrieve-parsed-headers): Use
+	`nnheader-retrieve-headers-from-directory'.
+
+	* lisp/nnheader.el (nnheader-retrieve-headers-from-directory): New
+	function.
+
 1999-01-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* Chaos: Version 1.12.2 was released.
