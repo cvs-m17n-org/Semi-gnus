@@ -125,7 +125,7 @@ it's not cached."
 	  (if (> (buffer-size) 0)
 	      ;; Non-empty overview, write it to a file.
 	      (gnus-write-buffer-as-coding-system
-	       overview-file gnus-cache-overview-coding-system)
+	       gnus-cache-overview-coding-system overview-file)
 	    ;; Empty overview file, remove it
 	    (when (file-exists-p overview-file)
 	      (delete-file overview-file))
