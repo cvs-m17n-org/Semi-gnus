@@ -522,7 +522,7 @@ If SILENT, don't prompt the user."
    (cond
     ((featurep 'xemacs)
      (concat (format "XEmacs/%d.%d" emacs-major-version emacs-minor-version)
-             ;; XXX: beta?
+             ;; XXX: include beta version?
              (if (featurep 'mule)
                  "-mule")
 	     (if (boundp 'xemacs-codename)
@@ -530,9 +530,10 @@ If SILENT, don't prompt the user."
              ))
     (t
      (concat (format "Emacs/%d.%d" emacs-major-version emacs-minor-version)
-             ;; XXX: unibyte or multibyte
+             ;; XXX: include unibyte/multibyte env. info.
              (if (boundp 'mule-version)
                  (concat " Mule/" mule-version))
+	     ;; XXX: convert (Meadow-version) -> PRODUCT/VERSION.
              (if (featurep 'meadow)
                  (concat " " (Meadow-version)))
              ))
