@@ -1,6 +1,6 @@
 2002-01-16  Keiichi Suzuki  <keiichi@nanap.org>
 
-	* Nana-gnus: Version 7.1.0.28 (This is alpha status.)
+	* Nana-gnus: Version 7.1.0.29 (This is alpha status.)
 	Sync. up `nnshimbun.el' with T-gnus.
 	Change user operation when open the large group.  (This is
 	preliminary.)
