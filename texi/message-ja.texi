@@ -1021,6 +1021,17 @@ qualified domain name (FQDN) ($B40A4$K>r7o$rK~$?$7$?%I%a%$%sL>(B) $B$G$J$$$J$
 @section $B$$$m$$$m$J%a%C%;!<%8JQ?t(B
 
 @table @code
+@c @item message-default-charset
+@c @vindex message-default-charset
+@c @cindex charset
+@c Symbol naming a @sc{mime} charset.  Non-ASCII characters in messages are
+@c assumed to be encoded using this charset.  The default is @code{nil},
+@c which means ask the user.  (This variable is used only on non-@sc{mule}
+@c Emacsen.  
+@c @xref{Charset Translation, , Charset Translation, emacs-mime, 
+@c       Emacs MIME Manual}, for details on the @sc{mule}-to-@sc{mime}
+@c translation process.
+@c
 @item message-signature-separator
 @vindex message-signature-separator
 $B=pL>J,N%$K9gCW$9$k@55,I=8=$G$9!#=i4|CM$O(B @samp{^-- *$} $B$G$9!#(B

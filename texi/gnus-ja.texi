@@ -10760,12 +10760,14 @@ IMAP $(B%a!<%k%=!<%9$NNc(B:
 @end lisp
 
 @item webmail
-www.hotmail.com, mail.yahoo.com, www.netaddress.com, www.my-deja.com
-$(B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
+www.hotmail.com, webmail.netscape.com, www.netaddress.com,
+www.my-deja.com $(B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
 
-$(BCm(B: $(B%&%'%V%a!<%k$O(B w3 (url) $(B%Q%C%1!<%8$N%P!<%8%g%s(B "WWW 4.0pre.46
-1999/10/01" $(B$KBg$-$/0MB8$7$^$9!#$=$l0JA0$N$b$N$O$*$=$i$/F0:n$7$J$$$G$7$g(B
-$(B$&!#(B
+$(BCm(B: $(B8=:_(B mail.yahoo.com $(B$O(B POP3 $(B%5!<%S%9$rDs6!$7$F$$$^$9$N$G!"(B@sc{pop}
+$(B%a!<%k%=!<%9$r;H$&$N$,NI$$$N$G$O$J$$$G$7$g$&$+!#(B
+
+$(BCm(B: $(B%&%'%V%a!<%k$O%/%C%-!<$KBg$-$/0MB8$7$^$9!#(Burl "4.0pre.46" $(B$r;H$&>l9g(B
+$(B$O(B "one-line-cookie" $(B%Q%C%A$rEv$F$kI,MW$,$"$j$^$9!#(B
 
 $(B7Y9p(B: $(B%a!<%k$,<:$o$l$k$+$b$7$l$^$;$s!#L5J]>Z$G$9!#(B
 
@@ -10774,7 +10776,7 @@ www.hotmail.com, mail.yahoo.com, www.netaddress.com, www.my-deja.com
 @table @code
 @item :subtype
 $(B%&%'%V%a!<%k%5!<%P!<$N7?$G$9!#=i4|CM$O(B @code{hotmail} $(B$G$9!#B>$N8uJd$O(B
-@code{yahoo}, @code{netaddress}, @code{my-deja} $(B$G$9!#(B
+@code{netscape}, @code{netaddress}, @code{my-deja} $(B$G$9!#(B
 
 @item :user
 $(B%&%'%V%a!<%k%5!<%P!<$NMxMQ<TL>$G$9!#=i4|CM$O%m%0%$%sL>$G$9!#(B
@@ -10792,7 +10794,7 @@ www.hotmail.com, mail.yahoo.com, www.netaddress.com, www.my-deja.com
 $(B%&%'%V%a!<%k$N%=!<%9$NNc$G$9(B:
 
 @lisp
-(webmail :subtype 'yahoo :user "user-name" :password "secret")
+(webmail :subtype 'hotmail :user "user-name" :password "secret")
 @end lisp
 @end table
 
