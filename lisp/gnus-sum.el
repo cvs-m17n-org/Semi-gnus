@@ -1136,6 +1136,7 @@ the MIME-Version header is missed."
     (?M ,(macroexpand '(mail-header-id gnus-tmp-header)) ?s)
     (?r ,(macroexpand '(mail-header-references gnus-tmp-header)) ?s)
     (?c (or (mail-header-chars gnus-tmp-header) 0) ?d)
+    (?k (gnus-summary-line-message-size gnus-tmp-header) ?s)
     (?L gnus-tmp-lines ?s)
     (?I gnus-tmp-indentation ?s)
     (?T (if (= gnus-tmp-level 0) "" (make-string (frame-width) ? )) ?s)
@@ -3257,6 +3258,18 @@ the thread are to be displayed."
 	(if (> number 1) gnus-not-empty-thread-mark
 	  gnus-empty-thread-mark)
       number)))
+
+(defsubst gnus-summary-line-message-size (head)
+  "Return pretty-printed version of message size.
+This function is intended to be used in
+`gnus-summary-line-format-alist', which see."
+  (let ((c (or (mail-header-chars head) -1)))
+    (cond ((< c 0) "n/a")		; chars not available
+	  ((< c (* 1000 10)) (format "%1.1fk" (/ c 1024.0)))
+	  ((< c (* 1000 100)) (format "%dk" (/ c 1024.0)))
+	  ((< c (* 1000 10000)) (format "%1.1fM" (/ c (* 1024.0 1024))))
+	  (t (format "%dM" (/ c (* 1024.0 1024)))))))
+
 
 (defun gnus-summary-set-local-parameters (group)
   "Go through the local params of GROUP and set all variable specs in that list."
