@@ -33,7 +33,7 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 (1) checkout
 
     % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root \
-	checkout -r t-gnus-6_15-quimby gnus
+	checkout -r t-gnus-6_15 gnus
 
 (2) compile
 
@@ -43,12 +43,15 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
 
 (3) update
 
-    % cvs update -r t-gnus-6_15-quimby gnus
+    % cvs update -r t-gnus-6_15 gnus
 
 主なタグは以下のようになっています:
 
     t-gnus-6_15-quimby	最新の T-gnus に割り当てられ、開発と Oort Gnus
 			との同期を行ないます。
+
+    t-gnus-6_15		最新の T-gnus に割り当てられ、開発とリリースさ
+			れた Oort Gnus との同期を行ないます。
 
     pgnus-ichikawa	T-gnus の幹です。
 

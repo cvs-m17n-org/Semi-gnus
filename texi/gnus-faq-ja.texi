@@ -71,8 +71,7 @@ Baur 氏、 Per Abrahamsen 氏に感謝します。
 @item
 Q1.1: 最新のバージョンは?
 
-現在の開発版の最新バージョンは T-gnus 6.15 (tag: t-gnus-6_15-quimby) で
-す。
+現在の開発版の最新バージョンは T-gnus 6.15 (tag: t-gnus-6_15) です。
 
 T-gnus 6.15 を使用するためには別パッケージの FLIM 1.13.1 以上, SEMI (ま
 たは WEMI) 1.13.5 以上が必要です。 その他、 APEL が必要になりますが、必
