@@ -1,3 +1,8 @@
+2001-06-28  Akitada Koyama  <cx2@kh.rim.or.jp>
+
+	* texi/gnus-ja.texi (Web Newspaper): Add a description how to show
+	html documents inline.
+
 2001-06-28  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* texi/message-ja.texi (message-suspend-font-lock-when-citing): Add

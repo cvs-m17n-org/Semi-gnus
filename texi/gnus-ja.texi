@@ -12661,9 +12661,25 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 
 上の @samp{a_group} は閲覧したい記事グループに置き換えてください。
 または @kbd{B nnshimbun RET asahi RET} でバックエンドをブラウズして下さ
-い。
+い。加えて、@sc{html} のドキュメントをインライン表示させたい場合は、
+@file{~/.gnus} ファイルに以下の設定をして下さい。
 
-以下の @code{nnshimbun} 変数を変えることが可能です:
+@lisp
+(setq mime-setup-enable-inline-html nil)
+(eval-after-load "mime-view"
+  '(progn
+     (autoload 'mime-w3m-preview-text/html "mime-w3m")
+     (ctree-set-calist-strictly
+      'mime-preview-condition
+      '((type . text)
+        (subtype . html)
+        (body . visible)
+        (body-presentation-method . mime-w3m-preview-text/html)))
+     (set-alist 'mime-view-type-subtype-score-alist
+                '(text . html) 3)))
+@end lisp
+
+Web Newspaper に関する以下の @code{nnshimbun} 変数を変えることが可能です:
 
 @table @code
 @item nnshimbun-directory
