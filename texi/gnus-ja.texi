@@ -21045,7 +21045,7 @@ Spam 記事だけの @samp{H} 印を関連付ける最小の世話によって、Bogofilte
 ん。シェルコマンド @command{head -1 ~/.bogofilter/*} は両方の記事の計数
 を表示します。概略モードにおけるデバッグのための、あるいは好奇心のための
 コマンド @kbd{S t} は、Bogofilter が現在の記事の @emph{spamicity} (訳注:
-smap 度?) スコア (0.0〜1.0) を、スコアに最も著しく寄与する記事の語といっ
+spam 度?) スコア (0.0〜1.0) を、スコアに最も著しく寄与する記事の語といっ
 しょに、他のバッファに表示することを促します。
 
 @end defvar
@@ -21139,7 +21139,7 @@ gnus はこの種の濾過をサポートします。しかしそれにはいくつかの設定が必要
 @end menu
 
 @node Creating a spam-stat dictionary
-@subsubsection spam-stat ディレクトリを作る
+@subsubsection spam-stat 辞書を作る
 
 統計に基づいた spam 濾過を始めるに、あなたは二つのメールのコレクションに
 基づいた統計を作らなければなりません。一つは spam、もう一つは非-spam で。
@@ -21203,24 +21203,23 @@ nnml バックエンドは一通のメールにつき一つのファイルで、すべてのメールを
 @end defvar
 
 @node Splitting mail using spam-stat
-@subsubsection Splitting mail using spam-stat
+@subsubsection spam-stat を使ってメールを分割する
 
-In order to use @code{spam-stat} to split your mail, you need to add the
-following to your @file{~/.gnus} file:
+@code{spam-stat} を使ってメールを分割するために、@file{~/.gnus} ファイル
+に以下を追加する必要があります。
 
 @example
 (require 'spam-stat)
 (spam-stat-load)
 @end example
 
-This will load the necessary Gnus code, and the dictionary you
-created.
+これは必要な gnus のコードとあなたが作った辞書を load します。
 
-Next, you need to adapt your fancy splitting rules:  You need to
-determine how to use @code{spam-stat}.  In the simplest case, you only have
-two groups, @samp{mail.misc} and @samp{mail.spam}.  The following expression says
-that mail is either spam or it should go into @samp{mail.misc}.  If it is
-spam, then @code{spam-stat-split-fancy} will return @samp{mail.spam}.
+次に、特級分割の規則を適合させる、どうやって @code{spam-stat} を使うかを
+決めて下さい。では @samp{mail.misc} と @samp{mail.spam} の二つのグループ
+だけがある最も単純な事例ではどうなるか。以下の式はメールが spam であるか、
+またはそれが @samp{mail.misc} に行くべきだと言っています。もし spam だっ
+たら @code{spam-stat-split-fancy} は @samp{mail.spam} を返します。
 
 @example
 (setq nnmail-split-fancy
@@ -21229,12 +21228,12 @@ spam, then @code{spam-stat-split-fancy} will return @samp{mail.spam}.
 @end example
 
 @defvar spam-stat-split-fancy-spam-group
-The group to use for spam.  Default is @samp{mail.spam}.
+Spam 用のグループです。ディフォルトは @samp{mail.spam} です。
 @end defvar
 
-If you also filter mail with specific subjects into other groups, use
-the following expression.  It only the mails not matching the regular
-expression are considered potential spam.
+特定の題名を持つメールを他のグループに入れる濾過をも行ないたいならば、以
+下の式を使って下さい。正規表現に合致しないメールだけを spam かもしれない
+と考えます。
 
 @example
 (setq nnmail-split-fancy
@@ -21243,11 +21242,12 @@ expression are considered potential spam.
 	  "mail.misc"))
 @end example
 
-If you want to filter for spam first, then you must be careful when
-creating the dictionary.  Note that @code{spam-stat-split-fancy} must
-consider both mails in @samp{mail.emacs} and in @samp{mail.misc} as
-non-spam, therefore both should be in your collection of non-spam
-mails, when creating the dictionary!
+最初に spam の濾過をしたい場合、辞書を作るときに十分に注意しなければなり
+ません。
+@code{spam-stat-split-fancy} は @samp{mail.emacs} と @samp{mail.misc} の
+どちらのメールも非-spam であると解釈しなければならないので、辞書を作ると
+きの非-spam コレクションに両方とも入っていなければならないことに注意して
+下さい。
 
 @example
 (setq nnmail-split-fancy
@@ -21256,12 +21256,11 @@ mails, when creating the dictionary!
 	  "mail.misc"))
 @end example
 
-You can combine this with traditional filtering.  Here, we move all
-HTML-only mails into the @samp{mail.spam.filtered} group.  Note that since
-@code{spam-stat-split-fancy} will never see them, the mails in
-@samp{mail.spam.filtered} should be neither in your collection of spam mails,
-nor in your collection of non-spam mails, when creating the
-dictionary!
+これを伝統的な濾過と組み合わせることもできます。ここでは我々はすべて
+の HTML だけのメールを @samp{mail.spam.filtered} グループに入れるものと
+しましょう。@code{spam-stat-split-fancy} はそれらのメールを見ないので、
+辞書を作るときに、@samp{mail.spam.filtered} のメールが spam または
+非-spam コレクションのどちらにも入るべきではないことに注意して下さい!
 
 @example
 (setq nnmail-split-fancy
@@ -21271,65 +21270,64 @@ dictionary!
 	  "mail.misc"))
 @end example
 
-
 @node Low-level interface to the spam-stat dictionary
-@subsubsection Low-level interface to the spam-stat dictionary
+@subsubsection spam-stat 辞書への低階層インターフェース
 
-The main interface to using @code{spam-stat}, are the following functions:
+@code{spam-stat} を使うための主インターフェースは以下の関数です:
 
 @defun spam-stat-buffer-is-spam
-called in a buffer, that buffer is considered to be a new spam mail;
-use this for new mail that has not been processed before
+Spam であると考えられる新着メールがあるバッファで呼ばれます; 処理前の新
+着メールに対して使って下さい。
 
 @end defun
 
 @defun spam-stat-buffer-is-no-spam
-called in a buffer, that buffer is considered to be a new non-spam
-mail; use this for new mail that has not been processed before
+非-spam であると考えられる新着メールがあるバッファで呼ばれます; 処理前の
+新着メールに対して使って下さい。
 
 @end defun
 
 @defun spam-stat-buffer-change-to-spam
-called in a buffer, that buffer is no longer considered to be normal
-mail but spam; use this to change the status of a mail that has
-already been processed as non-spam
+Spam ではない通常のメールだとはもはや考えられないメールがあるバッファで
+呼ばれます; すでに非-spam であるものとして処理されてしまったメールの地位
+の変更に使って下さい。
 
 @end defun
 
 @defun spam-stat-buffer-change-to-non-spam
-called in a buffer, that buffer is no longer considered to be spam but
-normal mail; use this to change the status of a mail that has already
-been processed as spam
+通常のメールではない spam だとはもはや考えられないメールがあるバッファで
+呼ばれます; すでに spam であるものとして処理されてしまったメールの地位の
+変更に使って下さい。
 
 @end defun
 
 @defun spam-stat-save
-save the hash table to the file; the filename used is stored in the
-variable @code{spam-stat-file}
+ハッシュテーブルをファイルにセーブします; 変数 @code{spam-stat-file} で
+設定されたファイル名が使われます。
 
 @end defun
 
 @defun spam-stat-load
-load the hash table from a file; the filename used is stored in the
-variable @code{spam-stat-file}
+ハッシュテーブルをファイルから load します; 変
+数 @code{spam-stat-file} で設定されたファイル名が使われます。
 
 @end defun
 
 @defun spam-stat-score-word
-return the spam score for a word
+単語の spam スコアを返します。
 
 @end defun
 
 @defun spam-stat-score-buffer
-return the spam score for a buffer
+バッファの spam スコアを返します。
 
 @end defun
 
 @defun spam-stat-split-fancy
-for fancy mail splitting; add the rule @samp{(: spam-stat-split-fancy)} to
-@code{nnmail-split-fancy}
+特級メール分割のために、@code{nnmail-split-fancy} に規
+則 @samp{(: spam-stat-split-fancy)} を追加します。
 
-This requires the following in your @file{~/.gnus} file:
+これには @file{~/.gnus} に以下が必要です:
 
 @example
 (require 'spam-stat)
@@ -21338,7 +21336,7 @@ This requires the following in your @file{~/.gnus} file:
 
 @end defun
 
-Typical test will involve calls to the following functions:
+代表的なテストは以下の関数呼出しを必要とします:
 
 @example
 Reset: (setq spam-stat (make-hash-table :test 'equal))
@@ -21357,7 +21355,7 @@ Test spam: (spam-stat-test-directory "~/Mail/mail/spam")
 Test non-spam: (spam-stat-test-directory "~/Mail/mail/misc")
 @end example
 
-Here is how you would create your dictionary:
+辞書を生成する方法:
 
 @example
 Reset: (setq spam-stat (make-hash-table :test 'equal))
