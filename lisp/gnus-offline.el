@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.6.2 1999-02-05 02:59:06 keiichi Exp $
+;;; $Id: gnus-offline.el,v 1.1.6.3 1999-03-31 07:59:55 keiichi Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -822,12 +822,12 @@ If value is nil , dialup line is disconnected status.")
       ;; Overwrite the toolbar spec for gnus-group-mode.
       (add-hook 'gnus-startup-hook
 		(lambda ()
-		  (let ((i 0) (stat t) but)
-		    (while (and stat (setq but (nth i gnus-group-toolbar)))
-		      (and (equal 'gnus-group-get-new-news (aref but 1))
-			   (aset but 1 'gnus-offline-gnus-get-new-news)
-			   (setq stat nil))
-		      (setq i (1+ i))))))))
+		  (catch 'tag
+		    (mapcar (lambda (but)
+			      (when (eq 'gnus-group-get-new-news (aref but 1))
+				(aset but 1 'gnus-offline-gnus-get-new-news)
+				(throw 'tag nil)))
+			    gnus-group-toolbar))))))
 ;;
 ;;
 (defun gnus-offline-define-menu-on-miee ()
@@ -917,16 +917,30 @@ If value is nil , dialup line is disconnected status.")
 ;;
 ;; Popup menu within the group buffer (under Emacs).
 ;;
+(defvar gnus-offline-popup-menu nil)
 (defun gnus-offline-popup-menu (event)
   "Popup menu for Gnus offline."
   (interactive "e")
-  (let* ((menu (if (boundp 'miee-popup-menu)
-		   (or (assoc 'keymap
-			      (assoc 'Miee (assoc 'menu-bar global-map)))
-		       miee-popup-menu)
-		 gnus-offline-menu-on-agent))
-	 (pop (x-popup-menu t menu))
-	 (func (and pop (lookup-key menu (apply 'vector pop)))))
+  (unless gnus-offline-popup-menu
+    (setq gnus-offline-popup-menu
+	  (let ((menu
+		 (if (boundp 'miee-popup-menu)
+		     (or (assoc 'keymap
+				(assoc 'Miee (assoc 'menu-bar global-map)))
+			 miee-popup-menu)
+		   gnus-offline-menu-on-agent)))
+	    (if (string< emacs-version "20")
+		(append (list 'keymap
+			      (if (boundp 'miee-popup-menu)
+				  '(nil "Miee")
+				'(nil "Offline"))
+			      '(nil "")
+			      '(nil ""))
+			(cdr menu))
+	      menu))))
+  (let* ((pop (x-popup-menu t gnus-offline-popup-menu))
+	 (func (and pop (lookup-key gnus-offline-popup-menu
+				    (apply 'vector pop)))))
     (and pop func (funcall func))))
 
 ;;

@@ -1885,20 +1885,27 @@ be added to \"References\" field."
   (interactive "P")
   (let ((modified (buffer-modified-p))
 	(buffer (message-eval-parameter message-reply-buffer))
-	refs)
+	start end refs)
     (when (and buffer
 	       message-cite-function)
       (delete-windows-on buffer t)
       (insert-buffer buffer) ; mark will be set at the end of article.
+      (setq start (point)
+	    end (mark t))
 
       ;; Add new IDs to References field.
       (when (and message-yank-add-new-references (interactive-p))
 	(save-excursion
 	  (save-restriction
-	    (narrow-to-region (point) (mark t))
+	    (message-narrow-to-headers)
+	    (setq refs (message-list-references
+			nil
+			(message-fetch-field "References")))
+	    (widen)
+	    (narrow-to-region start end)
 	    (std11-narrow-to-header)
 	    (when (setq refs (message-list-references
-			      '()
+			      refs
 			      (or (message-fetch-field "References")
 				  (message-fetch-field "In-Reply-To"))
 			      (message-fetch-field "Message-ID")))
@@ -2165,6 +2172,7 @@ the user from the mailer."
 				    (car elem))))
 			      (setq success (funcall (caddr elem) arg)))))
 	    (setq sent t))))
+      (prog1
       (when (and success sent)
 	(message-do-fcc)
 	;;(when (fboundp 'mail-hist-put-headers-into-history)
@@ -2179,7 +2187,8 @@ the user from the mailer."
 	(message-do-send-housekeeping)
 	(message-do-actions message-send-actions)
 	;; Return success.
-	t))))
+	t)
+      (kill-buffer message-encoding-buffer)))))
 
 (defun message-send-via-mail (arg)
   "Send the current message via mail."
@@ -4549,6 +4558,10 @@ when could not found legal MIME charset for sending message."
 
 (defun message-maybe-encode ()
   (when message-mime-mode
+    ;; Inherit the buffer local variable `mime-edit-pgp-processing'.
+    (let ((pgp-processing (with-current-buffer message-edit-buffer
+			    mime-edit-pgp-processing)))
+      (setq mime-edit-pgp-processing pgp-processing))
     (run-hooks 'mime-edit-translate-hook))
   (let ((locale-list (message-locale-detect)))
     (when message-mime-mode
@@ -4561,6 +4574,7 @@ when could not found legal MIME charset for sending message."
 	(message-mime-charset-setup locale-list)
 	(if (catch 'mime-edit-error
 	      (save-excursion
+		(mime-edit-pgp-enclose-buffer)
 		(mime-edit-translate-body)
 		))
 	    (error "Translation error!")
@@ -4836,8 +4850,8 @@ This funtion will by called from \`message-mime-charset-recover-by-ask\'."
     (narrow-to-region start end)
     (when (with-current-buffer orig-buf
 	    mime-edit-mode-flag)
-      (run-hooks 'mime-edit-translate-hook)
-      (mime-edit-translate-buffer)
+      (mime-edit-translate-body)
+      (mime-edit-translate-header)
       )
     (goto-char start)
     (and (search-forward (concat "\n" mail-header-separator "\n") nil t)
