@@ -1,3 +1,8 @@
+2000-06-13  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
+
+	* lisp/gnus-bbdb.el(gnus-bbdb/update-record): Fix to fetch last
+	mail field.
+
 2000-06-09  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-news-group-p): Sync with Gnus.
