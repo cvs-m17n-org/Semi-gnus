@@ -1,5 +1,13 @@
 2000-04-12  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus-art.el (gnus-article-prev-page): Bind
+	`window-pixel-scroll-increment' to nil while scrolling for
+	canceling a backlash and a modeline erosion.  It may work under
+	XEmacs 21.2.20 and later.
+	(gnus-article-next-page): Ditto.
+
+2000-04-12  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 17.
 
 	* lisp/gnus-spec.el (gnus-format-specs-compiled): Fix doc string.
