@@ -39,6 +39,9 @@
     (require 'timer))
   (require 'gnus-group))
 
+(eval-and-compile
+  (autoload 'gnus-server-update-server "gnus-srvr"))
+
 (defcustom gnus-agent-directory (nnheader-concat gnus-directory "agent/")
   "Where the Gnus agent will store its files."
   :group 'gnus-agent
