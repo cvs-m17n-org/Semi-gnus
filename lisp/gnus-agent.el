@@ -1363,14 +1363,14 @@ The following commands are available:
 	history overview file histories elem art nov-file low info
 	unreads marked article orig lowest highest)
     (save-excursion
-      (with-temp-buffer
-	(insert-file-contents-as-coding-system gnus-agent-file-coding-system
-					       file)
-	(gnus-active-to-gnus-format
-	 nil (setq orig (gnus-make-hashtable
-			 (count-lines (point-min) (point-max))))))
       (setq overview (gnus-get-buffer-create " *expire overview*"))
       (while (setq gnus-command-method (pop methods))
+	(with-temp-buffer
+	  (insert-file-contents-as-coding-system
+	   gnus-agent-file-coding-system (gnus-agent-lib-file "active"))
+	  (gnus-active-to-gnus-format
+	   nil (setq orig (gnus-make-hashtable
+			   (count-lines (point-min) (point-max))))))
 	(let ((expiry-hashtb (gnus-make-hashtable 1023)))
 	(gnus-agent-open-history)
 	(set-buffer
