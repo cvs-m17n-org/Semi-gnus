@@ -1,3 +1,12 @@
+1999-10-05  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-art.el (gnus-treat-predicate): Check whether arg's
+	value is t before checking for `condition'.
+	(gnus-article-prepare-mime-display): Search for the entity children
+	if the primary type is `multipart'.
+
 1999-10-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
