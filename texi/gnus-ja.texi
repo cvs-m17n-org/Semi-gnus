@@ -16863,44 +16863,42 @@ gnus $B$,(B @dfn{plugged} $B$G$"$k$H$-$K!"$9$G$K%(!<%8%'%s%H$K3JG<$5$l$F$$$k%
 
 $B4|8B@Z$l>C5n$5$l$F$$$k$O$:$J$N$K;D$C$F$$$k5-;v$r8+$D$1$?$J$i$P!"$?$V$s$$(B
 $B$/$D$+$N(B gnus $B%(!<%8%'%s%H%U%!%$%k$,2u$l$F$$$^$9!#(B
-@code{gnus-agent-regenerate} $B$O!"5/$3$j$&$kLdBj$r=$I|$9$k$?$a$NFCJL$J%3(B
+@pxref{gnus-agent-regenerate} $B$O!"5/$3$j$&$kLdBj$r=$I|$9$k$?$a$NFCJL$J%3(B
 $B%^%s%I$G$9!#(B
 
-@c TRANSLATEME!
 @node Agent Regeneration
-@subsection Agent Regeneration
+@subsection $B%(!<%8%'%s%H$r:n$jD>$9(B
 
 @cindex Agent Regeneration
 @cindex Gnus Agent Regeneration
 @cindex regeneration
 
-The local data structures used by @code{nnagent} may become corrupted
-due to certain exceptional conditions.  When this happens,
-@code{nnagent} functionality may degrade or even fail.  The solution
-to this problem is to repair the local data structures by removing all
-internal inconsistencies.
+@code{nnagent} $B$K$h$C$F;H$o$l$k%m!<%+%k$N%G!<%?9=B$$O!"$"$kNc30E*$J>r7o(B
+$B$K$h$C$F$*$+$7$/$J$C$F$7$^$&$+$b$7$l$^$;$s!#$3$l$,5/$3$k$H!"(B
+@code{nnagent} $B$N5!G=@-$,2<$,$k$+$b$7$l$J$$$7!"<:GT$7$5$($9$k$+$b$7$l$^(B
+$B$;$s!#$3$NLdBj$N2r7h:v$O!"FbIt$NL7=b$r$9$Y$F:o=|$9$k$3$H$K$h$C$F!"%m!<%+(B
+$B%k$N%G!<%?9=B$$r=$I|$9$k$3$H$G$9!#(B
 
-For example, if your connection to your server is lost while
-downloaded articles into the agent, the local data structures will not
-know about articles downloaded prior to the connection failure.
-Running @code{gnus-agent-regenerate} or
-@code{gnus-agent-regenerate-group} will update the data structures
-such that you don't need to download these articles a second time.
+$BNc$($P!"5-;v$r%(!<%8%'%s%H$K%@%&%s%m!<%I$7$F$$$k4V$K%5!<%P!<$X$N@\B3$,@Z(B
+$B$l$F$7$^$&>l9g!"%m!<%+%k$N%G!<%?9=B$$O@\B3$,@Z$l$kA0$K%@%&%s%m!<%I$5$l$?(B
+$B5-;v$N$3$H$rCN$j$^$;$s!#(B@code{gnus-agent-regenerate} $B$^$?(B
+$B$O(B @code{gnus-agent-regenerate-group} $B$r<B9T$9$k$H!"$=$N$h$&$J5-;v$rFs2s(B
+$B%@%&%s%m!<%I$7$J$/$F$b:Q$`$h$&$K%G!<%?9=B$$r99?7$7$^$9!#(B
 
 @findex gnus-agent-regenerate
 @kindex M-x gnus-agent-regenerate
-The command @code{gnus-agent-regenerate} will perform
-@code{gnus-agent-regenerate-group} on every agentized group.  While
-you can run @code{gnus-agent-regenerate} in any buffer, it is strongly
-recommended that you first close all summary buffers.
+$B%3%^%s%I(B @code{gnus-agent-regenerate} $B$O!"$9$Y$F$N%(!<%8%'%s%H2=$5$l$?%0(B
+$B%k!<%W$G(B @code{gnus-agent-regenerate-group} $B$r<B9T$7$^$9!#$I$N%P%C%U%!>e(B
+$B$G$b(B @code{gnus-agent-regenerate} $B$r<B9T$9$k$3$H$,$G$-$^$9$,!":G=i$K$9$Y(B
+$B$F$N35N,%P%C%U%!$rJD$8$k$3$H$r6/$/4+$a$^$9!#(B
 
 @findex gnus-agent-regenerate-group
 @kindex M-x gnus-agent-regenerate-group
-The command @code{gnus-agent-regenerate-group} uses the local copies
-of individual articles to repair the local NOV(header) database.  It
-then updates the internal data structures that document which articles
-are stored locally.  An optional argument will mark articles in the
-agent as unread.
+$B%3%^%s%I(B @code{gnus-agent-regenerate-group} $B$O!"%m!<%+%k$N(B NOV ($B%X%C(B
+$B%@!<(B) $B%G!<%?%Y!<%9$r=$I|$9$k$?$a$K!"8D!9$N5-;v$N%m!<%+%k$J%3%T!<$r;H$$$^(B
+$B$9!#$=$N8e$=$l$O!"$I$N5-;v$,%m!<%+%k$K3JG<$5$l$k$+$rN"IU$1$k$?$a$NFbIt%G!<(B
+$B%?9=B$$r99?7$7$^$9!#0z?t$rM?$($k$H!"%(!<%8%'%s%H$NCf$N5-;v$KL$FI$N0u$rIU(B
+$B$1$^$9!#(B
 
 @node Agent and IMAP
 @subsection $B%(!<%8%'%s%H$r(B IMAP $B$G;H$&J}K!(B
@@ -17009,30 +17007,30 @@ plugged $B$N$H$-$K!"%m!<%+%k$K;}$C$F$$$k(B @sc{nov} $B$H5-;v$r;H$&$+$I$&$+$r@
 $B%P!<$r%*%s%i%$%s>uBV$K$9$k$+$I$&$+$r?R$M$^$9!#$=$l0J30$NCM$@$C$?$i!"%*%U(B
 $B%i%$%s>uBV$N%5!<%P!<$O<+F0E*$K%*%s%i%$%s>uBV$K$J$j$^$9!#(B
 
-@c TRANSLATEME!
 @item gnus-agent-mark-unread-after-downloaded
 @vindex gnus-agent-mark-unread-after-downloaded
-If @code{gnus-agent-mark-unread-after-downloaded} is non-@code{nil},
-mark articles as unread after downloading.  The default is t.
+@code{gnus-agent-mark-unread-after-downloaded} $B$,(B $BHs(B-@code{nil} $B$@$C$?$i!"(B
+$B%@%&%s%m!<%I$7$?8e$G5-;v$KL$FI$N0u$rIU$1$^$9!#%G%#%U%)%k%H$O(B @code{t} $B$G(B
+$B$9!#(B
 
 @item gnus-agent-consider-all-articles
 @vindex gnus-agent-consider-all-articles
-If @code{gnus-agent-consider-all-articles} is non-@code{nil}, the
-agent will fetch all missing headers.  When @code{nil}, the agent will
-fetch only new headers. The default is @code{nil}.
+@code{gnus-agent-consider-all-articles} $B$,(B $BHs(B-@code{nil} $B$@$C$?$i!"%(!<(B
+$B%8%'%s%H$O$9$Y$F$N8+Ev$?$i$J$$%X%C%@!<$r<hF@$7$^$9!#(B@code{nil} $B$@$C$?$i(B
+$B?7$7$$%X%C%@!<$@$1$r<hF@$7$^$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G$9!#(B
 
 @item gnus-agent-max-fetch-size
 @vindex gnus-agent-max-fetch-size
-The agent fetches articles into a temporary buffer prior to parsing
-them into individual files.  To avoid exceeding the max. buffer size,
-the agent alternates between fetching and parsing until all articles
-have been fetched.  @code{gnus-agent-max-fetch-size} provides a size
-limit to control how often the cycling occurs.  A large value improves
-performance.  A small value minimizes the time lost should the
-connection be lost while fetching (You may need to run
-@pxref{gnus-agent-regenerate-group} to update the group's state.
-However, all articles parsed prior to loosing the connection will be
-available while unplugged).
+$B%(!<%8%'%s%H$O!"<hF@$7$?5-;v$r8D!9$N%U%!%$%k$KF~$l$k$?$a$N2r@O$r9T$J$&A0(B
+$B$K!"$=$l$i$r0l;~E*$J%P%C%U%!!<$X<h$j9~$_$^$9!#:GBg$N%P%C%U%!%5%$%:$rD62a(B
+$B$7$J$$$h$&$K$9$k$?$a$K!"5-;v$,$9$Y$F<hF@$5$l$k$^$G!"%(!<%8%'%s%H$O<hF@$H(B
+$B2r@O$r8r8_$K9T$J$$$^$9!#(B@code{gnus-agent-max-fetch-size} $B$O!"7+$jJV$7$,(B
+$B$I$l$/$i$$IQHK$K5/$-$k$+$r@)8f$9$k$?$a$N!"%5%$%:$N8B3&$r5,Dj$7$^$9!#Bg$-(B
+$B$JCM$O@-G=$r2~A1$7$^$9!#>.$5$JCM$O!"<hF@$7$F$$$k4V$K@\B3$,ES@Z$l$F$b!"CY(B
+$B$l;~4V$r:G>.$K$7$^$9(B ($B%0%k!<%W$N>uBV$r99?7$9$k$?$a(B
+$B$K(B @pxref{gnus-agent-regenerate-group} $B$r<B9T$9$kI,MW$,$"$k$+$b$7$l$^$;(B
+$B$s!#$G$b!"@\B3$,@Z$l$kA0$K2r@O$5$l$?$9$Y$F$N5-;v$O!"(Bunplugged $B$N4|4V$KMx(B
+$BMQ$9$k$3$H$,$G$-$k$G$7$g$&!#(B)$B!#(B
 
 @item gnus-server-unopen-status
 @vindex gnus-server-unopen-status
