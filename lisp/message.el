@@ -3117,15 +3117,16 @@ If NOW, use that time instead."
     (when (< zone 0)
       (setq sign "-")
       (setq zone (- zone)))
-    (concat
-     (format-time-string "%d" now)
-     ;; The month name of the %b spec is locale-specific.  Pfff.
-     (format " %s "
-	     (capitalize (car (rassoc (nth 4 (decode-time now))
-				      parse-time-months))))
-     (format-time-string "%Y %H:%M:%S " now)
-     ;; We do all of this because XEmacs doesn't have the %z spec.
-     (format "%s%02d%02d" sign (/ zone 3600) (/ (% zone 3600) 60)))))
+    (let ((system-time-locale "C"))
+      (concat
+       (format-time-string "%d" now)
+       ;; The month name of the %b spec is locale-specific.  Pfff.
+       (format " %s "
+	       (capitalize (car (rassoc (nth 4 (decode-time now))
+					parse-time-months))))
+       (format-time-string "%Y %H:%M:%S " now)
+       ;; We do all of this because XEmacs doesn't have the %z spec.
+       (format "%s%02d%02d" sign (/ zone 3600) (/ (% zone 3600) 60))))))
 
 (defun message-make-message-id ()
   "Make a unique Message-ID."
