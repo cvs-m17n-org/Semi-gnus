@@ -1,3 +1,15 @@
+1999-10-06  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+	(semi-gnus-developers): Remove.
+	(gnus-maintainer): Change mail address.
+	(gnus-group-startup-message): Display version string.
+
+	* lisp/gnus-msg.el (gnus-bug): Delete `Cc'; modify version string.
+
+	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Display
+	version string; fix glyph position.
+
 1999-10-06  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
 
 	* lisp/gnus-sum.el (gnus-read-move-group-name): Revert
