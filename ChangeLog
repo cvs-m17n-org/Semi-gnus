@@ -1,6 +1,7 @@
 2000-09-05   Daiki Ueno  <ueno@unixuser.org>
 
-	* lisp/pop3.el (pop3-save-uidls): Clear `pop3-uidl-obarray'.
+	* lisp/pop3.el (pop3-quit): Don't clear `pop3-uidl-obarray'.
+	(pop3-save-uidls): Clear `pop3-uidl-obarray' here.
 
 2000-09-04   Daiki Ueno  <ueno@unixuser.org>
 

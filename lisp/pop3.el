@@ -545,14 +545,7 @@ and close the connection."
     (save-excursion
       (set-buffer (process-buffer process))
       (goto-char (point-max))
-      (delete-process process)
-      ))
-  (when pop3-leave-mail-on-server
-    (mapatoms
-     (lambda (atom)
-       (when (car (symbol-value atom))
-	 (unintern atom pop3-uidl-obarray)))
-     pop3-uidl-obarray)))
+      (delete-process process))))
 
 (defun pop3-uidl (process &optional msgno)
   "Return the results of a UIDL command in PROCESS for optional MSGNO.
