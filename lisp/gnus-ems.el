@@ -1,7 +1,8 @@
-;;; gnus-ems.el --- functions for making Gnus work under different Emacsen
+;;; gnus-ems.el --- functions for making Semi-gnus work under different Emacsen
 ;; Copyright (C) 1995,96,97,98 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;         Tatsuya Ichikawa <t-ichi@niagara.shiojiri.ne.jp>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -77,6 +78,56 @@
        (if (> (length valstr) (, max-width))
 	   (truncate-string valstr (, max-width))
 	 valstr))))
+
+(defvar gnus-mule-bitmap-image-file nil)
+(defun gnus-mule-group-startup-message (&optional x y)
+  "Insert startup message in current buffer."
+  ;; Insert the message.
+  (erase-buffer)
+  (insert
+   (if (featurep 'bitmap)
+     (format "              %s
+
+"
+	     "" (if (and (stringp gnus-mule-bitmap-image-file)
+			 (file-exists-p gnus-mule-bitmap-image-file))
+		    (insert-file gnus-mule-bitmap-image-file)))
+     (format "              %s
+          _    ___ _             _
+          _ ___ __ ___  __    _ ___
+          __   _     ___    __  ___
+              _           ___     _
+             _  _ __             _
+             ___   __            _
+                   __           _
+                    _      _   _
+                   _      _    _
+                      _  _    _
+                  __  ___
+                 _   _ _     _
+                _   _
+              _    _
+             _    _
+            _
+          __
+
+"
+	     "")))
+  ;; And then hack it.
+  (gnus-indent-rigidly (point-min) (point-max)
+		       (/ (max (- (window-width) (or x 46)) 0) 2))
+  (goto-char (point-min))
+  (forward-line 1)
+  (let* ((pheight (count-lines (point-min) (point-max)))
+	 (wheight (window-height))
+	 (rest (- wheight pheight)))
+    (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
+  ;; Fontify some.
+  (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)
+  (goto-char (point-min))
+  (setq mode-line-buffer-identification (concat " " gnus-version))
+  (setq gnus-simple-splash t)
+  (set-buffer-modified-p t))
 
 (defun gnus-encode-coding-string (string system)
   string)
@@ -182,7 +233,13 @@
     (fset 'gnus-summary-set-display-table (lambda ()))
     (fset 'gnus-encode-coding-string 'encode-coding-string)
     (fset 'gnus-decode-coding-string 'decode-coding-string)
-    
+
+    (when window-system
+      (require 'path-util)
+      (if (module-installed-p 'bitmap)
+	  (fset 'gnus-group-startup-message 'gnus-mule-group-startup-message)
+	))
+
     (when (boundp 'gnus-check-before-posting)
       (setq gnus-check-before-posting
 	    (delq 'long-lines
@@ -257,6 +314,16 @@
 	    (decf i))
 	  (goto-char (point-min))
 	  (sit-for 0))))))
+
+(if (fboundp 'split-string)
+    (fset 'gnus-split-string 'split-string)
+  (defun gnus-split-string (string pattern)
+    "Return a list of substrings of STRING which are separated by PATTERN."
+    (let (parts (start 0))
+      (while (string-match pattern string start)
+	(setq parts (cons (substring string start (match-beginning 0)) parts)
+	      start (match-end 0)))
+      (nreverse (cons (substring string start) parts)))))
 
 (provide 'gnus-ems)
 
