@@ -1142,7 +1142,7 @@ The cdr of ech entry is a function for applying the face to a region.")
     (Lines)
     (Expires)
     (Message-ID)
-    (References . message-shorten-reference)
+    (References . message-shorten-references)
     (User-Agent))
   "Alist used for formatting headers.")
 
