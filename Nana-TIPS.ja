@@ -6,16 +6,22 @@
 * $B?d>)4D6-(B
 ====================================================================
 APEL $B$O(B 9.20 $B0J9_$N$b$N(B   ($B:G?7$N$b$N$r?d>)$7$^$9!#(B)
-FLIM $B$O(B 1.13 $B0J9_$N$b$N(B
+FLIM $B$O(B 1.13.0 $B0J9_$N$b$N(B (1.13 $B7ONs$N:G?7$N$b$N$r?d>)$7$^$9!#(B)
 SEMI $B$O(B 1.13.5 $B0J9_$N$b$N(B (1.13 $B7ONs$N:G?7$N$b$N$r?d>)$7$^$9!#(B)
 $B$,I,MW$G$9!#(B
 ====================================================================
 
+* $B:G?7HG$K4X$9$k>pJs(B
+
+http://www.nanap.org/nana-gnus.shtml $B$G8x3+$7$F$$$^$9!#(B
+
 * pop3-fma.el
 
-$B$3$N%U%!%$%k$O:o=|$7$^$7$?!#$=$N$?$a!"$3$l$^$G(B pop3-fma.el $B$r;HMQ$7$F(B
-$BJ#?t(B spool $B$r;HMQ$7$F$$$?J}$O!"@_Dj$rJQ99$9$kI,MW$,$"$j$^$9!#0J2<$KJQ(B
-$B99$9$kI,MW$,$"$kJQ?t72$N0lMw$r$"$2$F$*$-$^$9!#(B
+$B$3$N%U%!%$%k$O:o=|$7$^$7$?!#(B
+
+$B$=$N$?$a!"$3$l$^$G(B pop3-fma.el $B$r;HMQ$7$FJ#?t(B spool $B$r;HMQ$7$F$$$?J}$O!"(B
+$B@_Dj$rJQ99$9$kI,MW$,$"$j$^$9!#0J2<$KJQ99$9$kI,MW$,$"$kJQ?t72$N0lMw$r$"(B
+$B$2$F$*$-$^$9!#(B
 
 ** pop3-fma-spool-file-alist -> nnmail-spool-file
 
@@ -71,58 +77,64 @@ Meadow $BIUB0$N(B movemail.exe $B$r;HMQ$7$F$$$kJ}$G!"$3$l$K!"(B "-pf" $B$r;
 
 * nnmail.el
 
-$B%a%$%k$N<hF@@h(B spool $B$KJ#?t$N(B local spool file / POP account / POP
-server $B$r;HMQ$G$-$^$9!#(B
+$B%*%j%8%J%k$N(B Gnus $B$G$O!"J#?t$N(B POP server $B$+$i%a%$%k$r<h$j9~$`$3$H$O$G$-$^$;$s!#(B
+<p>
+Semi-gnus $B$G$O!"$3$l$r2r7h$9$k$?$a$K!"(B pop3-fma.el $B$,4^$^$l$F$$$^$9$,!"(B 
+Nana-gnus $B$G$O!"JL$N<BAu$K$h$j!"$3$l$,2r7h$5$l$F$$$^$9!#(B
 
 ** nnmail-spool-file
 
 $B$3$3$K!"<hF@@h$N(B spool $B$r@_Dj$7$F$/$@$5$$!#$3$l$O!"(B Gnus $BI8=`7A<0$N>e(B
-$B0L8_49$K$J$C$F$$$^$9!#(B
-
-*** Spool $BKh$N7A<0(B
+$B0L8_49$K$J$C$F$$$^$9!#3F(B Spool $B;XDj$N$?$a$N7A<0$O!"<!$N$H$*$j$G$9!#(B
 
 Spool $B$NI=8=$K$OJ8;zNs!"$^$?$O%j%9%H$r;HMQ$7$^$9!#0J2<$K$=$N7A<0$H0UL#(B
 $B$r$"$2$^$9!#(B
 
-**** $BJ8;zNs7A<0$N>l9g(B
+*** $BJ8;zNs7A<0$N>l9g(B
 
-"SpoolName"
+**** "SpoolName"
 
 $B$3$N7A<0$O!"(B local spool $B%U%!%$%k$rI=$7$^$9!#>\$7$/$O(B Info file $B$r$4Mw(B
 $B$/$@$5$$!#(B
 
-"po:AccountName"
+**** "po:AccountName"
 
 $B$3$N7A<0$O!"(B POP account $B$rI=$7$^$9!#(B POP server $B$N;XDj$O!"(B 
 `nnmail-default-mail-host' $B$K$h$C$F9T$$$^$9!#(B `AccountName' $B$r$4<+J,$N(B 
 POP account $BL>$KJQ99$7$F$/$@$5$$!#(B
 
-"po:SpoolName@PopServerHostName"
+**** "po:SpoolName@PopServerHostName"
 
 $B$3$N7A<0$O!"(BPOP server $B;XDj$D$-$G(B POP account $B$rI=$7$^$9!#(B
 `AccountName' $B$r$4<+J,$N(B POP account $BL>$K!"(B `PopServerHostName' $B$r(B POP
 server $B$N(B host name $B$KJQ99$7$F$/$@$5$$!#(B
 
-**** $B%j%9%H7A<0$N>l9g(B
+*** $B%j%9%H7A<0$N>l9g(B
 
 $B%j%9%H7A<0$N@hF,$N%a%s%P!<$O$9$Y$F!">e5-(B `$BJ8;zNs7A<0$N>l9g(B' $B$N$$$:$l$+(B
 $B$G!"0J9_$N%a%s%P!<$O(B option $B%Q%i%a!<%?$H$J$j$^$9!#(B
+
 $B$?$@$7!"(B local spool $B$N>l9g!"8=>u$N$H$3$m;HMQ2DG=$J(B option $B%Q%i%a!<%?(B
-$B$O$"$j$^$;$s$N$G!"$=$N>l9g$K$O$9$Y$FL5;k$5$l$^$9!#(B
-Option $B%Q%i%a!<%?$N7A<0$O<!$N$h$&$K$J$j$^$9!#(B
+$B$O$"$j$^$;$s$N$G!"$=$N>l9g$K$O$9$Y$FL5;k$5$l$^$9!#(BOption $B%Q%i%a!<%?$N(B
+$B7A<0$O<!$N$h$&$K$J$j$^$9!#(B
 
 :OptionName OptionParameter
 
-$B;XDj2DG=$J(B option $B$O<!$N$H$*$j$G$9!#(B
+$B;XDj2DG=$J(B OptionName $B$O<!$N$H$*$j$G$9!#(B
 
-***** :auto-scheme
+**** :auto-scheme
 
 POP account $B$NG'>ZJ}<0$r;XDj$7$^$9!#(B
 
 OptionParameter $B$K$O8=:_!"<!$N(B 2 $B$D$N%7%s%\%k$,M-8z$G$9!#(B
 
-pass            USER / PASS $B$K$h$k!"G'>Z$r9T$$$^$9!#(B
-apop            APOP $B$K$h$kG'>Z$r9T$$$^$9!#(B
+***** pass
+
+USER / PASS $B$K$h$k!"G'>Z$r9T$$$^$9!#(B
+
+***** apop
+
+APOP $B$K$h$kG'>Z$r9T$$$^$9!#(B
 
 Default $BCM$O(B `nnmail-pop3-movemail' $B$r;HMQ$7$F$$$k>l9g$O!"(B
 `pop3-authentication-scheme' $B$K@_Dj$5$l$F$$$k$b$N$K!"(B `movemail' $B30It(B
@@ -133,14 +145,13 @@ Default $BCM$O(B `nnmail-pop3-movemail' $B$r;HMQ$7$F$$$k>l9g$O!"(B
 $BI,MW$J(B option $B%Q%i%a!<%?$r(B `nnmail-movemail-program-apop-option' $B$K!"(B
 $B@_Dj$7$F$/$@$5$$!#(B Default $B$O(B "-A" $B$G$9!#(B
 
-***** :port
+**** :port
 
 POP $B$N(B port $B$r;XDj$7$^$9!#8=:_!"(B `nnmail-movemail-program' $B$K(B
 `nnmail-pop3-movemail' $B$r;XDj$7$F$$$k>l9g$N$_M-8z$G$9!#(B
 
-OptionParameter $B$K$O!"(B POP port $BHV9f$r;XDj$7$F$/$@$5$$!#(B
-
-Default $BCM$O!"(B `pop3-port' $B$K;XDj$5$l$F$$$k$b$N$K$J$j$^$9!#(B
+OptionParameter $B$K$O!"(B POP port $BHV9f$r;XDj$7$F$/$@$5$$!#(BDefault $BCM$O!"(B 
+`pop3-port' $B$K;XDj$5$l$F$$$k$b$N$K$J$j$^$9!#(B
 
 ** nnmail-default-mail-host
 
