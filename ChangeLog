@@ -5,6 +5,9 @@
 	* texi/gnus.texi (Customizing Articles): Remove duplicates; add the
 	function `gnus-treat-decode-message-body-as-default-mime-charset'.
 
+	* lisp/gnus-msg.el (gnus-copy-article-buffer): Bind
+	`inhibit-read-only' to t during modifying the destination buffer.
+
 	* lisp/gnus-art.el (gnus-article-prepare-mime-display): Rewrite.
 	(article-date-ut): If there is a forwarded message, fetch Date from
 	its header instead of `gnus-current-headers'.
