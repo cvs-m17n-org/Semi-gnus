@@ -1,3 +1,8 @@
+2000-04-10   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/imap.el (imap-body-lines): Check Content-Type: of the
+	article case insensitively.
+
 2000-04-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-cite-original): Use "unknown sender" if
