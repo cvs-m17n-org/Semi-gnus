@@ -24142,63 +24142,66 @@ Message $B%P%C%U%!$K$*$1$k(B @kbd{C-c C-j} $B$G!"%a%C%;!<%8$NAw?.$rCY$i$;$k$3
 $B35N,%P%C%U%!$O(B fringe $B$NCf$NLp0u$G8=:_$N5-;v$r<($7$^$9!#$3$l$rL58z$K$9$k(B
 $B$K$O(B @code{(setq gnus-summary-display-arrow nil)} $B$r;H$C$F2<$5$$!#(B
 
+@item
+$B%K%e!<%9$K%a!<%k$GJV?.$7$h$&$H$7$?$i7Y9p(B
+
+$B4V0c$C$F%K%e!<%9$K%a!<%k$GJV?.$7$h$&$H$7$F$7$^$&$3$H$,!"$7$g$C$A$e$&$"$j(B
+$B$^$;$s$+(B?  $B$=$s$J$"$J$?$K?7%*%W%7%g(B
+$B%s(B @code{gnus-confirm-mail-reply-to-news}$B!#(B
+
+@item
+$B?7$7$$%*%W%7%g%s(B @code{gnus-summary-display-while-building} $B$r(B
+$BHs(B-@code{nil} $B$K$9$k$H!"35N,%P%C%U%!$,:n$i$l$F$$$/MM;R$,I=<($5$l$^$9!#(B
+
+@item
+$B?7$7$$(B @code{recent} $B0u(B @samp{.} $B$G!"?75,$KFO$$$?%a%C%;!<%8$r(B ($BL$FI$@$1(B
+$B$l$I$b8E$$5-;v$H$O6hJL$7$F(B) $BI=<($7$^$9!#(B
+
+@item
+$B?7$7$$%*%W%7%g%s(B @code{gnus-gcc-mark-as-read} $B$O!"(BGcc $B$N5-;v$K<+F0E*$K4{(B
+$BFI$N0u$rIU$1$^$9!#(B
+
+@item
+nndoc $B%P%C%/%(%s%I$O!"(Bmailman $B$N$^$H$aAw$j$H(B exim $B$,CF$$$?%a%C%;!<%8$r%5(B
+$B%]!<%H$9$k$h$&$K$J$j$^$7$?!#(B
+
+@item
+Gnus $B$O(B RFC 2369 $B$N%a!<%j%s%0%j%9%H$N%X%C%@!<$r%5%]!<%H$7$^$9!#$^$?!"%a!<(B
+$B%j%s%0%j%9%H$N%0%k!<%WMQ$K?t!9$N%3%^%s%I$rMQ0U$7$^$7$?!#(B@xref{Mailing
+List}$B!#(B
+
+@item
+$BF|IU%X%C%@!<$r!"1Q8l$GH/2;$G$-$k7A<0$GI=<($9$k$3$H$,$G$-$^$9!#(B
+@xref{Article Date}$B!#(B
+
+@item
+Sendmail $B$r;H$&$H$-$N%(%s%Y%m!<%WAw?.<T(B (envelope sender) $B$N%"%I%l%9$,!"(B
+$B%+%9%?%^%$%:$G$-$k$h$&$K$J$j$^$7$?!#(B@xref{Mail Variables, Mail
+Variables,, message, Message Manual}$B!#(B
+
+@item
+@code{mm-uu-diff-groups-regexp} $B$K9gCW$9$k%0%k!<%W$G$O!":9J,(B (diffs) $B$,(B
+$B<+F0E*$K%O%$%i%$%H$5$l$^$9!#(B
+
+@item
+@acronym{TLS} $B%i%C%Q!<$,(B Gnus $B$KF1:-(B
+
+@acronym{TLS}/@acronym{SSL} $B$,!"(B@file{tls.el} $B$H(B GNUTLS $B$r2p$7(B
+$B$F(B @acronym{IMAP} $B$H(B @acronym{NNTP} $B$G%5%]!<%H$5$l$k$h$&$K$J$j$^$7$?!#(B
+($B%5!<%I%Q!<%F%#!<$N(B) @file{ssl.el} $B$H(B OpenSSL $B$K$h$k8E(B
+$B$$(B @acronym{TLS}/@acronym{SSL} $B$O!"$^$@;H$($^$9!#(B
+
+@item
+MS $B%&%#%s%I%&%:$G(B Gnus $B$r%3%s%Q%$%k$7$F%$%s%9%H!<%k$9$k$?$a$N!"?7$7(B
+$B$$(B @file{make.bat}
+
+MS $B%&%#%s%I%&%:$G(B Gnus $B$r%$%s%9%H!<%k$9$k$K$O(B @file{make.bat} $B$r;H$C$F2<(B
+$B$5$$!#$3$N%P%C%A!&%W%m%0%i%`$NBh0l0z?t$O%G%#%l%/%H%j$G$9!#$=$3(B
+$B$G(B @file{xemacs.exe} $B$H(B @file{emacs.exe} $B$,=g$KA\$7=P$5$l$^$9!#%3%s%Q%$(B
+$B%k$7$F$+$i(B Gnus $B$r%$%s%9%H!<%k$7$?$$$H$-$O!"(B@file{make.bat} $B$NBhFs0z?t(B
+$B$K(B @code{/copy} $B$rM?$($F2<$5$$!#(B
+
 @c TRANSLATEME
-@item
-Warn about email replies to news
-
-Do you often find yourself replying to news by email by mistake?  Then
-the new option @code{gnus-confirm-mail-reply-to-news} is just the thing for
-you.
-
-@item
-If the new option @code{gnus-summary-display-while-building} is
-non-@code{nil}, the summary buffer is shown and updated as it's being
-built.
-
-@item
-The new @code{recent} mark @samp{.} indicates newly arrived messages (as
-opposed to old but unread messages).
-
-@item
-The new option @code{gnus-gcc-mark-as-read} automatically marks 
-Gcc articles as read.
-
-@item
-The nndoc back end now supports mailman digests and exim bounces.
-
-@item
-Gnus supports RFC 2369 mailing list headers, and adds a number of 
-related commands in mailing list groups.  @xref{Mailing List}.
-
-@item
-The Date header can be displayed in a format that can be read aloud
-in English.  @xref{Article Date}.
-
-@item
-The envelope sender address can be customized when using Sendmail.
-@xref{Mail Variables, Mail Variables,, message, Message Manual}.
-
-@item
-diffs are automatically highlighted in groups matching
-@code{mm-uu-diff-groups-regexp}
-
-@item
-@acronym{TLS} wrapper shipped with Gnus
-
-@acronym{TLS}/@acronym{SSL} is now supported in @acronym{IMAP} and
-@acronym{NNTP} via @file{tls.el} and GNUTLS.  The old
-@acronym{TLS}/@acronym{SSL} support via (external third party)
-@file{ssl.el} and OpenSSL still works.
-
-@item
-New @file{make.bat} for compiling and installing Gnus under MS Windows
-
-Use @file{make.bat} if you want to install Gnus under MS Windows, the
-first argument to the batch-program should be the directory where
-@file{xemacs.exe} respectively @file{emacs.exe} is located, iff you want
-to install Gnus after compiling it, give @file{make.bat} @code{/copy} as
-the second parameter.
-
 @file{make.bat} has been rewritten from scratch, it now features
 automatic recognition of XEmacs and GNU Emacs, generates
 @file{gnus-load.el}, checks if errors occur while compilation and
