@@ -1,3 +1,15 @@
+1999-12-25  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/mm-decode.el (mm-dissect-buffer-header): Correspondence
+	with FLIM.
+
+	* lisp/gnus-art.el (gnus-article-decode-hook): Do not decode
+	message body.
+	(gnus-mime-view-all-parts): If single part message and only
+	remove part in `mm-display-part', then retry display this part.
+	(gnus-display-mime): Even if single part message, display message
+	body by handle.
+
 1999-12-24  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/nnheader.el (make-full-mail-header): If field decoder does
