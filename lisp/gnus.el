@@ -2119,6 +2119,10 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       (autoload 'smiley-toggle-buffer "gnus-bitmap")
       (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule"))))
 
+(unless (and (fboundp 'base64-encode-string)
+	     (subrp (symbol-function 'base64-encode-string)))
+  (require 'base64))
+
 ;;; gnus-sum.el thingies
 
 
