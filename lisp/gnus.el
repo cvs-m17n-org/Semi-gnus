@@ -905,9 +905,9 @@ used to 899, you would say something along these lines:
        (list 'nntp (or (condition-case nil
 			   (gnus-getenv-nntpserver)
 			 (error nil))
-		       (when (and gnus-default-nntp-server
-				  (not (string= gnus-default-nntp-server "")))
-			 gnus-default-nntp-server)
+		       (if (and gnus-default-nntp-server
+				(not (string= gnus-default-nntp-server "")))
+			   gnus-default-nntp-server)
 		       "news"))
        (if (or (null gnus-nntp-service)
 	       (equal gnus-nntp-service "nntp"))
