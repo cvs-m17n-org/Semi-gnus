@@ -2477,7 +2477,7 @@ marks of articles."
 	(let ((gnus-summary-line-format-spec spec)
 	      (gnus-newsgroup-downloadable '((0 . t))))
 	  (gnus-summary-insert-line
-	   (make-full-mail-header 0 "" "" "" "" "" 0 0 "" nil)
+	   (make-full-mail-header 0 "" "nobody" "" "" "" 0 0 "" nil)
 	   0 nil 128 t nil "" nil 1)
 	  (goto-char (point-min))
 	  (setq pos (list (cons 'unread (and (search-forward "\200" nil t)
