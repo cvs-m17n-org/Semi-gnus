@@ -5067,7 +5067,6 @@ If displaying \"text/html\" is discouraged \(see
 	 ((and (equal (car handle) "multipart/related")
 	       (not (or gnus-mime-display-multipart-as-mixed
 			gnus-mime-display-multipart-related-as-mixed)))
-	  (gnus-mime-accumulate-hierarchy handle)
 	  ;;;!!!We should find the start part, but we just default
 	  ;;;!!!to the first part.
 	  ;;(gnus-mime-display-part (cadr handle))
