@@ -1,3 +1,20 @@
+1999-04-16  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 6.12.12 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.13.
+
+	* lisp/message.el (message-charsets-mime-charset-alist):
+	Abolished.
+	(message-mime-charset-recover-args-set): New macro.
+	(message-mime-charset-recover-args): New macro.
+	(message-mime-charset-recover-args-original): New macro.
+	(message-maybe-encode): Save values to
+	`message-mime-charset-recover-args'.
+	(message-mime-charset-recover-by-ask): Use
+	'message-mime-charset-recover-args'.
+	(message-mime-encode): Restore original values for auto saveing.
+
 1999-04-13  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 6.12.12 released.
