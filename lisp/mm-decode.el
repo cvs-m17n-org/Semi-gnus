@@ -236,19 +236,23 @@ to:
 
 (defun mm-dissect-buffer-header (handle &optional no-strict-mime)
   (save-excursion
+    (unless handle
+      (setq handle (mm-make-handle)))
+    (save-restriction
+      (mail-narrow-to-head)
+      (mmgnus-entity-set-header-internal handle (buffer-string)))
     (let (ctl type cte cd description id result header-string header-end)
-      (save-restriction
-	(mail-narrow-to-head)
-	(when (or no-strict-mime
-		  (mail-fetch-field "mime-version"))
-	  (setq ctl (mail-fetch-field "content-type")
+      (when (or no-strict-mime
+		(mime-entity-fetch-field handle "mime-version"))
+	  (setq ctl (mime-entity-fetch-field handle "content-type")
 		ctl (ignore-errors (mail-header-parse-content-type ctl))
-		cte (mail-fetch-field "content-transfer-encoding")
-		cd (mail-fetch-field "content-disposition")
-		description (mail-fetch-field "content-description")
-		id (mail-fetch-field "content-id")))
-	(setq header-end (point-max)
-	      header-string (buffer-substring (point-min) header-end)))
+		cte (mime-entity-fetch-field handle
+					     "content-transfer-encoding")
+		cd (mime-entity-fetch-field handle
+					    "content-disposition")
+		description (mime-entity-fetch-field handle
+						     "content-description")
+		id (mime-entity-fetch-field handle "content-id")))
       (unless ctl
 	(setq ctl (mail-header-parse-content-type "text/plain")))
       (setq cte (and cte (downcase (mail-header-remove-whitespace
@@ -256,21 +260,15 @@ to:
 				     cte))))
 	    cd (and cd (ignore-errors
 			 (mail-header-parse-content-disposition cd))))
-      (if handle
-	  (progn
-	    (mime-entity-set-content-type-internal handle ctl)
-	    (mime-entity-set-encoding-internal handle cte)
-	    (mime-entity-set-content-disposition-internal handle cd)
-	    (mmgnus-entity-set-content-description-internal handle description)
-	    (mmgnus-entity-set-header-internal handle header-string)
-	    (setq result handle))
-	(setq result (mm-make-handle nil nil ctl cte nil cd
-				     description nil id nil header-string)))
+      (mime-entity-set-content-type handle ctl)
+      (mime-entity-set-encoding handle cte)
+      (mime-entity-set-content-disposition-internal handle cd)
+      (mmgnus-entity-set-content-description-internal handle description)
       (when id
 	(when (string-match " *<\\(.*\\)> *" id)
 	  (setq id (match-string 1 id)))
-	(mmgnus-entity-set-content-id-internal result id))
-      result)))
+	(mmgnus-entity-set-content-id-internal handle id))
+      handle)))
 
 (defun mm-dissect-buffer (handle &optional no-strict-mime)
   "Dissect the current buffer and return a list of MIME handles."
