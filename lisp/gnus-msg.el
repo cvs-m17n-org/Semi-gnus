@@ -135,6 +135,7 @@ See Info node `(gnus)Posting Styles'."
 					(const x-face-file)
 					(const name)
 					(const body)
+					(const import)
 					(symbol)
 					(string :tag "Header"))
 				(choice (string)
@@ -142,8 +143,25 @@ See Info node `(gnus)Posting Styles'."
 					(variable)
 					(sexp)))))))
 
-(defvar gnus-named-posting-styles nil
-  "Alist mapping names to the user-defined posting styles.")
+(defcustom gnus-named-posting-styles nil
+  "Alist mapping names to the user-defined posting styles."
+  :group 'gnus-message
+  :type '(repeat (cons string
+		       (repeat (list
+				(choice (const signature)
+					(const signature-file)
+					(const organization)
+					(const address)
+					(const x-face-file)
+					(const name)
+					(const body)
+					(const import)
+					(symbol)
+					(string :tag "Header"))
+				(choice (string)
+					(function)
+					(variable)
+					(sexp)))))))
 
 (defcustom gnus-gcc-mark-as-read nil
   "If non-nil, automatically mark Gcc articles as read."
@@ -1889,8 +1907,8 @@ this is a reply."
   (unless gnus-inhibit-posting-styles
     (let ((group (or group-name gnus-newsgroup-name ""))
 	  (styles gnus-posting-styles)
-	  style match variable attribute value v results
-	  filep name address element)
+	  style match attribute results
+	  name address)
       ;; If the group has a posting-style parameter, add it at the end with a
       ;; regexp matching everything, to be sure it takes precedence over all
       ;; the others.
@@ -1934,61 +1952,11 @@ this is a reply."
 		 (t
 		  ;; This is a form to be evaled.
 		  (eval match)))))
-	  ;; Expand all the named elements in style.
-	  (setq style (apply (function nconc)
-			     (mapcar
-			      (lambda (attribute)
-				(if (stringp attribute)
-				    (copy-sequence
-				     (cdr (assoc attribute
-						 gnus-named-posting-styles)))
-				  (list attribute)))
-			      style)))
 	  ;; We have a match, so we set the variables.
+	  (setq style (gnus-configure-posting-style style))
 	  (dolist (attribute style)
-	    (setq element (pop attribute)
-		  variable nil
-		  filep nil)
-	    (setq value
-		  (cond
-		   ((eq (car attribute) ':file)
-		    (setq filep t)
-		    (cadr attribute))
-		   ((eq (car attribute) :value)
-		    (cadr attribute))
-		   (t
-		    (car attribute))))
-	    ;; We get the value.
-	    (setq v
-		  (cond
-		   ((stringp value)
-		    value)
-		   ((or (symbolp value)
-			(gnus-functionp value))
-		    (cond ((gnus-functionp value)
-			   (funcall value))
-			  ((boundp value)
-			   (symbol-value value))))
-		   ((listp value)
-		    (eval value))))
-	    ;; Translate obsolescent value.
-	    (cond
-	     ((eq element 'signature-file)
-	      (setq element 'signature
-		    filep t))
-	     ((eq element 'x-face-file)
-	      (setq element 'x-face
-		    filep t)))
-	    ;; Get the contents of file elems.
-	    (when (and filep v)
-	      (setq v (with-temp-buffer
-			(insert-file-contents v)
-			(goto-char (point-max))
-			(while (bolp)
-			  (delete-char -1))
-			(buffer-string))))
-	    (setq results (delq (assoc element results) results))
-	    (push (cons element v) results))))
+	    (setq results (delq (assoc (car attribute) results) results))
+	    (push attribute results))))
       ;; Now we have all the styles, so we insert them.
       (setq name (assq 'name results)
 	    address (assq 'address results))
@@ -2042,6 +2010,60 @@ this is a reply."
 			 (insert "From: " (message-make-from) "\n"))))
 		  nil 'local)))))
 
+;; splitted from gnus-configure-posting-styles to allow recursive traversal.
+(defun gnus-configure-posting-style (style)
+  "Parse one posting style STYLE and returns the value as an alist."
+  (let (results element variable filep value v)
+    (dolist (attribute style)
+      (setq element (pop attribute)
+	    variable nil
+	    filep nil)
+      (setq value
+	    (cond
+	     ((eq (car attribute) ':file)
+	      (setq filep t)
+	      (cadr attribute))
+	     ((eq (car attribute) :value)
+	      (cadr attribute))
+	     (t
+	      (car attribute))))
+      ;; We get the value.
+      (setq v
+	    (cond
+	     ((stringp value)
+	      value)
+	     ((or (symbolp value)
+		  (gnus-functionp value))
+	      (cond ((gnus-functionp value)
+		     (funcall value))
+		    ((boundp value)
+		     (symbol-value value))))
+	     ((listp value)
+	      (eval value))))
+      ;; Translate obsolescent value.
+      (cond
+       ((eq element 'signature-file)
+	(setq element 'signature
+	      filep t))
+       ((eq element 'x-face-file)
+	(setq element 'x-face
+	      filep t)))
+      ;; Get the contents of file elems.
+      (when (and filep v)
+	(setq v (with-temp-buffer
+		  (insert-file-contents v)
+		  (goto-char (point-max))
+		  (while (bolp)
+		    (delete-char -1))
+		  (buffer-string))))
+      (if (eq element 'import)
+	  (setq results
+		(nconc (nreverse (gnus-configure-posting-style
+				  (cdr (assoc v gnus-named-posting-styles))))
+		       results))
+	(push (cons element v) results)))
+    (nreverse results)))
+
 (defun gnus-summary-execute-command-with-posting-style (style command)
   "Temporarily select a posting-style named STYLE and execute COMMAND."
   (interactive
@@ -2050,8 +2072,8 @@ this is a reply."
      (list style
 	   (key-binding
 	    (read-key-sequence
-	     (format "Command to execute with %s:" style))))))
-  (let ((gnus-posting-styles (list (list ".*" style))))
+	     (format "Command to execute with %s: " style))))))
+  (let ((gnus-posting-styles (list (list ".*" (list 'import style)))))
     (call-interactively command)))
 
 
