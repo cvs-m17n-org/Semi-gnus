@@ -1,3 +1,8 @@
+2004-02-11  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* texi/ptexinfmt.el: Support @docbook, @ifdocbook, @ifnotdocbook,
+	and @registeredsymbol.
+
 2004-02-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Fix misplaced `)'.
