@@ -32,9 +32,30 @@
       (,function ,@args))
    time repeat))
 
+(defun nnheader-xmas-Y-or-n-p (prompt)
+  "Ask user a \"Y/n\" question. Return t if answer is neither \"n\", \"N\" nor \"C-g\"."
+  (if (should-use-dialog-box-p)
+      (yes-or-no-p-dialog-box prompt)
+    (let ((cursor-in-echo-area t)
+	  (echo-keystrokes 0)
+	  (inhibit-quit t)
+	  event)
+      (message "%s(Y/n) " prompt)
+      (while (or (not (key-press-event-p (setq event (next-command-event))))
+		 (not (or (eq (event-key event) 'escape)
+			  (memq (event-to-character event)
+				'(?\  ?N ?Y ?\C-g ?\e ?\n ?\r ?n ?y))))))
+      (if (memq (event-key event) '(?\C-g ?N ?n))
+	  (progn
+	    (message "%s(Y/n) No" prompt)
+	    nil)
+	(message "%s(Y/n) Yes" prompt)
+	t))))
+
 (fset 'nnheader-run-at-time 'nnheader-xmas-run-at-time)
 (fset 'nnheader-cancel-timer 'delete-itimer)
 (fset 'nnheader-cancel-function-timers 'ignore)
+(fset 'nnheader-Y-or-n-p 'nnheader-xmas-Y-or-n-p)
 
 (provide 'nnheaderxm)
 
