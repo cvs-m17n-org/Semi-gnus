@@ -87,22 +87,20 @@
 (defun gnus-draft-edit-message ()
   "Enter a mail/post buffer to edit and send the draft."
   (interactive)
-  (gnus-set-global-variables)
   (let ((article (gnus-summary-article-number)))
+    (gnus-summary-mark-as-read article gnus-canceled-mark)
     (gnus-draft-setup article gnus-newsgroup-name)
     (push
      `((lambda ()
 	 (when (buffer-name (get-buffer ,gnus-summary-buffer))
 	   (save-excursion
 	     (set-buffer (get-buffer ,gnus-summary-buffer))
-	     (gnus-cache-possibly-remove-article ,article nil nil nil t)
-	     (gnus-summary-mark-as-read ,article gnus-canceled-mark)))))
+	     (gnus-cache-possibly-remove-article ,article nil nil nil t)))))
      message-send-actions)))
 
 (defun gnus-draft-send-message (&optional n)
   "Send the current draft."
   (interactive "P")
-  (gnus-set-global-variables)
   (let ((articles (gnus-summary-work-articles n))
 	article)
     (while (setq article (pop articles))
@@ -126,7 +124,7 @@
 (defun gnus-group-send-drafts ()
   "Send all sendable articles from the queue group."
   (interactive)
-  (gnus-request-group "nndraft:queue")
+  (gnus-activate-group "nndraft:queue")
   (save-excursion
     (let ((articles (nndraft-articles))
 	  (unsendable (gnus-uncompress-range
@@ -139,6 +137,16 @@
 	  (gnus-draft-send article))))))
 
 ;;; Utility functions
+
+(defcustom gnus-draft-decoding-function
+  (function
+   (lambda ()
+     (mime-edit-decode-buffer nil)
+     (eword-decode-header)
+     ))
+  "Function called to decode the message from network representation."
+  :group 'gnus-agent
+  :type 'function)
 
 ;;;!!!If this is byte-compiled, it fails miserably.
 ;;;!!!I have no idea why.
@@ -153,6 +161,7 @@
       (if (not (gnus-request-restore-buffer article group))
 	  (error "Couldn't restore the article")
 	;; Insert the separator.
+	(funcall gnus-draft-decoding-function)
 	(goto-char (point-min))
 	(search-forward "\n\n")
 	(forward-char -1)
