@@ -544,8 +544,9 @@ If SILENT, don't prompt the user."
 	;; Weed out all mail methods.
 	(while methods
 	  (setq method (gnus-server-get-method "" (pop methods)))
-	  (when (or (gnus-method-option-p method 'post)
-		    (gnus-method-option-p method 'post-mail))
+	  (when (and (or (gnus-method-option-p method 'post)
+			 (gnus-method-option-p method 'post-mail))
+		     (not (member method post-methods)))
 	    (push method post-methods)))
 	;; Create a name-method alist.
 	(setq method-alist
@@ -568,8 +569,9 @@ If SILENT, don't prompt the user."
      ;; Override normal method.
      ((and (eq gnus-post-method 'current)
 	   (not (eq (car group-method) 'nndraft))
+	   (gnus-get-function group-method 'request-post t)
 	   (not arg))
-      group-method) 
+      group-method)
      ((and gnus-post-method
 	   (not (eq gnus-post-method 'current)))
       gnus-post-method)
@@ -679,9 +681,7 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
     (gnus-summary-select-article)
     (let ((charset default-mime-charset))
       (set-buffer gnus-original-article-buffer)
-      (make-local-variable 'default-mime-charset)
-      (setq default-mime-charset charset)
-      )
+      (set (make-local-variable 'default-mime-charset) charset))
     (let ((message-included-forward-headers
 	   (if full-headers "" message-included-forward-headers)))
       (message-forward post))))
