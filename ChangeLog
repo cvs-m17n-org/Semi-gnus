@@ -1,3 +1,24 @@
+2004-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/hex-util.el: Remove.
+	* lisp/md5.el: Remove.
+	* lisp/sha1-el.el: Remove.
+
+2004-01-05  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Mention SASL, and that sieve-manage uses it.
+	Mention password.el.
+	Mention NTLM.
+
+2004-01-04  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Add IMAP ID (RFC 2971) support.
+	Mention `W e' for editing all.SCORE.
+
+2004-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.17.1 revision 00.
+
 2004-01-04  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.16.6 revision 00.

@@ -1,5 +1,5 @@
 ;;; gnus-group.el --- group mode commands for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -55,7 +55,7 @@
   :group 'gnus-group-foreign
   :type 'directory)
 
-(defcustom gnus-no-groups-message "No gnus is bad news"
+(defcustom gnus-no-groups-message "No Gnus is good news"
   "*Message displayed by Gnus when no groups are available."
   :group 'gnus-start
   :type 'string)
@@ -721,7 +721,8 @@ simple manner.")
   "?"  gnus-group-list-plus)
 
 (gnus-define-keys (gnus-group-score-map "W" gnus-group-mode-map)
-  "f" gnus-score-flush-cache)
+  "f" gnus-score-flush-cache
+  "e" gnus-score-edit-all-score)
 
 (gnus-define-keys (gnus-group-help-map "H" gnus-group-mode-map)
   "c" gnus-group-fetch-charter

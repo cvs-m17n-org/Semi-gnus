@@ -1,16 +1,16 @@
-このパッケージには T-gnus 6.16 が入っています。
+このパッケージには T-gnus 6.17 が入っています。
 
 T-gnus とは？
 =============
 
   T-gnus は、SEMI を利用して Gnus に MIME 機能を追加するものです。
-T-gnus 6.16 は Gnus v5.10 をベースにしています。SEMI は Emacs で MIME
-を使えるようにするもので、MIME message の構文の構造と利用者の間をつな
-ぐインターフェースを提供します。詳しくは、SEMI の README.en を参照して
-ください。
+T-gnus 6.17 は No Gnus をベースにしています。SEMI は Emacs で MIME を
+使えるようにするもので、MIME message の構文の構造と利用者の間をつなぐ
+インターフェースを提供します。詳しくは、SEMI の README.en を参照してく
+ださい。
 
   T-gnus を利用するには APEL, FLIM および SEMI パッケージが必要ですの
-で、インストールする前にそれらをインストールしてください。T-gnus 6.16 
+で、インストールする前にそれらをインストールしてください。T-gnus 6.17 
 は APEL 10.0 以上、FLIM 1.14 および SEMI 1.14 を必要とします。それらの
 パッケージは
 
@@ -40,7 +40,7 @@ http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 (1) checkout
 
     % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root \
-	checkout -r t-gnus-6_16 gnus
+	checkout -r t-gnus-6_17-quimby gnus
 
 (2) compile
 
@@ -50,14 +50,14 @@ http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
 (3) update
 
-    % cvs update -r t-gnus-6_16 gnus
+    % cvs update -r t-gnus-6_17-quimby gnus
 
 主なタグは以下のようになっています:
 
-    t-gnus-6_16-quimby	最新の T-gnus に割り当てられ、開発と Gnus との
+    t-gnus-6_17-quimby	最新の T-gnus に割り当てられ、開発と Gnus との
 			同期を行ないます。
 
-    t-gnus-6_16		最新の T-gnus に割り当てられ、開発とリリースさ
+    t-gnus-6_17		最新の T-gnus に割り当てられ、開発とリリースさ
 			れた Gnus との同期を行ないます。
 
     pgnus-ichikawa	T-gnus の幹です。
@@ -91,9 +91,9 @@ http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 取得方法 (ftp)
 ==============
 
-  T-gnus 6.16 は以下の場所から取得可能です。
+  T-gnus 6.17 は以下の場所から取得可能です。
 
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.16/snapshots/
+    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.17/snapshots/
 
   注意: これらの snapshot は a-ftp site の管理者の気が向いたときに手動
   で作成され、普通はテストされていません。

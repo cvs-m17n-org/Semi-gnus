@@ -1,7 +1,7 @@
 \input texinfo
 
 @setfilename gnus
-@settitle T-gnus 6.16 Manual
+@settitle T-gnus 6.17 Manual
 @syncodeindex fn cp
 @syncodeindex vr cp
 @syncodeindex pg cp
@@ -33,7 +33,7 @@
 \makeindex
 \begin{document}
 
-\newcommand{\gnusversionname}{T-gnus v6.16}
+\newcommand{\gnusversionname}{T-gnus v6.17}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
 
@@ -354,7 +354,7 @@ license to the document, as described in section 6 of the license.
 @tex
 
 @titlepage
-@title T-gnus 6.16 Manual
+@title T-gnus 6.17 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -404,7 +404,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So T-gnus does not discriminate various language communities.  Oh,
 if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to T-gnus 6.16.
+This manual corresponds to T-gnus 6.17.
 
 @end ifinfo
 
@@ -455,6 +455,7 @@ Other related manuals
 * Emacs-MIME:(emacs-mime).      Composing messages; @acronym{MIME}-specific parts.
 * Sieve:(sieve).                Managing Sieve scripts in Emacs.
 * PGG:(pgg).                    @acronym{PGP/MIME} with Gnus.
+* SASL:(sasl).                  @acronym{SASL} authentication in Emacs.
 
 @detailmenu
  --- The Detailed Node Listing ---
@@ -18915,6 +18916,12 @@ There aren't many of these as yet, I'm afraid.
 
 @table @kbd
 
+@item W e
+@kindex W e (Group)
+@findex gnus-score-edit-all-score
+Edit the apply-to-all-groups all.SCORE file.  You will be popped into
+a @code{gnus-score-mode} buffer (@pxref{Score File Editing}).
+
 @item W f
 @kindex W f (Group)
 @findex gnus-score-flush-cache
@@ -20477,6 +20484,8 @@ four days, Gnus will decay the scores four times, for instance.
 @include sieve.texi
 @c @chapter PGG
 @c @include pgg.texi
+@c @chapter SASL
+@c @include sasl.texi
 @end iflatex
 @end iftex
 
@@ -26685,7 +26694,7 @@ Gnus will work.
 
 @item
 Try doing an @kbd{M-x gnus-version}.  If you get something that looks
-like @samp{T-gnus 6.16.* (based on Gnus v5.10.*; for SEMI 1.1*, FLIM
+like @samp{T-gnus 6.17.* (based on Gnus v5.10.*; for SEMI 1.1*, FLIM
 1.1*)} you have the right files loaded.  Otherwise you have some old
 @file{.el} files lying around.  Delete these.
 

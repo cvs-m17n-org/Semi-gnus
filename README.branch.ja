@@ -1,7 +1,7 @@
 README.branch.ja --- branch と tag の説明 (草稿)
 ========================================================================
 
-Semi-gnus revision tree (2003-05-02)
+Semi-gnus revision tree (2004-01-05)
 
     vendor      personal    main trunk      public
     branch      branches                    branches
@@ -52,6 +52,15 @@ qGnus 0.??  ------> Semi-gnus 6.0.0
        :          |             :               :               |
        :  t-gnus-6_16-quimby    :               :               V
        :          |             :               :            t-gnus-6_16
+       :          +------------->--------------->----------> (for FLIM 1.14,
+       :                        :               :             develop)
+       :                        :               | feedback      |
+       :                        :(No Gnus 0.1)->+<--------------+
+       :                        :              /|\
+       :          +-------------<-------------- | --------------+
+       :          |             :               :               |
+       :  t-gnus-6_17-quimby    :               :               V
+       :          |             :               :            t-gnus-6_17
        :          +------------->--------------->----------> (for FLIM 1.14,
        :                        :               :             develop)
        :        akr      <--  6.2.3             :               |
@@ -148,7 +157,8 @@ Public Branches
 	t-gnus-6_14	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
 	t-gnus-6_15	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
 	t-gnus-6_16	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
-     t-gnus-6_16-quimby	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
+	t-gnus-6_17	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
+     t-gnus-6_17-quimby	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
 
     注: v0.03 以前の Oort Gnus を元にした T-gnus 6.15 は、SEMI 1.13 と
         FLIM 1.13 もサポートしていました。
