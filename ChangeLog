@@ -1,3 +1,9 @@
+2001-10-29  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* etc/smilies/sad.pbm: New bitmap.
+	* etc/smilies/blink.pbm: Ditto.
+	Contributed by Kim F. Storm <storm@cua.dk>.
+
 2001-10-22  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (rfc822-goto-eoh): Remove.
