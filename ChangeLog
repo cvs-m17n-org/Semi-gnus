@@ -1,3 +1,7 @@
+1998-11-18  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-dont-send): Use `message-delete-frame'.
+
 1998-11-16  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* Sync up with gnus-6_8.
