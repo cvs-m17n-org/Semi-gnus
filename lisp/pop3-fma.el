@@ -1,14 +1,14 @@
 ;; pop3-fma.el.el --- POP3 for Multiple Account for Gnus.
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc. , Tatsuya Ichikawa
 ;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
-;; Version: 0.12
+;; Version: 0.13
 ;; Keywords: mail , gnus , pop3
 ;;
 ;; SPECIAL THANKS
 ;;    Keiichi Suzuki <kei-suzu@mail.wbs.or.jp>
 ;;    Katsumi Yamaoka <yamaoka@jpl.org>
 ;;
-;; This file is not part of GNU Emacs.
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -33,7 +33,6 @@
 ;; add your .emacs following codes.
 ;;
 ;;  (autoload 'pop3-fma-set-pop3-password "pop3-fma")
-;;  (add-hook 'gnus-load-hook 'pop3-fma-set-pop3-password)
 ;;  (setq pop3-fma-spool-file-alist
 ;;        '(
 ;;  	    "po:username0@mailhost0.your.domain0"
@@ -73,14 +72,12 @@
   :group 'mail
   :group 'news)
 
-(defconst pop3-fma-version-number "0.12")
+(defconst pop3-fma-version-number "0.13")
 (defconst pop3-fma-codename
-;;;  "Feel the wind"		; 0.10
+;;  "Feel the wind"		; 0.10
 ;;  "My home town"  		; 0.11
-  "On the road"			; 0.12
-;;  "Before generation of Love"	; 0.xx
-;;  "Lonely Christmas eve"	; 0.xx
-;;  "Rock'n Roll city"		; 0.xx
+;;  "On the road"		; 0.12
+  "Rock'n Roll city"		; 0.13
 ;;  "Money"			; 0.xx
 ;;  "Midnight blue train" 	; 0.xx
 ;;  "Still 19"       		; 0.xx
@@ -130,12 +127,17 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 (defvar passwd nil)
 (defvar str nil)
 (defvar pop3-fma-movemail-options pop3-fma-movemail-arguments)
+(defvar pop3-fma-cypher-key (1+ (random 92)))
 
 (defun pop3-fma-init-hooks ()
   (add-hook 'message-send-hook 'pop3-fma-message-add-header))
 
 (eval-after-load "message"
   '(pop3-fma-init-hooks))
+
+(add-hook 'gnus-after-exiting-gnus-hook
+	  '(lambda () (setq pop3-fma-password nil)))
+(add-hook 'gnus-before-startup-hook 'pop3-fma-set-pop3-password)
 ;;
 ;;
 ;; Gnus POP3 additional utility...
@@ -174,7 +176,7 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 ;;
 (defun pop3-fma-read-passwd (mailhost)
   (setq passwd (nth 2 (assoc mailhost pop3-fma-password)))
-  passwd)
+  (pop3-fma-cypher-string passwd nil t))
 
 (setq pop3-read-passwd 'pop3-fma-read-passwd)
 ;;
@@ -190,7 +192,7 @@ Please do not set this valiable non-nil if you do not use Meadow.")
 		     (list
 		      pop3-mailhost
 		      pop3-maildrop
-		      passwd))))
+		      (pop3-fma-cypher-string passwd)))))		      
     (setcar (cdr (cdr (assoc pop3-mailhost pop3-fma-password)))
 	    passwd))
   (message "POP password registered.")
@@ -273,6 +275,29 @@ Argument PROMPT ."
 	  (setq str (concat hdr string))
 	  (setq hdr (concat str "\n"))
 	  (insert-string hdr)))))
+;;
+;; Crypt password string
+;;
+(defun pop3-fma-cypher-string (string &optional key flag)
+  (let ((r nil)
+	(i 0)
+	(rot (if flag (- 94 (or key pop3-fma-cypher-key 13))
+	       (or key pop3-fma-cypher-key 13))))
+    (mapcar (lambda (x)
+	      (setq r
+		    (concat r 
+			    (cond
+			     ((and (<= 32 x) (<= x 126))
+			      (char-to-string
+			       (+ (% (+ (- x 32)
+					(if flag
+					    (+ rot (- 94 i))
+					  (+ rot i)))
+				     94) 32)))
+			     (t (char-to-string x)))))
+	      (setq i (1+ i)))
+	    (string-to-char-list string))
+    r))
 ;;
 (provide 'pop3-fma)
 ;;
