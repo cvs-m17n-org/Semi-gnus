@@ -9597,10 +9597,10 @@ gnus $B$,<+J,<+?H$G(B POP $B%a!<%kJ8;zNs$rH/8+$7$h$&$H$7$^$9!#$I$N$h$&$J>l9g$
       ;; $BB>$N%a!<%j%s%0%j%9%H(B...
       (any "procmail@@informatik\\.rwth-aachen\\.de" "procmail.list")
       (any "SmartList@@informatik\\.rwth-aachen\\.de" "SmartList.list")
-      ;; Both lists below have the same suffix, so prevent
-      ;; cross-posting to mkpkg.list of messages posted only to 
-      ;; the bugs- list, but allow cross-posting when the
-      ;; message was really cross-posted.
+      ;; $B0J2<$N$I$A$i$N%a!<%j%s%0%j%9%H$bF1$8%5%U%#%C%/%9$J$N$G!"(Bbugs-
+      ;; $B$@$1$K%]%9%H$5$l$?$b$N$,(B mypkg.list $B$K%/%m%9%]%9%H$5$l$J$$$h(B
+      ;; $B$&$K$7$F$$$^$9!#$7$+$7K\Ev$K%/%m%9%]%9%H$5$l$?5-;v$r%/%m%9%](B
+      ;; $B%9%H$9$k$3$H$O5v$7$F$$$^$9!#(B
       (any "bugs-mypackage@@somewhere" "mypkg.bugs")
       (any "mypackage@@somewhere\" - "bugs-mypackage" "mypkg.list")
       ;; $B?M!9(B...
