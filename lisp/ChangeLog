@@ -1,3 +1,85 @@
+2000-09-17 01:13:46  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* rfc2047.el (rfc2047-q-encoding-alist): Remove = and _ from the
+	pattern. Avoid using 8 bit chars.
+	* qp.el (quoted-printable-encode-region): Avoid using 8 bit chars.
+
+2000-09-16 15:57:42  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* smiley.el (smiley-buffer-ems, smiley-create-glyph-ems,
+	smiley-toggle-extent-ems, smiley-toggle-extents-ems,
+	smiley-toggle-buffer-ems): New functions for Emacs 21. Toggle
+	functions are not implemented yet.
+	
+	* dgnushack.el (dgnushack-compile): Remove smiley.el and 
+	x-overlay.el from the FSF Emacs black list.
+
+2000-09-15 21:10:20  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-decode.el (mm-inlined-types): Add application/emacs-lisp.
+	(mm-inline-media-tests): Ditto.
+	(mm-automatic-display): Ditto.
+	* mm-view.el (mm-display-inline-fontify): Generalize from 
+	mm-display-patch-inline. 
+	(mm-display-patch-inline): Use it.
+	(mm-display-elisp-inline): Ditto.
+	
+2000-09-15 14:03:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-topic.el (gnus-topic-find-groups): Add recursive parameter.
+	(gnus-topic-unmark-topic): Ditto.
+	(gnus-topic-mark-topic): Ditto.
+	(gnus-topic-get-new-news-this-topic): Use it.
+
+2000-09-15 09:01:40  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-treat-display-xface): By default, Emacs 21
+	display xface.
+
+2000-08-23 02:54:46  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-group.el (gnus-group-rename-group): Inhibit renaming of
+	zombie or killed groups.
+	
+2000-09-15 00:09:56  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-preview): Reinsert unibyte content. 
+	(mml-parse-1): Remove with-unibyte-current-buffer.
+	(mml-generate-mime-1): Ditto.
+	* gnus-msg.el (gnus-summary-mail-forward): Ditto.
+	* message.el (message-forward): Ditto.
+
+2000-09-14 23:13:50  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (article-de-quoted-unreadable): Guess charset from
+	original article buffer.
+	(article-de-base64-unreadable): Ditto.
+	(article-wash-html): Ditto.
+
+2000-09-14 18:55:30  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-msg.el (gnus-summary-mail-forward): Disable multibyte
+	unless forward-show-mml.
+
+2000-09-14 14:48:57  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-save-parts-type-history): New.
+	(gnus-summary-save-parts-last-directory): New.
+	(gnus-summary-save-parts): Save history.
+
+2000-09-14 Ben Gertzfield <che@debian.org>
+
+	* gnus-sum.el (gnus-summary-save-parts-default-mime): New
+	variable.
+	(gnus-summary-save-parts): Use it.
+
+2000-09-14 11:31:28  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-article-setup-buffer): Clean handle-alist.
+	* gnus-sum.el (gnus-summary-exit): Ditto.
+	(gnus-summary-exit-no-update): Ditto.
+	(gnus-summary-show-article): Ditto.
+
 2000-09-14 08:42:48  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* nndoc.el (nndoc-dissect-mime-parts-sub): Remove

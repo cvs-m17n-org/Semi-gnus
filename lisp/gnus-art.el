@@ -902,11 +902,12 @@ See the manual for details."
 (put 'gnus-treat-overstrike 'highlight t)
 
 (defcustom gnus-treat-display-xface
-  (if (or (and gnus-xemacs (featurep 'xface))
-	  (eq 'x-face-mule-gnus-article-display-x-face
-	      gnus-article-x-face-command))
-      'head
-    nil)
+  (and (or (and (fboundp 'image-type-available-p)
+		(image-type-available-p 'xbm))
+	   (and gnus-xemacs (featurep 'xface))
+	   (eq 'x-face-mule-gnus-article-display-x-face
+	       gnus-article-x-face-command))
+       'head)
   "Display X-Face headers.
 Valid values are nil, t, `head', `last', an integer or a predicate.
 See the manual for details."
@@ -1657,9 +1658,21 @@ If FORCE, decode the article whether it is marked as quoted-printable
 or not."
   (interactive (list 'force))
   (save-excursion
-    (let ((buffer-read-only nil)
-	  (type (gnus-fetch-field "content-transfer-encoding"))
-	  (charset gnus-newsgroup-charset))
+    (let ((buffer-read-only nil) type charset)
+      (if (gnus-buffer-live-p gnus-original-article-buffer)
+	  (with-current-buffer gnus-original-article-buffer
+	    (setq type
+		  (gnus-fetch-field "content-transfer-encoding"))
+	    (let* ((ct (gnus-fetch-field "content-type"))
+		   (ctl (and ct 
+			     (ignore-errors
+			       (mail-header-parse-content-type ct)))))
+	      (setq charset (and ctl
+				 (mail-content-type-get ctl 'charset)))
+	      (if (stringp charset)
+		  (setq charset (intern (downcase charset)))))))
+      (unless charset 
+	(setq charset gnus-newsgroup-charset))
       (when (or force
 		(and type (string-match "quoted-printable" (downcase type))))
 	(article-goto-body)
@@ -1670,9 +1683,21 @@ or not."
 If FORCE, decode the article whether it is marked as base64 not."
   (interactive (list 'force))
   (save-excursion
-    (let ((buffer-read-only nil)
-	  (type (gnus-fetch-field "content-transfer-encoding"))
-	  (charset gnus-newsgroup-charset))
+    (let ((buffer-read-only nil) type charset)
+      (if (gnus-buffer-live-p gnus-original-article-buffer)
+	  (with-current-buffer gnus-original-article-buffer
+	    (setq type
+		  (gnus-fetch-field "content-transfer-encoding"))
+	    (let* ((ct (gnus-fetch-field "content-type"))
+		   (ctl (and ct 
+			     (ignore-errors
+			       (mail-header-parse-content-type ct)))))
+	      (setq charset (and ctl
+				 (mail-content-type-get ctl 'charset)))
+	      (if (stringp charset)
+		  (setq charset (intern (downcase charset)))))))
+      (unless charset 
+	(setq charset gnus-newsgroup-charset))
       (when (or force
 		(and type (string-match "base64" (downcase type))))
 	(article-goto-body)
@@ -1698,7 +1723,19 @@ If FORCE, decode the article whether it is marked as base64 not."
   (interactive)
   (save-excursion
     (let ((buffer-read-only nil)
-	  (charset gnus-newsgroup-charset))
+	  charset)
+      (if (gnus-buffer-live-p gnus-original-article-buffer)
+	  (with-current-buffer gnus-original-article-buffer
+	    (let* ((ct (gnus-fetch-field "content-type"))
+		   (ctl (and ct 
+			     (ignore-errors
+			       (mail-header-parse-content-type ct)))))
+	      (setq charset (and ctl
+				 (mail-content-type-get ctl 'charset)))
+	      (if (stringp charset)
+		  (setq charset (intern (downcase charset)))))))
+      (unless charset 
+	(setq charset gnus-newsgroup-charset))
       (article-goto-body)
       (save-window-excursion
 	(save-restriction
