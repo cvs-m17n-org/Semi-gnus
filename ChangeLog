@@ -1,3 +1,26 @@
+1999-06-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 01.
+
+	* lisp/gnus-sum.el (gnus-summary-mark-article): Call
+	`gnus-cache-possibly-enter-article' with the arg `headers'.
+	(gnus-summary-mark-article-as-unread): Ditto.
+	(gnus-summary-move-article): Ditto.
+
+	* lisp/gnus-msg.el (gnus-extended-version): Include
+	`gnus-revision-number' if it is non-zero.
+
+	* lisp/gnus-cache.el (gnus-cache-update-article): Call
+	`gnus-cache-possibly-enter-article' with the arg `headers'.
+	(gnus-cache-enter-article): Ditto.
+	(gnus-cache-possibly-enter-article): Accept parameter `headers'.
+
+	* lisp/gnus-art.el (gnus-article-display-x-face-with-x-face-mule):
+	Use `gnus-xemacs' instead of `featurep' with an arg `xemacs'.
+	(article-toggle-headers): Ditto.
+
+	* configure: Regenerate by autoconf 2.14.1.
+
 1999-06-15  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.067.
