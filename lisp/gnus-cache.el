@@ -82,6 +82,7 @@ it's not cached."
 (defvar gnus-cache-buffer nil)
 (defvar gnus-cache-active-hashtb nil)
 (defvar gnus-cache-active-altered nil)
+(defvar gnus-cache-write-file-coding-system 'raw-text)
 
 (eval-and-compile
   (autoload 'nnml-generate-nov-databases-1 "nnml")
@@ -121,7 +122,8 @@ it's not cached."
 	  (set-buffer buffer)
 	  (if (> (buffer-size) 0)
 	      ;; Non-empty overview, write it to a file.
-	      (gnus-write-buffer overview-file)
+	      (let ((coding-system-for-write gnus-cache-write-file-coding-system))
+		(gnus-write-buffer overview-file))
 	    ;; Empty overview file, remove it
 	    (when (file-exists-p overview-file)
 	      (delete-file overview-file))
@@ -173,7 +175,8 @@ it's not cached."
 	    (let ((gnus-use-cache nil))
 	      (gnus-request-article-this-buffer number group))
 	    (when (> (buffer-size) 0)
-	      (gnus-write-buffer file)
+	      (let ((coding-system-for-write gnus-cache-write-file-coding-system))
+		(gnus-write-buffer file))
 	      (gnus-cache-change-buffer group)
 	      (set-buffer (cdr gnus-cache-buffer))
 	      (goto-char (point-max))

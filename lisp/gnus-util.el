@@ -537,8 +537,6 @@ Timezone package is used."
 
 (defvar gnus-work-buffer " *gnus work*")
 
-(defvar gnus-write-file-coding-system 'raw-text)
-
 (defun gnus-set-work-buffer ()
   "Put point in the empty Gnus work buffer."
   (if (get-buffer gnus-work-buffer)
@@ -607,8 +605,7 @@ Bind `print-quoted' and `print-readably' to t while printing."
   ;; Make sure the directory exists.
   (gnus-make-directory (file-name-directory file))
   ;; Write the buffer.
-  (let ((coding-system-for-write gnus-write-file-coding-system))
-    (write-region (point-min) (point-max) file nil 'quietly)))
+  (write-region (point-min) (point-max) file nil 'quietly))
 
 (defun gnus-delete-file (file)
   "Delete FILE if it exists."
