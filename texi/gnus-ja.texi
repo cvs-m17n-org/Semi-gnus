@@ -2,9 +2,9 @@
 
 @setfilename gnus-ja
 @settitle T-gnus 6.15 Manual
-@synindex fn cp
-@synindex vr cp
-@synindex pg cp
+@syncodeindex fn cp
+@syncodeindex vr cp
+@syncodeindex pg cp
 @dircategory Emacs
 @direntry
 * Gnus-ja: (gnus-ja).         The newsreader gnus (Japanese).
@@ -2514,7 +2514,7 @@ Gnus $B$ODL>o!"(B@code{gnus-activate-level} $B$+$=$l$h$j>.$5$$%l%Y%k$N%0%k!<%
 @findex gnus-group-make-shimbun-group
 @cindex making groups
 @cindex nnshimbun
-@cindex Web Newspaper
+@cindex web newspaper
 $B?7$7$$(B @code{nnshimbun} $B%0%k!<%W$r:n@.$7$^(B
 $B$9(B (@code{gnus-group-make-shimbun-group})$B!#(Bgnus $B$O%W%m%s%W%H$rI=<($7$F!"(B
 $B%5!<%P!<$N%"%I%l%9$r<($9%7%s%\%kL>$H5-;v%0%k!<%WL>$NF~NO$r5a$a$F$-$^$9!#(B
@@ -2741,7 +2741,7 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B%W%Q%i%a!<%?$,$J$1$l$P!"Aw?.;~$K<+F0E*$KIU2C$5$l$^$9!#(B
 
 @findex gnus-mailing-list-mode
-@cindex Mail List Groups
+@cindex mail list groups
 $B$b$7$3$N%0%k!<%W%Q%i%a!<%?$,@_Dj$5$l$F$$$k$H!"35N,%P%C%U%!$KF~$C$?$H$-(B
 $B$K(B @code{gnus-mailing-list-mode} $B$,M-8z$K$J$j$^$9!#(B
 
@@ -9936,6 +9936,8 @@ This happens to also be the default action defined in
 @end ignore
 @node Mailing List
 @section $B%a!<%j%s%0%j%9%H(B
+@cindex mailing list
+@cindex RFC 2396
 
 @kindex A M ($B35N,(B)
 @findex gnus-mailing-list-insinuate
@@ -10419,7 +10421,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @c FIXMETGNUS Default value is nil for T-gnus.
 @vindex gnus-article-decode-hook
 @item gnus-article-decode-hook
-@cindex MIME
+@cindex @acronym{MIME}
 @acronym{MIME} $B5-;v$rI|9f2=$9$k$H$-$K;HMQ$5$l$k%U%C%/$G$9!#(B
 
 @vindex gnus-article-prepare-hook
@@ -11777,7 +11779,7 @@ default force yes
 
 @item nntp-xover-commands
 @vindex nntp-xover-commands
-@cindex nov
+@cindex @acronym{NOV}
 @cindex XOVER
 $B%5!<%P!<$+$i(B @acronym{NOV} $B9T$r<hF@$9$k$?$a$NL?Na$H$7$F;H$o$l$kJ8;zNs$N(B
 $B%j%9%H$G$9!#$3$NJQ?t$N%G%#%U%)%k%H$NCM$O(B @code{("XOVER" "XOVERVIEW")} $B$G(B
@@ -12347,7 +12349,7 @@ Gnus $B$r;H$C$F?7$7$$%a!<%k$rFI$`;v$OHs>o$K4JC1$G$9!#$"$J$?$N%a!<%k%P%C%/(B
 $B$5$$!#(B($B$3$NJQ?t$O%G%#%U%)%k%H$G(B @code{add-name-to-file} $B$G$9!#(B)
 
 @kindex M-x nnmail-split-history
-@kindex nnmail-split-history
+@findex nnmail-split-history
 $BA0$N%a!<%kJ,3d$,%a%C%;!<%8$r$I$3$KF~$l$?$+$r8+$?$$>l9g$O!"L?Na(B @kbd{M-x
 nnmail-split-history} $B$r;H$&;v$,$G$-$^$9!#$3$l$+$i%9%W!<%k$7D>$=$&$H$9$k(B
 $B%a%C%;!<%8$,$I$3$KF~$k$+$r8+$?$$>l9g$O!"(B
@@ -12968,8 +12970,8 @@ UNDELETED} $B$O$*$=$i$/$?$$$F$$$N?M$K$O:GNI$NA*Br$G$7$g$&$,!"$H$-$I(B
 @vindex nnmail-split-hook
 @item nnmail-split-hook
 @findex gnus-article-decode-encoded-words
-@findex RFC1522 decoding
-@findex RFC2047 decoding
+@cindex RFC1522 decoding
+@cindex RFC2047 decoding
 $B$=$l$>$l$N%a%C%;!<%8$,$=$N%X%C%@!<$K4p$E$$$FJ,3d$,$J$5$l$kD>A0$K$=$l$,J](B
 $BB8$5$l$F$$$k%P%C%U%!$G<B9T$5$l$k%U%C%/$G$9!#$3$N%U%C%/$O$=$l$,E,9g$9$k$H(B
 $B9M$($k$h$&$K<+M3$K%P%C%U%!$NFbMF$rJT=8$9$k;v$,$G$-$^$9(B---$B%P%C%U%!$OJ,3d(B
@@ -15342,7 +15344,7 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 @end itemize
 
 @item nnimap-expunge-on-close
-@cindex Expunging
+@cindex expunging
 @vindex nnimap-expunge-on-close
 
 $B%Q%k%a%K%G%9$H0c$C$F!"(B@acronym{IMAP} $B$N@_7W<TC#$O!"B8:_$7$F$$$J$$$b$N$,(B
@@ -15401,7 +15403,7 @@ Gnus $B$O%&%'%V%Z!<%8$r<hF@$9$k$?$a$K(B url $B%i%$%V%i%j$r!"%&%'%V%Z!<%8$rI=<
 $B$l$?$/$J$$$H;W$C$F$$$^$9!#(B
 
 @item nnimap-expunge-search-string
-@cindex Expunging
+@cindex expunging
 @vindex nnimap-expunge-search-string
 
 $B$3$NJQ?t$K$O!"4|8B@Z$l>C5n$9$k$N$,K>$^$7$$5-;v$rC5$9$H$-$K%5!<%P!<$KAw$C(B
@@ -15421,6 +15423,13 @@ nnimap $B$K5-;v$NFbItE*$JF|IU$NBe$o$j$K(B Date: $B$r;H$&$h$&$K$5$;$^$9!#$5$i$
 $B$N7A<0$O(B ($B$[$H$s$I(B) @code{ftp} $B$N(B @file{~/.netrc} $B%U%!%$%k$HF1$8$G$9!#87(B
 $BL)$JDj5A$O!"JQ?t(B @code{nntp-authinfo-file} $B$r8+$F2<$5$$!#$=$7(B
 $B$F(B @ref{NNTP} $B$b8+$F2<$5$$!#(B
+
+@item nnimap-need-unselect-to-notice-new-mail
+@vindex nnimap-need-unselect-to-notice-new-mail
+
+$B?7Ce%a!<%k$rC5$9A0$K%a!<%k%\%C%/%9$rL$A*Br$K$7$^$9!#2?$i$+$N>u67$N85$G!"(B
+$B4v$i$+$N%5!<%P!<$,!"$3$l$rI,MW$H$9$k$h$&$G$9!#(BCourier 1.7.1 $B$O$=$&$@$H$$(B
+$B$&Js9p$,$"$j$^$7$?!#(B
 @end table
 
 @menu
@@ -15474,7 +15483,7 @@ Nnmail $B$GBP1~$9$k$b$N(B: @code{nnmail-crosspost}.
 Nnmail $B$KBP1~$9$k$b$N$O$"$j$^$;$s!#(B
 
 @item nnimap-split-rule
-@cindex Splitting, rules
+@cindex splitting, rules
 @vindex nnimap-split-rule
 
 @code{nnimap-split-inbox} $B$G8+$D$+$C$??7$7$$%a!<%k$O$3$NJQ?t$K=>$C$FJ,3d(B
@@ -15663,8 +15672,8 @@ ACL $B$O(B Access Control List ($B;HMQ@)8B0lMw(B) $B$NN,$G$9!#(B@acronym{I
 @subsection $B%a!<%k%\%C%/%9$N:o=|(B
 @cindex expunging
 
-@cindex Expunge
-@cindex Manual expunging
+@cindex expunge
+@cindex manual expunging
 @kindex G x
 @findex gnus-group-nnimap-expunge
 
@@ -16658,9 +16667,9 @@ gnus-namazu-update-all-indices} $B$H$9$kI,MW$,$"$k$+$b$7$l$^$;$s!#(B
 @section Gnus $B$N@Z$jN%$7(B
 @cindex offline
 @cindex unplugged
-@cindex Agent
-@cindex Gnus Agent
-@cindex Gnus Unplugged
+@cindex agent
+@cindex gnus agent
+@cindex gnus unplugged
 
 $B$$$K$7$($N;~Be(B($B$*$h$=(B 1988 $BG/(B2$B7n:"(B)$B!"?M!9$O%K%e!<%9%j!<%@!<$r!"Bg$-$J%^(B
 $B%7%s$N>e$G%M%C%H%o!<%/$K1JB3E*$K@\B3$7$FAv$i$;$F$$$^$7$?!#%K%e!<%9$NG[Aw(B
@@ -17398,8 +17407,8 @@ nntp $B$+(B nnimap $B%P%C%/%(%s%I$r;H$C$F$$$k>l9g$O!"$?$V$s$3$N:G8e$NE@$O0UL#
 @kindex M-x gnus-agent-expire
 @kindex M-x gnus-agent-expire-group
 @findex gnus-agent-expire-group
-@cindex Agent expiry
-@cindex Gnus Agent expiry
+@cindex agent expiry
+@cindex Gnus agent expiry
 @cindex expiry
 
 $B%(!<%8%'%s%H%P%C%/%(%s%I(B @code{nnagent} $B$O4|8B@Z$l>C5n$r07$$$^$;$s!#$($((B
@@ -17432,8 +17441,8 @@ nntp $B$+(B nnimap $B%P%C%/%(%s%I$r;H$C$F$$$k>l9g$O!"$?$V$s$3$N:G8e$NE@$O0UL#
 @node Agent Regeneration
 @subsection $B%(!<%8%'%s%H$r:n$jD>$9(B
 
-@cindex Agent Regeneration
-@cindex Gnus Agent Regeneration
+@cindex agent regeneration
+@cindex Gnus agent regeneration
 @cindex regeneration
 
 @code{nnagent} $B$K$h$C$F;H$o$l$k%m!<%+%k$N%G!<%?9=B$$O!"$"$kNc30E*$J>r7o(B
@@ -18463,7 +18472,7 @@ Date ($BF|IU(B) $B%X%C%@!<$K$O;0$D$N$J$s$H$J$/$P$+$2$F$$$k9gCW$N7?$,$"$j$^$9
 @end table
 @end enumerate
 
-@cindex Score File Atoms
+@cindex score file atoms
 @item mark
 $B$3$NEPO?$NCM$O?t;z$G$"$k$Y$-$G$9!#$3$N?t;z$h$jDc$$%9%3%"$N5-;v$K$O4{FI$N(B
 $B0u$,IU$-$^$9!#(B
@@ -19988,9 +19997,9 @@ gnus $B$ODL>o$[$H$s$I$N%P%C%U%!$G!"%]%$%s%H$r3F9T$N$"$i$+$8$a7h$a$i$l$?>l(B
 @node Wide Characters
 @subsection Wide Characters
 
-$BB?$/$NCO0h$K$*$$$F!"%W%m%]!<%7%g%J%k$J%U%)%s%H$OF1$8I}$NJ8;z$r;}$C$F$$$^(B
-$B$9!#$7$+$7$$$/$D$+$NCO0h!"$h$/CN$i$l$F$$$kEl%"%8%"$N9q!9$G$O!"%i%F%sJ8;z(B
-$B$HI}$N9-$$J8;z$,:.:_$7$F;H$o$l$F$$$^$9!#(B
+$BB?$/$NCO0h$K$*$$$F!"8GDjI}%U%)%s%H$OF1$8I}$NJ8;z$r;}$C$F$$$^$9!#$7$+$7$$(B
+$B$/$D$+$NCO0h!"$h$/CN$i$l$F$$$kEl%"%8%"$N9q!9$G$O!"%i%F%sJ8;z$HI}$N9-$$J8(B
+$B;z$,:.:_$7$F;H$o$l$F$$$^$9!#(B
 
 $B@07A$K$*$$$F!"(Bgnus $B$OJ8;zNs$,(B 10$B8D$NJ8;z$NI}$@$H$7$?$i!"%9%/%j!<%s$G(B
 $B$b(B 10$B8DJ,$N%i%F%sJ8;z$NI}$K$J$k$H2>Dj$7$^$9$,!"$=$l$OLdBj$G$9!#$+$N9q!9(B
@@ -22623,7 +22632,7 @@ but at the common table.@*
 @node XEmacs
 @section XEmacs
 @cindex XEmacs
-@cindex Installing under XEmacs
+@cindex installing under XEmacs
 
 XEmacs $B$O%Q%C%1!<%8$N=/=8$H$7$FG[I[$5$l$F$$$^$9!#(Bgnus $B$N(B XEmacs $B%Q%C%1!<(B
 $B%8$,I,MW$H$9$k$b$N$O2?$G$"$l!"$"$J$?$O%$%s%9%H!<%k$9$Y$-$G$9!#:#$N$H$3$m(B
@@ -22857,7 +22866,7 @@ RFC 1036 $B$N8e7Q$H$7$F=q$$$F$$$k$b$N$G$9!#%K%e!<%95-;v$NMM<0$KBP$7$F!"$$(B
 $B$&!#(B
 
 @item MIME - RFC 2045-2049 etc
-@cindex MIME
+@cindex @acronym{MIME}
 @acronym{MIME} $B4XO"$N$9$Y$F$N(B RFC $B$,%5%]!<%H$5$l$F$$$^$9!#(B
 
 @item Disposition Notifications - RFC 2298
@@ -23977,8 +23986,7 @@ Gnus 5.8 $B$N?7$7$$5!G=(B:
                    :suffix ".in")))
 @end lisp
 
-$B$b$C$H>\$7$$>pJs$O(B info $B$N(B Select Methods -> Getting Mail -> Mail
-Sources $B$GF@$k$3$H$,$G$-$^$9!#(B
+@xref{Mail Source Specifiers}.
 
 @item
 Gnus $B$O(B @acronym{MIME} $B$KBP1~$7$?%j!<%@!<$K$J$j$^$7$?!#$3$l$O(B Gnus $B$NB?(B
@@ -24018,7 +24026,7 @@ Gnus $B$O(B @code{nnimap} $B$K$h$C$F(B @acronym{IMAP} $B%a!<%k$rFI$`$3$H$,$
 @c TRANSLATEME
 @node Oort Gnus
 @subsubsection Oort Gnus
-@cindex Oort
+@cindex Oort Gnus
 
 New features in Gnus 5.10:
 
@@ -24068,7 +24076,7 @@ Single-part yenc encoded attachments can be decoded.
 @item
 Picons
 
-The picons code has been reimplemented to work in GNU Emacs -- some of
+The picons code has been reimplemented to work in GNU Emacs---some of
 the previous options have been removed or renamed.
 
 Picons are small ``personal icons'' representing users, domain and
@@ -24132,7 +24140,7 @@ The nndoc back end now supports mailman digests and exim bounces.
 
 @item
 Gnus supports RFC 2369 mailing list headers, and adds a number of 
-related commands in mailing list groups.
+related commands in mailing list groups.  @xref{Mailing List}.
 
 @item
 The Date header can be displayed in a format that can be read aloud
@@ -24147,11 +24155,12 @@ diffs are automatically highlighted in groups matching
 @code{mm-uu-diff-groups-regexp}
 
 @item
-TLS wrapper shipped with Gnus
+@acronym{TLS} wrapper shipped with Gnus
 
-TLS/SSL is now supported in @acronym{IMAP} and @acronym{NNTP} via
-@file{tls.el} and GNUTLS.  The old TLS/SSL support via (external third
-party) @file{ssl.el} and OpenSSL still works.
+@acronym{TLS}/@acronym{SSL} is now supported in @acronym{IMAP} and
+@acronym{NNTP} via @file{tls.el} and GNUTLS.  The old
+@acronym{TLS}/@acronym{SSL} support via (external third party)
+@file{ssl.el} and OpenSSL still works.
 
 @item
 New @file{make.bat} for compiling and installing Gnus under MS Windows
@@ -24166,10 +24175,10 @@ the second parameter.
 automatic recognition of XEmacs and GNU Emacs, generates
 @file{gnus-load.el}, checks if errors occur while compilation and
 generation of info files and reports them at the end of the build
-process. It now uses @command{makeinfo} if it is available and falls
+process. It now uses @code{makeinfo} if it is available and falls
 back to @file{infohack.el} otherwise.  @file{make.bat} should now
 install all files which are necessary to run Gnus and be generally a
-complete replacement for the @command{configure; make; make install}
+complete replacement for the @code{configure; make; make install}
 cycle used under Unix systems.
 
 The new @file{make.bat} makes @file{make-x.bat} superfluous, so it has
@@ -24430,10 +24439,10 @@ in the Agent, it won't get downloaded once more.  @code{(setq
 gnus-agent-cache nil)} reverts to the old behavior.
 
 @item
-Gnus supports the ``format=flowed'' (RFC 2646) parameter.
-
-On composing messages, it is enabled by @code{use-hard-newlines}.  Decoding
-format=flowed was present but not documented in earlier versions.
+Gnus supports the ``format=flowed'' (RFC 2646) parameter.  On
+composing messages, it is enabled by @code{use-hard-newlines}.
+Decoding format=flowed was present but not documented in earlier
+versions.
 
 @item
 Gnus supports the generation of RFC 2298 Disposition Notification requests.
@@ -24544,7 +24553,7 @@ Gnus supports @acronym{PGP} (RFC 1991/2440), @acronym{PGP/MIME} (RFC
 2015/3156) and @acronym{S/MIME} (RFC 2630-2633).
 
 It needs an external @acronym{S/MIME} and OpenPGP implementation, but no
-additional lisp libraries.  This add several menu items to the
+additional Lisp libraries.  This add several menu items to the
 Attachments menu, and @kbd{C-c RET} key bindings, when composing
 messages.  This also obsoletes @code{gnus-article-hide-pgp-hook}.
 
@@ -24739,7 +24748,7 @@ Gnus $B$O$$$D$b0l$D$NJ}K!(B ($B$H%P%C%/%(%s%I(B) $B$r%K%e!<%9$rF@$k$?$a$N(
 $B$N=89g$G$9!#(B
 
 @item @acronym{NOV}
-@cindex nov
+@cindex @acronym{NOV}
 Gnus $B$,%0%k!<%W$KF~$k$H!"%0%k!<%W$NA4$F$NL$FI5-;v$N%X%C%@!<$r%P%C%/%(%s(B
 $B%I$K5a$a$^$9!#$[$H$s$I$N%5!<%P!<$O(B News OverView $BMM<0$,;HMQ2DG=$G!"$=$l(B
 $B$OIaDL$N(B @sc{head} $BMM<0$h$j$b$C$H<jC;$G$b$C$HB.$/FI$s$G2r@O(B (parse) $B$9$k(B
@@ -25198,8 +25207,8 @@ Gnus $B=*N;;~$K>C5n$9$k%P%C%U%!$N0lMw$K8=:_$N%P%C%U%!$rDI2C$7$^$9!#(B
 @findex gnus-group-foreign-p
 @var{group} $B$,30It%0%k!<%W$G$"$k$+$I$&$+$r<($7$^$9!#(B
 
-@item group-group-find-parameter
-@findex group-group-find-parameter
+@item gnus-group-find-parameter
+@findex gnus-group-find-parameter
 @var{group} $B$N%Q%i%a!<%?0lMw$rJV$7$^$9!#Fs$DL\$N0z?t$rM?$($k$H!"(B
 @var{group} $BMQ$N$=$N%Q%i%a!<%?$NCM$rJV$7$^$9!#(B
 
