@@ -1,5 +1,11 @@
 1999-09-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 07.
+
+	* lisp/gnus-art.el (gnus-article-prev-page): Rewrite to realize
+	smooth scrolling under XEmacs.
+	(gnus-article-next-page):Ditto.
+
 	* Mule23@1934.en, Mule23@1934.ja: Separate from Mule23@1934; add
 	descriptions about the problem of loaddefs.el and the patch for
 	CUSTOM 1.9962.
