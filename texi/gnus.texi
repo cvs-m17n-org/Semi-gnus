@@ -12070,7 +12070,7 @@ Score on the body.
 Score on the head.
 
 @item t
-Score on thead.
+Score on thread.
 
 @end table
 

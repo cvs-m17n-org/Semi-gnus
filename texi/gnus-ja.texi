@@ -6264,7 +6264,9 @@ Gnus はどこの引用文が隠されているかを示すためにボタンを付け加え、文章の
 @item e
 隠された文の最後のポイントです。
 @item l
-隠された文の長さです。
+隠されたリージョンの文字の数です。
+@item n
+隠された文の行の数です。
 @end table
 
 @item gnus-cited-lines-visible
