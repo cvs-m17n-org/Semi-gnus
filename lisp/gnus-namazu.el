@@ -283,8 +283,7 @@ options make any sense in this context."
   (goto-char (point-min))
   (while (not (eobp))
     (when (looking-at "file://")
-      (delete-region (point) (match-end 0))
-      (forward-line 0))
+      (delete-region (point) (match-end 0)))
     (when (if gnus-namazu-need-path-normalization
 	      (or (not (looking-at "/\\(.\\)|/"))
 		  (replace-match "\\1:/"))
