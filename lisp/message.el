@@ -557,9 +557,10 @@ nil means use indentation."
   :type 'string
   :group 'message-insertion)
 
-(defcustom message-yank-add-new-references t
+(defcustom message-yank-add-new-references nil
   "*Non-nil means new IDs will be added to \"References\" field when an
-article is yanked by the command `message-yank-original' interactively."
+article is yanked by the command `message-yank-original' interactively.
+But should not use this method. (See note of In-Reply-To in RFC2822.)"
   :type '(radio (const :tag "Do not add anything" nil)
 		(const :tag "From Message-Id, References and In-Reply-To fields" t)
 		(const :tag "From only Message-Id field." message-id-only))
@@ -1045,7 +1046,7 @@ The cdr of ech entry is a function for applying the face to a region.")
     (To . message-fill-address)
     (Cc . message-fill-address)
     (Subject)
-    (In-Reply-To)
+    (In-Reply-To . message-fill-references)
     (Fcc)
     (Bcc)
     (Date)
@@ -1942,7 +1943,8 @@ be added to \"References\" field.
   (interactive "P")
   (let ((modified (buffer-modified-p))
 	(buffer (message-eval-parameter message-reply-buffer))
-	start end refs)
+	(add-in-reply-to (message-mail-p))
+	start end refs msg-id in-reply-to orig-refs)
     (when (and buffer
 	       message-cite-function)
       (delete-windows-on buffer t)
@@ -1951,43 +1953,58 @@ be added to \"References\" field.
 	    end (mark t))
 
       ;; Add new IDs to References field.
-      (when (and message-yank-add-new-references (interactive-p))
+      (when (interactive-p)
 	(save-excursion
 	  (save-restriction
 	    (message-narrow-to-headers)
 	    (setq refs (message-list-references
-			nil
-			(message-fetch-field "References")))
+			nil (message-fetch-field "References")))
+	    (setq in-reply-to (message-list-references
+			       nil (message-fetch-field "In-Reply-To")))
+	    (when in-reply-to
+	      (setq add-in-reply-to t))
 	    (widen)
 	    (narrow-to-region start end)
 	    (std11-narrow-to-header)
-	    (when (setq refs (message-list-references
-			      refs
-			      (unless (eq message-yank-add-new-references
-					  'message-id-only)
-				(or (message-fetch-field "References")
-				    (message-fetch-field "In-Reply-To")))
-			      (message-fetch-field "Message-ID")))
-	      (widen)
-	      (message-narrow-to-headers)
-	      (goto-char (point-min))
-	      (let ((case-fold-search t))
-		(if (re-search-forward "^References:\\([\t ]+.+\n\\)+" nil t)
-		    (replace-match "")
-		  (goto-char (point-max))))
-	      (mail-header-format
-	       (list (or (assq 'References message-header-format-alist)
-			 '(References . message-fill-references)))
-	       (list (cons 'References
-			   (mapconcat 'identity (nreverse refs) " "))))
-	      (backward-delete-char 1)))))
+	    (setq msg-id (message-fetch-field "Message-ID"))
+	    (setq orig-refs (or (message-fetch-field "References")
+				(message-fetch-field "In-Reply-To")))
+	    (setq in-reply-to (message-list-references in-reply-to msg-id))
+	    (if (null refs)
+		(setq refs (message-list-references nil orig-refs msg-id))
+	      (when message-yank-add-new-references
+		(setq refs (message-list-references
+			    refs
+			    (unless (eq message-yank-add-new-references
+					'message-id-only)
+			      orig-refs)
+			    msg-id))))
+	    (widen)
+	    (message-narrow-to-headers)
+	    (when add-in-reply-to
+	      (message-replace-reference 'In-Reply-To in-reply-to))
+	    (message-replace-reference 'References refs)))))
 
-      (funcall message-cite-function)
-      (message-exchange-point-and-mark)
-      (unless (bolp)
-	(insert ?\n))
-      (unless modified
-	(setq message-checksum (message-checksum))))))
+    (funcall message-cite-function)
+    (message-exchange-point-and-mark)
+    (unless (bolp)
+      (insert ?\n))
+    (unless modified
+      (setq message-checksum (message-checksum)))))
+
+(defun message-replace-reference (field refs)
+  (goto-char (point-min))
+  (let ((case-fold-search t))
+    (if (re-search-forward (concat "^" (symbol-name field)
+				   ":\\([\t ]+.+\n\\)+") nil t)
+	(replace-match "")
+      (goto-char (point-max))))
+  (mail-header-format
+   (list (or (assq field message-header-format-alist)
+	     (cons field 'message-fill-references)))
+   (list (cons field
+	       (mapconcat 'identity (nreverse refs) " "))))
+  (backward-delete-char 1))
 
 (defun message-yank-buffer (buffer)
   "Insert BUFFER into the current buffer and quote it."
@@ -3223,23 +3240,8 @@ If NOW, use that time instead."
 
 (defun message-make-in-reply-to ()
   "Return the In-Reply-To header for this message."
-  (when message-reply-headers
-    (let ((from (mail-header-from message-reply-headers))
-	  (date (mail-header-date message-reply-headers))
-	  (msg-id (mail-header-message-id message-reply-headers)))
-      (when msg-id
-	(concat msg-id
-		(when from
-		  (let ((stop-pos
-			 (string-match "  *at \\|  *@ \\| *(\\| *<" from)))
-		    (concat " ("
-			    (if (and stop-pos
-				     (not (zerop stop-pos)))
-				(substring from 0 stop-pos) from)
-			    "'s message of \""
-			    (if (or (not date) (string= date ""))
-				"(unknown date)" date)
-			    "\")"))))))))
+  (and message-reply-headers
+       (mail-header-message-id message-reply-headers)))
 
 (defun message-make-distribution ()
   "Make a Distribution header."
@@ -4001,7 +4003,9 @@ OTHER-HEADERS is an alist of header/value pairs."
        ,@(if (or references message-id)
 	     `((References . ,(concat (or references "") (and references " ")
 				      (or message-id ""))))
-	   nil))
+	   nil)
+       ,@(if message-id
+	     `((In-Reply-To . ,message-id))))
      cur)))
 
 ;;;###autoload
