@@ -22313,9 +22313,7 @@ From Reiner Steib <reiner.steib@@gmx.de>.
 $B$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($k$+!"$^$?(B
 $B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
 $B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(Bham $B0u$,IU$$(B
-$B$?(B @emph{ham} $B%0%k!<%W$N5-;v$NAw?.<T$,%[%o%$%H%j%9%H$KDI2C$5$l$^$9!#$3(B
-$B$N(B ham $B%W%m%;%C%5!<$O(B @emph{spam} $B$+(B @emph{$BL$J,N`(B} $B%0%k!<%W$K$O8z2L$r5Z(B
-$B$\$5$J$$$3$H$KCm0U$7$F2<$5$$!#(B
+$B$?(B @emph{ham} $B%0%k!<%W$N5-;v$NAw?.<T$,%[%o%$%H%j%9%H$KDI2C$5$l$^$9!#(B
 
 @emph{$B7Y9p(B}
 
@@ -22376,9 +22374,7 @@ From Reiner Steib <reiner.steib@@gmx.de>.
 $B$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($k$+!"$^$?(B
 $B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
 $B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(Bham $B0u$,IU$$(B
-$B$?(B @emph{ham} $B%0%k!<%W$N5-;v$NAw?.<T$,(B BBDB $B$KDI2C$5$l$^$9!#$3$N(B ham $B%W(B
-$B%m%;%C%5!<$O(B @emph{spam} $B$+(B @emph{$BL$J,N`(B} $B%0%k!<%W$K$O8z2L$r5Z$\$5$J$$$3(B
-$B$H$KCm0U$7$F2<$5$$!#(B
+$B$?(B @emph{ham} $B%0%k!<%W$N5-;v$NAw?.<T$,(B BBDB $B$KDI2C$5$l$^$9!#(B
 
 @emph{$B7Y9p(B}
 
@@ -22586,8 +22582,7 @@ Path $B$K(B @code{bogofilter} $B$N<B9T%U%!%$%k$,L5$$>l9g!"(BBogofilter $B$N
 $B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
 $B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(Bham $B0u$,IU$$(B
 $B$?(B @emph{ham} $B%0%k!<%W$N5-;v$,Hs(B-spam $B5-;vMQ$N(B Bogofilter $B%G!<%?%Y!<%9$K(B
-$BDI2C$5$l$^$9!#$3$N(B ham $B%W%m%;%C%5!<$O(B @emph{spam} $B$+(B @emph{$BL$J,N`(B} $B%0%k!<(B
-$B%W$K$O8z2L$r5Z$\$5$J$$$3$H$KCm0U$7$F2<$5$$!#(B
+$BDI2C$5$l$^$9!#(B
 
 @emph{$B7Y9p(B}
 
@@ -22742,8 +22737,7 @@ Emacs Lisp $B$K$h$kE}7WJ,@O4o$G$"$k(B spam-stat.el $B$r(B @code{spam-split} 
 $B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
 $B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(Bham $B0u$,IU$$(B
 $B$?(B @emph{ham} $B%0%k!<%W$N5-;v$,Hs(B-spam $B5-;vMQ$N(B spam-stat $B%G!<%?%Y!<%9$K(B
-$BDI2C$5$l$^$9!#$3$N(B ham $B%W%m%;%C%5!<$O(B @emph{spam} $B$+(B @emph{$BL$J,N`(B} $B%0%k!<(B
-$B%W$K$O8z2L$r5Z$\$5$J$$$3$H$KCm0U$7$F2<$5$$!#(B
+$BDI2C$5$l$^$9!#(B
 
 @emph{$B7Y9p(B}
 
@@ -22848,9 +22842,7 @@ Package}.
 $B$O(B @code{gnus-spam-process-newsgroups} $BJQ?t$K2C$($F2<$5$$!#$3$N%7%s%\%k(B
 $B$,%0%k!<%W$N(B @code{spam-process} $B%Q%i%a!<%?$K2C$($i$l$k$H!"(B@emph{ham} $B%0(B
 $B%k!<%W$K$"$k(B ham $B0u$,IU$$$?5-;v$,(B ham $B$N5-;v$N%5%s%W%k$H$7(B
-$B$F(B SpamOracle $B$KAw$i$l$^$9!#$3$N(B ham $B%W%m%;%C%5!<(B
-$B$O(B @emph{spam} $B$+(B @emph{$BL$J,N`(B} $B%0%k!<%W$K$O8z2L$r5Z$\$5$J$$$3$H$KCm0U$7(B
-$B$F2<$5$$!#(B
+$B$F(B SpamOracle $B$KAw$i$l$^$9!#(B
 
 @emph{$B7Y9p(B}
 
