@@ -2541,7 +2541,7 @@ to find out how to use this."
    (message-check 'from
      (let* ((case-fold-search t)
 	    (from (message-fetch-field "from"))
-	    (ad (nth 1 (mail-extract-address-components from))))
+	    (ad (nth 1 (funcall gnus-extract-address-components from))))
        (cond
 	((not from)
 	 (message "There is no From line.  Posting is denied.")
@@ -2942,7 +2942,7 @@ give as trustworthy answer as possible."
   "Return the pertinent part of `user-mail-address'."
   (when user-mail-address
     (if (string-match " " user-mail-address)
-	(nth 1 (mail-extract-address-components user-mail-address))
+	(nth 1 (funcall gnus-extract-address-components user-mail-address))
       user-mail-address)))
 
 (defun message-make-fqdn ()
@@ -3084,13 +3084,15 @@ Headers already prepared in the buffer are not modified."
 		   (not (message-check-element 'sender))
 		   (not (string=
 			 (downcase
-			  (cadr (mail-extract-address-components from)))
+			  (cadr (funcall gnus-extract-address-components
+					 from)))
 			 (downcase secure-sender)))
 		   (or (null sender)
 		       (not
 			(string=
 			 (downcase
-			  (cadr (mail-extract-address-components sender)))
+			  (cadr (funcall gnus-extract-address-components
+					 sender)))
 			 (downcase secure-sender)))))
 	  (goto-char (point-min))
 	  ;; Rename any old Sender headers to Original-Sender.
@@ -3204,7 +3206,7 @@ Headers already prepared in the buffer are not modified."
      (concat "*" type
 	     (if to
 		 (concat " to "
-			 (or (car (mail-extract-address-components to))
+			 (or (car (funcall gnus-extract-address-components to))
 			     to) "")
 	       "")
 	     (if (and group (not (string= group ""))) (concat " on " group) "")
@@ -3704,9 +3706,10 @@ that further discussion should take place only in "
  			  (downcase sender)
  			  (downcase (message-make-sender))))
  		    (string-equal
- 		     (downcase (cadr (mail-extract-address-components from)))
- 		     (downcase (cadr (mail-extract-address-components
- 				      (message-make-from))))))
+ 		     (downcase (cadr (funcall gnus-extract-address-components
+					      from)))
+ 		     (downcase (cadr (funcall gnus-extract-address-components
+					      (message-make-from))))))
 	  (error "This article is not yours"))
 	;; Make control message.
 	(setq buf (set-buffer (get-buffer-create " *message cancel*")))
@@ -3740,8 +3743,8 @@ header line with the old Message-ID."
     ;; Check whether the user owns the article that is to be superseded.
     (unless (string-equal
 	     (downcase (or (message-fetch-field "sender")
-			   (cadr (mail-extract-address-components
-				  (message-fetch-field "from")))))
+			   (cadr (funcall gnus-extract-address-components
+					  (message-fetch-field "from")))))
 	     (downcase (message-make-sender)))
       (error "This article is not yours"))
     ;; Get a normal message buffer.
