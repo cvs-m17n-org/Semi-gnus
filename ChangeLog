@@ -1,3 +1,14 @@
+1999-12-06  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/dgnushack.el (char-after): Uncomment the byte-optimization;
+	don't use `byte-defop-compiler'.
+	(byte-optimize-form-code-walker): Advise it for fixing the bug in
+	and/or forms.  The original idea is devised by FUKUI-san, modified
+	by KOBAYASHI-san.
+	(max-specpdl-size): Set 3000.
+
 1999-12-05  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
