@@ -1,0 +1,115 @@
+
+gnus-offline で設定可能な変数一覧
+
+・gnus-offline-dialup-program  
+    ダイアルアップするプログラム名
+
+・gnus-offline-dialup-program-arguments
+    ダイアルアッププログラムの引数のリスト
+    例えば、gnus-offline-dialup-program に "-s AAA" を渡す場合は
+    (setq gnus-offline-dialup-program-arguments '("-s" "AAA"))
+    と記述してください。
+
+・gnus-offline-hangup-program
+    回線を切断するプログラム名
+
+・gnus-offline-hangup-program-arguments
+    切断するプログラムの引数のリスト
+    例えば、gnus-offline-hangup-program に "-s AAA" を渡す場合は
+    (setq gnus-offline-hangup-program-arguments '("-s" "AAA"))
+    と記述してください。
+
+・gnus-offline-mail-spool-directory
+    送信メールのスプールディレクトリ
+    Offline 状態で Mail を送信すると一旦ここで指定したディレクトリに保存され
+    ます。
+    MIEE を使用する場合以外無効です。
+
+・gnus-offline-news-spool-directory
+    送信ニュースのスプールディレクトリ
+    Offline 状態で News を送信すると一旦ここで指定したディレクトリに保存され
+    ます。
+    MIEE を使用する場合以外無効です。
+
+・gnus-offline-mail-treat-environ
+    Mail の送信を Online/Offline で行う事を切り替える
+
+・gnus-offline-articles-to-fetch
+    fetch する記事を切り替える both->mail->news->both...
+       'both ... Mail/News を両方受信
+       'Mail ... Mail だけ受信
+       'News ... News だけ受信
+    デフォルト値は 'both です。
+
+・gnus-offline-popup-menu
+    メニューを使うかどうかを指定します。デフォルトは "t" です。
+
+・gnus-offline-load-hook
+    gnus-offline が load されるときに評価される hook
+
+・gnus-offline-before-online-hook
+    Online job 直前に評価される hook
+
+・gnus-offline-after-online-hook
+    Online job 終了直前に評価される hook
+
+・gnus-offline-interval-time
+    Online job を行う間隔(分)
+    Emacs が idle 状態になってからここで指定した時間毎に Online 状態にし
+    Mail/News を取得します。
+
+・gnus-offline-MTA-type
+    Message を Online 時に送信するプログラムのタイプで、デフォルトは 'smtp 
+    です。
+   'smtp     ... smtp.el を使用
+   'sendmail ... sendmail.el を使用
+
+・gnus-offline-drafts-queue-type
+   送信メッセージをキューに溜めるもののタイプで、デフォルトは 'miee です。
+   'miee は miee.el を使用.
+   'agent は gnus-agent.el を使用.
+
+・gnus-offline-after-empting-spool-hook
+  送信メッセージのキューを空にする前に評価される hook
+
+・gnus-offline-before-empting-spool-hook
+  送信メッセージを送信後に、空になった後評価される hook
+
+・gnus-offline-dialup-function
+  接続に使用する関数名
+
+・gnus-offline-hangup-function
+  切断に使用する関数名
+
+・gnus-offline-pop-password-file 
+  ユーザー名、メールサーバー、パスワードを保存するためのファイル名
+
+・gnus-offline-pop-password-decoding-function 
+  パスワードを保存する際の暗号化を行うための関数。
+
+gnus-offline M-x で実行可能なコマンド一覧
+
+・M-x gnus-offline-toggle-plugged
+  offline 状態/Online 状態を切替えます。
+
+・M-x gnus-offline-toggle-auto-hangup
+  offline 状態にします。
+
+・M-x gnus-offline-toggle-on/off-send-mail
+  Online 状態/Offline 状態での Mail 送信状態を切替えます。
+  Online 状態では直接送信しますが、Offline 状態では一旦 spool に書き込み、
+  "g" を押した時に全部送信されます。
+
+・M-x gnus-offline-toggle-articles-to-fetch
+  取得する記事を選択します。both -> mail -> news -> both ... のように
+  切り替わります。
+
+・M-x gnus-offline-toggle-movemail-program
+  movemail プログラムを切替えます。
+
+・M-x gnus-offline-set-interval-time
+  記事/Mail の取得、送信を自動的に行う間隔(分)を設定します。
+  この間隔は Emacs が Idle になってからの時間です。
+
+・M-x gnus-offline-agent-expire
+  既読の記事を expire します。
