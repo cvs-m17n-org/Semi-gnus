@@ -54,7 +54,7 @@ bbdb/news-auto-create-p is non-nil, or if OFFER-TO-CREATE is true and
 the user confirms the creation."
   (if bbdb-use-pop-up
       (gnus-bbdb/pop-up-bbdb-buffer offer-to-create)
-    (let ((from (mail-header-from gnus-current-headers)))
+    (let ((from (mime-entity-fetch-field gnus-current-headers "from")))
       (when from
 	(setq from (gnus-bbdb/extract-address-components
 		    (gnus-bbdb/decode-field-body from 'From))))
