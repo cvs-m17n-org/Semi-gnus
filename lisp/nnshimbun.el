@@ -511,13 +511,16 @@ However, the optional FORCE if it is non-nil (it is supposed to be
 specified by the command `nnshimbun-expire-nov-databases'), it does
 expire for the SERVER:GROUP even if whose NOV is not open."
   (let ((buffer (cdr (assoc group nnshimbun-nov-buffer-alist)))
+	(nnmail-expiry-wait-function nnmail-expiry-wait-function)
+	(nnmail-expiry-wait nnmail-expiry-wait)
 	(progress-msg (format "Expiring NOV database for nnshimbun+%s:%s "
 			      server group))
 	(pinwheel "-/|\\")
 	(counter 0)
-	should-close-nov name article expirable end time)
+	name should-close-nov article expirable end time)
     (if (and
 	 server
+	 (setq name (concat "nnshimbun+" server ":" group))
 	 (or (let ((current (nnoo-current-server 'nnshimbun)))
 	       (and current
 		    (string-equal server current)
@@ -527,6 +530,12 @@ expire for the SERVER:GROUP even if whose NOV is not open."
 		     buffer (gnus-get-buffer-create
 			     (format " *nnshimbun overview %s %s*"
 				     server group)))
+	       (let ((expiry-wait (gnus-group-find-parameter name
+							     'expiry-wait)))
+		 (when expiry-wait
+		   ;; Prefer the group parameter `expiry-wait'.
+		   (setq nnmail-expiry-wait-function nil
+			 nnmail-expiry-wait expiry-wait)))
 	       (save-excursion
 		 (set-buffer buffer)
 		 (set (make-local-variable 'nnshimbun-nov-buffer-file-name)
@@ -544,7 +553,6 @@ expire for the SERVER:GROUP even if whose NOV is not open."
 	       t)))
 	(prog1
 	    (save-excursion
-	      (setq name (concat "nnshimbun+" server ":" group))
 	      (set-buffer buffer)
 	      (when (eq 'all articles)
 		(setq articles nil)
