@@ -267,7 +267,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.10.064"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "03"
+(defconst gnus-revision-number "04"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "0.84"
@@ -876,7 +876,7 @@ used to 899, you would say something along these lines:
 	   (save-excursion
 	     (set-buffer (gnus-get-buffer-create " *gnus nntp*"))
 	     (insert-file-contents gnus-nntpserver-file)
-	     (let ((name (buffer-substring (point-min) (point-max))))
+	     (let ((name (buffer-string)))
 	       (prog1
 		   (if (string-match "\\'[ \t\n]*$" name)
 		       nil

@@ -282,7 +282,7 @@ If NEWSGROUP is nil, the global kill file is selected."
   (if (and gnus-current-kill-article
 	   (get-buffer gnus-summary-buffer))
       ;; Assume newsgroup is selected.
-      (gnus-kill-file-apply-string (buffer-substring (point-min) (point-max)))
+      (gnus-kill-file-apply-string (buffer-string))
     (ding) (gnus-message 2 "No newsgroup is selected.")))
 
 (defun gnus-kill-file-apply-string (string)

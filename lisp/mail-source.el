@@ -273,9 +273,8 @@ Pass INFO on to CALLBACK."
 		    (delete-region (point-min) (match-end 0)))
 		  (unless (yes-or-no-p
 			   (format "movemail: %s (%d return).  Continue? "
-				   (buffer-substring (point-min) (point-max))
-				   result))
-		    (error "%s" (buffer-substring (point-min) (point-max))))
+				   (buffer-string) result))
+		    (error "%s" (buffer-string)))
 		  (setq to nil)))))))
       (when (and errors
 		 (buffer-name errors))

@@ -1476,10 +1476,9 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	;; Narrow to the status.
 	(narrow-to-region
 	 (point)
-	 (progn
-	   (while (and (zerop (forward-line 1))
-		       (memq (char-after) '(?\t ?\ ))))
-	   (point)))
+	 (if (re-search-forward "^[^ \t]" nil t)
+	     (1- (point))
+	   (point-max)))
 	;; Go through all elements and add them to the list.
 	(goto-char (point-min))
 	(while (re-search-forward "[^ \t=]+" nil t)

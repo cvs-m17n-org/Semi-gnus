@@ -823,8 +823,7 @@ XEmacs compatibility workaround."
 		 (gnus-xmas-call-region "icontopbm")
 		 (gnus-xmas-call-region "ppmtoxpm")
 		 (make-glyph
-		  (vector 'xpm :data (buffer-substring
-				      (point-min) (point-max)))))))
+		  (vector 'xpm :data (buffer-string))))))
 	    (t
 	     (make-glyph [nothing]))))
 	  (ext (make-extent (progn

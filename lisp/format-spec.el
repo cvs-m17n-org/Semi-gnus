@@ -52,7 +52,7 @@ to values."
        ;; Signal an error on bogus format strings.
        (t
 	(error "Invalid format string"))))
-    (buffer-substring (point-min) (point-max))))
+    (buffer-string)))
 
 (defun format-spec-make (&rest pairs)
   "Return an alist suitable for use in `format-spec' based on PAIRS.
