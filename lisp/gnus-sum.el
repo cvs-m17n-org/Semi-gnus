@@ -6907,7 +6907,7 @@ and `request-accept' functions."
 	((eq action 'copy)
 	 (save-excursion
 	   (set-buffer copy-buf)
-	   (when (gnus-request-article-this-buffer article gnus-newsgroup-name)
+	   (when (gnus-request-original-article article gnus-newsgroup-name)
 	     (gnus-request-accept-article
 	      to-newsgroup select-method (not articles)))))
 	;; Crosspost the article.
@@ -6928,7 +6928,7 @@ and `request-accept' functions."
 	   (save-excursion
 	     (set-buffer copy-buf)
 	     ;; First put the article in the destination group.
-	     (gnus-request-article-this-buffer article gnus-newsgroup-name)
+	     (gnus-request-original-article article gnus-newsgroup-name)
 	     (when (consp (setq art-group
 				(gnus-request-accept-article
 				 to-newsgroup select-method (not articles))))
@@ -7021,7 +7021,7 @@ and `request-accept' functions."
 	  (when (eq action 'crosspost)
 	    (save-excursion
 	      (set-buffer copy-buf)
-	      (gnus-request-article-this-buffer article gnus-newsgroup-name)
+	      (gnus-request-original-article article gnus-newsgroup-name)
 	      (nnheader-replace-header "Xref" new-xref)
 	      (gnus-request-replace-article
 	       article gnus-newsgroup-name (current-buffer)))))
