@@ -1,3 +1,8 @@
+1998-12-07  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-get-parameter-with-eval): Call
+	`message-get-parameter' with arg `key' first.
+
 1998-12-01  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.11.1.
