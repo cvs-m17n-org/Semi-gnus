@@ -1,5 +1,12 @@
 2002-01-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 11 in
+	order to force update cached format specs.
+
+	* lisp/gnus-spec.el (gnus-spec-tab): Deal with wide characters.
+
+2002-01-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/message.el (message-strip-forbidden-properties): Don't
 	strip properties when the invisible MIME part is inserted.
 
