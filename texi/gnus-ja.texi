@@ -5131,7 +5131,8 @@ Summary Buffer} を参照して下さい。
 現在の記事を書いた人に対して、広い返答 (wide reply) をしま
 す (@code{gnus-summary-wide-reply})。@dfn{広い返答} とはヘッダー
 の @code{To}, @code{From}, (もしくは @code{Reply-to}) と @code{Cc}) のす
-べての人に返答をすることです。
+べての人に返答をすることです。@code{Mail-Followup-To} があれば、代わりに
+それが使われます。
 
 @item S W
 @kindex S W (概略)
