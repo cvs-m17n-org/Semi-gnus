@@ -1,3 +1,41 @@
+1999-08-20  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 09.
+
+	* lisp/gnus-offline.el: Fix comments.
+	(TopLevel): Delete the code for emulating custom. Do not inhibit
+	byte-compile-warnings, but hide useless ones.
+	(gnus-offline-dialup-program-arguments): defvar instead of
+	defcustom.
+	(gnus-offline-hangup-program-arguments): Ditto.
+	(gnus-offline-interval-time): Ditto.
+	(gnus-offline-dialup-program, gnus-offline-hangup-program,
+	gnus-offline-drafts-queue-type, gnus-offline-MTA-type): defvar.
+	(gnus-offline-disable-fetch-mail): Remove pop3-fma dependent
+	codes.
+	Set `mail-sources' instead of `nnmail-spool-file'.
+	(gnus-offline-enable-fetch-mail): Ditto.
+	(gnus-offline-toggle-movemail-program): Abolish.
+	(gnus-offline-define-menu-and-key): Modify according to it.
+	(gnus-offline-define-menu-on-miee): Ditto.
+	(gnus-offline-define-menu-on-agent): Ditto.
+	(gnus-offline-message-add-header): Bind temporary variables.
+	(gnus-offline-add-custom-header): Ditto.
+	(gnus-offline-restore-mail-group-level): Ditto.
+
+	* lisp/gnus-ofsetup.el (TopLevel): Require gnus-cus and
+	gnus-offline at the compile time. Do not inhibit
+	byte-compile-warnings.
+	(gnus-setup-for-offline): Really bind all temporary variables.
+	(gnus-ofsetup-write-settting-file): Check if interval is a
+	integer.
+	Use `mail-sources' instead of `nnmail-spool-file'.
+	(gnus-ofsetup-update-setting-file): Redefine as a macro.
+	(gnus-ofsetup-prepare-for-miee): Ditto.
+
+	* README-offline.en : Update.
+	* README-offline.ja : Ditto.
+
 1999-08-20  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/gnus-sum.el (gnus-wheel-summary-scroll): Bind
