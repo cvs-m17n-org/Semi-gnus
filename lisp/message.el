@@ -383,12 +383,11 @@ always query the user whether to use the value.  If it is the symbol
 
 (defcustom message-use-mail-followup-to 'ask
   "*Specifies what to do with Mail-Followup-To header.
-If nil, ignore the header.  If it is t, use its value.  If it is the
-symbol `ask', always query the user whether to use the value."
-;;; If it is the symbol `use', always use the value.
+If nil, ignore the header.  If it is t or the symbol `use', use its value.
+If it is the symbol `ask', always query the user whether to use the value."
   :group 'message-interface
   :type '(choice (const :tag "ignore" nil)
-		 ;; (const use)
+		 (const use)
 		 (const ask)))
 
 ;;; Not implemented yet.
@@ -3474,11 +3473,11 @@ directs your response to " (if (string-match "," mft)
 			       "the specified addresses"
 			     "that address only") ".
 
-A typical situation where Mail-Followup-To is used is when the author
-thinks that further discussion should take place only in "
+A typical situation where Mail-Followup-To is used is when the author thinks
+that further discussion should take place only in "
 			     (if (string-match "," mft)
 				 "the specified mailing lists"
-			       "that mailing lists") ".")))
+			       "that mailing list") ".")))
 	  (setq follow-to (list (cons 'To mft))))
 	 (t
 	  (let (ccalist)
