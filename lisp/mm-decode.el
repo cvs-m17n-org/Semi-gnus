@@ -257,7 +257,7 @@ to:
 	   (type (mime-content-type-primary-type ctl)))
       (cond
        ((eq type 'multipart)
-	(mm-dissect-multipart parent ctl))
+	(mm-dissect-multipart result ctl))
        (t
 	(mm-dissect-singlepart result ctl no-strict-mime)))
       (when (mm-handle-id result)
