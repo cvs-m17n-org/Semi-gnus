@@ -1,3 +1,25 @@
+2001-12-16  Simon Josefsson  <jas@extundo.com>
+	Inspired by code by Dirk Meyer <dischi@tzi.de>.
+
+	* gnus-sum.el (gnus-summary-muttprint-program): New variable.
+	(gnus-summary-save-map): Add muttprint.
+	(gnus-summary-make-menu-bar): Ditto.
+	(gnus-summary-muttprint): New function.
+
+	* gnus-art.el (gnus-summary-pipe-to-muttprint): New function.
+
+2001-12-14 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* uudecode.el (uudecode-decode-region-internal): Speedup by using
+	temporary list instead of buffer.
+
+	* mm-url.el (executable-find): autoload.
+
+2001-12-12  Pavel Jan,Bm(Bk  <Pavel@Janik.cz>
+
+	* gnus-mlspl.el (gnus-group-split-fancy): Doc fix (add reference
+	to variable, follow doc-string conventions).
+
 2001-12-13  Josh Huber  <huber@alum.wpi.edu>
 
 	* gnus-cus.el (gnus-extra-topic-parameters): added topic parameter

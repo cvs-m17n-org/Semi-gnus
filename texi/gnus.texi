@@ -1,4 +1,4 @@
-\input texinfo                  @c -*-texinfo-*-  -*- coding: iso-latin-1 -*-
+\input texinfo                  @c -*- mode: texinfo; coding: iso-latin-1 -*-
 
 @setfilename gnus
 @settitle T-gnus 6.15 Manual
@@ -6929,6 +6929,17 @@ Save the current article in a VM folder
 @findex gnus-summary-pipe-output
 Save the current article in a pipe.  Uhm, like, what I mean is---Pipe
 the current article to a process (@code{gnus-summary-pipe-output}).
+
+@item O P
+@kindex O P (Summary)
+@findex gnus-summary-muttprint
+@vindex gnus-summary-muttprint-program
+Save the current article into muttprint. That is, print it using the
+external program Muttprint (see
+@uref{http://muttprint.sourceforge.net/}). The program name and
+options to use is controlled by the variable
+@code{gnus-summary-muttprint-program}. (@code{gnus-summary-muttprint}).
+
 @end table
 
 @vindex gnus-prompt-before-saving
@@ -8693,8 +8704,9 @@ something like
 @vindex gnus-ps-print-hook
 @findex gnus-summary-print-article
 Generate and print a PostScript image of the article buffer
-(@code{gnus-summary-print-article}).  @code{gnus-ps-print-hook} will be
-run just before printing the buffer.
+(@code{gnus-summary-print-article}).  @code{gnus-ps-print-hook} will
+be run just before printing the buffer.  An alternative way to print
+article is to use Muttprint (@pxref{Saving Articles}).
 
 @end table
 
@@ -15438,7 +15450,7 @@ there is typically no sure way for the component back end to know this,
 and in that case @code{nnvirtual} tells Gnus that the article came from a
 not-news back end.  (Just to be on the safe side.)
 
-@kbd{C-c C-t} in the message buffer will insert the @code{Newsgroups}
+@kbd{C-c C-n} in the message buffer will insert the @code{Newsgroups}
 line from the article you respond to in these cases.
 
 

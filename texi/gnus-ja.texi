@@ -1,4 +1,4 @@
-@c \input texinfo @c -*- mode: texinfo; coding: iso-2022-7bit; -*-
+\input texinfo                  @c -*- mode: texinfo; coding: iso-2022-7bit -*-
 
 @setfilename gnus-ja
 @settitle T-gnus 6.15 Manual
@@ -1150,7 +1150,7 @@ gnus $B$O(B @code{gnus-secondary-servers} $B%j%9%H(B ($B$b$7B8:_$9$k$J$i$P
 $B$K@\B3$7$h$&$H$9$k$H$$$&$3$H$G$9!#(B)
 
 @findex gnus-group-browse-foreign-server
-@kindex B (Group)
+@kindex B ($B%0%k!<%W(B)
 $B$7$+$7!"IaCJF|>oE*$K$O0l$D$N(B @sc{nntp} $B%5!<%P$r;H$$!"0c$C$?%5!<%P!<$K$O(B
 $B6=L#$N$"$k%0%k!<%W$,>/$7$7$+$J$$>l9g!"%0%k!<%W%P%C%U%!$G(B @kbd{B} $BL?Na$r(B
 $B;H$&$3$H$NJ}$,NI$$$G$7$g$&!#$=$l$O!"A*Br2DG=$J%0%k!<%W$rI=<($7!"$=$NCf$+(B
@@ -2052,37 +2052,37 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 
 @table @kbd
 @item n
-@kindex n (Group)
+@kindex n ($B%0%k!<%W(B)
 @findex gnus-group-next-unread-group
 $B<!$NL$FI5-;v$N$"$k%0%k!<%W$K0\F0$7$^(B
 $B$9(B (@code{gnus-group-next-unread-group})$B!#(B
 
 @item p
 @itemx DEL
-@kindex DEL (Group)
-@kindex p (Group)
+@kindex DEL ($B%0%k!<%W(B)
+@kindex p ($B%0%k!<%W(B)
 @findex gnus-group-prev-unread-group
 $B0l$DA0$NL$FI5-;v$N$"$k%0%k!<%W$K0\F0$7$^(B
 $B$9(B (@code{gnus-group-prev-unread-group})$B!#(B
 
 @item N
-@kindex N (Group)
+@kindex N ($B%0%k!<%W(B)
 @findex gnus-group-next-group
 $B<!$N%0%k!<%W$K0\F0$7$^$9(B (@code{gnus-group-next-group})$B!#(B
 
 @item P
-@kindex P (Group)
+@kindex P ($B%0%k!<%W(B)
 @findex gnus-group-prev-group
 $B0l$DA0$N%0%k!<%W$K0\F0$7$^$9(B (@code{gnus-group-prev-group})$B!#(B
 
 @item M-n
-@kindex M-n (Group)
+@kindex M-n ($B%0%k!<%W(B)
 @findex gnus-group-prev-unread-group-same-level
 $B0l$DA0$NF1$8%l%Y%k(B ($B$b$7$/$O$=$l$h$j>.$5$$%l%Y%k(B) $B$NL$FI%0%k!<%W$K0\F0$7(B
 $B$^$9(B (@code{gnus-group-prev-unread-group-same-level})$B!#(B
 
 @item M-p
-@kindex M-p (Group)
+@kindex M-p ($B%0%k!<%W(B)
 @findex gnus-group-next-unread-group-same-level
 $B<!$NF1$8%l%Y%k(B($B$b$7$/$O$=$l$h$j>.$5$$%l%Y%k(B)$B$NL$FI%0%k!<%W$K0\F0$7$^(B
 $B$9(B (@code{gnus-group-next-unread-group-same-level})$B!#(B
@@ -2092,20 +2092,20 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 
 @table @kbd
 @item j
-@kindex j (Group)
+@kindex j ($B%0%k!<%W(B)
 @findex gnus-group-jump-to-group
 $B%0%k!<%W$K%8%c%s%W$7$^$9(B ($B$=$l$,8+$($k$h$&$K$J$C$F$$$J$+$C$?$i8+$($k$h$&(B
 $B$K$7$^$9(B) (@code{gnus-group-jump-to-group})$B!#(Bkill $B$5$l$F$$$k%0%k!<%W$b!"(B
 $B@8$-$F$$$k%0%k!<%W$HF1MM$K%8%c%s%W$G$-$^$9!#(B
 
 @item ,
-@kindex , (Group)
+@kindex , ($B%0%k!<%W(B)
 @findex gnus-group-best-unread-group
 $B:G$b>.$5$$%l%Y%k$NL$FI%0%k!<%W$K%8%c%s%W$7$^(B
 $B$9(B (@code{gnus-group-best-unread-group})$B!#(B
 
 @item .
-@kindex . (Group)
+@kindex . ($B%0%k!<%W(B)
 @findex gnus-group-first-unread-group
 $B:G=i$NL$FI5-;v$N$"$k%0%k!<%W$K%8%c%s%W$7$^(B
 $B$9(B (@code{gnus-group-first-unread-group})$B!#(B
@@ -2123,7 +2123,7 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 
 @table @kbd
 @item SPACE
-@kindex SPACE (Group)
+@kindex SPACE ($B%0%k!<%W(B)
 @findex gnus-group-read-group
 $B8=:_$N%0%k!<%W$rA*Br$7!"35N,%P%C%U%!$K@Z$jBX$($F:G=i$NL$FI5-;v$rI=<($7$^(B
 $B$9(B (@code{gnus-group-read-group})$B!#$b$7$=$N%0%k!<%W$KL$FI5-;v$,L5$$!"$b(B
@@ -2141,7 +2141,7 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 $B$G$-$k$7!"(B@kbd{C-u M-g} $B$G$O8E$$5-;v$rI=<($9$k$3$H$,$G$-$^$9!#(B
 
 @item RET
-@kindex RET (Group)
+@kindex RET ($B%0%k!<%W(B)
 @findex gnus-group-select-group
 $B8=:_$N%0%k!<%W$rA*Br$7!"35N,%P%C%U%!$K@Z$jBX$($^(B
 $B$9(B (@code{gnus-group-select-group})$B!#(B@code{gnus-group-read-group} $B$HF1$8(B
@@ -2149,7 +2149,7 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 $B<($7$J$$!"$H$$$&$3$H$G$9!#(B
 
 @item M-RET
-@kindex M-RET (Group)
+@kindex M-RET ($B%0%k!<%W(B)
 @findex gnus-group-quick-select-group
 $B$3$l$O>e5-$N%3%^%s%I$HF1$8F0:n$r$7$^$9$,!"!V%4%?%4%?!W$O:GDc8B$K$7$h$&$H(B
 $B$7$^$9(B (@code{gnus-group-quick-select-group})$B!#%9%3%"!&(Bkill $B$N=hM}$O9T$o(B
@@ -2160,14 +2160,14 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 $BI=<($r@Z$jBX$($?$$$H$-Lr$KN)$A$^$9(B (@pxref{Summary Generation Commands})$B!#(B
 
 @item M-SPACE
-@kindex M-SPACE (Group)
+@kindex M-SPACE ($B%0%k!<%W(B)
 @findex gnus-group-visible-select-group
 $B$3$l$O(B @kbd{RET} $B%3%^%s%I$HF1$8F0:n$r$9$k$5$i$K$b$&0l$D$N%3%^%s%I$G$9$,!"(B
 $B$3$N%3%^%s%I$O5-;v>C5n$HJ]N15-;v$r1#$9=hM}$r9T$$$^$;(B
 $B$s(B (@code{gnus-group-visible-select-group})$B!#(B
 
 @item C-M-RET
-@kindex C-M-RET (Group)
+@kindex C-M-RET ($B%0%k!<%W(B)
 @findex gnus-group-select-group-ephemerally
 $B:G8e$K$3$N%3%^%s%I$O!"8=:_$N%0%k!<%W$r0lEY8B$j!"$=$NFbMF$K0l@Z$N=hM}$r$9(B
 $B$k$3$H$N$J$$$h$&$KA*Br$7$^(B
@@ -2229,8 +2229,8 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 @table @kbd
 @item S t
 @itemx u
-@kindex S t (Group)
-@kindex u (Group)
+@kindex S t ($B%0%k!<%W(B)
+@kindex u ($B%0%k!<%W(B)
 @findex gnus-group-unsubscribe-current-group
 @c @icon{gnus-group-unsubscribe}
 $B8=:_$N%0%k!<%W$N9XFI$r@Z$jBX$($^(B
@@ -2238,29 +2238,29 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 
 @item S s
 @itemx U
-@kindex S s (Group)
-@kindex U (Group)
+@kindex S s ($B%0%k!<%W(B)
+@kindex U ($B%0%k!<%W(B)
 @findex gnus-group-unsubscribe-group
 $B%0%k!<%W$r9XFI$9$k$+$I$&$+$r3NG'$7!"9XFI$7$^$9!#$9$G$K9XFI$9$k$h$&$K$J$C(B
 $B$F$$$k>l9g$K$O!"9XFI$r;_$a$^$9(B (@code{gnus-group-unsubscribe-group})$B!#(B
 
 @item S k
 @itemx C-k
-@kindex S k (Group)
-@kindex C-k (Group)
+@kindex S k ($B%0%k!<%W(B)
+@kindex C-k ($B%0%k!<%W(B)
 @findex gnus-group-kill-group
 @c @icon{gnus-group-kill-group}
 $B8=:_$N%0%k!<%W$r(B kill $B$7$^$9(B (@code{gnus-group-kill-group})$B!#(B
 
 @item S y
 @itemx C-y
-@kindex S y (Group)
-@kindex C-y (Group)
+@kindex S y ($B%0%k!<%W(B)
+@kindex C-y ($B%0%k!<%W(B)
 @findex gnus-group-yank-group
 $B:G8e$K(B kill $B$7$?%0%k!<%W$r(B yank $B$7$^$9(B (@code{gnus-group-yank-group})$B!#(B
 
 @item C-x C-t
-@kindex C-x C-t (Group)
+@kindex C-x C-t ($B%0%k!<%W(B)
 @findex gnus-group-transpose-groups
 $BFs$D$N%0%k!<%W$N=g=x$rCV$-49$($^$9(B (@code{gnus-group-transpose-groups})$B!#(B
 $B$3$l$O%[%s%H$O9XFI%3%^%s%I$G$O$"$j$^$;$s$,!"(Bkill $B$H(B yank $B$r2?EY$+B3$1$k(B
@@ -2268,19 +2268,19 @@ Gnus $B$O(B @code{gnus-user-format-function-}@samp{X} $B4X?t$r8F$S=P$7$^$9!#$
 
 @item S w
 @itemx C-w
-@kindex S w (Group)
-@kindex C-w (Group)
+@kindex S w ($B%0%k!<%W(B)
+@kindex C-w ($B%0%k!<%W(B)
 @findex gnus-group-kill-region
 $B%j!<%8%g%sFb$NA4$F$N%0%k!<%W$r(B kill $B$7$^(B
 $B$9(B (@code{gnus-group-kill-region})$B!#(B
 
 @item S z
-@kindex S z (Group)
+@kindex S z ($B%0%k!<%W(B)
 @findex gnus-group-kill-all-zombies
 $BA4$F$N%>%s%S%0%k!<%W$r(B kill $B$7$^$9(B (@code{gnus-group-kill-all-zombies})$B!#(B
 
 @item S C-k
-@kindex S C-k (Group)
+@kindex S C-k ($B%0%k!<%W(B)
 @findex gnus-group-kill-level
 $B$"$k%l%Y%k$N%0%k!<%W$rA4$F(B kill $B$7$^$9(B (@code{gnus-group-kill-level})$B!#(B
 kill $B$7$?8e!"$3$l$i$N%0%k!<%W$r(B yank $B$GLa$9$3$H$O$G$-$J$$$N$G!"$3$N%3%^(B
@@ -2297,7 +2297,7 @@ kill $B$7$?8e!"$3$l$i$N%0%k!<%W$r(B yank $B$GLa$9$3$H$O$G$-$J$$$N$G!"$3$N%3%^
 
 @table @kbd
 @item c
-@kindex c (Group)
+@kindex c ($B%0%k!<%W(B)
 @findex gnus-group-catchup-current
 @vindex gnus-group-catchup-group-hook
 @c @icon{gnus-group-catchup-current}
@@ -2306,13 +2306,13 @@ kill $B$7$?8e!"$3$l$i$N%0%k!<%W$r(B yank $B$GLa$9$3$H$O$G$-$J$$$N$G!"$3$N%3%^
 $B9g$O(B @code{gnus-group-catchup-group-hook} $B$,8F$S=P$5$l$^$9!#(B
 
 @item C
-@kindex C (Group)
+@kindex C ($B%0%k!<%W(B)
 @findex gnus-group-catchup-current-all
 $B$=$N%0%k!<%W$NA45-;v$r!"0uIU$-$N5-;v$b4^$a$F4{FI$K$7$^(B
 $B$9(B (@code{gnus-group-catchup-current-all})$B!#(B
 
 @item M-c
-@kindex M-c (Group)
+@kindex M-c ($B%0%k!<%W(B)
 @findex gnus-group-clear-data
 $B8=:_$N%0%k!<%W$NA4$F$N%G!<%?$r%/%j%"$7$^$9!=!=%^!<%/$H4{FI5-;v$N%j%9%H$r(B
 $B>C$75n$j$^$9(B (@code{gnus-group-clear-data})$B!#(B
@@ -2341,7 +2341,7 @@ kill $B$7$?8e!"$3$l$i$N%0%k!<%W$r(B yank $B$GLa$9$3$H$O$G$-$J$$$N$G!"$3$N%3%^
 
 @table @kbd
 @item S l
-@kindex S l (Group)
+@kindex S l ($B%0%k!<%W(B)
 @findex gnus-group-set-current-level
 $B8=:_$N%0%k!<%W$N%l%Y%k$r@_Dj$9$k!#?t;z%W%l%U%#%C%/%9$,M?$($i$l$k$H!"$=$3(B
 $B$+$i(B @var{n} $B8D$N%0%k!<%W$N%l%Y%k$,@_Dj$5$l$^$9!#%l%Y%k$rF~NO$9$k$?$a$N(B
@@ -2473,37 +2473,37 @@ Gnus $B$ODL>o!"(B@code{gnus-activate-level} $B$+$=$l$h$j>.$5$$%l%Y%k$N%0%k!<%
 
 @table @kbd
 @item #
-@kindex # (Group)
+@kindex # ($B%0%k!<%W(B)
 @itemx M m
-@kindex M m (Group)
+@kindex M m ($B%0%k!<%W(B)
 @findex gnus-group-mark-group
 $B8=:_$N%0%k!<%W$K0u$r$D$1$k(B (@code{gnus-group-mark-group})$B!#(B
 
 @item M-#
-@kindex M-# (Group)
+@kindex M-# ($B%0%k!<%W(B)
 @itemx M u
-@kindex M u (Group)
+@kindex M u ($B%0%k!<%W(B)
 @findex gnus-group-unmark-group
 $B8=:_$N%0%k!<%W$+$i0u$r:o=|$9$k(B (@code{gnus-group-unmark-group})$B!#(B
 
 @item M U
-@kindex M U (Group)
+@kindex M U ($B%0%k!<%W(B)
 @findex gnus-group-unmark-all-groups
 $BA4$F$N%0%k!<%W$+$i0u$r:o=|$9$k(B (@code{gnus-group-unmark-all-groups})$B!#(B
 
 @item M w
-@kindex M w (Group)
+@kindex M w ($B%0%k!<%W(B)
 @findex gnus-group-mark-region
 $B%]%$%s%H$H%^!<%/$N4V$NA4$F$N%0%k!<%W$K0u$r$D$1(B
 $B$k(B (@code{gnus-group-mark-region})$B!#(B
 
 @item M b
-@kindex M b (Group)
+@kindex M b ($B%0%k!<%W(B)
 @findex gnus-group-mark-buffer
 $B%P%C%U%!Fb$NA4$F$N%0%k!<%W$K0u$r$D$1$k(B (@code{gnus-group-mark-buffer})$B!#(B
 
 @item M r
-@kindex M r (Group)
+@kindex M r ($B%0%k!<%W(B)
 @findex gnus-group-mark-regexp
 $B$"$k@55,I=8=$K9gCW$9$kA4$F$N%0%k!<%W$K0u$r$D$1(B
 $B$k(B (@code{gnus-group-mark-regexp})$B!#(B
@@ -2527,7 +2527,7 @@ Gnus $B$ODL>o!"(B@code{gnus-activate-level} $B$+$=$l$h$j>.$5$$%l%Y%k$N%0%k!<%
 
 @table @kbd
 @item G m
-@kindex G m (Group)
+@kindex G m ($B%0%k!<%W(B)
 @findex gnus-group-make-group
 @cindex making groups
 $B?7$7$$%0%k!<%W$r:n@.$7$^$9(B (@code{gnus-group-make-group})$B!#(BGnus $B$O%W%m%s(B
@@ -2536,7 +2536,7 @@ Gnus $B$ODL>o!"(B@code{gnus-activate-level} $B$+$=$l$h$j>.$5$$%l%Y%k$N%0%k!<%
 @pxref{Browse Foreign Server}$B!#(B
 
 @item G n
-@kindex G n (Group)
+@kindex G n ($B%0%k!<%W(B)
 @findex gnus-group-make-shimbun-group
 @cindex making groups
 @cindex nnshimbun
@@ -2547,7 +2547,7 @@ Gnus $B$ODL>o!"(B@code{gnus-activate-level} $B$+$=$l$h$j>.$5$$%l%Y%k$N%0%k!<%
 @code{nnshimbun} $B$K4X$9$k>\:Y$O(B @pxref{Web Newspaper} $B$r;2>H$7$F2<$5$$!#(B
 
 @item G r
-@kindex G r (Group)
+@kindex G r ($B%0%k!<%W(B)
 @findex gnus-group-rename-group
 @cindex renaming groups
 $B8=:_$N%0%k!<%W$NL>A0$r!"2?$+JL$N$b$N$KJQ99$7$^(B
@@ -2556,46 +2556,46 @@ Gnus $B$ODL>o!"(B@code{gnus-activate-level} $B$+$=$l$h$j>.$5$$%l%Y%k$N%0%k!<%
 $B$KCY$$$3$H$bM-$jF@$^$9!#(B
 
 @item G c
-@kindex G c (Group)
+@kindex G c ($B%0%k!<%W(B)
 @cindex customizing
 @findex gnus-group-customize
 $B%0%k!<%W%Q%i%a!<%?$r%+%9%?%^%$%:$9$k(B (@code{gnus-group-customize})$B!#(B
 
 @item G e
-@kindex G e (Group)
+@kindex G e ($B%0%k!<%W(B)
 @findex gnus-group-edit-group-method
 @cindex renaming groups
 $B8=:_$N%0%k!<%W$NA*BrJ}K!$r=$@5$9$k$?$a$N%P%C%U%!$K0\F0$7$^(B
 $B$9(B (@code{gnus-group-edit-group-method})$B!#(B
 
 @item G p
-@kindex G p (Group)
+@kindex G p ($B%0%k!<%W(B)
 @findex gnus-group-edit-group-parameters
 $B%0%k!<%W%Q%i%a!<%?$r=$@5$9$k$?$a$N%P%C%U%!$K0\F0$7$^(B
 $B$9(B (@code{gnus-group-edit-group-parameters})$B!#(B
 
 @item G E
-@kindex G E (Group)
+@kindex G E ($B%0%k!<%W(B)
 @findex gnus-group-edit-group
 $B%0%k!<%W>pJs$r=$@5$9$k$?$a$N%P%C%U%!$K0\F0$7$^(B
 $B$9(B (@code{gnus-group-edit-group})$B!#(B
 
 @item G d
-@kindex G d (Group)
+@kindex G d ($B%0%k!<%W(B)
 @findex gnus-group-make-directory-group
 @cindex nndir
 $B%G%#%l%/%H%j%0%k!<%W$r:n@.$7$^$9(B (@pxref{Directory Groups})$B!#%G%#%l%/%H(B
 $B%jL>$r%W%m%s%W%H$GF~NO$7$^$9(B (@code{gnus-group-make-directory-group})$B!#(B
 
 @item G h
-@kindex G h (Group)
+@kindex G h ($B%0%k!<%W(B)
 @cindex help group
 @findex gnus-group-make-help-group
 
 Gnus $B%X%k%W%0%k!<%W$r:n@.$7$^$9(B (@code{gnus-group-make-help-group})$B!#(B
 
 @item G a
-@kindex G a (Group)
+@kindex G a ($B%0%k!<%W(B)
 @cindex (ding) archive
 @cindex archive group
 @findex gnus-group-make-archive-group
@@ -2609,7 +2609,7 @@ Gnus $B%"!<%+%$%V%0%k!<%W$r:n@.$7$^(B
 $B$l$^$9!#(B
 
 @item G k
-@kindex G k (Group)
+@kindex G k ($B%0%k!<%W(B)
 @findex gnus-group-make-kiboze-group
 @cindex nnkiboze
 kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$a(B
@@ -2617,7 +2617,7 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$9(B (@code{gnus-group-make-kiboze-group})$B!#(B@xref{Kibozed Groups}.
 
 @item G D
-@kindex G D (Group)
+@kindex G D ($B%0%k!<%W(B)
 @findex gnus-group-enter-directory
 @cindex nneething
 $BG$0U$N%G%#%l%/%H%j$r(B @code{nneething} $B%P%C%/%(%s%I%K%e!<%9%0%k!<%W$G$"$k(B
@@ -2625,7 +2625,7 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 @xref{Anything Groups}.
 
 @item G f
-@kindex G f (Group)
+@kindex G f ($B%0%k!<%W(B)
 @findex gnus-group-make-doc-group
 @cindex ClariNet Briefs
 @cindex nndoc
@@ -2641,14 +2641,14 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 @xref{Document Groups}$B!#(B
 
 @item G u
-@kindex G u (Group)
+@kindex G u ($B%0%k!<%W(B)
 @vindex gnus-useful-groups
 @findex gnus-group-make-useful-group
 @code{gnus-useful-groups} $B$K$"$k%0%k!<%W$N0l$D$r$D$/$j$^(B
 $B$9(B (@code{gnus-group-make-useful-group})$B!#(B
 
 @item G w
-@kindex G w (Group)
+@kindex G w ($B%0%k!<%W(B)
 @findex gnus-group-make-web-group
 @cindex DejaNews
 @cindex Alta Vista
@@ -2666,7 +2666,7 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$H$K$h$C$F!"8!:wBP>]$rFCDj$N%0%k!<%W$K8BDj$9$k$3$H$,2DG=$G$9!#(B
 
 @item G DEL
-@kindex G DEL (Group)
+@kindex G DEL ($B%0%k!<%W(B)
 @findex gnus-group-delete-group
 $B$3$N4X?t$O8=:_$N%0%k!<%W$r:o=|$7$^$9(B (@code{gnus-group-delete-group})$B!#(B
 $B@\F,<-$,M?$($i$l$k$H!"$3$N4X?t$O$=$N%0%k!<%WFb$NA45-;v$rK\Ev$K:o=|$7!"%0(B
@@ -2676,13 +2676,13 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$;$s$1$I!#(B
 
 @item G V
-@kindex G V (Group)
+@kindex G V ($B%0%k!<%W(B)
 @findex gnus-group-make-empty-virtual
 $B?7$7$$!"?7A/$J!"6u$N(B @code{nnvirtual} $B%0%k!<%W$r:n@.$7$^(B
 $B$9(B (@code{gnus-group-make-empty-virtual})$B!#(B@xref{Virtual Groups}.
 
 @item G v
-@kindex G v (Group)
+@kindex G v ($B%0%k!<%W(B)
 @findex gnus-group-add-to-virtual
 $B8=:_$N%0%k!<%W$r(B @code{nnvirtual} $B%0%k!<%W$KDI2C$7$^(B
 $B$9(B (@code{gnus-group-add-to-virtual})$B!#$3$l$O%W%m%;%90u(B/$B@\F,0z?t$N=,47$K(B
@@ -3026,8 +3026,8 @@ form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
 @table @kbd
 @item l
 @itemx A s
-@kindex A s (Group)
-@kindex l (Group)
+@kindex A s ($B%0%k!<%W(B)
+@kindex l ($B%0%k!<%W(B)
 @findex gnus-group-list-groups
 $BL$FI5-;v$r;}$DA4$F$N%0%k!<%W$rI=<($7$^$9(B (@code{gnus-group-list-groups})$B!#(B
 $B?t;z@\F,0z?t$r;H$&$H!"$3$N%3%^%s%I$O0z?t$N?t$+$=$l$h$j$b>.$5$$%l%Y%k$N%0(B
@@ -3037,8 +3037,8 @@ form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
 
 @item L
 @itemx A u
-@kindex A u (Group)
-@kindex L (Group)
+@kindex A u ($B%0%k!<%W(B)
+@kindex L ($B%0%k!<%W(B)
 @findex gnus-group-list-all-groups
 $BL$FI5-;v$N$"$k$J$7$K4X$o$i$:!"A4$F$N%0%k!<%W$rI=<($7$^(B
 $B$9(B (@code{gnus-group-list-all-groups})$B!#?t;z@\F,0z?t$r;HMQ$9$k$H!"$3$N%3(B
@@ -3047,38 +3047,38 @@ form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
 $B%k!<%W$N$_(B) $B$,I=<($5$l$^$9!#(B
 
 @item A l
-@kindex A l (Group)
+@kindex A l ($B%0%k!<%W(B)
 @findex gnus-group-list-level
 $B$"$kFCDj$N%l%Y%k$NL$FI5-;v$N$"$k%0%k!<%W$rI=<($7$^(B
 $B$9(B (@code{gnus-group-list-level})$B!#@\F,<-$rM?$($k$H!"L$FI5-;v$N$J$$%0%k!<(B
 $B%W$b4^$a$FI=<($7$^$9!#(B
 
 @item A k
-@kindex A k (Group)
+@kindex A k ($B%0%k!<%W(B)
 @findex gnus-group-list-killed
 kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\(B
 $BF,0z?t$rM?$($k$H!"8=:_9XFI!"Hs9XFI$H$J$C$F$$$J$$A4$F$NMxMQ2DG=$J%0%k!<%W(B
 $B$rI=<($7$^$9!#$3$l$O%5!<%P$+$i%"%/%F%#%V%U%!%$%k$rFI$`$3$H$K$J$k$G$7$g$&!#(B
 
 @item A z
-@kindex A z (Group)
+@kindex A z ($B%0%k!<%W(B)
 @findex gnus-group-list-zombies
 $BA4$F$N%>%s%S%0%k!<%W$rI=<($7$^$9(B (@code{gnus-group-list-zombies})$B!#(B
 
 @item A m
-@kindex A m (Group)
+@kindex A m ($B%0%k!<%W(B)
 @findex gnus-group-list-matching
 $B@55,I=8=$K9gCW$9$kL>A0$r;}$D%0%k!<%W$G!"L$FI5-;v$N$"$k9XFI%0%k!<%W$rA4$F(B
 $BI=<($7$^$9(B (@code{gnus-group-list-matching})$B!#(B
 
 @item A M
-@kindex A M (Group)
+@kindex A M ($B%0%k!<%W(B)
 @findex gnus-group-list-all-matching
 $B@55,I=8=$K9gCW$9$k%0%k!<%W$rI=<($9(B
 $B$k(B (@code{gnus-group-list-all-matching})$B!#(B
 
 @item A A
-@kindex A A (Group)
+@kindex A A ($B%0%k!<%W(B)
 @findex gnus-group-list-active
 $B:#@\B3$7$F$$$k%5!<%P$N%"%/%F%#%V%U%!%$%k$K$"$k%0%k!<%W$r!"K\Ev$KA4ItI=<((B
 $B$7$^$9(B (@code{gnus-group-list-active})$B!#$3$l$O$7$P$i$/;~4V$,$+$+$k$3$H$b(B
@@ -3088,41 +3088,41 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 $B$?%0%k!<%W$G$"$k$+$N$h$&$KI=<($5$l$^$9!#=PNO$OB?>/3d$j0z$$$F<u$1<h$C$F$M!#(B
 
 @item A a
-@kindex A a (Group)
+@kindex A a ($B%0%k!<%W(B)
 @findex gnus-group-apropos
 $B@55,I=8=$K9gCW$9$kL>A0$r;}$D%0%k!<%W$rA4$FI=<($9(B
 $B$k(B (@code{gnus-group-apropos})$B!#(B
 
 @item A d
-@kindex A d (Group)
+@kindex A d ($B%0%k!<%W(B)
 @findex gnus-group-description-apropos
 $B@55,I=8=$K9gCW$9$kL>A0$+@bL@J8$r;}$D%0%k!<%W$rA4$FI=<($9(B
 $B$k(B (@code{gnus-group-description-apropos})$B!#(B
 
 @item A c
-@kindex A c (Group)
+@kindex A c ($B%0%k!<%W(B)
 @findex gnus-group-list-cached
 $B%-%c%C%7%e5-;v$r;}$D%0%k!<%W$rA4$FI=<($9(B
 $B$k(B (@code{gnus-group-list-cached})$B!#(B
 
 @item A ?
-@kindex A ? (Group)
+@kindex A ? ($B%0%k!<%W(B)
 @findex gnus-group-list-dormant
 $BJ]N15-;v$r;}$D%0%k!<%W$rA4$FI=<($9$k(B (@code{gnus-group-list-dormant})$B!#(B
 
 @item A /
-@kindex A / (Group)
+@kindex A / ($B%0%k!<%W(B)
 @findex gnus-group-list-limit
 $B8=:_$NA*Br$5$l$?HO0O$K8BDj$7$?%0%k!<%W$rI=<($9(B
 $B$k(B (@code{gnus-group-list-limit})$B!#(B
 
 @item A f
-@kindex A f (Group)
+@kindex A f ($B%0%k!<%W(B)
 @findex gnus-group-list-flush
 $B8=:_$NA*Br$5$l$?%0%k!<%W$r=q$-=P$9(B (@code{gnus-group-list-flush})$B!#(B
 
 @item A p
-@kindex A p (Group)
+@kindex A p ($B%0%k!<%W(B)
 @findex gnus-group-list-plus
 $B8=:_$NA*Br$5$l$?%0%k!<%W$r2C$($?%0%k!<%W$rI=<($9(B
 $B$k(B (@code{gnus-group-list-plus})$B!#(B
@@ -3145,7 +3145,7 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 @section $B%0%k!<%W$N%=!<%H(B
 @cindex sorting groups
 
-@kindex C-c C-s (Group)
+@kindex C-c C-s ($B%0%k!<%W(B)
 @findex gnus-group-sort-groups
 @vindex gnus-group-sort-function
 @kbd{C-c C-s} (@code{gnus-group-sort-groups}) $BL?Na$O!"%0%k!<%W%P%C%U%!(B
@@ -3197,37 +3197,37 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 
 @table @kbd
 @item G S a
-@kindex G S a (Group)
+@kindex G S a ($B%0%k!<%W(B)
 @findex gnus-group-sort-groups-by-alphabet
 $B%0%k!<%W%P%C%U%!$r%0%k!<%WL>$N%"%k%U%!%Y%C%H=g$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-groups-by-alphabet})$B!#(B
 
 @item G S u
-@kindex G S u (Group)
+@kindex G S u ($B%0%k!<%W(B)
 @findex gnus-group-sort-groups-by-unread
 $B%0%k!<%W%P%C%U%!$rL$FI5-;v$N?t$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-groups-by-unread})$B!#(B
 
 @item G S l
-@kindex G S l (Group)
+@kindex G S l ($B%0%k!<%W(B)
 @findex gnus-group-sort-groups-by-level
 $B%0%k!<%W%P%C%U%!$r%0%k!<%W%l%Y%k$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-groups-by-level})$B!#(B
 
 @item G S v
-@kindex G S v (Group)
+@kindex G S v ($B%0%k!<%W(B)
 @findex gnus-group-sort-groups-by-score
 $B%0%k!<%W%P%C%U%!$r%0%k!<%W$N%9%3%"$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-groups-by-score})$B!#(B@xref{Group Score}.
 
 @item G S r
-@kindex G S r (Group)
+@kindex G S r ($B%0%k!<%W(B)
 @findex gnus-group-sort-groups-by-rank
 $B%0%k!<%W%P%C%U%!$r%0%k!<%W$N%i%s%/$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-groups-by-rank})$B!#(B@xref{Group Score}.
 
 @item G S m
-@kindex G S m (Group)
+@kindex G S m ($B%0%k!<%W(B)
 @findex gnus-group-sort-groups-by-method
 $B%0%k!<%W%P%C%U%!$r%P%C%/%(%s%I$NL>A0$G%"%k%U%!%Y%C%H=g$KJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-groups-by-method})$B!#(B
@@ -3243,38 +3243,38 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 
 @table @kbd
 @item G P a
-@kindex G P a (Group)
+@kindex G P a ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-alphabet
 $B%0%k!<%W$r!"%0%k!<%WL>$N%"%k%U%!%Y%C%H=g$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-alphabet})$B!#(B
 
 @item G P u
-@kindex G P u (Group)
+@kindex G P u ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-unread
 $B%0%k!<%W$r!"L$FI5-;v$N?t$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-unread})$B!#(B
 
 @item G P l
-@kindex G P l (Group)
+@kindex G P l ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-level
 $B%0%k!<%W$r!"%0%k!<%W%l%Y%k$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-level})$B!#(B
 
 @item G P v
-@kindex G P v (Group)
+@kindex G P v ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-score
 $B%0%k!<%W$r!"%0%k!<%W$N%9%3%"$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-score})$B!#(B
 @xref{Group Score}.
 
 @item G P r
-@kindex G P r (Group)
+@kindex G P r ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-rank
 $B%0%k!<%W$r!"%0%k!<%W$N%i%s%/$GJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-rank})$B!#(B@xref{Group Score}.
 
 @item G P m
-@kindex G P m (Group)
+@kindex G P m ($B%0%k!<%W(B)
 @findex gnus-group-sort-selected-groups-by-method
 $B%0%k!<%W$r!"%P%C%/%(%s%I$NL>A0$G%"%k%U%!%Y%C%H=g$KJB$YBX$($^(B
 $B$9(B (@code{gnus-group-sort-selected-groups-by-method})$B!#(B
@@ -3289,13 +3289,13 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 
 @table @kbd
 @item b
-@kindex b (Group)
+@kindex b ($B%0%k!<%W(B)
 @findex gnus-group-check-bogus-groups
 $BIT@5$J%0%k!<%W$r8+$D$1$F!":o=|$7$^(B
 $B$9(B (@code{gnus-group-check-bogus-groups})$B!#(B
 
 @item F
-@kindex F (Group)
+@kindex F ($B%0%k!<%W(B)
 @findex gnus-group-find-new-groups
 $B?7$7$$%0%k!<%W$r8+$D$1$F!"$=$l$i$r=hM}$7$^(B
 $B$9(B (@code{gnus-group-find-new-groups})$B!#0l2s$N(B @kbd{C-u} $B$N8e$G2!$5$l$k(B
@@ -3305,7 +3305,7 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 $B9XFI$7$^$9!#(B
 
 @item C-c C-x
-@kindex C-c C-x (Group)
+@kindex C-c C-x ($B%0%k!<%W(B)
 @findex gnus-group-expire-articles
 $B8=:_$N%0%k!<%W$N%(%/%9%Q%$%"5-;v$KBP$7$F(B ($B$b$7$"$l$P(B) $BA4$F%(%/%9%Q%$%"=h(B
 $BM}$r9T$$$^$9(B (@code{gnus-group-expire-articles})$B!#$3$l$O!"$=$N%0%k!<%W$K(B
@@ -3313,7 +3313,7 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 $B$9!#(B(@pxref{Expiring Mail})$B!#(B
 
 @item C-c C-M-x
-@kindex C-c C-M-x (Group)
+@kindex C-c C-M-x ($B%0%k!<%W(B)
 @findex gnus-group-expire-all-groups
 $BA4$F$N%0%k!<%W$NA4$F$N4|8B@Z$l:o=|2DG=$J5-;v$KBP$7$F!"%(%/%9%Q%$%"=hM}$r(B
 $B9T$$$^$9!#(B(@code{gnus-group-expire-all-groups})$B!#(B
@@ -3326,7 +3326,7 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 
 @table @kbd
 @item B
-@kindex B (Group)
+@kindex B ($B%0%k!<%W(B)
 @findex gnus-group-browse-foreign-server
 $BA*BrJ}K!$H%5!<%PL>$rJ9$+$l$^$9!#(BGnus $B$O$3$N%5!<%P$K@\B3$7!"$=$3$K$"$k(B
 $B%0%k!<%W$r1\Mw$7$h$&$H$7$^$9(B (@code{gnus-group-browse-foreign-server})$B!#(B
@@ -3341,41 +3341,41 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 
 @table @kbd
 @item n
-@kindex n (Browse)
+@kindex n ($B1\Mw(B)
 @findex gnus-group-next-group
 $B<!$N%0%k!<%W$K0\F0$7$^$9(B (@code{gnus-group-next-group})$B!#(B
 
 @item p
-@kindex p (Browse)
+@kindex p ($B1\Mw(B)
 @findex gnus-group-prev-group
 $B0l$DA0$N%0%k!<%W$K0\F0$7$^$9(B (@code{gnus-group-prev-group})$B!#(B
 
 @item SPACE
-@kindex SPACE (Browse)
+@kindex SPACE ($B1\Mw(B)
 @findex gnus-browse-read-group
 $B8=:_$N%0%k!<%W$KF~$j!":G=i$K5-;v$rI=<($7$^(B
 $B$9(B (@code{gnus-browse-read-group})$B!#(B
 
 @item RET
-@kindex RET (Browse)
+@kindex RET ($B1\Mw(B)
 @findex gnus-browse-select-group
 $B8=:_$N%0%k!<%W$KF~$j$^$9(B (@code{gnus-browse-select-group})$B!#(B
 
 @item u
-@kindex u (Browse)
+@kindex u ($B1\Mw(B)
 @findex gnus-browse-unsubscribe-current-group
 $B8=:_$N%0%k!<%W$rHs9XFI$K$9$k!"$D$^$j$3$N>l9g$O9XFI$9$k$3$H$K$J$k$N$@$1$l(B
 $B$I(B (@code{gnus-browse-unsubscribe-current-group})$B!#(B
 
 @item l
 @itemx q
-@kindex q (Browse)
-@kindex l (Browse)
+@kindex q ($B1\Mw(B)
+@kindex l ($B1\Mw(B)
 @findex gnus-browse-exit
 $B1\Mw%b!<%I(B (browse mode) $B$r=*N;$7$^$9(B (@code{gnus-browse-exit})$B!#(B
 
 @item ?
-@kindex ? (Browse)
+@kindex ? ($B1\Mw(B)
 @findex gnus-browse-describe-briefly
 $B1\Mw%b!<%I(B (browse mode) $B$r4JC1$K@bL@$7$^$9(B ($B$^$"!"Bg$7$F@bL@$9$k$3$H$b(B
 $B$J$$$s$@$1$I$5(B) (@code{gnus-browse-describe-briefly})$B!#(B
@@ -3390,20 +3390,20 @@ kill $B$5$l$?%0%k!<%W$rA4$FI=<($7$^$9(B (@code{gnus-group-list-killed})$B!#@\
 
 @table @kbd
 @item z
-@kindex z (Group)
+@kindex z ($B%0%k!<%W(B)
 @findex gnus-group-suspend
 Gnus $B$rCfCG$7$^$9(B (@code{gnus-group-suspend})$B!#$3$l$O(B gnus $B$r<B:]$K$O=*(B
 $BN;$5$;$:!"%0%k!<%W%P%C%U%!0J30$NA4$F$N%P%C%U%!$r>C$9$@$1$G$9!#KM$O$3$l$N(B
 $B$&$l$7$5$,$h$/$o$+$s$J$$$s$@$1$I!"C/$+J,$+$k?M$$$k(B?
 
 @item q
-@kindex q (Group)
+@kindex q ($B%0%k!<%W(B)
 @findex gnus-group-exit
 @c @icon{gnus-group-exit}
 Gnus $B$r=*N;$7$^$9(B(@code{gnus-group-exit})$B!#(B
 
 @item Q
-@kindex Q (Group)
+@kindex Q ($B%0%k!<%W(B)
 @findex gnus-group-quit
 @file{.newsrc} $B%U%!%$%k$r%;!<%V$;$:$K(B gnus $B$r=*N;$7$^(B
 $B$9(B (@code{gnus-group-quit})$B!#%I%j%V%k%U%!%$%k$O%;!<%V$5$l$^$9$1(B
@@ -3466,7 +3466,7 @@ Gnus
 @end example
 
 @findex gnus-topic-mode
-@kindex t (Group)
+@kindex t ($B%0%k!<%W(B)
 $B$3$N(B@emph{$BAG@2$i$7$$(B}$B5!G=$r;H$&$K$O!"(B@code{gnus-topic} $B%^%$%J!<%b!<%I(B
 $B$r(B ($B2?$H(B!) $BC1$K%9%$%C%A%*%s$9$k$@$1!=!=%0%k!<%W%P%C%U%!$G!"(B@kbd{t} $B$r2!(B
 $B$7$F$/$@$5$$(B ($B$3$l$O%H%0%k%3%^%s%I$G$9(B)$B!#(B
@@ -3513,22 +3513,22 @@ Gnus
 
 @table @kbd
 @item T n
-@kindex T n (Topic)
+@kindex T n ($B%H%T%C%/(B)
 @findex gnus-topic-create-topic
 $B?7$7$$%H%T%C%/L>$NF~NO$rB%$7!"$=$l$r:n@.$7$^(B
 $B$9(B (@code{gnus-topic-create-topic})$B!#(B
 
 @item T TAB
 @itemx TAB
-@kindex T TAB (Topic)
-@kindex TAB (Topic)
+@kindex T TAB ($B%H%T%C%/(B)
+@kindex TAB ($B%H%T%C%/(B)
 @findex gnus-topic-indent
 $B8=:_$N%H%T%C%/$N(B ``$B;z2<$2(B'' $B$r9T$$!"$=$NA0$N%H%T%C%/$NI{%H%T%C%/$K$7$^(B
 $B$9(B (@code{gnus-topic-indent})$B!#@\F,0z?t$rM?$($k$H!"H?BP$K$=$N%H%T%C%/$N(B
 $B;z2<$2$r2sI|(B (un-indent) $B$7$^$9!#(B
 
 @item M-TAB
-@kindex M-TAB (Topic)
+@kindex M-TAB ($B%H%T%C%/(B)
 @findex gnus-topic-unindent
 $B8=:_$N%H%T%C%/$N(B ``$B;z2<$22sI|(B'' (un-indent) $B$r9T$$!"$=$l$,8=:_$N?F$N?F$N(B
 $BI{%H%T%C%/$K$J$k$h$&$K$7$^$9(B (@code{gnus-topic-unindent})$B!#(B
@@ -3541,13 +3541,13 @@ Gnus
 
 @table @kbd
 @item C-k
-@kindex C-k (Topic)
+@kindex C-k ($B%H%T%C%/(B)
 @findex gnus-topic-kill-group
 $B%0%k!<%W$"$k$$$O%H%T%C%/$r(B kill $B$7$^$9(B (@code{gnus-topic-kill-group})$B!#(B
 $B%H%T%C%/Fb$K$"$C$?%0%k!<%W$bA4$F!"%H%T%C%/$H0l=o$K:o=|$5$l$^$9!#(B
 
 @item C-y
-@kindex C-y (Topic)
+@kindex C-y ($B%H%T%C%/(B)
 @findex gnus-topic-yank-group
 $BD>A0$N(B kill $B$5$l$?%0%k!<%W$"$k$$$O%H%T%C%/$r(B yank $B$7$^(B
 $B$9(B (@code{gnus-topic-yank-group})$B!#A4$F$N%H%T%C%/$O!"A4$F$N%0%k!<%W$NA0(B
@@ -3567,7 +3567,7 @@ Gnus
 
 @table @kbd
 @item RET
-@kindex RET (Topic)
+@kindex RET ($B%H%T%C%/(B)
 @findex gnus-topic-select-group
 @itemx SPACE
 $B%0%k!<%W$rA*Br$9$k$+!"$"$k$$$O%H%T%C%/$r@^$j$?$?$_$^(B
@@ -3583,38 +3583,38 @@ Gnus
 
 @table @kbd
 @item T m
-@kindex T m (Topic)
+@kindex T m ($B%H%T%C%/(B)
 @findex gnus-topic-move-group
 $B8=:_$N%0%k!<%W$r!"$I$3$+B>$N%H%T%C%/$K0\F0$5$;$^(B
 $B$9(B (@code{gnus-topic-move-group})$B!#$3$N%3%^%s%I$O%W%m%;%90u(B/$B@\F,0z?t$N=,(B
 $B47$K=>$$$^$9(B (@pxref{Process/Prefix})$B!#(B
 
 @item T j
-@kindex T j (Topic)
+@kindex T j ($B%H%T%C%/(B)
 @findex gnus-topic-jump-to-topic
 $B%H%T%C%/$K%8%c%s%W$7$^$9(B (@code{gnus-topic-jump-to-topic})$B!#(B
 
 @item T c
-@kindex T c (Topic)
+@kindex T c ($B%H%T%C%/(B)
 @findex gnus-topic-copy-group
 $B8=:_$N%0%k!<%W$r!"$I$3$+B>$N%H%T%C%/$K%3%T!<$7$^(B
 $B$9(B (@code{gnus-topic-copy-group})$B!#$3$N%3%^%s%I$O%W%m%;%90u(B/$B@\F,0z?t$N=,(B
 $B47$K=>$$$^$9(B (@pxref{Process/Prefix})$B!#(B
 
 @item T h
-@kindex T h (Topic)
+@kindex T h ($B%H%T%C%/(B)
 @findex gnus-topic-hide-topic
 $B8=:_$N%H%T%C%/$r1#$7$^$9!#$b$7%W%l%U%#%C%/%9$,M?$($i$l$?$J$i!"$=$N%H%T%C(B
 $B%/$r1J5W$K1#$7$^$9!#(B
 
 @item T s
-@kindex T s (Topic)
+@kindex T s ($B%H%T%C%/(B)
 @findex gnus-topic-show-topic
 $B8=:_$N%H%T%C%/$rI=<($7$^$9!#$b$7%W%l%U%#%C%/%9$,M?$($i$l$?$J$i!"$=$N%H%T%C(B
 $B%/$r1J5W$KI=<($7$^$9!#(B
 
 @item T D
-@kindex T D (Topic)
+@kindex T D ($B%H%T%C%/(B)
 @findex gnus-topic-remove-group
 $B%0%k!<%W$r8=:_$N%H%T%C%/$+$i:o=|$7$^$9(B (@code{gnus-topic-remove-group})$B!#(B
 $B$3$NL?Na$O<g$K$$$/$D$+$N%H%T%C%/$KF1$8%0%k!<%W$,$"$C$F!"$=$l$r%H%T%C%/$N(B
@@ -3627,59 +3627,59 @@ Gnus
 $B$3$NL?Na$O%W%m%;%90u(B/$B@\F,0z?t$N=,47$K=>$$$^$9(B (@pxref{Process/Prefix})$B!#(B
 
 @item T M
-@kindex T M (Topic)
+@kindex T M ($B%H%T%C%/(B)
 @findex gnus-topic-move-matching
 $B@55,I=8=$K%^%C%A$9$kA4$F$N%0%k!<%W$r!"$"$k%H%T%C%/$K0\F0$5$;$^(B
 $B$9(B (@code{gnus-topic-move-matching})$B!#(B
 
 @item T C
-@kindex T C (Topic)
+@kindex T C ($B%H%T%C%/(B)
 @findex gnus-topic-copy-matching
 $B@55,I=8=$K%^%C%A$9$kA4$F$N%0%k!<%W$r!"$"$k%H%T%C%/$K%3%T!<$7$^(B
 $B$9(B (@code{gnus-topic-copy-matching})$B!#(B
 
 @item T H
-@kindex T H (Topic)
+@kindex T H ($B%H%T%C%/(B)
 @findex gnus-topic-toggle-display-empty-topics
 $B6u$N%H%T%C%/$NI=<(!&HsI=<($r@Z$jBX$($^(B
 $B$9(B (@code{gnus-topic-toggle-display-empty-topics})$B!#(B
 
 @item T #
-@kindex T # (Topic)
+@kindex T # ($B%H%T%C%/(B)
 @findex gnus-topic-mark-topic
 $B8=:_$N%H%T%C%/$K$"$k%0%k!<%WA4$F$K%W%m%;%9%^!<%/$r$D$1$^(B
 $B$9(B (@code{gnus-topic-mark-topic})$B!#(B
 
 @item T M-#
-@kindex T M-# (Topic)
+@kindex T M-# ($B%H%T%C%/(B)
 @findex gnus-topic-unmark-topic
 $B8=:_$N%H%T%C%/$K$"$kA4$F$N%0%k!<%W$+$i%W%m%;%9%^!<%/$r>C$7$^(B
 $B$9(B (@code{gnus-topic-unmark-topic})$B!#(B
 
 @item C-c C-x
-@kindex C-c C-x (Topic)
+@kindex C-c C-x ($B%H%T%C%/(B)
 @findex gnus-topic-expire-articles
 ($B$b$7$"$l$P(B) $B8=:_$N%0%k!<%W$+%H%T%C%/$+$NA4$F$N;~8B>C5n2DG=5-;v$r;~8B>C(B
 $B5n$7$^$9(B (@code{gnus-topic-expire-articles})$B!#(B(@pxref{Expiring Mail})$B!#(B
 
 @item T r
-@kindex T r (Topic)
+@kindex T r ($B%H%T%C%/(B)
 @findex gnus-topic-rename
 $B%H%T%C%/$NL>A0$rJQ99$7$^$9(B (@code{gnus-topic-rename})$B!#(B
 
 @item T DEL
-@kindex T DEL (Topic)
+@kindex T DEL ($B%H%T%C%/(B)
 @findex gnus-topic-delete
 $B6u$N%H%T%C%/$r:o=|$7$^$9(B (@code{gnus-topic-delete})$B!#(B
 
 @item A T
-@kindex A T (Topic)
+@kindex A T ($B%H%T%C%/(B)
 @findex gnus-topic-list-active
 Gnus $B$,CN$C$F$$$k%H%T%C%/2=$5$l$?%0%k!<%W$rA4$FI=<($7$^(B
 $B$9(B (@code{gnus-topic-list-active})$B!#(B
 
 @item G p
-@kindex G p (Topic)
+@kindex G p ($B%H%T%C%/(B)
 @findex gnus-topic-edit-parameters
 @cindex group parameters
 @cindex topic parameters
@@ -3738,43 +3738,43 @@ Gnus $B$,CN$C$F$$$k%H%T%C%/2=$5$l$?%0%k!<%W$rA4$FI=<($7$^(B
 
 @table @kbd
 @item T S a
-@kindex T S a (Topic)
+@kindex T S a ($B%H%T%C%/(B)
 @findex gnus-topic-sort-groups-by-alphabet
 $B8=:_$N%H%T%C%/$r%0%k!<%WL>$N%"%k%U%!%Y%C%H=g$KJB$YBX$($^(B
 $B$9(B (@code{gnus-topic-sort-groups-by-alphabet})$B!#(B
 
 @item T S u
-@kindex T S u (Topic)
+@kindex T S u ($B%H%T%C%/(B)
 @findex gnus-topic-sort-groups-by-unread
 $B8=:_$N%H%T%C%/$rL$FI5-;v$N?t$GJB$YBX$($^(B
 $B$9(B (@code{gnus-topic-sort-groups-by-unread})$B!#(B
 
 @item T S l
-@kindex T S l (Topic)
+@kindex T S l ($B%H%T%C%/(B)
 @findex gnus-topic-sort-groups-by-level
 $B8=:_$N%H%T%C%/$r%0%k!<%W$N%l%Y%k$GJB$YBX$($^(B
 $B$9(B (@code{gnus-topic-sort-groups-by-level})$B!#(B
 
 @item T S v
-@kindex T S v (Topic)
+@kindex T S v ($B%H%T%C%/(B)
 @findex gnus-topic-sort-groups-by-score
 $B8=:_$N%H%T%C%/$r%0%k!<%W$N%9%3%"$GJB$YBX$($^(B
 $B$9(B (@code{gnus-topic-sort-groups-by-score})$B!#(B@xref{Group Score}.
 
 @item T S r
-@kindex T S r (Topic)
+@kindex T S r ($B%H%T%C%/(B)
 @findex gnus-topic-sort-groups-by-rank
 $B8=:_$N%H%T%C%/$r%0%k!<%W$N%i%s%/$GJB$YBX$($^(B
 $B$9(B (@code{gnus-topic-sort-groups-by-rank})$B!#(B@xref{Group Score}.
 
 @item T S m
-@kindex T S m (Topic)
+@kindex T S m ($B%H%T%C%/(B)
 @findex gnus-topic-sort-groups-by-method
 $B8=:_$N%H%T%C%/$r%P%C%/%(%s%I$NL>A0$G%"%k%U%!%Y%C%H=g$KJB$YBX$($^(B
 $B$9(B (@code{gnus-topic-sort-groups-by-method})$B!#(B
 
 @item T S e
-@kindex T S e (Topic)
+@kindex T S e ($B%H%T%C%/(B)
 @findex gnus-topic-sort-groups-by-server
 $B8=:_$N%H%T%C%/$r%5!<%P!<$NL>A0$G%"%k%U%!%Y%C%H=g$KJB$YBX$($^(B
 $B$9(B (@code{gnus-topic-sort-groups-by-server})$B!#(B
@@ -3912,13 +3912,13 @@ Gnus
 
 @table @kbd
 @item ^
-@kindex ^ (Group)
+@kindex ^ ($B%0%k!<%W(B)
 @findex gnus-group-enter-server-mode
 $B%5!<%P%P%C%U%!%b!<%I$KF~$k(B (@code{gnus-group-enter-server-mode})$B!#(B
 @xref{Server Buffer}$B!#(B
 
 @item a
-@kindex a (Group)
+@kindex a ($B%0%k!<%W(B)
 @findex gnus-group-post-news
 $B%a%C%;!<%8(B ($B%G%#%U%)%k%H$O%K%e!<%9(B) $B$N:n@.$r3+;O$7$^(B
 $B$9(B (@code{gnus-group-post-news})$B!#$b$7@\F,<-$,M?$($i$l$?$i8=:_0LCV$N%0%k!<(B
@@ -3928,7 +3928,7 @@ Gnus
 @xref{Composing Messages}$B!#(B
 
 @item m
-@kindex m (Group)
+@kindex m ($B%0%k!<%W(B)
 @findex gnus-group-mail
 $B%a!<%k$r$I$3$+$KAw$j$^$9(B (@code{gnus-group-mail})$B!#$b$7@\F,<-$,M?$($i$l(B
 $B$?$i8=:_0LCV$N%0%k!<%W$NEj9FMM<0(B (posting style) $B$r;H$$$^$9!#$b$7@\F,<-(B
@@ -3936,7 +3936,7 @@ Gnus
 @xref{Composing Messages}$B!#(B
 
 @item i
-@kindex i (Group)
+@kindex i ($B%0%k!<%W(B)
 @findex gnus-group-news
 $B%K%e!<%9$N:n@.$r3+;O$7$^$9(B (@code{gnus-group-news})$B!#$b$7@\F,<-$,M?$($i(B
 $B$l$?$i8=:_0LCV$N%0%k!<%W$KEj9F$7$^$9!#$b$7@\F,<-$,(B 1 $B$@$C$?$i!"$I$N%0%k!<(B
@@ -4003,7 +4003,7 @@ method) $B$r;}$C$F$$$J$1$l$P$J$j$^$;$s$,!#(B
 
 @table @kbd
 @item g
-@kindex g (Group)
+@kindex g ($B%0%k!<%W(B)
 @findex gnus-group-get-new-news
 @c @icon{gnus-group-get-new-news}
 $B%5!<%P$N?7Ce5-;v$r%A%'%C%/$7$^$9!#?t;z%W%l%U%#%C%/%9$r;HMQ$9$k$H!"$3$NL?(B
@@ -4013,7 +4013,7 @@ method) $B$r;}$C$F$$$J$1$l$P$J$j$^$;$s$,!#(B
 $B$9!#(B
 
 @item M-g
-@kindex M-g (Group)
+@kindex M-g ($B%0%k!<%W(B)
 @findex gnus-group-get-new-news-this-group
 @vindex gnus-goto-next-group-when-activating
 @c @icon{gnus-group-get-new-news-this-group}
@@ -4025,11 +4025,11 @@ method) $B$r;}$C$F$$$J$1$l$P$J$j$^$;$s$,!#(B
 @findex gnus-activate-all-groups
 @cindex activating groups
 @item C-c M-g
-@kindex C-c M-g (Group)
+@kindex C-c M-g ($B%0%k!<%W(B)
 $BL5>r7o$KA4$F$N%0%k!<%W$r5/F0$7$^$9(B (@code{gnus-activate-all-groups})$B!#(B
 
 @item R
-@kindex R (Group)
+@kindex R ($B%0%k!<%W(B)
 @cindex restarting
 @findex gnus-group-restart
 Gnus $B$r%j%9%?!<%H$7$^$9(B (@code{gnus-group-restart})$B!#$3$l(B
@@ -4052,7 +4052,7 @@ Gnus $B$r%j%9%?!<%H$7$^$9(B (@code{gnus-group-restart})$B!#$3$l(B
 
 @table @kbd
 @item H f
-@kindex H f (Group)
+@kindex H f ($B%0%k!<%W(B)
 @findex gnus-group-fetch-faq
 @vindex gnus-group-faq-directory
 @cindex FAQ
@@ -4071,8 +4071,8 @@ gnus $B$O(B @code{gnus-group-faq-directory} $B$NCM$rA4$F!"0l$D0l$D%*!<%W%s$7$
 @item H d
 @itemx C-c C-d
 @c @icon{gnus-group-describe-group}
-@kindex H d (Group)
-@kindex C-c C-d (Group)
+@kindex H d ($B%0%k!<%W(B)
+@kindex C-c C-d ($B%0%k!<%W(B)
 @cindex describing groups
 @cindex group description
 @findex gnus-group-describe-group
@@ -4080,7 +4080,7 @@ gnus $B$O(B @code{gnus-group-faq-directory} $B$NCM$rA4$F!"0l$D0l$D%*!<%W%s$7$
 $B%U%#%C%/%9$rM?$($k$H!"@bL@J8$r%5!<%P$+$i6/@)E*$K:FFI$_9~$_$7$^$9!#(B
 
 @item M-d
-@kindex M-d (Group)
+@kindex M-d ($B%0%k!<%W(B)
 @findex gnus-group-describe-all-groups
 $BA4$F$N%0%k!<%W$N@bL@$rI=<($7$^(B
 $B$9(B (@code{gnus-group-describe-all-groups})$B!#%W%l%U%#%C%/%9$rM?$($k$H!"@b(B
@@ -4088,20 +4088,20 @@ gnus $B$O(B @code{gnus-group-faq-directory} $B$NCM$rA4$F!"0l$D0l$D%*!<%W%s$7$
 
 @item H v
 @itemx V
-@kindex V (Group)
-@kindex H v (Group)
+@kindex V ($B%0%k!<%W(B)
+@kindex H v ($B%0%k!<%W(B)
 @cindex version
 @findex gnus-version
 $B8=:_$N(B gnus $B$N%P!<%8%g%sHV9f$rI=<($7$^$9(B (@code{gnus-version})$B!#(B
 
 @item ?
-@kindex ? (Group)
+@kindex ? ($B%0%k!<%W(B)
 @findex gnus-group-describe-briefly
 $B$H$F$bC;$$%X%k%W%a%C%;!<%8$rM?$($^(B
 $B$9(B (@code{gnus-group-describe-briefly})$B!#(B
 
 @item C-c C-i
-@kindex C-c C-i (Group)
+@kindex C-c C-i ($B%0%k!<%W(B)
 @cindex info
 @cindex manual
 @findex gnus-info-find-node
@@ -4154,7 +4154,7 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 
 @table @kbd
 @item r
-@kindex r (Group)
+@kindex r ($B%0%k!<%W(B)
 @findex gnus-group-read-init-file
 @vindex gnus-init-file
 @cindex reading init file
@@ -4162,14 +4162,14 @@ Gnus $B$K!"$"$J$?$,:G8e$K$$$D%0%k!<%W$rFI$s$@$+$r5-O?$5$;$k$HJXMx$+$b$7$l(B
 $B%U%)%k%H$O(B @file{~/.gnus}) (@code{gnus-group-read-init-file})$B!#(B
 
 @item s
-@kindex s (Group)
+@kindex s ($B%0%k!<%W(B)
 @findex gnus-group-save-newsrc
 @cindex saving .newsrc
 @file{.newsrc.eld} $B%U%!%$%k(B ($B$H!"$b$7$=$&$7$?$1$l$P(B @file{.newsrc} $B%U%!(B
 $B%$%k(B) $B$r%;!<%V$9$k(B (@code{gnus-group-save-newsrc})$B!#(B
 
 @c @item Z
-@c @kindex Z (Group)
+@c @kindex Z ($B%0%k!<%W(B)
 @c @findex gnus-group-clear-dribble
 @c $B%I%j%V%k%U%!%$%k$r%/%j%"$9$k(B
 @c (@code{gnus-group-clear-dribble})$B!#(B
@@ -4215,7 +4215,7 @@ if address "sender" "owner-ding@@hpc.uh.edu" @{
 
 @table @kbd
 @item D g
-@kindex D g (Group)
+@kindex D g ($B%0%k!<%W(B)
 @findex gnus-sieve-generate
 @vindex gnus-sieve-file
 @cindex generating sieve script
@@ -4223,7 +4223,7 @@ if address "sender" "owner-ding@@hpc.uh.edu" @{
 @code{gnus-sieve-file} $B$K=q$-9~$_$^$9!#0JA0$NFbMF$OJ]B8$5$l$^$;$s!#(B
 
 @item D u
-@kindex D u (Group)
+@kindex D u ($B%0%k!<%W(B)
 @findex gnus-sieve-update
 @vindex gnus-sieve-file
 @cindex updating sieve script
@@ -5005,8 +5005,8 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 
 @item S i
 @itemx i
-@kindex i (Summary)
-@kindex S i (Summary)
+@kindex i ($B35N,(B)
+@kindex S i ($B35N,(B)
 @findex gnus-summary-news-other-window
 $B%K%e!<%9$r:n@.$7$^$9(B (@code{gnus-summary-news-other-window})$B!#%G%#%U%)%k(B
 $B%H$G$O8=:_$N%0%k!<%W$KEj9F$7$^$9!#$b$7@\F,<-$,M?$($i$l$?$i8=:_$N%0%k!<%W(B
@@ -5894,7 +5894,7 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 $B$^$9(B (@code{gnus-summary-limit-to-score})$B!#(B
 
 @item / p
-@kindex / p (Summary)
+@kindex / p ($B35N,(B)
 @findex gnus-summary-limit-to-display-parameter
 $B35N,%P%C%U%!$r(B @code{display} $B%0%k!<%W%Q%i%a!<%?$N=R8l$rK~B-$5$;$k$h$&$K(B
 $B@)8B$7$^$9(B (@code{gnus-summary-limit-to-display-parameter})$B!#$3$N=R8l$K(B
@@ -5949,14 +5949,14 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 $B$i$l$l$P!"2D;k$HJ]N1$N$_$N0u$N5-;v$b4{FI$H$7$F0u$rIU$1$^$9!#(B
 
 @item / N
-@kindex / N (Summary)
+@kindex / N ($B35N,(B)
 @findex gnus-summary-insert-new-articles
 $B$9$Y$F$N?7$7$$5-;v$r35N,%P%C%U%!$KA^F~$7$^$9!#$b(B
 $B$7(B @var{back-end}@code{-get-new-mail} $B$,Hs(B-@code{nil} $B$@$C$?$i!"?7$7$$%a!<(B
 $B%k$NE~Mh$rD4$Y$k$H$$$&$3$H$G$9!#(B
 
 @item / o
-@kindex / o (Summary)
+@kindex / o ($B35N,(B)
 @findex gnus-summary-insert-old-articles
 $B$9$Y$F$N8E$$5-;v$r35N,%P%C%U%!$KA^F~$7$^$9!#$b$7?t;z$N@\F,<-$,M?$($i$l$l(B
 $B$P!"$=$N?t$N5-;v$r<h$j9~$_$^$9!#(B
@@ -6413,18 +6413,18 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 @item T n
 @kindex T n ($B35N,(B)
 @itemx C-M-n
-@kindex C-M-n (Summary)
+@kindex C-M-n ($B35N,(B)
 @itemx M-down
-@kindex M-down (Summary)
+@kindex M-down ($B35N,(B)
 @findex gnus-summary-next-thread
 $B<!$N%9%l%C%I$K0\F0$7$^$9(B (@code{gnus-summary-next-thread})$B!#(B
 
 @item T p
 @kindex T p ($B35N,(B)
 @itemx C-M-p
-@kindex C-M-p (Summary)
+@kindex C-M-p ($B35N,(B)
 @itemx M-up
-@kindex M-up (Summary)
+@kindex M-up ($B35N,(B)
 @findex gnus-summary-prev-thread
 $BA0$N%9%l%C%I$K0\F0$7$^$9(B (@code{gnus-summary-prev-thread})$B!#(B
 
@@ -6838,6 +6838,16 @@ Gnus $B$O$?$/$5$s$NJ}K!$G5-;v$rJ]B8$9$k;v$,$G$-$^$9!#0J2<$N$b$N$OHs>o$KN((B
 $B8=:_$N5-;v$r%Q%$%W$KJ]B8$7$^$9!#$&!<$s$H!"$"$N$)!";d$,8@$*$&$H$7$F$$$k;v(B
 $B$O!=!=8=:_$N5-;v$r%W%m%;%9$K%Q%$%W$9$k$H$$$&$3$H$G(B
 $B$9(B (@code{gnus-summary-pipe-output})$B!#(B
+
+@item O P
+@kindex O P ($B35N,(B)
+@findex gnus-summary-muttprint
+@vindex gnus-summary-muttprint-program
+$B8=:_$N5-;v$r(B muttprint $B$KJ]B8$7$^$9!#$3$l$O!"30It%W%m%0%i%`(B Muttprint
+(@uref{http://muttprint.sourceforge.net/} $B;2>H(B) $B$r;H$C$F5-;v$r0u:~$7$^$9!#(B
+$B%W%m%0%i%`L>$H;HMQ$9$k%*%W%7%g%s$O!"JQ(B
+$B?t(B @code{gnus-summary-muttprint-program} $B$G;XDj$5$l$^$9!#(B
+(@code{gnus-summary-muttprint})$B!#(B
 @end table
 
 @vindex gnus-prompt-before-saving
@@ -7620,7 +7630,7 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 @xref{Article Signature}.
 
 @item W W l
-@kindex W W l (Summary)
+@kindex W W l ($B35N,(B)
 @findex gnus-article-hide-list-identifiers
 @vindex gnus-list-identifiers
 @code{gnus-list-identifiers} $B$G;XDj$5$l$F$$$k%a!<%j%s%0%j%9%H$NI8<1$r:o(B
@@ -7887,7 +7897,7 @@ CRLF $B$NAH(B ($B$9$J$o$A!"9T$N:G8e$N(B @samp{^M}) $B$r(B LF $B$KJQ49$7$^
 @c If a prefix is given, a charset will be asked for.
 
 @item W Z
-@kindex W Z (Summary)
+@kindex W Z ($B35N,(B)
 @findex gnus-article-decode-HZ
 HZ $B$^$?$O(B HZP $B$r=hM}$7$^$9!#(BHZ ($B$^$?$O(B HZP) $B$OCf9q8l$N5-;v$rEAAw$9$k$H$-(B
 $B$K;H$o$l$k0lHLE*$JId9f$G$9!#$3$l$O(B @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}} $B$N(B
@@ -8121,7 +8131,7 @@ UT ($BJLL>(B GMT, ZULU) $B$GF|IU$rI=<($7$^$9(B (@code{gnus-article-date-ut})
 $BF|IU$r$=$NCO0h$N;~4VBS$GI=<($7$^$9(B (@code{gnus-article-date-local})$B!#(B
 
 @item W T p
-@kindex W T p (Summary)
+@kindex W T p ($B35N,(B)
 @findex gnus-article-date-english
 $BF|IU$r1Q8l$GH/2;$G$-$k7A<0$GI=<($7$^(B
 $B$9(B (@code{gnus-article-date-english})$B!#(B
@@ -8239,7 +8249,7 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 
 @table @kbd
 @item A t
-@kindex A t (Summary)
+@kindex A t ($B35N,(B)
 @findex gnus-article-babel
 $B5-;v$r$"$k8@8l$+$iJL$N$b$N$XJQ49$7$^(B
 $B$9(B (@code{gnus-article-babel})$B!#(B
@@ -8260,7 +8270,8 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 @findex gnus-summary-print-article
 $B5-;v%P%C%U%!$N%]%9%H%9%/%j%W%H(B (PostScript) $B%$%a!<%8$r:n@.$7$F0u:~$7$^(B
 $B$9(B (@code{gnus-summary-print-article})$B!#(B@code{gnus-ps-print-hook} $B$,%P%C(B
-$B%U%!$r0u:~$9$kD>A0$K<B9T$5$l$k$G$7$g$&!#(B
+$B%U%!$r0u:~$9$kD>A0$K<B9T$5$l$k$G$7$g$&!#B>$K!"(BMuttprint $B$r;H$C$F0u:~$9$k(B
+$B$3$H$b$G$-$^$9(B (@pxref{Saving Articles})$B!#(B
 @end table
 
 @node Summary Sorting
@@ -8307,7 +8318,7 @@ gnus $B$G%a!<%k$rFI$`$3$H$NM-Mx$JE@$O!"C1=c$J%P%0$rAG@2$i$7$$IT>rM}$KCV$-(B
 $B%9%3%"$K$h$C$FJB$SBX$($^$9(B (@code{gnus-summary-sort-by-score})$B!#(B
 
 @item C-c C-s C-o
-@kindex C-c C-s C-o (Summary)
+@kindex C-c C-s C-o ($B35N,(B)
 @findex gnus-summary-sort-by-original
 $B%G%#%U%)%k%H$NJ}K!$GJB$SBX$($^$9(B (@code{gnus-summary-sort-by-original})$B!#(B
 @end table
@@ -9019,7 +9030,7 @@ Parameters}) $B$rJT=8$7$^$9(B (@code{gnus-summary-edit-parameters})$B!#(B
 @table @kbd
 @item Z Z
 @itemx q
-@kindex Z Z (Summary)
+@kindex Z Z ($B35N,(B)
 @findex q ($B35N,(B)
 @findex gnus-summary-exit
 @vindex gnus-summary-exit-hook
@@ -9310,36 +9321,36 @@ Gnus $B$O(B RFC 2369 $B$G4{Dj$5$l$?3F<o$N%a!<%j%s%0%j%9%H$G;H$o$l$k%U%#!<%k%I
 
 @table @kbd
 @item C-c C-n h
-@kindex C-c C-n h (Summary)
+@kindex C-c C-n h ($B35N,(B)
 @findex gnus-mailing-list-help
 List-Help $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N%X%k%W$r<h$j4s$;$k$?$a(B
 $B$N%a%C%;!<%8$rAw?.$7$^$9!#(B
 
 @item C-c C-n s
-@kindex C-c C-n s (Summary)
+@kindex C-c C-n s ($B35N,(B)
 @findex gnus-mailing-list-subscribe
 List-Subscribe $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N9VFI$r;O$a$k$?$a(B
 $B$N%a%C%;!<%8$rAw?.$7$^$9!#(B
 
 @item C-c C-n u
-@kindex C-c C-n u (Summary)
+@kindex C-c C-n u ($B35N,(B)
 @findex gnus-mailing-list-unsubscribe
 List-Unsubscribe $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N9VFI$r$d$a$k$?(B
 $B$a$N%a%C%;!<%8$rAw?.$7$^$9!#(B
 
 @item C-c C-n p
-@kindex C-c C-n p (Summary)
+@kindex C-c C-n p ($B35N,(B)
 @findex gnus-mailing-list-post
 List-Post $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$KEj9F$7$^$9!#(B
 
 @item C-c C-n o
-@kindex C-c C-n o (Summary)
+@kindex C-c C-n o ($B35N,(B)
 @findex gnus-mailing-list-owner
 List-Owner $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N4IM}<T08$F$K%a%C%;!<(B
 $B%8$rAw?.$7$^$9!#(B
 
 @item C-c C-n a
-@kindex C-c C-n a (Summary)
+@kindex C-c C-n a ($B35N,(B)
 @findex gnus-mailing-list-owner
 List-Archive $B%U%#!<%k%I$,$"$C$?$i!"%a!<%j%s%0%j%9%H$N%"!<%+%$%V$r1\Mw$7(B
 $B$^$9!#(B
@@ -9656,50 +9667,50 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 
 @table @kbd
 @item SPACE
-@kindex SPACE (Article)
+@kindex SPACE ($B5-;v(B)
 @findex gnus-article-next-page
 $B0lJGA0$K$a$/$j$^$9(B (@code{gnus-article-next-page})$B!#(B
 
 @item DEL
-@kindex DEL (Article)
+@kindex DEL ($B5-;v(B)
 @findex gnus-article-prev-page
 $B0lJG8e$m$KLa$7$^$9(B (@code{gnus-article-prev-page})$B!#(B
 
 @item C-c ^
-@kindex C-c ^ (Article)
+@kindex C-c ^ ($B5-;v(B)
 @findex gnus-article-refer-article
 $B%+!<%=%k0LCV$,(B @code{Message-ID} $B$N6aJU$K$"$k$H$-$K(B @kbd{C-c ^} $B$r2!(B
 $B$9$H!"(Bgnus $B$O%5!<%P!<$+$i$=$N5-;v$r<h$C$F$3$h$&$H$7$^(B
 $B$9(B (@code{gnus-article-refer-article})$B!#(B
 
 @item C-c C-m
-@kindex C-c C-m (Article)
+@kindex C-c C-m ($B5-;v(B)
 @findex gnus-article-mail
 $B%+!<%=%k0LCV$N6a$/$K$"$k%"%I%l%9$KJV?.$rAw$j$^(B
 $B$9(B (@code{gnus-article-mail})$B!#@\F,0z?t$rM?$($k$H!"$=$N%a!<%k$K0zMQ$7$^(B
 $B$9!#(B
 
 @item s
-@kindex s (Article)
+@kindex s ($B5-;v(B)
 @findex gnus-article-show-summary
 $B%P%C%U%!$r:F9=@.$7$F!"35N,%P%C%U%!$r8+$($k$h$&$K$7$^(B
 $B$9(B (@code{gnus-article-show-summary})$B!#(B
 
 @item ?
-@kindex ? (Article)
+@kindex ? ($B5-;v(B)
 @findex gnus-article-describe-briefly
 $BMxMQ$G$-$k%-!<A`:n$N$4$/4JC1$J@bL@$r=P$7$^(B
 $B$9(B (@code{gnus-article-describe-briefly})$B!#(B
 
 @item TAB
-@kindex TAB (Article)
+@kindex TAB ($B5-;v(B)
 @findex gnus-article-next-button
 $B<!$N%\%?%s$,$"$l$P$=$3$K0\F0$7$^(B
 $B$9(B (@code{gnus-article-next-button})$B!#$3$l$O%\%?%s5!G=$r%*%s$K$7$F$$$k$H(B
 $B$-$N$_0UL#$r;}$A$^$9!#(B
 
 @item M-TAB
-@kindex M-TAB (Article)
+@kindex M-TAB ($B5-;v(B)
 @findex gnus-article-prev-button
 $B0l$DA0$N%\%?%s$,$"$l$P$=$3$K0\F0$7$^$9(B (@code{gnus-article-prev-button})$B!#(B
 @end table
@@ -13467,7 +13478,7 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}$B!#(B
 @end example
 
 @findex gnus-group-make-shimbun-group
-@kindex G n (Group)
+@kindex G n ($B%0%k!<%W(B)
 @code{nnshimbun} $B$r;O$a$k$?$a$N0lHV4JC1$JJ}K!$O%0%k!<%W%P%C%U%!$NE,Ev$J(B
 $B>l=j$G(B @kbd{G n asahi RET national RET} $B$J$I$H%?%$%W$9$k$3$H$G$9!#(B
 @samp{asahi} $B$O@\B3$7$?$$%5!<%P!<$N%"%I%l%9$r<($9%7%s%\%k$K!"(B
@@ -14691,36 +14702,36 @@ Gnus $B$+$i(B @kbd{G s s} $BL?Na$r;H$C$F$3$N%Q%1%C%H$+$i%a!<%k$r=P$7$^$9!#(B
 
 @table @kbd
 @item G s b
-@kindex G s b (Group)
+@kindex G s b ($B%0%k!<%W(B)
 @findex gnus-group-brew-soup
 $B8=:_$N%0%k!<%W$NA4$F$NL$FI5-;v$r:-Jq$9(B
 $B$k(B (@code{gnus-group-brew-soup})$B!#$3$N%3%^%s%I$O%W%m%;%9(B/$B@\F,0z?t$N=,47(B
 $B$K=>$$$^$9!#(B
 
 @item G s w
-@kindex G s w (Group)
+@kindex G s w ($B%0%k!<%W(B)
 @findex gnus-soup-save-areas
 $BA4$F$N(B @sc{soup} $B%G!<%?%U%!%$%k$rJ]B8$7$^(B
 $B$9(B (@code{gnus-soup-save-areas})$B!#(B
 
 @item G s s
-@kindex G s s (Group)
+@kindex G s s ($B%0%k!<%W(B)
 @findex gnus-soup-send-replies
 $BJV?.%Q%1%C%H$+$iA4$F$NJV?.$rAw=P$9$k(B (@code{gnus-soup-send-replies})$B!#(B
 
 @item G s p
-@kindex G s p (Group)
+@kindex G s p ($B%0%k!<%W(B)
 @findex gnus-soup-pack-packet
 $BA4$F$N%U%!%$%k$r(B  @sc{soup} $B%Q%1%C%H$K:-Jq$9(B
 $B$k(B (@code{gnus-soup-pack-packet})$B!#(B
 
 @item G s r
-@kindex G s r (Group)
+@kindex G s r ($B%0%k!<%W(B)
 @findex nnsoup-pack-replies
 $BA4$F$NJV?.$rJV?.%Q%1%C%H$K:-Jq$9$k(B (@code{nnsoup-pack-replies})$B!#(B
 
 @item O s
-@kindex O s (Summary)
+@kindex O s ($B35N,(B)
 @findex gnus-soup-add-article
 $B$3$N35N,%b!<%IL?Na$O!"8=:_$N5-;v$r(B @sc{soup} $B%Q%1%C%H$KDI2C$7$^(B
 $B$9(B (@code{gnus-soup-add-article})$B!#$3$l$O%W%m%;%9(B/$B@\F,0z?t$N=,47$K=>$$$^(B
@@ -15018,7 +15029,7 @@ nnvirtual $B%0%k!<%W(B (@dfn{nnvirtual group}) $B$O<B$OB>$N%0%k!<%W$N=89g0J>e
 $B3N$+$JJ}K!$O$J$/!"$=$N>l9g$O!"(B@code{nnvirtual} $B$O(B gnus $B$K5-;v$O%K%e!<%9(B
 $B$G$J$$%P%C%/%(%s%I$+$iMh$?$H9p$2$k;v$K$J$j$^$9!#(B($B0BA4$N$?$a$K!#(B)
 
-$B$3$N$h$&$J>l9g$O!"%a%C%;!<%8%P%C%U%!$G$N(B @kbd{C-c C-t} $B$,1~Ez$7$h$&$H$7(B
+$B$3$N$h$&$J>l9g$O!"%a%C%;!<%8%P%C%U%!$G$N(B @kbd{C-c C-n} $B$,1~Ez$7$h$&$H$7(B
 $B$F$$$k5-;v$+$i(B @code{Newsgroups} $B9T$rH4$-=P$7$FA^F~$7$^$9!#(B
 
 @node Kibozed Groups
@@ -15032,7 +15043,7 @@ nnvirtual $B%0%k!<%W(B (@dfn{nnvirtual group}) $B$O<B$OB>$N%0%k!<%W$N=89g0J>e
 $B$$$M(B! $B$3$l$G$I$s$J(B @sc{nntp} $B%5!<%P!<$G$b!"Lr$KN)$?$J$$MW5a$G;_$^$C$F$7(B
 $B$^$&$^$G9s;H$9$k$3$H$,$G$-$k$M!#$"$"!"$J$s$F9,$;$J$s$@(B!
 
-@kindex G k (Group)
+@kindex G k ($B%0%k!<%W(B)
 kiboze $B%0%k!<%W$r:n@.$9$k$K$O!"%0%k!<%W%P%C%U%!$G(B @kbd{G k} $BL?Na$r;H$$$^(B
 $B$9!#(B
 
@@ -15111,8 +15122,8 @@ Namazu $B$r;H$C$F!"%a!<%k$N;3$+$i$"$J$?$N9%$-$J%-!<%o!<%I$r4^$`5-;v$r8+(B
 
 $B$5$"!"$3$l$G=`Hw$,$G$-$^$7$?!#(B
 
-@kindex C-c C-n (Group)
-@kindex C-c C-n (Summary)
+@kindex C-c C-n ($B%0%k!<%W(B)
+@kindex C-c C-n ($B35N,(B)
 @findex gnus-namazu-search
 $B%0%k!<%W%P%C%U%!$G(B@kbd{C-c C-n}$B$HF~NO$9$k$H!"8!:w<0$r?R$M$i$l$^$9$+$i!"(B
 $BE,Ev$JC18l$rF~NO$7$F$/$@$5$$!#Nc$($P(B:
@@ -15573,44 +15584,44 @@ file
 
 @table @kbd
 @item q
-@kindex q (Category)
+@kindex q ($BJ,N`(B)
 @findex gnus-category-exit
 $B%0%k!<%W%P%C%U%!!<$KLa$k(B (@code{gnus-category-exit})$B!#(B
 
 @item k
-@kindex k (Category)
+@kindex k ($BJ,N`(B)
 @findex gnus-category-kill
 $B8=:_$NJ,N`$r>C5n$9$k(B (@code{gnus-category-kill})$B!#(B
 
 @item c
-@kindex c (Category)
+@kindex c ($BJ,N`(B)
 @findex gnus-category-copy
 $B8=:_$NJ,N`$rJ#@=$9$k(B (@code{gnus-category-copy})$B!#(B
 
 @item a
-@kindex a (Category)
+@kindex a ($BJ,N`(B)
 @findex gnus-category-add
 $B?7$7$$J,N`$rDI2C$9$k(B (@code{gnus-category-add})$B!#(B
 
 @item p
-@kindex p (Category)
+@kindex p ($BJ,N`(B)
 @findex gnus-category-edit-predicate
 $B8=:_$NJ,N`$N=R8l$rJT=8$9$k(B (@code{gnus-category-edit-predicate})$B!#(B
 
 @item g
-@kindex g (Category)
+@kindex g ($BJ,N`(B)
 @findex gnus-category-edit-groups
 $B8=:_$NJ,N`$KB0$9$k%0%k!<%W$N0lMw$rJT=8$9(B
 $B$k(B (@code{gnus-category-edit-groups})$B!#(B
 
 @item s
-@kindex s (Category)
+@kindex s ($BJ,N`(B)
 @findex gnus-category-edit-score
 $B8=:_$NJ,N`$N%@%&%s%m!<%I%9%3%"5,B'$rJT=8$9(B
 $B$k(B (@code{gnus-category-edit-score})$B!#(B
 
 @item l
-@kindex l (Category)
+@kindex l ($BJ,N`(B)
 @findex gnus-category-list
 $BA4$F$NJ,N`$rI=<($9$k(B (@code{gnus-category-list})$B!#(B
 @end table
@@ -15682,42 +15693,42 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
 
 @table @kbd
 @item J u
-@kindex J u (Agent Group)
+@kindex J u ($B%(!<%8%'%s%H(B $B%0%k!<%W(B)
 @findex gnus-agent-fetch-groups
 $B8=:_$N%0%k!<%W$NE,3J$J5-;v$rA4$F<hF@$9(B
 $B$k(B (@code{gnus-agent-fetch-groups})$B!#(B
 
 @item J c
-@kindex J c (Agent Group)
+@kindex J c ($B%(!<%8%'%s%H(B $B%0%k!<%W(B)
 @findex gnus-enter-category-buffer
 $B%(!<%8%'%s%HJ,N`%P%C%U%!!<$KF~$k(B (@code{gnus-enter-category-buffer})$B!#(B
 
 @item J s
-@kindex J s (Agent Group)
+@kindex J s ($B%(!<%8%'%s%H(B $B%0%k!<%W(B)
 @findex gnus-agent-fetch-session
 $BA4%0%k!<%W$NE,3J$J5-;v$rA4$F<hF@$9$k(B (@code{gnus-agent-fetch-session})$B!#(B
 
 @item J S
-@kindex J S (Agent Group)
+@kindex J S ($B%(!<%8%'%s%H(B $B%0%k!<%W(B)
 @findex gnus-group-send-drafts
 $B2<=q$-%0%k!<%W$K$"$kAw?.2DG=$J%a%C%;!<%8$rA4$FAw?.$9(B
 $B$k(B (@code{gnus-group-send-drafts})$B!#(B@xref{Drafts}.
 
 @item J a
-@kindex J a (Agent Group)
+@kindex J a ($B%(!<%8%'%s%H(B $B%0%k!<%W(B)
 @findex gnus-agent-add-group
 $B8=:_$N%0%k!<%W$r%(!<%8%'%s%HJ,N`$KDI2C$9$k(B (@code{gnus-agent-add-group})$B!#(B
 $B$3$NL?Na$O%W%m%;%9(B/$B@\F,<-$N=,47$rM}2r$7$^$9(B (@pxref{Process/Prefix})$B!#(B
 
 @item J r
-@kindex J r (Agent Group)
+@kindex J r ($B%(!<%8%'%s%H(B $B%0%k!<%W(B)
 @findex gnus-agent-remove-group
 $B8=:_$N%0%k!<%W$r!"$b$7B8:_$7$F$$$l$P!"$=$NJ,N`$+$i>C5n$7$^(B
 $B$9(B (@code{gnus-agent-remove-group})$B!#$3$NL?Na$O%W%m%;%9(B/$B@\F,<-$N=,47$rM}(B
 $B2r$7$^$9!#(B(@pxref{Process/Prefix})$B!#(B
 
 @item J Y
-@kindex J Y (Agent Group)
+@kindex J Y ($B%(!<%8%'%s%H(B $B%0%k!<%W(B)
 @findex gnus-agent-synchronize-flags
 $B%j%b!<%H%5!<%P!<$,(B @dfn{unplugged} $B$N$H$-$KJQ99$5$l$?%U%i%0$,$"$l$PF14|(B
 $B$5$;$^$9!#(B
@@ -15728,28 +15739,28 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
 
 @table @kbd
 @item J #
-@kindex J # (Agent Summary)
+@kindex J # ($B%(!<%8%'%s%H(B $B35N,(B)
 @findex gnus-agent-mark-article
 $B5-;v$K%@%&%s%m!<%I$9$k$h$&$K0u$rIU$1$k(B (@code{gnus-agent-mark-article})$B!#(B
 
 @item J M-#
-@kindex J M-# (Agent Summary)
+@kindex J M-# ($B%(!<%8%'%s%H(B $B35N,(B)
 @findex gnus-agent-unmark-article
 $B5-;v$+$i%@%&%s%m!<%I$9$k0u$r>C5n$9$k(B (@code{gnus-agent-unmark-article})$B!#(B
 
 @item @@
-@kindex @@ (Agent Summary)
+@kindex @@ ($B%(!<%8%'%s%H(B $B35N,(B)
 @findex gnus-agent-toggle-mark
 $B5-;v$r%@%&%s%m!<%I$9$k$+$I$&$+$r@Z$jBX$((B
 $B$k(B (@code{gnus-agent-toggle-mark})$B!#(B
 
 @item J c
-@kindex J c (Agent Summary)
+@kindex J c ($B%(!<%8%'%s%H(B $B35N,(B)
 @findex gnus-agent-catchup
 $B%@%&%s%m!<%I0u$NL5$$5-;v$rA4$F4{FI$K$9$k(B (@code{gnus-agent-catchup})$B!#(B
 
 @item J u
-@kindex J u (Agent Summary)
+@kindex J u ($B%(!<%8%'%s%H(B $B35N,(B)
 @findex gnus-agent-summary-fetch-group
 $B8=:_$N%0%k!<%W$N%@%&%s%m!<%I2DG=$J5-;v$r!"$9$Y$F%@%&%s%m!<%I$7$^(B
 $B$9(B (@code{gnus-agent-summary-fetch-group})$B!#(B
@@ -15760,13 +15771,13 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
 
 @table @kbd
 @item J a
-@kindex J a (Agent Server)
+@kindex J a ($B%(!<%8%'%s%H(B $B%5!<%P!<(B)
 @findex gnus-agent-add-server
 $B8=:_$N%5!<%P!<$r!"(Bgnus $B%(!<%8%'%s%H$G07$o$l$k%5!<%P!<$N0lMw$KDI2C$9(B
 $B$k(B (@code{gnus-agent-add-server})$B!#(B
 
 @item J r
-@kindex J r (Agent Server)
+@kindex J r ($B%(!<%8%'%s%H(B $B%5!<%P!<(B)
 @findex gnus-agent-remove-server
 $B8=:_$N%5!<%P!<$r!"(Bgnus $B%(!<%8%'%s%H$G07$o$l$k%5!<%P!<$N0lMw$+$i:o=|$9(B
 $B$k(B (@code{gnus-agent-remove-server})$B!#(B
@@ -17342,13 +17353,13 @@ GNUS $B>C5n%U%!%$%k$rJT=8$9$k$?$a$NFs$D$N35N,%P%C%U%!4X?t$,$"$j$^$9!#(B
 
 @table @kbd
 @item M-k
-@kindex M-k (Summary)
+@kindex M-k ($B35N,(B)
 @findex gnus-summary-edit-local-kill
 $B$=$N%0%k!<%W$N>C5n%U%!%$%k$rJT=8$9(B
 $B$k(B (@code{gnus-summary-edit-local-kill})$B!#(B
 
 @item M-K
-@kindex M-K (Summary)
+@kindex M-K ($B35N,(B)
 @findex gnus-summary-edit-global-kill
 $B0lHL>C5n%U%!%$%k$rJT=8$9$k(B (@code{gnus-summary-edit-global-kill})$B!#(B
 @end table
@@ -17357,12 +17368,12 @@ GNUS $B>C5n%U%!%$%k$rJT=8$9$k$?$a$NFs$D$N35N,%P%C%U%!4X?t$,$"$j$^$9!#(B
 
 @table @kbd
 @item M-k
-@kindex M-k (Group)
+@kindex M-k ($B%0%k!<%W(B)
 @findex gnus-group-edit-local-kill
 $B$=$N%0%k!<%W$N>C5n%U%!%$%k$rJT=8$9$k(B (@code{gnus-group-edit-local-kill})$B!#(B
 
 @item M-K
-@kindex M-K (Group)
+@kindex M-K ($B%0%k!<%W(B)
 @findex gnus-group-edit-global-kill
 $B0lHL>C5n%U%!%$%k$rJT=8$9$k(B (@code{gnus-group-edit-global-kill})$B!#(B
 @end table

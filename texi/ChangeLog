@@ -1,3 +1,17 @@
+2001-12-16  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Saving Articles): Add muttprint.
+	(Article Commands): Mention muttprint.
+
+2001-12-15  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Virtual Groups): Fix.  From Raymond Scholz
+	<ray-2001@zonix.de>.
+
+2001-12-15 08:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi, emacs-mime.texi: Fix the header.
+
 2001-12-12  Didier Verna  <didier@lrde.epita.fr>
 
 	* gnus.texi (Misc Group Stuff): advertise `gnus-group-news'.

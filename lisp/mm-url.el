@@ -29,12 +29,12 @@
 
 ;;; Code:
 
-(require 'mm-util)
-(require 'path-util)
-
 (eval-when-compile (require 'cl))
 
+(require 'mm-util)
+
 (eval-and-compile
+  (autoload 'exec-installed-p "path-util")
   (autoload 'url-insert-file-contents "url-handlers"))
 
 (defgroup mm-url nil
