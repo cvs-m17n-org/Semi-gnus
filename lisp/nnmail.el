@@ -999,8 +999,7 @@ FUNC will be called with the buffer narrowed to each mail."
 FUNC will be called with the group name to determine the article number."
   (let ((methods (or nnmail-split-methods '(("bogus" ""))))
 	(obuf (current-buffer))
-	(beg (point-min))
-	end group-art method grp)
+	group-art method grp)
     (if (and (sequencep methods)
 	     (= (length methods) 1))
 	;; If there is only just one group to put everything in, we
@@ -1009,13 +1008,17 @@ FUNC will be called with the group name to determine the article number."
 	      (list (cons (caar methods) (funcall func (caar methods)))))
       ;; We do actual comparison.
       (save-excursion
-	;; Find headers.
-	(goto-char beg)
-	(setq end (if (search-forward "\n\n" nil t) (point) (point-max)))
+	;; Copy the article into the work buffer.
 	(set-buffer nntp-server-buffer)
 	(erase-buffer)
-	;; Copy the headers into the work buffer.
-	(insert-buffer-substring obuf beg end)
+	(insert-buffer-substring obuf)
+	;; Narrow to headers.
+	(narrow-to-region
+	 (goto-char (point-min))
+	 (if (search-forward "\n\n" nil t)
+	     (point)
+	   (point-max)))
+	(goto-char (point-min))
 	;; Decode MIME headers and charsets.
 	(when nnmail-mail-splitting-decodes
 	  (mime-decode-header-in-region (point-min) (point-max)
@@ -1107,6 +1110,7 @@ FUNC will be called with the group name to determine the article number."
 	    (goto-char (point-min))
 	    (gnus-configure-windows 'split-trace)
 	    (set-buffer restore)))
+	(widen)
 	;; See whether the split methods returned `junk'.
 	(if (equal group-art '(junk))
 	    nil
