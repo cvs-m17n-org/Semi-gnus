@@ -323,7 +323,7 @@ Argument PROMPT ."
 ;;
 (defun pop3-fma-get-movemail-type (inbox)
   (if (eq (nth 1 (assoc inbox pop3-fma-spool-file-alist)) 'apop)
-      lisp
+      'lisp
     pop3-fma-movemail-type))
 ;;
 (provide 'pop3-fma)
