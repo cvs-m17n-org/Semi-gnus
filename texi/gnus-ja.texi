@@ -16867,54 +16867,48 @@ Commands}) $B$+!"$^$?$O%(!<%8%'%s%H$K07$C$FM_$7$/$J$$$N$K<+F0E*$KDI2C$5$l(B
 
 @cindex Agent Parameters
 @table @code
-@item gnus-agent-cat-name
+@item agent-cat-name
 $BJ,N`$NL>A0!#(B
 
-@item gnus-agent-cat-groups
+@item agent-groups
 $B$3$NJ,N`$K$"$k%0%k!<%W$N%j%9%H!#(B
 
-@item gnus-agent-cat-predicate
+@item agent-predicate
 ($BDL>o(B) $B$I$N5-;v$r%@%&%s%m!<%I$9$k$N$,E,Ev$+$H$$$&Bg$^$+$JNX3T$rM?$($k=R(B
 $B8l!#$=$7$F(B
 
-@item gnus-agent-cat-score-file
+@item agent-score-file
 ($BDL>o(B) $B$I$N5-;v$r%@%&%s%m!<%I$9$k$+$r7h$a$k$H$-$N$h$j$-$a$N:Y$+$$%9%3%"(B
 $B5,B'!#(B($B$3$N%@%&%s%m!<%I%9%3%"(B (@dfn{download score}) $B$ODL>o$N%9%3%"$H$O(B
 $BI,$:$7$b4X78$,L5$$$3$H$KCm0U$7$F$/$@$5$$!#(B)
 
-@item gnus-agent-cat-enable-expiration
+@item agent-enable-expiration
 $B$3$N%0%k!<%W$N8E$$5-;v$r%(!<%8%'%s%H$,4|8B@Z$l>C5n$9$Y$-$+$I$&$+$r<($9(B
 $B%V!<%kJQ?t!#BgDq$N%0%k!<%W$O%G%#%9%/6u4V$rO2Hq$7$J$$$?$a$K4|8B@Z$l>C5n$5(B
 $B$l$k$Y$-$G$9!#$$$d!"<B:]$K$O(B gnus.* $B3,AX$O4|8B@Z$l>C5n$5$l$k$Y$-$G$O$J(B
 $B$$%0%k!<%W$@$1$r4^$s$G$$$k$H8@$C$F$b!"$?$V$s:9$7;Y$($"$j$^$;$s!#(B
 
-@item gnus-agent-cat-days-until-old
+@item agent-days-until-old
 $B4{FI$N5-;v$r4|8B@Z$l>C5n$7$F$b:9$7;Y$($J$$$3$H$rH=CG$9$kA0$K!"%(!<%8%'%s(B
 $B%H$,BT$C$F$$$k$Y$-F|?t$r<($9@0?t!#(B
 
-@item gnus-agent-cat-low-score
+@item agent-low-score
 @code{gnus-agent-low-score} $B$r>e=q$-$9$k@0?t!#(B
 
-@item gnus-agent-cat-high-score
+@item agent-high-score
 @code{gnus-agent-high-score} $B$r>e=q$-$9$k@0?t!#(B
 
-@item gnus-agent-cat-length-when-short
+@item agent-length-when-short
 @code{gnus-agent-short-article} $B$r>e=q$-$9$k@0?t!#(B
 
-@item gnus-agent-cat-length-when-long
+@item agent-length-when-long
 @code{gnus-agent-long-article} $B$r>e=q$-$9$k@0?t!#(B
 
-@c @item gnus-agent-cat-disable-undownloaded-faces
-@c $B%@%&%s%m!<%I$5$l$F$$$J$$5-;v$r(B gnus-summary-*-undownloaded-face $B$r;H$C$F(B
-@c $B35N,%P%C%U%!$KI=<($9$Y$-(B @emph{$B$G$O$J$$(B} $B$3$H$r<($9%7%s%\%k!#CM(B
-@c $B$,(B @code{nil} $B$@$H!"B>$N%7%s%\%k$,$=$l$i$rM^@)$7$F$$$F$b!"%@%&%s%m!<%I$5(B
-@c $B$l$F$$$J$$5-;vMQ$N%U%'!<%9$r;H$($k$h$&$K$J$j$^$9!#(B
-
-@item gnus-agent-cat-enable-undownloaded-faces
+@item agent-enable-undownloaded-faces
 $B%@%&%s%m!<%I$5$l$F$$$J$$5-;v$r(B gnus-summary-*-undownloaded-face $B$r;H$C$F(B
-$B35N,%P%C%U%!$KI=<($9$Y$-$G$"$k$3$H$r<($9%7%s%\%k!#CM$,(B @code{nil} $B$@$H!"(B
-$BB>$N%7%s%\%k$,$=$l$i$rM-8z$K$7$F$$$F$b!"%@%&%s%m!<%I$5$l$F$$$J$$5-;vMQ$N(B
-$B%U%'!<%9$r;H$o$J$$$h$&$K$J$j$^$9!#(B
+$B35N,%P%C%U%!$KI=<($9$Y$-$+$I$&$+$r<($9%7%s%\%k!#(B@code{nil} $B0J30$J$i$I$s(B
+$B$J%7%s%\%k$G$b!"%@%&%s%m!<%I$5$l$F$$$J$$5-;vMQ$N%U%'!<%9$r;H$&$h$&$K$J$j(B
+$B$^$9!#(B
 @end table
 
 $B$$$C$?$sJ,N`$,:n$i$l$?$i!"J,N`$NL>A0$rJQ$($k$3$H$O$G$-$^$;$s!#(B
@@ -17466,22 +17460,20 @@ parameters at one time (@code{gnus-category-customize-category}).
 $B;~4V$r:G>.$K$9$k$?$a$K(B) $B%(!<%8%'%s%H$r%-%c%C%7%e$H$7$F;H$&>l9g$O!"%@%&%s(B
 $B%m!<%I$5$l$F$$$J$$5-;v$N%U%'!<%9$O$*$=$i$/NI$$9M$($N$h$&$K;W$($k$G$7$g$&!#(B
 $B%@%&%s%m!<%I$5$l$?5-;v$KBP$7$F$9$Y$F$N;E;v(B ($B0u$rIU$1$k!"FI$`!":o=|$9(B
-$B$k(B) $B$r9T$J$($P!"$$$D$bDL>o$N%U%'!<%9$,8=$l$k$+$i$G$9!#(B
+$B$k(B) $B$r9T$J$($P!"$$$D$bDL>o$N%U%'!<%9$,8=$l$k$+$i$G$9!#(B@acronym{NOV} $B$r(B
+$B%-%c%C%7%e$9$k$3$H$K$h$C$F%*%s%i%$%s@-G=$r2~A1$9$k$?$a$K%(!<%8%'%s%H$r;H$C(B
+$B$F$$$k%f!<%6$K$H$C$F!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v$N%U%'!<%9$,8+$($k$+$b(B
+$B$7$l$J$$$3$H$O!"$^$C$?$/$>$C$H$9$k$[$I$$$d$J$3$H$G$7$g$&!#$=$l$i$N$I$N5-(B
+$B;v$b%(!<%8%'%s%H$K<h$j9~$^$l$F$$$J$$$N$G!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v$N(B
+$B%U%'!<%9$N$?$a$K!"$9$Y$F$NIaDL$N%U%'!<%9$,L\N)$?$J$/$J$C$F$7$^$&$G$7$g$&!#(B
 
-$B$H$-$?$^%(!<%8%'%s%H$r;H$&%f!<%6$K$H$C$F$O!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v(B
-$B$N%U%'!<%9$O!"$I$&$7$h$&$b$J$/$R$I$$9M$($G$"$k$h$&$K;W$($k$+$b$7$l$^$;$s!#(B
-$BO@E@$O!"H`$i$NBgDq$N5-;v$O%(!<%8%'%s%H$K<h$j9~$^$l$F$$$J$$$N$G!"B?$/$NDL(B
-$B>o$N%U%'!<%9$,!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v$N%U%'!<%9$N1"$K2b$s$G$7$^$&(B
-$B$3$H$G$9!#$3$l$,$"$J$?$N6-6x$J$i$P!"$"$J$?$K$OFs$D$NA*Br;h$,$"$j$^$9!#Bh(B
-$B0l$K!"(B@code{gnus-summary-*-undownloaded-face} $B$N%U%'!<%972$K4X$o$k;0$D$N(B
-$B%3%s%9%;%k$r>C5n$9$k$?$a$K(B @code{gnus-summary-highlight} $B$r%+%9%?%^%$%:(B
-$B$9$k$3$H$K$h$C$F!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v$N%U%'!<%9$r40A4$KM^@)$9$k(B
-$B$3$H$,$G$-$^$9!#BhFs$K!"$b$C$H@vN}$5$l$?%"%W%m!<%A$,9%$_$J$i$P!"(B
-@code{agent-disable-undownloaded-faces} $B%0%k!<%W%Q%i%a!<%?$r(B t $B$K@_Dj$7(B
-$B$F$bNI$$$G$7$g$&!#$3$N%Q%i%a!<%?$OB>$N$9$Y$F$N%(!<%8%'%s%H%Q%i%a!<%?$HF1(B
-$BMM$K!"%(!<%8%'%s%HJ,N`(B (@pxref{Agent Categories})$B!"%0%k!<%W%H%T%C(B
-$B%/(B (@pxref{Topic Parameters})$B!"$"$k$$$O8D!9$N%0%k!<%W(B (@pxref{Group
-Parameters}) $B$KBP$7$F@_Dj$9$k$3$H$,$G$-$^$9!#(B
+$B%@%&%s%m!<%I$5$l$F$$$J$$5-;v$N%U%'!<%9$r;H$$$?$$>l9g$O!"(B
+@code{agent-enable-undownloaded-faces} $B%0%k!<%W%Q%i%a!<%?$r(B @code{t} $B$K(B
+$B@_Dj$7$F!"%@%&%s%m!<%I$5$l$F$$$J$$5-;v$N%U%'!<%9$rM-8z$K$7$J$1$l$P$J$j$^(B
+$B$;$s!#$3$N%Q%i%a!<%?$OB>$N$9$Y$F$N%(!<%8%'%s%H%Q%i%a!<%?$HF1MM$K!"%(!<%8%'(B
+$B%s%HJ,N`(B (@pxref{Agent Categories})$B!"%0%k!<%W%H%T%C%/(B (@pxref{Topic
+Parameters})$B!"$"$k$$$O8D!9$N%0%k!<%W(B (@pxref{Group Parameters}) $B$KBP$7$F(B
+$B@_Dj$9$k$3$H$,$G$-$^$9!#(B
 
 @node Agent as Cache
 @subsection $B%-%c%C%7%e$H$7$F$N%(!<%8%'%s%H(B
@@ -17633,13 +17625,25 @@ gnus $B$O%(!<%8%'%s%H$N85$G(B nnimap $B%0%k!<%W$rFI$`$H$-!"%U%i%0$NJQ2=$K@d$(
 @node Outgoing Messages
 @subsection $B:9=PMQ%a%C%;!<%8(B
 
-Gnus $B$,@Z$jN%$5$l$F$$$k$H$-!"A4$F$N:9=PMQ%a%C%;!<%8(B ($B%a!<%k$H%K%e!<%9$N(B
-$BN>J}(B) $B$O2<=q$-%0%k!<%W(B ``queue'' (@pxref{Drafts}) $B$K3JG<$5$l$^$9!#Ej9F$7(B
-$B$?8e$G$b!"$3$3$G$=$N%a%C%;!<%8$r8+$?$jJT=8$9$k$N$O0U$N$^$^$G$9!#(B
+$B%G%#%U%)%k%H$G!"(BGnus $B$,@Z$jN%$5$l$F$$$k$H$-!"A4$F$N:9=PMQ%a%C%;!<%8(B ($B%a!<(B
+$B%k$H%K%e!<%9$NN>J}(B) $B$O2<=q$-%0%k!<%W(B ``queue'' (@pxref{Drafts}) $B$K3JG<$5(B
+$B$l$^$9!#Ej9F$7$?8e$G$b!"$3$3$G$=$N%a%C%;!<%8$r8+$?$jJT=8$9$k$N$O0U$N$^$^(B
+$B$G$9!#(B
 
-Gnus $B$,:F$S:9$79~$^$l$?$H$-!"%a%C%;!<%8$rAw?.$9$k$?$a$K!"FCJL$JL?Na$r;H$C(B
-$B$F2<=q$-%0%k!<%W$+$iAw$k$3$H$b!"%0%k!<%W%P%C%U%!Fb$G(B @kbd{J S} $B$r;H$C$F!"(B
-$B2<=q$-%0%k!<%WFb$NA4$F$NAw?.2DG=%a%C%;!<%8Aw?.$9$k$3$H$b$G$-$^$9!#(B
+$BAw=P$9$k%a!<%k$,(B queue $B$5$l$k(B ($B=gHVBT$A$K$J$k(B) $B>u67$r@)8f$9$k$3$H$O2DG=(B
+$B$G$9(B (@code{gnus-agent-queue-mail}, @pxref{Agent Variables} $B;2>H(B)$B!#(B
+Gnus $B$,@Z$jN%$5$l$F$$$k>l9g!"%K%e!<%9$O>o$K(B queue $B$5$l$k$@$1$G$9!#(B
+
+$B%a%C%;!<%8$rAw?.$9$k$?$a$K!"2<=q$-%0%k!<%W$+$i!"$=$3$G;H$($kFCJL$JL?Na$r(B
+$B;H$C$FAw$k$3$H$b!"%0%k!<%W%P%C%U%!Fb$G(B @kbd{J S} $B$r;H$C$F!"2<=q$-%0%k!<(B
+$B%WFb$N$9$Y$F$NAw?.2DG=$J%a%C%;!<%8Aw?.$9$k$3$H$b$G$-$^$9!#%K%e!<%9$NEj9F(B
+$B$O(B Gnus $B$,:9$79~$^$l$F$$$k$H$-$@$1$G$-$^$9$,!"%a!<%k$O$$$D$G$bAw?.$9$k$3(B
+$B$H$,$G$-$^$9!#(B
+
+$B@Z$jN%$5$l$F$$$k$H$-$K%a!<%k$NAw?.$,$G$-$:!"$+$D@Z$jN%$5$l$F$$$k$H$-$K$&$C(B
+$B$+$j(B @kbd{J S} $B$rC!$$$F$7$^$&$3$H$,?4G[$J$i$P!"(BGnus $B$K$"$J$?$N9TF0$r3NG'(B
+$B$5$;$k$3$H$,$G$-$^$9(B (@code{gnus-agent-prompt-send-queue}, @pxref{Agent
+Variables} $B;2>H(B)$B!#(B
 
 @node Agent Variables
 @subsection $B%(!<%8%'%s%HJQ?t(B
@@ -17737,6 +17741,31 @@ gnus $B$,%5!<%P!<$K@\B3$G$-$J$H$-$K2?$,5/$-$?$+$rJ*8l$j$^$9!#%(!<%8%'%s%H(B
 $B5-;v$r>o$KL5;k$9$k$3$H(B)$B!"(B@code{unfetched} ($BA`:n$O%X%C%@!<$,<h$j9~$^$l$F(B
 $B$$$J$$5-;v$rL5;k$9$k$3$H(B) $B$G$9!#(B($BLuCm(B: $B$&!<$`(B Kevin $B$5$s$O2?$r8@$C$F$k$s(B
 $B$@(B?)
+
+@item gnus-agent-queue-mail
+@vindex gnus-agent-queue-mail
+@code{gnus-agent-queue-mail} $B$r(B @code{always} $B$K$9$k$H!"(BGnus $B$O%a!<%k$r(B
+$B$$$-$J$jAw?.$7$F$7$^$&$N$G$O$J$/!">o$K(B queue ($B=gHVBT$A(B) $B$KF~$l$^$9!#(B
+@code{t} $B$@$C$?$i(B Gnus $B$O@Z$jN%$5$l$F$$$k$H$-$@$1%a!<%k$r(B queue $B$KF~$l$^(B
+$B$9!#(B@code{nil} $B$@$C$?$i(B queue $B$KF~$l$^$;$s!#%G%#%U%)%k%H$O(B @code{t} $B$G$9!#(B
+
+@item gnus-agent-prompt-send-queue
+@vindex gnus-agent-prompt-send-queue
+@code{gnus-agent-prompt-send-queue} $B$,Hs(B-@code{nil} $B$@$C$?$i!"@Z$jN%$5$l(B
+$B$F$$$k$N$K$b$+$+$o$i$:(B @kbd{J S} $B$rC!$$$?>l9g$K!"(BGnus $B$OK\Ev$K$=$l$r9T$J$C(B
+$B$F$bNI$$$+$I$&$+$r3NG'$7$^$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G$9!#(B
+
+@item gnus-agent-auto-agentize-methods
+@vindex gnus-agent-auto-agentize-methods
+$B$"$J$?$,0JA0$K%(!<%8%'%s%H$r;H$C$?$3$H$,L5$$(B ($B$b$C$H5;=QE*$K$O!"(B
+@file{~/News/agent/lib/servers} $B$,L5$$>l9g(B)$B!"(BGnus $B$O$[$s$N>/?t$N%5!<%P!<(B
+$B$r<+F0E*$K%(!<%8%'%s%H2=$7$^$9!#$3$NJQ?t$O$I$N%P%C%/%(%s%I$r<+F0$G%(!<%8%'(B
+$B%s%H2=$9$Y$-$+$r@)8f$7$^$9!#0lHL$K!"%(!<%8%'%s%H2=$O1s3V%P%C%/%(%s%I$@$1(B
+$B$KM-MQ$G$9!#<+F0$N%(!<%8%'%s%H2=$O!"%5!<%P!<$KBP$7$F(B @kbd{J a} $B$r<B9T$9(B
+$B$k$N$HF1$88z2L$,$"$j$^$9(B (@pxref{Server Agent Commands})$B!#$b$7%U%!%$%k$,(B
+$BB8:_$9$k$J$i$P!"$=$l$i$rDI2C$7$?$j:o=|$9$k$?$a$K%5!<%P!<$r<jF0$GA`:n$7$J(B
+$B$1$l$P$J$j$^$;$s!#$3$NJQ?t$O:G=i$K(B Gnus $B$r5/F0$7$?$H$-$@$1E,MQ$5$l$^$9!#(B
+$B%G%#%U%)%k%H$O(B @samp{(nntp nnimap)} $B$G$9!#(B
 @end table
 
 @node Example Setup
