@@ -1,0 +1,7 @@
+If you would like to make gnus with Mule 2.3 based on Emacs 19.34,
+copy `sample.lpath.el' to `~/.lpath.el' and modify it suitably for
+your environment.
+
+Mule 2.3 based on Emacs 19.34 で gnus を作りたい人は、
+`sample.lpath.el' を `~/.lpath.el' にコピーして、
+あなたの環境に合うように書き換えて下さい。
