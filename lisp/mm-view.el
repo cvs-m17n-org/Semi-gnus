@@ -24,7 +24,7 @@
 ;;; Code:
 
 (require 'mail-parse)
-(require 'mailcap)
+(require 'mm-mailcap)
 (require 'mm-bodies)
 (require 'mm-decode)
 
@@ -207,10 +207,7 @@
 	  (insert "\n"))
 	(insert "----------\n\n")
 	(when handles
-	  (setq gnus-article-mime-handles
-		(nconc gnus-article-mime-handles 
-		       (if (listp (car handles)) 
-			   handles (list handles)))))
+	  (mm-handle-set-child handle handles))
 	(mm-handle-set-undisplayer
 	 handle
 	 `(lambda ()
