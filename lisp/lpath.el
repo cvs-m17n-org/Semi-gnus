@@ -39,7 +39,7 @@
 		     url-view-url w3-prepare-buffer
 		     set-buffer-multibyte
 		     find-non-ascii-charset-region char-charset
-		     find-charset-region
+		     find-charset-region subst-char-in-string
 		     find-coding-systems-region get-charset-property
 		     coding-system-get w3-region
 		     w3-coding-system-for-mime-charset
@@ -50,8 +50,7 @@
 		     vcard-pretty-print image-type-available-p
 		     put-image create-image  display-graphic-p
 		     find-image insert-image image-size
-		     make-overlay overlay-put make-symbolic-link
-		     subst-char-in-string))
+		     make-overlay overlay-put make-symbolic-link))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table

@@ -1,32 +1,47 @@
 AC_INIT(lisp/gnus.el)
 AC_SET_MAKE
 AC_PROG_INSTALL
-AM_PATH_LISPDIR
-AC_PATH_PROG(MAKEINFO, makeinfo, no)
+
+XEMACS="xemacs"
+EMACS="emacs"
+AC_ARG_WITH(
+	xemacs,
+	[  --with-xemacs           Use XEmacs to build [XEMACS=xemacs]],
+	[ if test "${withval}" = "yes"; then
+		EMACS=${XEMACS};
+	elif test "${withval}" != "no"; then
+		XEMACS=${withval};
+		EMACS=${withval};
+	fi ])
+AC_SUBST(XEMACS)
+
+AC_ARG_WITH(
+	emacs,
+	[  --with-emacs            Use Emacs to build  [EMACS=emacs]],
+	[ if test "${withval}" != "yes" && test "${withval}" != "no"; then
+		EMACS=${withval};
+	fi ])
+AC_SUBST(EMACS)
+
+AC_CHECK_PROG(MAKEINFO, makeinfo, makeinfo, no)
+
+AC_PATH_LISPDIR
+
+AC_CHECK_W3
 
 ADDITIONAL_LOAD_PATH=
 AC_ARG_WITH(
 	addpath,
 	[  --with-addpath=PATH     search Emacs-Lisp libraries with PATH
                           use colons to separate directory names],
-	ADDITIONAL_LOAD_PATH=$with_addpath,
-)
+	ADDITIONAL_LOAD_PATH=${with_addpath})
 AC_SUBST(ADDITIONAL_LOAD_PATH)
-
-XEMACS="xemacs"
-AC_ARG_WITH(
-	xemacs,
-	[  --with-xemacs=XEMACS    compile with XEMACS [XEMACS=xemacs]],
-	XEMACS=$with_xemacs,
-)
-AC_SUBST(XEMACS)
 
 PACKAGEDIR=
 AC_ARG_WITH(
 	packagedir,
 	[  --with-packagedir=DIR   package DIR for XEmacs [guessed]],
-	PACKAGEDIR=$with_packagedir,
-)
+	PACKAGEDIR=${with_packagedir})
 AC_SUBST(PACKAGEDIR)
 
 AC_OUTPUT(Makefile lisp/Makefile lisp/dgnuspath.el texi/Makefile)

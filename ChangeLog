@@ -1,3 +1,21 @@
+2000-07-13  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* configure: Regenerate with autoconf v2.14.1.
+	* aclocal.m4: Regenerate with aclocal v1.4.
+
+	* configure.in: Don't call `AC_CHECK_PROG' for `EMACS'.
+
+	* acinclude.m4: Merge ShengHuo's changes.
+	(AC_CHECK_W3): Use `quote' instead of '.
+	(AC_XEMACS_P): Don't modify the value of `XEMACS'.
+	(AC_EMACS_LISP): Safely quote the elisp form.
+
+2000-07-12 15:47:06  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* aclocal.m4: Stolen macros from w3.
+	* configure.in: Use them.
+	* configure: Generate it.
+
 2000-07-03  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (T-gnus): Update to 6.14.5.

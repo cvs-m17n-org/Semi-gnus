@@ -51,7 +51,13 @@
 
 (require 'cl)
 
-(push "/usr/share/emacs/site-lisp" load-path)
+(defvar srcdir (or (getenv "srcdir") "."))
+
+(push (or (getenv "lispdir")
+	  "/usr/share/emacs/site-lisp")
+      load-path)
+(push (or (getenv "W3DIR") (expand-file-name "../../w3/lisp/" srcdir))
+      load-path)
 
 ;; If we are building w3 in a different directory than the source
 ;; directory, we must read *.el from source directory and write *.elc
@@ -98,8 +104,6 @@
 		(cons fn (nreverse head)))))
       (si:byte-optimize-form-code-walker form for-effect)))
   (byte-compile 'byte-optimize-form-code-walker))
-
-(defvar srcdir (or (getenv "srcdir") "."))
 
 (load (expand-file-name "gnus-clfns.el" srcdir) nil t t)
 
