@@ -1,3 +1,8 @@
+2001-09-18  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: If W3DIR is identical to URLDIR, don't add it
+	to `load-path'.
+
 2001-09-17  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus-bbdb.el (gnus-bbdb/insert-address-regexp):
