@@ -30,7 +30,7 @@
 (require 'mail-prsvr)
 
 (defvar mm-mime-mule-charset-alist
-  '((us-ascii ascii)
+  `((us-ascii ascii)
     (iso-8859-1 latin-iso8859-1)
     (iso-8859-2 latin-iso8859-2)
     (iso-8859-3 latin-iso8859-3)
@@ -73,7 +73,11 @@
 		    chinese-cns11643-3 chinese-cns11643-4
 		    chinese-cns11643-5 chinese-cns11643-6
 		    chinese-cns11643-7)
-    (utf-8 unicode-a unicode-b unicode-c unicode-d unicode-e))
+    ,(if (or (charsetp 'unicode-a)
+	     (not (coding-system-p 'mule-utf-8)))
+	 '(utf-8 unicode-a unicode-b unicode-c unicode-d unicode-e)
+       ;; If we have utf-8 we're in Mule 5+.
+       (delete 'ascii (coding-system-get 'mule-utf-8 'safe-charsets))))
   "Alist of MIME-charset/MULE-charsets.")
 
 (eval-and-compile
@@ -124,7 +128,8 @@
 	      (setq idx (1+ idx)))
 	    string)))
      (string-as-unibyte . identity)
-      )))
+     (multibyte-string-p . ignore)
+     )))
 
 (eval-and-compile
   (defalias 'mm-char-or-char-int-p
@@ -301,6 +306,7 @@ If the charset is `composition', return the actual one."
 		 (setq mail-parse-mule-charset
 		       (or (car (last (assq mail-parse-charset
 					    mm-mime-mule-charset-alist)))
+			   ;; Fixme: don't fix that!
 			   'latin-iso8859-1)))
 	     mail-parse-mule-charset)))))))
 
@@ -340,7 +346,8 @@ If the charset is `composition', return the actual one."
     (setq charsets (mm-delete-duplicates charsets))
     (if (and (> (length charsets) 1)
 	     (fboundp 'find-coding-systems-region)
-	     (memq 'utf-8 (find-coding-systems-region b e)))
+	     (let ((cs (find-coding-systems-region b e)))
+	       (or (memq 'utf-8 cs) (memq 'mule-utf-8 cs))))
 	'(utf-8)
       charsets)))
 
