@@ -450,8 +450,9 @@ beginning of the message headers."
 (defun gnus-bbdb-insinuate ()
   "Call this function to hook BBDB into Semi-gnus."
 ;;  (setq gnus-optional-headers 'gnus-bbdb/lines-and-from)
-  (add-to-list 'bbdb-extract-field-value-function-list
-	       'gnus-bbdb/extract-field-value-init)
+  (when (boundp 'bbdb-extract-field-value-function-list)
+    (add-to-list 'bbdb-extract-field-value-function-list
+		 'gnus-bbdb/extract-field-value-init))
   (add-hook 'gnus-article-prepare-hook 'gnus-bbdb/update-record)
   (add-hook 'gnus-save-newsrc-hook 'bbdb-offer-save)
   (define-key gnus-summary-mode-map ":" 'gnus-bbdb/show-sender)
