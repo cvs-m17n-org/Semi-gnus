@@ -346,7 +346,8 @@ there.")
       ;; Make status message by folding lines.
       (while (re-search-forward "[ \t\n]+" nil t)
 	(replace-match " " t t))
-      (nnheader-report 'nnspool "%s" (buffer-string))
+      (nnheader-report 'nnspool "%s" (buffer-substring
+				      (point-min) (point-max)))
       (nnheader-message 5 "nnspool: %s" nnspool-status-string)
       (ding)
       (run-hooks 'nnspool-rejected-article-hook))))

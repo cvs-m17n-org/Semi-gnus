@@ -426,7 +426,7 @@ header line with the old Message-ID."
 	  (gnus-remove-text-with-property 'gnus-next)
 	  (insert
 	   (prog1
-	       (format "%s" (buffer-string))
+	       (format "%s" (buffer-substring (point-min) (point-max)))
 	     (erase-buffer)))
 	  ;; Find the original headers.
 	  (set-buffer gnus-original-article-buffer)

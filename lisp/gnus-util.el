@@ -396,7 +396,7 @@ Cache the result as a text property stored in DATE."
     (goto-char (point-min))
     (while (search-forward "%" nil t)
       (insert "%"))
-    (buffer-string)))
+    (buffer-substring (point-min) (point-max))))
 
 ;; Make a hash table (default and minimum size is 256).
 ;; Optional argument HASHSIZE specifies the table size.

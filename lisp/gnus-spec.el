@@ -449,7 +449,7 @@
 		  (push el flist)))
 	    (insert elem-type)
 	    (push (car elem) flist))))
-      (setq fstring (buffer-string)))
+      (setq fstring (buffer-substring (point-min) (point-max))))
 
     ;; Do some postprocessing to increase efficiency.
     (setq

@@ -701,8 +701,9 @@ always hide."
 	    ;; select which header lines is to remain visible in the
 	    ;; article buffer.
 	    (goto-char (point-min))
-	    (while (re-search-forward "^[^ \t]*:" nil t)
-	      (beginning-of-line)
+	    (while (memq (char-after) '(?\t ?\ ))
+	      (forward-line 1))
+	    (while (not (eobp))
 	      ;; Mark the rank of the header.
 	      (put-text-property
 	       (point) (1+ (point)) 'message-rank
@@ -711,7 +712,9 @@ always hide."
 			    (not (looking-at ignored))))
 		   (gnus-article-header-rank)
 		 (+ 2 max)))
-	      (forward-line 1))
+	      (forward-line 1)
+	      (while (memq (char-after) '(?\t ?\ ))
+		(forward-line 1)))
 	    (message-sort-headers-1)
 	    (when (setq beg (text-property-any
 			     (point-min) (point-max) 'message-rank (+ 2 max)))
@@ -746,12 +749,11 @@ always hide."
 	      (while (re-search-forward "^[^:]+:[ \t]*\n[^ \t]" nil t)
 		(forward-line -1)
 		(gnus-article-hide-text-type
-		 (progn (beginning-of-line) (point))
+		 (point)
 		 (progn
-		   (end-of-line)
-		   (if (re-search-forward "^[^ \t]" nil t)
-		       (match-beginning 0)
-		     (point-max)))
+		   (while (and (zerop (forward-line 1))
+			       (memq (char-after) '(?\t ?\ ))))
+		   (point))
 		 'boring-headers)))
 	     ;; Hide boring Newsgroups header.
 	     ((eq elem 'newsgroups)
@@ -807,10 +809,9 @@ always hide."
       (gnus-article-hide-text-type
        (progn (beginning-of-line) (point))
        (progn
-	 (end-of-line)
-	 (if (re-search-forward "^[^ \t]" nil t)
-	     (match-beginning 0)
-	   (point-max)))
+	 (while (and (zerop (forward-line 1))
+		     (memq (char-after) '(?\t ?\ ))))
+	 (point))
        'boring-headers))))
 
 (defun article-treat-dumbquotes ()
@@ -877,7 +878,7 @@ characters to translate to."
 	    (adaptive-fill-mode t))
 	(while (not (eobp))
 	  (and (>= (current-column) (min fill-column (window-width)))
-	       (not (eq (char-before) ?:))
+	       (not (eq (preceding-char) ?:))
 	       (fill-paragraph nil))
 	  (end-of-line 2))))))
 
@@ -2706,7 +2707,7 @@ groups."
   "Exit the article editing without updating."
   (interactive)
   ;; We remove all text props from the article buffer.
-  (let ((buf (format "%s" (buffer-string)))
+  (let ((buf (format "%s" (buffer-substring (point-min) (point-max))))
 	(curbuf (current-buffer))
 	(p (point))
 	(window-start (window-start)))
@@ -2815,7 +2816,7 @@ after replacing with the original article."
       (setq font-lock-defaults nil)
       (font-lock-mode 0))
     ;; We remove all text props from the article buffer.
-    (setq buf (format "%s" (buffer-string)))
+    (setq buf (format "%s" (buffer-substring (point-min) (point-max))))
     (set-buffer (get-buffer-create gnus-original-article-buffer))
     (erase-buffer)
     (insert buf)
@@ -3028,9 +3029,11 @@ do the highlighting.  See the documentation for those functions."
 	    (when (and field-face
 		       (not (memq (setq from (point)) fpoints)))
 	      (push from fpoints)
-	      (if (re-search-forward "^[^ \t]" nil t)
-		  (forward-char -2)
-		(goto-char (point-max)))
+	      (while (and (zerop (forward-line 1))
+			  (memq (char-after) '(?\t ?\ ))))
+	      (unless (eobp)
+		;; Go to the end of the previous line.
+		(end-of-line 0))
 	      (gnus-put-text-property from (point) 'face field-face))))))))
 
 (defun gnus-article-highlight-signature ()
@@ -3122,9 +3125,9 @@ specified by `gnus-button-alist'."
 	(while (re-search-forward (car entry) nil t)
 	  ;; Each header matching the entry.
 	  (setq beg (match-beginning 0))
-	  (setq end (or (and (re-search-forward "^[^ \t]" nil t)
-			     (match-beginning 0))
-			(point-max)))
+	  (while (and (zerop (forward-line 1))
+		      (memq (char-after) '(?\t ?\ ))))
+	  (setq end (point))
 	  (goto-char beg)
 	  (while (re-search-forward (nth 1 entry) end t)
 	    ;; Each match within a header.
