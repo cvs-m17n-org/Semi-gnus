@@ -205,9 +205,10 @@ Message $B$O2?=h$KJVEz$,9T$/$+$rIaDL$NJ}K!(B (@pxref{Responses}) $B$G7hDj$7$^
 $B$&!#(B
 
 $B$3$N4X?t$O%j%9%H$rJV$9;v$b$G$-$^$9!#$=$N$h$&$J>l9g$O!"$=$l$>$l$NMWAG(B
-$B$O(B cons $B%;%k$G$"$k$Y$-$G!"$=$l$N(B car $B$O%X%C%@!<$NL>A0(B ($BNc(B @code{Cc}) $B$G!"(B
-cdr $B$,%X%C%@!<$NCM(B ($BNc(B @samp{larsi@@ifi.uio.no}) $B$G$"$k$Y$-$G$9!#A4$F$N(B
-$B$3$l$i$N%X%C%@!<$O=P$F9T$/%a!<%k$N%X%C%@!<$KA^F~$5$l$^$9!#(B
+$B$O(B cons $B%;%k$G$"$k$Y$-$G!"$=$l$N(B @sc{car} $B$O%X%C%@!<$NL>(B
+$BA0(B ($BNc(B @code{Cc}) $B$G!"(B@sc{cdr} $B$,%X%C%@!<$N(B
+$BCM(B ($BNc(B @samp{larsi@@ifi.uio.no}) $B$G$"$k$Y$-$G$9!#$9$Y$F$N$3$l$i$N%X%C%@!<(B
+$B$O=P$F9T$/%a!<%k$N%X%C%@!<$KA^F~$5$l$^$9!#(B
 
 @node Wide Reply
 @section $B9-$/JVEz(B
@@ -989,7 +990,7 @@ modern cryptography, @acronym{S/MIME}, various PKCS standards, OpenSSL and
 so on.
 
 The @acronym{S/MIME} support in Message (and MML) require OpenSSL.  OpenSSL
-perform the actual @acronym{S/MIME} sign/encrypt operations.  OpenSSL can
+performs the actual @acronym{S/MIME} sign/encrypt operations.  OpenSSL can
 be found at @uref{http://www.openssl.org/}.  OpenSSL 0.9.6 and later
 should work.  Version 0.9.5a cannot extract mail addresses from
 certificates, and it insert a spurious CR character into @acronym{MIME}
@@ -1622,16 +1623,16 @@ qmail-inject $B%W%m%0%i%`$KEO$90z?t$G$9!#$3$l$OJ8;zNs$N%j%9%H$G!"$=$l$>$l(B
 
 @findex yow
 @cindex Mime-Version
-$B2C$($F(B cons $B$r%j%9%H$KF~$l$k;v$,$G$-$^$9!#(Bcons $B$N(B car $B$O%7%s%\%k$G$"$k$Y(B
-$B$-$G$9!#$3$N%7%s%\%kL>$O%X%C%@!<L>$G!"(Bcdr $B$O$3$N%X%C%@!<$NCM$H$7$F$=$N$^(B
-$B$^F~$l$i$l$k$3$H$K$J$kJ8;zNs$+!"8F$P$l$k4X?t$N$I$A$i$+$G$"$k;v$,$G$-$^$9!#(B
-$BNc$($P!"$b$7(B @code{Mime-Version: 1.0} $B$rA^F~$7$?$$$J$i!"(B
+$B2C$($F(B cons $B$r%j%9%H$KF~$l$k;v$,$G$-$^$9!#$3$N(B cons $B$N(B @sc{car} $B$O%7%s%\(B
+$B%k$G$"$k$Y$-$G$9!#$3$N%7%s%\%kL>$O%X%C%@!<L>$G!"(B@sc{cdr} $B$O$3$N%X%C%@!<(B
+$B$NCM$H$7$F$=$N$^$^F~$l$i$l$k$3$H$K$J$kJ8;zNs$+!"8F$P$l$k4X?t$N$I$A$i$+$G(B
+$B$"$k;v$,$G$-$^$9!#Nc$($P!"$b$7(B @code{Mime-Version: 1.0} $B$rA^F~$7$?$$$J$i!"(B
 @code{(Mime-Version . "1.0")} $B$r%j%9%H$KF~$l$k$Y$-$G$7$g$&!#$b$7$*$b$7$m(B
 $B$$0zMQ$rA^F~$7$?$$$J$i!"(B@code{(X-Yow . yow)} $B$N$h$&$J$b$N$r%j%9%H$KF~$l(B
 $B$k;v$,$G$-$k$G$7$g$&!#4X?t(B @code{yow} $B$O$=$N8e$G0z?tL5$7$G8F$P$l$^$9!#(B
 
-$B$b$7%j%9%H$,(B cons $B$N(B car $B$,(B @code{optional} $B$G$"$k(B cons $B$r4^$s$G$$$k$J$i!"(B
-$B$3$N(B cons $B$N(B cdr $B$O(B @code{nil} $B$G$J$$$H$-$@$1A^F~$5$l$^$9!#(B
+$B$b$7%j%9%H$,(B cons $B$N(B @sc{car} $B$,(B @code{optional} $B$G$"$k(B cons $B$r4^$s$G$$(B
+$B$k$J$i!"$3$N(B cons $B$N(B @sc{cdr} $B$O(B @code{nil} $B$G$J$$$H$-$@$1A^F~$5$l$^$9!#(B
 
 $B$3$N%j%9%H$+$i$"$k9`L\$r>C$7$?$$$J$i$P!"0J2<$N(B Lisp $B$N@Z$lC<$,Lr$KN)$D$G(B
 $B$7$g$&!#B>$NMWAG$r:o=|$7$?$$$H$-$O$=$l$K9g$o$;$F2<$5$$!#(B
@@ -1760,7 +1761,8 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 $BG=$,$"$j$^$9!#$b$7$"$J$?$,EY$r1[$7$F0zMQ9T$rJQ99$7$F$7$^$&$H!"$=$l$rFI$`(B
 $B?M$?$A$bH`$i$N(B gnus $B$rBP1~$5$;$J$1$l$P$J$i$J$/$J$k$G$7$g$&!#JQ(B
 $B?t(B @code{gnus-cite-attribution-suffix} $B$r;2>H$7$F2<$5$$!#>\:Y(B
-$B$O(B @xref{Article Highlighting, , $B5-;v$N%O%$%i%$%H(B, gnus-ja}, $B$K$"$j$^$9!#(B
+$B$O(B @xref{Article Highlighting, , $B5-;v$N%O%$%i%$%H(B, gnus-ja, The Gnus
+Manual}, $B$K$"$j$^$9!#(B
 
 @item message-yank-prefix
 @vindex message-yank-prefix
@@ -1991,7 +1993,7 @@ Emacs $B$O%a%C%;!<%8:n@.$r$$$m$$$m$K2u$7$F$7$^$&$3$H$,$G$-$kB?$/$N%F%-%9%H(B
 $B<0$r;}$C$F$$$^$9(B
 
 @lisp
-(TYPE PREDICATE FUNCTION)
+(@var{type} @var{predicate} @var{function})
 @end lisp
 
 @table @var
@@ -2153,7 +2155,7 @@ Message $B$O$3$l$i$N%j%9%H$H:nMQ$9$k4X?t$rDs6!$7$F$$$^$9(B:
 $B%I%&@_Dj$rI|3h$5$;$^$9!#(B
 
 @dfn{$BF0:n(B} $B$O<!$N$I$l$+$G$9(B: $BIaDL$N4X?t!"$b$7$/$O(B @code{car} $B$,4X?t$G!"(B
-@code{cdr} $B$,0z?t$N%j%9%H$G$"$k%j%9%H$+!"(B@code{$BI>2A(B} $B$5$l$k<0$G$9!#(B
+@sc{cdr} $B$,0z?t$N%j%9%H$G$"$k%j%9%H$+!"(B@code{$BI>2A(B} $B$5$l$k<0$G$9!#(B
 
 @node Compatibility
 @chapter $B8_49@-(B
