@@ -1,3 +1,12 @@
+2000-05-23  KOSEKI Yoshinori  <kose@wizard.tamra.co.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-mime-encode-string): Fix wrong
+	close brackets.
+
+2000-05-23  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el: Change coding-system.
+
 2000-05-21  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* texi/gnus-ja.texi (nnshimbun): Add description.
@@ -10,9 +19,9 @@
 
 2000-05-21  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
-	* nnshimbun.el: New backend.
+	* lisp/nnshimbun.el: New backend.
 
-	* gnus-group.el (gnus-group-make-shimbun-group): New command.
+	* lisp/gnus-group.el (gnus-group-make-shimbun-group): New command.
 
 2000-05-17  Kenichi OKADA <okada@opaopa.org>
 
