@@ -7949,3 +7949,441 @@ given a prefix, include the mail.
 @end table
 
 
+@node Composing Messages
+@chapter メッセージの作成
+@cindex composing messages
+@cindex messages
+@cindex mail
+@cindex sending mail
+@cindex reply
+@cindex followup
+@cindex post
+
+@kindex C-c C-c (投稿)
+全ての投稿とメールの命令は、@kbd{C-c C-c} を押す事によって、記事を送信す
+る前に記事を好きなように編集する事のできる、メッセージバッファに移動しま
+す。 @xref{Top, , Top, message, The Message Manual}。もし外部ニューズグ
+ループにいて、記事を外部サーバーを使って投稿したいのであれば、@kbd{C-c
+C-c} に接頭引数を与えて、gnus に外部サーバーを使って投稿しようと試させる
+事ができます。
+
+@menu
+* Mail::                 メールと返答。
+* Post::                 投稿とフォローアップ。
+* Posting Server::       どのサーバーを通して投稿するべきか?
+* Mail and Post::        同時にメールを出し返答する。
+* Archived Messages::    送ったメッセージを gnus が貯めておくところ。
+* Drafts::               メッセージの延期と拒否されたメッセージ。
+* Rejected Articles::    サーバーがあなたの記事を好きでないときに何が起こる?
+@end menu
+
+投稿するべきでなかった記事を削除するための情報は @pxref{Canceling and
+Superseding} を参照してください。
+
+
+@node Mail
+@section メール
+
+出て行くメールをカスタマイズする変数です:
+
+@table @code
+@item gnus-uu-digest-headers
+@vindex gnus-uu-digest-headers
+要約メッセージ (digested message) に含まれるヘッダーに合致する正規表現の
+リストです。ヘッダーは合致した順に取り込まれます。
+
+@item gnus-add-to-list
+@vindex gnus-add-to-list
+@code{nil} でなければ、@kbd{a} をしたときに、@code{to-list} グループパラ
+メータをそれのないメールグループに付け加えます。
+
+@end table
+
+
+@node Post
+@section 投稿
+
+ニューズ記事作成のための変数:
+
+@table @code
+@item gnus-sent-message-ids-file
+@vindex gnus-sent-message-ids-file
+Gnus は送信した全てのメールの @code{Message-ID} 履歴ファイル (history
+file) を保存します。もしメールを既に送った事が発見されたなら、利用者にメー
+ルを再送するかどうかを尋ねます。 (これは主に同じパケットを複数回送る傾向
+のある @sc{soup} パケットや、それに似たようなものを扱っているときに役に
+立ちます。) この変数はこの履歴ファイルがどこにあるかを指定します。ディフォ
+ルトでは @file{~/News/Sent-Message-IDs} です。Gnus が履歴ファイルを保持
+する事を望まないのであれば、この変数を @code{nil} に設定する事ができます。
+
+@item gnus-sent-message-ids-length
+@vindex gnus-sent-messages-ids-length
+この変数はどれくらい多くの @code{Message-ID} を履歴ファイルに保持するか
+を指定します。ディフォルトでは1000です。
+
+@end table
+
+
+@node Posting Server
+@section 投稿するサーバー
+
+最新の (もちろん、非常に知的な) 記事を送り出すために、あの魔法のような
+@kbd{C-c C-c} キーを押した時、それはどこにいくのでしょう?
+
+尋ねてくれてありがとう。あなたを恨みます。
+
+@vindex gnus-post-method
+
+それは非常に複雑になり得ます。普通は、gnus は同じ基本サーバーを使用しま
+す。しかし。あなたの基本サーバーが投稿を許可せず、読むことのみを許可して
+いるのならば、おそらくあなたの (非常に知的でとんでもなく興味深い) 記事を
+投稿するために、他のサーバーを使いたいと思うでしょう。
+@code{gnus-post-method} を他の方法に設定する事ができます。
+
+@lisp
+(setq gnus-post-method '(nnspool ""))
+@end lisp
+
+さて、この設定をした後でサーバーがあなたの記事を拒否したり、サーバーが落
+ちていたりしたら、どうしたらよいのでしょう? この変数を上書きするために、
+命令 @kbd{C-c C-c} に零でない接頭引数を与える事で、投稿に ``現在の'' サー
+バーを使わせる事ができます。
+
+もし、零接頭引数をその命令に与えたなら (すなわち、@kbd{C-u 0 C-c C-c})、
+gnus は投稿にどの方法を使うかをあなたに尋ねます。
+
+@code{gnus-post-method} を選択方法のリストにする事もできます。その場合は、
+gnus は常に投稿にどの方法を使うかをあなたに尋ねます。
+
+
+@node Mail and Post
+@section メールと投稿
+
+これはメールを出す事と投稿する事の両方に関連する変数のリストです:
+
+@table @code
+@item gnus-mailing-list-groups
+@findex gnus-mailing-list-groups
+@cindex mailing lists
+
+もしあなたのニューズサーバーが本当にメーリングリストから @sc{nntp} サー
+バーへのゲートウェイを提供しているのであれば、それらのグループは問題なく
+読めるでしょう。しかし簡単にはそれらに投稿/フォローアップすることはでき
+ません。一つの解決法は グループパラメータ (@pxref{Group Parameters}) に 
+@code{to-address} を加える事です。簡単にできるのは、
+@code{gnus-mailing-list-groups} を、本当にメーリングリストであるようなグ
+ループに合致する正規表現に設定することです。その後は、すくなくとも、メー
+リングリストへのフォローアップはたいていのときに動作します。これらのグルー
+プに投稿する事は (@kbd{a}) それでも苦痛を引き起こすでしょうけど。
+
+@end table
+
+あなたは自分が送るメッセージの綴りを調べたいと思うかも知れません。もしく
+は、もし手で綴り調べをしたくないのであれば、自動綴り調べを @code{ispell}
+パッケージを使う事によって付け加える事ができます:
+
+@cindex ispell
+@findex ispell-message
+@lisp
+(add-hook 'message-send-hook 'ispell-message)
+@end lisp
+
+
+@node Archived Messages
+@section メッセージの保管
+@cindex archived messages
+@cindex sent messages
+
+Gnus はあなたが送ったメールとニューズを貯めておくためのいくつかの違った
+方法を提供します。ディフォルトの方法はメッセージを保存するために 
+@dfn{事実上の書庫サーバー} (archive virtual server) を使います。これを完
+全に禁止したいのであれば、変数 @code{gnus-message-archive-group} は 
+@code{nil} になるべきで、これがディフォルトです。
+
+@vindex gnus-message-archive-method
+@code{gnus-message-archive-method} は送ったメッセージを蓄積するためにど
+の事実上のサーバーを gnus が使うべきかを指定します。ディフォルトは:
+
+@lisp
+(nnfolder "archive"
+          (nnfolder-directory   "~/Mail/archive")
+          (nnfolder-active-file "~/Mail/archive/active")
+          (nnfolder-get-new-mail nil)
+          (nnfolder-inhibit-expiry t))
+@end lisp
+
+しかし、どのメール選択方法でも使う事ができます (@code{nnml}、
+@code{nnmbox} などなど)。しかし @code{nnfolder} はこのような事をするのに
+とても好ましい選択方法です。ディフォルトのディレクトリー選択を好きでない
+ならば、次のようにできます:
+
+@lisp
+(setq gnus-message-archive-method
+      '(nnfolder "archive"
+                 (nnfolder-inhibit-expiry t)
+                 (nnfolder-active-file "~/News/sent-mail/active")
+                 (nnfolder-directory "~/News/sent-mail/")))
+@end lisp
+
+@vindex gnus-message-archive-group
+@cindex Gcc
+Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
+ループへ向かう @code{Gcc} ヘッダーを挿入します。どのグループを使うかは変
+数 @code{gnus-message-archive-group} によって決まります。
+
+この変数は次のような事をするために使われます:
+
+@itemize @bullet
+@item 文字列
+メッセージはそのグループに保存されます。
+@item 文字列のリスト
+メッセージはそれらの全てのグループに保存されます。
+@item 正規表現、関数、様式の連想リスト
+キーが ''合致'' すると、結果が使われます。
+@item @code{nil}
+メッセージの保存は行われません。これがディフォルトです。
+@end itemize
+
+試してみましょう:
+
+@samp{MisK} と呼ばれる一つのグループに保存するならば:
+@lisp
+(setq gnus-message-archive-group "MisK")
+@end lisp
+
+2つのグループ、@samp{MisK} と @samp{safe} に保存するならば:
+@lisp
+(setq gnus-message-archive-group '("Misk" "safe"))
+@end lisp
+
+どのグループにいるかによって違ったグループに保存するなら:
+@lisp
+(setq gnus-message-archive-group
+      '(("^alt" "sent-to-alt")
+        ("mail" "sent-to-mail")
+        (".*" "sent-to-misc"))
+@end lisp
+
+もっと複雑なもの:
+@lisp
+(setq gnus-message-archive-group
+      '((if (message-news-p)
+            "misc-news"
+          "misc-mail")))
+@end lisp
+
+全てのニューズメッセージを一つのファイルに保存して、メールメッセージを一
+月につき一つのファイルに保存するには:
+
+@lisp
+(setq gnus-message-archive-group
+      '((if (message-news-p)
+            "misc-news"
+          (concat "mail." (format-time-string
+                           "%Y-%m" (current-time))))))
+@end lisp
+
+(XEmacs 19.13 には @code{format-time-string} はありませんので、その 
+@code{gnus-message-archive-group} のために違った値を使わなければなりませ
+ん。)
+
+今や、メッセージを送ると、それは適切なグループに保存されます。 (もし特定
+のメッセージに対して保存をしたくないのであれば、挿入された @code{Gcc} ヘッ
+ダーを取り除いてください。) 保管グループは次に gnus を起動したときか、次
+にグループバッファで @kbd{F} を押したときにグループバッファに現れます。
+他のグループと同じようにそのグループに入って、記事を読む事ができます。そ
+のグループが本当に大きくなって嫌になったら、なにか良いものにその名前を変
+更する事ができます (グループバッファで @kbd{G r} を使う事によって)
+---@samp{misc-mail-september-1995} や他のもに。新しいメッセージは古い 
+(今は空になった) グループに溜められます。
+
+以上が送ったメッセージを保管するディフォルトの方法です。Gnus はディフォ
+ルトの方法を好きではない人には違ったやり方を勧めています。そのような場合
+は、@code{gnus-message-archive-group} を @code{nil} に設定するべきです。
+これは保管をしないようにします。
+
+@table @code
+@item gnus-outgoing-message-group
+@vindex gnus-outgoing-message-group
+全ての外にいくメッセージはこのグループに入れられます。もし全ての外に行く
+メールと記事をグループ @samp{nnml:archive} に保管したいのであれば、この
+変数をその値に設定する事ができます。この変数はグループ名のリストである事
+もできます。
+
+もしそれぞれのメッセージをどのグループに入れるかをもっと制御したいのであ
+れば、この変数を現在のニューズグループ名を調べて、適切なグループ名 (もし
+くは名前のリスト) を返す関数に設定する事ができます。
+
+この変数は @code{gnus-message-archive-group} の代わりに使う事ができます
+が、後者の方が好ましい方法です。
+@end table
+
+
+@c @node Posting Styles
+@c @section Posting Styles
+@c @cindex posting styles
+@c @cindex styles
+@c
+@c All them variables, they make my head swim.
+@c
+@c So what if you want a different @code{Organization} and signature based
+@c on what groups you post to?  And you post both from your home machine
+@c and your work machine, and you want different @code{From} lines, and so
+@c on?
+@c
+@c @vindex gnus-posting-styles
+@c One way to do stuff like that is to write clever hooks that change the
+@c variables you need to have changed.  That's a bit boring, so somebody
+@c came up with the bright idea of letting the user specify these things in
+@c a handy alist.  Here's an example of a @code{gnus-posting-styles}
+@c variable:
+@c
+@c @lisp
+@c ((".*"
+@c   (signature . "Peace and happiness")
+@c   (organization . "What me?"))
+@c  ("^comp"
+@c   (signature . "Death to everybody"))
+@c  ("comp.emacs.i-love-it"
+@c   (organization . "Emacs is it")))
+@c @end lisp
+@c
+@c As you might surmise from this example, this alist consists of several
+@c @dfn{styles}.  Each style will be applicable if the first element
+@c ``matches'', in some form or other.  The entire alist will be iterated
+@c over, from the beginning towards the end, and each match will be
+@c applied, which means that attributes in later styles that match override
+@c the same attributes in earlier matching styles.  So
+@c @samp{comp.programming.literate} will have the @samp{Death to everybody}
+@c signature and the @samp{What me?} @code{Organization} header.
+@c
+@c The first element in each style is called the @code{match}.  If it's a
+@c string, then Gnus will try to regexp match it against the group name.
+@c If it's a function symbol, that function will be called with no
+@c arguments.  If it's a variable symbol, then the variable will be
+@c referenced.  If it's a list, then that list will be @code{eval}ed.  In
+@c any case, if this returns a non-@code{nil} value, then the style is said
+@c to @dfn{match}.
+@c
+@c Each style may contain a arbitrary amount of @dfn{attributes}.  Each
+@c attribute consists of a @var{(name . value)} pair.  The attribute name
+@c can be one of @code{signature}, @code{organization} or @code{from}.  The
+@c attribute name can also be a string.  In that case, this will be used as
+@c a header name, and the value will be inserted in the headers of the
+@c article.
+@c
+@c The attribute value can be a string (used verbatim), a function (the
+@c return value will be used), a variable (its value will be used) or a
+@c list (it will be @code{eval}ed and the return value will be used).
+@c
+@c So here's a new example:
+@c
+@c @lisp
+@c (setq gnus-posting-styles
+@c       '((".*"
+@c           (signature . "~/.signature")
+@c           (from . "user@@foo (user)")
+@c           ("X-Home-Page" . (getenv "WWW_HOME"))
+@c           (organization . "People's Front Against MWM"))
+@c         ("^rec.humor"
+@c           (signature . my-funny-signature-randomizer))
+@c         ((equal (system-name) "gnarly")
+@c           (signature . my-quote-randomizer))
+@c         (posting-from-work-p
+@c           (signature . "~/.work-signature")
+@c           (from . "user@@bar.foo (user)")
+@c           (organization . "Important Work, Inc"))
+@c         ("^nn.+:"
+@c           (signature . "~/.mail-signature"))))
+@c @end lisp
+
+@node Drafts
+@section 下書き
+@cindex drafts
+
+もしメッセージ (メールもしくはニューズ) を書いているときに、突然オーブン
+にステーキが入っている事を思い出したなら (もしくは、あなたがとーってもす
+ごい菜食主義者で、茎をフードプロセッサーをいれているなら)、書いているメッ
+セージを保存する方法があれば良いと思うでしょう。そうすれば、いつか別の日
+に編集を続ける事ができ、それが完成したと思ったときに送る事ができます。
+
+えぇ、心配しないでください。Gnus のメールと投稿命令を使う何らかのメッセー
+ジを書き始めたときに、手に入れるバッファは自動的に特別な @dfn{draft} グ
+ループに関連付けられます。普通の方法でバッファを保存すれば (たとえば、
+@kbd{C-x C-s})、その記事はそこに保存されます。(自動保存ファイルも下書き
+グループ (draft group) に行きます。)
+
+@cindex nndraft
+@vindex nndraft-directory
+下書きグループは @samp{nndraft:draftx} と呼ばれる特別なグループ です(も
+しあなたが全てを知らなければならないのであれば、それは  @code{nndraft} 
+グループとして実装されています)。変数 @code{nndraft-directory} はそのファ
+イルを @code{nndraft} がどこに保管するべきかを指定します。このグループが
+特別であるというのは、その中の記事を永可視にしたり既読の印を付けたりでき
+ないからです---グループの全ての記事は永久に未読です。
+
+もしグループが存在しないなら、それは作成され、購読されます。グループバッ
+ファからそれを消し去る唯一の方法は、それを未購読にすることです。
+
+@c @findex gnus-dissociate-buffer-from-draft
+@c @kindex C-c M-d (Mail)
+@c @kindex C-c M-d (Post)
+@c @findex gnus-associate-buffer-with-draft
+@c @kindex C-c C-d (Mail)
+@c @kindex C-c C-d (Post)
+@c If you're writing some super-secret message that you later want to
+@c encode with PGP before sending, you may wish to turn the auto-saving
+@c (and association with the draft group) off.  You never know who might be
+@c interested in reading all your extremely valuable and terribly horrible
+@c and interesting secrets.  The @kbd{C-c M-d}
+@c (@code{gnus-dissociate-buffer-from-draft}) command does that for you.
+@c If you change your mind and want to turn the auto-saving back on again,
+@c @kbd{C-c C-d} (@code{gnus-associate-buffer-with-draft} does that.
+@c
+@c @vindex gnus-use-draft
+@c To leave association with the draft group off by default, set
+@c @code{gnus-use-draft} to @code{nil}.  It is @code{t} by default.
+
+@findex gnus-draft-edit-message
+@kindex D e (下書き)
+記事の編集を続けたいときは、下書きグループに入って @kbd{D e}
+(@code{gnus-draft-edit-message}) を押すだけです。あなたが残した状態のバッ
+ファに移動します。
+
+拒否された記事もこの下書きグループに入れられます (@pxref{Rejected
+Articles})。
+
+@findex gnus-draft-send-all-messages
+@findex gnus-draft-send-message
+それ以上編集しないで投稿 (もしくはメール) したい拒否されたメッセージがた
+くさんあるのであれば、命令 @kbd{D s} を使う事ができます。この命令はプロ
+セス/接頭引数の習慣を理解します (@pxref{Process/Prefix})。命令 @kbd{D S}
+(@code{gnus-draft-send-all-messages}) はバッファの全てのメッセージを送り
+出します。
+
+送りたくないメッセージがいくつかあるのであれば、命令 @kbd{D t}
+(@code{gnus-draft-toggle-sending}) を使ってメッセージを配送不可の印を付
+ける事ができます。これは切り替え命令です。
+
+
+@node Rejected Articles
+@section 拒否された記事
+@cindex rejected articles
+
+時々ニューズサーバーは記事を拒否します。おそらくサーバーはあなたの顔を好
+きではないのでしょう。おそらくそれは惨めに感じたからでしょう。おそらく 
+@emph{デーモン (demon) がいるのでしょう}。 おそらく引用文を入れすぎたの
+でしょう。おそらくディスクが一杯だったのでしょう。おそらくサーバーが落ち
+ていたのでしょう。
+
+これらの状況は、もちろん、完全に gnus の扱える範囲外です。(Gnus は、もち
+ろん、あなたの外見を愛しており、いつも機嫌が良く、中を飛び回る天使がいて、
+どれくらい引用文が含まれていようと気にせず、一杯になったり、落っこちたり
+しません。) ですから、gnus はこれらの記事を後でサーバーの気分がよくなる
+まで保存します。
+
+拒否された記事は自動的に特別な下書きグループ (@pxref{Drafts}) に入れられ
+ます。サーバーが戻ってきたなら、普通はそのグループに入って全ての記事を送
+ります。
+
+
