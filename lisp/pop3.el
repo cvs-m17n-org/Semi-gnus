@@ -56,6 +56,7 @@
 (require 'path-util)
 
 (require 'mail-utils)
+(require 'nnheader)
 
 (defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
   "*POP3 maildrop.")
