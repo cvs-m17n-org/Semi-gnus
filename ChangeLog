@@ -1,5 +1,8 @@
 1998-03-13  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus-art.el: Rename `mime-view-kill-buffer' ->
+ 	`mime-preview-kill-buffer'.
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.0.10.
 
 	* lisp/gnus-sum.el: Add code to check latest SEMI.
