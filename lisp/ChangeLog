@@ -1,3 +1,13 @@
+2004-11-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* nntp.el (nntp-request-update-info): Return nil if
+	nntp-marks-is-evil is true so that gnus-get-unread-articles-in-group
+	may not call gnus-activate-group which uselessly issues the GROUP
+	commands for all nntp groups and wastes time.  Reported by Romain
+	Francoise <romain@orebokech.com>.
+
+	* gnus-start.el (gnus-get-unread-articles): Remove redundant test.
+
 2004-11-15  Simon Josefsson  <jas@extundo.com>
 
 	* gnus-art.el (gnus-header-button-alist): Handle URLs in OpenPGP:
@@ -99,7 +109,7 @@
 
 	* starttls.el (starttls-gnutls-program, starttls-use-gnutls)
 	(starttls-extra-arguments, starttls-process-connection-type)
-	(starttls-connect, starttls-failure, starttls-success): 
+	(starttls-connect, starttls-failure, starttls-success):
 
 	* spam-stat.el (spam-stat): Add :version.
 
@@ -111,7 +121,7 @@
 	* nnmail.el (nnmail-split-fancy-with-parent-ignore-groups)
 	(nnmail-cache-ignore-groups, nnmail-spool-hook)
 	(nnmail-split-fancy-match-partial-words)
-	(nnmail-split-lowercase-expanded): 
+	(nnmail-split-lowercase-expanded):
 
 	* nndiary.el (nndiary): Add :version.
 
