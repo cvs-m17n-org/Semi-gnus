@@ -8279,7 +8279,7 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
 $B$G$J$$CM$r5"$;$P!"MM<0$O(B @code{$B9gCW$7$?(B} $B$H8@$$$^$9!#(B
 
 $B$=$l$>$l$NMM<0$OG$0U$NNL$N(B @dfn{$BB0@-(B} $B$r;}$D;v$,$G$-$^$9!#$=$l$>$l$NB0@-(B
-$B$O(B @var{(name . value)} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>$O!"(B
+$B$O(B @var{(name value)} $B$NBP$K$h$j@.$jN)$C$F$$$^$9!#B0@-L>$O!"(B
 @code{signature}, @code{signature-file}, @code{organization},
 @code{address}, @code{name}, @code{body} $B$N$I$l$+$G$"$k;v$,$G$-$^$9!#B0(B
 $B@-L>$OJ8;zNs$G$"$k;v$b$G$-$^$9!#$=$N>l9g$O!"$3$l$O%X%C%@!<L>$H$7$F;H$o$l!"(B
