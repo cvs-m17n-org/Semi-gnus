@@ -6923,6 +6923,9 @@ and `request-accept' functions."
 		 (crosspost "Crosspost" "Crossposting")))
 	(copy-buf (save-excursion
 		    (nnheader-set-temp-buffer " *copy article*")))
+	(default-marks gnus-article-mark-lists)
+	(no-expire-marks (delete '(expirable . expire)
+				 (copy-sequence gnus-article-mark-lists)))
 	art-group to-method new-xref article to-groups)
     (unless (assq action names)
       (error "Unknown action %s" action))
@@ -7028,11 +7031,10 @@ and `request-accept' functions."
 				       (list (cdr art-group)))))
 
 	    ;; Copy any marks over to the new group.
-	    (let ((marks gnus-article-mark-lists)
+	    (let ((marks (if (gnus-group-auto-expirable-p to-group)
+			     default-marks
+			   no-expire-marks))
 		  (to-article (cdr art-group)))
-	      (unless (gnus-group-auto-expirable-p to-group)
-		(setq marks (delete '(expirable . expire) marks)))
-
 	      ;; See whether the article is to be put in the cache.
 	      (when gnus-use-cache
 		(gnus-cache-possibly-enter-article
