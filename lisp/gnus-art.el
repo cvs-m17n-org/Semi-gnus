@@ -31,12 +31,10 @@
 (eval-when-compile (require 'static))
 
 (require 'path-util)
-(require 'custom)
 (require 'gnus)
 (require 'gnus-sum)
 (require 'gnus-spec)
 (require 'gnus-int)
-(require 'browse-url)
 (require 'alist)
 (require 'mime-view)
 
@@ -211,16 +209,24 @@ regexp.  If it matches, the text in question is not a signature."
   :group 'gnus-article-hiding)
 
 (defcustom gnus-article-x-face-command
-  (if (and (not gnus-xemacs)
-	   window-system
-	   (module-installed-p 'x-face-mule))
-      'x-face-mule-gnus-article-display-x-face
-    "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | display -"
-    )
+  (cond
+   ((and (fboundp 'image-type-available-p)
+	 (or (image-type-available-p 'xpm)
+	     (image-type-available-p 'xbm)))
+    'gnus-article-display-xface)
+   ((and (not gnus-xemacs)
+	 window-system
+	 (module-installed-p 'x-face-mule))
+    'x-face-mule-gnus-article-display-x-face)
+   (t
+    "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | display -"))
   "*String or function to be executed to display an X-Face header.
 If it is a string, the command will be executed in a sub-shell
 asynchronously.	 The compressed face will be piped to this command."
-  :type 'string				;Leave function case to Lisp.
+  :type '(choice string
+		 (function-item gnus-article-display-xface)
+		 (function-item x-face-mule-gnus-article-display-x-face)
+		 function)
   :group 'gnus-article-washing)
 
 (defcustom gnus-article-x-face-too-ugly nil

@@ -1,3 +1,35 @@
+2000-04-27  Dave Love  <fx@gnu.org>
+
+	* gnus-art.el: Don't bother to require custom, browse-url.
+	(gnus-article-x-face-command): Include gnus-article-display-xface.
+
+	* gnus-ems.el: Assume only (X)Emacs 20+.  Simplify XEmacs checks.
+	Use defalias, not fset.
+	(gnus-article-display-xface): New function.
+
+	* mm-view.el (mm-inline-image-emacs): Use put-image, remove-images.
+
+	* mm-decode.el: Small doc fixes.  Require cl when compiling.
+	(mm-xemacs-p): Deleted.
+	(mm-get-image-emacs, mm-get-image-xemacs): Deleted.
+	(mm-get-image): Amalgamate Emacs and XEmacs code here; for Emacs,
+	use create-image and don't special-case xbm.
+	(mm-valid-image-format-p): Use display-graphic-p.
+
+2000-04-27 15:27:54  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-send-mail-partially-limit): New variable.
+	(message-send-mail-partially): New function.
+	(message-send-mail): Use it.
+	* mm-bodies.el (mm-decode-content-transfer-encoding): Remove 
+	all blank lines inside of base64.
+	* mm-partial.el (mm-inline-partial): Add an option. Remove tail
+	blank lines.
+
+2000-04-27 10:03:36  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-insert-tag): Match more special characters.
+
 2000-04-27 09:06:29  Shenghuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-msg.el (gnus-bug): Avoid attaching the external buffer.
