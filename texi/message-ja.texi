@@ -31,9 +31,20 @@ Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
 license is included in the section entitled ``GNU Free Documentation
 License''.
 
+この文書を、フリーソフトウェア財団発行の GNU フリー文書利用許諾契約書
+第 1.1 版またはそれ以降の版が定める条件の下で複製、配布、あるいは変更す
+ることを許可する。変更不可部分は指定しない。「A GNU Manual」は表表紙テ
+キスト、以下の (a) は裏表紙テキストである。この利用許諾契約書の複写は
+「GNU フリー文書利用許諾契約書」という章に含まれている。
+
 (a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
 this GNU Manual, like GNU software.  Copies published by the Free
 Software Foundation raise funds for GNU development.''
+
+(a) FSF の裏表紙テキスト:「あなたにはこの GNU Manual を GNU ソフトウェア
+のように複製したり変更する自由がある。複製はフリーソフトウェア財団によっ
+て出版された。(フリーソフトウェア財団は) GNU の開発のために必要な資金を
+集めている。」
 @end ifnottex
 
 @tex
@@ -56,9 +67,20 @@ Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
 license is included in the section entitled ``GNU Free Documentation
 License''.
 
+この文書を、フリーソフトウェア財団発行の GNU フリー文書利用許諾契約書
+第 1.1 版またはそれ以降の版が定める条件の下で複製、配布、あるいは変更す
+ることを許可する。変更不可部分は指定しない。「A GNU Manual」は表表紙テ
+キスト、以下の (a) は裏表紙テキストである。この利用許諾契約書の複写は
+「GNU フリー文書利用許諾契約書」という章に含まれている。
+
 (a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
 this GNU Manual, like GNU software.  Copies published by the Free
 Software Foundation raise funds for GNU development.''
+
+(a) FSF の裏表紙テキスト:「あなたにはこの GNU Manual を GNU ソフトウェア
+のように複製したり変更する自由がある。複製はフリーソフトウェア財団によっ
+て出版された。(フリーソフトウェア財団は) GNU の開発のために必要な資金を
+集めている。」
 @end titlepage
 @page
 
