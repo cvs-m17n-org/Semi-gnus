@@ -85,6 +85,7 @@
 	   coding-system-to-mime-charset compose-mail
 	   file-name-extension find-coding-systems-for-charsets
 	   find-coding-systems-region function-max-args get-charset-property
+	   read-passwd ;; See the Mule23@1934 file.
 	   smiley-encode-buffer smtpmail-send-it))
 	(t
 	 '(function-max-args smiley-encode-buffer))))
