@@ -2770,9 +2770,11 @@ It should typically alter the sending method in some way or other."
 	(set-buffer message-encoding-buffer)
 	(erase-buffer)
 	;; ;; Avoid copying text props.
-	;; T-gnus change: copy all text props from the editing buffer
-	;; into the encoding buffer.
+	;; T-gnus change: copy all text props, except for `field', from
+	;; the editing buffer into the encoding buffer.  `field' is the
+	;; special text property on Emacs 21, see NEWS for details.
 	(insert-buffer message-edit-buffer)
+	(put-text-property (point-min) (point-max) 'field nil)
 	(funcall message-encode-function)
 	(while (and success
 		    (setq elem (pop alist)))
