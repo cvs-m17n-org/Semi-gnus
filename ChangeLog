@@ -1,3 +1,9 @@
+2001-04-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-inews-yank-articles): Make it to work with
+	multiple articles even if there is a detached minibuffer frame on
+	some window managers.
+
 2001-03-21  Thierry Emery <thierry.emery@club-internet.fr>
 
 	* lisp/mm-decode.el (mm-copy-to-buffer): Copy buffer in unibyte
