@@ -1,3 +1,7 @@
+2003-05-01  Jesper Harder  <harder@ifa.au.dk>
+
+	* etc/gnus-tut.txt (http): Update.
+
 2003-05-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.15.24 (quimby) revision 00.
