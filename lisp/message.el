@@ -2943,17 +2943,21 @@ to find out how to use this."
   "Return the In-Reply-To header for this message."
   (when message-reply-headers
     (let ((from (mail-header-from message-reply-headers))
-	  (date (mail-header-date message-reply-headers)))
-      (when from
-	(let ((stop-pos
-	       (string-match "  *at \\|  *@ \\| *(\\| *<" from)))
-	  (concat (if (and stop-pos
-			   (not (zerop stop-pos)))
-		      (substring from 0 stop-pos) from)
-		  "'s message of \""
-		  (if (or (not date) (string= date ""))
-		      "(unknown date)" date)
-		  "\""))))))
+	  (date (mail-header-date message-reply-headers))
+	  (msg-id (mail-header-message-id message-reply-headers)))
+      (when msg-id
+	(concat msg-id
+		(when from
+		  (let ((stop-pos
+			 (string-match "  *at \\|  *@ \\| *(\\| *<" from)))
+		    (concat " ("
+			    (if (and stop-pos
+				     (not (zerop stop-pos)))
+				(substring from 0 stop-pos) from)
+			    "'s message of \""
+			    (if (or (not date) (string= date ""))
+				"(unknown date)" date)
+			    "\")"))))))))
 
 (defun message-make-distribution ()
   "Make a Distribution header."
