@@ -600,6 +600,7 @@ the resulting string may be narrower than END-COLUMN.
       (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
     ;; Paint it.
     (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)))
+  (goto-char (point-min))
   (setq modeline-buffer-identification
 	(list (concat gnus-version ": *Group*")))
   (set-buffer-modified-p t))
