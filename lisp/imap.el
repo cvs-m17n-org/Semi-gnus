@@ -148,7 +148,7 @@
   (autoload 'utf7-decode "utf7")
   (autoload 'format-spec "format-spec")
   (autoload 'format-spec-make "format-spec")
-  (autoload 'mel-find-function "mel"))
+  (require 'mel))
 
 (defun-maybe base64-decode-string (string)
   "Base64-decode STRING and return the result."
