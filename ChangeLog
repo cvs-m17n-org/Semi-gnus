@@ -1,6 +1,42 @@
+1998-10-06  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-mime-insert-article): Don't refer to
+	`mark' position.
+
+	* lisp/message.el (message-mime-insert-article): If the optional
+	arg FULL-HEADERS is non-nil, include full headers when inserting.
+
+1998-10-06  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el (message-parameter-alist): New variable.
+	(message-startup-parameter-alist):  New variable.
+	(message-fetch-reply-field): Get reply buffer with
+	`message-get-reply-buffer()'.
+	(message-yank-original): Ditto.
+	(message-eval-parameter): New function.
+	(message-get-reply-buffer): Ditto.
+	(message-get-original-reply-buffer): Ditto.
+	(message-mode): New buffer local variable
+	`message-parameter-alist'.
+	(message-setup): Set up `message-reply-buffer' from
+	`message-parameter-alist'.
+	(message-mime-insert-article): Get `Original message buffer' with
+	`message-get-original-reply-buffer' instead of
+	`gnus-original-article-buffer'.
+	Remove bogus header fields for forwarding message.
+
+	* lisp/gnus-msg.el (gnus-setup-message): Setup
+	`message-startup-parameter-alist'.
+
+1998-10-05  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/gnus.el (gnus-info-filename): New variable.
+	(gnus-info-find-node): Use `gnus-info-filename' and
+	`current-language-environment'.
+
 1998-10-05  Katsumi Yamaoka   <yamaoka@jpl.org>
 
-	* lisp/message.el (message-send-mail): Remove the misplaced
+	* lisp/message.el (message-send-mail): Remove misplaced
 	`interactive'.
 
 	* lisp/message.el (message-yank-original): Get back to the previous
