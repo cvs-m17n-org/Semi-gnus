@@ -4731,8 +4731,8 @@ gnus はそのメールを取得して、それのヘッダーの精密調査ができるように画面
 @c @icon{gnus-summary-followup-with-original}
 @findex gnus-summary-followup-with-original
 本記事を取り込んで、現在の記事にフォローアップをしま
-す (@code{ggnus-summary-followup-with-original})。この命令はプロセス/接
-頭引数の習慣を用います。
+す (@code{gnus-summary-followup-with-original})。この命令はプロセス/接頭
+引数の習慣を用います。
 
 @item S n
 @kindex S n (概略)
