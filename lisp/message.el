@@ -5733,13 +5733,9 @@ regexp varstr."
     (if (catch 'mime-edit-error
 	  (save-excursion
 	    (mime-edit-pgp-enclose-buffer)
-	    (mime-edit-translate-body)
-	    ))
-	(error "Translation error!")
-      )
-    (end-of-invisible)
-    (run-hooks 'mime-edit-exit-hook)
-    ))
+	    (mime-edit-translate-body)))
+	(error "Translation error!"))
+    (run-hooks 'mime-edit-exit-hook)))
 
 (defun message-mime-insert-article (&optional full-headers)
   (interactive "P")
