@@ -1,3 +1,10 @@
+2001-04-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-interactive): Fix mismatched parentheses.
+
+	* lisp/nnshimbun.el: Enclose w3m stuff with `eval-and-compile';
+	bind `w3m-work-buffer-name' and `w3m-retrieve' when compiling.
+
 2001-04-03  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el (nnshimbun-type-definition: Follow changes in
