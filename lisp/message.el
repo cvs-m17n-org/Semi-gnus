@@ -4450,9 +4450,8 @@ regexp varstr."
 
 (set-alist 'format-alist
 	   'mime-message
-	   `("MIME message."
-	     ,(concat "\\(" std11-field-name-regexp
-		      ":[^\n]*\\(\n[ \t][^\n]*\\)*\\)*\n\n")
+	   '("MIME message."
+	     "1\\(^\\)"
 	     nil
 	     message-mime-encode
 	     t nil))
