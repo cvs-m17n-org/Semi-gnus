@@ -5626,40 +5626,40 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 
 @item
 @vindex gnus-replied-mark
-$BJVEz$r$7$?$+!"%U%)%m!<%"%C%W$r$7$?(B ($BNc$($P!"Ez$($?(B) $B5-;v$O$9$Y$FFs7eL\(B
-$B$K(B @samp{A} $B$N0u$,$D$-$^$9(B (@code{gnus-replied-mark})$B!#(B
+$BJVEz$r$7$?$+%U%)%m!<%"%C%W$r$7$?(B ($BNc$($PEz$($?(B) $B5-;v$O!"$9$Y$FFs7eL\(B
+$B$K(B @samp{A} $B$N0u$,IU$-$^$9(B (@code{gnus-replied-mark})$B!#(B
 
 @item
 @vindex gnus-forwarded-mark
-$BE>Aw$7$?5-;v$O$9$Y$FFs7eL\$K(B @samp{F} $B$N0u$,$D$-$^(B
+$BE>Aw$7$?5-;v$O!"$9$Y$FFs7eL\$K(B @samp{F} $B$N0u$,IU$-$^(B
 $B$9(B (@code{gnus-forwarded-mark})$B!#(B
 
 @item
 @vindex gnus-cached-mark
-$B5-;v%-%c%C%7%e$KCy$a$i$l$F$$$k5-;v$OFs7eL\$K(B @samp{*} $B$N0u$,$D$-$^(B
+$B5-;v%-%c%C%7%e$KCy$a$i$l$F$$$k5-;v$O!"Fs7eL\$K(B @samp{*} $B$N0u$,IU$-$^(B
 $B$9(B (@code{gnus-replied-mark})$B!#(B@xref{Article Caching}.
 
 @item
 @vindex gnus-saved-mark
 ($B2?$i$+$NJ}K!$K$h$C$F!(I,$:$7$b=!65E*$H$$$&$o$1$G$O$J$/(B) $B!XJ]B8$5$l$?!Y(B
-$B5-;v$OFs7eL\$K(B @samp{S} $B$N0u$,$D$-$^$9(B (@code{gnus-saved-mark})$B!#(B
+$B5-;v$O!"Fs7eL\$K(B @samp{S} $B$N0u$,IU$-$^$9(B (@code{gnus-saved-mark})$B!#(B
 
 @vindex gnus-recent-mark
-$B$=$N%0%k!<%W$G(B ``$B:G6a(B'' (``recently'') $BFO$$$?5-;v$OFs7eL\$K(B @samp{N} $B$N(B
-$B$N0u$,$D$-$^$9(B (@code{gnus-recent-mark})$B!#$?$$$F$$$N%P%C%/%(%s%I$O$3$N0u(B
-$B$r%5%]!<%H$;$:!"$=$N>l9g$OC1$KI=<($5$l$^$;$s!#(B
+$B$=$N%5!<%P!<$G$^$@FI$^$l$F$$$J$$5-;v$O!"Fs7eL\$K(B @samp{N} $B$N0u$,IU$-$^(B
+$B$9(B (@code{gnus-recent-mark})$B!#$?$$$F$$$N%5!<%P!<$O$3$N0u$r%5%]!<%H$;$:!"(B
+$B$=$N>l9g$OC1$KI=<($5$l$^$;$s!#(B@code{gnus-unseen-mark} $B$H8+Hf$Y$F2<$5$$!#(B
 
 @item
 @vindex gnus-unseen-mark
-$B$^$@FI$^$l$?$3$H$,$J$$5-;v$OFs7eL\$K(B @samp{.} $B$N0u$,$D$-$^(B
-$B$9(B (@code{gnus-unseen-mark})$B!#(B
+$B$^$@(B gnus $B$GFI$^$l$?$3$H$,$J$$5-;v$O!"Fs7eL\$K(B @samp{.} $B$N0u$,IU$-$^(B
+$B$9(B (@code{gnus-unseen-mark})$B!#(B@code{gnus-recent-mark} $B$H8+Hf$Y$F2<$5$$!#(B
 
 @item
 @vindex gnus-not-empty-thread-mark
 @vindex gnus-empty-thread-mark
 $B$b$7(B @samp{%e} $B$N;EMM$,;H$o$l$k$H!"%9%l%C%I$,$"$k$+$I$&$+$O!";07eL\(B
 $B$K(B @code{gnus-not-empty-thread-mark} $B$H(B @code{gnus-empty-thread-mark} $B$N(B
-$B$=$l$>$l$K$h$C$F0u$,$D$-$^$9!#(B
+$B$=$l$>$l$K$h$C$F0u$,IU$-$^$9!#(B
 
 @item
 @vindex gnus-process-mark
