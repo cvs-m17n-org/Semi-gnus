@@ -816,9 +816,8 @@ The following commands are available:
     (or level gnus-group-default-list-level gnus-level-subscribed))))
 
 (defun gnus-group-setup-buffer ()
-  (set-buffer (get-buffer-create gnus-group-buffer))
+  (set-buffer (gnus-get-buffer-create gnus-group-buffer))
   (unless (eq major-mode 'gnus-group-mode)
-    (gnus-add-current-to-buffer-list)
     (gnus-group-mode)
     (when gnus-carpal
       (gnus-carpal-setup-buffer 'group))))
@@ -2914,17 +2913,19 @@ If N is negative, this group and the N-1 previous groups will be checked."
 	 (ret (if (numberp n) (- n (length groups)) 0))
 	 (beg (unless n
 		(point)))
-	 group)
+	 group method)
     (while (setq group (pop groups))
       (gnus-group-remove-mark group)
       ;; Bypass any previous denials from the server.
-      (gnus-remove-denial (gnus-find-method-for-group group))
+      (gnus-remove-denial (setq method (gnus-find-method-for-group group)))
       (if (gnus-activate-group group (if dont-scan nil 'scan))
 	  (progn
 	    (gnus-get-unread-articles-in-group
 	     (gnus-get-info group) (gnus-active group) t)
 	    (unless (gnus-virtual-group-p group)
 	      (gnus-close-group group))
+	    (gnus-agent-save-group-info
+	     method (gnus-group-real-name group) (gnus-active group))
 	    (gnus-group-update-group group))
 	(if (eq (gnus-server-status (gnus-find-method-for-group group))
 		'denied)
@@ -3161,16 +3162,13 @@ The hook gnus-suspend-gnus-hook is called before actually suspending."
   (interactive)
   (gnus-run-hooks 'gnus-suspend-gnus-hook)
   ;; Kill Gnus buffers except for group mode buffer.
-  (let* ((group-buf (get-buffer gnus-group-buffer))
-	 ;; Do this on a separate list in case the user does a ^G before we finish
-	 (gnus-buffer-list
-	  (delete group-buf (delete gnus-dribble-buffer
-				    (append gnus-buffer-list nil)))))
-    (while gnus-buffer-list
-      (gnus-kill-buffer (pop gnus-buffer-list)))
+  (let* ((group-buf (get-buffer gnus-group-buffer)))
+    (apply (lambda (buf)
+	     (unless (equal buf group-buf)
+	       (kill-buffer buf)))
+	   (gnus-buffers))
     (gnus-kill-gnus-frames)
     (when group-buf
-      (setq gnus-buffer-list (list group-buf))
       (bury-buffer group-buf)
       (delete-windows-on group-buf t))))
 

@@ -250,11 +250,11 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "6.8.11"
+(defconst gnus-version-number "6.8.12"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Gnus 5.6.34; for SEMI 1.8, FLIM 1.8/1.9)"
+  (format "Semi-gnus %s (based on Gnus 5.6.36; for SEMI 1.8, FLIM 1.8/1.9)"
           gnus-version-number)
   "Version string for this version of gnus.")
 
@@ -602,6 +602,33 @@ be set in `.emacs' instead."
   "Face used for normal interest read articles.")
 
 
+;;;
+;;; Gnus buffers
+;;;
+
+(defvar gnus-buffers nil)
+
+(defun gnus-get-buffer-create (name)
+  "Do the same as `get-buffer-create', but store the created buffer."
+  (or (get-buffer name)
+      (car (push (get-buffer-create name) gnus-buffers))))
+
+(defun gnus-add-buffer ()
+  "Add the current buffer to the list of Gnus buffers."
+  (push (current-buffer) gnus-buffers))
+
+(defun gnus-buffers ()
+  "Return a list of live Gnus buffers."
+  (while (and gnus-buffers
+	      (not (buffer-name (car gnus-buffers))))
+    (pop gnus-buffers))
+  (let ((buffers gnus-buffers))
+    (while (cdr buffers)
+      (if (buffer-name (cadr buffers))
+	  (pop buffers)
+	(setcdr buffers (cddr buffers)))))
+  gnus-buffers)
+
 ;;; Splash screen.
 
 (defvar gnus-group-buffer "*Group*")
@@ -622,7 +649,7 @@ be set in `.emacs' instead."
 
 (defun gnus-splash ()
   (save-excursion
-    (switch-to-buffer (get-buffer-create gnus-group-buffer))
+    (switch-to-buffer (gnus-get-buffer-create gnus-group-buffer))
     (let ((buffer-read-only nil))
       (erase-buffer)
       (unless gnus-inhibit-startup-message
@@ -690,9 +717,10 @@ be set in `.emacs' instead."
 
 (eval-when (load)
   (let ((command (format "%s" this-command)))
-    (when (and (string-match "gnus" command)
-	       (not (string-match "gnus-other-frame" command)))
-      (gnus-splash))))
+    (if (and (string-match "gnus" command)
+	     (not (string-match "gnus-other-frame" command)))
+	(gnus-splash)
+      (gnus-get-buffer-create gnus-group-buffer))))
 
 ;;; Do the rest.
 
@@ -755,7 +783,7 @@ used to 899, you would say something along these lines:
   (or (getenv "NNTPSERVER")
       (and (file-readable-p gnus-nntpserver-file)
 	   (save-excursion
-	     (set-buffer (get-buffer-create " *gnus nntp*"))
+	     (set-buffer (gnus-get-buffer-create " *gnus nntp*"))
 	     (buffer-disable-undo (current-buffer))
 	     (insert-file-contents gnus-nntpserver-file)
 	     (let ((name (buffer-string)))
@@ -1468,9 +1496,6 @@ want."
 (defvar gnus-article-buffer "*Article*")
 (defvar gnus-server-buffer "*Server*")
 
-(defvar gnus-buffer-list nil
-  "Gnus buffers that should be killed on exit.")
-
 (defvar gnus-slave nil
   "Whether this Gnus is a slave or not.")
 
@@ -1933,6 +1958,7 @@ This restriction may disappear in later versions of Gnus."
 ;;; Gnus Utility Functions
 ;;;
 
+
 (defmacro gnus-string-or (&rest strings)
   "Return the first element of STRINGS that is a non-blank string.
 STRINGS will be evaluated in normal `or' order."
@@ -1946,11 +1972,6 @@ STRINGS will be evaluated in normal `or' order."
 	  (setq string nil)
 	(setq strings nil)))
     string))
-
-;; Add the current buffer to the list of buffers to be killed on exit.
-(defun gnus-add-current-to-buffer-list ()
-  (or (memq (current-buffer) gnus-buffer-list)
-      (push (current-buffer) gnus-buffer-list)))
 
 (defun gnus-version (&optional arg)
   "Version number of this version of Gnus.
