@@ -3404,9 +3404,9 @@ Headers already prepared in the buffer are not modified."
      `((Subject . ,subject)
        ,@follow-to
        ,@(if (or references message-id)
-	     `((References . ,(concat (or references "") (and references " ")
-				      (or message-id ""))))
-	   nil))
+	     `((References . ,(std11-fill-msg-id-list-string
+			       (concat references message-id)))))
+       )
      cur)))
 
 ;;;###autoload
@@ -3512,8 +3512,8 @@ responses here are directed to other newsgroups."))
 	   `((Newsgroups . ,newsgroups))))
        ,@(and distribution (list (cons 'Distribution distribution)))
        ,@(if (or references message-id)
-	     `((References . ,(concat (or references "") (and references " ")
-				      (or message-id "")))))
+	     `((References . ,(std11-fill-msg-id-list-string
+			       (concat references message-id)))))
        ,@(when (and mct
 		    (not (equal (downcase mct) "never")))
 	   (list (cons 'Cc (if (equal (downcase mct) "always")
