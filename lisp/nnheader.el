@@ -74,35 +74,53 @@ on your system, you could say something like:
   "Set article number of HEADER to NUMBER."
   `(aset ,header 0 ,number))
 
+(defmacro mail-header-entity (header)
+  "Return mime-entity in HEADER."
+  `(aref ,header 1))
+
+(defmacro mail-header-set-entity (header entity)
+  "Set mime-entity of HEADER to ENTITY."
+  `(aset ,header 1 entity))
+
+(defmacro mail-header-set-field (header field body)
+  `(mime-entity-set-original-header-internal
+    (mail-header-entity ,header)
+    (put-alist ,field ,body
+	       (mime-entity-original-header-internal
+		(mail-header-entity ,header)))
+    ))
+
+(defmacro mail-header-set-parsed-field (header field body)
+  `(mime-entity-set-parsed-header-internal
+    (mail-header-entity ,header)
+    (put-alist ,field ,body
+	       (mime-entity-parsed-header-internal
+		(mail-header-entity ,header)))
+    ))
+
 (defmacro mail-header-subject (header)
   "Return subject string in HEADER."
-  `(mime-read-field 'Subject (aref ,header 1)))
+  `(mime-read-field 'Subject (mail-header-entity ,header)))
 
 (defmacro mail-header-set-subject (header subject)
   "Set article subject of HEADER to SUBJECT."
-  `(mime-entity-set-parsed-header-internal
-    (aref ,header 1)
-    (put-alist 'Subject ,subject
-	       (mime-entity-parsed-header-internal (aref ,header 1)))))
+  `(mail-header-set-parsed-field ,header 'Subject ,subject))
 
 (defmacro mail-header-from (header)
   "Return author string in HEADER."
-  `(mime-read-field 'From (aref ,header 1)))
+  `(mime-read-field 'From (mail-header-entity ,header)))
 
 (defmacro mail-header-set-from (header from)
   "Set article author of HEADER to FROM."
-  `(mime-entity-set-parsed-header-internal
-    (aref ,header 1)
-    (put-alist 'From ,from
-	       (mime-entity-parsed-header-internal (aref ,header 1)))))
+  `(mail-header-set-parsed-field ,header 'From ,from))
 
 (defmacro mail-header-date (header)
   "Return date in HEADER."
-  `(aref ,header 3))
+  `(mime-fetch-field 'Date (mail-header-entity ,header)))
 
 (defmacro mail-header-set-date (header date)
   "Set article date of HEADER to DATE."
-  `(aset ,header 3 ,date))
+  `(mail-header-set-field ,header 'Date ,date))
 
 (defalias 'mail-header-message-id 'mail-header-id)
 (defmacro mail-header-id (header)
@@ -146,20 +164,24 @@ on your system, you could say something like:
   "Set article xref of HEADER to xref."
   `(aset ,header 8 ,xref))
 
-(defun make-mail-header (&optional init)
-  "Create a new mail header structure initialized with INIT."
-  (make-vector 9 init))
-
 (defun make-full-mail-header (&optional number subject from date id
 					references chars lines xref)
   "Create a new mail header structure initialized with the parameters given."
   (let ((entity (make-mime-entity-internal nil nil)))
+    (mime-entity-set-original-header-internal
+     entity
+     (list (cons 'Date date)))
     (mime-entity-set-parsed-header-internal
      entity
      (list (cons 'Subject subject)
 	   (cons 'From from)))
     (vector number entity from date id references chars lines xref)
     ))
+
+(defun make-mail-header (&optional init)
+  "Create a new mail header structure initialized with INIT."
+  (make-full-mail-header init init init init init
+			 init init init init))
 
 ;; fake message-ids: generation and detection
 
