@@ -322,7 +322,6 @@ directly.")
 	 '(("\\*" "\\*" bold)
 	   ("_" "_" underline)
 	   ("/" "/" italic)
-	   ("-" "-" strikethru)
 	   ("_/" "/_" underline-italic)
 	   ("_\\*" "\\*_" underline-bold)
 	   ("\\*/" "/\\*" bold-italic)
@@ -333,6 +332,8 @@ directly.")
 	    (format format (car spec) (car (cdr spec)))
 	    2 3 (intern (format "gnus-emphasis-%s" (nth 2 spec)))))
 	 types)
+	("\\(\\s-\\|^\\)\\(-\\(\\(\\w\\|-[^-]\\)+\\)-\\)\\(\\s-\\|[?!.,;]\\)"
+	 2 3 gnus-emphasis-strikethru)
 	("\\(\\s-\\|^\\)\\(_\\(\\(\\w\\|_[^_]\\)+\\)_\\)\\(\\s-\\|[?!.,;]\\)"
 	 2 3 gnus-emphasis-underline)))
   "*Alist that says how to fontify certain phrases.
