@@ -11304,40 +11304,44 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 け 1 から 9 までで合致した文字列で代替されます。
 
 @findex nnmail-split-fancy-with-parent
-@code{nnmail-split-fancy-with-parent} is a function which allows you to
-split followups into the same groups their parents are in.  Sometimes
-you can't make splitting rules for all your mail.  For example, your
-boss might send you personal mail regarding different projects you are
-working on, and as you can't tell your boss to put a distinguishing
-string into the subject line, you have to resort to manually moving the
-messages into the right group.  With this function, you only have to do
-it once per thread.
+関数 @code{nnmail-split-fancy-with-parent} は、ある記事へのフォロー記事
+を元記事と同じグループに振り分けるときに使います。実際、メールの振り分け
+を一生懸命設定してみても完璧にはできないことがありますね。 例えば、上司
+から個人宛てのメールが届いたとします。自分が携っているプロジェクトとは別
+の話です。けれど「他のメールと区別できるようにこれこれこういう言葉を表題
+に書いてください」と上司に向かって指図するわけにはいきませんから、結局自
+分の手を煩わしてひとつひとつメールを正しいグループに振り分けるはめになり
+ます。そんなときにこの関数を使うと、この面倒な作業を 1 スレッドにつき 1
+回きりで済ますことができます。
 
-To use this feature, you have to set @code{nnmail-treat-duplicates} to a
-non-nil value.  And then you can include
-@code{nnmail-split-fancy-with-parent} using the colon feature, like so:
+この機能を利用するためには、まず変数 @code{nnmail-treat-duplicates} の値
+を非 nil に設定する必要があります。そうしたら
+@code{nnmail-split-fancy-with-parent} を使ってみてください。コロンを使っ
+てこんな風に書きます:
 @lisp
 (setq nnmail-split-fancy
       '(| (: nnmail-split-fancy-with-parent)
-          ;; other splits go here
+          ;; 残りの振り分け方はここに書く
         ))
 @end lisp
 
-This feature works as follows: when @code{nnmail-treat-duplicates} is
-non-nil, Gnus records the message id of every message it sees in the
-file specified by the variable @code{nnmail-message-id-cache-file},
-together with the group it is in (the group is omitted for non-mail
-messages).  When mail splitting is invoked, the function
-@code{nnmail-split-fancy-with-parent} then looks at the References (and
-In-Reply-To) header of each message to split and searches the file
-specified by @code{nnmail-message-id-cache-file} for the message ids.
-When it has found a parent, it returns the corresponding group name.  It
-is recommended that you set @code{nnmail-message-id-cache-length} to a
-somewhat higher number than the default so that the message ids are
-still in the cache.  (A value of 5000 appears to create a file some 300
-kBytes in size.)  When @code{nnmail-cache-accepted-message-ids} is
-non-nil, Gnus also records the message ids of moved articles, so that
-the followup messages goes into the new group.
+この機能は実際、次の様に働いています: 変数
+@code{nnmail-treat-duplicates} の値が非 nil の場合、Gnus は見つけた全記
+事のメッセージ ID を 変数 @code{nnmail-message-id-cache-file} が指定する
+ファイルに記録します。同時に、それぞれの記事が存在するグループの名前も記
+録します (ただしメールの場合だけ、さもなければグループ名は調べません)。
+さて、いよいよメールの振り分けが始まると、関数
+@code{nnmail-split-fancy-with-parent} は、対象となる各記事の References
+(と In-Reply-to) ヘッダを調べ、@code{nnmail-message-id-cache-file} に指
+定されているファイルにそれらのメッセージ ID が無いかどうか調べます。元記
+事が見つかると、この関数は対応するグループ名を返すわけです。ここで、変数
+@code{nnmail-message-id-cache-length} の値を既定値よりも幾らか大きな値に
+設定することをお勧めします。そうすると、今調べられたメッセージ ID 達は今
+しばらくキャッシュの中に存続できます (5000 くらいに設定するとキャッシュ
+ファイルの大きさはだいたい 300 キロバイトぐらいになるみたいです)。さらに、
+変数 @code{nnmail-cache-accepted-message-ids} の値を非 nil に設定すれば、
+Gnus は移動された記事のメッセージ ID をも記録するので、フォローアップ記
+事は元記事の移動先と同じグループに入るようになります。
 
 @node Group Mail Splitting
 @subsection グループメール分割

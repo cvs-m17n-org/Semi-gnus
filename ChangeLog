@@ -1,3 +1,10 @@
+2000-12-02  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
+
+	* texi/gnus-ja.texi: Translate description about
+	`nnmail-split-fancy-with-parent'.
+
+	* texi/message-ja.texi: Use two lines for direntry.
+
 2000-12-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: Attempt to add another FLIM path to `load-path'
