@@ -1,5 +1,6 @@
 ;;; gnus-clfns.el --- compiler macros for emulating cl functions
-;; Copyright (C) 2000, 2001 Free Software Foundation, Inc.
+
+;; Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Kastsumi Yamaoka <yamaoka@jpl.org>
 ;; Keywords: cl, compile
@@ -36,7 +37,8 @@
 
   (define-compiler-macro butlast (&whole form x &optional n)
     (if (and (fboundp 'butlast)
-	     (subrp (symbol-function 'butlast)))
+	     (or (>= emacs-major-version 21)
+		 (subrp (symbol-function 'butlast))))
 	form
       (if n
 	  `(let ((x ,x)
@@ -47,12 +49,16 @@
 		 (or n (setq n 1))
 		 (and (< n m)
 		      (progn
-			(if (> n 0) (setcdr (nthcdr (- (1- m) n) x) nil))
+			(if (> n 0)
+			    (progn
+			      (setq x (copy-sequence x))
+			      (setcdr (nthcdr (- (1- m) n) x) nil)))
 			x)))))
 	`(let* ((x ,x)
 		(m (length x)))
 	   (and (< 1 m)
 		(progn
+		  (setq x (copy-sequence x))
 		  (setcdr (nthcdr (- m 2) x) nil)
 		  x))))))
 
@@ -88,7 +94,8 @@
 
   (define-compiler-macro last (&whole form x &optional n)
     (if (and (fboundp 'last)
-	     (subrp (symbol-function 'last)))
+	     (or (>= emacs-major-version 21)
+		 (subrp (symbol-function 'last))))
 	form
       (if n
 	  `(let* ((x ,x)
