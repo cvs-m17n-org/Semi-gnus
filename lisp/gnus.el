@@ -253,7 +253,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "Nana-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.13.5"
+(defconst gnus-version-number "6.13.6"
   "Version number for this version of gnus.")
 
 (defconst gnus-version
