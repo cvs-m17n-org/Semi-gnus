@@ -1,3 +1,10 @@
+1999-08-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* README.semi: Update for the recent a-ftp sites and directories.
+	* README.semi.ja: Ditto.
+	* texi/gnus-faq.texi: Ditto.
+	* texi/gnus-faq-ja.texi: Ditto.
+
 1999-08-24  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 11.
