@@ -927,7 +927,7 @@ Formatting Variables
 * User-Defined Specs::          Gnus $B$K$"$J$?<+?H$N4X?t$r8F$P$;$k(B
 * Formatting Fonts::            $B;EMM$rB?:L$GAGE($K8+$;$k(B
 * Positioning Point::           $BA`:n$N8e$G%]%$%s%H$r0\F0$9$k(B
-* Tabulation::                  $BI=$r:n$k(B
+* Tabulation::                  $B=PNO$N@0Ns(B
 * Wide Characters::             $BI}$,9-$$J8;z$r07$&(B
 
 XEmacs Enhancements
@@ -17413,7 +17413,7 @@ Gnus $B$r=*N;$9$kA0$K3NG'$rMW5a$7$^$9!#$3$NJQ?t$O=i4|@_Dj$G(B @code{t} $B$G$9
 * User-Defined Specs::          Gnus $B$K$"$J$?<+?H$N4X?t$r8F$P$;$k(B
 * Formatting Fonts::            $B;EMM$rB?:L$GAGE($K8+$;$k(B
 * Positioning Point::           $BA`:n$N8e$G%]%$%s%H$r0\F0$9$k(B
-* Tabulation::                  $BI=$r:n$k(B
+* Tabulation::                  $B=PNO$N@0Ns(B
 * Wide Characters::             $BI}$,9-$$J8;z$r07$&(B
 @end menu
 
@@ -17611,30 +17611,30 @@ gnus $B$ODL>o$[$H$s$I$N%P%C%U%!$G!"%]%$%s%H$r3F9T$N$"$i$+$8$a7h$a$i$l$?>l(B
 $B$-$^$9!#$=$N4X?t$O(B @code{gnus-goto-colon} $B$H8F$P$l$F$$$^$9!#(B
 
 $B$G$b!"$b$7$"$J$?$,9T$K%3%m%s$r4^$a$?$/$J$$$J$i$P!"$3$l$r07$&$?$a$N$*$=$i(B
-$B$/:G$b<j$4$m$JJ}K!$O!"(B@samp{%C} $B;X<(;R$r;H$&$3$H$G$9!#$"$J$?$N9T$NMM(B
-$B<0(B (line format) $B$NDj5A$K(B @samp{%C} $B$rF~$l$F$*$1$P!"(Bgnus $B$O$=$3$K%]%$%s(B
-$B%H$rCV$-$^$9!#(B
+$B$/:G$b<j$4$m$JJ}K!$O(B @samp{%C} $B;X<(;R$r;H$&$3$H$G$9!#$"$J$?$N9T$N=qK!;E(B
+$BMM$NDj5A$K(B @samp{%C} $B$rF~$l$F$*$1$P!"(Bgnus $B$O$=$3$K%]%$%s%H$rCV$-$^$9!#(B
+
+@node Tabulation
+@subsection $B@0Ns(B
+
+$B$"$J$?$ODL>o$O!"1d$P$7$?$j=L$a$?$j$7$FJ8;zNs$r%G%#%9%W%l%$$KJB$Y$k$3$H$,(B
+$B$G$-$^$9!#$G$bBg$-$5$,0c$&0[$J$kJ8;zNs$rO"7k$5$;$k>l9g$O!"C1$KJ8;zNs$r=P(B
+$BNO$7$F$7$^$&$N$,$h$j<j$4$m$G$"$k$3$H$,B?$$$O$:$G!"$7$+$7$=$&$9$k$H$=$N8e(B
+$B$KB3$/%F%-%9%H$rJB$Y$k$N$KG:$`$3$H$K$J$j$^$9!#(B
+
+$B$=$l$r9T$J$&$?$a!"(Bgnus $B$O@0Ns;R(B (tabulator) $B$N;XDj(B @samp{%=} $B$rHw$($F$$(B
+$B$^$9!#$3$l$K$OFs$D$N7A(B
+$B<0(B @dfn{hard tabulators} $B$H(B @dfn{soft tabulators} $B$,$"$j$^$9!#(B
+
+@samp{%50=} $B$OJ8;zNs$,(B 50$B7e$+$i;O$^$k$h$&$K6uGrJ8;z$r5M$a9~$_$^$9!#$b(B
+$B$7(B 50$B7e$h$j8e$m$K$9$G$K%F%-%9%H$,$"$k>l9g$O2?$bA^F~$7$^$;$s!#$3$l$O2:$d(B
+$B$+(B (soft) $B$J@0Ns;R$G$9!#(B
+
+@samp{%-50=} $B$b$^$?!"J8;zNs$,(B 50$B7e$+$i;O$^$k$h$&$K6uGrJ8;z$r5M$a9~$_$^$9!#(B
+$B$G$9$,!"$b$7(B 50$B7e$h$j8e$m$K$9$G$K%F%-%9%H$,$"$k>l9g!"(B50$B7e$h$j8e$m$K$"$k(B
+$B2a>j$J%F%-%9%H$O:o=|$5$l$^$9!#$3$l$O87L)(B (hard) $B$J@0Ns;R$G$9!#(B
 
 @c TRANSLATEME
-@node Tabulation
-@subsection Tabulation
-
-You can usually line up your displays by padding and cutting your
-strings.  However, when combining various strings of different size, it
-can often be more convenient to just output the strings, and then worry
-about lining up the following text afterwards.
-
-To do that, Gnus supplies tabulator specs--@samp{%=}.  There are two
-different types---@dfn{hard tabulators} and @dfn{soft tabulators}.
-
-@samp{%50=} will insert space characters to pad the line up to column
-50.  If the text is already past column 50, nothing will be inserted.
-This is the soft tabulator.
-
-@samp{%-50=} will insert space characters to pad the line up to column
-50.  If the text is already past column 50, the excess text past column
-50 will be removed.  This is the hard tabulator.
-
 @node Wide Characters
 @subsection Wide Characters
 
