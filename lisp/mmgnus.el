@@ -95,17 +95,7 @@
 			(funcall field-decoder field-body len)
 		      ;; Don't decode
 		      field-body))
-	    (insert "\n")
-	    ))))))
-
-(defun mmgnus-entity-body (entity)
-   (cond
-    ((bufferp (mmgnus-entity-body-internal entity))
-     (with-current-buffer (mmgnus-entity-body-internal entity)
-       (buffer-string)))
-    (t
-     (error "Invalid body object. %s"
-	    (mmgnus-entity-body-internal entity)))))
+	    (insert "\n")))))))
 
 (luna-define-method mime-insert-header ((entity mmgnus-entity)
 					&optional invisible-fields
@@ -114,8 +104,17 @@
    (mmgnus-entity-header-internal entity)
    invisible-fields visible-fields))
 
+(luna-define-method mime-entity-body ((entity mmgnus-entity))
+   (cond
+    ((bufferp (mmgnus-entity-body-internal entity))
+     (with-current-buffer (mmgnus-entity-body-internal entity)
+       (buffer-string)))
+    (t
+     (error "Invalid body object. %s"
+	    (mmgnus-entity-body-internal entity)))))
+
 (luna-define-method mime-entity-content ((entity mmgnus-entity))
-  (mime-decode-string (mmgnus-entity-body entity)
+  (mime-decode-string (mime-entity-body entity)
 		      (mime-entity-encoding entity)))
 
 (luna-define-method mime-insert-entity-content ((entity mmgnus-entity))
@@ -123,7 +122,7 @@
 
 (luna-define-method mime-write-entity-content ((entity mmgnus-entity) filename)
   (with-temp-buffer
-    (insert (mmgnus-entity-body entity))
+    (insert (mime-entity-body entity))
     (mime-write-decoded-region (point-min) (point-max)
 			       filename
 			       (or (mime-entity-encoding entity) "7bit"))))
@@ -131,7 +130,7 @@
 (luna-define-method mime-insert-entity ((entity mmgnus-entity))
   (insert (mmgnus-entity-header-internal entity)
 	  "\n"
-	  (mmgnus-entity-body entity)))
+	  (mime-entity-body entity)))
 
 (luna-define-method mime-write-entity ((entity mmgnus-entity) filename)
   (with-temp-buffer
@@ -140,7 +139,7 @@
 
 (luna-define-method mime-write-entity-body ((entity mmgnus-entity) filename)
   (with-temp-buffer
-    (insert (mmgnus-entity-body entity))
+    (insert (mime-entity-body entity))
     (write-region-as-binary (point-min) (point-max) filename)))
 
 (eval-and-compile
