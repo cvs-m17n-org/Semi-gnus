@@ -75,7 +75,7 @@
     ("\\(:-*|\\)\\W" 1 "FaceStraight.xpm")
     ("\\(:-*p\\)\\W" 1 "FaceTalking.xpm")
     ("\\(:-*d\\)\\W" 1 "FaceTasty.xpm")
-    ("\\(;-*[>)}ｻ]+\\)\\W" 1 "FaceWinking.xpm")
+    ("[^^;_]\\(;-*[>)}ｻ]+\\)\\W" 1 "FaceWinking.xpm")
     ("\\(:-*[Vvｵ]\\)\\W" 1 "FaceWry.xpm")
     ("\\([:|]-*P\\)\\W" 1 "FaceYukky.xpm"))
   "*Normal and deformed faces for smilies."
