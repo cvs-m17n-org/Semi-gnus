@@ -34,7 +34,6 @@ EXAMINE_PACKAGEDIR = $(XEMACS) -batch -q -no-site-file -eval \
 	   (princ (or package-dir \"\")))" 2>/dev/null
 
 all: lick info
-	cd etc && $(MAKE) EMACS="$(EMACS)" all
 
 all-ja: lick info info-ja
 
