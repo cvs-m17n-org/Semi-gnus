@@ -1,3 +1,11 @@
+1999-11-20   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/imap.el: Add autoload setting for `starttls-open-stream'
+	and `starttls-negotiate'.
+	(imap-stream-alist): Add TLS entry.
+	(imap-tls-p): New function.
+	(imap-tls-open): New function.
+
 1999-11-19  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
