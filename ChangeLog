@@ -1,3 +1,10 @@
+1998-10-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.3.
+
+	* lisp/nnheader.el (make-full-mail-header): Store original subject
+	and from fields.
+
 1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-sum.el: Abolish variable
