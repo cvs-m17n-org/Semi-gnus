@@ -347,7 +347,7 @@ If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
     (cond
      ((and gnus-use-cache (numberp (car articles)))
       (gnus-cache-retrieve-headers articles group fetch-old))
-     ((and gnus-agent gnus-agent-cache (gnus-online gnus-command-method)
+     ((and gnus-agent (gnus-online gnus-command-method)
 	   (gnus-agent-method-p gnus-command-method))
       (gnus-agent-retrieve-headers articles group fetch-old))
      (t
@@ -419,9 +419,7 @@ If BUFFER, insert the article in that group."
       (setq res (cons group article)
 	    clean-up t))
      ;; Check the agent cache.
-     ((and gnus-agent gnus-agent-cache gnus-plugged
-	   (numberp article)
-	   (gnus-agent-request-article article group))
+     ((gnus-agent-request-article article group)
       (setq res (cons group article)
 	    clean-up t))
      ;; Use `head' function.
@@ -454,9 +452,7 @@ If BUFFER, insert the article in that group."
       (setq res (cons group article)
 	    clean-up t))
      ;; Check the agent cache.
-     ((and gnus-agent gnus-agent-cache gnus-plugged
-	   (numberp article)
-	   (gnus-agent-request-article article group))
+     ((gnus-agent-request-article article group)
       (setq res (cons group article)
 	    clean-up t))
      ;; Use `head' function.
@@ -526,18 +522,22 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
 	   (gnus-get-function gnus-command-method 'request-expire-articles)
 	   articles (gnus-group-real-name group) (nth 1 gnus-command-method)
 	   force)))
-    (when (and gnus-agent gnus-agent-cache (gnus-agent-method-p gnus-command-method))
+    (when (and gnus-agent
+	       (gnus-agent-method-p gnus-command-method))
       (let ((expired-articles (gnus-sorted-difference articles not-deleted)))
         (when expired-articles
           (gnus-agent-expire expired-articles group 'force))))
     not-deleted))
 
-(defun gnus-request-move-article (article group server accept-function &optional last)
+(defun gnus-request-move-article (article group server accept-function
+					  &optional last)
   (let* ((gnus-command-method (gnus-find-method-for-group group))
-	 (result (funcall (gnus-get-function gnus-command-method 'request-move-article)
+	 (result (funcall (gnus-get-function gnus-command-method
+					     'request-move-article)
 			  article (gnus-group-real-name group)
 			  (nth 1 gnus-command-method) accept-function last)))
-    (when (and result gnus-agent gnus-agent-cache (gnus-agent-method-p gnus-command-method))
+    (when (and result gnus-agent
+	       (gnus-agent-method-p gnus-command-method))
       (gnus-agent-expire (list article) group 'force))
     result))
     

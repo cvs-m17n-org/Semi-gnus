@@ -33,6 +33,7 @@
 (require 'gnus-ems)
 (require 'message)
 (require 'gnus-art)
+(require 'gnus-util)
 
 (defcustom gnus-post-method 'current
   "*Preferred method for posting USENET news.
@@ -283,10 +284,23 @@ If nil, the address field will always be empty after invoking
   :group 'gnus-message
   :type 'boolean)
 
-(defcustom gnus-version-expose-system nil
-  "If non-nil, `system-configuration' is exposed in `gnus-extended-version'."
+(defcustom gnus-user-agent 'emacs-gnus-type
+  "Which information should be exposed in the User-Agent header.
+
+It can be one of the symbols `gnus' \(show only Gnus version\), `emacs-gnus'
+\(show only Emacs and Gnus versions\), `emacs-gnus-config' \(same as
+`emacs-gnus' plus system configuration\), `emacs-gnus-type' \(same as
+`emacs-gnus' plus system type\) or a custom string.  If you set it to a
+string, be sure to use a valid format, see RFC 2616."
   :group 'gnus-message
-  :type 'boolean)
+  :type '(choice
+	  (item :tag "Show Gnus and Emacs versions and system type"
+		emacs-gnus-type)
+	  (item :tag "Show Gnus and Emacs versions and system configuration"
+		emacs-gnus-config)
+	  (item :tag "Show Gnus and Emacs versions" emacs-gnus)
+	  (item :tag "Show only Gnus version" gnus)
+	  (string :tag "Other")))
 
 ;;; Internal variables.
 
@@ -520,7 +534,9 @@ Gcc: header for archiving purposes."
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
   (setq message-newsreader (setq message-mailer (gnus-extended-version)))
   (message-add-action
-   `(set-window-configuration ,winconf) 'exit 'postpone 'kill)
+   `(when (gnus-buffer-exists-p ,buffer)
+      (set-window-configuration ,winconf))
+   'exit 'postpone 'kill)
   (let ((to-be-marked (cond
 		       (yanked yanked)
 		       (article (if (listp article) article (list article)))
@@ -852,7 +868,9 @@ header line with the old Message-ID."
 	      (forward-line 1))
 	    (let ((mail-header-separator ""))
 	      (setq beg (point)
-		    end (or (message-goto-body) beg)))
+		    end (or (message-goto-body)
+			    ;; There may be just a header.
+			    (point-max))))
 	    ;; Delete the headers from the displayed articles.
 	    (set-buffer gnus-article-copy)
 	    (let ((mail-header-separator ""))
@@ -1024,31 +1042,51 @@ If SILENT, don't prompt the user."
   (defvar xemacs-codename))
 
 (defun gnus-extended-version ()
-  "Stringified Gnus version and Emacs version."
+  "Stringified Gnus version and Emacs version.
+See the variable `gnus-user-agent'."
   (interactive)
-  (concat
-   "Gnus/" (gnus-prin1-to-string (gnus-continuum-version gnus-version))
-   " (" gnus-version ")"
-   " "
-   (cond
-    ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$" emacs-version)
-     (concat "Emacs/" (match-string 1 emacs-version)
-	     (if gnus-version-expose-system
-		 " (" system-configuration ")"
-	       "")))
-    ((string-match "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
-		   emacs-version)
-     (concat (match-string 1 emacs-version)
+  (let* ((gnus-v
+	  (concat "Gnus/"
+		  (prin1-to-string (gnus-continuum-version gnus-version) t)
+		  " (" gnus-version ")"))
+	 (system-v
+	  (cond
+	   ((eq gnus-user-agent 'emacs-gnus-config)
+	    system-configuration)
+	   ((eq gnus-user-agent 'emacs-gnus-type)
+	    (symbol-name system-type))
+	   (t nil)))
+	 (emacs-v
+	  (cond
+	   ((eq gnus-user-agent 'gnus)
+	    nil)
+	   ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$" emacs-version)
+	    (concat "Emacs/" (match-string 1 emacs-version)
+		    (if system-v
+			(concat " (" system-v ")")
+		      "")))
+	   ((string-match
+	     "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
+	     emacs-version)
+	    (concat
+	     (match-string 1 emacs-version)
 	     (format "/%d.%d" emacs-major-version emacs-minor-version)
 	     (if (match-beginning 3)
 		 (match-string 3 emacs-version)
 	       "")
 	     (if (boundp 'xemacs-codename)
-	     (if gnus-version-expose-system
-		 (concat " (" xemacs-codename ", " system-configuration ")")
-	       (concat " (" xemacs-codename ")"))
-	     "")))
-    (t emacs-version))))
+		 (concat
+		  " (" xemacs-codename
+		  (if system-v
+		      (concat ", " system-v ")")
+		    ")"))
+	       "")))
+	   (t emacs-version))))
+    (if (stringp gnus-user-agent)
+	gnus-user-agent
+      (concat gnus-v
+	      (when emacs-v
+		(concat " " emacs-v))))))
 
 
 ;;;
@@ -1746,9 +1784,7 @@ this is a reply."
 		     group)))
 		(if (not (eq gcc-self-val 'none))
 		    (insert "\n")
-		  (progn
-		    (beginning-of-line)
-		    (kill-line))))
+		  (gnus-delete-line)))
 	    ;; Use the list of groups.
 	    (while (setq name (pop groups))
 	      (let ((str (if (string-match ":" name)
@@ -1761,6 +1797,16 @@ this is a reply."
 	      (when groups
 		(insert " ")))
 	    (insert "\n")))))))
+
+(defun gnus-mailing-list-followup-to ()
+  "Look at the headers in the current buffer and return a Mail-Followup-To address."
+  (let ((x-been-there (gnus-fetch-original-field "x-beenthere"))
+	(list-post (gnus-fetch-original-field "list-post")))
+    (when (and list-post
+	       (string-match "mailto:\\([^>]+\\)" list-post))
+      (setq list-post (match-string 1 list-post)))
+    (or list-post
+	x-been-there)))
 
 ;;; Posting styles.
 

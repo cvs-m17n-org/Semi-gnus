@@ -254,9 +254,12 @@ noticing asynchronous data.")
 (defvar nntp-async-timer nil)
 (defvar nntp-async-process-list nil)
 
-(eval-and-compile
-  (autoload 'mail-source-read-passwd "mail-source")
-  (autoload 'open-ssl-stream "ssl"))
+(defvar nntp-ssl-program 
+  "openssl s_client -quiet -ssl3 -connect %s:%p"
+"A string containing commands for SSL connections.
+Within a string, %s is replaced with the server address and %p with
+port number on server.  The program should accept IMAP commands on
+stdin and return responses to stdout.")
 
 
 
@@ -1042,9 +1045,8 @@ If SEND-IF-FORCE, only send authinfo to the server if the
 	   (or passwd
 	       nntp-authinfo-password
 	       (setq nntp-authinfo-password
-		     (mail-source-read-passwd
-		      (format "NNTP (%s@%s) password: "
-			      user nntp-address))))))))))
+		     (read-passwd (format "NNTP (%s@%s) password: "
+					  user nntp-address))))))))))
 
 (defun nntp-send-nosy-authinfo ()
   "Send the AUTHINFO to the nntp server."
@@ -1053,8 +1055,8 @@ If SEND-IF-FORCE, only send authinfo to the server if the
       (nntp-send-command "^3.*\r?\n" "AUTHINFO USER" user)
       (when t				;???Should check if AUTHINFO succeeded
 	(nntp-send-command "^2.*\r?\n" "AUTHINFO PASS"
-			   (mail-source-read-passwd "NNTP (%s@%s) password: "
-						    user nntp-address))))))
+			   (read-passwd (format "NNTP (%s@%s) password: "
+						user nntp-address)))))))
 
 (defun nntp-send-authinfo-from-file ()
   "Send the AUTHINFO to the nntp server.
@@ -1068,7 +1070,7 @@ password contained in '~/.nntp-authinfo'."
       (nntp-send-command "^3.*\r?\n" "AUTHINFO USER" (user-login-name))
       (nntp-send-command
        "^2.*\r?\n" "AUTHINFO PASS"
-       (buffer-substring (point) (progn (end-of-line) (point)))))))
+       (buffer-substring (point) (gnus-point-at-eol))))))
 
 ;;; Internal functions.
 
@@ -1148,7 +1150,15 @@ password contained in '~/.nntp-authinfo'."
   (open-network-stream "nntpd" buffer nntp-address nntp-port-number))
 
 (defun nntp-open-ssl-stream (buffer)
-  (let ((proc (open-ssl-stream "nntpd" buffer nntp-address nntp-port-number)))
+  (let* ((process-connection-type nil)
+	 (proc (start-process "nntpd" buffer 
+			      shell-file-name
+			      shell-command-switch
+			      (format-spec nntp-ssl-program 
+					   (format-spec-make
+					    ?s nntp-address
+					    ?p nntp-port-number)))))
+    (process-kill-without-query proc)
     (save-excursion
       (set-buffer buffer)
       (nntp-wait-for-string "^\r*20[01]")
@@ -1280,7 +1290,7 @@ password contained in '~/.nntp-authinfo'."
   (save-excursion
     (set-buffer (or (nntp-find-connection-buffer nntp-server-buffer)
 		    nntp-server-buffer))
-    (let ((len (/ (point-max) 1024))
+    (let ((len (/ (buffer-size) 1024))
 	  message-log-max)
       (unless (< len 10)
 	(setq nntp-have-messaged t)
@@ -1315,16 +1325,18 @@ password contained in '~/.nntp-authinfo'."
 
   (when group
     (let ((entry (nntp-find-connection-entry nntp-server-buffer)))
-      (when (not (equal group (caddr entry)))
-	(save-excursion
-	  (set-buffer (process-buffer (car entry)))
-	  (erase-buffer)
-	  (nntp-send-command "^[245].*\n" "GROUP" group)
-	  (setcar (cddr entry) group)
-	  (erase-buffer)
-	  (save-excursion
-	    (set-buffer nntp-server-buffer)
-	    (erase-buffer)))))))
+      (cond ((not entry)
+             (nntp-report "Server closed connection"))
+            ((not (equal group (caddr entry)))
+             (save-excursion
+               (set-buffer (process-buffer (car entry)))
+               (erase-buffer)
+               (nntp-send-command "^[245].*\n" "GROUP" group)
+               (setcar (cddr entry) group)
+               (erase-buffer)
+               (save-excursion
+                 (set-buffer nntp-server-buffer)
+                 (erase-buffer))))))))
 
 (defun nntp-decode-text (&optional cr-only)
   "Decode the text in the current buffer."
@@ -1669,7 +1681,7 @@ via telnet.")
 	 proc (concat
 	       (or nntp-telnet-passwd
 		   (setq nntp-telnet-passwd
-			 (mail-source-read-passwd "Password: ")))
+			 (read-passwd "Password: ")))
 	       "\n"))
 	(nntp-wait-for-string nntp-telnet-shell-prompt)
 	(process-send-string
@@ -1821,8 +1833,7 @@ Please refer to the following variables to customize the connection:
 			     (concat
 			      (or nntp-via-user-password
 				  (setq nntp-via-user-password
-					(mail-source-read-passwd
-					 "Password: ")))
+					(read-passwd "Password: ")))
 			      "\n"))
 	(nntp-wait-for-string nntp-via-shell-prompt)
 	(let ((real-telnet-command `("exec"

@@ -73,25 +73,28 @@
 (defun mm-inline-image-emacs (handle)
   (let ((b (point-marker))
 	buffer-read-only)
-    (insert "\n")
     (put-image (mm-get-image handle) b)
+    (insert "\n\n")
     (mm-handle-set-undisplayer
      handle
-     `(lambda () (remove-images ,b (1+ ,b))))))
+     `(lambda ()
+	(let ((b ,b)
+	      buffer-read-only)
+	  (remove-images b b)
+	  (delete-region b (+ b 2)))))))
 
 (defun mm-inline-image-xemacs (handle)
-  (insert "\n")
-  (forward-char -1)
-  (let ((b (point))
-	(annot (make-annotation (mm-get-image handle) nil 'text))
+  (insert "\n\n")
+  (forward-char -2)
+  (let ((annot (make-annotation (mm-get-image handle) nil 'text))
 	buffer-read-only)
     (mm-handle-set-undisplayer
      handle
      `(lambda ()
-	(let (buffer-read-only)
+	(let ((b ,(point-marker))
+	      buffer-read-only)
 	  (delete-annotation ,annot)
-	  (delete-region ,(set-marker (make-marker) b)
-			 ,(set-marker (make-marker) (point))))))
+	  (delete-region (- b 2) b))))
     (set-extent-property annot 'mm t)
     (set-extent-property annot 'duplicable t)))
 
@@ -369,7 +372,8 @@ map.")))
       (set-text-properties (point-min) (point-max) nil)
       (when (or (equal type "enriched")
 		(equal type "richtext"))
-	(enriched-decode (point-min) (point-max)))
+	(ignore-errors
+	  (enriched-decode (point-min) (point-max))))
       (mm-handle-set-undisplayer
        handle
        `(lambda ()

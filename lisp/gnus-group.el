@@ -445,6 +445,7 @@ simple manner.")
 ;;; Internal variables
 
 (defvar gnus-group-is-exiting-p nil)
+(defvar gnus-group-is-exiting-without-update-p nil)
 (defvar gnus-group-sort-alist-function 'gnus-group-sort-flat
   "Function for sorting the group buffer.")
 
@@ -729,7 +730,7 @@ simple manner.")
 (defun gnus-topic-mode-p ()
   "Return non-nil in `gnus-topic-mode'."
   (and (boundp 'gnus-topic-mode) 
-       gnus-topic-mode))
+       (symbol-value 'gnus-topic-mode)))
 
 (defun gnus-group-make-menu-bar ()
   (gnus-turn-off-edit-menu 'group)
@@ -960,7 +961,7 @@ simple manner.")
 
 ;; Emacs 21 tool bar.  Should be no-op otherwise.
 (defun gnus-group-make-tool-bar ()
-  (if (and 
+  (if (and
        (condition-case nil (require 'tool-bar) (error nil))
        (fboundp 'tool-bar-add-item-from-menu)
        (default-value 'tool-bar-mode)
@@ -1449,7 +1450,7 @@ if it is a string, only list groups matching REGEXP."
   "Highlight the current line according to `gnus-group-highlight'."
   (let* ((list gnus-group-highlight)
 	 (p (point))
-	 (end (progn (end-of-line) (point)))
+	 (end (gnus-point-at-eol))
 	 ;; now find out where the line starts and leave point there.
 	 (beg (progn (beginning-of-line) (point)))
 	 (group (gnus-group-group-name))
@@ -1876,6 +1877,8 @@ If the group is opened, just switch the summary buffer.
 If ALL is non-nil, already read articles become readable.
 If ALL is a number, fetch this number of articles."
   (interactive "P")
+  (when (and (eobp) (not (gnus-group-group-name)))
+    (forward-line -1))
   (gnus-group-read-group all t))
 
 (defun gnus-group-quick-select-group (&optional all)
@@ -3488,6 +3491,7 @@ re-scanning.  If ARG is non-nil and not a number, this will force
 	;; Binding this variable will inhibit multiple fetchings
 	;; of the same mail source.
 	(nnmail-fetched-sources (list t)))
+    (gnus-run-hooks 'gnus-get-top-new-news-hook)
     (gnus-run-hooks 'gnus-get-new-news-hook)
 
     ;; Read any slave files.

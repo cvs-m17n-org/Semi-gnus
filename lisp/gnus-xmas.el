@@ -714,9 +714,9 @@ XEmacs compatibility workaround."
 	  (eq (cadr (memq 'gnus-undeletable (text-properties-at b))) t)
 	(text-property-any b e 'gnus-undeletable t))))
 
-(defun gnus-xmas-mime-button-menu (event)
+(defun gnus-xmas-mime-button-menu (event prefix)
   "Construct a context-sensitive menu of MIME commands."
-  (interactive "e")
+  (interactive "e\nP")
   (let ((response (get-popup-menu-response
 		   `("MIME Part"
 		     ,@(mapcar (lambda (c) `[,(caddr c) ,(car c) t])
@@ -728,7 +728,7 @@ XEmacs compatibility workaround."
 (defun gnus-group-add-icon ()
   "Add an icon to the current line according to `gnus-group-icon-list'."
   (let* ((p (point))
-	 (end (progn (end-of-line) (point)))
+	 (end (gnus-point-at-eol))
 	 ;; now find out where the line starts and leave point there.
 	 (beg (progn (beginning-of-line) (point))))
     (save-restriction
