@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus-ja
-@settitle Semi-gnus 6.10.037 Manual
+@settitle Semi-gnus 6.10.038 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -345,7 +345,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.037 Manual
+@title Semi-gnus 6.10.038 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
@@ -399,7 +399,7 @@ Semi-gnus は、大きな絵が入っていたりさまざまな形式を用いたりしているちょっ
 な言語圏を差別しません。ああ、クリンゴンの方は Unicode Next Generationを
 お待ちください。
 
-この説明書は Semi-gnus 6.10.037 に対応します。
+この説明書は Semi-gnus 6.10.038 に対応します。
 
 @end ifinfo
 
@@ -531,11 +531,16 @@ gnus-other-frame} を使うことができます。
 ようになっています。
 
 @vindex gnus-secondary-servers
+@vindex gnus-nntp-server
 Gnus に @sc{nntp} サーバーの名前の入力を対話的に指定することもできます。
 @code{gnus} に数値でない接頭引数を渡すと（例：@kbd{C-u M-x gnus}）、gnus 
 は @code{gnus-secondary-servers} リスト（もし存在するならば）からサーバー
 を選ぶことができるようにします。ただ単に接続したいと思ったサーバーの名前
 を打つこともできます。
+(気を付けてほしいのは、この操作によって @code{gnus-nntp-server} もセットさ
+れてしまうことです。それは、そのとき使っている Emacs で再び @kbd{M-x gnus}
+の操作を行なうと、gnus は @code{gnus-nntp-server} にセットされたサーバーに
+接続してしまうことを意味しています。)
 
 @findex gnus-group-browse-foreign-server
 @kindex B (Group)
