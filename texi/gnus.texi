@@ -11003,7 +11003,7 @@ Or using the default path:
 @end lisp
 
 If the mail spool file is not located on the local machine, it's best to 
-use POP or @sc{imap} or the like to fetch the mail.  You can not you ange-ftp 
+use POP or @sc{imap} or the like to fetch the mail.  You can not use ange-ftp 
 file names here---it has no way to lock the mail spool while moving the
 mail.
 
@@ -11229,7 +11229,7 @@ What stream to use for connecting to the server, this is one of the
 symbols in @code{imap-stream-alist}.  Right now, this means
 @samp{kerberos4}, @samp{ssl} or the default @samp{network}.
 
-@item :authenticator
+@item :authentication
 Which authenticator to use for authenticating to the server, this is one
 of the symbols in @code{imap-authenticator-alist}.  Right now, this
 means @samp{kerberos4}, @samp{cram-md5}, @samp{anonymous} or the default
@@ -13537,17 +13537,30 @@ SSL). Require the external library @samp{starttls.el} and program
 @dfn{ssl:} Connect through SSL. Require OpenSSL (the
 program @samp{openssl}) or SSLeay (@samp{s_client}).
 @item
+@dfn{shell:} Use a shell command to start IMAP connection.
+@item
 @dfn{network:} Plain, TCP/IP network connection.
 @end itemize
 
+@vindex imap-kerberos4-program
 The @samp{imtest} program is shipped with Cyrus IMAPD, nnimap support
-both @samp{imtest} version 1.5.x and version 1.6.x.
+both @samp{imtest} version 1.5.x and version 1.6.x.  The variable
+@code{imap-kerberos4-program} contain parameters to pass to the imtest
+program. 
 
+@vindex imap-ssl-program
 For SSL connections, the OpenSSL program is available from
 @file{http://www.openssl.org/}. OpenSSL was formerly known as SSLeay,
-and nnimap support it too - although the most recent versions of SSLeay,
-0.9.x, are known to have serious bugs making it useless. Earlier
-versions, especially 0.8.x, of SSLeay are known to work.
+and nnimap support it too - although the most recent versions of
+SSLeay, 0.9.x, are known to have serious bugs making it
+useless. Earlier versions, especially 0.8.x, of SSLeay are known to
+work. The variable @code{imap-ssl-program} contain parameters to pass
+to OpenSSL/SSLeay.
+
+@vindex imap-shell-program
+@vindex imap-shell-host
+For IMAP connections using the @code{shell} stream, the variable
+@code{imap-shell-program} specify what program to call.
 
 @item nnimap-authenticator
 @vindex nnimap-authenticator
@@ -13606,6 +13619,14 @@ manually, @xref{Expunging mailboxes}.
 @item ask
 When closing mailboxes, nnimap will ask if you wish to expunge deleted
 articles or not.
+
+@item nnimap-authinfo-file
+@vindex nnimap-authinfo-file
+
+A file containing credentials used to log in on servers.  The format
+is (almost) the same as the @code{ftp} @file{~/.netrc} file.  See
+`nntp-authinfo-file' for exact syntax.
+
 @end table
 
 @end table
@@ -14050,7 +14071,8 @@ already fetched while in this mode.
 @item
 You then decide to see whether any new news has arrived.  You connect
 your machine to the net (using PPP or whatever), and then hit @kbd{J j}
-to make Gnus become @dfn{plugged}.
+to make Gnus become @dfn{plugged} and use @kbd{g} to check for new mail
+as usual.
 
 @item
 You can then read the new news immediately, or you can download the news
@@ -18295,6 +18317,17 @@ some headers.  I don't see why you'd want that, though.
 @item gnus-shell-command-separator
 @vindex gnus-shell-command-separator
 String used to separate two shell commands.  The default is @samp{;}.
+
+@item gnus-invalid-group-regexp
+@vindex gnus-invalid-group-regexp
+
+Regexp to match ``invalid'' group names when querying user for a group
+name.  The default value catches some @strong{really} invalid group
+names who could possibly mess up Gnus internally (like allowing
+@samp{:} in a group name, which is normally used to delimit method and
+group).
+
+IMAP users might want to allow @samp{/} in group names though.
 
 
 @end table

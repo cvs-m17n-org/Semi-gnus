@@ -1684,6 +1684,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 use the article treating faculties instead.  Is is described in Info node
 `Customizing Articles'.")
 
+(defvar gnus-invalid-group-regexp "[: `'\"/]\\|^$"
+  "Regexp matching invalid groups.")
+
 ;;; End of variables.
 
 ;; Define some autoload functions Gnus might use.
@@ -2860,8 +2863,8 @@ Disallow invalid group names."
   (let ((prefix "")
 	group)
     (while (not group)
-      (when (string-match
-	     "[: `'\"/]\\|^$"
+      (when (string-match 
+	     gnus-invalid-group-regexp
 	     (setq group (read-string (concat prefix prompt)
 				      (cons (or default "") 0)
 				      'gnus-group-history)))

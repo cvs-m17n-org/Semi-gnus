@@ -10806,7 +10806,7 @@ IMAP サーバーに渡すパスワードです。指定されていないときは、利用者は入力
 シンボルの中のひとつを設定します。現状では、@samp{kerberos4} か 
 @samp{ssl} か初期値の @samp{network} になります。
 
-@item :authenticator
+@item :authentication
 サーバーでの認証にどの認証法を使うか。これは
 @code{imap-authenticator-alist} のシンボルの一つを設定します。現状では、
 @samp{kerberos4}、@samp{cram-md5}、@samp{anonymous} か初期値の 
@@ -13121,17 +13121,29 @@ REFERENCE が使用されるかはサーバー特有ですが、ワシントン大学のサーバーで
 @dfn{ssl:} SSL を使います。OpenSSL (@samp{openssl} プログラム) か SSLeay
 (@samp{s_client}) が必要です。
 @item
+@dfn{shell:} シェル命令を使って IMAP 接続を開始します。
+@item
 @dfn{network:} 生の、TCP/IP のネットワーク接続です。
 @end itemize
 
+@vindex imap-kerberos4-program
 @samp{imtest} プログラムは Cyrus IMAPD に含まれています。nnimap は
-@samp{imtest} バージョン 1.5.x と 1.6.x の両方をサポートします。
+@samp{imtest} バージョン 1.5.x と 1.6.x の両方をサポートします。変数
+@code{imap-kerberos4-program} は imtest プログラムに渡すパタメータを含み
+ます。
 
+@vindex imap-ssl-program
 SSL 接続のための OpenSSL プログラムは @file{http://www.openssl.org/} か
 ら入手できます。OpenSSL は以前は SSLeay として知られていたもので、nnimap
 はそれもサポートします。しかし、SSLeay の最新版である 0.9.x には重大なバ
 グがあるため使えません。以前の版、特に SSLeay 0.8.x は使えることがわかっ
-ています。
+ています。変数 @code{imap-ssl-program} は OpenSSL/SSLeay に渡すパタメー
+タを含みます。
+
+@vindex imap-shell-program
+@vindex imap-shell-host
+IMAP 接続に @code{shell} ストリームを使う場合、変数
+@code{imap-shell-program} は何のプログラムを呼ぶかを指定します。
 
 @item nnimap-authenticator
 @vindex nnimap-authenticator
@@ -13191,6 +13203,14 @@ SSL 接続のための OpenSSL プログラムは @file{http://www.openssl.org/}
 @item ask
 メールボックスを閉じるときに、nnimap が消去された記事を削除するかどうか
 を尋ねます。
+
+@item nnimap-authinfo-file
+@vindex nnimap-authinfo-file
+
+サーバにログインするために使う認証情報 (authinfo) を含むファイルです。そ
+の形式は (ほとんど) @code{ftp} の @file{~/.netrc} ファイルと同じです。厳
+密た定義は `nntp-authinfo-file'を見て下さい。
+
 @end table
 
 @end table
@@ -13641,9 +13661,10 @@ Gnus を @code{gnus-unplugged} で起動します。これは gnus エージェ
 $Bしているニュース記事は全て読むことができます。
 
 @item
-そして、新しいニュースが到着しているかどうかを調べることにします。
-あなたは (PPP か何かを使って) あなたのマシンをネットワークに接続
-し、そして gnus を差し込むために @kbd{J j} を叩きます。
+そして、新しいニュースが到着しているかどうかを調べることにします。あなた
+は (PPP か何かを使って) あなたのマシンをネットワークに接続し、gnus を差
+し込むために @kbd{J j} を叩き、そして普通は新着メールを検査するために
+@kbd{g} を使います。
 
 @item
 そして、その場ですぐに新しいニュースを読むこともできますし、ニュー
@@ -17969,6 +17990,16 @@ t)} で、これは不可視テキストを見えなくして触れなくします。
 @vindex gnus-shell-command-separator
 二つのシェル命令を区切るのに使用される文字列。初期設定値は
 @samp{;} です。
+
+@item gnus-invalid-group-regexp
+@vindex gnus-invalid-group-regexp
+
+ユーザにグループ名を確認するときに使う、``使えない'' グループ名にマッチ
+する正規表現です。既定値は gnus の内部動作 (選択方法とグループの境界に、
+通常 @samp{:} を使っている) をめちゃめちゃにしてしまうかもしれない、いく
+つかの @strong{本当に} 使えないグループ名を捕まえます。
+
+IMAP ユーザはグループ名に @samp{/} を使いたいと思うでしょうけれど。
 
 
 @end table

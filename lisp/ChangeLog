@@ -1,3 +1,41 @@
+2000-07-16 18:25:07  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nndoc.el (nndoc-type-alist): Add outlook.
+	(nndoc-outlook-type-p): New function.
+	(nndoc-outlook-article-begin): Ditto.
+
+2000-07-16  Daiki Ueno  <ueno@unixuser.org>
+
+	* gnus-sum.el (gnus-restore-hidden-threads-configuration): Save
+	excursion.
+
+2000-07-15  Simon Josefsson  <simon@josefsson.org>
+
+	* gnus-cus.el (gnus-group-parameters, banner): Type is regexp.
+
+	* imap.el (imap): 
+	(imap-kerberos4-program): 
+	(imap-gssapi-program): 
+	(imap-ssl-program): Customization.
+	(imap-shell-program): 
+	(imap-shell-host): New variables.
+	(imap-streams): 
+	(imap-stream-alist): Add shell.
+	(imap-shell-p): 
+	(imap-shell-open): New functions.
+	(imap-open): Don't call authenticator if preauth.
+	(imap-authenticate): Return t if already authenticated.
+
+2000-07-14  Simon Josefsson  <simon@josefsson.org>
+
+	* gnus.el (gnus-invalid-group-regexp): New variable.
+	(gnus-read-group): Use it.
+
+2000-07-14 12:40:51  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agent-fetch-group-1): mark-below, 
+	expunge-below and orphan-score are "group variables".
+
 2000-07-13  Simon Josefsson  <jas@pdc.kth.se>
 
 	* gnus-srvr.el (gnus-browse-read-group): Don't pass fully
