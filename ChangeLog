@@ -1,3 +1,8 @@
+2001-07-06  KITAGAWA Takurou  <i30x1641@ip.media.kyoto-u.ac.jp>
+
+	* lisp/Makefile.in (clever): Use `if test... then' instead of
+	`test... &&'.
+
 2001-07-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/Makefile.in (clever): Change the quoting style for the

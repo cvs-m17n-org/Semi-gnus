@@ -18,6 +18,10 @@ EMACS_COMP = URLDIR=$(URLDIR) W3DIR=$(W3DIR) lispdir=$(lispdir) srcdir=$(srcdir)
 GNUS_PRODUCT_NAME = @GNUS_PRODUCT_NAME@
 EXPORTING_FILES = $(EMACS_COMP) -f dgnushack-exporting-files 2>/dev/null
 
+# We should never use `COMMAND && ...' form, use `if COMMAND then ...'
+# form instead.  Because, as far as we know, FreeBSD's native make will
+# be discontinued if COMMAND returns a non-zero exit status.
+
 all total: clean-some gnus-load.elc
 	$(EMACS_COMP) -f dgnushack-compile
 
@@ -37,9 +41,9 @@ clever some: gnus-load.elc
 	  if test `$(EMACS) -batch -q -no-site-file \
 		-eval '(prin1 (featurep (quote xemacs)))' \
 		2>/dev/null` = t; then \
-	    test ! -f $(srcdir)/gnus-xmas.elc && RM_ELC=t; \
+	    if test ! -f $(srcdir)/gnus-xmas.elc; then RM_ELC=t; fi; \
 	  else \
-	    test -f $(srcdir)/gnus-xmas.elc && RM_ELC=t; \
+	    if test -f $(srcdir)/gnus-xmas.elc; then RM_ELC=t; fi; \
 	  fi; \
 	  if test $$RM_ELC = t; then \
 	    echo " => maybe yes;" \
