@@ -47,8 +47,7 @@
   (require 'mail-parse)
   (require 'mm-decode)
   (require 'mm-view)
-  (require 'mm-uu)
-  )
+  (require 'mm-uu))
 
 (autoload 'gnus-msg-mail "gnus-msg" nil t)
 (autoload 'gnus-button-mailto "gnus-msg")
@@ -5216,12 +5215,12 @@ the entire article will be yanked."
     (if (not (mark t))
 	(with-current-buffer gnus-summary-buffer
 	  (gnus-summary-reply (list (list article)) wide))
+      (setq cont (buffer-substring (point) (mark t)))
+      ;; Deactivate active regions.
+      (when (and (boundp 'transient-mark-mode)
+		 transient-mark-mode)
+	(setq mark-active nil))
       (with-current-buffer gnus-summary-buffer
-	(setq cont (buffer-substring (point) (mark t)))
-	;; Deactivate active regions.
-	(when (and (boundp 'transient-mark-mode)
-		   transient-mark-mode)
-	  (setq mark-active nil))
 	(gnus-summary-reply
 	 (list (list article cont)) wide)))))
 
