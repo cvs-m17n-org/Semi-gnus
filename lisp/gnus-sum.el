@@ -11139,7 +11139,7 @@ UNREAD is a sorted list."
 
 (defun gnus-summary-setup-default-charset ()
   "Setup newsgroup default charset."
-  (if (equal gnus-newsgroup-name "nndraft:drafts")
+  (if (member gnus-newsgroup-name '("nndraft:delayed" "nndraft:drafts"))
       (progn
 	(setq gnus-newsgroup-charset nil)
 	(make-local-variable 'default-mime-charset)

@@ -5741,18 +5741,22 @@ after replacing with the original article."
 			     gnus-article-edit-mode-map)
   (erase-buffer)
   (insert-buffer-substring gnus-original-article-buffer)
-  (let ((ofn (symbol-function 'mime-edit-decode-single-part-in-buffer)))
-    (fset 'mime-edit-decode-single-part-in-buffer
-	  (lambda (&rest args)
-	    (if (let ((content-type (car args)))
-		  (and (eq 'message (mime-content-type-primary-type
-				     content-type))
-		       (eq 'rfc822 (mime-content-type-subtype content-type))))
-		(setcar (cdr args) 'not-decode-text))
-	    (apply ofn args)))
-    (unwind-protect
-	(mime-edit-again)
-      (fset 'mime-edit-decode-single-part-in-buffer ofn)))
+  (unless (member (with-current-buffer gnus-summary-buffer
+		    gnus-newsgroup-name)
+		  '("nndraft:delayed" "nndraft:drafts"))
+    (let ((ofn (symbol-function 'mime-edit-decode-single-part-in-buffer)))
+      (fset 'mime-edit-decode-single-part-in-buffer
+	    (lambda (&rest args)
+	      (if (let ((content-type (car args)))
+		    (and (eq 'message (mime-content-type-primary-type
+				       content-type))
+			 (eq 'rfc822 (mime-content-type-subtype
+				      content-type))))
+		  (setcar (cdr args) 'not-decode-text))
+	      (apply ofn args)))
+      (unwind-protect
+	  (mime-edit-again)
+	(fset 'mime-edit-decode-single-part-in-buffer ofn))))
   (when (featurep 'font-lock)
     (set (make-local-variable 'font-lock-defaults)
 	 '(message-font-lock-keywords t))
@@ -5769,7 +5773,8 @@ after replacing with the original article."
   (when (featurep 'font-lock)
     (setq font-lock-defaults nil)
     (font-lock-mode -1))
-  (gnus-article-edit-done arg))
+  (let ((inhibit-read-only t))
+    (gnus-article-edit-done arg)))
 
 (defun gnus-article-mime-edit-exit ()
   "Exit the article MIME editing without updating."
@@ -6737,10 +6742,11 @@ For example:
   (let ((func (cdr (assoc protocol gnus-article-encrypt-protocol-alist))))
     (unless func
       (error (format "Can't find the encrypt protocol %s" protocol)))
-    (if (equal gnus-newsgroup-name "nndraft:drafts")
-	(error "Can't encrypt the article in group nndraft:drafts"))
-    (if (equal gnus-newsgroup-name "nndraft:queue")
-	(error "Don't encrypt the article in group nndraft:queue"))
+    (if (member gnus-newsgroup-name '("nndraft:delayed"
+				      "nndraft:drafts"
+				      "nndraft:queue"))
+	(error "Can't encrypt the article in group %s"
+	       gnus-newsgroup-name))
     (gnus-summary-iterate n
       (save-excursion
 	(set-buffer gnus-summary-buffer)

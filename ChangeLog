@@ -1,3 +1,10 @@
+2002-11-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-mime-edit-article-setup): Don't
+	perform `mime-edit-again' for a delayed or a queued article.
+	(gnus-article-mime-edit-done): Bind `inhibit-read-only' to t while
+	running `gnus-article-edit-done'.
+
 2002-10-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/dgnushack.el (dgnushack-bind-colon-keywords): Protect
