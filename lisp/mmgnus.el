@@ -25,9 +25,7 @@
 
 ;;; Code:
 
-(condition-case nil
-    (require 'mmgeneric)
-  (error nil))
+(require 'mmgeneric)
 (require 'mime)
 (require 'eword-decode)
 
@@ -104,14 +102,36 @@
    (mmgnus-entity-header-internal entity)
    invisible-fields visible-fields))
 
+(luna-define-method mime-entity-fetch-field :around
+  ((entity mmgnus-entity) field-name)
+  (or (luna-call-next-method)
+      (let* ((header (mmgnus-entity-header-internal entity))
+	     (case-fold-search t)
+	     (ret (and header
+		       (string-match 
+			(concat "^" field-name
+				":[ \t]+\\(.*\\(\n[ \t]+.*\\)*\\)\n")
+			header)
+		       (match-string 1 header))))
+	(when ret
+	  (or (symbolp field-name)
+	      (setq field-name
+		    (intern (capitalize (capitalize field-name)))))
+	  (mime-entity-set-original-header-internal
+	   entity
+	   (put-alist field-name ret
+		      (mime-entity-original-header-internal entity)))
+	  ret))))
+
 (luna-define-method mime-entity-body ((entity mmgnus-entity))
    (cond
     ((bufferp (mmgnus-entity-body-internal entity))
      (with-current-buffer (mmgnus-entity-body-internal entity)
        (buffer-string)))
     (t
-     (error "Invalid body object. %s"
-	    (mmgnus-entity-body-internal entity)))))
+     (message "Invalid body object. %s"
+	      (mmgnus-entity-body-internal entity))
+     "")))
 
 (luna-define-method mime-entity-content ((entity mmgnus-entity))
   (mime-decode-string (mime-entity-body entity)
@@ -119,6 +139,15 @@
 
 (luna-define-method mime-insert-entity-content ((entity mmgnus-entity))
   (insert (mime-entity-content entity)))
+
+(luna-define-method mime-insert-text-content ((entity mmgnus-entity))
+  (insert
+   (decode-mime-charset-string (mime-entity-content entity)
+			       (or (mime-content-type-parameter
+				    (mime-entity-content-type entity)
+				    "charset")
+				   default-mime-charset)
+			       'CRLF)))
 
 (luna-define-method mime-write-entity-content ((entity mmgnus-entity) filename)
   (with-temp-buffer
@@ -136,6 +165,9 @@
   (with-temp-buffer
     (mime-insert-entity entity)
     (write-region-as-raw-text-CRLF (point-min) (point-max) filename)))
+
+(luna-define-method mime-insert-entity-body ((entity mmgnus-entity))
+  (insert (mime-entity-body entity)))
 
 (luna-define-method mime-write-entity-body ((entity mmgnus-entity) filename)
   (with-temp-buffer
@@ -162,6 +194,42 @@
   (luna-call-next-method))
 
 (luna-define-method mime-entity-content :around ((entity mime-gnus-entity))
+  (luna-call-next-method))
+
+(luna-define-method mime-entity-fetch-field :around ((entity mime-gnus-entity)
+						     field-name)
+  (luna-call-next-method))
+
+(luna-define-method mime-entity-body :around ((entity mime-gnus-entity))
+  (luna-call-next-method))
+
+(luna-define-method mime-entity-content :around ((entity mime-gnus-entity))
+  (luna-call-next-method))
+
+(luna-define-method mime-insert-entity-content :around
+  ((entity mime-gnus-entity))
+  (luna-call-next-method))
+
+(luna-define-method mime-insert-text-content :around
+  ((entity mime-gnus-entity))
+  (luna-call-next-method))
+
+(luna-define-method mime-write-entity-content :around
+  ((entity mime-gnus-entity) filename)
+  (luna-call-next-method))
+
+(luna-define-method mime-insert-entity :around ((entity mime-gnus-entity))
+  (luna-call-next-method))
+
+(luna-define-method mime-write-entity :around ((entity mime-gnus-entity)
+					       filename)
+  (luna-call-next-method))
+
+(luna-define-method mime-insert-entity-body :around ((entity mime-gnus-entity))
+  (luna-call-next-method))
+
+(luna-define-method mime-write-entity-body :around ((entity mime-gnus-entity)
+						    filename)
   (luna-call-next-method))
 
 ;;; @ end
