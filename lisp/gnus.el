@@ -1315,6 +1315,7 @@ slower."
     ("nnweb" none)
     ("nnslashdot" post)
     ("nnultimate" none)
+    ("nnwfm" none)
     ("nnwarchive" none)
     ("nnlistserv" none)
     ("nnagent" post-mail)
@@ -1357,8 +1358,7 @@ this variable.	I think."
 		    :inline t
 		    (list :format "%v"
 			  variable
-			  (sexp :tag "Value"))))
-    ))
+			  (sexp :tag "Value"))))))
 
 (gnus-redefine-select-method-widget)
 

@@ -493,40 +493,45 @@ header line with the old Message-ID."
 	(error "Can't find any article buffer")
       (save-excursion
 	(set-buffer article-buffer)
-	(save-restriction
-	  ;; Copy over the (displayed) article buffer, delete
-	  ;; hidden text and remove text properties.
-	  (widen)
-	  (let ((inhibit-read-only t))
-	    (copy-to-buffer gnus-article-copy (point-min) (point-max))
+	(let ((gnus-newsgroup-charset (or gnus-article-charset
+					  gnus-newsgroup-charset))
+	      (gnus-newsgroup-ignored-charsets
+	       (or gnus-article-ignored-charsets
+		   gnus-newsgroup-ignored-charsets)))
+	  (save-restriction
+	    ;; Copy over the (displayed) article buffer, delete
+	    ;; hidden text and remove text properties.
+	    (widen)
+	    (let ((inhibit-read-only t))
+	      (copy-to-buffer gnus-article-copy (point-min) (point-max))
+	      (set-buffer gnus-article-copy)
+	      ;; Encode bitmap smileys to ordinary text.
+	      ;; Possibly, the original text might be restored.
+	      (static-unless (featurep 'xemacs)
+		(when (featurep 'smiley-mule)
+		  (smiley-encode-buffer)))
+	      (gnus-article-delete-text-of-type 'annotation)
+	      (gnus-remove-text-with-property 'gnus-prev)
+	      (gnus-remove-text-with-property 'gnus-next)
+	      (gnus-remove-text-with-property 'x-face-mule-bitmap-image)
+	      (insert
+	       (prog1
+		   (buffer-substring-no-properties (point-min) (point-max))
+		 (erase-buffer))))
+	    ;; Find the original headers.
+	    (set-buffer gnus-original-article-buffer)
+	    (goto-char (point-min))
+	    (while (looking-at message-unix-mail-delimiter)
+	      (forward-line 1))
+	    (setq beg (point))
+	    (setq end (or (search-forward "\n\n" nil t) (point)))
+	    ;; Delete the headers from the displayed articles.
 	    (set-buffer gnus-article-copy)
-	    ;; Encode bitmap smileys to ordinary text.
-	    ;; Possibly, the original text might be restored.
-	    (static-unless (featurep 'xemacs)
-	      (when (featurep 'smiley-mule)
-		(smiley-encode-buffer)))
-	    (gnus-article-delete-text-of-type 'annotation)
-	    (gnus-remove-text-with-property 'gnus-prev)
-	    (gnus-remove-text-with-property 'gnus-next)
-	    (gnus-remove-text-with-property 'x-face-mule-bitmap-image)
-	    (insert
-	     (prog1
-		 (buffer-substring-no-properties (point-min) (point-max))
-	       (erase-buffer))))
-	  ;; Find the original headers.
-	  (set-buffer gnus-original-article-buffer)
-	  (goto-char (point-min))
-	  (while (looking-at message-unix-mail-delimiter)
-	    (forward-line 1))
-	  (setq beg (point))
-	  (setq end (or (search-forward "\n\n" nil t) (point)))
-	  ;; Delete the headers from the displayed articles.
-	  (set-buffer gnus-article-copy)
-	  (delete-region (goto-char (point-min))
-			 (or (search-forward "\n\n" nil t) (point-max)))
-	  ;; Insert the original article headers.
-	  (insert-buffer-substring gnus-original-article-buffer beg end)
-	  (article-decode-encoded-words)))
+	    (delete-region (goto-char (point-min))
+			   (or (search-forward "\n\n" nil t) (point-max)))
+	    ;; Insert the original article headers.
+	    (insert-buffer-substring gnus-original-article-buffer beg end)
+	    (article-decode-encoded-words))))
       gnus-article-copy)))
 
 (defun gnus-post-news (post &optional group header article-buffer yank subject
