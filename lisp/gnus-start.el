@@ -1632,30 +1632,30 @@ newsgroup."
 (defun gnus-read-active-file (&optional force not-native)
   (gnus-group-set-mode-line)
   (let ((methods
-	 (append
-	  (if (and (not not-native)
-		   (gnus-check-server gnus-select-method))
-	      ;; The native server is available.
-	      (cons gnus-select-method gnus-secondary-select-methods)
-	    ;; The native server is down, so we just do the
-	    ;; secondary ones.
-	    gnus-secondary-select-methods)
-	  ;; Also read from the archive server.
-	  (when (gnus-archive-server-wanted-p)
-	    (list "archive"))))
-	list-type)
+	 (mapcar
+	  (lambda (m) (if (stringp m) (gnus-server-get-method nil m) m))
+	  (append
+	   (if (and (not not-native)
+		    (gnus-check-server gnus-select-method))
+	       ;; The native server is available.
+	       (cons gnus-select-method gnus-secondary-select-methods)
+	     ;; The native server is down, so we just do the
+	     ;; secondary ones.
+	     gnus-secondary-select-methods)
+	   ;; Also read from the archive server.
+	   (when (gnus-archive-server-wanted-p)
+	     (list "archive")))))
+	method where mesg list-type)
     (setq gnus-have-read-active-file nil)
     (save-excursion
       (set-buffer nntp-server-buffer)
-      (while methods
-	(let* ((method (if (stringp (car methods))
-			   (gnus-server-get-method nil (car methods))
-			 (car methods)))
-	       (where (nth 1 method))
-	       (mesg (format "Reading active file%s via %s..."
+      (while (setq method (pop methods))
+	(unless (member method methods)
+	  (setq where (nth 1 method)
+		mesg (format "Reading active file%s via %s..."
 			     (if (and where (not (zerop (length where))))
 				 (concat " from " where) "")
-			     (car method))))
+			     (car method)))
 	  (gnus-message 5 mesg)
 	  (when (gnus-check-server method)
 	    ;; Request that the backend scan its incoming messages.
@@ -1702,9 +1702,7 @@ newsgroup."
 		(gnus-active-to-gnus-format method gnus-active-hashtb nil t)
 		;; We mark this active file as read.
 		(push method gnus-have-read-active-file)
-		(gnus-message 5 "%sdone" mesg))))))
-	(setq methods (cdr methods))))))
-
+		(gnus-message 5 "%sdone" mesg))))))))))
 
 (defun gnus-ignored-newsgroups-has-to-p ()
   "Non-nil iff gnus-ignored-newsgroups includes \"^to\\\\.\" as an element."

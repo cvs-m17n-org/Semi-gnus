@@ -1,5 +1,5 @@
 ;;; gnus-sum.el --- summary mode commands for Semi-gnus
-;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
+;; Copyright (C) 1996,97,98,99 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -3022,24 +3022,6 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	     (setq heads nil)))))
      gnus-newsgroup-dependencies)))
 
-;; The following macros and functions were written by Felix Lee
-;; <flee@cse.psu.edu>.
-
-(defmacro gnus-nov-read-integer ()
-  '(prog1
-       (if (eq (char-after) ?\t)
-	   0
-	 (let ((num (ignore-errors (read buffer))))
-	   (if (numberp num) num 0)))
-     (unless (eobp)
-       (search-forward "\t" eol 'move))))
-
-(defmacro gnus-nov-skip-field ()
-  '(search-forward "\t" eol 'move))
-
-(defmacro gnus-nov-field ()
-  '(buffer-substring (point) (if (gnus-nov-skip-field) (1- (point)) eol)))
-
 ;; This function has to be called with point after the article number
 ;; on the beginning of the line.
 (defsubst gnus-nov-parse-line (number dependencies &optional force-new)
@@ -3048,27 +3030,22 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	header)
 
     ;; overview: [num subject from date id refs chars lines misc]
-    (unwind-protect
-	(progn
-	  (narrow-to-region (point) eol)
-	  (unless (eobp)
-	    (forward-char))
+    (unless (eobp)
+      (forward-char))
 
-	  (setq header
-		(make-full-mail-header
-		 number			; number
-		 (gnus-nov-field)	; subject
-		 (gnus-nov-field)	; from
-		 (gnus-nov-field)	; date
-		 (or (gnus-nov-field)
-		     (nnheader-generate-fake-message-id)) ; id
-		 (gnus-nov-field)	; refs
-		 (gnus-nov-read-integer) ; chars
-		 (gnus-nov-read-integer) ; lines
-		 (unless (= (following-char) ?\n)
-		   (gnus-nov-field)))))	; misc
-
-      (widen))
+    (setq header
+	  (make-full-mail-header
+	   number				; number
+	   (nnheader-nov-field)			; subject
+	   (nnheader-nov-field)			; from
+	   (nnheader-nov-field)			; date
+	   (or (nnheader-nov-field)		; id
+	       (nnheader-generate-fake-message-id))
+	   (nnheader-nov-field)			; refs
+	   (nnheader-nov-read-integer)		; chars
+	   (nnheader-nov-read-integer)		; lines
+	   (unless (= (char-after) ?\n)
+	     (nnheader-nov-field))))		; misc
 
     (when gnus-alter-header-function
       (funcall gnus-alter-header-function header))
@@ -3454,11 +3431,11 @@ If LINE, insert the rebuilt thread starting on line LINE."
 (defsubst gnus-article-sort-by-author (h1 h2)
   "Sort articles by root author."
   (string-lessp
-   (let ((addr (mime-read-field 'From h1)))
+   (let ((addr (car (mime-read-field 'From h1))))
      (or (std11-full-name-string addr)
 	 (std11-address-string addr)
 	 ""))
-   (let ((addr (mime-read-field 'From h2)))
+   (let ((addr (car (mime-read-field 'From h2))))
      (or (std11-full-name-string addr)
 	 (std11-address-string addr)
 	 ""))
@@ -3896,20 +3873,14 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; Retrieve the headers and read them in.
       (gnus-message 5 "Fetching headers for %s..." gnus-newsgroup-name)
       (setq gnus-newsgroup-headers
-	    (if (eq 'nov
-		    (setq gnus-headers-retrieved-by
-			  (gnus-retrieve-headers
-			   articles gnus-newsgroup-name
-			   ;; We might want to fetch old headers, but
-			   ;; not if there is only 1 article.
-			   (and (or (and
-				     (not (eq gnus-fetch-old-headers 'some))
-				     (not (numberp gnus-fetch-old-headers)))
-				    (> (length articles) 1))
-				gnus-fetch-old-headers))))
-		(gnus-get-newsgroup-headers-xover
-		 articles nil nil gnus-newsgroup-name t)
-	      (gnus-get-newsgroup-headers)))
+	    (gnus-retrieve-parsed-headers
+	     articles gnus-newsgroup-name
+	     ;; We might want to fetch old headers, but
+	     ;; not if there is only 1 article.
+	     (and (or (and (not (eq gnus-fetch-old-headers 'some))
+			   (not (numberp gnus-fetch-old-headers)))
+		      (> (length articles) 1))
+		  gnus-fetch-old-headers)))
       (gnus-message 5 "Fetching headers for %s...done" gnus-newsgroup-name)
 
       ;; Kludge to avoid having cached articles nixed out in virtual groups.
@@ -4553,8 +4524,8 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
 	(let ((gnus-nov-is-evil t))
 	  (nconc
 	   (nreverse headers)
-	   (when (gnus-retrieve-headers sequence group)
-	     (gnus-get-newsgroup-headers))))))))
+	   (gnus-retrieve-parsed-headers sequence group)
+	   ))))))
 
 (defun gnus-article-get-xrefs ()
   "Fill in the Xref value in `gnus-current-headers', if necessary.
