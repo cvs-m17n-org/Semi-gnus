@@ -69,6 +69,10 @@ It is specified by variable `gnus-newsgroup-default-charset-alist'
 			(set-buffer gnus-summary-buffer)
 			gnus-newsgroup-name))
 		     (alist gnus-newsgroup-default-charset-alist))
+		 ;; Strip method and foreign server name.
+		 (when (string-match ":" group)
+		   (setq group (substring group (match-end 0)))
+		   )
 		 (while alist
 		   (let ((pair (car alist)))
 		     (if (string-match (car pair) group)
