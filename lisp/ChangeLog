@@ -1,5 +1,19 @@
 2002-10-10  Simon Josefsson  <jas@extundo.com>
 
+	* pgg.el (pgg-decrypt-region): Bind pgg-default-user-id to
+	key-identifier in packet.  Is this a good idea?
+
+	* mml.el (mml-mode-map): Add security commands that operates on
+	MIME parts.
+	(mml-menu): And menu items for them.
+
+	* mml1991.el (mml1991-pgg-encrypt): Remove headers.
+
+	* mml.el (mml-parse-1): Support sender in #secure tags.
+
+	* mml1991.el (mml1991-pgg-sign): Only use message-sender if it is
+	defined.
+
 	* mml-sec.el (mml-smime-encrypt-buffer): Warn about combined signing.
 	(mml-pgp-encrypt-buffer): Support combined signing.
 

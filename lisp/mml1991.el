@@ -230,7 +230,9 @@
       (forward-line) ;; skip header/body separator
       (kill-region (point-min) (point)))
     (quoted-printable-decode-region (point-min) (point-max))
-    (unless (let ((pgg-default-user-id (message-options-get 'message-sender)))
+    (unless (let ((pgg-default-user-id
+		   (or (message-options-get 'message-sender)
+		       pgg-default-user-id)))
 	      (pgg-sign-region (point-min) (point-max) t))
       (pop-to-buffer pgg-errors-buffer)
       (error "Encrypt error"))
@@ -244,14 +246,12 @@
 
 (defun mml1991-pgg-encrypt (cont &optional sign)
   (let (headers)
-    ;; Don't sign headers.
+    ;; Strip MIME Content[^ ]: headers since it will be ASCII ARMOURED
     (goto-char (point-min))
-    (while (not (looking-at "^$"))
-      (forward-line))
-    (unless (eobp) ;; no headers?
-      (setq headers (buffer-substring (point-min) (point)))
-      (forward-line) ;; skip header/body separator
-      (kill-region (point-min) (point)))
+    (while (looking-at "^Content[^ ]+:") (forward-line))
+    (if (> (point) (point-min))
+	(progn
+	  (kill-region (point-min) (point))))
     (unless (pgg-encrypt-region
 	     (point-min) (point-max) 
 	     (split-string
@@ -264,7 +264,8 @@
       (pop-to-buffer pgg-errors-buffer)
       (error "Encrypt error"))
     (kill-region (point-min) (point-max))
-    (if headers (insert headers))
+    ;;(insert "Content-Type: application/pgp-encrypted\n\n")
+    ;;(insert "Version: 1\n\n")
     (insert "\n")
     (insert-buffer pgg-output-buffer)
     t))
