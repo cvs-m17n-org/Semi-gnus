@@ -1,3 +1,7 @@
+2001-09-27  Katsuhiro Hermit Endo  <hermit@koka-in.org>
+
+	* texi/gnus-ja.texi (Article Hiding): Fix typo.
+
 2001-09-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 07.
