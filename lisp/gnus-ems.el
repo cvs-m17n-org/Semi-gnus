@@ -50,12 +50,12 @@
 ;;; Mule functions.
 
 (defun gnus-mule-max-width-function (el max-width)
-  (` (let* ((val (eval (, el)))
-	    (valstr (if (numberp val)
-			(int-to-string val) val)))
-       (if (> (length valstr) (, max-width))
-	   (truncate-string-to-width valstr (, max-width))
-	 valstr))))
+  `(let* ((val (eval (, el)))
+	  (valstr (if (numberp val)
+		      (int-to-string val) val)))
+     (if (> (length valstr) ,max-width)
+	 (truncate-string-to-width valstr ,max-width)
+       valstr)))
 
 (eval-and-compile
   (if (string-match "XEmacs\\|Lucid" emacs-version)
@@ -85,7 +85,8 @@
 (eval-and-compile
   (let ((case-fold-search t))
     (cond
-     ((string-match "windows-nt\\|os/2\\|emx" (symbol-name system-type))
+     ((string-match "windows-nt\\|os/2\\|emx\\|cygwin32"
+		    (symbol-name system-type))
       (setq nnheader-file-name-translation-alist
 	    (append nnheader-file-name-translation-alist
 		    '((?: . ?_)

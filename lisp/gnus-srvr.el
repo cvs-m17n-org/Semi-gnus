@@ -594,10 +594,20 @@ The following commands are available:
 	    (delete-matching-lines gnus-ignored-newsgroups))
 	  (while (not (eobp)) 
 	    (ignore-errors
-             (push (cons (let ((p (point)))
-			   (skip-chars-forward "^ \t")
-			   (buffer-substring p (point)))
-			  (max 0 (- (1+ (read cur)) (read cur))))
+	      (push (cons 
+		     (if (eq (char-after) ?\")
+			 (read cur)
+		       (let ((p (point)) (name ""))
+			 (skip-chars-forward "^ \t\\\\")
+			 (setq name (buffer-substring p (point)))
+			 (while (eq (char-after) ?\\)
+			   (setq p (1+ (point)))
+			   (forward-char 2)
+			   (skip-chars-forward "^ \t\\\\")
+			   (setq name (concat name (buffer-substring
+						    p (point)))))
+			 name))
+		     (max 0 (- (1+ (read cur)) (read cur))))
 		    groups))
 	    (forward-line))))
       (setq groups (sort groups
@@ -726,7 +736,8 @@ buffer.
 		   nil nil (if (gnus-server-equal
 				gnus-browse-current-method "native")
 			       nil
-			     gnus-browse-current-method))
+			     (gnus-method-simplify 
+			      gnus-browse-current-method)))
 	     gnus-level-default-subscribed gnus-level-killed
 	     (and (car (nth 1 gnus-newsrc-alist))
 		  (gnus-gethash (car (nth 1 gnus-newsrc-alist))

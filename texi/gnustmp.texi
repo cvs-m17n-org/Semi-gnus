@@ -14,280 +14,9 @@
 @setchapternewpage odd
 
 @iftex
-@iflatex
-\documentclass[twoside,a4paper,openright,11pt]{book}
-\usepackage[latin1]{inputenc}
-\usepackage{pagestyle}
-\usepackage{epsfig}
-\usepackage{bembo}
-\usepackage{pixidx}
-
-\makeindex
-\begin{document}
-
-\newcommand{\gnuschaptername}{}
-\newcommand{\gnussectionname}{}
-
-\newcommand{\gnusbackslash}{/}
-
-\newcommand{\gnusxref}[1]{See ``#1'' on page \pageref{#1}}
-\newcommand{\gnuspxref}[1]{see ``#1'' on page \pageref{#1}}
-
-\newcommand{\gnuskindex}[1]{\index{#1}}
-\newcommand{\gnusindex}[1]{\index{#1}}
-
-\newcommand{\gnustt}[1]{{\fontfamily{pfu}\fontsize{10pt}{10}\selectfont #1}}
-\newcommand{\gnuscode}[1]{\gnustt{#1}}
-\newcommand{\gnussamp}[1]{``{\fontencoding{OT1}\fontfamily{pfu}\fontsize{10pt}{10}\selectfont #1}''}
-\newcommand{\gnuslisp}[1]{\gnustt{#1}}
-\newcommand{\gnuskbd}[1]{`\gnustt{#1}'}
-\newcommand{\gnusfile}[1]{`\gnustt{#1}'}
-\newcommand{\gnusdfn}[1]{\textit{#1}}
-\newcommand{\gnusi}[1]{\textit{#1}}
-\newcommand{\gnusstrong}[1]{\textbf{#1}}
-\newcommand{\gnusemph}[1]{\textit{#1}}
-\newcommand{\gnusvar}[1]{{\fontsize{10pt}{10}\selectfont\textsl{\textsf{#1}}}}
-\newcommand{\gnussc}[1]{\textsc{#1}}
-\newcommand{\gnustitle}[1]{{\huge\textbf{#1}}}
-\newcommand{\gnusauthor}[1]{{\large\textbf{#1}}}
-\newcommand{\gnusresult}[1]{\gnustt{=> #1}}
-
-\newcommand{\gnusbullet}{{${\bullet}$}}
-\newcommand{\gnusdollar}{\$}
-\newcommand{\gnusampersand}{\&}
-\newcommand{\gnuspercent}{\%}
-\newcommand{\gnushash}{\#}
-\newcommand{\gnushat}{\symbol{"5E}}
-\newcommand{\gnusunderline}{\symbol{"5F}}
-\newcommand{\gnusnot}{$\neg$}
-\newcommand{\gnustilde}{\symbol{"7E}}
-\newcommand{\gnusless}{{$<$}}
-\newcommand{\gnusgreater}{{$>$}}
-\newcommand{\gnusbraceleft}{{$>$}}
-\newcommand{\gnusbraceright}{{$>$}}
-
-\newcommand{\gnushead}{\raisebox{-1cm}{\epsfig{figure=ps/gnus-head.eps,height=1cm}}}
-\newcommand{\gnusinteresting}{
-\marginpar[\mbox{}\hfill\gnushead]{\gnushead}
-}
-
-\newcommand{\gnuscleardoublepage}{\ifodd\count0\mbox{}\clearpage\thispagestyle{empty}\mbox{}\clearpage\else\clearpage\fi}
-
-\newcommand{\gnuspagechapter}[1]{
-{\mbox{}}
-}
-
-\newdimen{\gnusdimen}
-\gnusdimen 0pt
-
-\newcommand{\gnuschapter}[2]{
-\gnuscleardoublepage
-\ifdim \gnusdimen = 0pt\setcounter{page}{1}\pagestyle{gnus}\pagenumbering{arabic} \gnusdimen 1pt\fi
-\chapter{#2}
-\renewcommand{\gnussectionname}{}
-\renewcommand{\gnuschaptername}{#2}
-\thispagestyle{empty}
-\hspace*{-2cm}
-\begin{picture}(500,500)(0,0)
-\put(480,350){\makebox(0,0)[tr]{#1}}
-\put(40,300){\makebox(500,50)[bl]{{\Huge\bf{#2}}}}
-\end{picture}
-\clearpage
-}
-
-\newcommand{\gnusfigure}[3]{
-\begin{figure}
-\mbox{}\ifodd\count0\hspace*{-0.8cm}\else\hspace*{-3cm}\fi\begin{picture}(440,#2)
-#3
-\end{picture}
-\caption{#1}
-\end{figure}
-}
-
-\newcommand{\gnusicon}[1]{
-\marginpar[\mbox{}\hfill\raisebox{-1.5cm}{\epsfig{figure=tmp/#1-up.ps,height=1.5cm}}]{\raisebox{-1cm}{\epsfig{figure=tmp/#1-up.ps,height=1cm}}}
-}
-
-\newcommand{\gnuspicon}[1]{
-\margindex{\epsfig{figure=#1,width=2cm}}
-}
-
-\newcommand{\gnusxface}[2]{
-\margindex{\epsfig{figure=#1,width=1cm}\epsfig{figure=#2,width=1cm}}
-}
-
-\newcommand{\gnussmiley}[2]{
-\margindex{\makebox[2cm]{\hfill\epsfig{figure=#1,width=0.5cm}\hfill\epsfig{figure=#2,width=0.5cm}\hfill}}
-}
-
-\newcommand{\gnusitemx}[1]{\mbox{}\vspace*{-\itemsep}\vspace*{-\parsep}\item#1}
-
-\newcommand{\gnussection}[1]{
-\renewcommand{\gnussectionname}{#1}
-\section{#1}
-}
-
-\newenvironment{codelist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newenvironment{kbdlist}%
-{\begin{list}{}{
-\labelwidth=0cm
-}
-}{\end{list}}
-
-\newenvironment{dfnlist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newenvironment{stronglist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newenvironment{samplist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newenvironment{varlist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newenvironment{emphlist}%
-{\begin{list}{}{
-}
-}{\end{list}}
-
-\newlength\gnusheadtextwidth
-\setlength{\gnusheadtextwidth}{\headtextwidth}
-\addtolength{\gnusheadtextwidth}{1cm}
-
-\newpagestyle{gnuspreamble}%
-{
-{
-\ifodd\count0
-{
-\hspace*{-0.23cm}\underline{\makebox[\gnusheadtextwidth]{\mbox{}}\textbf{\hfill\roman{page}}}
-}
-\else
-{
-\hspace*{-3.25cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\roman{page}\hfill\mbox{}}}
-}
-}
-\fi
-}
-}
-{
-\ifodd\count0
-\mbox{} \hfill
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\else
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\hfill \mbox{}
-\fi
-}
-
-\newpagestyle{gnusindex}%
-{
-{
-\ifodd\count0
-{
-\hspace*{-0.23cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\gnuschaptername\hfill\arabic{page}}}}
-}
-\else
-{
-\hspace*{-3.25cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\arabic{page}\hfill\gnuschaptername}}}
-}
-\fi
-}
-}
-{
-\ifodd\count0
-\mbox{} \hfill
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\else
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\hfill \mbox{}
-\fi
-}
-
-\newpagestyle{gnus}%
-{
-{
-\ifodd\count0
-{
-\makebox[12cm]{\hspace*{3.1cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\arabic{chapter}.\arabic{section}} \textbf{\gnussectionname\hfill\arabic{page}}}}}
-}
-\else
-{
-\makebox[12cm]{\hspace*{-2.95cm}\underline{\makebox[\gnusheadtextwidth]{\textbf{\arabic{page}\hfill\gnuschaptername}}}}
-}
-\fi
-}
-}
-{
-\ifodd\count0
-\mbox{} \hfill
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\else
-\raisebox{-0.5cm}{\epsfig{figure=ps/gnus-big-logo.eps,height=1cm}}
-\hfill \mbox{}
-\fi
-}
-
-\pagenumbering{roman}
-\pagestyle{gnuspreamble}
-
-@end iflatex
 @end iftex
 
 @iftex
-@iflatex
-\begin{titlepage}
-{
-
-%\addtolength{\oddsidemargin}{-5cm}
-%\addtolength{\evensidemargin}{-5cm}
-\parindent=0cm
-\addtolength{\textheight}{2cm}
-
-\gnustitle{\gnustitlename}\\
-\rule{15cm}{1mm}\\
-\vfill
-\hspace*{0cm}\epsfig{figure=ps/gnus-big-logo.eps,height=15cm}
-\vfill
-\rule{15cm}{1mm}\\
-\gnusauthor{by Lars Magne Ingebrigtsen}
-\newpage
-}
-
-\mbox{}
-\vfill
-
-\thispagestyle{empty}
-
-Copyright \copyright{} 1995,96,97,98,99 Free Software Foundation, Inc.
-
-Permission is granted to make and distribute verbatim copies of
-this manual provided the copyright notice and this permission notice
-are preserved on all copies.
-
-Permission is granted to copy and distribute modified versions of this
-manual under the conditions for verbatim copying, provided that the
-entire resulting derived work is distributed under the terms of a
-permission notice identical to this one.
-
-Permission is granted to copy and distribute translations of this manual
-into another language, under the above conditions for modified versions.
-
-\newpage
-\end{titlepage}
-@end iflatex
 @end iftex
 
 @ifinfo
@@ -361,10 +90,6 @@ This manual corresponds to Pterodactyl Gnus .
 
 @iftex
 
-@iflatex
-\tableofcontents
-\gnuscleardoublepage
-@end iflatex
 
 Gnus is the advanced, self-documenting, customizable, extensible
 unreal-time newsreader for GNU Emacs.
@@ -735,9 +460,6 @@ topic parameter that looks like
 will mean that all groups that match that regex will be subscribed under 
 that topic.
 
-If no topics match the groups, the groups will be subscribed in the
-top-level topic.
-
 @end table
 
 @vindex gnus-subscribe-hierarchical-interactive
@@ -1100,17 +822,6 @@ is the first buffer shown when Gnus starts, and will never be killed as
 long as Gnus is active.
 
 @iftex
-@iflatex
-\gnusfigure{The Group Buffer}{320}{
-\put(75,50){\epsfig{figure=tmp/group.ps,height=9cm}}
-\put(120,37){\makebox(0,0)[t]{Buffer name}}
-\put(120,38){\vector(1,2){10}}
-\put(40,60){\makebox(0,0)[r]{Mode line}}
-\put(40,58){\vector(1,0){30}}
-\put(200,28){\makebox(0,0)[t]{Native select method}}
-\put(200,26){\vector(-1,2){15}}
-}
-@end iflatex
 @end iftex
 
 @menu
@@ -2622,11 +2333,6 @@ even group the Emacs sex groups as a sub-topic to either the Emacs
 groups or the sex groups---or both!  Go wild!
 
 @iftex
-@iflatex
-\gnusfigure{Group Topics}{400}{
-\put(75,50){\epsfig{figure=tmp/group-topic.ps,height=9cm}}
-}
-@end iflatex
 @end iftex
 
 Here's an example:
@@ -2968,18 +2674,6 @@ All groups in a topic will inherit group parameters from the parent (and
 ancestor) topic parameters.  All valid group parameters are valid topic
 parameters (@pxref{Group Parameters}).
 
-In addition, the following parameters are only valid as topic
-parameters:
-
-@table @code
-@item subscribe
-When subscribing new groups by topic (@pxref{Subscription Methods}), the 
-@code{subscribe} topic parameter says what groups go in what topic.  Its 
-value should be a regexp to match the groups that should go in that
-topic. 
-
-@end table
-
 Group parameters (of course) override topic parameters, and topic
 parameters in sub-topics override topic parameters in super-topics.  You
 know.  Normal inheritance rules.  (@dfn{Rules} is here a noun, not a
@@ -3285,6 +2979,7 @@ You can have as many summary buffers open as you wish.
 * Choosing Articles::           Reading articles.
 * Paging the Article::          Scrolling the current article.
 * Reply Followup and Post::     Posting articles.
+* Canceling and Superseding::   ``Whoops, I shouldn't have called him that.''
 * Marking Articles::            Marking articles as read, expirable, etc.
 * Limiting::                    You can limit the summary buffer.
 * Threading::                   How threads are made.
@@ -3316,12 +3011,6 @@ You can have as many summary buffers open as you wish.
 @cindex summary buffer format
 
 @iftex
-@iflatex
-\gnusfigure{The Summary Buffer}{180}{
-\put(0,0){\epsfig{figure=tmp/summary.ps,width=7.5cm}}
-\put(445,0){\makebox(0,0)[br]{\epsfig{figure=tmp/summary-article.ps,width=7.5cm}}}
-}
-@end iflatex
 @end iftex
 
 @menu
@@ -3950,10 +3639,8 @@ Select the article buffer (@code{gnus-summary-select-article-buffer}).
 @section Reply, Followup and Post
 
 @menu
-* Summary Mail Commands::       Sending mail.
-* Summary Post Commands::       Sending news.
-* Summary Message Commands::    Other Message-related commands.
-* Canceling and Superseding::   ``Whoops, I shouldn't have called him that.''
+* Summary Mail Commands::            Sending mail.
+* Summary Post Commands::            Sending news.
 @end menu
 
 
@@ -4155,23 +3842,8 @@ Uuencode a file, split it into parts, and post it as a series
 Also @pxref{(message)Header Commands} for more information.
 
 
-@node Summary Message Commands
-@subsection Summary Message Commands
-
-@table @kbd
-@item S y
-@kindex S y (Summary)
-@findex gnus-summary-yank-message
-Yank the current article into an already existing Message composition
-buffer (@code{gnus-summary-yank-message}).  This command prompts for
-what message buffer you want to yank into, and understands the
-process/prefix convention (@pxref{Process/Prefix}).
-
-@end table
-
-
 @node Canceling and Superseding
-@subsection Canceling Articles
+@section Canceling Articles
 @cindex canceling articles
 @cindex superseding articles
 
@@ -4928,14 +4600,6 @@ something.  This variable says what fudging method Gnus should use.
 There are four possible values:
 
 @iftex
-@iflatex
-\gnusfigure{The Summary Buffer}{390}{
-\put(0,0){\epsfig{figure=tmp/summary-adopt.ps,width=7.5cm}}
-\put(445,0){\makebox(0,0)[br]{\epsfig{figure=tmp/summary-empty.ps,width=7.5cm}}}
-\put(0,400){\makebox(0,0)[tl]{\epsfig{figure=tmp/summary-none.ps,width=7.5cm}}}
-\put(445,400){\makebox(0,0)[tr]{\epsfig{figure=tmp/summary-dummy.ps,width=7.5cm}}}
-}
-@end iflatex
 @end iftex
 
 @cindex adopting articles
@@ -6821,9 +6485,6 @@ header that says that this encoding has been done.
 @vindex gnus-article-x-face-command
 @vindex gnus-article-x-face-too-ugly
 @iftex
-@iflatex
-\include{xface}
-@end iflatex
 @end iftex
 Look for and display any X-Face headers
 (@code{gnus-article-display-x-face}).  The command executed by this
@@ -10121,7 +9782,7 @@ need to save them because if we should need to read one again, they are
 archived somewhere else.
 
 Some people have local news groups which have only a handful of readers.
-These are transported via @sc{nntp}, and are therefore news.  But we may need
+These are transported via NNTP, and are therefore news.  But we may need
 to read and answer a large fraction of the messages very carefully in
 order to do our work.  And there may not be an archive, so we may need
 to save the interesting messages the same way we would personal mail.
@@ -10333,7 +9994,7 @@ Or using the default path:
 @end lisp
 
 If the mail spool file is not located on the local machine, it's best to 
-use POP or @sc{imap} or the like to fetch the mail.  You can not you ange-ftp 
+use POP or IMAP or the like to fetch the mail.  You can not you ange-ftp 
 file names here---it has no way to lock the mail spool while moving the
 mail.
 
@@ -10513,28 +10174,28 @@ An example maildir mail source:
 @end lisp
 
 @item imap
-Get mail from a @sc{imap} server. If you don't want to use @sc{imap} as intended,
+Get mail from a IMAP server. If you don't want to use IMAP as intended,
 as a network mail reading protocol (ie with nnimap), for some reason or
 other, Gnus let you treat it similar to a POP server and fetches
-articles from a given @sc{imap} mailbox.
+articles from a given IMAP mailbox.
 
 Keywords:
 
 @table @code
 @item :server
-The name of the @sc{imap} server.  The default is taken from the
+The name of the IMAP server.  The default is taken from the
 @code{MAILHOST} environment variable.
 
 @item :port
-The port number of the @sc{imap} server.  The default is @samp{143}, or
+The port number of the IMAP server.  The default is @samp{143}, or
 @samp{993} for SSL connections.
 
 @item :user
-The user name to give to the @sc{imap} server.  The default is the login
+The user name to give to the IMAP server.  The default is the login
 name.
 
 @item :password
-The password to give to the @sc{imap} server.  If not specified, the user is
+The password to give to the IMAP server.  If not specified, the user is
 prompted.
 
 @item :stream
@@ -10555,7 +10216,7 @@ which normally is the mailbox which receive incoming mail.
 @item :predicate
 The predicate used to find articles to fetch. The default, 
 @samp{UNSEEN UNDELETED}, is probably the best choice for most people,
-but if you sometimes peek in your mailbox with a @sc{imap} client and mark
+but if you sometimes peek in your mailbox with a IMAP client and mark
 some articles as read (or; SEEN) you might want to set this to
 @samp{nil}. Then all articles in the mailbox is fetched, no matter
 what. For a complete list of predicates, see RFC2060 §6.4.4.
@@ -10572,43 +10233,12 @@ after finishing the fetch.
 
 @end table
 
-An example @sc{imap} mail source:
+An example IMAP mail source:
 
 @lisp
 (imap :server "mail.mycorp.com" :stream kerberos4)
 @end lisp
 
-@item webmail
-Get mail from a webmail server, such as www.hotmail.com, 
-mail.yahoo.com, and www.netaddress.com. 
-
-NOTE: Webmail largely depends on w3 (url) package, whose version of "WWW
-4.0pre.46 1999/10/01" or previous ones may not work.
-
-WARNING: Mails may lost. NO WARRANTY.
-
-Keywords:
-
-@table @code
-@item :subtype
-The type of the webmail server.  The default is @code{hotmail}. The
-alternatives are @code{yahoo}, @code{netaddress}.
-
-@item :user
-The user name to give to the webmail server.  The default is the login
-name.
-
-@item :password
-The password to give to the webmail server.  If not specified, the user is
-prompted.
-
-@end table
-
-An example webmail source:
-
-@lisp
-(webmail :subtype 'yahoo :user "user-name" :password "secret")
-@end lisp
 @end table
 
 
@@ -10805,7 +10435,7 @@ name.  Normal regexp match expansion will be done.  See below for
 examples.
 
 @item
-@code{(@var{field} @var{value} @code{[-} @var{restrict} @code{[-} @var{restrict} @code{[@dots{}]}@code{]]} 
+@code{(@var{field} @var{value} @var{[- restrict [- restrict [@dots{}]]]} 
 @var{split})}: If the split is a list, the first element of which is a
 string, then store the message as specified by @var{split}, if header
 @var{field} (a regexp) contains @var{value} (also a regexp).  If
@@ -11623,9 +11253,9 @@ and so selection of a suitable backend is required in order to get that
 mail within spitting distance of Gnus.
 
 The same concept exists for Usenet itself: Though access to articles is
-typically done by @sc{nntp} these days, once upon a midnight dreary, everyone
+typically done by NNTP these days, once upon a midnight dreary, everyone
 in the world got at Usenet by running a reader on the machine where the
-articles lay (the machine which today we call an @sc{nntp} server), and
+articles lay (the machine which today we call an NNTP server), and
 access was by the reader stepping into the articles' directory spool
 area directly.  One can still select between either the @code{nntp} or
 @code{nnspool} backends, to select between these methods, if one happens
@@ -11765,7 +11395,6 @@ interfaces to these sources.
 * Web Searches::          Creating groups from articles that match a string.
 * Slashdot::              Reading the Slashdot comments.
 * Ultimate::              The Ultimate Bulletin Board systems.
-* Web Archive::           Reading mailing list archived on web.
 @end menu
 
 The main caveat with all these web sources is that they probably won't
@@ -11984,39 +11613,6 @@ The directory where @code{nnultimate} stores its files.  The default is
 @samp{~/News/ultimate/}.
 @end table
 
-@node Web Archive
-@subsection Web Archive
-@cindex nnwarchive
-@cindex Web Archive
-
-Some mailing lists only have archives on Web servers, such as
-(@file{http://www.egroups.com/}). It has a quite regular and nice
-interface, and it's possible to get the information Gnus needs to keep
-groups updated.
-
-The easiest way to get started with @code{nnwarchive} is to say
-something like the following in the group buffer: @kbd{M-x
-gnus-group-make-nnwarchive-group RET an_egroup RET egroups RET
-www.egroups.com RET your@@email.address RET}.  (Substitute the
-@sc{an_egroup} with the mailing list you subscribed, the
-@sc{your@@email.address} with your email address.)
-
-The following @code{nnwarchive} variables can be altered:
-
-@table @code
-@item nnwarchive-directory
-@vindex nnwarchive-directory
-The directory where @code{nnwarchive} stores its files.  The default is
-@samp{~/News/warchive/}.
-
-@item nnwarchive-login
-@vindex nnwarchive-login
-The account name on the web server.
-
-@item nnwarchive-passwd
-@vindex nnwarchive-passwd
-The password for your account on the web server.
-@end table
 
 @node Other Sources
 @section Other Sources
@@ -12029,9 +11625,9 @@ newsgroups.
 * Directory Groups::      You can read a directory as if it was a newsgroup.
 * Anything Groups::       Dired?  Who needs dired?
 * Document Groups::       Single files can be the basis of a group.
-* SOUP::                  Reading @sc{soup} packets ``offline''.
+* SOUP::                  Reading @sc{SOUP} packets ``offline''.
 * Mail-To-News Gateways:: Posting articles via mail-to-news gateways.
-* IMAP::                  Using Gnus as a @sc{imap} client.
+* IMAP::                  Using Gnus as a IMAP client.
 @end menu
 
 
@@ -12703,12 +12299,12 @@ So, to use this, simply say something like:
 
 
 @node IMAP
-@subsection @sc{imap}
+@subsection IMAP
 @cindex nnimap
-@cindex @sc{imap}
+@cindex IMAP
 
-@sc{imap} is a network protocol for reading mail (or news, or ...), think of
-it as a modernized @sc{nntp}. Connecting to a @sc{imap} server is much similar to
+IMAP is a network protocol for reading mail (or news, or ...), think of
+it as a modernized NNTP. Connecting to a IMAP server is much similar to
 connecting to a news server, you just specify the network address of the
 server.
 
@@ -12720,7 +12316,7 @@ server:
 @item nnimap-address
 @vindex nnimap-address
 
-The address of the remote @sc{imap} server. Defaults to the virtual server
+The address of the remote IMAP server. Defaults to the virtual server
 name if not specified.
 
 @item nnimap-server-port
@@ -12731,7 +12327,7 @@ Port on server to contact. Defaults to port 143, or 993 for SSL.
 @vindex nnimap-list-pattern
 String or list of strings of mailboxes to limit available groups
 to. This is used when the server has very many mailboxes and you're only
-interested in a few -- some servers export your home directory via @sc{imap},
+interested in a few -- some servers export your home directory via IMAP,
 you'll probably want to limit the mailboxes to those in @file{~/Mail/*}
 then.
 
@@ -12780,8 +12376,8 @@ use the most secure authenticator your server is capable of.
 @item nnimap-expunge-on-close
 @cindex Expunging
 @vindex nnimap-expunge-on-close
-Unlike Parmenides the @sc{imap} designers has decided that things that
-doesn't exist actually does exist. More specifically, @sc{imap} has this
+Unlike Parmenides the IMAP designers has decided that things that
+doesn't exist actually does exist. More specifically, IMAP has this
 concept of marking articles @code{Deleted} which doesn't actually delete
 them, and this (marking them @code{Deleted}, that is) is what nnimap
 does when you delete a article in Gnus (with @kbd{G DEL} or similair).
@@ -12803,7 +12399,7 @@ The default behaviour, delete all articles marked as "Deleted" when
 closing a mailbox.
 @item never
 Never actually delete articles. Currently there is no way of showing the
-articles marked for deletion in nnimap, but other @sc{imap} clients may allow
+articles marked for deletion in nnimap, but other IMAP clients may allow
 you to do this. If you ever want to run the EXPUNGE command manually,
 @xref{Expunging mailboxes}.
 @item ask
@@ -12822,13 +12418,13 @@ articles or not.
 
 
 @node Splitting in IMAP
-@subsubsection Splitting in @sc{imap}
+@subsubsection Splitting in IMAP
 @cindex splitting imap mail
 
 Splitting is something Gnus users has loved and used for years, and now
-the rest of the world is catching up. Yeah, dream on, not many @sc{imap}
+the rest of the world is catching up. Yeah, dream on, not many IMAP
 server has server side splitting and those that have splitting seem to
-use some non-standard protocol. This means that @sc{imap} support for Gnus
+use some non-standard protocol. This means that IMAP support for Gnus
 has to do it's own splitting.
 
 And it does.
@@ -12852,7 +12448,7 @@ Nnmail equivalent: @code{nnmail-crosspost}.
 @cindex inbox
 @vindex nnimap-split-inbox
 
-A string or a list of strings that gives the name(s) of @sc{imap} mailboxes
+A string or a list of strings that gives the name(s) of IMAP mailboxes
 to split from. Defaults to nil, which means that splitting is disabled!
 
 @lisp
@@ -12869,7 +12465,7 @@ New mail found in @code{nnimap-split-inbox} will be split according to
 this variable.
 
 This variable contains a list of lists, where the first element in the
-sublist gives the name of the @sc{imap} mailbox to move articles matching the
+sublist gives the name of the IMAP mailbox to move articles matching the
 regexp in the second element in the sublist. Got that? Neither did I, we
 need examples.
 
@@ -12915,15 +12511,15 @@ Nnmail equivalent: @code{nnmail-split-methods}.
 @end table
 
 @node Editing IMAP ACLs
-@subsubsection Editing @sc{imap} ACLs
+@subsubsection Editing IMAP ACLs
 @cindex editing imap acls
 @cindex Access Control Lists
-@cindex Editing @sc{imap} ACLs
+@cindex Editing IMAP ACLs
 @kindex G l
 @findex gnus-group-nnimap-edit-acl
 
-ACL stands for Access Control List.  ACLs are used in @sc{imap} for limiting
-(or enabling) other users access to your mail boxes. Not all @sc{imap}
+ACL stands for Access Control List.  ACLs are used in IMAP for limiting
+(or enabling) other users access to your mail boxes. Not all IMAP
 servers support this, this function will give an error if it doesn't.
 
 To edit a ACL for a mailbox, type @kbd{G l}
@@ -12940,7 +12536,7 @@ follow the list without subscribing to it.
 @item
 At least with the Cyrus server, you are required to give the user
 "anyone" posting ("p") capabilities to have "plussing" work (that is,
-mail sent to user+mailbox@@domain ending up in the @sc{imap} mailbox
+mail sent to user+mailbox@@domain ending up in the IMAP mailbox
 INBOX.mailbox).
 @end itemize
 
@@ -13816,7 +13412,7 @@ setup, you may be able to use something like the following as your
 @file{.gnus.el} file to get started.
 
 @lisp
-;;; Define how Gnus is to fetch news.  We do this over @sc{nntp}
+;;; Define how Gnus is to fetch news.  We do this over NNTP
 ;;; from your ISP's server.
 (setq gnus-select-method '(nntp "news.your-isp.com"))
 
@@ -16817,9 +16413,6 @@ advantage of that.
 @subsection Picons
 
 @iftex
-@iflatex
-\include{picons}
-@end iflatex
 @end iftex
 
 So...  You want to slow down your news reader even more!  This is a
@@ -16841,9 +16434,6 @@ over your shoulder as you read news.
 What are Picons?  To quote directly from the Picons Web site:
 
 @iftex
-@iflatex
-\margindex{}
-@end iflatex
 @end iftex
 
 @quotation
@@ -16914,9 +16504,6 @@ Alternatively if you want to use the web piconsearch engine add this:
 @subsubsection Hard Picons
 
 @iftex
-@iflatex
-\margindex{}
-@end iflatex
 @end iftex
 
 Gnus can display picons for you as you enter and leave groups and
@@ -16986,9 +16573,6 @@ Decodes and displays the X-Face header if present.
 @subsubsection Picon Useless Configuration
 
 @iftex
-@iflatex
-\margindex{}
-@end iflatex
 @end iftex
 
 The following variables offer further control over how things are
@@ -17071,9 +16655,6 @@ Gnus will never clear the cache itself; you will have to manually call
 cleared every time you exit Gnus.  Defaults to @code{t}.
 
 @iftex
-@iflatex
-\margindex{}
-@end iflatex
 @end iftex
 
 @end table
@@ -17083,10 +16664,6 @@ cleared every time you exit Gnus.  Defaults to @code{t}.
 @cindex smileys
 
 @iftex
-@iflatex
-\gnusfig{-3cm}{0.5cm}{\epsfig{figure=tmp/BigFace.ps,height=20cm}}
-\input{smiley}
-@end iflatex
 @end iftex
 
 @dfn{Smiley} is a package separate from Gnus, but since Gnus is
@@ -17156,9 +16733,6 @@ Face used for mouse highlighting over the smiley face.
 @table @code
 
 @iftex
-@iflatex
-\margindex{}
-@end iflatex
 @end iftex
 
 @item gnus-use-toolbar
@@ -17210,9 +16784,6 @@ A glyph displayed in all Gnus mode lines.  It is a tiny gnu head by
 default.
 
 @iftex
-@iflatex
-\margindex{}
-@end iflatex
 @end iftex
 
 @end table
@@ -17462,7 +17033,6 @@ but at the common table.@*
 
 @menu
 * History::                        How Gnus got where it is today.
-* On Writing Manuals::             Why this is not a beginner's guide.
 * Terminology::                    We use really difficult, like, words here.
 * Customization::                  Tailoring Gnus to your needs.
 * Troubleshooting::                What you might try if things do not work.
@@ -17766,12 +17336,6 @@ wrong show.
 Masanobu @sc{Umeda}---the writer of the original @sc{gnus}.
 
 @item
-Shenghuo Zhu---uudecode.el, mm-uu.el, rfc1843.el, webmail.el,
-nnwarchive and many, many other things connected with @sc{mime} and
-other types of en/decoding, as well as general bug fixing, new
-functionality and stuff.
-
-@item
 Per Abrahamsen---custom, scoring, highlighting and @sc{soup} code (as
 well as numerous other things).
 
@@ -17780,6 +17344,10 @@ Luis Fernandes---design and graphics.
 
 @item
 Erik Naggum---help, ideas, support, code and stuff.
+
+@item
+Shenghuo Zhu---uudecode.el, mm-uu.el, rfc1843.el and many other things
+connected with @sc{mime} and other types of en/decoding.
 
 @item
 Wes Hardaker---@file{gnus-picon.el} and the manual section on
@@ -18199,9 +17767,6 @@ You can click on buttons instead of using the keyboard
 @subsubsection September Gnus
 
 @iftex
-@iflatex
-\gnusfig{-28cm}{0cm}{\epsfig{figure=tmp/september.ps,height=20cm}}
-@end iflatex
 @end iftex
 
 New features in Gnus 5.2/5.3:
@@ -18341,9 +17906,6 @@ Configuration}).
 @item
 Mail can be re-scanned by a daemonic process (@pxref{Daemons}).
 @iftex
-@iflatex
-\marginpar[\mbox{}\hfill\epsfig{figure=tmp/fseptember.ps,height=5cm}]{\epsfig{figure=tmp/fseptember.ps,height=5cm}}
-@end iflatex
 @end iftex
 
 @item
@@ -18436,9 +17998,6 @@ Further syntax checking of outgoing articles have been added.
 New features in Gnus 5.4/5.5:
 
 @iftex
-@iflatex
-\gnusfig{-5.5cm}{-4cm}{\epsfig{figure=tmp/red.ps,height=20cm}}
-@end iflatex
 @end iftex
 
 @itemize @bullet
@@ -18544,7 +18103,7 @@ Process mark sets can be pushed and popped (@pxref{Setting Process
 Marks}).
 
 @item
-A new mail-to-news backend makes it possible to post even when the @sc{nntp}
+A new mail-to-news backend makes it possible to post even when the NNTP
 server doesn't allow posting (@pxref{Mail-To-News Gateways}).
 
 @item
@@ -18565,9 +18124,6 @@ Groups}).
 Cached articles can be pulled into the groups (@pxref{Summary Generation
 Commands}).
 @iftex
-@iflatex
-\marginpar[\mbox{}\hfill\epsfig{figure=tmp/fred.ps,width=3cm}]{\epsfig{figure=tmp/fred.ps,width=3cm}}
-@end iflatex
 @end iftex
 
 @item
@@ -19849,7 +19405,7 @@ New limit command---limit to articles that have a certain string
 in the head or body.
 
 @item
-Allow breaking lengthy @sc{nntp} commands.
+Allow breaking lengthy NNTP commands.
 
 @item
 gnus-article-highlight-limit, to disable highlighting in big articles.
@@ -20004,10 +19560,6 @@ Solve the halting problem.
 
 This manual was generated from a TeXinfo file and then run through
 either @code{texi2dvi}
-@iflatex
-or my own home-brewed TeXinfo to \LaTeX\ transformer,
-and then run through @code{latex} and @code{dvips}
-@end iflatex
 to get what you hold in your hands now.
 
 The following conventions have been used:
@@ -20044,38 +19596,8 @@ If I say ``set @code{flumphel} to @code{yes}'', that would mean:
 @samp{yes} and @code{yes} are two @emph{very} different things---don't
 ever get them confused.
 
-@iflatex
-@c @head
-Of course, everything in this manual is of vital interest, so you should
-read it all.  Several times.  However, if you feel like skimming the
-manual, look for that gnu head you should see in the margin over
-there---it means that what's being discussed is of more importance than
-the rest of the stuff.  (On the other hand, if everything is infinitely
-important, how can anything be more important than that?  Just one more
-of the mysteries of this world, I guess.)
-@end iflatex
 
 @end iftex
-
-
-@node On Writing Manuals
-@section On Writing Manuals
-
-I guess most manuals are written after-the-fact; documenting a program
-that's already there.  This is not how this manual is written.  When
-implementing something, I write the manual entry for that something
-straight away.  I then see that it's difficult to explain the
-functionality, so I write how it's supposed to be, and then I change the 
-implementation.  Writing the documentation and writing the code goes
-hand in hand.
-
-This, of course, means that this manual has no, or little, flow.  It
-documents absolutely everything in Gnus, but often not where you're
-looking for it.  It is a reference manual, and not a guide to how to get 
-started with Gnus.
-
-That would be a totally different book, that should be written using the 
-reference manual as source material.  It would look quite differently.
 
 
 @page
@@ -20961,7 +20483,7 @@ There should be no result data from this function.
 
 Set/remove/add marks on articles. Normally Gnus handles the article
 marks (such as read, ticked, expired etc) internally, and store them in
-@code{~/.newsrc.eld}. Some backends (such as @sc{imap}) however carry all
+@code{~/.newsrc.eld}. Some backends (such as IMAP) however carry all
 information about the articles on the server, so Gnus need to propagate
 the mark information to the server.
 
@@ -22027,9 +21549,6 @@ former).  The manual is unambiguous, but it can be confusing.
 @bye
 
 @iftex
-@iflatex
-\end{document}
-@end iflatex
 @end iftex
 
 @c End:

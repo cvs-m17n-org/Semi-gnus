@@ -141,27 +141,19 @@ properly with all servers."
 		 (const some)
 		 (const t)))
 
-(defcustom gnus-level-subscribed 5
-  "*Groups with levels less than or equal to this variable are subscribed."
-  :group 'gnus-group-levels
-  :type 'integer)
+(defconst gnus-level-subscribed 5
+  "Groups with levels less than or equal to this variable are subscribed.")
 
-(defcustom gnus-level-unsubscribed 7
-  "*Groups with levels less than or equal to this variable are unsubscribed.
+(defconst gnus-level-unsubscribed 7
+  "Groups with levels less than or equal to this variable are unsubscribed.
 Groups with levels less than `gnus-level-subscribed', which should be
-less than this variable, are subscribed."
-  :group 'gnus-group-levels
-  :type 'integer)
+less than this variable, are subscribed.")
 
-(defcustom gnus-level-zombie 8
-  "*Groups with this level are zombie groups."
-  :group 'gnus-group-levels
-  :type 'integer)
+(defconst gnus-level-zombie 8
+  "Groups with this level are zombie groups.")
 
-(defcustom gnus-level-killed 9
-  "*Groups with this level are killed."
-  :group 'gnus-group-levels
-  :type 'integer)
+(defconst gnus-level-killed 9
+  "Groups with this level are killed.")
 
 (defcustom gnus-level-default-subscribed 3
   "*New subscribed groups will be subscribed at this level."
@@ -235,7 +227,7 @@ not match this regexp will be removed before saving the list."
  (mapconcat 'identity
 	    '("^to\\."			; not "real" groups
 	      "^[0-9. \t]+ "		; all digits in name
-	      "[][\"#'()]"		; bogus characters
+	      "^[\"][]\"[#'()]"		; bogus characters
 	      )
 	    "\\|")
   "*A regexp to match uninteresting newsgroups in the active file.
@@ -253,7 +245,9 @@ inserts new groups at the beginning of the list of groups;
 alphabetic order; `gnus-subscribe-hierarchically' inserts new groups
 in hierarchical newsgroup order; `gnus-subscribe-interactively' asks
 for your decision; `gnus-subscribe-killed' kills all new groups;
-`gnus-subscribe-zombies' will make all new groups into zombies."
+`gnus-subscribe-zombies' will make all new groups into zombies;
+`gnus-subscribe-topics' will enter groups into the topics that
+claim them."
   :group 'gnus-group-new
   :type '(radio (function-item gnus-subscribe-randomly)
 		(function-item gnus-subscribe-alphabetically)
@@ -261,6 +255,7 @@ for your decision; `gnus-subscribe-killed' kills all new groups;
 		(function-item gnus-subscribe-interactively)
 		(function-item gnus-subscribe-killed)
 		(function-item gnus-subscribe-zombies)
+		(function-item gnus-subscribe-topics)
 		function))
 
 (defcustom gnus-subscribe-options-newsgroup-method
@@ -1161,12 +1156,15 @@ for new groups, and subscribe the new groups as zombies."
 	(when gnus-novice-user
 	  (gnus-message 7 "`A k' to list killed groups"))))))
 
-(defun gnus-subscribe-group (group previous &optional method)
+
+(defun gnus-subscribe-group (group &optional previous method)
+  "Subcribe GROUP and put it after PREVIOUS."
   (gnus-group-change-level
    (if method
        (list t group gnus-level-default-subscribed nil nil method)
      group)
-   gnus-level-default-subscribed gnus-level-killed previous t))
+   gnus-level-default-subscribed gnus-level-killed previous t)
+  t)
 
 ;; `gnus-group-change-level' is the fundamental function for changing
 ;; subscription levels of newsgroups.  This might mean just changing
@@ -1386,7 +1384,7 @@ newsgroup."
 	   t)
 	 (condition-case ()
 	     (inline (gnus-request-group group dont-check method))
-	   (error nil)
+	   ;(error nil)
 	   (quit nil))
 	 (setq active (gnus-parse-active))
 	 ;; If there are no articles in the group, the GROUP
@@ -1500,7 +1498,7 @@ newsgroup."
 		  gnus-activate-foreign-newsgroups)
 		 (t 0))
 	   level))
-	 info group active method)
+	 info group active method retrievegroups)
     (gnus-message 5 "Checking new news...")
 
     (while newsrc
@@ -1537,8 +1535,15 @@ newsgroup."
 	  (setq active 'ignore))
 	 ;; Activate groups.
 	 ((not gnus-read-active-file)
+	  (if (gnus-check-backend-function 'retrieve-groups group)
+	      ;; if server support gnus-retrieve-groups we push
+	      ;; the group onto retrievegroups for later checking
+	      (if (assoc method retrievegroups)
+		  (setcdr (assoc method retrievegroups)
+			  (cons group (cdr (assoc method retrievegroups))))
+		(push (list method group) retrievegroups))
 	  (setq active (gnus-activate-group group 'scan))
-	  (inline (gnus-close-group group)))))
+	    (inline (gnus-close-group group))))))
 
       ;; Get the number of unread articles in the group.
       (cond
@@ -1551,7 +1556,32 @@ newsgroup."
 	;; The group couldn't be reached, so we nix out the number of
 	;; unread articles and stuff.
 	(gnus-set-active group nil)
-	(setcar (gnus-gethash group gnus-newsrc-hashtb) t))))
+	(let ((tmp (gnus-gethash group gnus-newsrc-hashtb)))
+	  (if tmp (setcar tmp t))))))
+
+    ;; iterate through groups on methods which support gnus-retrieve-groups
+    ;; and fetch a partial active file and use it to find new news.
+    (while retrievegroups
+      (let* ((mg (pop retrievegroups))
+	     (method (or (car mg) gnus-select-method))
+	     (groups (cdr mg)))
+	(gnus-check-server method)
+	;; Request that the backend scan its incoming messages.
+	(when (gnus-check-backend-function 'request-scan (car method))
+	  (gnus-request-scan nil method))
+	(gnus-read-active-file-2 (mapcar (lambda (group)
+					   (gnus-group-real-name group))
+					 groups) method)
+	(dolist (group groups)
+	  (cond
+	   ((setq active (gnus-active (gnus-info-group
+				       (setq info (gnus-get-info group)))))
+	    (inline (gnus-get-unread-articles-in-group info active t)))
+	   (t
+	    ;; The group couldn't be reached, so we nix out the number of
+	    ;; unread articles and stuff.
+	    (gnus-set-active group nil)
+	    (setcar (gnus-gethash group gnus-newsrc-hashtb) t))))))
 
     (gnus-message 5 "Checking new news...done")))
 
@@ -1672,65 +1702,78 @@ newsgroup."
 	   ;; Also read from the archive server.
 	   (when (gnus-archive-server-wanted-p)
 	     (list "archive")))))
-	method where mesg list-type)
+	method)
     (setq gnus-have-read-active-file nil)
     (save-excursion
       (set-buffer nntp-server-buffer)
       (while (setq method (pop methods))
+	;; Only do each method once, in case the methods appear more
+	;; than once in this list.
 	(unless (member method methods)
-	  (setq where (nth 1 method)
-		mesg (format "Reading active file%s via %s..."
-			     (if (and where (not (zerop (length where))))
-				 (concat " from " where) "")
-			     (car method)))
-	  (gnus-message 5 mesg)
-	  (when (gnus-check-server method)
-	    ;; Request that the backend scan its incoming messages.
-	    (when (gnus-check-backend-function 'request-scan (car method))
-	      (gnus-request-scan nil method))
-	    (cond
-	     ((and (eq gnus-read-active-file 'some)
-		   (gnus-check-backend-function 'retrieve-groups (car method))
-		   (not force))
-	      (let ((newsrc (cdr gnus-newsrc-alist))
-		    (gmethod (gnus-server-get-method nil method))
-		    groups info)
-		(while (setq info (pop newsrc))
-		  (when (inline
-			  (gnus-server-equal
-			   (inline
-			     (gnus-find-method-for-group
-			      (gnus-info-group info) info))
-			   gmethod))
-		    (push (gnus-group-real-name (gnus-info-group info))
-			  groups)))
-		(when groups
-		  (gnus-check-server method)
-		  (setq list-type (gnus-retrieve-groups groups method))
-		  (cond
-		   ((not list-type)
-		    (gnus-error
-		     1.2 "Cannot read partial active file from %s server."
-		     (car method)))
-		   ((eq list-type 'active)
-		    (gnus-active-to-gnus-format
-		     method gnus-active-hashtb nil t))
-		   (t
-		    (gnus-groups-to-gnus-format
-		     method gnus-active-hashtb t))))))
-	     ((null method)
-	      t)
-	     (t
-	      (if (not (gnus-request-list method))
-		  (unless (equal method gnus-message-archive-method)
-		    (gnus-error 1 "Cannot read active file from %s server"
-				(car method)))
-		(gnus-message 5 mesg)
-		(gnus-active-to-gnus-format method gnus-active-hashtb nil t)
-		;; We mark this active file as read.
-		(push method gnus-have-read-active-file)
-		(gnus-message 5 "%sdone" mesg))))))))))
+	  (condition-case ()
+	      (gnus-read-active-file-1 method force)
+	    ;; We catch C-g so that we can continue past servers
+	    ;; that do not respond.
+	    (quit nil)))))))
 
+(defun gnus-read-active-file-1 (method force)
+  (let (where mesg)
+    (setq where (nth 1 method)
+	  mesg (format "Reading active file%s via %s..."
+		       (if (and where (not (zerop (length where))))
+			   (concat " from " where) "")
+		       (car method)))
+    (gnus-message 5 mesg)
+    (when (gnus-check-server method)
+      ;; Request that the backend scan its incoming messages.
+      (when (gnus-check-backend-function 'request-scan (car method))
+	(gnus-request-scan nil method))
+      (cond
+       ((and (eq gnus-read-active-file 'some)
+	     (gnus-check-backend-function 'retrieve-groups (car method))
+	     (not force))
+	(let ((newsrc (cdr gnus-newsrc-alist))
+	      (gmethod (gnus-server-get-method nil method))
+	      groups info)
+	  (while (setq info (pop newsrc))
+	    (when (inline
+		    (gnus-server-equal
+		     (inline
+		       (gnus-find-method-for-group
+			(gnus-info-group info) info))
+		     gmethod))
+	      (push (gnus-group-real-name (gnus-info-group info))
+		    groups)))
+	  (gnus-read-active-file-2 groups method)))
+       ((null method)
+	t)
+       (t
+	(if (not (gnus-request-list method))
+	    (unless (equal method gnus-message-archive-method)
+	      (gnus-error 1 "Cannot read active file from %s server"
+			  (car method)))
+	  (gnus-message 5 mesg)
+	  (gnus-active-to-gnus-format method gnus-active-hashtb nil t)
+	  ;; We mark this active file as read.
+	  (push method gnus-have-read-active-file)
+	  (gnus-message 5 "%sdone" mesg)))))))
+
+(defun gnus-read-active-file-2 (groups method)
+  "Read an active file for GROUPS in METHOD using gnus-retrieve-groups."
+  (when groups
+    (save-excursion
+      (set-buffer nntp-server-buffer)
+      (gnus-check-server method)
+      (let ((list-type (gnus-retrieve-groups groups method)))
+	(cond ((not list-type)
+	       (gnus-error 
+		1.2 "Cannot read partial active file from %s server."
+		(car method)))
+	      ((eq list-type 'active)
+	       (gnus-active-to-gnus-format method gnus-active-hashtb nil t))
+	      (t
+	       (gnus-groups-to-gnus-format method gnus-active-hashtb t)))))))
+  
 ;; Read an active file and place the results in `gnus-active-hashtb'.
 (defun gnus-active-to-gnus-format (&optional method hashtb ignore-errors
 					     real-active)
@@ -1754,11 +1797,13 @@ newsgroup."
      (t
       (delete-matching-lines (concat "^to\\.\\|" gnus-ignored-newsgroups))))
 
-    ;; Make the group names readable as a lisp expression even if they
-    ;; contain special characters.
-    (goto-char (point-max))
-    (while (re-search-backward "[][';?()#]" nil t)
-      (insert ?\\))
+    (goto-char (point-min))
+    (unless (re-search-forward "[\\\"]" nil t)
+      ;; Make the group names readable as a lisp expression even if they
+      ;; contain special characters.
+      (goto-char (point-max))
+      (while (re-search-backward "[][';?()#]" nil t)
+	(insert ?\\)))
 
     ;; Let the Gnus agent save the active file.
     (when (and gnus-agent real-active gnus-plugged)
@@ -1772,18 +1817,25 @@ newsgroup."
       (let ((prefix (gnus-group-prefixed-name "" method)))
 	(goto-char (point-min))
 	(while (and (not (eobp))
-		    (progn (insert prefix)
-			   (zerop (forward-line 1)))))))
+		    (progn
+		      (when (= (following-char) ?\")
+			(forward-char 1))
+		      (insert prefix)
+		      (zerop (forward-line 1)))))))
     ;; Store the active file in a hash table.
     (goto-char (point-min))
     (let (group max min)
       (while (not (eobp))
-	(condition-case ()
+	(condition-case err
 	    (progn
 	      (narrow-to-region (point) (gnus-point-at-eol))
 	      ;; group gets set to a symbol interned in the hash table
 	      ;; (what a hack!!) - jwz
 	      (setq group (let ((obarray hashtb)) (read cur)))
+	      ;; ### The extended group name scheme makes
+	      ;; the previous optimization strategy sort of pointless...
+	      (when (stringp group)
+		(setq group (intern group hashtb)))
 	      (if (and (numberp (setq max (read cur)))
 		       (numberp (setq min (read cur)))
 		       (progn

@@ -232,7 +232,7 @@ any confusion."
   :type 'regexp
   :group 'message-various)
 
-(defcustom message-elide-elipsis "\n[...]\n\n"
+(defcustom message-elide-ellipsis "\n[...]\n\n"
   "*The string which is inserted for elided text."
   :type 'string
   :group 'message-various)
@@ -295,6 +295,11 @@ The provided functions are:
  :type '(radio (function-item message-forward-subject-author-subject)
 	       (function-item message-forward-subject-fwd)))
 
+(defcustom message-forward-as-mime t
+  "*If non-nil, forward messages as an inline/rfc822 MIME section.  Otherwise, directly inline the old message in the forwarded message."
+  :group 'message-forwarding
+  :type 'boolean)
+
 (defcustom message-wash-forwarded-subjects nil
   "*If non-nil, try to remove as much old cruft as possible from the subject of messages before generating the new subject of a forward."
   :group 'message-forwarding
@@ -304,7 +309,6 @@ The provided functions are:
   "*All headers that match this regexp will be deleted when resending a message."
   :group 'message-interface
   :type 'regexp)
-
 
 (defcustom message-forward-ignored-headers nil
   "*All headers that match this regexp will be deleted when forwarding a message."
@@ -1056,7 +1060,7 @@ The cdr of ech entry is a function for applying the face to a region.")
     (when value
       (while (string-match "\n[\t ]+" value)
 	(setq value (replace-match " " t t value)))
-      ;; We remove all text props.delete-region
+      ;; We remove all text props.
       (format "%s" value))))
 
 (defun message-narrow-to-field ()
@@ -1296,6 +1300,7 @@ Point is left at the beginning of the narrowed-to region."
   (define-key message-mode-map "\C-c\C-n" 'message-insert-newsgroups)
 
   (define-key message-mode-map "\C-c\C-y" 'message-yank-original)
+  (define-key message-mode-map "\C-c\C-Y" 'message-yank-buffer)
   (define-key message-mode-map "\C-c\C-q" 'message-fill-yanked-message)
   (define-key message-mode-map "\C-c\C-w" 'message-insert-signature)
   (define-key message-mode-map "\C-c\M-h" 'message-insert-headers)
@@ -1383,7 +1388,8 @@ C-c C-e  message-elide-region (elide the text between point and mark).
 C-c C-v  message-delete-not-region (remove the text outside the region).
 C-c C-z  message-kill-to-signature (kill the text up to the signature).
 C-c C-r  message-caesar-buffer-body (rot13 the message body).
-C-c C-a  mml-attach-file (attach a file as MIME)."
+C-c C-a  mml-attach-file (attach a file as MIME).
+M-RET    message-newline-and-reformat (break the line and reformat)."
   (interactive)
   (kill-all-local-variables)
   (set (make-local-variable 'message-reply-buffer) nil)
@@ -1614,19 +1620,24 @@ With the prefix argument FORCE, insert the header anyway."
 (defun message-newline-and-reformat ()
   "Insert four newlines, and then reformat if inside quoted text."
   (interactive)
-  (let ((point (point))
-	quoted)
-    (save-excursion
-      (beginning-of-line)
-      (if (looking-at (sc-cite-regexp))
-	  (setq quoted (buffer-substring (match-beginning 0) (match-end 0)))))
-    (insert "\n\n\n\n")
+  (let ((prefix "[]>»|:}+ \t]*")
+	(supercite-thing "[-._a-zA-Z0-9]*[>]+[ \t]*")
+	quoted point)
+    (unless (bolp)
+      (save-excursion
+	(beginning-of-line)
+	(when (looking-at (concat prefix
+				  supercite-thing))
+	  (setq quoted (match-string 0))))
+      (insert "\n"))
+    (setq point (point))
+    (insert "\n\n\n")
     (delete-region (point) (re-search-forward "[ \t]*"))
     (when quoted
       (insert quoted))
     (fill-paragraph nil)
     (goto-char point)
-    (forward-line 2)))
+    (forward-line 1)))
 
 (defun message-insert-signature (&optional force)
   "Insert a signature.  See documentation for the `message-signature' variable."
@@ -1667,13 +1678,11 @@ With the prefix argument FORCE, insert the header anyway."
 
 (defun message-elide-region (b e)
   "Elide the text between point and mark.
-An ellipsis (from `message-elide-elipsis') will be inserted where the
+An ellipsis (from `message-elide-ellipsis') will be inserted where the
 text was killed."
   (interactive "r")
   (kill-region b e)
-  (unless (bolp)
-    (insert "\n"))
-  (insert message-elide-elipsis))
+  (insert message-elide-ellipsis))
 
 (defvar message-caesar-translation-table nil)
 
@@ -1742,7 +1751,7 @@ Mail and USENET news headers are not rotated."
         (unless (equal 0 (call-process-region
                            (point-min) (point-max) program t t))
             (insert body)
-            (message "%s failed." program))))))
+            (message "%s failed" program))))))
 
 (defun message-rename-buffer (&optional enter-string)
   "Rename the *message* buffer to \"*message* RECIPIENT\".
@@ -1846,6 +1855,24 @@ prefix, and don't delete any headers."
 	(insert ?\n))
       (unless modified
 	(setq message-checksum (message-checksum))))))
+
+(defun message-yank-buffer (buffer)
+  "Insert BUFFER into the current buffer and quote it."
+  (interactive "bYank buffer: ")
+  (let ((message-reply-buffer buffer))
+    (save-window-excursion
+      (message-yank-original))))
+
+(defun message-buffers ()
+  "Return a list of active message buffers."
+  (let (buffers)
+    (save-excursion
+      (dolist (buffer (buffer-list t))
+	(set-buffer buffer)
+	(when (and (eq major-mode 'message-mode)
+		   (null message-sent-message-via))
+	  (push (buffer-name buffer) buffers))))
+    (nreverse buffers)))
 
 (defun message-cite-original-without-signature ()
   "Cite function in the standard Message manner."
@@ -3818,16 +3845,21 @@ Optional NEWS will use news to forward instead of mail."
     ;; Put point where we want it before inserting the forwarded
     ;; message.
     (message-goto-body)
-    (insert "\n\n<#part type=message/rfc822 disposition=inline>\n")
+    (if message-forward-as-mime
+	 (insert "\n\n<#part type=message/rfc822 disposition=inline>\n")
+      (insert "\n\n"))
     (let ((b (point))
 	  e)
       (mml-insert-buffer cur)
       (setq e (point))
-      (insert "<#/part>\n")
-      (when message-forward-ignored-headers
+      (and message-forward-as-mime
+	   (insert "<#/part>\n"))
+      (when (and (not current-prefix-arg)
+		 message-forward-ignored-headers)
 	(save-restriction
 	  (narrow-to-region b e)
-	  (message-narrow-to-head)
+	  (goto-char b)
+	  (narrow-to-region (point) (or (search-forward "\n\n" nil t) (point)))
 	  (message-remove-header message-forward-ignored-headers t))))
     (message-position-point)))
 
@@ -3835,10 +3867,7 @@ Optional NEWS will use news to forward instead of mail."
 (defun message-resend (address)
   "Resend the current article to ADDRESS."
   (interactive
-   (list
-    (let ((mail-abbrev-mode-regexp ""))
-      (read-from-minibuffer
-       "Resend message to: " nil message-mode-map))))
+   (list (message-read-from-minibuffer "Resend message to: ")))
   (message "Resending message to %s..." address)
   (save-excursion
     (let ((cur (current-buffer))
@@ -4192,6 +4221,15 @@ regexp varstr."
 	(re-search-forward "^MIME-Version:")
 	(forward-line 1)
 	(insert "Content-Type: text/plain; charset=us-ascii\n")))))
+
+(defun message-read-from-minibuffer (prompt)
+  "Read from the minibuffer while providing abbrev expansion."
+  (if (fboundp 'mail-abbrevs-setup)
+      (let ((mail-abbrev-mode-regexp "")
+	    (minibuffer-setup-hook 'mail-abbrevs-setup))
+	(read-from-minibuffer prompt)))
+  (let ((minibuffer-setup-hook 'mail-abbrev-minibuffer-setup-hook))
+    (read-string prompt)))
 
 (provide 'message)
 

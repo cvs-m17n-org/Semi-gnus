@@ -2820,6 +2820,7 @@ If NO-DISPLAY, don't generate a summary buffer."
 	      (let ((gnus-newsgroup-dormant nil))
 		(gnus-summary-initial-limit show-all))
 	    (gnus-summary-initial-limit show-all))
+	;; When untreaded, all articles are always shown.
 	(setq gnus-newsgroup-limit
 	      (mapcar
 	       (lambda (header) (mail-header-number header))
@@ -3158,6 +3159,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 
 (defun gnus-build-sparse-threads ()
   (let ((headers gnus-newsgroup-headers)
+	(mail-parse-charset gnus-newsgroup-charset)
 	(gnus-summary-ignore-duplicates t)
 	header references generation relations
 	subject child end new-child date)
@@ -3210,7 +3212,8 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
   ;; fetch the headers for the articles that aren't there.  This will
   ;; build complete threads - if the roots haven't been expired by the
   ;; server, that is.
-  (let (id heads)
+  (let ((mail-parse-charset gnus-newsgroup-charset)
+	id heads)
     (mapatoms
      (lambda (refs)
        (when (not (car (symbol-value refs)))
@@ -3299,6 +3302,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 (defun gnus-build-all-threads ()
   "Read all the headers."
   (let ((gnus-summary-ignore-duplicates t)
+	(mail-parse-charset gnus-newsgroup-charset)
 	(dependencies gnus-newsgroup-dependencies)
 	header article)
     (save-excursion
@@ -3308,8 +3312,7 @@ Returns HEADER if it was entered in the DEPENDENCIES.  Returns nil otherwise."
 	(while (not (eobp))
 	  (ignore-errors
 	    (setq article (read (current-buffer))
-		  header (gnus-nov-parse-line
-			  article dependencies)))
+		  header (gnus-nov-parse-line article dependencies)))
 	  (when header
 	    (save-excursion
 	      (set-buffer gnus-summary-buffer)
@@ -4027,20 +4030,18 @@ or a straight list of headers."
 	 (memq number gnus-newsgroup-processable))))))
 
 (defun gnus-summary-remove-list-identifiers ()
-  "Remove list identifiers in `gnus-list-identifiers' from articles in
-the current group."
+  "Remove list identifiers in `gnus-list-identifiers' from articles in the current group."
   (let ((regexp (if (stringp gnus-list-identifiers)
 		    gnus-list-identifiers
 		  (mapconcat 'identity gnus-list-identifiers " *\\|"))))
-    (when regexp
-      (dolist (header gnus-newsgroup-headers)
-	(when (string-match (concat "\\(Re: +\\)?\\(" regexp " *\\)")
-			    (mail-header-subject header))
-	  (mail-header-set-subject
-	   header (concat (substring (mail-header-subject header)
-				     0 (match-beginning 2))
-			  (substring (mail-header-subject header)
-				     (match-end 2)))))))))
+    (dolist (header gnus-newsgroup-headers)
+      (when (string-match (concat "\\(Re: +\\)?\\(" regexp " *\\)")
+			  (mail-header-subject header))
+	(mail-header-set-subject
+	 header (concat (substring (mail-header-subject header)
+				   0 (match-beginning 2))
+			(substring (mail-header-subject header)
+				   (match-end 2))))))))
 
 (defun gnus-select-newsgroup (group &optional read-all select-articles)
   "Select newsgroup GROUP.
@@ -5106,7 +5107,8 @@ displayed, no centering will be performed."
 	;; whichever is the least.
 	(set-window-start
 	 window (min bottom (save-excursion
-			      (forward-line (- top)) (point)))))
+			      (forward-line (- top)) (point)))
+	 t))
       ;; Do horizontal recentering while we're at it.
       (when (and (get-buffer-window (current-buffer) t)
 		 (not (eq gnus-auto-center-summary 'vertical)))
@@ -6234,7 +6236,9 @@ articles that are younger than AGE days."
 	  (when (and (vectorp (gnus-data-header d))
 		     (setq date (mail-header-date (gnus-data-header d))))
 	    (setq is-younger (time-less-p
-			      (time-since (date-to-time date))
+			      (time-since (condition-case ()
+					      (date-to-time date)
+					    (error '(0 0))))
 			      cutoff))
 	    (when (if younger-p
 		      is-younger
@@ -6464,6 +6468,7 @@ If ALL, mark even excluded ticked and dormants as read."
   "Go forwards in the thread until we find an article that we want to display."
   (when (or (eq gnus-fetch-old-headers 'some)
 	    (eq gnus-fetch-old-headers 'invisible)
+	    (numberp gnus-fetch-old-headers)
 	    (eq gnus-build-sparse-threads 'some)
 	    (eq gnus-build-sparse-threads 'more))
     ;; Deal with old-fetched headers and sparse threads.
@@ -6493,6 +6498,7 @@ If ALL, mark even excluded ticked and dormants as read."
   "Cut off all uninteresting articles from the beginning of threads."
   (when (or (eq gnus-fetch-old-headers 'some)
 	    (eq gnus-fetch-old-headers 'invisible)
+	    (numberp gnus-fetch-old-headers)
 	    (eq gnus-build-sparse-threads 'some)
 	    (eq gnus-build-sparse-threads 'more))
     (let ((th threads))
@@ -6510,6 +6516,7 @@ fetch-old-headers verbiage, and so on."
   (if (or gnus-inhibit-limiting
 	  (and (null gnus-newsgroup-dormant)
 	       (not (eq gnus-fetch-old-headers 'some))
+	       (not (numberp gnus-fetch-old-headers))
 	       (not (eq gnus-fetch-old-headers 'invisible))
 	       (null gnus-summary-expunge-below)
 	       (not (eq gnus-build-sparse-threads 'some))
@@ -6563,7 +6570,8 @@ fetch-old-headers verbiage, and so on."
 		 (zerop children))
 	    ;; If this is "fetch-old-headered" and there is no
 	    ;; visible children, then we don't want this article.
-	    (and (eq gnus-fetch-old-headers 'some)
+	    (and (or (eq gnus-fetch-old-headers 'some)
+		     (numberp gnus-fetch-old-headers))
 		 (gnus-summary-article-ancient-p number)
 		 (zerop children))
 	    ;; If this is "fetch-old-headered" and `invisible', then
@@ -6714,11 +6722,9 @@ of what's specified by the `gnus-refer-thread-limit' variable."
       (gnus-message 5 "Fetching headers for %s...done" gnus-newsgroup-name))
     (gnus-summary-limit-include-thread id)))
 
-(defun gnus-summary-refer-article (message-id &optional arg)
-  "Fetch an article specified by MESSAGE-ID.
-If ARG (the prefix), fetch the article using `gnus-refer-article-method'
-or `gnus-select-method', no matter what backend the article comes from."
-  (interactive "sMessage-ID: \nP")
+(defun gnus-summary-refer-article (message-id)
+  "Fetch an article specified by MESSAGE-ID."
+  (interactive "sMessage-ID: ")
   (when (and (stringp message-id)
 	     (not (zerop (length message-id))))
     ;; Construct the correct Message-ID if necessary.
@@ -6732,7 +6738,8 @@ or `gnus-select-method', no matter what backend the article comes from."
 			(gnus-summary-article-sparse-p
 			 (mail-header-number header))
 			(memq (mail-header-number header)
-			      gnus-newsgroup-limit))))
+			      gnus-newsgroup-limit)))
+	   number)
       (cond
        ;; If the article is present in the buffer we just go to it.
        ((and header
@@ -6745,22 +6752,23 @@ or `gnus-select-method', no matter what backend the article comes from."
 	  (when sparse
 	    (gnus-summary-update-article (mail-header-number header)))))
        (t
-	;; We fetch the article
-	(let ((gnus-override-method
-	       (cond ((gnus-news-group-p gnus-newsgroup-name)
-		      gnus-refer-article-method)
-		     (arg
-		      (or gnus-refer-article-method gnus-select-method))
-		     (t nil)))
-	      number)
-	  ;; Start the special refer-article method, if necessary.
-	  (when (and gnus-refer-article-method
-		     (gnus-news-group-p gnus-newsgroup-name))
-	    (gnus-check-server gnus-refer-article-method))
-	  ;; Fetch the header, and display the article.
-	  (if (setq number (gnus-summary-insert-subject message-id))
+	;; We fetch the article.
+	(catch 'found
+	  (dolist (gnus-override-method
+		   (cond ((null gnus-refer-article-method)
+			  (list 'current gnus-select-method))
+			 ((consp (car gnus-refer-article-method))
+			  gnus-refer-article-method)
+			 (t
+			  (list gnus-refer-article-method))))
+	    (when (eq 'current gnus-override-method)
+	      (setq gnus-override-method gnus-current-select-method))
+	    (gnus-check-server gnus-override-method)
+	    ;; Fetch the header, and display the article.
+	    (when (setq number (gnus-summary-insert-subject message-id))
 	      (gnus-summary-select-article nil nil nil number)
-	    (gnus-message 3 "Couldn't fetch article %s" message-id))))))))
+	      (throw 'found t)))
+	  (gnus-message 3 "Couldn't fetch article %s" message-id)))))))
 
 (defun gnus-summary-edit-parameters ()
   "Edit the group parameters of the current group."
@@ -8408,7 +8416,6 @@ If prefix argument ALL is non-nil, all articles are marked as read."
   (interactive "P")
   (gnus-summary-catchup-and-exit t quietly))
 
-;; Suggested by "Arne Eofsson" <arne@hodgkin.mbi.ucla.edu>.
 (defun gnus-summary-catchup-and-goto-next-group (&optional all)
   "Mark all articles in this group as read and select the next group.
 If given a prefix, mark all articles, unread as well as ticked, as
@@ -8416,7 +8423,7 @@ read."
   (interactive "P")
   (save-excursion
     (gnus-summary-catchup all))
-  (gnus-summary-next-group t nil nil))
+  (gnus-summary-next-group))
 
 ;; Thread-based commands.
 
@@ -8967,9 +8974,10 @@ save those articles instead."
 				     to-newsgroup))
 	      (or (and (gnus-request-create-group
 			to-newsgroup (gnus-group-name-to-method to-newsgroup))
-		       (gnus-activate-group to-newsgroup nil nil
-					    (gnus-group-name-to-method
-					     to-newsgroup)))
+		       (gnus-activate-group
+			to-newsgroup nil nil
+			(gnus-group-name-to-method to-newsgroup))
+		       (gnus-subscribe-group to-newsgroup))
 		  (error "Couldn't create group %s" to-newsgroup)))
 	  (error "No such group: %s" to-newsgroup)))
     to-newsgroup))

@@ -136,6 +136,7 @@
   (require 'cl)
   (autoload 'open-ssl-stream "ssl")
   (autoload 'base64-decode-string "base64")
+  (autoload 'base64-encode-string "base64")
   (autoload 'rfc2104-hash "rfc2104")
   (autoload 'md5 "md5")
   (autoload 'utf7-encode "utf7")
@@ -313,7 +314,7 @@ string).")
   "Non-nil indicates that the server emitted a continuation request. The
 actually value is really the text on the continuation line.")
 
-(defvar imap-log "*imap-log*"
+(defvar imap-log nil
   "Imap session trace.")
 
 (defvar imap-debug nil;"*imap-debug*"

@@ -260,7 +260,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.98"
+(defconst gnus-version-number "0.99"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "Pterodactyl Gnus v%s" gnus-version-number)
@@ -996,10 +996,23 @@ articles by Message-ID is painfully slow.  By setting this method to an
 nntp method, you might get acceptable results.
 
 The value of this variable must be a valid select method as discussed
-in the documentation of `gnus-select-method'."
+in the documentation of `gnus-select-method'.
+
+It can also be a list of select methods, as well as the special symbol
+`current', which means to use the current select method.  If it is a
+list, Gnus will try all the methods in the list until it finds a match."
   :group 'gnus-server
   :type '(choice (const :tag "default" nil)
-		 gnus-select-method))
+		 (const :tag "DejaNews" (nnweb "refer" (nnweb-type dejanews)))
+		 gnus-select-method
+		 (repeat :menu-tag "Try multiple" 
+			 :tag "Multiple"
+			 :value (current (nnweb "refer" (nnweb-type dejanews)))
+			 (choice :tag "Method"
+				 (const current)
+				 (const :tag "DejaNews" 
+					(nnweb "refer" (nnweb-type dejanews)))
+				 gnus-select-method))))
 
 (defcustom gnus-group-faq-directory
   '("/ftp@mirrors.aol.com:/pub/rtfm/usenet/"
@@ -1233,6 +1246,9 @@ slower."
     ("nnfolder" mail respool address)
     ("nngateway" post-mail address prompt-address physical-address)
     ("nnweb" none)
+    ("nnslashdot" post)
+    ("nnultimate" none)
+    ("nnwarchive" none)
     ("nnlistserv" none)
     ("nnagent" post-mail)
     ("nnimap" post-mail address prompt-address physical-address))
@@ -1258,6 +1274,8 @@ this variable.	I think."
 
 (define-widget 'gnus-select-method 'list
   "Widget for entering a select method."
+  :value '(nntp "")
+  :tag "Select Method"
   :args `((choice :tag "Method"
 		  ,@(mapcar (lambda (entry)
 			      (list 'const :format "%v\n"
@@ -1668,7 +1686,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-score-find-trace gnus-score-file-name)
      ("gnus-cus" :interactive t gnus-group-customize gnus-score-customize)
      ("gnus-topic" :interactive t gnus-topic-mode)
-     ("gnus-topic" gnus-topic-remove-group gnus-topic-set-parameters)
+     ("gnus-topic" gnus-topic-remove-group gnus-topic-set-parameters
+      gnus-subscribe-topics)
      ("gnus-salt" :interactive t gnus-pick-mode gnus-binary-mode)
      ("gnus-uu" (gnus-uu-extract-map keymap) (gnus-uu-mark-map keymap))
      ("gnus-uu" :interactive t
@@ -2604,11 +2623,13 @@ just the host name."
 	(setq levels (- glen levels))
 	(dolist (g glist)
 	  (push (if (>= (decf levels) 0)
-		    (substring g 0 1)
+		    (if (zerop (length g))
+			""
+		      (substring g 0 1))
 		  g)
 		res))
 	(concat foreign (mapconcat 'identity (nreverse res) "."))))))
-      
+
 (defun gnus-narrow-to-body ()
   "Narrow to the body of an article."
   (narrow-to-region
@@ -2772,6 +2793,9 @@ Disallow invalid group names."
 Allow completion over sensible values."
   (let* ((servers
 	  (append gnus-valid-select-methods
+		  (mapcar (lambda (i) (list (format "%s:%s" (caar i)
+						    (cadar i))))
+			  gnus-opened-servers)
 		  gnus-predefined-server-alist
 		  gnus-server-alist))
 	 (method
@@ -2782,11 +2806,18 @@ Allow completion over sensible values."
      ((equal method "")
       (setq method gnus-select-method))
      ((assoc method gnus-valid-select-methods)
-      (list (intern method)
-	    (if (memq 'prompt-address
-		      (assoc method gnus-valid-select-methods))
-		(read-string "Address: ")
-	      "")))
+      (let ((address (if (memq 'prompt-address
+			       (assoc method gnus-valid-select-methods))
+			 (read-string "Address: ")
+		       "")))
+	(or (let ((opened gnus-opened-servers))
+	      (while (and opened
+			  (not (equal (format "%s:%s" method address)
+				      (format "%s:%s" (caaar opened) 
+					      (cadaar opened)))))
+		(pop opened))
+	      (caar opened))
+	    (list (intern method) address))))
      ((assoc method servers)
       method)
      (t

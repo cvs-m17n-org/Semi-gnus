@@ -291,7 +291,9 @@
 
 (defun gnus-dd-mmm (messy-date)
   "Return a string like DD-MMM from a big messy string."
-  (format-time-string "%d-%b" (safe-date-to-time messy-date)))
+  (condition-case ()
+      (format-time-string "%d-%b" (safe-date-to-time messy-date))
+    (error "  -   ")))
 
 (defmacro gnus-date-get-time (date)
   "Convert DATE string to Emacs time.
@@ -946,14 +948,17 @@ ARG is passed to the first function."
        (when (and sym
 		  (boundp sym)
 		  (symbol-value sym))
-	 (insert (format "%s %d %d y\n"
+	 (insert (format "%S %d %d y\n"
 			 (if full-names
-			     (symbol-name sym)
-			   (gnus-group-real-name (symbol-name sym)))
+			     sym
+			   (intern (gnus-group-real-name (symbol-name sym))))
 			 (or (cdr (symbol-value sym))
 			     (car (symbol-value sym)))
 			 (car (symbol-value sym))))))
-     hashtb)))
+     hashtb)
+    (goto-char (point-max))
+    (while (search-backward "\\." nil t)
+      (delete-char 1))))
 
 (provide 'gnus-util)
 

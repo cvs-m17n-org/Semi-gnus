@@ -618,15 +618,18 @@ articles in the topic and its subtopics."
     (let* ((top (gnus-topic-find-topology
 		 (gnus-topic-parent-topic topic)))
 	   (tp (reverse (cddr top))))
-      (while (not (equal (caaar tp) topic))
-	(setq tp (cdr tp)))
-      (pop tp)
-      (while (and tp
-		  (not (gnus-topic-goto-topic (caaar tp))))
-	(pop tp))
-      (if tp
-	  (gnus-topic-forward-topic 1)
-	(gnus-topic-goto-missing-topic (caadr top))))
+      (if (not top)
+	  (gnus-topic-insert-topic-line
+	   topic t t (car (gnus-topic-find-topology topic)) nil 0)
+	(while (not (equal (caaar tp) topic))
+	  (setq tp (cdr tp)))
+	(pop tp)
+	(while (and tp
+		    (not (gnus-topic-goto-topic (caaar tp))))
+	  (pop tp))
+	(if tp
+	    (gnus-topic-forward-topic 1)
+	  (gnus-topic-goto-missing-topic (caadr top)))))
     nil))
 
 (defun gnus-topic-update-topic-line (topic-name &optional reads)
@@ -1528,6 +1531,19 @@ If REVERSE, reverse the sorting order."
     (gnus-group-list-groups)
     (gnus-topic-goto-topic current)))
 
+(defun gnus-subscribe-topics (newsgroup)
+  (catch 'end
+    (let (match gnus-group-change-level-function)
+      (dolist (topic (gnus-topic-list))
+	(when (and (setq match (cdr (assq 'subscribe
+					  (gnus-topic-parameters topic))))
+		   (string-match match newsgroup))
+	  ;; Just subscribe the group.
+	  (gnus-subscribe-alphabetically newsgroup)
+	  ;; Add the group to the topic.
+	  (nconc (assoc topic gnus-topic-alist) (list newsgroup))
+	  (throw 'end t))))))
+	  
 (provide 'gnus-topic)
 
 ;;; gnus-topic.el ends here
