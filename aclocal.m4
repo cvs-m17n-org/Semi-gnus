@@ -16,14 +16,14 @@ AC_DEFUN(AC_CHECK_EMACS,
   unset ac_cv_prog_EMACS; unset ac_cv_prog_XEMACS;
 
   AC_ARG_WITH(emacs,
-   [  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, mule...]],
+   [  --with-emacs=EMACS      compile with EMACS [[EMACS=emacs, mule...]]],
    [if test "$withval" = yes -o -z "$withval"; then
       AC_CHECK_PROGS(EMACS, emacs xemacs mule, emacs)
     else
       AC_CHECK_PROG(EMACS, $withval, $withval, emacs)
     fi])
   AC_ARG_WITH(xemacs,
-   [  --with-xemacs=XEMACS    compile with XEMACS [XEMACS=xemacs]],
+   [  --with-xemacs=XEMACS    compile with XEMACS [[XEMACS=xemacs]]],
    [if test "$withval" = yes -o -z "$withval"; then
       AC_CHECK_PROG(XEMACS, xemacs, xemacs, xemacs)
     else

@@ -782,8 +782,8 @@ if test -n "$ac_init_help"; then
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-emacs=EMACS      compile with EMACS EMACS=emacs, mule...
-  --with-xemacs=XEMACS    compile with XEMACS XEMACS=xemacs
+  --with-emacs=EMACS      compile with EMACS [EMACS=emacs, mule...]
+  --with-xemacs=XEMACS    compile with XEMACS [XEMACS=xemacs]
   --with-lispdir=DIR      Where to install lisp files
                           (for XEmacs package, use --with-packagedir instead)
   --with-etcdir=DIR       Where to install etc files
