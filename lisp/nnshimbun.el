@@ -295,7 +295,9 @@
 			   (and (nnheader-find-nov-line article)
 				(nnheader-parse-nov))))
 	(let* ((xref (substring (mail-header-xref header) 6))
-	       (x-faces (cdr (or (assoc server nnshimbun-x-face-alist)
+	       (x-faces (cdr (or (assoc (or server
+					    (nnoo-current-server 'nnshimbun))
+					nnshimbun-x-face-alist)
 				 (assoc "default" nnshimbun-x-face-alist))))
 	       (x-face (cdr (or (assoc group x-faces)
 				(assoc "default" x-faces)))))
@@ -785,7 +787,7 @@ is enclosed by at least one regexp grouping construct."
 				(buffer-substring
 				 (match-end 0)
 				 (progn (search-forward "<br>" nil t) (point)))
-				"<[^>]+>")
+				"\\(<[^>]+>\\|\r\\)")
 			       ""))
 		   nnshimbun-from-address
 		   "" id "" 0 0 (concat nnshimbun-url url))

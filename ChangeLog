@@ -1,3 +1,9 @@
+2000-05-28  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* nnshimbun.el (nnshimbun-request-article-1): Fix to insert x-face
+	unless SERVER.
+	(nnshimbun-asahi-get-headers): Fix for subjects which contain ^M.
+
 2000-05-26  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el (nnshimbun-write-nov): New function.
