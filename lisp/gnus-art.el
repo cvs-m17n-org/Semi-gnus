@@ -1207,6 +1207,81 @@ always hide."
 	   (point-max)))
        'boring-headers))))
 
+(defun article-toggle-headers (&optional arg)
+  "Toggle hiding of headers.  If given a negative prefix, always show;
+if given a positive prefix, always hide."
+  (interactive (gnus-article-hidden-arg))
+  (save-restriction
+    (widen)
+    (let ((force (when (numberp arg)
+		   (cond ((> arg 0) 'always-hide)
+			 ((< arg 0) 'always-show))))
+	  (window (get-buffer-window gnus-article-buffer))
+	  (header-start (if (get-text-property
+			     (point-min) 'article-treated-header)
+			    (point-min)
+			  (next-single-property-change
+			   (point-min) 'article-treated-header)))
+	  header-end field-start field-end
+	  (inhibit-read-only t)
+	  buffer-read-only)
+      (while (and header-start
+		  (setq header-end (next-single-property-change
+				    header-start 'article-treated-header)))
+	(narrow-to-region header-start header-end)
+	(goto-char header-start)
+	(cond
+	 (;; Hide fields.
+	  (and (not (eq 'always-hide force))
+	       (setq field-start (if (get-text-property
+				      header-start 'exposed-invisible-field)
+				     header-start
+				   (next-single-property-change
+				    header-start 'exposed-invisible-field))))
+	  (while (and field-start
+		      ;; Under FSF Emacs, `next-single-property-change's
+		      ;; return value may be larger than point-max even if
+		      ;; the 4th arg LIMIT is specified.
+		      (< field-start header-end)
+		      (setq field-end (next-single-property-change
+				       field-start
+				       'exposed-invisible-field)))
+	    (put-text-property field-start field-end
+			       'exposed-invisible-field nil)
+	    (put-text-property field-start field-end 'invisible t)
+	    (setq field-start (next-single-property-change
+			       field-end 'exposed-invisible-field))))
+	 (;; Expose invisible fields.
+	  (and (not (eq 'always-show force))
+	       (setq field-start (if (get-text-property header-start
+							'invisible)
+				     header-start
+				   (next-single-property-change header-start
+								'invisible))))
+	  (while (and field-start
+		      (< field-start header-end)
+		      (setq field-end (next-single-property-change
+				       field-start 'invisible)))
+	    ;; If the invisible text is not terminated with newline, we
+	    ;; won't expose it.  Because it may be created by x-face-mule.
+	    (when (eq ?\n (char-before field-end))
+	      (put-text-property field-start field-end 'invisible nil)
+	      (put-text-property field-start field-end
+				 'exposed-invisible-field t))
+	    (setq field-start (next-single-property-change
+			       field-end 'invisible))))
+	 (;; Maybe hide fields.
+	  (not (eq 'always-show force))
+	  (gnus-article-maybe-hide-headers))
+	 )
+	(goto-char header-end)
+	(widen)
+	(setq header-start (next-single-property-change
+			    header-end 'article-treated-header)))
+      (goto-char (point-min))
+      (when window
+	(set-window-start window (point-min))))))
+
 (defvar gnus-article-normalized-header-length 40
   "Length of normalized headers.")
 
@@ -1408,22 +1483,6 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
 		    gnus-article-x-face-command))
 		  (process-send-region "article-x-face" beg end)
 		  (process-send-eof "article-x-face"))))))))))
-
-(autoload 'x-face-mule-x-face-decode-message-header "x-face-mule")
-
-(defun gnus-article-display-x-face-with-x-face-mule (&rest args)
-  "Decode and show X-Face with the function
-`x-face-mule-x-face-decode-message-header'.  The buffer is expected to be
-narrowed to just the headers of the article."
-  (when (featurep 'xemacs)
-    (error "`%s' won't work under XEmacs."
-	   'gnus-article-display-x-face-with-x-face-mule))
-  (condition-case err
-      (x-face-mule-x-face-decode-message-header)
-    (error (error "%s"
-		  (if (featurep 'x-face-mule)
-		      "Please install x-face-mule 0.24 or later."
-		    err)))))
 
 (defun article-decode-mime-words ()
   "Decode all MIME-encoded words in the article."
@@ -2366,6 +2425,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 		      (apply ',afunc args))))))))
    '(article-hide-headers
      article-hide-boring-headers
+     article-toggle-headers
      article-treat-overstrike
      article-fill-long-lines
      article-capitalize-sentences
@@ -2469,7 +2529,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
     (easy-menu-define
      gnus-article-treatment-menu gnus-article-mode-map ""
      '("Treatment"
-       ["Hide headers" gnus-article-hide-headers t]
+       ["Hide headers" gnus-article-toggle-headers t]
        ["Hide signature" gnus-article-hide-signature t]
        ["Hide citation" gnus-article-hide-citation t]
        ["Treat overstrike" gnus-article-treat-overstrike t]
@@ -2605,8 +2665,7 @@ commands:
 (defun gnus-article-display-traditional-message ()
   "Article display method for traditional message."
   (set-buffer gnus-article-buffer)
-  (let ((inhibit-read-only t)
-	buffer-read-only)
+  (let (buffer-read-only)
     (erase-buffer)
     (insert-buffer-substring gnus-original-article-buffer)))
 
@@ -2758,54 +2817,51 @@ If ALL-HEADERS is non-nil, no headers are hidden."
 		     (get-text-property 1 'mime-view-entity)
 		   (get-text-property (point) 'mime-view-entity)))
 	 (number (or number 0))
-	 start content-type treat-type ids)
+	 next type ids)
     (save-restriction
       (narrow-to-region (point)
 			(if (search-forward "\n\n" nil t)
 			    (point)
 			  (point-max)))
       (gnus-treat-article 'head)
-      (goto-char (setq start (point-max))))
+      (put-text-property (point-min) (point-max) 'article-treated-header t)
+      (goto-char (point-max)))
     (while (and (not (eobp))
 		entity
-		(progn (mime-preview-move-to-next)
-		       (> (point) start)))
-      (setq content-type (mime-entity-content-type entity)
-	    treat-type (format "%s/%s"
-			       (mime-content-type-primary-type
-				content-type)
-			       (mime-content-type-subtype
-				content-type)))
-      (save-restriction
-	(if (string-equal treat-type "message/rfc822")
-	    (progn
-	      (narrow-to-region start (point-max))
-	      (gnus-article-prepare-mime-display number))
-	  (narrow-to-region start (point))
-	  (setq start (point)
-		ids (length (mime-entity-node-id entity))
-		entity (get-text-property start 'mime-view-entity)
-		number (1+ number))
+		(setq next (next-single-property-change (point)
+							'mime-view-entity)))
+      (setq type (mime-entity-content-type entity)
+	    type (format "%s/%s"
+			 (mime-content-type-primary-type type)
+			 (mime-content-type-subtype type)))
+      (if (string-equal type "message/rfc822")
+	  (save-restriction
+	    (narrow-to-region (point) (point-max))
+	    (gnus-article-prepare-mime-display number)
+	    (goto-char (point-max)))
+	(setq ids (length (mime-entity-node-id entity))
+	      entity (get-text-property next 'mime-view-entity)
+	      number (1+ number))
+	(save-restriction
+	  (narrow-to-region (point) next)
 	  (if (or (null entity)
 		  (< (length (mime-entity-node-id entity)) ids))
-	      (gnus-treat-article 'last number number treat-type)
-	    (gnus-treat-article nil number nil treat-type)))
-	(goto-char (point-max))))
+	      (gnus-treat-article 'last number number type)
+	    (gnus-treat-article nil number nil type))
+	  (goto-char (point-max)))))
     (unless (eobp)
       (save-restriction
 	(narrow-to-region (point) (point-max))
 	(if entity
 	    (progn
-	      (setq content-type (mime-entity-content-type entity)
-		    treat-type (format "%s/%s"
-				       (mime-content-type-primary-type
-					content-type)
-				       (mime-content-type-subtype
-					content-type)))
-	      (if (string-equal treat-type "message/rfc822")
+	      (setq type (mime-entity-content-type entity)
+		    type (format "%s/%s"
+				 (mime-content-type-primary-type type)
+				 (mime-content-type-subtype type)))
+	      (if (string-equal type "message/rfc822")
 		  (gnus-article-prepare-mime-display number)
 		(incf number)
-		(gnus-treat-article 'last number number treat-type)))
+		(gnus-treat-article 'last number number type)))
 	  (gnus-treat-article t))))))
 
 ;;;###autoload
@@ -2823,27 +2879,47 @@ If ALL-HEADERS is non-nil, no headers are hidden."
   ;; Associate this article with the current summary buffer.
   (setq gnus-article-current-summary gnus-summary-buffer)
   ;; Call the treatment functions.
-  (save-restriction
-    (widen)
-    (if gnus-show-mime
-	(let (mime-preview-over-to-next-method-alist)
-	  (gnus-article-prepare-mime-display))
-      (std11-narrow-to-header)
-      (gnus-treat-article 'head)
-      (goto-char (point-max))
+  (let ((inhibit-read-only t)
+	buffer-read-only)
+    (save-restriction
       (widen)
-      (narrow-to-region (point) (point-max))
-      (gnus-treat-article t)))
+      (if gnus-show-mime
+	  (gnus-article-prepare-mime-display)
+	(std11-narrow-to-header)
+	(gnus-treat-article 'head)
+	(put-text-property (point-min) (point-max) 'article-treated-header t)
+	(goto-char (point-max))
+	(widen)
+	(narrow-to-region (point) (point-max))
+	(gnus-treat-article t))
+      (put-text-property (point-min) (point-max) 'read-only nil)))
   ;; Perform the article display hooks.  Incidentally, this hook is
   ;; an obsolete variable by now.
   (gnus-run-hooks 'gnus-article-display-hook))
 
 (defun gnus-article-decode-message-body-as-default-mime-charset ()
-  "Decode the message body as `default-mime-charset'."
-  (let (buffer-read-only)
-    (decode-mime-charset-region (point) (point-max)
-				(with-current-buffer gnus-summary-buffer
-				  default-mime-charset))))
+  "Decode the message body as `default-mime-charset'.  The buffer is
+expected to be narrowed to the article body."
+  (decode-mime-charset-region (point-min) (point-max)
+			      (with-current-buffer gnus-summary-buffer
+				default-mime-charset)))
+
+(autoload 'x-face-mule-x-face-decode-message-header "x-face-mule")
+
+(defun gnus-article-display-x-face-with-x-face-mule (&rest args)
+  "Decode and show X-Face with the function
+`x-face-mule-x-face-decode-message-header'.  The buffer is expected to be
+narrowed to just the headers of the article."
+  (when (featurep 'xemacs)
+    (error "`%s' won't work under XEmacs."
+	   'gnus-article-display-x-face-with-x-face-mule))
+  (when window-system
+    (condition-case err
+	(x-face-mule-x-face-decode-message-header)
+      (error (error "%s"
+		    (if (featurep 'x-face-mule)
+			"Please install x-face-mule 0.24 or later."
+		      err))))))
 
 ;;;
 ;;; Gnus MIME viewing functions
