@@ -666,6 +666,7 @@ Getting News
 * Direct Functions::            $B%5!<%P!<$KD>@\@\B3$9$k(B
 * Indirect Functions::          $B%5!<%P!<$K4V@\E*$K@\B3$9$k(B
 * Common Variables::            $B$$$/$D$+$N@\B3MQ$N4X?t$,;2>H$9$kJQ?t(B
+* NNTP marks::                  @acronym{NNTP} $B%5!<%P!<MQ$N0u$NJ]B8(B
 
 Getting Mail
 
@@ -1072,6 +1073,11 @@ gnus $B$O(B @code{gnus-secondary-servers} $B%j%9%H(B ($B$b$7B8:_$9$k$J$i$P
 
 @noindent
 $B$H@_Dj$7$^$9!#(B
+
+$BCm(B: @acronym{NNTP} $B$O0u%U%!%$%k(B (@pxref{NNTP marks}) $B$K0u$rJ]B8$7$^$9!#(B
+$B$3$N5!G=$O(B Gnus $B$,%$%s%9%H!<%k$5$l$F$$$kJ#?t$N%[%9%H4V$G0u$r6&M-$9$k$3$H(B
+$B$rMF0W$K$7$^$9$,!"?7Ce5-;v$N<hF@$r$A$g$C$HCY$/$9$k$+$b$7$l$^$;$s!#>\:Y$K(B
+$B$D$$$F$O(B @ref{NNTP marks} $B$r;2>H$7$F2<$5$$!#(B
 
 @node The First Time
 @section $B0lHV=i$a(B
@@ -12023,6 +12029,7 @@ LIST $B%3%^%s%I$N%*%W%7%g%s$K;H$C$F!"(B($B%5!<%P!<$N(B) $B%j%9%H=PNO$r@_Dj$
 * Direct Functions::            $B%5!<%P!<$KD>@\@\B3$9$k(B
 * Indirect Functions::          $B%5!<%P!<$K4V@\E*$K@\B3$9$k(B
 * Common Variables::            $B$$$/$D$+$N@\B3MQ$N4X?t$,;2>H$9$kJQ?t(B
+* NNTP marks::                  @acronym{NNTP} $B%5!<%P!<MQ$N0u$NJ]B8(B
 @end menu
 
 @node Direct Functions
@@ -12192,15 +12199,6 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 @vindex nntp-via-shell-prompt
 $BCf4V$N%[%9%H$G$N%7%'%k$N%W%m%s%W%H$K9gCW$9$k@55,I=8=$G$9!#%G%#%U%)%k%H(B
 $B$O(B @samp{bash\\|\$ *\r?$\\|> *\r?} $B$G$9!#(B
-
-@item nntp-marks-is-evil
-@vindex nntp-marks-is-evil
-$BHs(B-@code{nil} $B$@$C$?$i!"$3$N%P%C%/%(%s%I$O(B @sc{marks} $B%U%!%$%k$rL5;k$7$^(B
-$B$9!#%G%#%U%)%k%H$O(B @code{nil} $B$G$9!#(B
-
-@item nntp-marks-directory
-@vindex nntp-marks-directory
-@acronym{NNTP} $B%0%k!<%W$N(B @sc{marks} $B$,3JG<$5$l$k%G%#%l%/%H%j$G$9!#(B
 @end table
 
 @code{nntp-end-of-line} $B$NCM$r(B @samp{\n} $B$KJQ99$9$kI,MW$,$"$k$G$"$m$&$3(B
@@ -12264,6 +12262,51 @@ Emacs $B$N%;%C%7%g%sA4BN$r%i%C%W$7$F!"%G%#%U%)%k%H$N%a%=%C%I$r;H$&$H$$$&$N(B
 @vindex nntp-telnet-switches
 @code{nntp-telnet-command} $B$KEO$9%9%$%C%A$N%j%9%H$G$9!#%G%#%U%)%k%H(B
 $B$O(B @samp{("-8")} $B$G$9!#(B
+@end table
+
+@node NNTP marks
+@subsubsection NNTP marks
+@cindex storing NNTP marks
+
+Gnus $B$O(B @acronym{NNTP} $B%5!<%P!<MQ$N0u(B (marks) $B$r0u%U%!%$%k$KJ]B8$7$^$9!#(B
+$B0u%U%!%$%k$O$"$k%0%k!<%W$G@_Dj$7$?0u$r5-O?$7!"$=$l$>$l$N%U%!%$%k$O!"BP1~(B
+$B$9$k%5!<%P!<$N$=$l$>$l$KBP$7$F@lMQ$G$9!#0u%U%!%$%k$O!"%K%e!<%9%5!<%P!<$K(B
+$B;w$F$$$k8EE5E*$J3,AX(B
+$B$G(B @file{~/News/marks} (@code{nntp-marks-directory}) $B$KJ]B8$5$l$^$9!#Nc(B
+$B$($P(B news.gmane.org $B%5!<%P!<$K$*$1$k(B @samp{gmane.discuss} $B%0%k!<%W$N$?$a(B
+$B$N0u%U%!%$%k(B
+$B$O(B @file{~/News/marks/news.gmane.org/gmane/discuss/.marks} $B$KJ]B8$5$l$^(B
+$B$9!#(B
+
+$B0u%U%!%$%k$OLr$KN)$A$^$9!#(B@file{~/News/marks} $B%G%#%l%/%H%j$O(B (rsync$B!"(B
+scp $B$^$?$OB>$N2?$+$r;H$C$F(B) Gnus $B$rAv$i$;$kJL$N%[%9%H$K%3%T!<$9$k$3$H$,(B
+$B$G$-!"$I$N5-;v$rFI$s$G0u$rIU$1$?$+$r$=$A$i$G:F8=$7$^$9!#(B
+@file{~/News/marks} $B$N%G!<%?$O!"(B@file{~/.newsrc.eld} $B$K$"$kF1$8$b$N$h$j(B
+$B$bM%@h$5$l$^$9!#(B
+
+$B0u%U%!%$%k$O!"$=$l$>$l$N%5!<%P!<$4$H$K!"Hs>o$KFC2=$5$l$k$3$H$KCm0U$7$F2<(B
+$B$5$$!#(BGnus $B$O5-;vHV9f$r5-21$9$k$N$G!"N>J}$N%[%9%H$GF1$8%5!<%P!<$r;H$C$F(B
+$B$$$J$$$H!"J*;v$O2u$l$F$7$^$&$G$7$g$&(B ($BBgDq$N%5!<%P!<$OB>$N$I$s$J%5!<%P!<(B
+$B$HF1$85-;vHV9f$r;H$$$^$;$s(B)$B!#$7$+$7!"$"$k%[%9%H$G%5!<%P!<(B A$B!"(BB$B!"(BC $B$r;H$$!"(B
+$BJL$N%[%9%H$G%5!<%P!<(B A$B!"(BD$B!"(BE $B$r;H$&>l9g$K$O!"(BA $B$N$?$a$N0u%U%!%$%k$rF1$8(B
+$B$K$9$k$3$H$,$G$-!"Fs$D$N%[%9%H4V$G$=$N%5!<%P!<$OF14|$7$^$9!#(B
+
+@acronym{NNTP} $B0u$N;HMQ$O@-G=$NNt2=$r>7$-!"(BGnus $B$r$N$m$/46$8$5$;$k2DG=@-(B
+$B$,$"$j$^$9!#$=$&$$$&>l9g$O(B @code{nntp-marks-is-evil} $BJQ?t$r(B @code{t} $B$K(B
+$B@_Dj$7$F$_$F2<$5$$!#$9$k$H!"0u$O(B @file{~/.newsrc.eld} ($B$@$1(B) $B$K3JG<$5$l(B
+$B$k$G$7$g$&!#(B
+
+$B4XO"$9$kJQ?t(B:
+
+@table @code
+@item nntp-marks-is-evil
+@vindex nntp-marks-is-evil
+$BHs(B-@code{nil} $B$@$C$?$i!"$3$N%P%C%/%(%s%I$O0u%U%!%$%k$rL5;k$7$^$9!#%G%#%U%)(B
+$B%k%H$O(B @code{nil} $B$G$9!#(B
+
+@item nntp-marks-directory
+@vindex nntp-marks-directory
+@acronym{NNTP} $B%0%k!<%W$N0u$,3JG<$5$l$k%G%#%l%/%H%j$G$9!#(B
 @end table
 
 @node News Spool
