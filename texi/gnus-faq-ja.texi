@@ -71,10 +71,10 @@ Baur 氏、 Per Abrahamsen 氏に感謝します。
 @item
 Q1.1: 最新のバージョンは?
 
-現在の開発版の最新バージョンは T-gnus 6.14 (tag: t-gnus-6_14) で、標準パッ
-ケージの最新バージョンは T-gnus 6.12 (tag: t-gnus-6_12) です。
+現在の開発版の最新バージョンは T-gnus 6.15 (tag: t-gnus-6_15-quimby) で
+す。
 
-T-gnus 6.14 を使用するためには別パッケージの FLIM 1.13.1 以上, SEMI (ま
+T-gnus 6.15 を使用するためには別パッケージの FLIM 1.13.1 以上, SEMI (ま
 たは WEMI) 1.13.5 以上が必要です。 その他、 APEL が必要になりますが、必
 要なバージョンは FLIM / SEMI (WEMI) パッケージ内の README を参照してくだ
 さい。
@@ -121,7 +121,7 @@ anonymous ftp での取得
 
 anonymous ftp では以下の場所から取得できます。
 
-@file{ftp://ftp.jpl.org/pub/elisp/t-gnus-6.14/}
+@file{ftp://ftp.jpl.org/pub/elisp/t-gnus-6.15/}
 
 SEMI, FLIM, APEL の取得
 

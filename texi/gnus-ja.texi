@@ -1,7 +1,7 @@
 @c \input texinfo @c -*- mode: texinfo; coding: iso-2022-7bit-ss2; -*-
 
 @setfilename gnus-ja
-@settitle T-gnus 6.14 Manual
+@settitle T-gnus 6.15 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -359,7 +359,7 @@ license to the document, as described in section 6 of the license.
 @tex
 
 @titlepage
-@title T-gnus 6.14 Manual
+@title T-gnus 6.15 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
@@ -424,7 +424,7 @@ T-gnus $B$O!"Bg$-$J3($,F~$C$F$$$?$j$5$^$6$^$J7A<0$rMQ$$$?$j$7$F$$$k$A$g$C(B
 $B7w$r:9JL$7$^$;$s!#$"$"!"%/%j%s%4%s$NJ}$O(B Unicode Next Generation $B$r$*BT(B
 $B$A$/$@$5$$!#(B
 
-$B$3$N@bL@=q$O(B T-gnus 6.14 $B$KBP1~$7$^$9!#(B
+$B$3$N@bL@=q$O(B T-gnus 6.15 $B$KBP1~$7$^$9!#(B
 
 @end ifinfo
 
@@ -21196,9 +21196,8 @@ Gnus $B$OH"$+$i=P$7$F$9$0$K(B @emph{$BHs>o$K(B} $B$h$/F0:n$7$^$9(B---$B2?
 
 @item
 @kbd{M-x gnus-version} $B$r;n$7$F2<$5$$!#$b$7!"(B
-@samp{T-gnus 6.14.* (based on Pterodactyl Gnus v0.*; for SEMI 1.1*,
-FLIM 1.1*)} $B$N$h$&$J$b$N$,=P$F$-$?$J$i!"@5$7$$%U%!%$%k$,FI$_9~$^$l$F$$$^(B
-$B$9!#(B
+@samp{T-gnus 6.15.* (based on Oort Gnus v0.*; for SEMI 1.1*, FLIM
+1.1*)} $B$N$h$&$J$b$N$,=P$F$-$?$J$i!"@5$7$$%U%!%$%k$,FI$_9~$^$l$F$$$^$9!#(B
 $B$b$7!"(B@samp{NNTP 3.x} $B$d(B @samp{nntp flee} $B$N$h$&$J$b$N$,=P$F$-$?$H$-$O!"(B
 $B$=$3$K$"$k$$$/$D$+$N8E$$(B @file{.el} $B%U%!%$%k$,FI$_9~$^$l$F$$$^$9!#$=$l$i(B
 $B$r>C$7$F2<$5$$!#(B

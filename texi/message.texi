@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename message
-@settitle T-gnus 6.14 Message Manual
+@settitle T-gnus 6.15 Message Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -41,7 +41,7 @@ license to the document, as described in section 6 of the license.
 @tex
 
 @titlepage
-@title T-gnus 6.14 Message Manual
+@title T-gnus 6.15 Message Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -86,7 +86,7 @@ Message mode buffers.
 * Key Index::         List of Message mode keys.
 @end menu
 
-This manual corresponds to T-gnus 6.14 Message.  Message is
+This manual corresponds to T-gnus 6.15 Message.  Message is
 distributed with the Gnus distribution bearing the same version number
 as this manual.
 
