@@ -31,6 +31,7 @@
 
 ;;; Code:
 
+(eval-when-compile (require 'cl))
 (require 'nntp)
 (require 'nnheader)
 (require 'gnus)
@@ -39,7 +40,6 @@
 (require 'gnus-start)
 (require 'gnus-sum)
 (require 'gnus-msg)
-(require 'cl)
 
 (nnoo-declare nnvirtual)
 

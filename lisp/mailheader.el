@@ -46,7 +46,7 @@
 
 ;;; Code:
 
-(require 'cl)
+(eval-when-compile (require 'cl))
 
 ;; Make the byte-compiler shut up.
 (defvar headers)

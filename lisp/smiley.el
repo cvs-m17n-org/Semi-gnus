@@ -35,9 +35,9 @@
 
 ;; The smilies were drawn by Joe Reiss <jreiss@vt.edu>.
 
+(eval-when-compile (require 'cl))
 (require 'annotations)
 (require 'messagexmas)
-(require 'cl)
 (require 'custom)
 
 (defgroup smiley nil
