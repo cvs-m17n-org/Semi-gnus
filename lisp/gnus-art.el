@@ -37,6 +37,9 @@
 (require 'alist)
 (require 'mime-view)
 
+(or (string< "1" eword-decode-version)
+    (error "Please install latest SEMI."))
+
 (defgroup gnus-article nil
   "Article display."
   :link '(custom-manual "(gnus)The Article Buffer")
@@ -932,20 +935,8 @@ characters to translate to."
     (let ((charset (save-excursion
 		     (set-buffer gnus-summary-buffer)
 		     default-mime-charset)))
-      (save-restriction
-	(std11-narrow-to-header)
-	(goto-char (point-min))
-	(while (re-search-forward "^[^ \t:]+:" nil t)
-	  (let ((start (match-beginning 0))
-		(end (std11-field-end))
-		)
-	    (save-restriction
-	      (narrow-to-region start end)
-	      (decode-mime-charset-region start end charset)
-	      (goto-char (point-max))
-	      )))
-	(eword-decode-header)
-	))))
+      (eword-decode-header charset)
+      )))
 
 (defun article-hide-pgp (&optional arg)
   "Toggle hiding of any PGP headers and signatures in the current article.
@@ -1989,28 +1980,16 @@ commands:
 (defun gnus-article-decode-encoded-word ()
   "Header filter for gnus-article-mode.
 It is registered to variable `mime-view-content-header-filter-alist'."
-  (goto-char (point-min))
   (let ((charset (save-excursion
 		   (set-buffer gnus-summary-buffer)
 		   default-mime-charset)))
-    (save-restriction
-      (std11-narrow-to-header)
-      (goto-char (point-min))
-      (while (re-search-forward "^[^ \t:]+:" nil t)
-	(let ((start (match-beginning 0))
-	      (end (std11-field-end))
-	      )
-	  (save-restriction
-	    (narrow-to-region start end)
-	    (decode-mime-charset-region start end charset)
-	    (goto-char (point-max))
-	    )))
-      (eword-decode-header)
-      )
-    (decode-mime-charset-region (point) (point-max) charset)
+    (eword-decode-header charset)
+    (goto-char (point-min))
+    (if (search-forward "\n\n" nil t)
+	(decode-mime-charset-region (match-end 0) (point-max) charset))
     (mime-maybe-hide-echo-buffer)
     )
-  (run-hooks 'gnus-mime-article-prepare-hook)
+  (gnus-run-hooks 'gnus-mime-article-prepare-hook)
   )
 
 (defun gnus-article-prepare (article &optional all-headers header)
@@ -3268,18 +3247,7 @@ forbidden in URL encoding."
 (defun gnus-content-header-filter ()
   "Header filter for mime-view.
 It is registered to variable `mime-view-content-header-filter-alist'."
-  (goto-char (point-min))
-  (while (re-search-forward "^[^ \t:]+:" nil t)
-    (let ((start (match-beginning 0))
-	  (end (std11-field-end))
-	  )
-      (save-restriction
-	(narrow-to-region start end)
-	(decode-mime-charset-region start end default-mime-charset)
-	(goto-char (point-max))
-	)))
-  (eword-decode-header)
-  )
+  (eword-decode-header default-mime-charset))
 
 (defun mime-view-quitting-method-for-gnus ()
   (if (not gnus-show-mime)
