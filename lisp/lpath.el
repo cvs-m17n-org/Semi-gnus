@@ -99,7 +99,7 @@
 (let ((functions-variables
        (cond
 	((featurep 'xemacs)
-	 '((propertize xml-parse-region)))
+	 '((propertize xml-node-children xml-parse-region)))
 	((>= emacs-major-version 21)
 	 '((function-max-args smiley-encode-buffer)))
 	((boundp 'MULE)
@@ -107,10 +107,11 @@
 	    coding-system-get compose-mail file-name-extension
 	    find-coding-systems-region function-max-args get-charset-property
 	    propertize shell-command-to-string smiley-encode-buffer
-	    xml-parse-region)))
+	    xml-node-children xml-parse-region)))
 	(t
 	 '((function-max-args
-	    propertize smiley-encode-buffer xml-parse-region))))))
+	    propertize smiley-encode-buffer
+	    xml-node-children xml-parse-region))))))
   (maybe-fbind (car functions-variables))
   (maybe-bind (car (cdr functions-variables))))
 
