@@ -1,3 +1,14 @@
+2001-12-06 01:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* dgnushack.el (dgnushack-compile): nnrss.el and
+	nnslashdot.el don't depend on nnweb, url, w3.
+
+	* nnrss.el: Use mm-url. 
+
+2001-12-06 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-url.el (mm-url-insert-file-contents): Support file:.
+
 2001-12-05 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* mm-view.el: Lower case for the description line. Sync from the

@@ -463,8 +463,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			  (message " => ignored")
 			  nil)))
 	    '("nnweb.el" "nnlistserv.el" "nnultimate.el"
-	      "nnslashdot.el" "nnwarchive.el" "webmail.el"
-	      "nnwfm.el" "nnrss.el"))
+	      "nnwarchive.el" "webmail.el" "nnwfm.el"))
 	  (condition-case code
 	      (progn (require 'mh-e) nil)
 	    (error
