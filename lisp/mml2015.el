@@ -673,6 +673,9 @@
 		mm-security-handle 'gnus-details "Quit.")
 	       nil))
 	    (with-current-buffer pgg-output-buffer
+	      (goto-char (point-min))
+	      (while (search-forward "\r\n" nil t)
+		(replace-match "\n" t t))
 	      (setq handles (mm-dissect-buffer t))
 	      (mm-destroy-parts handle)
 	      (mm-set-handle-multipart-parameter
@@ -701,6 +704,9 @@
 	(progn
 	  (erase-buffer)
 	  (insert-buffer pgg-output-buffer)
+	  (goto-char (point-min))
+	  (while (search-forward "\r\n" nil t)
+	    (replace-match "\n" t t))
 	  (mm-set-handle-multipart-parameter
 	   mm-security-handle 'gnus-info "OK"))
       (mm-set-handle-multipart-parameter
@@ -738,6 +744,9 @@
 		(prog1
 		    (pgg-verify-region (point-min) (point-max)
 				       signature-file t)
+		  (goto-char (point-min))
+		  (while (search-forward "\r\n" nil t)
+		    (replace-match "\n" t t))
 		  (mm-set-handle-multipart-parameter
 		   mm-security-handle 'gnus-details
 		   (concat (with-current-buffer pgg-output-buffer
@@ -771,6 +780,9 @@
 		(mm-with-unibyte-buffer
 		  (insert-buffer text)
 		  (pgg-verify-region (point-min) (point-max) nil t))
+	      (goto-char (point-min))
+	      (while (search-forward "\r\n" nil t)
+		(replace-match "\n" t t))
 	      (mm-set-handle-multipart-parameter
 	       mm-security-handle 'gnus-details
 	       (concat (with-current-buffer pgg-output-buffer
