@@ -1,3 +1,8 @@
+2002-01-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-mime-extract-message/rfc822): New
+	implementation.
+
 2002-01-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-clfns.el (find-cl-run-time-functions): Insert a

@@ -10811,46 +10811,25 @@ If REVERSE, save parts that do not match TYPE."
 ;;;
 
 (defun gnus-mime-extract-message/rfc822 (entity situation)
-  (let (group article num cwin swin cur)
-    (with-temp-buffer
-      (mime-insert-entity-content entity)
-      (setq group (or (cdr (assq 'group situation))
-		      (completing-read "Group: "
-				       gnus-active-hashtb
-				       nil
-				       (gnus-read-active-file-p)
-				       gnus-newsgroup-name))
-	    article (gnus-request-accept-article group)))
-    (when (and (consp article)
-	       (numberp (setq article (cdr article))))
-      (setq num (1+ (or (cdr (assq 'number situation)) 0))
-	    cwin (get-buffer-window (current-buffer) t))
-      (save-window-excursion
-	(if (setq swin (get-buffer-window gnus-summary-buffer t))
-	    (select-window swin)
-	  (set-buffer gnus-summary-buffer))
-	(setq cur gnus-current-article)
-	(forward-line num)
+  "Burst a forwarded article."
+  (save-excursion
+    (set-buffer gnus-summary-buffer)
+    (let ((group (completing-read "Group: " gnus-active-hashtb
+				  nil (gnus-read-active-file-p)
+				  gnus-newsgroup-name 'gnus-group-history))
+	  article summary buffers)
+      (gnus-summary-goto-subject gnus-current-article)
+      (gnus-summary-copy-article 1 group)
+      (setq article (cdr (gnus-active group)))
+      (with-temp-buffer
+	(mime-insert-entity-content entity)
+	(gnus-request-replace-article article group (current-buffer) t))
+      (when (string-equal group gnus-newsgroup-name)
+	(gnus-summary-goto-subject gnus-current-article)
+	(forward-line 1)
 	(let (gnus-show-threads)
 	  (gnus-summary-goto-subject article t))
-	(gnus-summary-clear-mark-forward 1)
-	(gnus-summary-goto-subject cur))
-      (when (and cwin (window-frame cwin))
-	(select-frame (window-frame cwin)))
-      (when (boundp 'mime-acting-situation-to-override)
-	(set-alist 'mime-acting-situation-to-override
-		   'group
-		   group)
-	(set-alist 'mime-acting-situation-to-override
-		   'after-method
-		   `(progn
-		      (save-current-buffer
-			(set-buffer gnus-group-buffer)
-			(gnus-activate-group ,group))
-		      (gnus-summary-goto-article ,cur
-						 gnus-show-all-headers)))
-	(set-alist 'mime-acting-situation-to-override
-		   'number num)))))
+	(gnus-summary-clear-mark-forward 1)))))
 
 (mime-add-condition
  'action '((type . message)(subtype . rfc822)
