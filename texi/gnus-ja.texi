@@ -596,8 +596,7 @@ Summary Buffer
 @c * Charsets::                    Character set issues.
 * Article Commands::            記事バッファでいろいろなことをする
 * Summary Sorting::             いろいろな方法で概略バッファを並べ替える
-* Finding the Parent::          子記事に援助が無いって? 親記事を取得しな
-                                さい
+* Finding the Parent::          子記事が探せないって? 親記事を取得しなさい
 * Alternative Approaches::      初期設定でない概略を使って読む
 * Tree Display::                もっと視覚的なスレッドの表示
 * Mail Group Commands::         いくつかの命令はメールグループだけで使う
@@ -4401,8 +4400,7 @@ if address "sender" "owner-ding@@hpc.uh.edu" @{
 @c * Charsets::                    Character set issues.
 * Article Commands::            記事バッファでいろいろなことをする
 * Summary Sorting::             いろいろな方法で概略バッファを並べ替える
-* Finding the Parent::          子記事に援助が無いって? 親記事を取得しな
-                                さい
+* Finding the Parent::          子記事が探せないって? 親記事を取得しなさい
 * Alternative Approaches::      初期設定でない概略を使って読む
 * Tree Display::                もっと視覚的なスレッドの表示
 * Mail Group Commands::         いくつかの命令はメールグループだけで使う
@@ -8696,8 +8694,8 @@ gnus でメールを読むことの有利な点は、単純なバグを素晴らしい不条理に置き
 @item ^
 @kindex ^ (概略)
 @findex gnus-summary-refer-parent-article
-現在の記事の親記事を読みたくて、それが概略バッファに表示されていないくて
-も、おそらくそれは可能でしょう。というのは、現在のグループ
+現在の記事の親記事を読みたくて、それが概略バッファに表示されていなくても、
+おそらくそれは可能でしょう。というのは、現在のグループ
 が @sc{nntp} で取得されていて、親がまだ期限消去されていない上、現在の記
 事の @code{References} がぶち壊されていなければ、ただ、
 @kbd{^} か @kbd{A r} を押せば良いだけで
