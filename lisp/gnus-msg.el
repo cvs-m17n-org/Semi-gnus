@@ -190,9 +190,51 @@ Thank you for your help in stamping out bugs.
 ;;; Internal functions.
 
 (defun gnus-extended-version ()
-  "Stringified gnus version."
+  "Stringified Gnus version and Emacs version."
   (interactive) ; ???
-  (concat gnus-product-name "/" gnus-version-number))
+  (concat
+   ;; Semi-gnus/VERSION
+   gnus-product-name "/" gnus-version-number
+   ;; EMACS/VERSION
+   (if (featurep 'xemacs)
+       ;; XEmacs
+       (concat
+	(format " XEmacs/%d.%d%s" emacs-major-version emacs-minor-version
+		(if (and (boundp 'xemacs-betaname) xemacs-betaname)
+		    (if (string-match "\\`(\\(.*\\))\\'" xemacs-betaname)
+			(match-string 1 xemacs-betaname)
+		      "")		; unknown format
+		  ""))			; not beta
+	(if (boundp 'xemacs-codename)
+	    (concat " (" xemacs-codename ")")
+	  "")				; no codename
+	)
+     ;; not XEmacs
+     (concat
+      (format " Emacs/%d.%d" emacs-major-version emacs-minor-version)
+      (if (and (boundp 'enable-multibyte-characters)
+	       enable-multibyte-characters)
+	  ;; Should return " (multibyte)" ?
+	  ""
+	" (unibyte)")
+      ))
+   ;; MULE[/VERSION]
+   (if (featurep 'mule)
+       (if (and (boundp 'mule-version) mule-version)
+	   (concat " MULE/" mule-version)
+	 " MULE")			; no mule-version
+     "")				; not Mule
+   ;; Meadow/VERSION
+   (if (featurep 'meadow)
+       (let ((version (Meadow-version)))
+	 (if (string-match "\\`Meadow.\\([^ ]*\\)\\( (.*)\\)\\'" version)
+	     (concat " Meadow/"
+		     (match-string 1 version)
+		     (match-string 2 version)
+		     )
+	   "Meadow"))			; unknown format
+     "")				; not Meadow
+   ))
 
 (defvar gnus-article-reply nil)
 (defmacro gnus-setup-message (config &rest forms)
