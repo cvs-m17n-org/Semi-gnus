@@ -1,3 +1,9 @@
+2002-04-18   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-draft.el (gnus-group-send-queue): Pass group and
+	interactive as the arguments of gnus-draft-send.
+	(gnus-draft-send): Don't give "nndraft:queue" special treatment.
+
 2002-04-17   Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/gnus-delay.el (gnus-delay-article): Use `message-save-drafts'

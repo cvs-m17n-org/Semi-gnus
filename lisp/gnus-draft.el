@@ -135,12 +135,9 @@
   (let ((message-syntax-checks (if interactive message-syntax-checks
 				 'dont-check-for-anything-just-trust-me))
 	(message-inhibit-body-encoding (or (not group)
-					   (equal group "nndraft:queue")
 					   message-inhibit-body-encoding))
-	(message-send-hook (and group (not (equal group "nndraft:queue"))
-				message-send-hook))
-	(message-setup-hook (and group (not (equal group "nndraft:queue"))
-				 message-setup-hook))
+	(message-send-hook (and group message-send-hook))
+	(message-setup-hook (and group message-setup-hook))
 	type method)
     (gnus-draft-setup-for-editing article (or group "nndraft:queue"))
     ;; We read the meta-information that says how and where
@@ -194,7 +191,7 @@
 	  (let ((message-sending-message
 		 (format "Sending message %d of %d..."
 			 (- total (length articles)) total)))
-	    (gnus-draft-send article)))))))
+	    (gnus-draft-send article "nndraft:queue" t)))))))
 
 ;;;###autoload
 (defun gnus-draft-reminder ()
