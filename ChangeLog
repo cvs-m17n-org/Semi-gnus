@@ -1,5 +1,10 @@
 1999-12-14  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/imap.el (imap-base64-encode-string): Use `static-if' instead
+	of `static-condition-case'.
+
+1999-12-14  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 11.
 
 	* lisp/imap.el (imap-base64-encode-string): Allow the optional 2nd
