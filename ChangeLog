@@ -1,3 +1,33 @@
+1998-12-01  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.11.1.
+	(gnus-version): Change required SEMI/FLIM version.
+
+	* lisp/smtp.el: Use smtp.el in FLIM package.
+
+	* lisp/smtpmail.el: Use smtpmail.el in FLIM package.
+
+	* Syncup with chao-gnus-6_12
+
+* 1998-11-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el: Sync with Gnus 5.6.45.
+
+* 1998-07-03  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-send-mail-with-smtp): Require 'smtp.
+
+* 1998-06-18  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-send-mail-with-smtp): New
+	implementation.
+
+* 1998-11-13  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (nnheader-decode-subject): Use field-decoder
+	for `nov' mode.
+	(nnheader-decode-from): Likewise.
+
 1998-11-25  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/nnmail.el (nnmail-move-inbox): Fix bug. (Could not use
