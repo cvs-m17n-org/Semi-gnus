@@ -54,6 +54,12 @@ These parameters are generated in Content-Disposition header if exists."
   :type '(repeat (symbol :tag "Parameter"))
   :group 'message)
 
+(defcustom mml-insert-mime-headers-always nil
+  "If non-nil, always put Content-Type: text/plain at top of empty parts.
+It is necessary to work against a bug in certain clients."
+  :type 'boolean
+  :group 'message)
+
 (defvar mml-tweak-type-alist nil
   "A list of (TYPE . FUNCTION) for tweaking MML parts.
 TYPE is a string containing a regexp to match the MIME type.  FUNCTION
@@ -70,7 +76,7 @@ handle to tweak the part.")
 (defvar mml-tweak-sexp-alist
   '((mml-externalize-attachments . mml-tweak-externalize-attachments))
   "A list of (SEXP . FUNCTION) for tweaking MML parts.
-SEXP is a s-expression. If the evaluation of SEXP is non-nil, FUNCTION
+SEXP is an s-expression.  If the evaluation of SEXP is non-nil, FUNCTION
 is called.  FUNCTION is a Lisp function which is called with the MML
 handle to tweak the part.")
 
@@ -210,12 +216,12 @@ one charsets.")
 	  (if (or (memq 'unknown-encoding mml-confirmation-set)
 		  (message-options-get 'unknown-encoding)
 		  (and (y-or-n-p "\
-Message contains characters with unknown encoding.  Really send?")
+Message contains characters with unknown encoding.  Really send? ")
 		       (message-options-set 'unknown-encoding t)))
 	      (if (setq use-ascii
 			(or (memq 'use-ascii mml-confirmation-set)
 			    (message-options-get 'use-ascii)
-			    (and (y-or-n-p "Use ASCII as charset?")
+			    (and (y-or-n-p "Use ASCII as charset? ")
 				 (message-options-set 'use-ascii t))))
 		  (setq charsets (delq nil charsets))
 		(setq warn nil))
@@ -424,8 +430,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 				       (+ (match-beginning 0) 3))))))
 		  (cond
 		   ((eq (car cont) 'mml)
-		    (let ((mml-boundary (funcall mml-boundary-function
-						 (incf mml-multipart-number)))
+		    (let ((mml-boundary (mml-compute-boundary cont))
 			  (mml-generate-default-type "text/plain"))
 		      (mml-to-mime))
 		    (let ((mm-7bit-chars (concat mm-7bit-chars "\x1b")))
@@ -524,8 +529,11 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	      (funcall (cdr handler) cont)
 	    ;; No specific handler.  Use default one.
 	    (let ((mml-boundary (mml-compute-boundary cont)))
-	      (insert (format "Content-Type: multipart/%s; boundary=\"%s\"\n"
-			      type mml-boundary))
+	      (insert (format "Content-Type: multipart/%s; boundary=\"%s\""
+			      type mml-boundary)
+		      (if (cdr (assq 'start cont))
+			  (format "; start=\"%s\"\n" (cdr (assq 'start cont)))
+			"\n"))
 	      (let ((cont cont) part)
 		(while (setq part (pop cont))
 		  ;; Skip `multipart' and attributes.
@@ -601,17 +609,18 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	  mml-base-boundary))
 
 (defun mml-insert-mime-headers (cont type charset encoding flowed)
-  (let (parameters disposition description)
+  (let (parameters id disposition description)
     (setq parameters
 	  (mml-parameter-string
 	   cont mml-content-type-parameters))
     (when (or charset
 	      parameters
 	      flowed
-	      (not (equal type mml-generate-default-type)))
+	      (not (equal type mml-generate-default-type))
+	      mml-insert-mime-headers-always)
       (when (consp charset)
 	(error
-	 "Can't encode a part with several charsets."))
+	 "Can't encode a part with several charsets"))
       (insert "Content-Type: " type)
       (when charset
 	(insert "; " (mail-header-encode-parameter
@@ -622,6 +631,8 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	(mml-insert-parameter-string
 	 cont mml-content-type-parameters))
       (insert "\n"))
+    (when (setq id (cdr (assq 'id cont)))
+      (insert "Content-ID: " id "\n"))
     (setq parameters
 	  (mml-parameter-string
 	   cont mml-content-disposition-parameters))
@@ -748,10 +759,12 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
       (insert "<#/multipart>\n"))
      (textp
       (let ((charset (mail-content-type-get
-		      (mm-handle-type handle) 'charset)))
+		      (mm-handle-type handle) 'charset))
+	    (start (point)))
 	(if (eq charset 'gnus-decoded)
 	    (mm-insert-part handle)
-	  (insert (mm-decode-string (mm-get-part handle) charset))))
+	  (insert (mm-decode-string (mm-get-part handle) charset)))
+	(mml-quote-region start (point)))
       (goto-char (point-max)))
      (t
       (insert "<#/part>\n")))))
@@ -759,8 +772,12 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
 (defun mml-insert-mml-markup (handle &optional buffer nofile mmlp)
   "Take a MIME handle and insert an MML tag."
   (if (stringp (car handle))
-      (insert "<#multipart type=" (mm-handle-media-subtype handle)
-	      ">\n")
+      (progn
+	(insert "<#multipart type=" (mm-handle-media-subtype handle))
+	(let ((start (mm-handle-multipart-ctl-parameter handle 'start)))
+	  (when start
+	    (insert " start=\"" start "\"")))
+	(insert ">\n"))
     (if mmlp
 	(insert "<#mml type=" (mm-handle-media-type handle))
       (insert "<#part type=" (mm-handle-media-type handle)))
@@ -768,6 +785,8 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
 			  (cdr (mm-handle-disposition handle))))
       (unless (symbolp (cdr elem))
 	(insert " " (symbol-name (car elem)) "=\"" (cdr elem) "\"")))
+    (when (mm-handle-id handle)
+      (insert " id=\"" (mm-handle-id handle) "\""))
     (when (mm-handle-disposition handle)
       (insert " disposition=" (car (mm-handle-disposition handle))))
     (when buffer
@@ -916,6 +935,19 @@ See Info node `(emacs-mime)Composing'.
       (setq description nil))
     description))
 
+(defun mml-minibuffer-read-disposition (type &optional default)
+  (let* ((default (or default
+		      (if (string-match "^text/.*" type)
+			  "inline"
+			"attachment")))
+	 (disposition (completing-read "Disposition: "
+				       '(("attachment") ("inline") (""))
+				       nil
+				       nil)))
+    (if (not (equal disposition ""))
+	disposition
+      default)))
+
 (defun mml-quote-region (beg end)
   "Quote the MML tags in the region."
   (interactive "r")
@@ -958,7 +990,7 @@ See Info node `(emacs-mime)Composing'.
 
 ;;; Attachment functions.
 
-(defun mml-attach-file (file &optional type description)
+(defun mml-attach-file (file &optional type description disposition)
   "Attach a file to the outgoing MIME message.
 The file is not inserted or encoded until you send the message with
 `\\[message-send-and-exit]' or `\\[message-send]'.
@@ -969,10 +1001,14 @@ description of the attachment."
   (interactive
    (let* ((file (mml-minibuffer-read-file "Attach file: "))
 	  (type (mml-minibuffer-read-type file))
-	  (description (mml-minibuffer-read-description)))
-     (list file type description)))
-  (mml-insert-empty-tag 'part 'type type 'filename file
-			'disposition "attachment" 'description description))
+	  (description (mml-minibuffer-read-description))
+	  (disposition (mml-minibuffer-read-disposition type)))
+     (list file type description disposition)))
+  (mml-insert-empty-tag 'part
+			'type type
+			'filename file
+			'disposition (or disposition "attachment")
+			'description description))
 
 (defun mml-attach-buffer (buffer &optional type description)
   "Attach a buffer to the outgoing MIME message.
@@ -1041,6 +1077,8 @@ If RAW, don't highlight the article."
       (switch-to-buffer (generate-new-buffer
 			 (concat (if raw "*Raw MIME preview of "
 				   "*MIME preview of ") (buffer-name))))
+      (when (boundp 'gnus-buffers)
+	(push (current-buffer) gnus-buffers))
       (erase-buffer)
       (insert-buffer-substring buf)
       (mml-preview-insert-mail-followup-to)

@@ -1,7 +1,7 @@
 README.branch --- description of branches and tags. (DRAFT)
 ========================================================================
 
-Semi-gnus revision tree (2002-10-09)
+Semi-gnus revision tree (2003-05-02)
 
     vendor      personal    main trunk      public
     branch      branches                    branches
@@ -39,14 +39,26 @@ qGnus 0.??  ------> Semi-gnus 6.0.0
        :     V    V             :               :               |
        :  t-gnus-6_15-quimby<---<-----(t-gnus-6_14-quimby)<-----+
        :          |             :               :               |
-       :          :             :               | feedback      |
-       :                        :               +<--------------+
-       :                        :               |               |
-       :        akr      <--  6.2.3             :            t-gnus-6_15
-       :        shuhei-k <--  6.3.1                          (for FLIM 1.14,
-Gnus 5.6.11 ------>           6.3.3                           develop)
-       :                      6.4.0 (for SEMI 1.5)              |
-       :                      (6.4.?)------> for SEMI 1.5       :
+       :          |             :               | feedback      |
+       :          |             : (Gnus 5.8.8)->+<--------------+
+       :          |             :               |               |
+       :          |             :               |            t-gnus-6_15
+       :          +------------->--------------->----------> (for FLIM 1.14,
+       :                        :               |             develop)
+       :                        :               | feedback      |
+       :                        :  (Gnus 5.10)->+<--------------+
+       :                        :              /|\
+       :          +------------->-------------- | ------------- +
+       :          |             :               :               |
+       :  t-gnus-6_16-quimby    :               :               V
+       :          |             :               :            t-gnus-6_16
+       :          +------------->--------------->----------> (for FLIM 1.14,
+       :                        :               :             develop)
+       :        akr      <--  6.2.3             :               |
+       :        shuhei-k <--  6.3.1                             :
+Gnus 5.6.11 ------>           6.3.3
+       :                      6.4.0 (for SEMI 1.5)
+       :                      (6.4.?)------> for SEMI 1.5
        :                        |    \
        :                        |     \
 (Synch with original Gnus       |      ---> for SEMI 1.6
@@ -135,7 +147,8 @@ Public Branches
 	t-gnus-6_13	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
 	t-gnus-6_14	T-gnus for SEMI 1.13, FLIM 1.13 API (develop)
 	t-gnus-6_15	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
-     t-gnus-6_15-quimby	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
+	t-gnus-6_16	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
+     t-gnus-6_16-quimby	T-gnus for SEMI 1.14, FLIM 1.14 API (develop)
 
     Note: T-gnus versions 6.15 based on Oort Gnus v0.03 and earlier
           had supported SEMI 1.13 and FLIM 1.13 as well.

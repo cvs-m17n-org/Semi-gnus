@@ -358,9 +358,9 @@ If NOT-ALL, don't pack ticked articles."
     (gnus-make-directory dir)
     (setq gnus-soup-areas nil)
     (gnus-message 4 "Packing %s..." packer)
-    (if (zerop (call-process shell-file-name
-			     nil nil nil shell-command-switch
-			     (concat "cd " dir " ; " packer)))
+    (if (eq 0 (call-process shell-file-name
+			    nil nil nil shell-command-switch
+			    (concat "cd " dir " ; " packer)))
 	(progn
 	  (call-process shell-file-name nil nil nil shell-command-switch
 			(concat "cd " dir " ; rm " files))
@@ -497,10 +497,10 @@ Return whether the unpacking was successful."
   (gnus-make-directory dir)
   (gnus-message 4 "Unpacking: %s" (format unpacker packet))
   (prog1
-      (zerop (call-process
-	      shell-file-name nil nil nil shell-command-switch
-	      (format "cd %s ; %s" (expand-file-name dir)
-		      (format unpacker packet))))
+      (eq 0 (call-process
+	     shell-file-name nil nil nil shell-command-switch
+	     (format "cd %s ; %s" (expand-file-name dir)
+		     (format unpacker packet))))
     (gnus-message 4 "Unpacking...done")))
 
 (defun gnus-soup-send-packet (packet)
@@ -550,7 +550,7 @@ Return whether the unpacking was successful."
 		(sit-for 1)
 		(let ((message-syntax-checks
 		       'dont-check-for-anything-just-trust-me)
-		      (method (if (message-functionp message-post-method)
+		      (method (if (functionp message-post-method)
 				  (funcall message-post-method)
 				message-post-method))
 		      result)

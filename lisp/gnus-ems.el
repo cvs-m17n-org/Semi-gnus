@@ -46,12 +46,17 @@
 (eval-and-compile
   (autoload 'gnus-xmas-define "gnus-xmas")
   (autoload 'gnus-xmas-redefine "gnus-xmas")
-  (autoload 'appt-select-lowest-window "appt"))
+  (autoload 'appt-select-lowest-window "appt")
+  (autoload 'gnus-get-buffer-create "gnus")
+  (autoload 'nnheader-find-etc-directory "nnheader"))
 
 (if (or (featurep 'xemacs)
 	(>= emacs-major-version 21))
     (autoload 'smiley-region "smiley")
   (autoload 'smiley-region "smiley-mule"))
+
+;; Fixme: shouldn't require message
+(autoload 'message-text-with-property "message")
 
 (defun gnus-kill-all-overlays ()
   "Delete all overlays in the current buffer."
@@ -75,16 +80,19 @@
     (defvar gnus-mouse-face-prop 'mouse-face
       "Property used for highlighting mouse regions.")))
 
-(defvar gnus-tmp-unread)
-(defvar gnus-tmp-replied)
-(defvar gnus-tmp-score-char)
-(defvar gnus-tmp-indentation)
-(defvar gnus-tmp-opening-bracket)
-(defvar gnus-tmp-lines)
-(defvar gnus-tmp-name)
-(defvar gnus-tmp-closing-bracket)
-(defvar gnus-tmp-subject-or-nil)
-(defvar gnus-check-before-posting)
+(eval-when-compile
+  (defvar gnus-tmp-unread)
+  (defvar gnus-tmp-replied)
+  (defvar gnus-tmp-score-char)
+  (defvar gnus-tmp-indentation)
+  (defvar gnus-tmp-opening-bracket)
+  (defvar gnus-tmp-lines)
+  (defvar gnus-tmp-name)
+  (defvar gnus-tmp-closing-bracket)
+  (defvar gnus-tmp-subject-or-nil)
+  (defvar gnus-check-before-posting)
+  (defvar gnus-mouse-face)
+  (defvar gnus-group-buffer))
 
 (defun gnus-ems-redefine ()
   (cond
@@ -225,16 +233,20 @@
       (setq props (plist-put props :background (face-background face))))
     (apply 'create-image file type data-p props)))
 
-(defun gnus-put-image (glyph &optional string)
-  (insert-image glyph (or string " "))
-  (unless string
-    (put-text-property (1- (point)) (point)
-		       'gnus-image-text-deletable t))
-  glyph)
+(defun gnus-put-image (glyph &optional string category)
+  (let ((point (point)))
+    (insert-image glyph (or string " "))
+    (put-text-property point (point) 'gnus-image-category category)
+    (unless string
+      (put-text-property (1- (point)) (point)
+			 'gnus-image-text-deletable t))
+    glyph))
 
-(defun gnus-remove-image (image)
+(defun gnus-remove-image (image &optional category)
   (dolist (position (message-text-with-property 'display))
-    (when (equal (get-text-property position 'display) image)
+    (when (and (equal (get-text-property position 'display) image)
+	       (equal (get-text-property position 'gnus-image-category)
+		      category))
       (put-text-property position (1+ position) 'display nil)
       (when (get-text-property position 'gnus-image-text-deletable)
 	(delete-region position (1+ position))))))

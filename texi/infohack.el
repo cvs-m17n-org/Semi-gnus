@@ -25,10 +25,11 @@
 
 ;;; Code:
 
-(let ((default-directory (expand-file-name "../lisp/"))
-      (features (cons 'w3-forms (copy-sequence features))))
+(let ((default-directory (expand-file-name "../lisp/")))
   ;; Adjust `load-path' for APEL.
-  (load-file "dgnushack.el"))
+  (load-file "dgnushack.el")
+  ;; Replace "./" with "../lisp/" in `load-path'.
+  (setq load-path (mapcar 'expand-file-name load-path)))
 (load-file (expand-file-name "ptexinfmt.el" "./"))
 
 (defun infohack-remove-unsupported ()
@@ -90,6 +91,8 @@ Both characters must have the same length of multi-byte form."
   (setq command-line-args-left nil))
 
 
+(require 'bytecomp)
+
 (defun infohack-texi-format (file &optional addsuffix)
   (let ((auto-save-default nil)
 	(find-file-run-dired nil)
@@ -104,22 +107,6 @@ Both characters must have the same length of multi-byte form."
 	  (if (boundp 'MULE)
 	      (setq output-coding-system file-coding-system)
 	    (setq coding-system-for-write buffer-file-coding-system))
-	  ;; Remove ignored areas first.
-	  (while (re-search-forward "^@ignore[\t\r ]*$" nil t)
-	    (delete-region (match-beginning 0)
-			   (if (re-search-forward
-				"^@end[\t ]+ignore[\t\r ]*$" nil t)
-			       (1+ (match-end 0))
-			     (point-max))))
-	  (infohack-remove-unsupported)
-	  (goto-char (point-min))
-	  ;; Add suffix if it is needed.
-	  (when (and addsuffix
-		     (re-search-forward "^@setfilename[\t ]+\\([^\t\n ]+\\)"
-					nil t)
-		     (not (string-match "\\.info$" (match-string 1))))
-	    (insert ".info")
-	    (goto-char (point-min)))
 	  ;; process @include before updating node
 	  ;; This might produce some problem if we use @lowersection or
 	  ;; such.
@@ -152,11 +139,47 @@ Both characters must have the same length of multi-byte form."
 			  (delete-region (point) (save-excursion
 						   (forward-line 1)
 						   (point))))))))))
+	  ;; Remove ignored areas.
+	  (goto-char (point-min))
+	  (while (re-search-forward "^@ignore[\t\r ]*$" nil t)
+	    (delete-region (match-beginning 0)
+			   (if (re-search-forward
+				"^@end[\t ]+ignore[\t\r ]*$" nil t)
+			       (1+ (match-end 0))
+			     (point-max))))
+	  ;; Remove unsupported commands.
+	  (infohack-remove-unsupported)
+	  ;; Add suffix if it is needed.
+	  (goto-char (point-min))
+	  (when (and addsuffix
+		     (re-search-forward "^@setfilename[\t ]+\\([^\t\n ]+\\)"
+					nil t)
+		     (not (string-match "\\.info$" (match-string 1))))
+	    (insert ".info"))
 	  (texinfo-mode)
 	  (texinfo-every-node-update)
 	  (set-buffer-modified-p nil)
 	  (message "texinfo formatting %s..." file)
-	  (texinfo-format-buffer nil)
+	  (if (featurep 'mule)
+	      ;; Encode messages to terminal.
+	      (let ((si:message (symbol-function 'message)))
+		(fset 'message
+		      (byte-compile
+		       (if (boundp 'MULE)
+			   `(lambda (fmt &rest args)
+			      (funcall ,si:message "%s"
+				       (code-convert-string
+					(apply 'format fmt args)
+					'*internal* '*junet*)))
+			 `(lambda (fmt &rest args)
+			    (funcall ,si:message "%s"
+				     (encode-coding-string
+				      (apply 'format fmt args)
+				      'iso-2022-7bit))))))
+		(unwind-protect
+		    (texinfo-format-buffer nil)
+		  (fset 'message si:message)))
+	    (texinfo-format-buffer nil))
 	  (if (buffer-modified-p)
 	      (progn (message "Saving modified %s" (buffer-file-name))
 		     (save-buffer))))

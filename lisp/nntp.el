@@ -175,8 +175,8 @@ If non-nil, there will be no prompt for a login name.")
 This variable is used by the `nntp-open-via-telnet-and-telnet' method.")
 
 (defvoo nntp-large-newsgroup 50
-  "*The number of the articles which indicates a large newsgroup.
-If the number of the articles is greater than the value, verbose
+  "*The number of articles which indicates a large newsgroup.
+If the number of articles is greater than the value, verbose
 messages will be shown to indicate the current status.")
 
 (defvoo nntp-maximum-request 400
@@ -475,8 +475,7 @@ be restored and the command retried."
 	      (goto-char pos)
 	      (if (looking-at (regexp-quote command))
 		  (delete-region pos (progn (forward-line 1)
-					    (gnus-point-at-bol))))
-	      )))
+					    (gnus-point-at-bol)))))))
       (nnheader-report 'nntp "Couldn't open connection to %s."
 		       nntp-address))))
 
@@ -1208,6 +1207,10 @@ password contained in '~/.nntp-authinfo'."
   (open-network-stream-as-binary
    "nntpd" buffer nntp-address nntp-port-number))
 
+(autoload 'format-spec "format")
+(autoload 'format-spec-make "format")
+(autoload 'open-tls-stream "tls")
+
 (defun nntp-open-ssl-stream (buffer)
   (let* ((process-connection-type nil)
 	 (proc (as-binary-process
@@ -1487,8 +1490,7 @@ password contained in '~/.nntp-authinfo'."
 	  in-process-buffer-p
 	  (buf nntp-server-buffer)
 	  (process-buffer (nntp-find-connection-buffer nntp-server-buffer))
-	  first
-          last)
+	  first last status)
       ;; We have to check `nntp-server-xover'.  If it gets set to nil,
       ;; that means that the server does not understand XOVER, but we
       ;; won't know that until we try.
@@ -1522,15 +1524,22 @@ password contained in '~/.nntp-authinfo'."
 	    (while (progn
 		     (goto-char (or last-point (point-min)))
 		     ;; Count replies.
-		     (while (re-search-forward "^[0-9][0-9][0-9] .*\n" nil t)
-		       (incf received))
+		     (while (re-search-forward "^\\([0-9][0-9][0-9]\\) .*\n"
+					       nil t)
+		       (incf received)
+		       (setq status (match-string 1))
+		       (if (string-match "^[45]" status)
+			   (setq status 'error)
+			 (setq status 'ok)))
 		     (setq last-point (point))
 		     (or (< received count)
-			 ;; I haven't started reading the final response
-                         (progn
-                           (goto-char (point-max))
-                           (forward-line -1)
-                           (not (looking-at "^\\.\r?\n")))))
+			 (if (eq status 'error)
+			     nil
+			   ;; I haven't started reading the final response
+			   (progn
+			     (goto-char (point-max))
+			     (forward-line -1)
+			     (not (looking-at "^\\.\r?\n"))))))
 	      ;; I haven't read the end of the final response
 	      (nntp-accept-response)
 	      (set-buffer process-buffer))))

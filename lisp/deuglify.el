@@ -204,7 +204,7 @@
 ;; Renamed `gnus-outlook-deuglify-article' to
 ;; `gnus-article-outlook-deuglify-article'.
 ;; Made it easier to deuglify the article while being in Gnus' Article
-;; Edit Mode. (suggested by Phil Nitschke)
+;; Edit Mode.  (suggested by Phil Nitschke)
 ;;
 ;;
 ;; Revision 1.3  2002/01/02 23:35:54  rscholz
@@ -235,13 +235,13 @@
 ;;;###autoload
 (defcustom gnus-outlook-deuglify-unwrap-min 45
   "Minimum length of the cited line above the (possibly) wrapped line."
-  :type 'number
+  :type 'integer
   :group 'gnus-outlook-deuglify)
 
 ;;;###autoload
 (defcustom gnus-outlook-deuglify-unwrap-max 95
   "Maximum length of the cited line after unwrapping."
-  :type 'number
+  :type 'integer
   :group 'gnus-outlook-deuglify)
 
 (defcustom gnus-outlook-deuglify-cite-marks ">|#%"
@@ -251,7 +251,8 @@
 
 (defcustom gnus-outlook-deuglify-unwrap-stop-chars nil ;; ".?!" or nil
   "Characters that inhibit unwrapping if they are the last one on the cited line above the possible wrapped line."
-  :type 'string
+  :type '(radio (const :format "None  " nil)
+		(string :size 0 :value ".?!"))
   :group 'gnus-outlook-deuglify)
 
 (defcustom gnus-outlook-deuglify-no-wrap-chars "`"
@@ -300,10 +301,10 @@ It is run after `gnus-article-prepare-hook'."
 
 ;;;###autoload
 (defun gnus-article-outlook-unwrap-lines (&optional nodisplay)
-  "Unwrap lines that appear to be wrapped citation lines.  
+  "Unwrap lines that appear to be wrapped citation lines.
 You can control what lines will be unwrapped by frobbing
 `gnus-outlook-deuglify-unwrap-min' and `gnus-outlook-deuglify-unwrap-max',
-indicating the miminum and maximum length of an unwrapped citation line.  If
+indicating the minimum and maximum length of an unwrapped citation line.  If
 NODISPLAY is non-nil, don't redisplay the article buffer."
   (interactive "P")
   (save-excursion
@@ -330,7 +331,7 @@ NODISPLAY is non-nil, don't redisplay the article buffer."
   (unless nodisplay (gnus-outlook-display-article-buffer)))
 
 (defun gnus-outlook-rearrange-article (attr-start)
-  "Put the text from `attr-start' to the end of buffer at the top of the article buffer."
+  "Put the text from ATTR-START to the end of buffer at the top of the article buffer."
   (save-excursion
     (let ((inhibit-read-only t)
 	  (cite-marks gnus-outlook-deuglify-cite-marks))

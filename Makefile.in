@@ -60,22 +60,20 @@ install-info-ja:
 ## Rule for XEmacs package.
 install-package: \
 	xclever-package \
-	compose-package \
 	remove-extra-files-in-package \
 	install-package-lisp \
 	install-package-info install-package-manifest
 
 install-package-ja: \
 	xclever-package \
-	compose-package \
 	remove-extra-files-in-package \
 	install-package-lisp \
 	install-package-info install-package-info-ja \
 	install-package-manifest
 
-package: xlick-package xinfo compose-package
+package: xlick-package xinfo
 
-package-ja: xlick-package xinfo xinfo-ja compose-package
+package-ja: xlick-package xinfo xinfo-ja
 
 # Sub-rule for XEmacs package.
 install-package-lisp:
@@ -138,10 +136,6 @@ remove-extra-files-in-package:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR=$$package_dir \
 		lispdir="$(PACKAGEDIR)/lisp/$(GNUS_PRODUCT_NAME)" \
 		remove-extra-files-in-package
-
-compose-package:
-	cd lisp && $(MAKE) EMACS="$(XEMACS)" \
-	lispdir="$(PACKAGEDIR)/lisp/$(GNUS_PRODUCT_NAME)" compose-package
 ##
 
 xclever:

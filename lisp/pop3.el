@@ -225,6 +225,9 @@ Argument PORT specifies connecting port."
 			 (+ 1 (or (string-match ">" response) -1)))))
       process)))
 
+(eval-when-compile
+  (autoload 'open-ssl-stream "ssl"))
+
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
   (require 'ssl)
   (let* ((ssl-program-name
@@ -293,7 +296,8 @@ Return the response string if optional second argument RETURN is non-nil."
     (save-excursion
       (set-buffer (process-buffer process))
       (goto-char pop3-read-point)
-      (while (not (search-forward "\r\n" nil t))
+      (while (and (memq (process-status process) '(open run))
+		  (not (search-forward "\r\n" nil t)))
 	(nnheader-accept-process-output process)
 	(goto-char pop3-read-point))
       (setq match-end (point))
@@ -511,18 +515,16 @@ If NOW, use that time instead."
 ;; tree, `md5' might have been defined in w3/md5.el, ./lpath.el or one
 ;; of some other libraries and `md5' will accept only 3 arguments.  We
 ;; will deceive the byte-compiler not to say warnings.
-(eval-and-compile
-  (if (fboundp 'eval-when)
-      ;; `eval-when' might not be provided when loading .el file.
-      (eval-when 'compile
-	(let ((def (assq 'md5 byte-compile-function-environment)))
-	  (if def
-	      (setcdr def '(lambda (object &optional start end
-					   coding-system noerror)))
-	    (setq byte-compile-function-environment
-		  (cons '(md5 . (lambda (object &optional start end
-						coding-system noerror)))
-			byte-compile-function-environment)))))))
+(eval-when-compile
+  (if (boundp 'byte-compile-function-environment)
+      (let ((def (assq 'md5 byte-compile-function-environment)))
+	(if def
+	    (setcdr def '(lambda (object &optional start end
+					 coding-system noerror)))
+	  (setq byte-compile-function-environment
+		(cons '(md5 . (lambda (object &optional start end
+					      coding-system noerror)))
+		      byte-compile-function-environment))))))
 
 ;; Note that `pop3-md5' should never encode a given string to use for
 ;; the apop authentication.
@@ -705,6 +707,7 @@ If msgno is invalid, return nil.  Otherwise, return a string."
     (set-buffer (process-buffer process))
     (goto-char start)
     (while (not (re-search-forward "^\\.\r\n" nil t))
+      ;; Fixme: Shouldn't depend on nnheader.
       (nnheader-accept-process-output process)
       (goto-char start))
     (setq pop3-read-point (point-marker))

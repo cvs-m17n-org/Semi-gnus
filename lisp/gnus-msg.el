@@ -1,5 +1,5 @@
 ;;; gnus-msg.el --- mail and post interface for Semi-gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -274,7 +274,7 @@ See also the `mml-default-encrypt-method' variable."
 
 (defcustom gnus-message-replysignencrypted
   t
-  "Setting this causes automatically encryped messages to also be signed."
+  "Setting this causes automatically encrypted messages to also be signed."
   :group 'gnus-message
   :type 'boolean)
 
@@ -307,24 +307,6 @@ If nil, the address field will always be empty after invoking
 `gnus-summary-resend-message'."
   :group 'gnus-message
   :type 'boolean)
-
-(defcustom gnus-user-agent 'emacs-gnus-type
-  "Which information should be exposed in the User-Agent header.
-
-It can be one of the symbols `gnus' \(show only Gnus version\), `emacs-gnus'
-\(show only Emacs and Gnus versions\), `emacs-gnus-config' \(same as
-`emacs-gnus' plus system configuration\), `emacs-gnus-type' \(same as
-`emacs-gnus' plus system type\) or a custom string.  If you set it to a
-string, be sure to use a valid format, see RFC 2616."
-  :group 'gnus-message
-  :type '(choice
-	  (item :tag "Show Gnus and Emacs versions and system type"
-		emacs-gnus-type)
-	  (item :tag "Show Gnus and Emacs versions and system configuration"
-		emacs-gnus-config)
-	  (item :tag "Show Gnus and Emacs versions" emacs-gnus)
-	  (item :tag "Show only Gnus version" gnus)
-	  (string :tag "Other")))
 
 ;;; Internal variables.
 
@@ -559,14 +541,16 @@ Gcc: header for archiving purposes."
   (setq message-post-method
 	`(lambda (arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
-  (setq message-user-agent (gnus-extended-version))
+  (setq message-user-agent (gnus-message-make-user-agent))
   (unless message-use-multi-frames
     (message-add-action
      `(if (gnus-buffer-exists-p ,buffer)
 	  (set-window-configuration ,winconf))
      'exit 'postpone 'kill))
   (let ((to-be-marked (cond
-		       (yanked yanked)
+		       (yanked
+			(mapcar
+			 (lambda (x) (if (listp x) (car x) x)) yanked))
 		       (article (if (listp article) article (list article)))
 		       (t nil))))
     (message-add-action
@@ -618,7 +602,7 @@ If ARG is 1, prompt for group name to post to.
 
 This function prepares a news even when using mail groups.  This is useful
 for posting messages to mail groups without actually sending them over the
-network.  The corresponding backend must have a 'request-post method."
+network.  The corresponding back end must have a 'request-post method."
   (interactive "P")
   ;; We can't `let' gnus-newsgroup-name here, since that leads
   ;; to local variables leaking.
@@ -697,7 +681,7 @@ If ARG, don't do that.  If ARG is 1, prompt for group name to post to.
 
 This function prepares a news even when using mail groups.  This is useful
 for posting messages to mail groups without actually sending them over the
-network.  The corresponding backend must have a 'request-post method."
+network.  The corresponding back end must have a 'request-post method."
   (interactive "P")
   ;; We can't `let' gnus-newsgroup-name here, since that leads
   ;; to local variables leaking.
@@ -751,8 +735,7 @@ a news."
 If prefix argument YANK is non-nil, the original article is yanked
 automatically.
 YANK is a list of elements, where the car of each element is the
-article number, and the two following numbers is the region to be
-yanked."
+article number, and the cdr is the string to be yanked."
   (interactive
    (list (and current-prefix-arg
 	      (gnus-summary-work-articles 1))))
@@ -1122,17 +1105,23 @@ If SILENT, don't prompt the user."
      (t gnus-select-method))))
 
 
+;; Dummies to avoid byte-compile warning.
+(eval-when-compile
+  (defvar xemacs-codename))
+
 (defun gnus-message-make-user-agent (&optional include-mime-info max-column
 						 newline-product)
   "Return a user-agent info.  If INCLUDE-MIME-INFO is non-nil and the
 variable `mime-edit-user-agent-value' is bound, the value will be
-included in the return value.  If MAX-COLUMN is specified, the return
-value will be folded up as it were filled.  NEWLINE-PRODUCT specifies
-whether a newline should be inserted in front of each product-token.
-If the value is t or `hard', it works strictly.  Otherwise, if it is
-non-nil (e.g. `soft'), it works semi-strictly.
+included in the return value, and `gnus-user-agent' is ignored.  If
+MAX-COLUMN is specified, the return value will be folded up as it were
+filled.  NEWLINE-PRODUCT specifies whether a newline should be
+inserted in front of each product-token.  If the value is t or `hard',
+it works strictly.  Otherwise, if it is non-nil (e.g. `soft'), it
+works semi-strictly.
 
-Here is an example of how to use this function:
+Here is an odd example, which inserts a User-Agent: header when you
+begin to compose a message:
 
 \(add-hook 'gnus-message-setup-hook
 	  (lambda nil
@@ -1145,12 +1134,23 @@ Here is an example of how to use this function:
 			(gnus-message-make-user-agent t 76 'soft)
 			\"\\n\")))))
 "
-  (let ((user-agent (if (and include-mime-info
-			     (boundp 'mime-edit-user-agent-value))
-			(concat (gnus-extended-version)
-				" "
-				mime-edit-user-agent-value)
-		      (gnus-extended-version))))
+  (let ((gnus-v (gnus-extended-version))
+	user-agent)
+    (cond ((and include-mime-info
+		(boundp 'mime-edit-user-agent-value))
+	   (setq user-agent (concat gnus-v " " mime-edit-user-agent-value)))
+	  ((eq gnus-user-agent 'gnus-mime-edit)
+	   (setq user-agent
+		 (if (boundp 'mime-edit-user-agent-value)
+		     (concat gnus-v " " mime-edit-user-agent-value)
+		   gnus-v)))
+	  (t
+	   (setq user-agent (if (stringp gnus-user-agent)
+				gnus-user-agent
+			      (concat gnus-v
+				      (let ((emacs-v (gnus-emacs-version)))
+					(when emacs-v
+					  (concat " " emacs-v))))))))
     (when max-column
       (unless (natnump max-column)
 	(setq max-column 76))
@@ -1226,7 +1226,7 @@ If VERY-WIDE, make a very wide reply."
 	      (gnus-summary-work-articles 1))))
   ;; Allow user to require confirmation before replying by mail to the
   ;; author of a news article (or mail message).
-  (when (or 
+  (when (or
 	    (not (or (gnus-news-group-p gnus-newsgroup-name)
 		     gnus-confirm-treat-mail-like-news))
 	    (not (cond ((stringp gnus-confirm-mail-reply-to-news)
@@ -1494,8 +1494,8 @@ composing a new message."
 	(goto-char (point-max))
 	(insert mail-header-separator)
 	(goto-char (point-min))
-	(re-search-forward "^To:\\|^Newsgroups:" nil 'move)
-	(forward-char 1)
+	(when (re-search-forward "^To:\\|^Newsgroups:" nil 'move)
+	  (forward-char 1))
 	(widen)))))
 
 (defun gnus-summary-post-forward (&optional full-headers)
@@ -1591,7 +1591,7 @@ The current group name will be inserted at \"%s\".")
       ;; This mail group doesn't have a `to-list', so we add one
       ;; here.  Magic!
       (when (gnus-y-or-n-p
-	     (format "Do you want to add this as `to-list': %s " to-address))
+	     (format "Do you want to add this as `to-list': %s? " to-address))
 	(gnus-group-add-parameter group (cons 'to-list to-address))))))
 
 (defun gnus-put-message ()
@@ -1789,7 +1789,7 @@ The source file has to be in the Emacs load path."
 
 (defun gnus-summary-resend-bounced-mail (&optional fetch)
   "Re-mail the current message.
-This only makes sense if the current message is a bounce message than
+This only makes sense if the current message is a bounce message that
 contains some mail you have written which has been bounced back to
 you.
 If FETCH, try to fetch the article that this is a reply to, if indeed
@@ -1960,9 +1960,14 @@ this is a reply."
 		     (if (string-match " " gcc-self-val)
 			 (concat "\"" gcc-self-val "\"")
 		       gcc-self-val)
-		   (if (string-match " " group)
-		       (concat "\"" group "\"")
-		     group)))
+		   ;; In nndoc groups, we use the parent group name
+		   ;; instead of the current group.
+		   (let ((group (or (gnus-group-find-parameter
+				     gnus-newsgroup-name 'parent-group)
+				    group)))
+		     (if (string-match " " group)
+			 (concat "\"" group "\"")
+		       group))))
 		(if (not (eq gcc-self-val 'none))
 		    (insert "\n")
 		  (gnus-delete-line)))

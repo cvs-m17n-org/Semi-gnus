@@ -104,7 +104,7 @@
     (while (looking-at "^Content[^ ]+:") (forward-line))
     (unless (bobp)
       (delete-region (point-min) (point)))
-    (mm-with-unibyte-current-buffer-mule4
+    (mm-with-unibyte-current-buffer
       (with-temp-buffer
 	(setq cipher (current-buffer))
 	(insert-buffer-substring text)
@@ -178,7 +178,7 @@
     (while (looking-at "^Content[^ ]+:") (forward-line))
     (unless (bobp)
       (delete-region (point-min) (point)))
-    (mm-with-unibyte-current-buffer-mule4
+    (mm-with-unibyte-current-buffer
       (with-temp-buffer
 	(flet ((gpg-encrypt-func 
 		(sign plaintext ciphertext result recipients &optional
@@ -223,7 +223,7 @@
 (defvar pgg-errors-buffer)
 
 (defun mml1991-pgg-sign (cont)
-  (let (headers)
+  (let (headers cte)
     ;; Don't sign headers.
     (goto-char (point-min))
     (while (not (looking-at "^$"))
@@ -232,31 +232,39 @@
       (setq headers (buffer-substring (point-min) (point)))
       (forward-line) ;; skip header/body separator
       (delete-region (point-min) (point)))
-    (quoted-printable-decode-region (point-min) (point-max))
+    (when (string-match "^Content-Transfer-Encoding: \\(.+\\)" headers)
+      (setq cte (intern (match-string 1 headers))))
+    (mm-decode-content-transfer-encoding cte)
     (unless (let ((pgg-default-user-id
-		   (or (message-options-get 'message-sender)
+		   (or (message-options-get 'mml-sender)
 		       pgg-default-user-id)))
 	      (pgg-sign-region (point-min) (point-max) t))
       (pop-to-buffer pgg-errors-buffer)
       (error "Encrypt error"))
     (delete-region (point-min) (point-max))
-    (insert-buffer-substring pgg-output-buffer)
-    (goto-char (point-min))
-    (while (re-search-forward "\r+$" nil t)
-      (replace-match "" t t))
-    (quoted-printable-encode-region (point-min) (point-max))
-    (goto-char (point-min))
-    (if headers (insert headers))
-    (insert "\n")
+    (mm-with-unibyte-current-buffer
+      (insert-buffer-substring pgg-output-buffer)
+      (goto-char (point-min))
+      (while (re-search-forward "\r+$" nil t)
+	(replace-match "" t t))
+      (mm-encode-content-transfer-encoding cte)
+      (goto-char (point-min))
+      (when headers
+	(insert headers))
+      (insert "\n"))
     t))
 
 (defun mml1991-pgg-encrypt (cont &optional sign)
-  (let (headers)
+  (let (cte)
     ;; Strip MIME Content[^ ]: headers since it will be ASCII ARMOURED
     (goto-char (point-min))
-    (while (looking-at "^Content[^ ]+:") (forward-line))
+    (while (looking-at "^Content[^ ]+:")
+      (when (looking-at "^Content-Transfer-Encoding: \\(.+\\)")
+	(setq cte (intern (match-string 1))))
+      (forward-line))
     (unless (bobp)
       (delete-region (point-min) (point)))
+    (mm-decode-content-transfer-encoding cte)
     (unless (pgg-encrypt-region
 	     (point-min) (point-max) 
 	     (split-string

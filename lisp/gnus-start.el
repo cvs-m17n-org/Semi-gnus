@@ -36,6 +36,8 @@
 (require 'gnus-range)
 (require 'gnus-util)
 (autoload 'message-make-date "message")
+(autoload 'gnus-agent-read-servers-validate "gnus-agent")
+(autoload 'gnus-agent-possibly-alter-active "gnus-agent")
 
 (defcustom gnus-startup-file (nnheader-concat gnus-home-directory ".newsrc")
   "Your `.newsrc' file.
@@ -250,7 +252,12 @@ nil if you set this variable to nil.
 This variable can also be a regexp.  In that case, all groups that do
 not match this regexp will be removed before saving the list."
   :group 'gnus-newsrc
-  :type 'boolean)
+  :type '(radio (sexp :format "Non-nil\n"
+		      :match (lambda (widget value)
+			       (and value (not (stringp value))))
+		      :value t)
+		(const nil)
+		(regexp :format "%t: %v\n" :size 0)))
 
 (defcustom gnus-ignored-newsgroups
   (mapconcat 'identity
@@ -289,8 +296,8 @@ claim them."
 		(repeat function)))
 
 (defcustom gnus-subscribe-newsgroup-hooks nil
-  "*Hooks run after you subscribe to a new group. The hooks will be called
-with new group's name as argument."
+  "*Hooks run after you subscribe to a new group.
+The hooks will be called with new group's name as argument."
   :group 'gnus-group-new
   :type 'hook)
 
@@ -389,7 +396,7 @@ This hook is called as the first thing when Gnus is started."
   :group 'gnus-start
   :type 'hook)
 
-(defcustom gnus-setup-news-hook 
+(defcustom gnus-setup-news-hook
   '(gnus-fixup-nnimap-unread-after-getting-new-news)
   "A hook after reading the .newsrc file, but before generating the buffer."
   :group 'gnus-start
@@ -563,7 +570,7 @@ Can be used to turn version control on or off."
   (gnus-subscribe-newsgroup newsgroup))
 
 (defun gnus-subscribe-alphabetically (newgroup)
-  "Subscribe new NEWSGROUP and insert it in alphabetical order."
+  "Subscribe new NEWGROUP and insert it in alphabetical order."
   (let ((groups (cdr gnus-newsrc-alist))
 	before)
     (while (and (not before) groups)
@@ -573,7 +580,7 @@ Can be used to turn version control on or off."
     (gnus-subscribe-newsgroup newgroup before)))
 
 (defun gnus-subscribe-hierarchically (newgroup)
-  "Subscribe new NEWSGROUP and insert it in hierarchical newsgroup order."
+  "Subscribe new NEWGROUP and insert it in hierarchical newsgroup order."
   ;; Basic ideas by mike-w@cs.aukuni.ac.nz (Mike Williams)
   (save-excursion
     (set-buffer (nnheader-find-file-noselect gnus-current-startup-file))
@@ -676,6 +683,8 @@ the first newsgroup."
   ;; Clear other internal variables.
   (setq gnus-list-of-killed-groups nil
 	gnus-have-read-active-file nil
+        gnus-agent-covered-methods nil
+        gnus-server-method-cache nil
 	gnus-newsrc-alist nil
 	gnus-newsrc-hashtb nil
 	gnus-killed-list nil
@@ -972,6 +981,15 @@ If LEVEL is non-nil, the news will be set up at level LEVEL."
 	      (eq gnus-read-active-file 'some))
       (gnus-update-active-hashtb-from-killed))
 
+    ;; Validate agent covered methods now that gnus-server-alist has
+    ;; been initialized.
+    ;; NOTE: This is here for one purpose only.  By validating the
+    ;; agentized server's, it converts the old 5.10.3, and earlier,
+    ;; format to the current format.  That enables the agent code
+    ;; within gnus-read-active-file to function correctly.
+    (if gnus-agent
+        (gnus-agent-read-servers-validate))
+
     ;; Read the active file and create `gnus-active-hashtb'.
     ;; If `gnus-read-active-file' is nil, then we just create an empty
     ;; hash table.  The partial filling out of the hash table will be
@@ -1267,7 +1285,7 @@ for new groups, and subscribe the new groups as zombies."
 	  (gnus-message 7 "`A k' to list killed groups"))))))
 
 (defun gnus-subscribe-group (group &optional previous method)
-  "Subcribe GROUP and put it after PREVIOUS."
+  "Subscribe GROUP and put it after PREVIOUS."
   (gnus-group-change-level
    (if method
        (list t group gnus-level-default-subscribed nil nil method)
@@ -1515,6 +1533,7 @@ newsgroup."
 		    (zerop (cdr active))
 		    (gnus-active group))
 	       (gnus-active group)
+
 	     (gnus-set-active group active)
 	     ;; Return the new active info.
 	     active)))))
@@ -1534,6 +1553,12 @@ newsgroup."
       (when (and gnus-use-cache info)
 	(inline (gnus-cache-possibly-alter-active
 		 (gnus-info-group info) active)))
+
+      ;; If the agent is enabled, we may have to alter the active info.
+      (when (and gnus-agent info)
+	(gnus-agent-possibly-alter-active
+	 (gnus-info-group info) active))
+
       ;; Modify the list of read articles according to what articles
       ;; are available; then tally the unread articles and add the
       ;; number to the group hash table entry.
@@ -1620,7 +1645,10 @@ newsgroup."
 		  gnus-activate-foreign-newsgroups)
 		 (t 0))
 	   level))
-	 scanned-methods info group active method retrieve-groups)
+	 (methods-cache nil)
+	 (type-cache nil)
+	 scanned-methods info group active method retrieve-groups cmethod
+	 method-type)
     (gnus-message 6 "Checking new news...")
 
     (while newsrc
@@ -1639,12 +1667,25 @@ newsgroup."
       ;; nil for non-foreign groups that the user has requested not be checked
       ;; t for unchecked foreign groups or bogus groups, or groups that can't
       ;;   be checked, for one reason or other.
-      (if (and (setq method (gnus-info-method info))
-	       (not (inline
-		      (gnus-server-equal
-		       gnus-select-method
-		       (setq method (gnus-server-get-method nil method)))))
-	       (not (gnus-secondary-method-p method)))
+      (when (setq method (gnus-info-method info))
+	(if (setq cmethod (assoc method methods-cache))
+	    (setq method (cdr cmethod))
+	  (setq cmethod (inline (gnus-server-get-method nil method)))
+	  (push (cons method cmethod) methods-cache)
+	  (setq method cmethod)))
+      (when (and method
+		 (not (setq method-type (cdr (assoc method type-cache)))))
+	(setq method-type
+	      (cond
+	       ((gnus-secondary-method-p method)
+		'secondary)
+	       ((inline (gnus-server-equal gnus-select-method method))
+		'primary)
+	       (t
+		'foreign)))
+	(push (cons method method-type) type-cache))
+      (if (and method
+	       (eq method-type 'foreign))
 	  ;; These groups are foreign.  Check the level.
 	  (when (and (<= (gnus-info-level info) foreign-level)
 		     (setq active (gnus-activate-group group 'scan)))
@@ -1983,7 +2024,7 @@ newsgroup."
 	  (gnus-message 5 "%sdone" mesg)))))))
 
 (defun gnus-read-active-file-2 (groups method)
-  "Read an active file for GROUPS in METHOD using gnus-retrieve-groups."
+  "Read an active file for GROUPS in METHOD using `gnus-retrieve-groups'."
   (when groups
     (save-excursion
       (set-buffer nntp-server-buffer)
@@ -2715,16 +2756,21 @@ If FORCE is non-nil, the .newsrc file is read."
     (gnus-offer-save-summaries)
     (gnus-save-newsrc-file)))
 
-(defun gnus-gnus-to-quick-newsrc-format ()
-  "Print Gnus variables such as gnus-newsrc-alist in lisp format."
+(defun gnus-gnus-to-quick-newsrc-format (&optional minimal name &rest specific-variables)
+  "Print Gnus variables such as `gnus-newsrc-alist' in Lisp format."
     (princ ";; -*- emacs-lisp -*-\n")
-    (princ ";; Gnus startup file.\n")
-    (princ "\
+    (if name
+	(princ (format ";; %s\n" name))
+      (princ ";; Gnus startup file.\n"))
+
+    (unless minimal
+      (princ "\
 ;; Never delete this file -- if you want to force Gnus to read the
 ;; .newsrc file (if you have one), touch .newsrc instead.\n")
-    (princ "(setq gnus-newsrc-file-version ")
-    (princ (gnus-prin1-to-string gnus-version))
-    (princ ")\n")
+      (princ "(setq gnus-newsrc-file-version ")
+      (princ (gnus-prin1-to-string gnus-version))
+      (princ ")\n"))
+
     (let* ((print-quoted t)
            (print-readably t)
            (print-escape-multibyte nil)
@@ -2738,10 +2784,11 @@ If FORCE is non-nil, the .newsrc file is read."
 		(gnus-strip-killed-list)
 	      gnus-killed-list))
 	   (variables
-	    (if gnus-save-killed-list gnus-variable-list
-	      ;; Remove the `gnus-killed-list' from the list of variables
-	      ;; to be saved, if required.
-	      (delq 'gnus-killed-list (copy-sequence gnus-variable-list))))
+	    (or specific-variables
+		(if gnus-save-killed-list gnus-variable-list
+		  ;; Remove the `gnus-killed-list' from the list of variables
+		  ;; to be saved, if required.
+		  (delq 'gnus-killed-list (copy-sequence gnus-variable-list)))))
 	   ;; Peel off the "dummy" group.
 	   (gnus-newsrc-alist (cdr gnus-newsrc-alist))
 	   variable)
@@ -3061,7 +3108,7 @@ If FORCE is non-nil, the .newsrc file is read."
 
 ;;;###autoload
 (defun gnus-declare-backend (name &rest abilities)
-  "Declare backend NAME with ABILITIES as a Gnus backend."
+  "Declare back end NAME with ABILITIES as a Gnus back end."
   (setq gnus-valid-select-methods
 	(nconc gnus-valid-select-methods
 	       (list (apply 'list name abilities))))
@@ -3077,7 +3124,7 @@ If this variable is nil, don't do anything."
 	  default-directory)))
 
 (eval-and-compile
-(defalias 'gnus-display-time-event-handler 
+(defalias 'gnus-display-time-event-handler
   (if (gnus-boundp 'display-time-timer)
       'display-time-event-handler
     (lambda () "Does nothing as `display-time-timer' is not bound.

@@ -1329,23 +1329,23 @@ When called interactively, prompt for REGEXP."
 	      (setq process-state (list 'error))
 	      (gnus-message 2 "No begin part at the beginning")
 	      (sleep-for 2))
-	  (setq state 'middle)))
-
+	  (setq state 'middle))))
+    
       ;; When there are no result-files, then something must be wrong.
-      (if result-files
-	  (message "")
-	(cond
-	 ((not has-been-begin)
-	  (gnus-message 2 "Wrong type file"))
-	 ((memq 'error process-state)
-	  (gnus-message 2 "An error occurred during decoding"))
-	 ((not (or (memq 'ok process-state)
-		   (memq 'end process-state)))
-	  (gnus-message 2 "End of articles reached before end of file")))
-	;; Make unsuccessfully decoded articles unread.
-	(when gnus-uu-unmark-articles-not-decoded
-	  (while article-series
-	    (gnus-summary-tick-article (pop article-series) t)))))
+    (if result-files
+	(message "")
+      (cond
+       ((not has-been-begin)
+	(gnus-message 2 "Wrong type file"))
+       ((memq 'error process-state)
+	(gnus-message 2 "An error occurred during decoding"))
+       ((not (or (memq 'ok process-state)
+		 (memq 'end process-state)))
+	(gnus-message 2 "End of articles reached before end of file")))
+      ;; Make unsuccessfully decoded articles unread.
+      (when gnus-uu-unmark-articles-not-decoded
+	(while article-series
+	  (gnus-summary-tick-article (pop article-series) t))))
 
     ;; The original article buffer is hosed, shoot it down.
     (gnus-kill-buffer gnus-original-article-buffer)
@@ -1610,7 +1610,7 @@ Gnus might fail to display all of it.")
 
     (gnus-message 5 "Unpacking: %s..." (gnus-uu-command action file-path))
 
-    (if (= 0 (call-process shell-file-name nil
+    (if (eq 0 (call-process shell-file-name nil
 			   (gnus-get-buffer-create gnus-uu-output-buffer-name)
 			   nil shell-command-switch command))
 	(message "")
@@ -1904,8 +1904,8 @@ The user will be asked for a file name."
 
 ;; Encodes with base64 and adds MIME headers
 (defun gnus-uu-post-encode-mime (path file-name)
-  (when (zerop (call-process shell-file-name nil t nil shell-command-switch
-			     (format "%s %s -o %s" "mmencode" path file-name)))
+  (when (eq 0 (call-process shell-file-name nil t nil shell-command-switch
+			    (format "%s %s -o %s" "mmencode" path file-name)))
     (gnus-uu-post-make-mime file-name "base64")
     t))
 
@@ -1930,8 +1930,8 @@ The user will be asked for a file name."
 ;; Encodes a file PATH with COMMAND, leaving the result in the
 ;; current buffer.
 (defun gnus-uu-post-encode-file (command path file-name)
-  (= 0 (call-process shell-file-name nil t nil shell-command-switch
-		     (format "%s %s %s" command path file-name))))
+  (eq 0 (call-process shell-file-name nil t nil shell-command-switch
+		      (format "%s %s %s" command path file-name))))
 
 (defun gnus-uu-post-news-inews ()
   "Posts the composed news article and encoded file.

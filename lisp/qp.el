@@ -74,15 +74,17 @@ them into characters should be done separately."
 		   (mm-insert-byte byte 1)
 		   (delete-char 3)))
 		(t
-		 (error "Malformed quoted-printable text")
+		 (message "Malformed quoted-printable text")
 		 (forward-char)))))
       (if coding-system
 	  (mm-decode-coding-region (point-min) (point-max) coding-system)))))
 
 (defun quoted-printable-decode-string (string &optional coding-system)
   "Decode the quoted-printable encoded STRING and return the result.
-If CODING-SYSTEM is non-nil, decode the region with coding-system."
-  (with-temp-buffer
+If CODING-SYSTEM is non-nil, decode the region with coding-system.
+Use of CODING-SYSTEM is deprecated; this function should deal with
+raw bytes, and coding conversion should be done separately."
+  (mm-with-unibyte-buffer
     (insert string)
     (quoted-printable-decode-region (point-min) (point-max) coding-system)
     (buffer-string)))

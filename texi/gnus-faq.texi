@@ -1,6 +1,6 @@
 @c Insert  "\input texinfo" at 1st line before texing this file alone.
 @c -*-texinfo-*-
-@c Copyright (C) 1995, 2001, 2003 Free Software Foundation, Inc.
+@c Copyright (C) 1995, 2001, 2003, 2004 Free Software Foundation, Inc.
 @setfilename gnus-faq.info
 
 @c Frequently Asked Questions, FAQ - Introduction, Emacs for Heathens, Top
@@ -214,7 +214,7 @@ Answer:
 @end example
 
 @noindent
- Make sure that you don't have any gnus related stuff
+ Make sure that you don't have any Gnus related stuff
  before this line, on MS Windows use something like
  "C:/path/to/lisp" (yes, "/").
  
@@ -647,7 +647,7 @@ Answer:
 (eval-after-load "mail-source"
   '(add-to-list 'mail-sources '(pop :server "pop.YourProvider.net"
                                     :user "yourUserName"
-                                    :password "yourPassword"))
+                                    :password "yourPassword")))
 @end example
 
 @noindent
@@ -1385,7 +1385,7 @@ Answer:
 * [5.9]::   Sometimes I accidentally hit r instead of f in newsgroups.
             Can Gnus warn me, when I'm replying by mail in newsgroups? 
 * [5.10]::  How to tell Gnus not to generate a sender header? 
-* [5.11]::  I want gnus to locally store copies of my send mail and news,
+* [5.11]::  I want Gnus to locally store copies of my send mail and news,
             how to do it? 
 * [5.12]::  People tell me my Message-IDs are not correct,
             why aren't they and how to fix it? 
@@ -1654,7 +1654,7 @@ alias al	"Al <al@@english-heritage.bla>"
 @noindent
  Then typing your alias (followed by a space or punctuation
  character) on a To: or Cc: line in the message buffer will
- cause gnus to insert the full address for you. See the
+ cause Gnus to insert the full address for you. See the
  node "Mail Aliases" in Message (not Gnus) manual for
  details.
  
@@ -1845,17 +1845,25 @@ Answer:
  name to put after the "@@". If the name of the machine
  where Gnus is running isn't suitable (it probably isn't
  at most private machines) you can tell Gnus what to use
- by saying:
- 
-
+ by saying
 @example
-(defun message-make-message-id()
-   (concat "<"(message-unique-id)"@@yourmachine.yourdomain.tld>"))
+(setq message-user-fqdn "yourmachine.yourdomain.tld")
 @end example
- 
-
 @noindent
- in ~/.gnus. If you have no idea what to insert for
+ in ~/.gnus.  If you use Gnus 5.9 or ealier, you can use this
+instead:
+@example
+(eval-after-load "message"
+  '(let (myfqdn "yourmachine.yourdomain.tld");; <-- Edit this!
+     (if (boundp 'message-user-fqdn)
+         (setq message-user-fqdn fqdn)
+       (gnus-message 1 "Redefining `message-make-fqdn'.")
+       (defun message-make-fqdn ()
+         "Return user's fully qualified domain name."
+         fqdn))))
+@end example
+
+ If you have no idea what to insert for
  "yourmachine.yourdomain.tld", you've got several
  choices. You can either ask your provider if he allows
  you to use something like

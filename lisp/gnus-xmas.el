@@ -28,6 +28,14 @@
 
 ;;; Code:
 
+(eval-when-compile
+  (autoload 'gnus-active "gnus" nil nil 'macro)
+  (autoload 'gnus-group-entry "gnus" nil nil 'macro)
+  (autoload 'gnus-info-level "gnus" nil nil 'macro)
+  (autoload 'gnus-info-marks "gnus" nil nil 'macro)
+  (autoload 'gnus-info-method "gnus" nil nil 'macro)
+  (autoload 'gnus-info-score "gnus" nil nil 'macro))
+
 (require 'text-props)
 (defvar menu-bar-mode (featurep 'menubar))
 (require 'messagexmas)
@@ -391,6 +399,7 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-put-text-property 'gnus-xmas-put-text-property)
   (defalias 'gnus-deactivate-mark 'ignore)
   (defalias 'gnus-window-edges 'window-pixel-edges)
+  (defalias 'gnus-assq-delete-all 'gnus-xmas-assq-delete-all)
 
   (if (and (<= emacs-major-version 19)
 	   (< emacs-minor-version 14))
@@ -888,7 +897,7 @@ XEmacs compatibility workaround."
       (with-temp-buffer
 	(if data-p
 	    (insert file)
-	  (insert-file-contents file))
+	  (insert-file-contents-literally file))
 	(shell-command-on-region (point-min) (point-max)
 				 "ppmtoxpm 2>/dev/null" t)
 	(setq file (buffer-string)
@@ -900,7 +909,7 @@ XEmacs compatibility workaround."
 	    (with-temp-buffer
 	      (if data-p
 		  (insert file)
-		(insert-file-contents file))
+		(insert-file-contents-literally file))
 	      (make-glyph
 	       (vector
 		(or (intern type)
@@ -910,7 +919,7 @@ XEmacs compatibility workaround."
       (set-glyph-face glyph face))
     glyph))
 
-(defun gnus-xmas-put-image (glyph &optional string)
+(defun gnus-xmas-put-image (glyph &optional string category)
   "Insert STRING, but display GLYPH.
 Warning: Don't insert text immediately after the image."
   (let ((begin (point))
@@ -921,21 +930,21 @@ Warning: Don't insert text immediately after the image."
 	(insert string)
       (setq begin (1- begin)))
     (setq extent (make-extent begin (point)))
-    (set-extent-property extent 'gnus-image t)
+    (set-extent-property extent 'gnus-image category)
     (set-extent-property extent 'duplicable t)
     (if string
 	(set-extent-property extent 'invisible t))
     (set-extent-property extent 'end-glyph glyph))
   glyph)
 
-(defun gnus-xmas-remove-image (image)
+(defun gnus-xmas-remove-image (image &optional category)
   (map-extents
    (lambda (ext unused)
      (when (equal (extent-end-glyph ext) image)
        (set-extent-property ext 'invisible nil)
        (set-extent-property ext 'end-glyph nil))
      nil)
-   nil nil nil nil nil 'gnus-image))
+   nil nil nil nil nil 'gnus-image category))
 
 (defun gnus-xmas-completing-read (prompt table &optional
 					 predicate require-match history)
@@ -961,6 +970,12 @@ Warning: Don't insert text immediately after the image."
 	   (emacs-version>= 21 2))
       `(open-network-stream ,name ,buffer ,host ,service ,protocol)
     `(open-network-stream ,name ,buffer ,host ,service)))
+
+(defun gnus-xmas-assq-delete-all (key alist)
+  (let ((elem nil))
+    (while (setq elem (assq key alist))
+      (setq alist (delq elem alist)))
+    alist))
 
 (provide 'gnus-xmas)
 

@@ -39,6 +39,7 @@
 ;;(eval-when-compile (require 'gnus-util))
 
 (require 'mail-utils)
+(require 'gnus-util)
 
 ;; Reduce the required value of `recursive-load-depth-limit' for Emacs 21.
 (require 'pces)
@@ -82,10 +83,10 @@ Integer values will in effect be rounded up to the nearest multiple of
 (defvar nnheader-read-timeout
   (if (string-match "windows-nt\\|os/2\\|emx\\|cygwin"
 		    (symbol-name system-type))
-      1.0
+      1.0				; why?
     0.1)
   "How long nntp should wait between checking for the end of output.
-Shorter values mean quicker response, but is more CPU intensive.")
+Shorter values mean quicker response, but are more CPU intensive.")
 
 (defvar nnheader-file-name-translation-alist
   (let ((case-fold-search t))
@@ -311,16 +312,18 @@ nil, ."
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)
-  ;; Should keep track of `rfc2047-narrow-to-field' in rfc2047.el.
-  (defun-maybe std11-narrow-to-field ()
-    "Narrow the buffer to the header on the current line."
-    (forward-line 0)
-    (narrow-to-region (point)
-		      (progn
-			(std11-field-end)
-			(when (eolp) (forward-line 1))
-			(point)))
-    (goto-char (point-min)))
+  (unless (fboundp 'std11-narrow-to-field)
+    (defalias 'std11-narrow-to-field
+      ;; Should keep track of `rfc2047-narrow-to-field' in rfc2047.el.
+      (lambda ()
+	"Narrow the buffer to the header on the current line."
+	(forward-line 0)
+	(narrow-to-region (point)
+			  (progn
+			    (std11-field-end)
+			    (when (eolp) (forward-line 1))
+			    (point)))
+	(goto-char (point-min)))))
   (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
 
   ;; Should keep track of `ietf-drums-narrow-to-header' in ietf-drums.el.
@@ -333,128 +336,136 @@ nil, ."
        (point-max)))
     (goto-char (point-min)))
 
-  ;; Should keep track of `rfc2047-fold-region' in rfc2047.el.
-  (defun-maybe std11-fold-region (b e)
-    "Fold long lines in region B to E."
-    (save-restriction
-      (narrow-to-region b e)
-      (goto-char (point-min))
-      (let ((break nil)
-	    (qword-break nil)
-	    (first t)
-	    (bol (save-restriction
-		   (widen)
-		   (gnus-point-at-bol))))
-	(while (not (eobp))
-	  (when (and (or break qword-break)
-		     (> (- (point) bol) 76))
-	    (goto-char (or break qword-break))
-	    (setq break nil
-		  qword-break nil)
-	    (if (looking-at "[ \t]")
-		(insert "\n")
-	      (insert "\n "))
-	    (setq bol (1- (point)))
-	    ;; Don't break before the first non-LWSP characters.
-	    (skip-chars-forward " \t")
-	    (unless (eobp)
-	      (forward-char 1)))
-	  (cond
-	   ((eq (char-after) ?\n)
-	    (forward-char 1)
-	    (setq bol (point)
-		  break nil
-		  qword-break nil)
-	    (skip-chars-forward " \t")
-	    (unless (or (eobp) (eq (char-after) ?\n))
-	      (forward-char 1)))
-	   ((eq (char-after) ?\r)
-	    (forward-char 1))
-	   ((memq (char-after) '(?  ?\t))
-	    (skip-chars-forward " \t")
-	    (if first
-		;; Don't break just after the header name.
-		(setq first nil)
-	      (setq break (1- (point)))))
-	   ((not break)
-	    (if (not (looking-at "=\\?[^=]"))
-		(if (eq (char-after) ?=)
-		    (forward-char 1)
-		  (skip-chars-forward "^ \t\n\r="))
-	      (setq qword-break (point))
-	      (skip-chars-forward "^ \t\n\r")))
-	   (t
-	    (skip-chars-forward "^ \t\n\r"))))
-	(when (and (or break qword-break)
-		   (> (- (point) bol) 76))
-	  (goto-char (or break qword-break))
-	  (setq break nil
-		qword-break nil)
-	  (if (looking-at "[ \t]")
-	      (insert "\n")
-	    (insert "\n "))
-	  (setq bol (1- (point)))
-	  ;; Don't break before the first non-LWSP characters.
-	  (skip-chars-forward " \t")
-	  (unless (eobp)
-	    (forward-char 1))))))
+  (unless (fboundp 'std11-fold-region)
+    (defalias 'std11-fold-region
+      ;; Should keep track of `rfc2047-fold-region' in rfc2047.el.
+      (lambda (b e)
+	"Fold long lines in region B to E."
+	(save-restriction
+	  (narrow-to-region b e)
+	  (goto-char (point-min))
+	  (let ((break nil)
+		(qword-break nil)
+		(first t)
+		(bol (save-restriction
+		       (widen)
+		       (gnus-point-at-bol))))
+	    (while (not (eobp))
+	      (when (and (or break qword-break)
+			 (> (- (point) bol) 76))
+		(goto-char (or break qword-break))
+		(setq break nil
+		      qword-break nil)
+		(if (looking-at "[ \t]")
+		    (insert "\n")
+		  (insert "\n "))
+		(setq bol (1- (point)))
+		;; Don't break before the first non-LWSP characters.
+		(skip-chars-forward " \t")
+		(unless (eobp)
+		  (forward-char 1)))
+	      (cond
+	       ((eq (char-after) ?\n)
+		(forward-char 1)
+		(setq bol (point)
+		      break nil
+		      qword-break nil)
+		(skip-chars-forward " \t")
+		(unless (or (eobp) (eq (char-after) ?\n))
+		  (forward-char 1)))
+	       ((eq (char-after) ?\r)
+		(forward-char 1))
+	       ((memq (char-after) '(?  ?\t))
+		(skip-chars-forward " \t")
+		(if first
+		    ;; Don't break just after the header name.
+		    (setq first nil)
+		  (setq break (1- (point)))))
+	       ((not break)
+		(if (not (looking-at "=\\?[^=]"))
+		    (if (eq (char-after) ?=)
+			(forward-char 1)
+		      (skip-chars-forward "^ \t\n\r="))
+		  (setq qword-break (point))
+		  (skip-chars-forward "^ \t\n\r")))
+	       (t
+		(skip-chars-forward "^ \t\n\r"))))
+	    (when (and (or break qword-break)
+		       (> (- (point) bol) 76))
+	      (goto-char (or break qword-break))
+	      (setq break nil
+		    qword-break nil)
+	      (if (looking-at "[ \t]")
+		  (insert "\n")
+		(insert "\n "))
+	      (setq bol (1- (point)))
+	      ;; Don't break before the first non-LWSP characters.
+	      (skip-chars-forward " \t")
+	      (unless (eobp)
+		(forward-char 1))))))))
 
-  ;; Should keep track of `rfc2047-fold-field' in rfc2047.el.
-  (defun-maybe std11-fold-field ()
-    "Fold the current line."
-    (save-excursion
-      (save-restriction
-	(std11-narrow-to-field)
-	(std11-fold-region (point-min) (point-max)))))
-
+  (unless (fboundp 'std11-fold-field)
+    (defalias 'std11-fold-field
+      ;; Should keep track of `rfc2047-fold-field' in rfc2047.el.
+      (lambda ()
+	"Fold the current line."
+	(save-excursion
+	  (save-restriction
+	    (std11-narrow-to-field)
+	    (std11-fold-region (point-min) (point-max)))))))
   (defalias 'mail-header-fold-field 'std11-fold-field)
 
-  ;; Should keep track of `rfc2047-unfold-region' in rfc2047.el.
-  (defun-maybe std11-unfold-region (b e)
-    "Unfold lines in region B to E."
-    (save-restriction
-      (narrow-to-region b e)
-      (goto-char (point-min))
-      (let ((bol (save-restriction
-		   (widen)
-		   (gnus-point-at-bol)))
-	    (eol (gnus-point-at-eol)))
-	(forward-line 1)
-	(while (not (eobp))
-	  (if (and (looking-at "[ \t]")
-		   (< (- (gnus-point-at-eol) bol) 76))
-	      (delete-region eol (progn
-				   (goto-char eol)
-				   (skip-chars-forward "\r\n")
-				   (point)))
-	    (setq bol (gnus-point-at-bol)))
-	  (setq eol (gnus-point-at-eol))
-	  (forward-line 1)))))
+  (unless (fboundp 'std11-unfold-region)
+    (defalias 'std11-unfold-region
+      ;; Should keep track of `rfc2047-unfold-region' in rfc2047.el.
+      (lambda (b e)
+	"Unfold lines in region B to E."
+	(save-restriction
+	  (narrow-to-region b e)
+	  (goto-char (point-min))
+	  (let ((bol (save-restriction
+		       (widen)
+		       (gnus-point-at-bol)))
+		(eol (gnus-point-at-eol)))
+	    (forward-line 1)
+	    (while (not (eobp))
+	      (if (and (looking-at "[ \t]")
+		       (< (- (gnus-point-at-eol) bol) 76))
+		  (delete-region eol (progn
+				       (goto-char eol)
+				       (skip-chars-forward "\r\n")
+				       (point)))
+		(setq bol (gnus-point-at-bol)))
+	      (setq eol (gnus-point-at-eol))
+	      (forward-line 1)))))))
 
-  ;; Should keep track of `rfc2047-unfold-field' in rfc2047.el.
-  (defun-maybe std11-unfold-field ()
-    "Fold the current line."
-    (save-excursion
-      (save-restriction
-	(std11-narrow-to-field)
-	(std11-unfold-region (point-min) (point-max)))))
-
+  (unless (fboundp 'std11-unfold-field)
+    (defalias 'std11-unfold-field
+      ;; Should keep track of `rfc2047-unfold-field' in rfc2047.el.
+      (lambda ()
+	"Fold the current line."
+	(save-excursion
+	  (save-restriction
+	    (std11-narrow-to-field)
+	    (std11-unfold-region (point-min) (point-max)))))))
   (defalias 'mail-header-unfold-field 'std11-unfold-field)
 
-  ;; This is the original function in T-gnus.
-  (defun-maybe std11-extract-addresses-components (string)
-    "Extract a list of full name and canonical address from STRING.  Each
+  (unless (fboundp 'std11-extract-addresses-components)
+    (defalias 'std11-extract-addresses-components
+      ;; This is the original function in T-gnus.
+      (lambda (string)
+	"Extract a list of full name and canonical address from STRING.  Each
 element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
 If no name can be extracted, FULL-NAME will be nil."
-    (when string
-      (let (addresses)
-	(dolist (structure (std11-parse-addresses-string
-			    (std11-unfold-string string))
-			   addresses)
-	  (push (list (std11-full-name-string structure)
-		      (std11-address-string structure))
-		addresses))
-	(nreverse addresses))))
+	(when string
+	  (let (addresses)
+	    (dolist (structure (std11-parse-addresses-string
+				(std11-unfold-string string))
+			       addresses)
+	      (push (list (std11-full-name-string structure)
+			  (std11-address-string structure))
+		    addresses))
+	    (nreverse addresses))))))
 
   ;; Should keep track of `ietf-drums-parse-addresses' in ietf-drums.el.
   (defun mail-header-parse-addresses (string)
@@ -485,7 +496,6 @@ given, the return value will not contain the last newline."
 	  (setq value (buffer-substring start (point)))))
       (goto-char begin)
       value))
-
   (defalias 'mail-header-field-value 'std11-field-value))
 
 ;; ietf-drums stuff.
@@ -1450,11 +1460,6 @@ without formatting."
 	 ((numberp file) (int-to-string file))
 	 (t file))))
 
-(defun nnheader-functionp (form)
-  "Return non-nil if FORM is funcallable."
-  (or (and (symbolp form) (fboundp form))
-      (and (listp form) (eq (car form) 'lambda))))
-
 (defun nnheader-concat (dir &rest files)
   "Concat DIR as directory to FILES."
   (apply 'concat (file-name-as-directory dir) files))
@@ -1468,13 +1473,15 @@ without formatting."
   "Return the file size of FILE or 0."
   (or (nth 7 (file-attributes file)) 0))
 
-(defun nnheader-find-etc-directory (package &optional file)
+(defun nnheader-find-etc-directory (package &optional file first)
   "Go through `load-path' and find the \"../etc/PACKAGE\" directory.
 This function will look in the parent directory of each `load-path'
 entry, and look for the \"etc\" directory there.
-If FILE, find the \".../etc/PACKAGE\" file instead."
+If FILE, find the \".../etc/PACKAGE\" file instead.
+If FIRST is non-nil, return the directory or the file found at the
+first.  Otherwise, find the newest one, though it may take a time."
   (let ((path load-path)
-	dir result)
+	dir results)
     ;; We try to find the dir by looking at the load path,
     ;; stripping away the last component and adding "etc/".
     (while path
@@ -1486,10 +1493,14 @@ If FILE, find the \".../etc/PACKAGE\" file instead."
 			   "etc/" package
 			   (if file "" "/"))))
 	       (or file (file-directory-p dir)))
-	  (setq result dir
-		path nil)
+	  (progn
+	    (or (member dir results)
+		(push dir results))
+	    (setq path (if first nil (cdr path))))
 	(setq path (cdr path))))
-    result))
+    (if (or first (not (cdr results)))
+	(car results)
+      (car (sort results 'file-newer-than-file-p)))))
 
 (eval-when-compile
   (defvar ange-ftp-path-format)

@@ -325,7 +325,10 @@ as unread by Gnus.")
 	   (not (equal group "draft")))
       (nnmail-check-syntax))
   (when nnmail-cache-accepted-message-ids
-    (nnmail-cache-insert (nnmail-fetch-field "message-id") group))
+    (nnmail-cache-insert (nnmail-fetch-field "message-id") 
+			 group
+			 (nnmail-fetch-field "subject")
+			 (nnmail-fetch-field "from")))
   (nnheader-init-server-buffer)
   (prog1
       (if (stringp group)

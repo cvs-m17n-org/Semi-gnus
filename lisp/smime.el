@@ -119,7 +119,6 @@
 ;;; Code:
 
 (require 'dig)
-(require 'comint)
 (eval-when-compile (require 'cl))
 
 (defgroup smime nil
@@ -185,6 +184,27 @@ and the files themself should be in PEM format."
 		 (const :tag "RC2 128 bits" "-rc2-128"))
   :group 'smime)
 
+(defcustom smime-crl-check nil
+  "*Check revocation status of signers certificate using CRLs.
+Enabling this will have OpenSSL check the signers certificate
+against a certificate revocation list (CRL).
+
+For this to work the CRL must be up-to-date and since they are
+normally updated quite often (ie. several times a day) you
+probably need some tool to keep them up-to-date. Unfortunately
+Gnus cannot do this for you.
+
+The CRL should either be appended (in PEM format) to your
+`smime-CA-file' or be located in a file (also in PEM format) in
+your `smime-certificate-directory' named to the X.509 hash of the
+certificate with .r0 as file name extension.
+
+At least OpenSSL version 0.9.7 is required for this to work."
+  :type '(choice (const :tag "No check" nil)
+		 (const :tag "Check certificate" "-crl_check")
+		 (const :tag "Check certificate chain" "-crl_check_all"))
+  :group 'smime)
+
 (defcustom smime-dns-server nil
   "*DNS server to query certificates from.
 If nil, use system defaults."
@@ -194,6 +214,7 @@ If nil, use system defaults."
 
 (defvar smime-details-buffer "*OpenSSL output*")
 
+;; Use mm-util?
 (eval-and-compile
   (defalias 'smime-make-temp-file
     (if (fboundp 'make-temp-file)
@@ -210,8 +231,8 @@ If nil, use system defaults."
 (defun smime-ask-passphrase ()
   "Asks the passphrase to unlock the secret key."
   (let ((passphrase
-	 (comint-read-noecho
-	  "Passphrase for secret key (RET for no passphrase): " t)))
+	 (read-passwd
+	  "Passphrase for secret key (RET for no passphrase): ")))
     (if (string= passphrase "")
 	nil
       passphrase)))
@@ -348,6 +369,8 @@ Any details (stdout and stderr) are left in the buffer specified by
 			       (expand-file-name smime-CA-directory))))))
     (unless CAs
       (error "No CA configured"))
+    (if smime-crl-check
+	(add-to-list 'CAs smime-crl-check))
     (if (apply 'smime-call-openssl-region b e (list smime-details-buffer t)
 	       "smime" "-verify" "-out" "/dev/null" CAs)
 	t
@@ -489,6 +512,7 @@ A string or a list of strings is returned."
 	    (caddr curkey)
 	  (smime-get-certfiles keyfile otherkeys)))))
 
+;; Use mm-util?
 (eval-and-compile
   (defalias 'smime-point-at-eol
     (if (fboundp 'point-at-eol)

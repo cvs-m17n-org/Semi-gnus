@@ -26,7 +26,7 @@ all total: clean-some gnus-load.el
 	$(EMACS_COMP) -f dgnushack-compile
 
 clean-some:
-	rm -f *.elc gnus-load.el
+	rm -f *.elc gnus-load.el auto-autoloads.* custom-load.*
 
 warn: clean-some gnus-load.el
 	$(EMACS_COMP) --eval '(dgnushack-compile t)' 2>&1 | egrep -v "variable G|inhibit-point-motion-hooks|coding-system|temp-results|variable gnus|variable nn|scroll-in-place|deactivate-mark|filladapt-mode|byte-code-function-p|print-quoted|ps-right-header|ps-left-header|article-inhibit|print-escape|ssl-program-arguments|message-log-max"
@@ -72,9 +72,6 @@ install-without-compiling:
 install-package-manifest:
 	$(EMACS_COMP) -f dgnushack-install-package-manifest \
 		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
-
-compose-package: gnus-load.el
-	$(EMACS_COMP) -f dgnushack-compose-package
 
 remove-extra-files-in-package:
 	$(EMACS_COMP) -f dgnushack-remove-extra-files-in-package \

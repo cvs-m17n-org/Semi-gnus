@@ -1,7 +1,7 @@
 ;;; hashcash.el --- Add hashcash payments to email
 
-;; Copyright (C) 1997--2002 Paul E. Foley
 ;; Copyright (C) 2003 Free Software Foundation
+;; Copyright (C) 1997--2002 Paul E. Foley
 
 ;; Maintainer: Paul Foley <mycroft@actrix.gen.nz>
 ;; Keywords: mail, hashcash
@@ -20,8 +20,6 @@
 ;;    (add-hook 'message-send-hook 'mail-add-payment)
 
 ;;; Code:
-
-(eval-when-compile (require 'cl))
 
 (eval-and-compile
  (autoload 'executable-find "executable"))
@@ -61,38 +59,30 @@ is used instead.")
 
 (require 'mail-utils)
 
-(if (fboundp 'point-at-bol)
-    (defalias 'hashcash-point-at-bol 'point-at-bol)
-  (defalias 'hashcash-point-at-bol 'line-beginning-position))
+(eval-and-compile
+ (if (fboundp 'point-at-bol)
+     (defalias 'hashcash-point-at-bol 'point-at-bol)
+   (defalias 'hashcash-point-at-bol 'line-beginning-position))
 
-(if (fboundp 'point-at-eol)
-    (defalias 'hashcash-point-at-eol 'point-at-eol)
-  (defalias 'hashcash-point-at-eol 'line-end-position))
+ (if (fboundp 'point-at-eol)
+     (defalias 'hashcash-point-at-eol 'point-at-eol)
+   (defalias 'hashcash-point-at-eol 'line-end-position)))
 
 (defun hashcash-strip-quoted-names (addr)
   (setq addr (mail-strip-quoted-names addr))
-  (if (and addr (string-match "^[^+@]+\\(\\+[^@]*\\)@" addr))
-      (concat (substring addr 0 (match-beginning 1))
-	      (substring addr (match-end 1)))
+  (if (and addr (string-match "\\`\\([^+@]+\\)\\+[^@]*\\(@.+\\)" addr))
+      (concat (match-string 1 addr) (match-string 2 addr))
     addr))
 
 (defun hashcash-payment-required (addr)
   "Return the hashcash payment value required for the given address."
   (let ((val (assoc addr hashcash-payment-alist)))
-    (if val
-	(if (cddr val)
-	    (caddr val)
-	  (cadr val))
-      hashcash-default-payment)))
+    (or (nth 2 val) (nth 1 val) hashcash-default-payment)))
 
 (defun hashcash-payment-to (addr)
   "Return the string with which hashcash payments should collide."
   (let ((val (assoc addr hashcash-payment-alist)))
-    (if val
-	(if (cddr val)
-	    (cadr val)
-	  (car val))
-      addr)))
+    (or (nth 1 val) (nth 0 val) addr)))
 
 (defun hashcash-generate-payment (str val)
   "Generate a hashcash payment by finding a VAL-bit collison on STR."
@@ -101,7 +91,7 @@ is used instead.")
 	(set-buffer (get-buffer-create " *hashcash*"))
 	(erase-buffer)
 	(call-process hashcash-path nil t nil
-		      (concat "-b " (number-to-string val)) str)
+		      "-m" "-q" "-b" (number-to-string val) str)
 	(goto-char (point-min))
 	(buffer-substring (hashcash-point-at-bol) (hashcash-point-at-eol)))
     nil))
@@ -137,17 +127,17 @@ is used instead.")
   (let ((pay (hashcash-generate-payment (hashcash-payment-to arg)
 					(hashcash-payment-required arg))))
     (when pay
-      (insert-before-markers "X-Payment: hashcash "
-			     (number-to-string (hashcash-version pay)) " "
-			     pay "\n")
+;      (insert-before-markers "X-Payment: hashcash "
+;			     (number-to-string (hashcash-version pay)) " "
+;			     pay "\n")
       (insert-before-markers "X-Hashcash: " pay "\n"))))
 
 ;;;###autoload
 (defun hashcash-verify-payment (token &optional resource amount)
   "Verify a hashcash payment"
   (let ((key (if (< (hashcash-version token) 1.2)
-		 (cadr (split-string token ":"))
-		 (caddr (split-string token ":")))))
+		 (nth 1 (split-string token ":"))
+		 (nth 2 (split-string token ":")))))
     (cond ((null resource)
 	   (let ((elt (assoc key hashcash-accept-resources)))
 	     (and elt (hashcash-check-payment token (car elt)
@@ -168,9 +158,7 @@ for each recipient address.  Prefix arg sets default payment temporarily."
     (save-excursion
       (save-restriction
 	(goto-char (point-min))
-	(re-search-forward (concat "^\\("
-				   (regexp-quote mail-header-separator)
-				   "\\)?$"))
+	(search-forward mail-header-separator)
 	(beginning-of-line)
 	(narrow-to-region (point-min) (point))
 	(let ((to (hashcash-strip-quoted-names (mail-fetch-field "To" nil t)))
@@ -183,8 +171,8 @@ for each recipient address.  Prefix arg sets default payment temporarily."
 	    (setq addrlist (nconc addrlist (split-string cc ",[ \t\n]*"))))
 	  (when (and hashcash-in-news ng)
 	    (setq addrlist (nconc addrlist (split-string ng ",[ \t\n]*")))))
-	(while addrlist
-	  (hashcash-insert-payment (pop addrlist))))))
+	(when addrlist
+	  (mapcar #'hashcash-insert-payment addrlist))))) ; mapc
   t)
 
 ;;;###autoload
