@@ -610,6 +610,21 @@ Bind `print-quoted' and `print-readably' to t while printing."
   ;; Write the buffer.
   (write-region (point-min) (point-max) file nil 'quietly))
 
+(defun gnus-write-buffer-as-binary (file)
+  "Write the current buffer's contents to FILE without code conversion."
+  ;; Make sure the directory exists.
+  (gnus-make-directory (file-name-directory file))
+  ;; Write the buffer.
+  (write-region-as-binary (point-min) (point-max) file nil 'quietly))
+
+(defun gnus-write-buffer-as-specified-coding-system (file coding-system)
+  "Write the current buffer's contents to FILE with code conversion."
+  ;; Make sure the directory exists.
+  (gnus-make-directory (file-name-directory file))
+  ;; Write the buffer.
+  (write-region-as-specified-coding-system
+   (point-min) (point-max) file nil 'quietly coding-system))
+
 (defun gnus-delete-file (file)
   "Delete FILE if it exists."
   (when (file-exists-p file)
@@ -791,9 +806,8 @@ with potentially long computations."
 	    (let ((file-buffer (create-file-buffer filename)))
 	      (save-excursion
 		(set-buffer file-buffer)
-		(let ((require-final-newline nil)
-		      (coding-system-for-write 'binary))
-		  (gnus-write-buffer filename)))
+		(let ((require-final-newline nil))
+		  (gnus-write-buffer-as-binary filename)))
 	      (kill-buffer file-buffer))
 	  (error "Output file does not exist")))
       (set-buffer tmpbuf)
@@ -810,8 +824,7 @@ with potentially long computations."
       ;; Decide whether to append to a file or to an Emacs buffer.
       (let ((outbuf (get-file-buffer filename)))
 	(if (not outbuf)
-	    (let ((buffer-read-only nil)
-		  (coding-system-for-write 'binary))
+	    (let ((buffer-read-only nil))
 	      (save-excursion
 		(goto-char (point-max))
 		(forward-char -2)
@@ -821,7 +834,8 @@ with potentially long computations."
 		    (insert "\n"))
 		  (insert "\n"))
 		(goto-char (point-max))
-		(append-to-file (point-min) (point-max) filename)))
+		(write-region-as-binary (point-min) (point-max)
+					filename 'append)))
 	  ;; File has been visited, in buffer OUTBUF.
 	  (set-buffer outbuf)
 	  (let ((buffer-read-only nil))
