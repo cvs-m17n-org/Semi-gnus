@@ -641,15 +641,18 @@ The function `message-supersede' runs this hook."
   :group 'message-insertion)
 
 (defcustom message-yank-add-new-references t
-  "*Non-nil means new IDs will be added to \"References\" field when an
-article is yanked by the command `message-yank-original' interactively."
+  "Non-nil means new IDs will be added to \"References\" field when an
+article is yanked by the command `message-yank-original' interactively.
+If it is a symbol `message-id-only', only an ID from \"Message-ID\" field
+is used, otherwise IDs extracted from \"References\", \"In-Reply-To\" and
+\"Message-ID\" fields are used."
   :type '(radio (const :tag "Do not add anything" nil)
 		(const :tag "From Message-Id, References and In-Reply-To fields" t)
 		(const :tag "From only Message-Id field." message-id-only))
   :group 'message-insertion)
 
 (defcustom message-list-references-add-position nil
-  "*Integer value means position for adding to \"References\" field when
+  "Integer value means position for adding to \"References\" field when
 an article is yanked by the command `message-yank-original' interactively."
   :type '(radio (const :tag "Add to last" nil)
 		(integer :tag "Position from last ID"))
