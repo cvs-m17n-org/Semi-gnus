@@ -1,3 +1,10 @@
+1999-12-01  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 10.
+
+	* lisp/gnus-art.el (article-treat-overstrike): Work for multibyte
+	char with old Emacsen as well.
+
 1999-12-01   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/gnus-agent.el (gnus-category-edit-predicate): Expand `setf'
