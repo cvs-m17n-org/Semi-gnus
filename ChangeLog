@@ -1,3 +1,16 @@
+2000-03-03  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.9 (This is alpha status.)
+	Fix a bug.
+
+	* lisp/gnus.el (gnus-version-number): Update to 7.1.0.9.
+
+	* lisp/mmgnus.el (TopLevel): Require `mmgeneric' when installed
+	it.
+
+	* lisp/mm-decode.el (mm-mailcap-command): Do not use
+	`mime-parameter' (in flim-1_13-rfc2231).
+
 2000-02-22  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.8 (This is alpha status.)
