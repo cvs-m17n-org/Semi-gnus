@@ -797,6 +797,7 @@ than the period that is set to `gnus-namazu-index-update-interval'"
     t))
   (when (setq directory (gnus-namazu/update-p directory force))
     (with-current-buffer (get-buffer-create (concat " *mknmz*" directory))
+      (buffer-disable-undo)
       (erase-buffer)
       (unless (file-directory-p directory)
 	(make-directory directory t))
@@ -811,10 +812,16 @@ than the period that is set to `gnus-namazu-index-update-interval'"
 	      (set-process-sentinel proc 'gnus-namazu/update-sentinel)
 	      (add-hook 'kill-emacs-hook 'gnus-namazu-stop-update)
 	      (message "Update index at %s..." directory))
-	  (kill-buffer (current-buffer))
-	  (when force
-	    (error "Can not start %s"
-		   gnus-namazu-make-index-command)))))))
+	  (goto-char (point-min))
+	  (if (re-search-forward "^ERROR:.*$" nil t)
+	      (progn
+		(pop-to-buffer (current-buffer))
+		(funcall (if force 'error 'message)
+			 "Update index at %s...%s" directory (match-string 0)))
+	    (kill-buffer (current-buffer))
+	    (funcall (if force 'error 'message)
+		     "Can not start %s" gnus-namazu-make-index-command))
+	  nil)))))
 
 ;;;###autoload
 (defun gnus-namazu-update-all-indices (&optional directories force)
@@ -832,11 +839,18 @@ than the period that is set to `gnus-namazu-index-update-interval'"
     (when (buffer-name buffer)
       (with-current-buffer buffer
 	(gnus-namazu/mknmz-cleanup default-directory)
-	(when (and (eq 'exit (process-status process))
-		   (zerop (process-exit-status process)))
-	  (message "Update index at %s...done" default-directory)))
-      (unless (or debug-on-error debug-on-quit)
-	(kill-buffer buffer))))
+	(goto-char (point-min))
+	(cond
+	 ((re-search-forward "^ERROR:.*$" nil t)
+	  (pop-to-buffer (current-buffer))
+	  (message "Update index at %s...%s"
+		   default-directory (match-string 0))
+	  (setq gnus-namazu/update-directories nil))
+	 ((and (eq 'exit (process-status process))
+	       (zerop (process-exit-status process)))
+	  (message "Update index at %s...done" default-directory)
+	  (unless (or debug-on-error debug-on-quit)
+	    (kill-buffer buffer)))))))
   (setq gnus-namazu/update-process nil)
   (when gnus-namazu/update-directories
     (gnus-namazu-update-all-indices gnus-namazu/update-directories)))
