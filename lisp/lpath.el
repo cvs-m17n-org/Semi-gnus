@@ -6,6 +6,19 @@
     (load "apel/path-util"))
 (add-path "apel")
 (add-path "flim")
+(unless (module-installed-p 'mel)
+  ;; FLIM 1.14 may have installed in two "flim" subdirectories.
+  (push (expand-file-name "flim"
+			  (file-name-directory (get-latest-path "^apel$" t)))
+	load-path)
+  (unless (module-installed-p 'mel)
+    (error "
+FLIM package does not found in %s.
+Try to re-configure with --with-addpath=FLIM_PATH and run make again.
+"
+	   (progn
+	     (add-path "semi")
+	     load-path))))
 (add-path "semi")
 
 (defun maybe-fbind (args)
