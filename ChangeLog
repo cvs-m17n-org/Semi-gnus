@@ -1,3 +1,8 @@
+1998-12-10  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+	
+	* lisp/gnus-offline.el (gnus-offline-after-jobs-done): Create menu
+	using 'easymenu'.
+	
 1998-12-09  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-offline.el (gnus-offline-after-jobs-done): Don't call

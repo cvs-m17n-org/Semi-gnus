@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.12 1998-12-08 22:51:13 yamaoka Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.13 1998-12-10 06:31:18 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -81,6 +81,7 @@
 (require 'cl)
 (require 'custom)
 (require 'pop3-fma)
+(require 'easymenu)
 
 (unless (and (condition-case ()
 		 (require 'custom)
@@ -738,154 +739,47 @@ If value is nil , dialup line is disconnected status.")
 		   (substitute-key-definition
 		    'gnus-agent-toggle-plugged 'gnus-offline-toggle-plugged
 		    gnus-agent-summary-mode-map)))))
-
+;;
+;;
 (defun gnus-offline-define-menu-on-miee ()
   "*Set menu bar on MIEE menu."
-  (global-set-key
-   [menu-bar
-    miee
-    gnus-offline-hup-separator]
-   '("--"))
-
-  (global-set-key
-   [menu-bar
-    miee
-    gnus-offline]
-   (cons "Gnus Offline Utility"
-	 (make-sparse-keymap "Gnus Offline Utiliry")))
-  
-  (global-set-key
-   [menu-bar
-    miee
-    gnus-offline
-    gnus-offline-toggle-movemail-program]
-   '("Toggle movemail program" .
-     gnus-offline-toggle-movemail-program))
-  
-  (global-set-key
-   [menu-bar
-    miee
-    gnus-offline
-    gnus-offline-toggle-articles-to-fetch]
-   '("Toggle articles to fetch" .
-     gnus-offline-toggle-articles-to-fetch))
-  
-  (global-set-key
-   [menu-bar
-    miee
-    gnus-offline
-    gnus-offline-toggle-on/off-send-mail]
-   '("Toggle online/offline send mail" .
-     gnus-offline-toggle-on/off-send-mail))
-  
-  (global-set-key
-   [menu-bar
-    miee
-    gnus-offline
-    gnus-offline-toggle-auto-hangup]
-   '("Toggle auto hang up" . gnus-offline-toggle-auto-hangup))
-  
-  (global-set-key
-   [menu-bar
-    miee
-    gnus-offline
-    gnus-offline-expire-separator]
-   '("--"))
-  
-  (if (eq gnus-offline-news-fetch-method 'nnagent)
-      (global-set-key
-       [menu-bar
-	miee
-	gnus-offline
-	gnus-offline-agent-expire]
-       '("Expire articles" . gnus-offline-agent-expire)))
-  
-  (global-set-key
-   [menu-bar
-    miee
-    gnus-offline
-    gnus-offline-set-interval-time]
-   '("Set interval time." . gnus-offline-set-interval-time))
-  
-  (global-set-key
-   [menu-bar
-    miee
-    gnus-offline
-    gnus-offline-hup-separator]
-   '("--"))
-  
-  (global-set-key
-   [menu-bar
-    miee
-    gnus-offline
-    gnus-offline-set-unplugged-state]
-   '("Hang Up Line." . gnus-offline-set-unplugged-state)))
+  (easy-menu-define
+   global-map grobal-map "Gnus offline menu on Miee"
+   '("Miee"
+     ["Post news in spool" news-spool-post t]
+     ["Send mails in spool" mail-spool-send t]
+     "----"
+     ["Message Offline" message-offline-state (not message-offline-state)]
+     ["Message Online" message-online-state message-online-state]
+     "----"
+     '("Gnus Offline"
+       ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
+       ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
+       ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
+       ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
+       "----"
+       ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
+       ["Set interval time" gnus-offline-set-interval-time t]
+       "----"
+       ["Hang up Line." gnus-offline-set-unplugged-state (gnus-offline-connected)]
+       ))))
 ;;
 ;; define menu without miee.
 ;;
 (defun gnus-offline-define-menu-on-agent ()
   "*Set menu bar on OFFLINE menu."
-  (define-key-after
-    (lookup-key global-map [menu-bar])
-    [offline]
-    (cons "Offline" (make-sparse-keymap "Offline"))
-    'help)               ;; Actually this adds before "Help".
-
-  (global-set-key
-   [menu-bar
-    offline
-    gnus-offline-toggle-movemail-program]
-   '("Toggle movemail program" . gnus-offline-toggle-movemail-program))
-  
-  (global-set-key
-   [menu-bar
-    offline
-    gnus-offline-toggle-articles-to-fetch]
-   '("Toggle articles to fetch" . gnus-offline-toggle-articles-to-fetch))
-  
-  (global-set-key
-   [menu-bar
-    offline
-    gnus-offline-toggle-on/off-send-mail]
-   '("Toggle online/offline send mail" . gnus-offline-toggle-on/off-send-mail))
-  
-  (global-set-key
-   [menu-bar
-    offline
-    gnus-offline-toggle-auto-hangup]
-   '("Toggle auto hang up" . gnus-offline-toggle-auto-hangup))
-  
-  (global-set-key
-   [menu-bar
-    offline
-    gnus-offline-separator]
-   '("--"))
-  
-  (if (eq gnus-offline-news-fetch-method 'nnagent)
-      (progn
-	(global-set-key
-	 [menu-bar
-	  offline
-	  gnus-offline-agent-expire]
-	 '("Expire articles" . gnus-offline-agent-expire))))
-  
-  (global-set-key
-   [menu-bar
-    offline
-    gnus-offline-set-interval-time]
-   '("Set interval time." . gnus-offline-set-interval-time))
-  
-  (global-set-key
-   [menu-bar
-    offline
-    gnus-offline-hup-separator]
-   '("--"))
-  
-  (global-set-key
-   [menu-bar
-    offline
-    gnus-offline-set-unplugged-state]
-   '("Hang Up Line." . gnus-offline-set-unplugged-state)))
+  (easy-menu-define 
+   gnus-group-mode-map gnus-group-mode-map "Gnus offline Menu"
+   '("Offline"
+     ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
+     ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
+     ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
+     ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
+     "----"
+     ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
+     ["Set interval time" gnus-offline-set-interval-time t]
+     "----"
+     ["Hang up Line." gnus-offline-set-unplugged-state (gnus-offline-connected)])))
 
 ;;
 ;; Timer Function
