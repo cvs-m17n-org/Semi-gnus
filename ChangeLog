@@ -1,3 +1,13 @@
+1999-12-16  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/message.el (message-goto-mail-copies-to): If the field is
+	newly created, a string "never" is inserted in default.
+	(message-goto-mail-followup-to): If the field is newly created and
+	To field contains only one address, the address is inserted in
+	default.
+	(message-mode-map): New key stroke `C-c C-f c' for the command
+	`message-goto-mail-copies-to'.
+
 1999-12-15  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 12.
