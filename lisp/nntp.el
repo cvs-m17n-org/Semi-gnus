@@ -764,7 +764,8 @@ command whose response triggered the error."
                            (set-buffer buf)
                            (goto-char (point-max))
                            (if (not nntp-server-list-active-group)
-                               (not (re-search-backward "\r?\n" (- (point) 3) t))
+                               (not (re-search-backward "\r?\n"
+							(- (point) 3) t))
                              (not (re-search-backward "^\\.\r?\n"
                                                       (- (point) 4) t)))))
                (nntp-accept-response)))
@@ -1503,12 +1504,13 @@ password contained in '~/.nntp-authinfo'."
 		     (while (re-search-forward "^[0-9][0-9][0-9] .*\n" nil t)
 		       (incf received))
 		     (setq last-point (point))
-		     (or (< received count) ;; I haven't started reading the final response
+		     (or (< received count)
+			 ;; I haven't started reading the final response
                          (progn
                            (goto-char (point-max))
                            (forward-line -1)
-                           (not (looking-at "^\\.\r?\n"))) ;; I haven't read the end of the final response
-                         ))
+                           (not (looking-at "^\\.\r?\n")))))
+	      ;; I haven't read the end of the final response
 	      (nntp-accept-response)
 	      (set-buffer process-buffer))))
 
@@ -1526,8 +1528,9 @@ password contained in '~/.nntp-authinfo'."
         (when (<= count 1)
           (goto-char (point-min))
           (when (re-search-forward "^[0-9][0-9][0-9] .*\n\\([0-9]+\\)" nil t)
-            (let ((low-limit (string-to-int (buffer-substring (match-beginning 1) 
-                                                              (match-end 1)))))
+            (let ((low-limit (string-to-int
+			      (buffer-substring (match-beginning 1) 
+						(match-end 1)))))
               (while (and articles (<= (car articles) low-limit))
                 (setq articles (cdr articles))))))
         (set-buffer buf))
