@@ -1,3 +1,206 @@
+1998-10-20  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Change to 6.9.1
+
+	* Sync up with Chao-gnus 6.9
+
+1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (nnheader-insert-nov): Use `mime-fetch-field'
+	for Subject and From field.
+
+1998-10-20  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-parse-nov): Use
+	`make-full-mail-header'.
+
+1998-10-20  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (nnheader-parse-head): Use
+	`make-full-mail-header'.
+
+1998-10-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.5.
+	(gnus-version): Modify for SEMI 1.9.
+
+1998-10-14  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-line-format-alist): Use
+	`mime-read-field', `std11-address-string' and
+	`std11-full-name-string' instead of
+	`gnus-extract-address-components'.
+	(gnus-article-sort-by-author): Likewise.
+
+1998-10-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.5.
+
+1998-10-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (make-full-mail-header-from-decoded-header):
+	New function.
+
+	* lisp/message.el (message-reply): Use
+	`make-full-mail-header-from-decoded-header' instead of
+	`make-full-mail-header'.
+	(message-followup): Likewise.
+
+1998-10-05  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-set-default-charset): New
+	function.
+
+	* lisp/gnus-art.el (gnus-article-display-mime-message): Set up
+	buffer local variable `default-mime-charset' of
+	`gnus-original-article-buffer' and `gnus-article-buffer'.
+	(gnus-article-display-message-with-encoded-word): Likewise.
+
+1998-10-05  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-msg.el (gnus-message-setup-hook): Add
+	`gnus-maybe-setup-default-charset'.
+	Delete dummy definition for `nnspool-rejected-article-hook' and
+	`xemacs-codename'
+	(gnus-maybe-setup-default-charset): New function.
+
+	* lisp/message.el (message-setup-hook): Delete
+	`message-maybe-setup-default-charset'.	
+	Abolish variable `message-newsreader' and `message-mailer'.
+	(message-user-agent): New variable.
+	Abolish function `message-maybe-setup-default-charset'.
+
+1998-10-03  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.4.
+
+1998-10-02  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-prepare): Don't store original
+	buffer to the entity.
+
+	* lisp/mmgnus.el: Use `generic' as mother backend; abolish method
+	`entity-header-start', `entity-header-end' and `fetch-field'.
+	(entity-buffer): New method.
+
+	* lisp/gnus-cache.el (gnus-cache-possibly-enter-article): Use
+	`mime-fetch-field' to refer Subject and From field for saving
+	cache file.
+
+1998-10-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.3.
+
+	* lisp/nnheader.el (make-full-mail-header): Store original subject
+	and from fields.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el: Abolish variable
+	`gnus-structured-field-decoder' and
+	`gnus-unstructured-field-decoder'.
+	(gnus-nov-parse-line): Don't decode from and subject.
+	(gnus-get-newsgroup-headers): Likewise.
+
+	* lisp/nnheader.el (make-full-mail-header): Decode subject and
+	from; changed to inline function.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-get-newsgroup-headers): Store
+	content-type.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.2.
+
+	* lisp/mmgnus.el: New module.
+
+	* lisp/gnus-art.el (gnus-article-prepare): Use content of
+	`gnus-current-headers' as mime-message-structure.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.1.
+	(gnus-version): Modify for Chao 1.11.
+
+	* lisp/nnheader.el (make-full-mail-header): Changed to macro.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version): Modify for Chao 1.10.
+
+	* lisp/gnus-score.el (gnus-header-index): Modify to use
+	mime-entity structure as gnus-header structure.
+
+	* lisp/nnheader.el: Use `mime-entity' as gnus-header structure.
+	(mail-header-number): Use `mime-entity-location-internal'.
+	(mail-header-set-number): Use `mime-entity-set-location-internal'.
+	- Change other `mail-header-*' and `mail-header-set-*' to alias of
+	  reference and set functions for mime-entity-internal.
+	(make-full-mail-header): Use `make-mime-entity-internal'.
+
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-reply): Use `make-full-mail-header'.
+	(message-followup): Likewise.
+
+	* lisp/nnheader.el (mail-header-references): Use
+	`mime-fetch-field' and `mail-header-entity'.
+	(mail-header-set-references): Use `mail-header-set-field'.
+	Define mm-backend `nil' and its method `fetch-field'.
+	(make-full-mail-header): Modify data structure to store References
+	to mime-entity.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (mail-header-id): Use `mime-fetch-field' and
+	`mail-header-entity'.
+	(mail-header-set-id): Use `mail-header-set-field'.
+	(make-full-mail-header): Modify data structure to store Message-Id
+	to mime-entity.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (mail-header-entity): New macro.
+	(mail-header-set-entity): New macro.
+	(mail-header-set-field): New macro.
+	(mail-header-set-parsed-field): New macro.
+	(mail-header-subject): Use `mail-header-entity'.
+	(mail-header-set-subject): Use `mail-header-set-parsed-field'.
+	(mail-header-from): Use `mail-header-entity'.
+	(mail-header-set-from): Use `mail-header-set-parsed-field'.
+	(mail-header-date): Use `mime-fetch-field' and
+	`mail-header-entity'.
+	(mail-header-set-date): Use `mail-header-set-field'.
+	(make-full-mail-header): Modify data structure to store Date to
+	mime-entity.
+	(make-mail-header): Use `make-full-mail-header'.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (mail-header-from): Use `mime-read-field'.
+	(mail-header-set-from): Store to mime-entity.
+	(make-full-mail-header): Modify data structure to store Subject to
+	mime-entity.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnheader.el (mail-header-subject): Use `mime-read-field'.
+	(mail-header-set-subject): Store to mime-entity.
+	(make-full-mail-header): Modify data structure to store Subject to
+	mime-entity.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-update-summary-mark-positions): Use
+	`make-full-mail-header'.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-get-newsgroup-headers): Use
+	`make-full-mail-header'.
+
 1998-10-16  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Change to 6.8.19.5.
