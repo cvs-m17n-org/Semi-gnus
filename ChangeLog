@@ -1,5 +1,10 @@
 1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/nndoc.el (nndoc-mime-parts-type-p): Strip leading white
+	space from the matching pattern.
+
+1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus-sum.el (gnus-nov-parse-extra): Abolished.
 	(gnus-nov-parse-line): Use `char-after' instead of `following-char'
 	; use `nnheader-nov-parse-extra' instead of `gnus-nov-parse-extra'.
