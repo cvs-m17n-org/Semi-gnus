@@ -1,3 +1,10 @@
+1999-05-13  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Don't specify
+	the authentication scheme if `password' is selected.
+
 1999-05-06  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
