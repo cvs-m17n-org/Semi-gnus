@@ -1,3 +1,92 @@
+2000-05-14 16:19:28  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnmail.el (nnmail-scan-directory-mail-source-once): New variable.
+	(nnmail-get-new-mail): Use it.
+	* gnus-start.el (gnus-get-unread-articles): Ditto.
+
+2000-05-14 14:02:12  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-edit-article): Better support for
+	nndraft:drafts.
+	* nndraft.el (nndraft-request-replace-article): New function,
+	bind nnmail-file-coding-system.
+
+2000-05-14  Dave Love  <fx@gnu.org>
+
+	* nnheader.el: Replace uses of `fset' with `defalias'.
+	(jka-compr-compression-info-list): Only defvar when compiling.
+
+2000-05-14 12:30:28  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el (webmail-netaddress-article): Refresh redirect.
+
+2000-05-13 20:41:10  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-view.el (mm-inline-text): w3 might not recognize utf-8.
+
+2000-05-13 16:49:41  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el: Translate &nbsp; to SP.
+
+2000-05-13 13:00:17  Robin S. Socha <robin@socha.net>
+
+	* message.el (message-bounce): Doc typo.
+
+2000-05-13 12:25:21  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-soup.el (gnus-soup-encoding-type): u is USENET news format.
+	(gnus-soup-store): Ditto.
+	(gnus-soup-send-packet): Ditto.
+	* nnsoup.el (nnsoup-replies-format-type): Ditto.
+	(nnsoup-dissect-buffer): Ditto.
+	(nnsoup-narrow-to-article): Ditto.
+	(nnsoup-make-active): Ditto
+
+2000-05-13 12:03:29  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-mode): Two parameters for local-variable-p.
+
+2000-05-13 00:54:46  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-strip-list-identifiers): New function.
+	(message-reply): Use it and use message-strip-subject-re.
+	(message-followup): Ditto.
+	* gnus-art.el (article-hide-list-identifiers): Remove more.
+	* gnus-sum.el (gnus-summary-remove-list-identifiers): Ditto.
+
+2000-05-12 22:28:54  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-uu.el (gnus-uu-digest-mail-forward): Bind
+	mail-parset-charset and use non-numeric argument.
+
+2000-05-12 20:54:11  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* mml.el (mml-buffer-list): New variable.
+	(mml-generate-new-buffer): New function.
+	(mml-destroy-buffers): Ditto.
+	(mml-insert-mime): Use them.
+	* gnus-msg.el (gnus-setup-message): mml-buffer leaks.
+	* gnus-sum.el (gnus-summary-edit-article): Ditto.
+	* message.el (message-mode): Ditto.
+	* gnus-uu.el (gnus-uu-digest-headers): Keep MIME headers.
+	(gnus-uu-save-article): Support show-as-mml.
+	* message.el (message-forward): Ditto.
+
+2000-05-12 15:15:55  Shenghuo ZHU  <zsh@cs.rochester.edu>
+
+	* nndoc.el (nndoc-type-alist): mime-digest head-begin.
+	(nndoc-mime-digest-type-p): Locate article head precisely.
+	* mml.el (mml-generate-default-type): New variable.
+	(mml-generate-mime-1): Use it.
+	(mml-insert-mime-headers): Use it.
+	* gnus-uu.el (gnus-uu-digest-buffer): New variable.
+	(gnus-uu-digest-mail-forward): Use it and call message-forward 
+	with argument digest.
+	(gnus-uu-save-article): Support message-forward-as-mime.
+	* message.el (message-forward): Add parameter digest.
+	* mm-decode.el (mm-dissect-default-type): New variable.
+	(mm-dissect-buffer): Use it.
+
 2000-05-11 11:08:03  Shenghuo ZHU  <zsh@cs.rochester.edu>
 
 	* mml.el (mml-parse-singlepart-with-multiple-charsets): Set space,

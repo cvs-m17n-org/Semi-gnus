@@ -1365,6 +1365,7 @@ should be sent in several parts. If it is nil, the size is unlimited."
   (autoload 'gnus-request-post "gnus-int")
   (autoload 'gnus-copy-article-buffer "gnus-msg")
   (autoload 'gnus-alive-p "gnus-util")
+  (autoload 'gnus-list-identifiers "gnus-sum")
   (autoload 'rmail-output "rmail")
   (autoload 'mu-cite-original "mu-cite"))
 
@@ -1504,6 +1505,20 @@ should be sent in several parts. If it is nil, the size is unlimited."
   (or (and (symbolp form) (fboundp form))
       (and (listp form) (eq (car form) 'lambda))
       (byte-code-function-p form)))
+
+(defun message-strip-list-identifiers (subject)
+  "Remove list identifiers in `gnus-list-identifiers'."
+  (let ((regexp (if (stringp gnus-list-identifiers)
+		    gnus-list-identifiers
+		  (mapconcat 'identity gnus-list-identifiers " *\\|"))))
+    (if (string-match (concat "\\(\\(\\(Re: +\\)?\\(" regexp 
+				" *\\)\\)+\\(Re: +\\)?\\)") subject)
+	(concat (substring subject 0 (match-beginning 1))
+		(or (match-string 3 subject)
+		    (match-string 5 subject))
+		(substring subject
+			   (match-end 1)))
+      subject)))
 
 (defun message-strip-subject-re (subject)
   "Remove \"Re:\" from subject lines."
@@ -4490,10 +4505,8 @@ that further discussion should take place only in "
 	    date (message-fetch-field "date")
 	    from (message-fetch-field "from")
 	    subject (or (message-fetch-field "subject") "none"))
-      ;; Remove any (buggy) Re:'s that are present and make a
-      ;; proper one.
-      (when (string-match message-subject-re-regexp subject)
-	(setq subject (substring subject (match-end 0))))
+      (if gnus-list-identifiers
+	  (setq subject (message-strip-list-identifiers subject)))
       (setq subject (message-make-followup-subject subject))
 
       (when (and (setq gnus-warning (message-fetch-field "gnus-warning"))
@@ -4575,8 +4588,8 @@ If TO-NEWSGROUPS, use that as the new Newsgroups line."
 		 (let ((case-fold-search t))
 		   (string-match "world" distribution)))
 	(setq distribution nil))
-      ;; Remove any (buggy) Re:'s that are present and make a
-      ;; proper one.
+      (if gnus-list-identifiers
+	  (setq subject (message-strip-list-identifiers subject)))
       (setq subject (message-make-followup-subject subject))
       (widen))
 
@@ -4893,9 +4906,10 @@ the message."
 	subject))))
 
 ;;;###autoload
-(defun message-forward (&optional news)
+(defun message-forward (&optional news digest)
   "Forward the current message via mail.
-Optional NEWS will use news to forward instead of mail."
+Optional NEWS will use news to forward instead of mail.
+Optional DIGEST will use digest to forward."
   (interactive "P")
   (let ((cur (current-buffer))
 	(subject (message-make-forward-subject))
@@ -4990,7 +5004,7 @@ Optional NEWS will use news to forward instead of mail."
 ;;;###autoload
 (defun message-bounce ()
   "Re-mail the current message.
-This only makes sense if the current message is a bounce message than
+This only makes sense if the current message is a bounce message that
 contains some mail you have written which has been bounced back to
 you."
   (interactive)

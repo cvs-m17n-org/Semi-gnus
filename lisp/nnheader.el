@@ -750,7 +750,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
     (erase-buffer))
   (current-buffer))
 
-(defvar jka-compr-compression-info-list)
+(eval-when-compile (defvar jka-compr-compression-info-list))
 (defvar nnheader-numerical-files
   (if (boundp 'jka-compr-compression-info-list)
       (concat "\\([0-9]+\\)\\("
@@ -1075,9 +1075,9 @@ find-file-hooks, etc.
   "Strip all \r's from the current buffer."
   (nnheader-skeleton-replace "\r"))
 
-(fset 'nnheader-run-at-time 'run-at-time)
-(fset 'nnheader-cancel-timer 'cancel-timer)
-(fset 'nnheader-cancel-function-timers 'cancel-function-timers)
+(defalias 'nnheader-run-at-time 'run-at-time)
+(defalias 'nnheader-cancel-timer 'cancel-timer)
+(defalias 'nnheader-cancel-function-timers 'cancel-function-timers)
 
 (defun nnheader-Y-or-n-p (prompt)
   "Ask user a \"Y/n\" question. Return t if answer is neither \"n\", \"N\" nor \"C-g\"."
@@ -1096,7 +1096,7 @@ find-file-hooks, etc.
       (message "%s(Y/n) Yes" prompt)
       t)))
 
-(when (string-match "XEmacs\\|Lucid" emacs-version)
+(when (string-match "XEmacs" emacs-version)
   (require 'nnheaderxm))
 
 (run-hooks 'nnheader-load-hook)

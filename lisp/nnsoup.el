@@ -48,7 +48,7 @@
 (defvoo nnsoup-replies-directory (concat nnsoup-directory "replies/")
   "*Directory where outgoing packets will be composed.")
 
-(defvoo nnsoup-replies-format-type ?n
+(defvoo nnsoup-replies-format-type ?u  ;; u is USENET news format.
   "*Format of the replies packages.")
 
 (defvoo nnsoup-replies-index-type ?n
@@ -256,7 +256,7 @@ backend for the messages.")
 		  (nth 1 (nnsoup-article-to-area
 			  article nnsoup-current-group))))))
       (cond ((= kind ?m) 'mail)
-	    ((= kind ?n) 'news)
+	    ((= kind ?n) 'news) 
 	    (t 'unknown)))))
 
 (deffoo nnsoup-close-group (group &optional server)
@@ -477,7 +477,8 @@ backend for the messages.")
     (goto-char (point-min))
     (cond
      ;; rnews batch format
-     ((= format ?n)
+     ((or (= format ?u)
+	  (= format ?n)) ;; Gnus back compatibility.
       (while (looking-at "^#! *rnews \\(+[0-9]+\\) *$")
 	(forward-line 1)
 	(push (list
@@ -591,7 +592,7 @@ backend for the messages.")
 		(let ((format (gnus-soup-encoding-format
 			       (gnus-soup-area-encoding (nth 1 area)))))
 		  (goto-char end)
-		  (when (or (= format ?n) (= format ?m))
+		  (when (or (= format ?u) (= format ?n) (= format ?m))
 		    (setq end (progn (forward-line -1) (point))))))
 	    (set-buffer msg-buf))
 	  (widen)
@@ -767,13 +768,13 @@ backend for the messages.")
       (if (not (setq elem (assoc group active)))
 	  (push (list group (cons 1 lines)
 		      (list (cons 1 lines)
-			    (vector ident group "ncm" "" lines)))
+			    (vector ident group "ucm" "" lines)))
 		active)
 	(nconc elem
 	       (list
 		(list (cons (1+ (setq min (cdadr elem)))
 			    (+ min lines))
-		      (vector ident group "ncm" "" lines))))
+		      (vector ident group "ucm" "" lines))))
 	(setcdr (cadr elem) (+ min lines)))
       (setq files (cdr files)))
     (nnheader-message 5 "")

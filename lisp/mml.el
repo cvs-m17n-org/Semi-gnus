@@ -72,6 +72,20 @@ unknown encoding; `use-ascii': always use ASCII for those characters
 with unknown encoding; `multipart': always send messages with more than
 one charsets.")
 
+(defvar mml-generate-default-type "text/plain")
+
+(defvar mml-buffer-list nil)
+
+(defun mml-generate-new-buffer (name) 
+  (let ((buf (generate-new-buffer name)))
+    (push buf mml-buffer-list)
+    buf))
+
+(defun mml-destroy-buffers ()
+  (let (kill-buffer-hook)
+    (mapcar 'kill-buffer mml-buffer-list)
+    (setq mml-buffer-list nil)))
+
 (defun mml-parse ()
   "Parse the current buffer as an MML document."
   (goto-char (point-min))
@@ -287,7 +301,8 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	    (cond 
 	     ((eq (car cont) 'mml)
 	      (let ((mml-boundary (funcall mml-boundary-function
-					   (incf mml-multipart-number))))
+			  		   (incf mml-multipart-number)))
+		    (mml-generate-default-type "text/plain"))
 		(mml-to-mime))
 	      (let ((mm-7bit-chars (concat mm-7bit-chars "\x1b")))
 		;; ignore 0x1b, it is part of iso-2022-jp
@@ -351,6 +366,9 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
     (insert "\n"))
    ((eq (car cont) 'multipart)
     (let* ((type (or (cdr (assq 'type cont)) "mixed"))
+	   (mml-generate-default-type (if (equal type "digest")
+					  "message/rfc822"
+					"text/plain"))
            (handler (assoc type mml-generate-multipart-alist)))
       (if handler
           (funcall (cdr handler) cont)
@@ -420,7 +438,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	   cont '(name access-type expiration size permission)))
     (when (or charset
 	      parameters
-	      (not (equal type "text/plain")))
+	      (not (equal type mml-generate-default-type)))
       (when (consp charset)
 	(error
 	 "Can't encode a part with several charsets."))
@@ -531,7 +549,7 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
     (unless (stringp (car handle))
       (unless (setq textp (equal (mm-handle-media-supertype handle) "text"))
 	(save-excursion
-	  (set-buffer (setq buffer (generate-new-buffer " *mml*")))
+	  (set-buffer (setq buffer (mml-generate-new-buffer " *mml*")))
 	  (mm-insert-part handle)
 	  (if (setq mmlp (equal (mm-handle-media-type handle) 
 				"message/rfc822"))
