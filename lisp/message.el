@@ -255,7 +255,8 @@ any confusion."
   :group 'message-sending
   :type 'function)
 
-(defcustom message-subject-re-regexp "^[ \t]*\\([Rr][Ee]:[ \t]*\\)*[ \t]*"
+(defcustom message-subject-re-regexp
+  "^[ \t]*\\([Rr][Ee]\\(\\[[0-9]*\\]\\)*:[ \t]*\\)*[ \t]*"
   "*Regexp matching \"Re: \" in the subject line."
   :group 'message-various
   :type 'regexp)
@@ -1961,15 +1962,15 @@ be added to \"References\" field.
 			nil (message-fetch-field "References")))
 	    (setq in-reply-to (message-list-references
 			       nil (message-fetch-field "In-Reply-To")))
-	    (when in-reply-to
-	      (setq add-in-reply-to t))
 	    (widen)
 	    (narrow-to-region start end)
 	    (std11-narrow-to-header)
 	    (setq msg-id (message-fetch-field "Message-ID"))
 	    (setq orig-refs (or (message-fetch-field "References")
 				(message-fetch-field "In-Reply-To")))
-	    (setq in-reply-to (message-list-references in-reply-to msg-id))
+	    (unless in-reply-to
+	      (setq add-in-reply-to t)
+	      (setq in-reply-to (message-list-references in-reply-to msg-id)))
 	    (if (null refs)
 		(setq refs (message-list-references nil orig-refs msg-id))
 	      (when message-yank-add-new-references
