@@ -1,3 +1,10 @@
+2000-12-26  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el: Bind `:parameter-type', `:parameter-document',
+	`:function', `:function-document', `:variable',
+	`:variable-document', `:variable-group', `:variable-type' and
+	`:variable-default' for old Emacsen.
+
 2000-12-22  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.

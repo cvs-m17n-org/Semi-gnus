@@ -2710,6 +2710,13 @@ like this in the group parameters:
   (signature "Funky Signature"))
 @end example
 
+@item banner
+An item like @code{(banner . "regex")} causes any part of an article
+that matches the regular expression "regex" to be stripped. Instead of
+"regex", you can also use the symbol @code{signature} which strips the
+last signature or any of the elements of the alist
+@code{gnus-article-banner-alist}.
+
 @end table
 
 Use the @kbd{G p} command to edit group parameters of a group.  You
@@ -14606,7 +14613,7 @@ wherever.  (Note: this would have to be at a point *after*
 @code{gnus-agent} has been loaded via @code{(gnus-agentize)})
 
 @lisp
-(defvar  gnus-category-predicate-alist
+(setq  gnus-category-predicate-alist
   (append gnus-category-predicate-alist
 	 '((old . my-article-old-p))))
 @end lisp
@@ -15995,7 +16002,7 @@ the @code{gnus-default-adaptive-score-alist} variable.  For instance, it
 might look something like this:
 
 @lisp
-(defvar gnus-default-adaptive-score-alist
+(setq gnus-default-adaptive-score-alist
   '((gnus-unread-mark)
     (gnus-ticked-mark (from 4))
     (gnus-dormant-mark (from 5))

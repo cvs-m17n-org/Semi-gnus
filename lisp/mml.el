@@ -90,13 +90,14 @@ one charsets.")
 
 (defun mml-parse ()
   "Parse the current buffer as an MML document."
-  (goto-char (point-min))
-  (let ((table (syntax-table)))
-    (unwind-protect
-	(progn
-	  (set-syntax-table mml-syntax-table)
-	  (mml-parse-1))
-      (set-syntax-table table))))
+  (save-excursion
+    (goto-char (point-min))
+    (let ((table (syntax-table)))
+      (unwind-protect
+	  (progn
+	    (set-syntax-table mml-syntax-table)
+	    (mml-parse-1))
+	(set-syntax-table table)))))
 
 (defun mml-parse-1 ()
   "Parse the current buffer as an MML document."
@@ -215,7 +216,8 @@ one charsets.")
 
 (defun mml-read-tag ()
   "Read a tag and return the contents."
-  (let (contents name elem val)
+  (let ((orig-point (point))
+	contents name elem val)
     (forward-char 2)
     (setq name (buffer-substring-no-properties
 		(point) (progn (forward-sexp 1) (point))))
@@ -233,6 +235,8 @@ one charsets.")
     (goto-char (match-end 0))
     ;; Don't skip the leading space.
     ;;(skip-chars-forward " \t\n")
+    ;; Put the tag location into the returned contents
+    (setq contents (append (list (cons 'tag-location orig-point)) contents))
     (cons (intern name) (nreverse contents))))
 
 (defun mml-read-part (&optional mml)

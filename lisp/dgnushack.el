@@ -324,7 +324,8 @@ Modify to suit your needs."))
 
   (dolist (file dgnushack-exporting-files)
     (setq file (expand-file-name file srcdir))
-    (when (and (file-exists-p (setq elc (concat file "c")))
+    (when (and (file-exists-p
+		(setq elc (concat (file-name-nondirectory file) "c")))
 	       (file-newer-than-file-p file elc))
       (delete-file elc)))
 
@@ -333,7 +334,8 @@ Modify to suit your needs."))
 	file elc)
     (while (setq file (pop files))
       (setq file (expand-file-name file srcdir))
-      (when (or (not (file-exists-p (setq elc (concat file "c"))))
+      (when (or (not (file-exists-p
+		      (setq elc (concat (file-name-nondirectory file) "c"))))
 		(file-newer-than-file-p file elc))
 	(ignore-errors
 	  (byte-compile-file file))))))

@@ -4630,13 +4630,20 @@ than 988 characters long, and if they are not, trim them until they are."
   "Start editing a mail message to be sent.
 OTHER-HEADERS is an alist of header/value pairs."
   (interactive)
-  (let ((message-this-is-mail t))
+  (let ((message-this-is-mail t) replybuffer)
     (unless (message-mail-user-agent)
       (message-pop-to-buffer (message-buffer-name "mail" to)))
+    ;; FIXME: message-mail should do something if YANK-ACTION is not
+    ;; insert-buffer.
+    (and (consp yank-action) (eq (car yank-action) 'insert-buffer)
+	 (setq replybuffer (nth 1 yank-action)))
     (message-setup
      (nconc
       `((To . ,(or to "")) (Subject . ,(or subject "")))
-      (when other-headers other-headers)))))
+      (when other-headers other-headers))
+     replybuffer)
+    ;; FIXME: Should return nil if failure.
+    t))
 
 ;;;###autoload
 (defun message-news (&optional newsgroups subject)
@@ -5448,9 +5455,6 @@ which specify the range to operate on."
 (defalias 'message-exchange-point-and-mark 'exchange-point-and-mark)
 
 ;; Support for toolbar
-(if (featurep 'xemacs)
-    (require 'messagexmas))
-
 (eval-when-compile 
   (defvar tool-bar-map)
   (defvar tool-bar-mode))
@@ -5753,6 +5757,10 @@ regexp varstr."
     (message-options-set 'message-recipients
 			  (mail-strip-quoted-names 
 			   (message-fetch-field "to")))))
+
+(when (featurep 'xemacs)
+  (require 'messagexmas)
+  (message-xmas-redefine))
 
 (defun message-save-drafts ()
   "Postponing the message."

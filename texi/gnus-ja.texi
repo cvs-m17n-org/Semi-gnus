@@ -2745,6 +2745,13 @@ form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
   (signature "Funky Signature"))
 @end example
 
+@item banner
+@code{(banner . "regex")} $B$N$h$&$J9`L\$O!"5-;v$N$9$Y$F$N>l=j$G@55,I=(B
+$B8=(B "regex" $B$K%^%C%A$9$k$b$N$r:o=|$7$^$9!#(B"regex" $B$NBe$o$j$K%7%s%\(B
+$B%k(B @code{signature} ($B:G8e$N=pL>$r:o(B
+$B=|(B) $B$dO"A[%j%9%H(B @code{gnus-article-banner-alist} $B$N3FMWAG$r;H$&$3$H$b$G(B
+$B$-$^$9!#(B
+
 @end table
 
 $B%0%k!<%W%Q%i%a!<%?$N=$@5$K$O(B @kbd{G p} $BL?Na$r;H$C$F$/$@$5$$!#%H%T%C%/%Q(B
@@ -14047,9 +14054,9 @@ gnus $B%(!<%8%'%s%H$,$=$N5-;v$r(B SPAM $B$@$H8+Pv$7$?$i??!#$3$NH/8+E*<jK!$O!"
 $B9~$^$l$?8e$G$"$kI,MW$,$"$k$G$7$g$&(B)
 
 @lisp
-(defvar  gnus-category-predicate-alist
-  (append gnus-category-predicate-alist
-	 '((old . my-article-old-p))))
+(setq gnus-category-predicate-alist
+      (append gnus-category-predicate-alist
+	      '((old . my-article-old-p))))
 @end lisp
 
 $B$=$7$F!"C1$K<!$N$h$&$K=R8l$r;XDj$7$^$9(B:
@@ -15474,18 +15481,18 @@ gnus $B$K$O$3$l$i$rA4$F<+F0E*$K(B --- $B$^$k$GKbK!$G$b;H$C$?$h$&$K:n@.(B
 $B%9%3%"IU$1$N=hM}$r40A4$K@)8f$G$-$^$9!#Nc$($P!"$3$N$h$&$J46$8$K$J$j$^$9!#(B
 
 @lisp
-(defvar gnus-default-adaptive-score-alist
-  '((gnus-unread-mark)
-    (gnus-ticked-mark (from 4))
-    (gnus-dormant-mark (from 5))
-    (gnus-del-mark (from -4) (subject -1))
-    (gnus-read-mark (from 4) (subject 2))
-    (gnus-expirable-mark (from -1) (subject -1))
-    (gnus-killed-mark (from -1) (subject -3))
-    (gnus-kill-file-mark)
-    (gnus-ancient-mark)
-    (gnus-low-score-mark)
-    (gnus-catchup-mark (from -1) (subject -1))))
+(setq gnus-default-adaptive-score-alist
+      '((gnus-unread-mark)
+	(gnus-ticked-mark (from 4))
+	(gnus-dormant-mark (from 5))
+	(gnus-del-mark (from -4) (subject -1))
+	(gnus-read-mark (from 4) (subject 2))
+	(gnus-expirable-mark (from -1) (subject -1))
+	(gnus-killed-mark (from -1) (subject -3))
+	(gnus-kill-file-mark)
+	(gnus-ancient-mark)
+	(gnus-low-score-mark)
+	(gnus-catchup-mark (from -1) (subject -1))))
 @end lisp
 
 $B8+$F$*J,$+$j$N$h$&$K!"$3$NO"A[%j%9%H$N3FMWAG$O!"%-!<$H$7$F0u(B ($BJQ?tL>$+$b(B
