@@ -171,8 +171,7 @@
   (when (or force
 	    (not (equal emacs-version
 			(cdr (assq 'version gnus-format-specs))))
-	    (not (equal gnus-version
-			(cdr (assq 'gnus-version gnus-format-specs)))))
+	    (not (equal gnus-version gnus-newsrc-file-version)))
     (message "%s" "Force update format specs.")
     (setq gnus-format-specs nil))
 
@@ -216,9 +215,7 @@
 	  (set (intern (format "gnus-%s-line-format-spec" type)) val)))))
 
   (unless (assq 'version gnus-format-specs)
-    (push (cons 'version emacs-version) gnus-format-specs))
-  (unless (assq 'gnus-version gnus-format-specs)
-    (push (cons 'gnus-version gnus-version) gnus-format-specs)))
+    (push (cons 'version emacs-version) gnus-format-specs)))
 
 (defvar gnus-mouse-face-0 'highlight)
 (defvar gnus-mouse-face-1 'highlight)
