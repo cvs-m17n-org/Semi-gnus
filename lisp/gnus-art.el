@@ -199,7 +199,7 @@ asynchronously.	 The compressed face will be piped to this command."
 	 (lambda (spec)
 	   (list
 	    (format format (car spec) (cadr spec))
-	    2 3 (intern (format "gnus-emphasis-%s" (caddr spec)))))
+	    2 3 (intern (format "gnus-emphasis-%s" (nth 2 spec)))))
 	 types)))
   "*Alist that says how to fontify certain phrases.
 Each item looks like this:
@@ -1584,7 +1584,6 @@ This format is defined by the `gnus-article-time-format' variable."
   "Append this article to Rmail file.
 Optional argument FILENAME specifies file name.
 Directory to save to is default to `gnus-article-save-directory'."
-  (interactive)
   (setq filename (gnus-read-save-file-name
 		  "Save %s in rmail file:" filename
 		  gnus-rmail-save-name gnus-newsgroup-name
@@ -1600,7 +1599,6 @@ Directory to save to is default to `gnus-article-save-directory'."
   "Append this article to Unix mail file.
 Optional argument FILENAME specifies file name.
 Directory to save to is default to `gnus-article-save-directory'."
-  (interactive)
   (setq filename (gnus-read-save-file-name
 		  "Save %s in Unix mail file:" filename
 		  gnus-mail-save-name gnus-newsgroup-name
@@ -1619,7 +1617,6 @@ Directory to save to is default to `gnus-article-save-directory'."
   "Append this article to file.
 Optional argument FILENAME specifies file name.
 Directory to save to is default to `gnus-article-save-directory'."
-  (interactive)
   (setq filename (gnus-read-save-file-name
 		  "Save %s in file:" filename
 		  gnus-file-save-name gnus-newsgroup-name
@@ -1638,14 +1635,12 @@ Directory to save to is default to `gnus-article-save-directory'."
   "Write this article to a file.
 Optional argument FILENAME specifies file name.
 The directory to save in defaults to `gnus-article-save-directory'."
-  (interactive)
   (gnus-summary-save-in-file nil t))
 
 (defun gnus-summary-save-body-in-file (&optional filename)
   "Append this article body to a file.
 Optional argument FILENAME specifies file name.
 The directory to save in defaults to `gnus-article-save-directory'."
-  (interactive)
   (setq filename (gnus-read-save-file-name
 		  "Save %s body in file:" filename
 		  gnus-file-save-name gnus-newsgroup-name
@@ -1662,7 +1657,6 @@ The directory to save in defaults to `gnus-article-save-directory'."
 
 (defun gnus-summary-save-in-pipe (&optional command)
   "Pipe this article to subprocess."
-  (interactive)
   (setq command
 	(cond ((eq command 'default)
 	       gnus-last-shell-command)
@@ -1892,9 +1886,9 @@ commands:
   (use-local-map gnus-article-mode-map)
   (gnus-update-format-specifications nil 'article-mode)
   (set (make-local-variable 'page-delimiter) gnus-page-delimiter)
-  (set (make-local-variable 'gnus-page-broken) nil)
-  (set (make-local-variable 'gnus-button-marker-list) nil)
-  (set (make-local-variable 'gnus-article-current-summary) nil)
+  (make-local-variable 'gnus-page-broken) 
+  (make-local-variable 'gnus-button-marker-list) 
+  (make-local-variable 'gnus-article-current-summary) 
   (gnus-set-default-directory)
   (buffer-disable-undo (current-buffer))
   (setq buffer-read-only t)
@@ -2408,7 +2402,7 @@ If given a prefix, show the hidden text instead."
 	  (when (and (numberp article)
 		     gnus-summary-buffer
 		     (get-buffer gnus-summary-buffer)
-		     (buffer-name (get-buffer gnus-summary-buffer)))
+		     (gnus-buffer-exists-p gnus-summary-buffer))
 	    (save-excursion
 	      (set-buffer gnus-summary-buffer)
 	      (let ((header (gnus-summary-article-header article)))
@@ -2432,8 +2426,8 @@ If given a prefix, show the hidden text instead."
 
 		(let ((method (gnus-find-method-for-group
 			       gnus-newsgroup-name)))
-		  (if (not (eq (car method) 'nneething))
-		      ()
+		  (when (and (eq (car method) 'nneething)
+			     (vectorp header))
 		    (let ((dir (concat (file-name-as-directory (nth 1 method))
 				       (mail-header-subject header))))
 		      (when (file-directory-p dir)
@@ -2445,7 +2439,7 @@ If given a prefix, show the hidden text instead."
 	   ((and (numberp article)
 		 gnus-summary-buffer
 		 (get-buffer gnus-summary-buffer)
-		 (buffer-name (get-buffer gnus-summary-buffer))
+		 (gnus-buffer-exists-p gnus-summary-buffer)
 		 (eq (cdr (save-excursion
 			    (set-buffer gnus-summary-buffer)
 			    (assq article gnus-newsgroup-reads)))
@@ -2502,7 +2496,7 @@ If given a prefix, show the hidden text instead."
 			(buffer-name (get-buffer gnus-article-buffer))))
 	(save-excursion
 	  (if (get-buffer gnus-original-article-buffer)
-	      (set-buffer (get-buffer gnus-original-article-buffer))
+	      (set-buffer gnus-original-article-buffer)
 	    (set-buffer (get-buffer-create gnus-original-article-buffer))
 	    (buffer-disable-undo (current-buffer))
 	    (setq major-mode 'gnus-original-article-mode)
