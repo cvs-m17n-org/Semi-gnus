@@ -630,7 +630,7 @@ adjust according to `gpg-command-passphrase-env'."
       ;; temporary file resides in a world-writable directory.
       (unless (or (memq system-type '(windows-nt cygwin32 win32 w32 mswindows))
 		  (eq (file-modes gpg-temp-directory) 448)) ; mode 0700
-	(error "Directory for temporary files must have mode 0700."))
+	(error "Directory for temporary files (%s) must have mode 0700." gpg-temp-directory))
       (setq name (make-temp-name name))
       (let ((mode (default-file-modes)))
 	(unwind-protect
