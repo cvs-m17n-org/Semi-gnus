@@ -253,10 +253,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.9.04"
+(defconst gnus-version-number "6.9.07"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.10"
+(defconst gnus-original-version-number "0.13"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -1358,11 +1358,15 @@ face."
 (defcustom gnus-article-display-hook
   (if (and (string-match "XEmacs" emacs-version)
 	   (featurep 'xface))
+;;    '(gnus-article-decode-charset	- comment out for Semi-gnus
+;;	gnus-article-decode-rfc1522	- comment out for Semi-gnus
       '(gnus-article-hide-headers-if-wanted
 	gnus-article-hide-boring-headers
 	gnus-article-treat-overstrike
 	gnus-article-maybe-highlight
 	gnus-article-display-x-face)
+;;    '(gnus-article-decode-charset	- comment out for Semi-gnus
+;;      gnus-article-decode-rfc1522	- comment out for Semi-gnus
     '(gnus-article-hide-headers-if-wanted
       gnus-article-hide-boring-headers
       gnus-article-treat-overstrike
@@ -1581,6 +1585,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
    '(("info" Info-goto-node)
      ("pp" pp pp-to-string pp-eval-expression)
      ("qp" quoted-printable-decode-region quoted-printable-decode-string)
+     ("rfc2047" rfc2047-decode-region rfc2047-decode-string)
      ("ps-print" ps-print-preprint)
      ("mail-extr" mail-extract-address-components)
      ("browse-url" browse-url)
@@ -1701,7 +1706,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-next-page gnus-article-prev-page
       gnus-request-article-this-buffer gnus-article-mode
       gnus-article-setup-buffer gnus-narrow-to-page
-      gnus-article-delete-invisible-text)
+      gnus-article-delete-invisible-text gnus-hack-decode-rfc1522)
      ("gnus-art" :interactive t
       gnus-article-hide-headers gnus-article-hide-boring-headers
       gnus-article-treat-overstrike gnus-article-word-wrap
@@ -1713,7 +1718,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-date-original gnus-article-date-lapsed
       gnus-article-show-all-headers
       gnus-article-edit-mode gnus-article-edit-article
-      gnus-article-edit-done
+      gnus-article-edit-done gnus-decode-rfc1522 article-decode-rfc1522
       gnus-start-date-timer gnus-stop-date-timer)
      ("gnus-int" gnus-request-type)
      ("gnus-start" gnus-newsrc-parse-options gnus-1 gnus-no-server-1
@@ -2010,14 +2015,13 @@ If ARG, insert string at point."
       (string-to-number
        (if (zerop major)
 	   (format "%s00%02d%02d"
-		   (cond
-		    ((member alpha '("(ding)" "d")) "4.99")
-		    ((member alpha '("September" "s")) "5.01")
-		    ((member alpha '("Red" "r")) "5.03")
-		    ((member alpha '("Quassia" "q")) "5.05")
-		    ((member alpha '("Pterodactyl" "p")) "5.07")
-		    ((member alpha '("o")) "5.09")
-		    ((member alpha '("n")) "5.11"))
+		   (if (member alpha '("(ding)" "d"))
+		       "4.99"
+		     (+ 5 (* 0.02
+			     (abs
+			      (- (char-int (aref (downcase alpha) 0))
+				 (char-int ?t))))
+			-0.01))
 		   minor least)
 	 (format "%d.%02d%02d" major minor least))))))
 

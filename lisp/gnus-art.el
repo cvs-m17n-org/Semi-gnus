@@ -36,6 +36,7 @@
 (require 'browse-url)
 (require 'alist)
 (require 'mime-view)
+(require 'mm-bodies)
 
 (defgroup gnus-article nil
   "Article display."
@@ -410,7 +411,7 @@ beginning of a line."
   :type 'regexp
   :group 'gnus-article-various)
 
-(defcustom gnus-article-mode-line-format "Gnus: %%b %S"
+(defcustom gnus-article-mode-line-format "Gnus: %g %S"
   "*The format specification for the article mode line.
 See `gnus-summary-mode-line-format' for a closer description."
   :type 'string
@@ -967,6 +968,73 @@ characters to translate to."
 		     default-mime-charset)))
       (eword-decode-header charset)
       )))
+;; Semi-gnus specific
+;;
+
+;; - pgnus specific
+(defun gnus-article-decode-mime-words ()
+  "Decode all MIME-encoded words in the article."
+  (interactive)
+  (save-excursion
+    (set-buffer gnus-article-buffer)
+    (let ((inhibit-point-motion-hooks t)
+	  buffer-read-only)
+      (rfc2047-decode-region (point-min) (point-max)))))
+
+(defun gnus-article-decode-charset (&optional prompt)
+  "Decode charset-encoded text in the article.
+If PROMPT (the prefix), prompt for a coding system to use."
+  (interactive "P")
+  (save-excursion
+    (set-buffer gnus-article-buffer)
+    (let* ((inhibit-point-motion-hooks t)
+	   (ct (message-fetch-field "Content-Type" t))
+	   (cte (message-fetch-field "Content-Transfer-Encoding" t))
+	   (charset (cond
+		     (prompt
+		      (mm-read-coding-system "Charset to decode: "))
+		     (ct
+		      (mm-content-type-charset ct))
+		     (gnus-newsgroup-name
+		      (gnus-group-find-parameter
+		       gnus-newsgroup-name 'charset))))
+	   buffer-read-only)
+      (save-restriction
+	(goto-char (point-min))
+	(search-forward "\n\n" nil 'move)
+	(narrow-to-region (point) (point-max))
+	(mm-decode-body
+	 charset (and cte (intern (downcase (gnus-strip-whitespace cte)))))))))
+
+(defalias 'gnus-decode-rfc1522 'article-decode-rfc1522)
+(defalias 'gnus-article-decode-rfc1522 'article-decode-rfc1522)
+(defun article-decode-rfc1522 ()
+  "Remove QP encoding from headers."
+  (let ((inhibit-point-motion-hooks t)
+	(buffer-read-only nil))
+    (save-restriction
+      (message-narrow-to-head)
+      (rfc2047-decode-region (point-min) (point-max)))))
+
+(defun article-de-quoted-unreadable (&optional force)
+  "Translate a quoted-printable-encoded article.
+If FORCE, decode the article whether it is marked as quoted-printable
+or not."
+  (interactive (list 'force))
+  (save-excursion
+    (let ((buffer-read-only nil)
+	  (type (gnus-fetch-field "content-transfer-encoding")))
+      (gnus-article-decode-rfc1522)
+      (when (or force
+		(and type (string-match "quoted-printable" (downcase type))))
+	(goto-char (point-min))
+	(search-forward "\n\n" nil 'move)
+	(quoted-printable-decode-region (point) (point-max))))))
+
+(defun article-mime-decode-quoted-printable-buffer ()
+  "Decode Quoted-Printable in the current buffer."
+  (quoted-printable-decode-region (point-min) (point-max)))
+;; - pgnus specific
 
 (defun article-hide-pgp (&optional arg)
   "Toggle hiding of any PGP headers and signatures in the current article.
@@ -1908,8 +1976,7 @@ commands:
   (buffer-disable-undo (current-buffer))
   (setq buffer-read-only t)
   (set-syntax-table gnus-article-mode-syntax-table)
-  (when (fboundp 'set-buffer-multibyte)
-    (set-buffer-multibyte t))
+  (mm-enable-multibyte)
   (gnus-run-hooks 'gnus-article-mode-hook))
 
 (defun gnus-article-setup-buffer ()

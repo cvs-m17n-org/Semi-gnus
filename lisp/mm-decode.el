@@ -1,4 +1,4 @@
-;;; mm-decode.el --- Function for decoding MIME things
+;;; mm-decode.el --- Functions for decoding MIME things
 ;; Copyright (C) 1998 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>

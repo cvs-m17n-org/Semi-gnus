@@ -46,6 +46,8 @@
     (require 'mail-abbrevs)
   (require 'mailabbrev))
 (require 'mime-edit)
+(require 'rfc2047)
+(require 'mm-bodies)
 
 (defgroup message '((user-mail-address custom-variable)
 		    (user-full-name custom-variable))
@@ -1181,7 +1183,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 	(erase-buffer))
     (set-buffer (get-buffer-create " *message work*"))
     (kill-all-local-variables)
-    (buffer-disable-undo (current-buffer))))
+    (mm-enable-multibyte)))
 
 (defun message-functionp (form)
   "Return non-nil if FORM is funcallable."
@@ -1505,8 +1507,7 @@ C-c C-r  message-caesar-buffer-body (rot13 the message body)."
   (setq adaptive-fill-first-line-regexp
 	(concat "[ \t]*[-a-z0-9A-Z]*>+[ \t]*\\|"
 		adaptive-fill-first-line-regexp))
-  (when (fboundp 'set-buffer-multibyte)
-    (set-buffer-multibyte t))
+  (mm-enable-multibyte)
   (run-hooks 'text-mode-hook 'message-mode-hook))
 
 
@@ -2197,8 +2198,10 @@ the user from the mailer."
       (let ((message-deletable-headers
 	     (if news nil message-deletable-headers)))
 	(message-generate-headers message-required-mail-headers))
+;;      (rfc2047-encode-message-header)
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
+;;    (message-encode-message-body)
     (unwind-protect
 	(save-excursion
 	  (set-buffer tembuf)
@@ -2398,8 +2401,10 @@ to find out how to use this."
       (message-narrow-to-headers)
       ;; Insert some headers.
       (message-generate-headers message-required-news-headers)
+;;      (rfc2047-encode-message-header)
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
+;;    (message-encode-message-body)
     (message-cleanup-headers)
     (if (not (message-check-news-syntax))
 	(progn
@@ -2709,7 +2714,7 @@ to find out how to use this."
 	   (y-or-n-p "Empty article.  Really post? "))))
    ;; Check for control characters.
    (message-check 'control-chars
-     (if (re-search-forward "[\000-\007\013\015-\037\200-\237]" nil t)
+     (if (re-search-forward "[\000-\007\013\015-\032\034-\037\200-\237]" nil t)
 	 (y-or-n-p
 	  "The article contains control characters.  Really post? ")
        t))
@@ -4495,6 +4500,32 @@ regexp varstr."
 	(aset string idx to))
       (setq idx (1+ idx)))
     string))
+
+;;;
+;;; MIME functions
+;;;
+
+(defun message-encode-message-body ()
+  "Examine the message body, encode it, and add the requisite headers."
+  (when (featurep 'mule)
+    (save-excursion
+      (save-restriction
+	(message-narrow-to-headers)
+	(message-remove-header
+	 "^Content-Transfer-Encoding:\\|^Content-Type:\\|^Mime-Version:" t)
+	(goto-char (point-max))
+	(widen)
+	(narrow-to-region (point) (point-max))
+	(let* ((charset (mm-encode-body))
+	       (encoding (mm-body-encoding)))
+	  (when (consp charset)
+	    (error "Can't encode messages with multiple charsets (yet)"))
+	  (widen)
+	  (message-narrow-to-headers)
+	  (goto-char (point-max))
+	  (mm-insert-rfc822-headers
+	   (or charset (mm-mule-charset-to-mime-charset 'ascii))
+	   encoding))))))
 
 (run-hooks 'message-load-hook)
 
