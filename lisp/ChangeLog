@@ -1,3 +1,28 @@
+2002-07-21  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+	From Nevin Kapur <nevin@jhu.edu>.
+
+	* nnmail.el (nnmail-fancy-expiry-target): Treat nonexisting
+	headers as empty headers.
+	
+2002-07-21  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+	From Jochen Hein <jochen@jochen.org>.
+
+	* gnus-art.el (gnus-emphasis-alist): Add strikethrough and
+	correct typo.
+	(gnus-emphasis-strikethru): New face.
+
+2002-07-20  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+	From Jason Merrill <jason@redhat.com>.
+
+	* nnfolder.el (nnfolder-retrieve-headers): Avoid searching the
+	entire file for each of a sequence of missing articles.
+
+	* gnus-salt.el (gnus-binary-display-article): Respect an existing
+	value for gnus-view-pseudos.
+
+	* gnus-sum.el (gnus-summary-insert-new-articles): Count down to
+	avoid nreverse.
+
 2002-07-14  Kai Gro,b_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 	From Ted Zlatanov <teodor.zlatanov@divine.com>.
 
