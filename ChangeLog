@@ -1,5 +1,10 @@
 2001-07-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/message.el (message-font-lock-keywords-1): Replace regexp
+	for mml tags with `mime-edit-tag-regexp'.
+
+2001-07-10  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/message.el (message-font-lock-keywords-2): Move definitions
 	for cited texts and mml tags to `message-font-lock-keywords-1'.
 
