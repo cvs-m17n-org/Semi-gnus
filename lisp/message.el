@@ -920,6 +920,18 @@ Defaults to `text-mode-abbrev-table'.")
   "Face used for displaying cited text names."
   :group 'message-faces)
 
+(defface message-mml-face
+  '((((class color)
+      (background dark))
+     (:foreground "ForestGreen"))
+    (((class color)
+      (background light))
+     (:foreground "ForestGreen"))
+    (t
+     (:bold t)))
+  "Face used for displaying MML."
+  :group 'message-faces)
+
 (defvar message-font-lock-keywords
   (let* ((cite-prefix "A-Za-z")
 	 (cite-suffix (concat cite-prefix "0-9_.@-"))
@@ -953,7 +965,9 @@ Defaults to `text-mode-abbrev-table'.")
       (,(concat "^[ \t]*"
 		"\\([" cite-prefix "]+[" cite-suffix "]*\\)?"
 		"[:>|}].*")
-       (0 'message-cited-text-face))))
+       (0 'message-cited-text-face))
+      ("<#/?\\(multi\\)part.*>"
+       (0 'message-mml-face))))
   "Additional expressions to highlight in Message mode.")
 
 ;; XEmacs does it like this.  For Emacs, we have to set the
@@ -4727,11 +4741,12 @@ regexp varstr."
 	(delete-region beg (point))
 	(insert "Mime-Version: 1.0\n")
 	(search-forward "\n\n")
+	(forward-char -1)
 	(insert line)
 	(when (save-excursion
 		(re-search-backward "^Content-Type: multipart/" nil t))
 	  (insert "This is a MIME multipart message.  If you are reading\n")
-	  (insert "this, you shouldn't.\n\n"))))))
+	  (insert "this, you shouldn't.\n"))))))
 
 (defvar message-save-buffer " *encoding")
 (defun message-save-drafts ()
