@@ -5570,7 +5570,7 @@ Gnus は実際にはどの記事も親にはせず、単に最初の孤児を除いてすべての孤児
 この変数を特別な値 @code{fuzzy} に設定すれば、gnus は表題にあいまいな文
 字列比較アルゴリズムを使います (@pxref{Fuzzy Matching})。
 
-@item gnus-sumplify-subject-fuzzy-regexp
+@item gnus-simplify-subject-fuzzy-regexp
 @vindex gnus-simplify-subject-fuzzy-regexp
 これは正規表現か、あいまい表題指定が使われているときに表題から合致したも
 のが取り除かれる、正規表現のリストであることができます。
