@@ -1,5 +1,10 @@
 2002-11-28  Daiki Ueno  <ueno@unixuser.org>
 
+	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Don't refer to
+	the value of `gnus-agent-file-name'.
+
+2002-11-28  Daiki Ueno  <ueno@unixuser.org>
+
 	* lisp/gnus-agent.el (gnus-agent-fetch-group-1): Article numbers
 	should be accessed through `mail-header-number'.
 

@@ -1212,7 +1212,7 @@ and that there are no duplicates."
           (gnus-agent-check-overview-buffer)
 	  (write-region-as-coding-system
 	   gnus-agent-file-coding-system
-	   (1+ (point-min)) (point-max) gnus-agent-file-name nil 'silent)
+	   (1+ (point-min)) (point-max) file nil 'silent)
           (gnus-agent-save-alist group articles nil)
           articles)))
     articles))
