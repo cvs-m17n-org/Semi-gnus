@@ -1,5 +1,17 @@
 1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
+	* lisp/gnus-util.el (gnus-string-width): New function.
+
+	* lisp/gnus-ems.el (gnus-mule-max-width-function): Removed.
+	(gnus-tilde-max-form): Ditto.
+	(gnus-string-width): Redefine for mule.
+
+	* lisp/gnus-spec.el (gnus-tilde-max-form): Use `gnus-string-width'
+	and `gnus-truncate-string'.
+	(gnus-tilde-cut-form): Ditto.
+	
+1998-08-23  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.7.
 
 	* Sync up with Gnus 5.6.39.
@@ -49,7 +61,7 @@
 
 1998-08-06  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	*lisp/smtp.el: Do not insert empty line at the end of message.
+	* lisp/smtp.el: Do not insert empty line at the end of message.
 	
 1998-08-05  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
