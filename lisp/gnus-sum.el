@@ -1478,7 +1478,6 @@ increase the score of each group you read."
     "t" gnus-article-toggle-headers
     "v" gnus-summary-verbose-headers
     "m" gnus-summary-toggle-mime
-    "h" gnus-article-treat-html
     "H" gnus-article-strip-headers-in-body
     "d" gnus-article-treat-dumbquotes)
 
@@ -1637,7 +1636,6 @@ increase the score of each group you read."
 	      ["Capitalize sentences" gnus-article-capitalize-sentences t]
               ["CR" gnus-article-remove-cr t]
               ["Show X-Face" gnus-article-display-x-face t]
-              ["UnHTMLize" gnus-article-treat-html t]
               ["Rot 13" gnus-summary-caesar-message t]
               ["Unix pipe" gnus-summary-pipe-message t]
               ["Add buttons" gnus-article-add-buttons t]
@@ -6203,7 +6201,7 @@ articles that are younger than AGE days."
 	  (intern
 	   (gnus-completing-read
 	    (symbol-name (car gnus-extra-headers))	
-	    "Score extra header:"	
+	    "Limit extra header:"	
 	    (mapcar (lambda (x)	
 		      (cons (symbol-name x) x))
 		    gnus-extra-headers)
@@ -6756,7 +6754,7 @@ to guess what the document format is."
 	 (goto-char (point-min))
 	 (or (search-forward "\n\n" nil t) (point)))
 	(goto-char (point-min))
-	(delete-matching-lines "^\\(Path\\):\\|^From ")
+	(delete-matching-lines "^Path:\\|^From ")
 	(widen))
       (unwind-protect
           (if (let ((gnus-newsgroup-ephemeral-charset gnus-newsgroup-charset)
@@ -8355,7 +8353,7 @@ If ALL is non-nil, also mark ticked and dormant articles as read."
   (gnus-summary-catchup t quietly))
 
 (defun gnus-summary-catchup-and-exit (&optional all quietly)
-  "Mark all articles not marked as unread in this newsgroup as read, then exit.
+  "Mark all unread articles in this group as read, then exit.
 If prefix argument ALL is non-nil, all articles are marked as read."
   (interactive "P")
   (when (gnus-summary-catchup all quietly nil 'fast)

@@ -9264,17 +9264,26 @@ gnus $B$O$U$D$&F1$8<jK!$G$9$Y$F$N%0%k!<%W$r07$$$^$9!#$"$J$?$O$"$k%0%k!<(B
 $B$F(B expire $B$N=hM}$,@)8f$5$l!"%a!<%k$N(B expire $B$N=hM}$O$"$J$?$,@)8f$7$^$9!#(B
 $B%a!<%k$N(B expire $B$K$D$$$F$O(B @pxref{Expiring Mail} $B$r;2>H$7$F2<$5$$!#(B
 
-$B$7$P$i$/%a!<%k$H%K%e!<%9$NN>J}$r;H$C$F$_$l$P!"G[Aw$N;EAH$_$N0c$$$,=EMW(B
-$B$G$O$J$$$3$H$K5$$,IU$-$^$9!#Bg;v$J$N$O5-;v$r<u$1<h$k4Q=0$N?t$J$N$G$9!#(B
+$B$7$P$i$/%a!<%k$H%K%e!<%9$NN>J}$r;H$C$F$_$l$P!"5-;v$N<h$j07$$$K$D$$$FG[(B
+$BAw$N5!9=$,9T$J$&$3$H$O$o$:$+$G$"$k$3$H$K5$$,IU$-$^$9!#(B
 
 $BB?$/$N?M$?$A$OJ#?t$N%a!<%j%s%0%j%9%H$r9VFI$7$F$$$^$9!#$=$l$i$O(B SMTP $B$G(B
-$BG[Aw$5$l$k!"%a!<%k!"$G$9!#$"$k?M$?$A$O>.?M?t$KMxMQ$5$l$F$$$k%m!<%+%k(B
-$B%K%e!<%9%0%k!<%W$r9VFI$7$F$$$^$9!#$=$l$i$O(B NNTP $B$GG[Aw$5$l$k!"%K%e!<%9!"(B
-$B$G$9!#(B
+$BG[Aw$5$l$k!"%a!<%k!"$G$9!#$=$l$i$N5-;v$r$H$F$bCm0U?<$/FI$s$G$$$k$K$b$+(B
+$B$+$o$i$:!"2?=54V$bJV;v$,L5$$$3$H$,$"$k$G$7$g$&!#;d$?$A$O$=$&$$$&5-;v$r(B
+$B%;!<%V$9$kI,MW$O$"$j$^$;$s!#$J$<$J$i$P!"$b$&0lEYFI$`I,MW$,@8$8$F$b!"$=(B
+$B$l$i$O$I$3$+$KJ]B8$5$l$F$$$k$+$i$G$9!#(B
 
-$BG[Aw$N;EAH$_$N0c$$$O$I$&$G$b$h$$$3$H$G!"Bg;v$J$N$O5-;v$,(B @dfn{personal}
- $B$J$b$N$+(B @dfn{public} $B$J$b$N$+$H$$$&$3$H$G$9!#$3$l$iFs$D$N<oN`$K1~$8(B
-$B$F!"B?$/$N%f!<%6$O(B gnus $B$NF0:n$rHyL/$K@Z$jBX$($^$9!#(B
+$B$"$k?M$?$A$O>.?M?t$KMxMQ$5$l$F$$$k%m!<%+%k%K%e!<%9%0%k!<%W$r9VFI$7$F$$(B
+$B$^$9!#$=$l$i$O(B NNTP $B$GG[Aw$5$l$k!"%K%e!<%9!"$G$9!#;d$?$A$O<+J,$N;E;v$K(B
+$BLrN)$F$k$?$a$K!"$=$l$i$NKDBg$J5-;v$NCGJR$rFI$s$@$jJV;v$r$7$J$1$l$P$J$j(B
+$B$^$;$s!#$=$7$F$=$l$i$OJ]B8$5$l$F$$$J$$$+$b$7$l$^$;$s$+$i!"6=L#$N$"$k5-(B
+$B;v$r8D?M%a!<%k$HF1$8$h$&$KJ]B8$7$J$1$l$P$J$i$J$$$G$7$g$&!#(B
+
+$BG[Aw$N;EAH$_$N0c$$$O$I$&$G$b$h$$$3$H$G!"Bg;v$J$N$O$$$+$K<gBj$K6=L#$r;}$C(B
+$B$F$$$k$+$H!"$b$&0lEYFI$_$?$$$H$-$K$$$+$K4JC1$K8F$S=P$;$k$+$J$N$G$9!#(B
+
+gnus $B$O%a!<%k$r%K%e!<%9%0%k!<%W$N$h$&$K(B ``$B%0%k!<%W(B'' $B$KJB$YJQ$($F!"3F!9(B
+$B$N%0%k!<%W(B ($B%a!<%k$+%K%e!<%9(B) $B$rJL8D$K07$&$?$a$NK-IY$J5!G=$rDs6!$7$^$9!#(B
 
 $B$"$k?M$?$A$O(B gnus ($B$($C$X$s(B) $B$N$d$j$+$?$KK~B-$G$-$J$/$F!"(Bgnus $B$,%a!<%k(B
 $B%j!<%@$K$J$k$3$H$rM_$7$^$9!#(Bgnus $B$r$b$C$H%a!<%k%j!<%@E*$J$b$N$K$9$k$?(B
@@ -9588,6 +9597,12 @@ gnus $B$,<+J,<+?H$G(B POP $B%a!<%kJ8;zNs$rH/8+$7$h$&$H$7$^$9!#$I$N$h$&$J>l9g$
       ;; $BB>$N%a!<%j%s%0%j%9%H(B...
       (any "procmail@@informatik\\.rwth-aachen\\.de" "procmail.list")
       (any "SmartList@@informatik\\.rwth-aachen\\.de" "SmartList.list")
+      ;; Both lists below have the same suffix, so prevent
+      ;; cross-posting to mkpkg.list of messages posted only to 
+      ;; the bugs- list, but allow cross-posting when the
+      ;; message was really cross-posted.
+      (any "bugs-mypackage@@somewhere" "mypkg.bugs")
+      (any "mypackage@@somewhere\" - "bugs-mypackage" "mypkg.list")
       ;; $B?M!9(B...
       (any "larsi@@ifi\\.uio\\.no" "people.Lars_Magne_Ingebrigtsen"))
    ;; $B9gCW$7$J$+$C$?%a!<%k$OA4$F$rJa$^$($k%0%k!<%W$X9T$-$^$9!#(B
@@ -15842,12 +15857,15 @@ Russ Allbery,
 Peter Arius,
 Matt Armstrong,
 Marc Auslander,
+Miles Bader,
+Alexei V. Barantsev,
 Frank Bennett,
 Robert Bihlmeyer,
 Chris Bone,
 Mark Borges,
 Mark Boyns,
 Lance A. Brown,
+Rob Browning,
 Kees de Bruin,
 Martin Buchholz,
 Joe Buehler,
@@ -15860,8 +15878,13 @@ Castor,
 David Charlap,
 Dan Christensen,
 Kevin Christian,
+Jae-you Chung, @c ?
+James H. Cloos, Jr.,
+Laura Conrad,
 Michael R. Cook,
 Glenn Coombs,
+Andrew J. Cosgriff,
+Neil Crellin,
 Frank D. Cringle,
 Geoffrey T. Dairiki,
 Andre Deparade,
@@ -15872,12 +15895,16 @@ Joev Dubach,
 Michael Welsh Duggan,
 Dave Edmondson,
 Paul Eggert,
+Mark W. Eichin,
+Karl Eichwalder,
 Enami Tsugutomo, @c Enami
 Michael Ernst,
 Luc Van Eycken,
 Sam Falkner,
 Nelson Jose dos Santos Ferreira,
 Sigbjorn Finne,
+Sven Fischer,
+Paul Fisher,
 Decklin Foster,
 Gary D. Foster,
 Paul Franklin,
@@ -15885,6 +15912,7 @@ Guy Geens,
 Arne Georg Gleditsch,
 David S. Goldberg,
 Michelangelo Grigni,
+Dale Hagglund,
 D. Hall,
 Magnus Hammerin,
 Kenichi Handa, @c Handa
@@ -15892,29 +15920,36 @@ Raja R. Harinath,
 Yoshiki Hayashi, @c ?
 P. E. Jareth Hein,
 Hisashige Kenji, @c Hisashige
+Scott Hofmann,
 Marc Horowitz,
 Gunnar Horrigmo,
 Richard Hoskins,
 Brad Howes,
+Miguel de Icaza,
 Fran,Ag(Bois Felix Ingrand,
+Tatsuya Ichikawa, @c ?
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
 Iwamuro Motonori, @c Iwamuro
 Rajappa Iyer,
 Andreas Jaeger,
+Adam P. Jenkins,
 Randell Jesup,
 Fred Johansen,
 Gareth Jones,
 Simon Josefsson,
 Greg Klanderman,
 Karl Kleinpaste,
+Michael Klingbeil,
 Peter Skov Knudsen,
 Shuhei Kobayashi, @c Kobayashi
+Petr Konecny,
 Koseki Yoshinori, @c Koseki
 Thor Kristoffersen,
 Jens Lautenbacher,
 Martin Larose,
 Seokchan Lee, @c Lee
+Joerg Lenneis,
 Carsten Leonhardt,
 James LewisMoss,
 Christian Limpach,
@@ -15941,11 +15976,13 @@ Alexandre Oliva,
 Ken Olstad,
 Masaharu Onishi, @c Onishi
 Hideki Ono, @c Ono
+Ettore Perazzoli,
 William Perry,
 Stephen Peters,
 Jens-Ulrik Holger Petersen,
 Ulrich Pfeifer,
 Matt Pharr,
+Andy Piper,
 John McClary Prevost,
 Bill Pringlemeir,
 Mike Pullen,
@@ -15958,10 +15995,12 @@ Renaud Rioboo,
 Roland B. Roberts,
 Bart Robinson,
 Christian von Roques,
+Markus Rost,
 Jason Rumney,
 Wolfgang Rupprecht,
 Jay Sachs,
 Dewey M. Sasser,
+Conrad Sauerwald,
 Loren Schall,
 Dan Schmidt,
 Ralph Schleicher,
@@ -15979,26 +16018,33 @@ Darren Stalder,
 Richard Stallman,
 Greg Stark,
 Sam Steingold,
+Paul Stevenson,
+Jonas Steverud,
 Paul Stodghill,
+Kiyokazu Suto, @c Suto
 Kurt Swanson,
 Samuel Tardieu,
 Teddy,
 Chuck Thompson,
+Tozawa Akihiko, @c Tozawa
 Philippe Troin,
 James Troup,
 Trung Tran-Duc,
+Jack Twilley,
 Aaron M. Ucko,
 Aki Vehtari,
 Didier Verna,
+Vladimir Volovich,
 Jan Vroonhof,
 Stefan Waldherr,
 Pete Ware,
 Barry A. Warsaw,
 Christoph Wedler,
 Joe Wells,
-Katsumi Yamaoka, @c Yamaoka
+Lee Willis,
+Katsumi Yamaoka @c Yamaoka
 and
-Shenghuo Zhu. @c Zhu
+Lloyd Zusman.
 
 $B$=$l$>$l$N?M!9$,9T$C$?;v$N40A4$J354Q$rF@$k$?$a$K!"(BChangeLog $B$,(B Gnus $B$N%"(B
 $B%k%U%!G[I[$K$O4^$^$l$F$$$F!"K-IY$JFI$_J*$rM?$($k$G$7$g$&!#(B(550KB $B$H$$$/(B

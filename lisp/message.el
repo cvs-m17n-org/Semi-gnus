@@ -203,7 +203,8 @@ Don't touch this variable unless you really know what you're doing.
 Checks include subject-cmsg multiple-headers sendsys message-id from
 long-lines control-chars size new-text redirected-followup signature
 approved sender empty empty-headers message-id from subject
-shorten-followup-to existing-newsgroups buffer-file-name unchanged."
+shorten-followup-to existing-newsgroups buffer-file-name unchanged
+newsgroups."
   :group 'message-news)
 
 (defcustom message-required-news-headers
@@ -1990,7 +1991,7 @@ Numeric argument means justify as well."
     (goto-char (point-min))
     (search-forward (concat "\n" mail-header-separator "\n") nil t)
     (let ((fill-prefix message-yank-prefix))
-      (fill-individual-paragraphs (point) (point-max) justifyp t))))
+      (fill-individual-paragraphs (point) (point-max) justifyp))))
 
 (defun message-indent-citation ()
   "Modify text just inserted from a message to be cited.
@@ -2364,6 +2365,8 @@ the user from the mailer."
 				    (car elem))))
 			      (setq success (funcall (caddr elem) arg)))))
 	    (setq sent t))))
+      (unless sent
+	(error "No methods specified to send by"))
       (prog1
 	  (when (and success sent)
 	    (message-do-fcc)
@@ -2807,6 +2810,15 @@ This sub function is for exclusive use of `message-send-news'."
 
 (defun message-check-news-header-syntax ()
   (and
+   ;; Check Newsgroups header.
+   (message-check 'newsgroyps
+     (let ((group (message-fetch-field "newsgroups")))
+       (or
+	(and group
+	     (not (string-match "\\`[ \t]*\\'" group)))
+	(ignore
+	 (message
+	  "The newsgroups field is empty or missing.  Posting is denied.")))))
    ;; Check the Subject header.
    (message-check 'subject
      (let* ((case-fold-search t)
