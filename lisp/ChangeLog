@@ -1,3 +1,46 @@
+2002-04-21  Paul Jarc  <prj@po.cwru.edu>
+
+	* nnmaildir.el (nnmaildir-request-update-info,
+	nnmaildir-request-group, nnmaildir-retrieve-groups): remove
+	unnecessary calls to nnmaildir-request-scan.
+
+2002-04-20  Josh Huber  <huber@alum.wpi.edu>
+
+	* gnus-msg.el:
+	* gnus-msg.el (gnus-message-replysign): New.
+	* gnus-msg.el (gnus-message-replyencrypt): New.
+	* gnus-msg.el (gnus-message-replysignencrypted): New.
+	* gnus-msg.el (gnus-summary-reply): Use the three new variables
+	(above) to automatically encrypt/sign to encrypted/signed
+	messages.
+	* message.el:
+	* message.el (message-mode-map): Add keybinding for
+	`message-to-list-only'
+	* message.el (message-mode): Add description for
+	`message-to-list-only'
+	* message.el (message-to-list-only): New.
+	* message.el (message-make-mft): Changed to use the cl loop macro,
+	and added optional flag to return only the matched list. (for use
+	in new message-to-list-only function)
+
+2002-04-20  Josh Huber  <huber@alum.wpi.edu>
+
+	* gnus-msg.el:
+	* gnus-msg.el (gnus-message-replysign):
+	* gnus-msg.el (gnus-replysign): New.
+	* gnus-msg.el (gnus-replyencrypt): New.
+	* gnus-msg.el (gnus-replysignencrypted): New.
+	* gnus-msg.el (gnus-summary-reply):
+	* message.el:
+	* message.el (message-mode-map):
+	* message.el (message-mode):
+	* message.el (message-to-list-only): New.
+	* message.el (message-make-mft):
+
+2002-04-19  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-win.el (gnus-configure-windows-hook): Fix typo.
+
 2002-04-18  Josh Huber  <huber@alum.wpi.edu>
 
 	* message.el (message-gen-unsubscribed-mft): accept a prefix
@@ -96,7 +139,7 @@
 2002-04-01  Jesper Harder  <harder@ifa.au.dk>
 
 	* message.el (message-buffer-naming-style): Remove.
-	
+
 2002-04-02  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-group.el (gnus-group-make-tool-bar): Load tool-bar first.
@@ -125,7 +168,7 @@
 	(spam-address-whitelisted-p): New function.
 
 	* dns.el (query-dns): Use TCP when make-network-process isn't
-	available. 
+	available.
 	(dns-servers): New variable.
 	(dns-parse-resolv-conf): New function.
 	(query-dns): Use it.
