@@ -1,3 +1,17 @@
+2000-04-13  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* Nana-gnus: Version 7.1.0.16 (This is alpha status.)
+	Fix bugs.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.16.
+
+	* lisp/gnus-spec.el (gnus-update-format): Fix a bug in last
+	modification.
+	(gnus-search-or-regist-spec): Change interface.
+
+	* lisp/message.el (message-buffers): New function. (copy from Gnus
+	5.8.3)
+
 2000-04-11  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
 
 	* Nana-gnus: Version 7.1.0.15 (This is alpha status.)
