@@ -54,34 +54,25 @@ bbdb/news-auto-create-p is non-nil, or if OFFER-TO-CREATE is true and
 the user confirms the creation."
   (if bbdb-use-pop-up
       (gnus-bbdb/pop-up-bbdb-buffer offer-to-create)
-    (save-excursion
-      (let (from)
-	(set-buffer gnus-original-article-buffer)
-	(save-restriction
-	  (widen)
-	  (narrow-to-region (point-min)
-			    (progn (goto-char (point-min))
-				   (or (search-forward "\n\n" nil t)
-				       (error "message unexists"))
-				   (1- (point))))
-	  (when (setq from (mail-fetch-field "from"))
-	    (setq from (gnus-bbdb/extract-address-components
-			(gnus-bbdb/decode-field-body from 'From))))
-	  (when (and (car (cdr from))
-		     (string-match (bbdb-user-mail-names)
-				   (car (cdr from))))
-	    ;; if logged-in user sent this, use recipients.
-	    (let ((to (mail-fetch-field "to")))
-	      (when to
-		(setq from
-		      (gnus-bbdb/extract-address-components
-		       (gnus-bbdb/decode-field-body to 'To))))))
-	(when from
-	  (bbdb-annotate-message-sender from t
-					(or (bbdb-invoke-hook-for-value
-					     bbdb/news-auto-create-p)
-					    offer-to-create)
-					offer-to-create)))))) )
+    (let ((from (mail-header-from gnus-current-headers)))
+      (when from
+	(setq from (gnus-bbdb/extract-address-components
+		    (gnus-bbdb/decode-field-body from 'From))))
+      (when (and (car (cdr from))
+		 (string-match (bbdb-user-mail-names)
+			       (car (cdr from))))
+	;; if logged-in user sent this, use recipients.
+	(let ((to (mime-entity-fetch-field gnus-current-headers "to")))
+	  (when to
+	    (setq from
+		  (gnus-bbdb/extract-address-components
+		   (gnus-bbdb/decode-field-body to 'To))))))
+      (when from
+	(bbdb-annotate-message-sender from t
+				      (or (bbdb-invoke-hook-for-value
+					   bbdb/news-auto-create-p)
+					  offer-to-create)
+				      offer-to-create)))))
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)
@@ -90,7 +81,7 @@ corresponding to the sender of this message.  If REPLACE is non-nil,
 replace the existing notes entry (if any)."
   (interactive (list (if bbdb-readonly-p
 			 (error "The Insidious Big Brother Database is read-only.")
-			 (read-string "Comments: "))))
+		       (read-string "Comments: "))))
   (bbdb-annotate-notes (gnus-bbdb/update-record t) string 'notes replace))
 
 (defun gnus-bbdb/edit-notes (&optional arg)
@@ -128,10 +119,10 @@ displaying the record corresponding to the sender of the current message."
       (cond
        (record
 	(bbdb-pop-up-bbdb-buffer
-	 (function (lambda (w)
-		     (with-current-buffer (window-buffer w)
-		       (memq major-mode
-			     '(mime-view-mode gnus-article-mode))))))
+	 (lambda (w)
+	   (with-current-buffer (window-buffer w)
+	     (memq major-mode
+		   '(mime-view-mode gnus-article-mode)))))
 	(bbdb-display-records (list record)))
        ((and (not bbdb-inside-electric-display)
 	     (get-buffer-window bbdb-buffer-name))
@@ -175,7 +166,7 @@ BBDB-FIELD values is returned.  Otherwise, GROUP is returned."
       (goto-char (point-min))
       (while (re-search-forward pat nil t)
 	(setq header-values (cons (buffer-substring (point)
-						(std11-field-end))
+						    (std11-field-end))
 				  header-values)))
       (let ((address-regexp
 	     (with-temp-buffer
@@ -529,17 +520,7 @@ addresses better than the traditionally static global scorefile."
   gnus-bbdb/score-alist)
 
 (defun gnus-bbdb/extract-field-value-init ()
-  (when (or (and (eq (current-buffer) (get-buffer gnus-article-buffer))
-		 (buffer-live-p gnus-original-article-buffer)
-		 (set-buffer gnus-original-article-buffer))
-	    (eq (current-buffer) (get-buffer gnus-original-article-buffer)))
-    (widen)
-    (narrow-to-region (point-min)
-		      (progn (goto-char (point-min))
-			     (or (search-forward "\n\n" nil t)
-				 (error "message unexists"))
-			     (- (point) 2)))
-    'gnus-bbdb/extract-field-value))
+  (function gnus-bbdb/extract-field-value))
 
 (defun gnus-bbdb/extract-field-value (field-name)
   "Given the name of a field (like \"Subject\") this returns the value of
@@ -552,7 +533,8 @@ beginning of the message headers."
   ;; divided real-names from addresses; the actual From: and Subject: fields
   ;; exist only in the message.
   (let (value)
-    (when (setq value (mail-fetch-field field-name))
+    (when (setq value (mime-entity-fetch-field
+		       gnus-current-headers field-name))
       (gnus-bbdb/decode-field-body value field-name))))
 
 ;;; @ mail-extr
@@ -573,8 +555,7 @@ beginning of the message headers."
     (if (string= address "") (setq address nil))
     (if (string= phrase "") (setq phrase nil))
     (when (or phrase address)
-      (list phrase address))
-    ))
+      (list phrase address))))
 
 ;;; @ full-name canonicalization methods
 ;;;
@@ -583,25 +564,21 @@ beginning of the message headers."
   (let (dest)
     (while (string-match "\\s +" str)
       (setq dest (cons (substring str 0 (match-beginning 0)) dest))
-      (setq str (substring str (match-end 0)))
-      )
+      (setq str (substring str (match-end 0))))
     (or (string= str "")
         (setq dest (cons str dest)))
     (setq dest (nreverse dest))
-    (mapconcat 'identity dest " ")
-    ))
+    (mapconcat 'identity dest " ")))
 
 (defun gnus-bbdb/canonicalize-dots (str)
   (let (dest)
     (while (string-match "\\." str)
       (setq dest (cons (substring str 0 (match-end 0)) dest))
-      (setq str (substring str (match-end 0)))
-      )
+      (setq str (substring str (match-end 0))))
     (or (string= str "")
         (setq dest (cons str dest)))
     (setq dest (nreverse dest))
-    (mapconcat 'identity dest " ")
-    ))
+    (mapconcat 'identity dest " ")))
 
 ;;
 ;; Insinuation
@@ -614,7 +591,7 @@ beginning of the message headers."
   (when (boundp 'bbdb-extract-field-value-function-list)
     (add-to-list 'bbdb-extract-field-value-function-list
 		 'gnus-bbdb/extract-field-value-init))
-  (add-hook 'gnus-article-prepare-hook 'gnus-bbdb/update-record)
+  (add-hook 'gnus-article-display-hook 'gnus-bbdb/update-record)
   (add-hook 'gnus-save-newsrc-hook 'bbdb-offer-save)
   (define-key gnus-summary-mode-map ":" 'gnus-bbdb/show-sender)
   (define-key gnus-summary-mode-map ";" 'gnus-bbdb/edit-notes)
