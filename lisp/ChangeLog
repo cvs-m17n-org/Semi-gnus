@@ -1,10 +1,161 @@
+Sat Feb 28 08:27:20 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.34 is released.
+
+Sat Feb 28 08:17:37 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.33 is released.
+
+Sat Feb 28 08:10:27 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-picon.el (gnus-picons-display-x-face): `buf' -- unbound
+	var. 
+
+Sat Feb 28 08:03:23 1998  François Pinard  <pinard@iro.umontreal.ca>
+
+	* gnus: configure'd.
+
+Sat Feb 28 07:43:00 1998  Nelson Jose dos Santos Ferreira  <Nelson.Ferreira@inesc.pt>
+
+	* nnsoup.el (nnsoup-store-reply): Fix double sep error.
+
+Sat Feb 28 07:01:17 1998  Lasse Rasinen  <lrasinen@iki.fi>
+
+	* gnus-start.el (gnus-ask-server-for-new-groups): Message more. 
+
+Fri Feb 27 13:26:34 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* message.el (message-resend): Allow arbitrary Also's.
+
+1998-02-27  Dave Love  <d.love@dl.ac.uk>
+
+	* gnus-sum.el (gnus-simplify-subject-functions): Fix
+	customization, doc.
+
+1998-02-25  Dave Love  <d.love@dl.ac.uk>
+
+	* gnus-art.el (gnus-article-x-face-command): Replace leading `{'.
+
+Mon Feb 23 18:26:48 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-agent.el (gnus-plugged): New command and keystroke.
+
+	* gnus-ems.el (gnus-ems-redefine): Define
+	'gnus-summary-set-display-table as a function that takes no
+	params. 
+
+	* gnus.el (gnus-interactive): Don't use gnus-sum macros.
+	(gnus-valid-select-methods): Include nnlistserv.
+
+	* gnus.el: Autoloaded things to make byte-comp silent.
+
+Mon Feb 23 18:06:47 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.32 is released.
+
+Mon Feb 23 17:48:42 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-cite.el (gnus-article-hide-citation-maybe): Wrong
+	interactive specs.
+	(gnus-cite-toggle): Maybe parse.
+
+Mon Feb 23 05:26:11 1998  Rui-Tao Dong ~{6-HpLN~}  <rdong@internetmci.com>
+
+	* nnweb.el (nnweb-type-definition): Fixed.
+
+Sun Feb 22 18:10:53 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-agent.el (gnus-agent-group-path): Translate right chars.
+	(gnus-agent-toggle-plugged): Allow proper closing.
+
+	* gnus-srvr.el (gnus-browse-read-group): Allow entering
+	non-ephemeral groups.
+
+Sun Feb 22 04:21:15 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.31 is released.
+
+Sun Feb 22 02:09:35 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-summary-highlight): Give undownloaded marks a
+	better face.
+
+	* gnus-score.el (gnus-score-set): Take optional "warn".
+	(gnus-summary-score-entry): Use it.
+
+	* gnus.el: Removed spurious * in defcustoms.
+
+	* gnus-score.el (gnus-score-load-file): Reverse logic.
+
+	* gnus-cite.el (gnus-article-hide-citation): Use markers to make
+	things work when wrapping.
+
+	* gnus-sum.el (gnus-summary-exit): Stop prefetch.
+
+Sat Feb 21 02:12:42 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-get-newsgroup-headers): Buggy regexp.
+
+Sat Feb 21 00:51:22 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
+
+	* gnus.el: Quassia Gnus v0.30 is released.
+
+Sat Feb 21 00:09:14 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-summary-mark-article): Don't do anything if
+	the mark doesn't change.
+
+	* gnus-art.el (gnus-article-prepare): Don't enter article into
+	cache. 
+
+	* gnus-sum.el (gnus-summary-reparent-thread): Don't mark as read.
+	(gnus-summary-mark-article): Don't do cache things here.
+
+	* gnus-util.el (gnus-parse-netrc): Skip past macdefs.
+
+Fri Feb 20 22:56:22 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-srvr.el (gnus-browse-unsubscribe-group): Wouldn't allow
+	unsubscription. 
+
+	* gnus-sum.el (gnus-summary-insert-subject): Allow inserting
+	articles outside limits.
+
+	* gnus-start.el (gnus-dribble-enter): Update mode line.
+
+	* gnus-srvr.el (gnus-browse-unsubscribe-group): Allow
+	unsubscription. 
+
+	* gnus-picon.el (gnus-article-display-picons): Check that the
+	extents are live first.
+
+Thu Feb 19 15:13:44 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-group.el (gnus-useful-groups): Include gnus-bug.
+
+Thu Feb 19 02:28:17 1998  Jens-Ulrik Holger Petersen  <petersen@kurims.kyoto-u.ac.jp>
+
+	* gnus.el (gnus-group-history): Defined twice.
+
+Thu Feb 19 01:58:47 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-get-newsgroup-headers): Just use the header
+	value. 
+	(gnus-summary-exit): Set global vars.
+
+Tue Feb 17 07:17:49 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
+
+	* gnus-sum.el (gnus-summary-stop-page-breaking): Mark page as no
+	longer broken.
+	(gnus-summary-exit): Purge the real name.
+
 Tue Feb 17 07:00:43 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
 
 	* gnus.el: Quassia Gnus v0.29 is released.
 
 Tue Feb 17 06:15:03 1998  Lars Magne Ingebrigtsen  <larsi@ifi.uio.no>
 
-	* nnmail.el (nnmail-purge-split-history): List if alists, not
+	* nnmail.el (nnmail-purge-split-history): List of alists, not
 	alist. 
 
 Mon Feb 16 20:22:04 1998  Lars Magne Ingebrigtsen  <larsi@menja.ifi.uio.no>
