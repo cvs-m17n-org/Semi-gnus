@@ -1,3 +1,16 @@
+2003-07-28  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/group-prefixed-name): Return
+	the whole name from a given group and a method, only when it
+	exists.  Otherwise, return nil.
+	(gnus-namazu/possible-real-groups): Removed.
+	(gnus-namazu/decode-group-name): The successor of the above
+	function.
+	(gnus-namazu/real-group-name): Use the above functions, and accept
+	the third optional argument, `method'.
+	(gnus-namazu/search): Change the order getting groups and article
+	numbers from file names.
+
 2003-07-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/pop3.el: Silence the byte-compiler when modifying
