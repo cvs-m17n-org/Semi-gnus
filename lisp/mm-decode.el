@@ -232,6 +232,7 @@ images, however this behavior may be changed in the future."
 (defcustom mm-inlined-types
   '("image/.*" "text/.*" "message/delivery-status" "message/rfc822"
     "message/partial" "message/external-body" "application/emacs-lisp"
+    "application/x-emacs-lisp"
     "application/pgp-signature" "application/x-pkcs7-signature"
     "application/pkcs7-signature" "application/x-pkcs7-mime"
     "application/pkcs7-mime")
@@ -253,7 +254,8 @@ when selecting a different article."
   '("text/plain" "text/enriched" "text/richtext" "text/html"
     "text/x-vcard" "image/.*" "message/delivery-status" "multipart/.*"
     "message/rfc822" "text/x-patch" "application/pgp-signature"
-    "application/emacs-lisp" "application/x-pkcs7-signature"
+    "application/emacs-lisp" "application/x-emacs-lisp"
+    "application/x-pkcs7-signature"
     "application/pkcs7-signature" "application/x-pkcs7-mime"
     "application/pkcs7-mime")
   "A list of MIME types to be displayed automatically."

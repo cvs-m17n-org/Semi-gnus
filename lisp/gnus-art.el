@@ -5595,6 +5595,7 @@ groups."
 	(winconf gnus-prev-winconf))
     (remove-hook 'gnus-article-mode-hook
 		 'gnus-article-mime-edit-article-unwind)
+    (widen) ;; Widen it in case that users narrowed the buffer.
     (funcall func arg)
     (set-buffer buf)
     ;; The cache and backlog have to be flushed somewhat.

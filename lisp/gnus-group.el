@@ -1042,8 +1042,7 @@ The following commands are available:
       result)))
 
 (defun gnus-group-name-decode (string charset)
-  (if (and string charset (featurep 'mule)
-	   (not (mm-multibyte-string-p string)))
+  (if (and string charset (featurep 'mule))
       (decode-coding-string string charset)
     string))
 

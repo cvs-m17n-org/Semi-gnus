@@ -1,3 +1,22 @@
+2002-02-20  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nndoc.el (nndoc-dissect-mime-parts-sub): Fix MIME-Version header
+	for mime-parts.
+
+	* gnus-art.el (gnus-article-edit-done): Widen the buffer.
+
+	* gnus-group.el (gnus-group-name-decode): Don't test
+	multibyte-string, because it breaks XEmacs.
+	From: TSUCHIYA Masatoshi <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* message.el (message-send-mail): Be talkative.
+
+	* mm-decode.el (mm-inlined-types): Add application/x-emacs-lisp.
+	(mm-automatic-display): Ditto.
+	
+	* mailcap.el (mailcap-mime-data): Ditto.
+	From: Reiner Steib <4uce.02.r.steib@gmx.net>
+
 2002-02-20  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* many files: Remove trailing whitespaces, replace spc+tab with
