@@ -1,3 +1,7 @@
+1998-02-24  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el, lisp/message.el: Sync up with qgnus-0.32.
+
 1998-02-23  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.0.6.
