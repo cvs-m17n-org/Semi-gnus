@@ -13,6 +13,8 @@ SHELL = /bin/sh
 VPATH = @srcdir@
 PACKAGEDIR = @PACKAGEDIR@
 W3DIR = @W3@
+GNUS_PRODUCT_NAME = @GNUS_PRODUCT_NAME@
+EXPORTING_FILES = $(EMACS) $(FLAGS) -f dgnushack-exporting-files 2>/dev/null
 
 all total:
 	rm -f *.elc auto-autoloads.el custom-load.el
@@ -29,10 +31,11 @@ clever some:
 	W3DIR=$(W3DIR) lispdir=$(lispdir) \
 		srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
 
-install: clever
+install: clever install-lisp
+
+install-lisp:
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
-	@for p in \
-	`$(EMACS) $(FLAGS) -f dgnushack-exported-files 2>/dev/null`; do \
+	@for p in `$(EXPORTING_FILES)`; do \
 	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
 	  if test -f $$p"c"; then \
@@ -42,20 +45,18 @@ install: clever
 	done
 
 # Rule for XEmacs package.
-install-package-lick:
+install-package-manifest:
 	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
-		-f dgnushack-install-package-lick $(PACKAGEDIR)
-
-install-package-info:
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
-		-f dgnushack-install-package-info $(PACKAGEDIR)
-
-install-package-info-ja:
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
-		-f dgnushack-install-package-info-ja $(PACKAGEDIR)
+		-f dgnushack-install-package-manifest \
+		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
 
 compose-package:
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compose-package
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-autoloads
+
+remove-extra-files-in-package:
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
+		-f dgnushack-remove-extra-files-in-package \
+		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
 #
 
 tags:

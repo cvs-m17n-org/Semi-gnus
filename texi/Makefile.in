@@ -187,13 +187,16 @@ install: $(INFO_DEPS)
 	else : ; fi
 
 install-ja: $(INFO_DEPS_JA)
-	$(MAKE) INFO_DEPS='$(INFO_DEPS_JA)' install
+	$(MAKE) INFO_DEPS='$(INFO_DEPS_JA)' EMACS="$(EMACS)" \
+		infodir="$(infodir)" install
 
 install-info: $(INFO_DEPS_INFO)
-	$(MAKE) INFO_DEPS='$(INFO_DEPS_INFO)' install
+	$(MAKE) INFO_DEPS='$(INFO_DEPS_INFO)' EMACS="$(EMACS)" \
+		infodir="$(infodir)" install
 
 install-ja-info: $(INFO_DEPS_JA_INFO)
-	$(MAKE) INFO_DEPS='$(INFO_DEPS_JA_INFO)' install
+	$(MAKE) INFO_DEPS='$(INFO_DEPS_JA_INFO)' EMACS="$(EMACS)" \
+		infodir="$(infodir)" install
 
 tmps:
 	if [ ! -e tmp ]; then mkdir tmp; fi

@@ -1,3 +1,66 @@
+2000-11-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* texi/Makefile.in (install-ja-info): Specify `EMACS' and
+	`infodir'.
+	(install-info): Ditto.
+	(install-ja): Ditto.
+
+	* lisp/lpath.el (md5): Fbind using `maybe-fbind'.
+
+	* lisp/dgnushack.el (dgnushack-compose-package): Remove function.
+	(dgnushack-install-package-info-ja): Remove function.
+	(dgnushack-install-package-info): Remove function.
+	(dgnushack-install-package-lick): Remove function.
+	(dgnushack-install-package-pkginfo): Remove function.
+	(dgnushack-install-package-info-files): Remove function.
+	(dgnushack-install-package-manifest): New function.
+	(dgnushack-remove-extra-files-in-package): New function.
+	(dgnushack-gnus-product-name): Remove function.
+	(dgnushack-examine-package-dir): Remove function.
+	(dgnushack-exporting-files): Rename from `dgnushack-exported-files'.
+	(dgnushack-unexporting-files): Rename from
+	`dgnushack-unexported-files'; attempt to fix `load-path' for W3 and
+	retry to load `w3-forms' if it is failed.
+	(dgnushack-w3-dir): New variable.
+
+	* lisp/Makefile.in (remove-extra-files-in-package): New target.
+	(install-package-manifest): New target.
+	(install-package-info-ja): Remove target.
+	(install-package-info): Remove target.
+	(install-package-lick): Remove target.
+	(install-lisp): New target detached from `install'.
+	(install): Call `clever' and `install-lisp'.
+	(EXPORTING_FILES, GNUS_PRODUCT_NAME): New variables.
+
+	* configure: Regenerate.
+
+	* aclocal.m4 (AC_PATH_PACKAGEDIR): Examine `PACKAGEDIR' if it is
+	not specified under XEmacs.
+	(AC_EXAMINE_PACKAGEDIR): New function.
+	(AC_PATH_LISPDIR): Don't say annotations about install-package if
+	FSFmacs is used.
+	(AC_DEFINE_GNUS_PRODUCT_NAME): Add substitution for
+	`GNUS_PRODUCT_NAME'.
+
+	* Makefile.in (remove-extra-files-in-package): New target.
+	(install-package-manifest): New target.
+	(install-package-info-ja): Examine `PACKAGEDIR' if it is not
+	specified; call install-ja-info in texi/Makefile.
+	(install-package-info): Examine `PACKAGEDIR' if it is not
+	specified; call install-info in texi/Makefile.
+	(install-package-lisp): Rename from `install-package-lick'; examine
+	`PACKAGEDIR' if it is not specified; call `install-lisp' in
+	lisp/Makefile.
+	(install-package-ja): Call `xlick', `compose-package',
+	`remove-extra-files-in-package', `install-package-lisp',
+	`install-package-info', `install-package-info-ja' and
+	`install-package-manifest'.
+	(install-package): Call `xlick', `compose-package',
+	`remove-extra-files-in-package', `install-package-lisp',
+	`install-package-info' and `install-package-manifest'.
+	(install-info-ja, install-info): Specify `infodir'.
+	(EXAMINE_PACKAGEDIR, GNUS_PRODUCT_NAME, infodir): New variables.
+
 2000-11-07  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
 
 	* texi/gnus-ja.texi: Do not use characters other than ascii ones

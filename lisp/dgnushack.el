@@ -52,8 +52,11 @@
 
 (defvar srcdir (or (getenv "srcdir") "."))
 
-(push (or (getenv "W3DIR") (expand-file-name "../../w3/lisp/" srcdir))
-      load-path)
+(defvar dgnushack-w3-dir
+  (file-name-as-directory
+   (or (getenv "W3DIR") (expand-file-name "../../w3/lisp/" srcdir))))
+(push dgnushack-w3-dir load-path)
+
 (load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
 
 ;; If we are building w3 in a different directory than the source
@@ -182,13 +185,24 @@
 (defalias 'ange-ftp-re-read-dir 'ignore)
 (defalias 'define-mail-user-agent 'ignore)
 
-(defconst dgnushack-unexported-files
+(defconst dgnushack-unexporting-files
   (append '("dgnushack.el" "dgnuspath.el" "lpath.el" "ptexinfmt.el")
-	  (condition-case nil
-	      (progn (require 'w3-forms) nil)
-	    (error '("nnweb.el" "nnlistserv.el" "nnultimate.el"
-		     "nnslashdot.el" "nnwarchive.el" "webmail.el"
-		     "nnwfm.el")))
+	  (unless (or (condition-case nil
+			  (require 'w3-forms)
+			(error nil))
+		      ;; Maybe mis-configured Makefile is used (e.g.
+		      ;; configured for FSFmacs but XEmacs is running).
+		      (let ((lp (delete dgnushack-w3-dir
+					(copy-sequence load-path))))
+			(when (condition-case nil
+				  (let ((load-path lp))
+				    (require 'w3-forms))
+				(error nil))
+			  ;; If success, fix `load-path' for compiling.
+			  (setq load-path lp))))
+	    '("nnweb.el" "nnlistserv.el" "nnultimate.el"
+	      "nnslashdot.el" "nnwarchive.el" "webmail.el"
+	      "nnwfm.el"))
 	  (condition-case nil
 	      (progn (require 'bbdb) nil)
 	    (error '("gnus-bbdb.el")))
@@ -202,18 +216,18 @@
 	    '("base64.el"))
 	  (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
 	    '("md5.el")))
-  "Files not to be installed.")
+  "Files which will not be installed.")
 
-(defconst dgnushack-exported-files
-  (let ((files (directory-files srcdir nil "^[^=].*\\.el$")))
-    (dolist (file dgnushack-unexported-files)
+(defconst dgnushack-exporting-files
+  (let ((files (directory-files srcdir nil "^[^=].*\\.el$" t)))
+    (dolist (file dgnushack-unexporting-files)
       (setq files (delete file files)))
     (sort files 'string-lessp))
-  "Files to be installed.")
+  "Files which will be compiled and installed.")
 
-(defun dgnushack-exported-files ()
-  "Print files to be installed."
-  (princ (mapconcat 'identity dgnushack-exported-files " ")))
+(defun dgnushack-exporting-files ()
+  "Print name of files which will be installed."
+  (princ (mapconcat 'identity dgnushack-exporting-files " ")))
 
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
@@ -228,14 +242,14 @@ You also then need to add the following to the lisp/dgnushack.el file:
      (push \"~/lisp/custom\" load-path)
 
 Modify to suit your needs."))
-  (dolist (file dgnushack-exported-files)
+  (dolist (file dgnushack-exporting-files)
     (setq file (expand-file-name file srcdir))
     (when (and (file-exists-p (setq elc (concat file "c")))
 	       (file-newer-than-file-p file elc))
       (delete-file elc)))
 
   (let (;;(byte-compile-generate-call-tree t)
-	(files dgnushack-exported-files)
+	(files dgnushack-exporting-files)
 	file elc)
     (while (setq file (pop files))
       (setq file (expand-file-name file srcdir))
@@ -271,7 +285,7 @@ Modify to suit your needs."))
 		     command-line-args-left (cdr command-line-args-left)))
 	      ((file-directory-p file)
 	       (setq command-line-args-left
-		     (nconc (directory-files file)
+		     (nconc (directory-files file nil nil t)
 			    (cdr command-line-args-left))))
 	      (t
 	       (setq files (cons file files)
@@ -402,126 +416,50 @@ Modify to suit your needs."))
     (require 'cus-load)
     (byte-compile-file "custom-load.el")))
 
-(defun dgnushack-examine-package-dir ()
-  "Examine PACKAGEDIR."
-  (let ((package-dir (car command-line-args-left)))
-    (unless package-dir
-      (let (dirs)
-	(when (boundp 'early-packages)
-	  (setq dirs (delq nil (append (when early-package-load-path
-					 early-packages)
-				       (when late-package-load-path
-					 late-packages)
-				       (when last-package-load-path
-					 last-packages))))
-	  (while (and dirs (not package-dir))
-	    (when (file-directory-p (car dirs))
-	      (setq package-dir (car dirs)
-		    dirs (cdr dirs)))))))
-    (or package-dir
-	(error "%s" "
-You must specify the name of the package path as follows:
+(defun dgnushack-remove-extra-files-in-package ()
+  "Remove extra files in the lisp directory of the XEmacs package."
+  (let ((lisp-dir (expand-file-name (concat "lisp/"
+					    ;; GNUS_PRODUCT_NAME
+					    (cadr command-line-args-left)
+					    "/")
+				    ;; PACKAGEDIR
+				    (car command-line-args-left))))
+    (when (file-directory-p lisp-dir)
+      (let (files)
+	(dolist (file dgnushack-exporting-files)
+	  (setq files (nconc files (list file (concat file "c")))))
+	(dolist (file (directory-files lisp-dir nil nil t t))
+	  (unless (member file files)
+	    (setq file (expand-file-name file lisp-dir))
+	    (message "Removing %s..." file)
+	    (condition-case nil
+		(delete-file file)
+	      (error nil))))))))
 
-% make install-package PACKAGEDIR=/usr/local/lib/xemacs/xemacs-packages/"))))
-
-(defun dgnushack-gnus-product-name ()
-  "Return a product name of this gnus."
-  (require 'gnus)
-  (downcase gnus-product-name))
-
-(defun dgnushack-make-manifest (product-name)
-  "Make MANIFEST file for XEmacs package."
-  (let (make-backup-files)
-    (message "Generating MANIFEST.%s for the package..." product-name)
-    (with-temp-file (concat "../MANIFEST." product-name)
+(defun dgnushack-install-package-manifest ()
+  "Install MANIFEST file as an XEmacs package."
+  (let* ((package-dir (car command-line-args-left))
+	 (product-name (cadr command-line-args-left))
+	 (name (expand-file-name (concat "pkginfo/MANIFEST." product-name)
+				 package-dir))
+	 make-backup-files)
+    (message "Generating %s..." name)
+    (with-temp-file name
       (insert "pkginfo/MANIFEST." product-name "\n")
       (let ((lisp-dir (concat "lisp/" product-name "/"))
-	    (files (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
+	    (files (sort (directory-files "." nil "\\.elc?$" t) 'string-lessp))
 	    file)
 	(while (setq file (pop files))
-	  (unless (member file dgnushack-unexported-files)
+	  (unless (member file dgnushack-unexporting-files)
 	    (insert lisp-dir file "\n")))
 	(setq files
 	      (sort (directory-files "../texi/" nil
 				     (concat dgnushack-info-file-regexp-en
 					     "\\|"
-					     dgnushack-info-file-regexp-ja))
+					     dgnushack-info-file-regexp-ja)
+				     t)
 		    'string-lessp))
 	(while (setq file (pop files))
 	  (insert "info/" file "\n"))))))
-
-(defun dgnushack-install-package-info-files (package-dir regexp)
-  "Install info files as an XEmacs package."
-  (let ((files (sort (directory-files "../texi/" nil regexp) 'string-lessp))
-	(info-dir (expand-file-name "info/" package-dir))
-	file)
-    (unless (file-directory-p info-dir)
-      (make-directory info-dir))
-    (while (setq file (pop files))
-      (message "Copying ../texi/%s to %s..." file info-dir)
-      (copy-file (expand-file-name file "../texi/")
-		 (expand-file-name file info-dir)
-		 t t))))
-
-(defun dgnushack-install-package-pkginfo (package-dir product-name)
-  "Install MANIFEST file."
-  (let ((manifest (concat "MANIFEST." product-name))
-	(pkginfo-dir (expand-file-name "pkginfo/" package-dir)))
-    (unless (file-directory-p pkginfo-dir)
-      (make-directory pkginfo-dir))
-    (message "Copying ../%s to %s..." manifest pkginfo-dir)
-    (copy-file (expand-file-name manifest "../")
-	       (expand-file-name manifest pkginfo-dir) t t)))
-
-(defun dgnushack-install-package-lick ()
-  "Install lisp files and MANIFEST file as an XEmacs package."
-  (dgnushack-make-autoloads)
-  (let ((package-dir (dgnushack-examine-package-dir))
-	(product-name (dgnushack-gnus-product-name)))
-    (dgnushack-make-manifest product-name)
-    ;; Install lisp files.
-    (let ((lisp-dir (expand-file-name (concat "lisp/" product-name "/")
-				      package-dir))
-	  (files (sort (directory-files "." nil "\\.elc?$") 'string-lessp)))
-      (unless (file-directory-p lisp-dir)
-	(make-directory lisp-dir t))
-      (dolist (file dgnushack-unexported-files)
-	(setq files (delete file files)))
-      ;; Remove extra files.
-      (dolist (file (directory-files lisp-dir nil nil nil t))
-	(unless (or (member file files)
-		    (not (string-match "\\.elc?$" file)))
-	  (setq file (expand-file-name file lisp-dir))
-	  (message "Removing %s..." file)
-	  (condition-case nil
-	      (delete-file file)
-	    (error nil))))
-      (while (setq file (pop files))
-	(message "Copying %s to %s..." file lisp-dir)
-	(copy-file file (expand-file-name file lisp-dir) t t)))
-    (dgnushack-install-package-pkginfo package-dir product-name)))
-
-(defun dgnushack-install-package-info ()
-  "Install English info files and MANIFEST file as an XEmacs package."
-  (let ((package-dir (dgnushack-examine-package-dir))
-	(product-name (dgnushack-gnus-product-name)))
-    (dgnushack-make-manifest product-name)
-    (dgnushack-install-package-info-files package-dir
-					  dgnushack-info-file-regexp-en)
-    (dgnushack-install-package-pkginfo package-dir product-name)))
-
-(defun dgnushack-install-package-info-ja ()
-  "Install Japanese info files and MANIFEST file as an XEmacs package."
-  (let ((package-dir (dgnushack-examine-package-dir))
-	(product-name (dgnushack-gnus-product-name)))
-    (dgnushack-make-manifest product-name)
-    (dgnushack-install-package-info-files package-dir
-					  dgnushack-info-file-regexp-ja)
-    (dgnushack-install-package-pkginfo package-dir product-name)))
-
-(defun dgnushack-compose-package ()
-  "Make auto-autoloads.el(c), custom-load.el(c) and MANIFEST file."
-  (dgnushack-make-autoloads)
-  (dgnushack-make-manifest (dgnushack-gnus-product-name)))
 
 ;;; dgnushack.el ends here

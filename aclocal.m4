@@ -1,6 +1,7 @@
 AC_DEFUN(AC_DEFINE_GNUS_PRODUCT_NAME,
  [dnl Defining gnus product name.
-  GNUS_PRODUCT_NAME=$1])
+  GNUS_PRODUCT_NAME=$1
+  AC_SUBST(GNUS_PRODUCT_NAME)])
 
 AC_DEFUN(AC_CHECK_EMACS,
  [dnl Check for Emacsen.
@@ -95,8 +96,12 @@ AC_DEFUN(AC_PATH_LISPDIR, [
 	fi
     done
   fi
-  AC_MSG_RESULT([$lispdir
+  if test ${EMACS_FLAVOR} = xemacs; then
+    AC_MSG_RESULT([$lispdir
          (it will be ignored when \"make install-package[[-ja]]\" is done)])
+  else
+    AC_MSG_RESULT([$lispdir])
+  fi
   AC_SUBST(lispdir)
 ])
 
@@ -147,16 +152,44 @@ fi
    AC_MSG_RESULT("${W3}")
 ])
 
+AC_DEFUN(AC_EXAMINE_PACKAGEDIR,
+ [dnl Examine PACKAGEDIR.
+  AC_EMACS_LISP(PACKAGEDIR,
+    (let (package-dir)\
+      (if (boundp (quote early-packages))\
+	  (let ((dirs (delq nil (append (if early-package-load-path\
+					    early-packages)\
+					(if late-package-load-path\
+					    late-packages)\
+					(if last-package-load-path\
+					    last-packages)))))\
+	    (while (and dirs (not package-dir))\
+	      (if (file-directory-p (car dirs))\
+		  (setq package-dir (car dirs)\
+			dirs (cdr dirs))))))\
+      (or package-dir \"\")),
+    "noecho")])
+
 AC_DEFUN(AC_PATH_PACKAGEDIR,
  [dnl Check for PACKAGEDIR.
-  AC_ARG_WITH(packagedir,
-   [  --with-packagedir=DIR   package DIR for XEmacs],
-   [if test x$withval != xyes -a x$withval != x; then
-      AC_MSG_CHECKING([where the package should go])
-      PACKAGEDIR=$withval
+  if test ${EMACS_FLAVOR} = xemacs; then
+    AC_MSG_CHECKING([where the XEmacs package is])
+    AC_ARG_WITH(packagedir,
+      [  --with-packagedir=DIR   package DIR for XEmacs],
+      [if test x$withval != xyes -a x$withval != x; then
+	PACKAGEDIR=$withval
+      else
+	AC_EXAMINE_PACKAGEDIR
+      fi],
+      AC_EXAMINE_PACKAGEDIR)
+    if test x$PACKAGEDIR = x; then
+      AC_MSG_RESULT("not found")
+    else
       AC_MSG_RESULT($PACKAGEDIR)
-    fi],
-    PACKAGEDIR=)
+    fi
+  else
+    PACKAGEDIR=
+  fi
   AC_SUBST(PACKAGEDIR)])
 
 AC_DEFUN(AC_ADD_LOAD_PATH,

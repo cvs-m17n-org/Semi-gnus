@@ -93,6 +93,7 @@
 		 window-pixel-height window-pixel-width)))
 
 ;; T-gnus.
+(maybe-fbind '(md5))
 (if (featurep 'xemacs)
     (progn
       (maybe-fbind '(propertize))
@@ -108,9 +109,6 @@
 	(maybe-bind '(mh-lib-progs)))))
 
 (require 'custom)
-
-(defun md5 (object &optional start end coding noerror)
-  )
 
 (defun nnkiboze-score-file (a)
   )
