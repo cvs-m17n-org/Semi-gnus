@@ -57,11 +57,6 @@ don't define this value."
   :type 'boolean
   :group 'smtp)
 
-(defcustom smtp-coding-system 'binary
-  "*Coding-system for SMTP output."
-  :type 'coding-system
-  :group 'smtp)
-
 
 (defun smtp-fqdn ()
   (if smtp-local-domain
@@ -75,9 +70,7 @@ don't define this value."
 	response-code
 	greeting
 	process-buffer
-	(supported-extensions '())
-	(coding-system-for-read smtp-coding-system)
-	(coding-system-for-write smtp-coding-system))
+	(supported-extensions '()))
     (unwind-protect
 	(catch 'done
 	  ;; get or create the trace buffer
@@ -91,7 +84,8 @@ don't define this value."
 	    (erase-buffer))
 
 	  ;; open the connection to the server
-	  (setq process (open-network-stream "SMTP" process-buffer host port))
+	  (setq process (open-network-stream-as-binary
+			 "SMTP" process-buffer host port))
 	  (and (null process) (throw 'done nil))
 
 	  ;; set the send-filter

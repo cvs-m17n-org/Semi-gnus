@@ -185,7 +185,7 @@
 (defcustom gnus-draft-decoding-function
   (function
    (lambda ()
-     (mime-edit-decode-buffer nil)
+     (mime-edit-decode-message-in-buffer nil)
      (eword-decode-header)
      ))
   "*Function called to decode the message from network representation."

@@ -30,10 +30,6 @@
 
 (nnoo-declare nntp)
 
-(eval-and-compile
-  (unless (fboundp 'open-network-stream)
-    (require 'tcp)))
-
 (eval-when-compile (require 'cl))
 
 (defvoo nntp-address nil
@@ -153,12 +149,6 @@ server there that you can connect to.  See also
 
 (defvoo nntp-warn-about-losing-connection t
   "*If non-nil, beep when a server closes connection.")
-
-(defvoo nntp-coding-system-for-read 'binary
-  "*Coding system to read from NNTP.")
-
-(defvoo nntp-coding-system-for-write 'binary
-  "*Coding system to write to NNTP.")
 
 (defcustom nntp-authinfo-file "~/.authinfo"
   ".netrc-like file that holds nntp authinfo passwords."
@@ -847,9 +837,7 @@ password contained in '~/.nntp-authinfo'."
 		     (kill-buffer ,pbuffer))))))
 	 (process
 	  (condition-case ()
-	      (let ((coding-system-for-read nntp-coding-system-for-read)
-                    (coding-system-for-write nntp-coding-system-for-write))
-		(funcall nntp-open-connection-function pbuffer))
+	      (funcall nntp-open-connection-function pbuffer)
 	    (error nil)
 	    (quit nil))))
     (when timer 
@@ -875,7 +863,8 @@ password contained in '~/.nntp-authinfo'."
 	nil))))
 
 (defun nntp-open-network-stream (buffer)
-  (open-network-stream "nntpd" buffer nntp-address nntp-port-number))
+  (open-network-stream-as-binary
+   "nntpd" buffer nntp-address nntp-port-number))
 
 (defun nntp-open-ssl-stream (buffer)
   (let* ((ssl-program-arguments '("-connect" (concat host ":" service)))
@@ -1174,9 +1163,10 @@ password contained in '~/.nntp-authinfo'."
   (save-excursion
     (set-buffer buffer)
     (erase-buffer)
-    (let ((proc (apply
-		 'start-process
-		 "nntpd" buffer nntp-telnet-command nntp-telnet-switches))
+    (let ((proc (as-binary-process
+		 (apply
+		  'start-process
+		  "nntpd" buffer nntp-telnet-command nntp-telnet-switches)))
 	  (case-fold-search t))
       (when (memq (process-status proc) '(open run))
 	(process-send-string proc "set escape \^X\n")
@@ -1221,13 +1211,15 @@ password contained in '~/.nntp-authinfo'."
 (defun nntp-open-rlogin (buffer)
   "Open a connection to SERVER using rsh."
   (let ((proc (if nntp-rlogin-user-name
-		  (apply 'start-process
-			 "nntpd" buffer nntp-rlogin-program
-			 nntp-address "-l" nntp-rlogin-user-name
-			 nntp-rlogin-parameters)
-		(apply 'start-process
-		       "nntpd" buffer nntp-rlogin-program nntp-address
-		       nntp-rlogin-parameters))))
+		  (as-binary-process
+		   (apply 'start-process
+			  "nntpd" buffer nntp-rlogin-program
+			  nntp-address "-l" nntp-rlogin-user-name
+			  nntp-rlogin-parameters))
+		(as-binary-process
+		 (apply 'start-process
+			"nntpd" buffer nntp-rlogin-program nntp-address
+			nntp-rlogin-parameters)))))
     (save-excursion
       (set-buffer buffer)
       (nntp-wait-for-string "^\r*20[01]")

@@ -667,7 +667,7 @@ is not run if `gnus-visual' is nil."
   :type 'hook)
 
 (defcustom gnus-structured-field-decoder
-  #'eword-decode-and-unfold-structured-field
+  #'eword-decode-and-unfold-structured-field-body
   "Function to decode non-ASCII characters in structured field for summary."
   :group 'gnus-various
   :type 'function)
@@ -676,7 +676,7 @@ is not run if `gnus-visual' is nil."
   (function
    (lambda (string)
      (eword-decode-unstructured-field-body
-      (std11-unfold-string string) 'must-unfold)
+      (std11-unfold-string string))
      ))
   "Function to decode non-ASCII characters in unstructured field for summary."
   :group 'gnus-various

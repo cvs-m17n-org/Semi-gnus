@@ -1,3 +1,185 @@
+1998-12-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Set
+	`gnus-article-current-summary' to `gnus-summary-buffer'.
+
+1998-12-18  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (gnus-read-newsrc-el-file): Bug (referring to
+	unbounded variable) fix.
+
+1998-12-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (gnus-read-newsrc-el-file): Don't load newsrc
+	file if it does not exist.
+
+1998-12-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el: (gnus-version-number): Update to 6.9.2.
+
+	* lisp/nnheader.el (nnheader-find-file-noselect): Call
+	`find-file-noselect-as-coding-system' with CODING-SYSTEM as the
+	1st arg.
+
+	* lisp/nnmail.el (nnmail-find-file): Call
+	`insert-file-contents-as-coding-system' with CODING-SYSTEM as the
+	1st arg.
+	* lisp/nnheader.el (nnheader-insert-file-contents): Likewise.
+
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Call
+	`write-region-as-coding-system' with CODING-SYSTEM as the 1st arg.
+	(gnus-read-newsrc-el-file): Call
+	`insert-file-contents-as-coding-system' with CODING-SYSTEM as the
+	1st arg.
+
+	* lisp/gnus-cache.el (gnus-cache-save-buffers): Call
+	`gnus-write-buffer-as-coding-system' with CODING-SYSTEM as the 1st
+	arg.
+
+	* lisp/gnus-util.el (gnus-write-buffer-as-coding-system): Be
+	CODING-SYSTEM the 1st arg.
+
+	* lisp/nnmail.el (nnmail-write-region): Call
+	`write-region-as-coding-system' with CODING-SYSTEM as the 1st arg.
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Likewise.
+	* lisp/gnus-agent.el (gnus-agent-expire): Likewise.
+	(gnus-agent-fetch-headers): Likewise.
+	(gnus-agent-flush-cache): Likewise.
+	(gnus-agent-fetch-articles): Likewise.
+	(gnus-agent-save-history): Likewise.
+	(gnus-agent-save-groups): Likewise.
+	(gnus-agent-save-active): Likewise.
+
+1998-12-14  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-find-file-noselect): Use
+	`find-file-noselect-as-coding-system' (renamed from
+	`find-file-noselect-as-specified-coding-system').
+
+	* lisp/nnmail.el (nnmail-find-file): Use
+	`insert-file-contents-as-coding-system' (renamed from
+	`insert-file-contents-as-specified-coding-system').
+	* lisp/nnheader.el (nnheader-insert-file-contents): Likewise.
+
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Use
+	`write-region-as-coding-system' (renamed from
+	`write-region-as-specified-coding-system').
+	(gnus-read-newsrc-el-file): Use
+	`insert-file-contents-as-coding-system' (renamed from
+	`insert-file-contents-as-specified-coding-system').
+
+	* lisp/gnus-cache.el (gnus-cache-save-buffers): Use
+	`gnus-write-buffer-as-coding-system' (renamed from
+	`gnus-write-buffer-as-specified-coding-system').
+
+	* lisp/gnus-util.el (gnus-write-buffer-as-coding-system):
+	Renamed from `gnus-write-buffer-as-specified-coding-system'.
+
+	* lisp/nnmail.el (nnmail-write-region): Use
+	`write-region-as-coding-system' (renamed from
+	`write-region-as-specified-coding-system').
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Likewise.
+	* lisp/gnus-agent.el (gnus-agent-expire): Likewise.
+	(gnus-agent-fetch-headers): Likewise.
+	(gnus-agent-flush-cache): Likewise.
+	(gnus-agent-fetch-articles): Likewise.
+	(gnus-agent-save-history): Likewise.
+	(gnus-agent-save-groups): Likewise.
+	(gnus-agent-save-active): Likewise.
+
+1998-12-11  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-find-file-noselect): Call
+	`find-file-noselect-as-specified-coding-system' directly.
+
+1998-12-10  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/pop3.el (pop3-movemail): Use `write-region-as-binary'
+	instead of `append-to-file'.
+	(pop3-movemail-file-coding-system): Abolished.
+
+	* lisp/nnheader.el (nnheader-find-file-noselect): Use
+	`find-file-noselect-as-specified-coding-system' instead of
+	`find-file-noselect'.
+
+	* lisp/nnmail.el (nnmail-find-file): Use
+	`insert-file-contents-as-specified-coding-system' instead of
+	`insert-file-contents'.
+	* lisp/nnheader.el (nnheader-insert-file-contents): Likewise.
+
+	* lisp/message.el (message-send-mail-with-qmail): Enclose
+	`call-process-region' with `as-binary-process'.
+	(message-send-mail-with-sendmail): Likewise.
+	(message-send-coding-system): Abolished.
+
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Emulate
+	`save-buffer' with `write-region-as-specified-coding-system'.
+	(gnus-read-newsrc-el-file): Emulate `load' with
+	`insert-file-contents-as-specified-coding-system' and
+	`eval-region'.
+
+	* lisp/gnus-cache.el (gnus-cache-save-buffers): Use
+	`gnus-write-buffer-as-specified-coding-system' instead of
+	`gnus-write-buffer'.
+
+	* lisp/gnus-util.el (gnus-output-to-mail): Use
+	`write-region-as-binary' instead of `append-to-file'.
+	(gnus-output-to-mail): Use `gnus-write-buffer-as-binary' instead
+	of `gnus-write-buffer'.
+	(gnus-write-buffer-as-specified-coding-system): New function.
+	(gnus-write-buffer-as-binary): New function.
+
+	* lisp/nnmail.el (nnmail-write-region): Use
+	`write-region-as-specified-coding-system' instead of
+	`write-region'.
+	* lisp/gnus-start.el (gnus-save-newsrc-file): Likewise.
+	* lisp/gnus-agent.el (gnus-agent-expire): Likewise.
+	(gnus-agent-fetch-headers): Likewise.
+	(gnus-agent-flush-cache): Likewise.
+	(gnus-agent-fetch-articles): Likewise.
+	(gnus-agent-save-history): Likewise.
+	(gnus-agent-save-groups): Likewise.
+	(gnus-agent-save-active): Likewise.
+
+1998-12-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/smtp.el (smtp-via-smtp): Use `open-network-stream-as-binary'
+	instead of `open-network-stream'.
+	* lisp/pop3.el (pop3-open-server): Likewise.
+	* lisp/nntp.el (nntp-open-network-stream): Likewise.
+	* lisp/gnus-gl.el (bbb-connect-to-bbbd): Likewise.
+
+	* lisp/nntp.el (nntp-open-rlogin): Enclose `start-process' with
+	`as-binary-process'.
+	(nntp-open-telnet): Likewise.
+
+	* lisp/smtp.el (smtp-coding-system): Abolished.
+
+	* lisp/nntp.el (nntp-coding-system-for-write): Abolished.
+	(nntp-coding-system-for-read): Abolished.
+
+	* lisp/nntp.el: Don't require `tcp'.
+	* lisp/nndb.el: Likewise.
+
+1998-12-07  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-get-parameter-with-eval): Call
+	`message-get-parameter' with arg `key' first.
+
+1998-11-26  Yoshiki Hayashi <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/gnus.el: (gnus-version-number): Update to 6.9.1.
+	(gnus-version): Modified for SEMI 1.11, FLIM 1.12.
+
+	* lisp/gnus-draft.el: (gnus-draft-decoding-buffer): Call
+	`mime-edit-decode-message-in-buffer' instead of
+	`mime-edit-decode-buffer'.
+
+	* lisp/gnus-sum.el: (gnus-structured-field-decoder): Use
+	`eword-decode-and-unfold-structured-field-body' instead of
+	'eword-decode-and-unfold-structured-field'.
+	(gnus-unstructured-field-decoder): remove `must-unfold'.
+
 1998-11-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-summary-supersede-article): Bind
@@ -8,7 +190,7 @@
 	(message-supersede-setup-function): New user option. Use
 	`message-supersede-setup-for-mime-edit' in default.
 	(message-supersede): Call `message-supersede-setup-function' if it
- 	is non-nil.
+	is non-nil.
 	(message-supersede-setup-hook): New user option.
 
 	* lisp/message.el (message-bounce-setup-for-mime-edit): Don't
@@ -142,7 +324,7 @@
 1998-11-11  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/message.el (message-mode-map): Add new command key
- 	`C-x C-s' for `message-save-drafts'.
+	`C-x C-s' for `message-save-drafts'.
 
 1998-11-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 

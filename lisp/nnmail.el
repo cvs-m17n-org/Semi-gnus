@@ -493,9 +493,9 @@ parameter.  It should return nil, `warn' or `delete'."
   (let ((format-alist nil)
         (after-insert-file-functions nil))
     (condition-case ()
-	(let ((coding-system-for-read nnmail-file-coding-system)
-	      (pathname-coding-system 'binary))
-	  (insert-file-contents file)
+	(let ((pathname-coding-system 'binary))
+	  (insert-file-contents-as-coding-system
+	   nnmail-file-coding-system file)
 	  t)
       (file-error nil))))
 
@@ -1703,9 +1703,9 @@ If ARGS, PROMPT is used as an argument to `format'."
 
 (defun nnmail-write-region (start end filename &optional append visit lockname)
   "Do a `write-region', and then set the file modes."
-  (let ((coding-system-for-write nnmail-file-coding-system)
-	(pathname-coding-system 'binary))
-    (write-region start end filename append visit lockname)
+  (let ((pathname-coding-system 'binary))
+    (write-region-as-coding-system
+     nnmail-file-coding-system start end filename append visit lockname)
     (set-file-modes filename nnmail-default-file-modes)))
 
 ;;;

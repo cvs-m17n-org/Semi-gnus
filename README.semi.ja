@@ -1,4 +1,4 @@
-このパッケージには Semi-gnus が入っています。
+このパッケージには Semi-gnus 6.9 が入っています。
 
 Semi-gnus とは？
 ==================
@@ -9,9 +9,11 @@ Semi-gnus とは？
 使用してはいけません。
 
   SEMI パッケージを要求しますので、インストールする前に SEMI パッケー
-ジをインストールしてください。SEMI は
-ftp://ftp.jaist.ac.jp/pub/elisp/semi/ から取得することができます。必要
-な環境は SEMI の README.ja を参照してください。
+ジをインストールしてください。Semi-gnus 6.9 は SEMI 1.11 を要求します。
+SEMI は
+ftp://ftp.jaist.ac.jp/pub/elisp/semi/ 
+から取得することができます。必要な環境は SEMI の README.ja を参照して
+ください。
 
 
 取得方法 (CVS)
@@ -56,7 +58,8 @@ ftp://ftp.jaist.ac.jp/pub/elisp/semi/ から取得することができます。必要
     himi		himi branch
 
     ichikawa		ichikawa branch
-			Based on pGnus
+
+    pgnus-ichikawa	ichikawa branch. Based on pGnus
 	
     akr			akr branch
 

@@ -1916,14 +1916,17 @@ If FORCE is non-nil, the .newsrc file is read."
     ;; We always, always read the .eld file.
     (gnus-message 5 "Reading %s..." ding-file)
     (let (gnus-newsrc-assoc)
-      (condition-case nil
-	  (let ((coding-system-for-read gnus-startup-file-coding-system))
-	    (load ding-file t t t))
-	(error
-	 (ding)
-	 (unless (gnus-yes-or-no-p
-		  (format "Error in %s; continue? " ding-file))
-	   (error "Error in %s" ding-file))))
+      (when (file-exists-p ding-file)
+	(condition-case nil
+	    (with-temp-buffer
+	      (insert-file-contents-as-coding-system
+	       gnus-startup-file-coding-system ding-file)
+	      (eval-region (point-min) (point-max)))
+	  (error
+	   (ding)
+	   (unless (gnus-yes-or-no-p
+		    (format "Error in %s; continue? " ding-file))
+	     (error "Error in %s" ding-file)))))
       (when gnus-newsrc-assoc
 	(setq gnus-newsrc-alist gnus-newsrc-assoc)))
     (gnus-make-hashtable-from-newsrc-alist)
@@ -2279,8 +2282,10 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (gnus-message 5 "Saving %s.eld..." gnus-current-startup-file)
 	  (gnus-gnus-to-quick-newsrc-format)
 	  (gnus-run-hooks 'gnus-save-quick-newsrc-hook)
-	  (let ((coding-system-for-write gnus-startup-file-coding-system))
-	    (save-buffer))
+	  (write-region-as-coding-system
+	   gnus-startup-file-coding-system
+	   (point-min) (point-max) (buffer-file-name))
+	  (set-buffer-modified-p nil)
 	  (kill-buffer (current-buffer))
 	  (gnus-message
 	   5 "Saving %s.eld...done" gnus-current-startup-file))

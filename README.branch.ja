@@ -81,9 +81,10 @@ Public Branches
 	for-semi-1_5	Semi-gnus for SEMI 1.5 API
 	for-semi-1_6	Semi-gnus for SEMI 1.6 API
 	gnus-6_5	Semi-gnus for SEMI 1.7 API
-	gnus-6_6	Semi-gnus for SEMI 1.8, FLIM 1.7 API (stable)
-	gnus-6_7	Semi-gnus for SEMI 1.8, FLIM 1.7 API (develop)
-	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 API
+	gnus-6_6	Semi-gnus for SEMI 1.8, FLIM 1.7 API
+	gnus-6_7	Semi-gnus for SEMI 1.8, FLIM 1.7 API
+	gnus-6_8	Semi-gnus for SEMI 1.8, FLIM 1.8 API (stable)
+	gnus-6_9	Semi-gnus for SEMI 1.11 FLIM 1.12 API (develop)
 
 Personal Branches
 

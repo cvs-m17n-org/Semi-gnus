@@ -917,9 +917,6 @@ The cdr of ech entry is a function for applying the face to a region.")
 		 (const :tag "always" t)
 		 (const :tag "ask" ask)))
 
-(defvar message-send-coding-system 'binary
-  "Coding system to encode outgoing mail.")
-
 ;;; Internal variables.
 
 (defvar message-buffer-list nil)
@@ -1051,7 +1048,7 @@ The cdr of ech entry is a function for applying the face to a region.")
   (cdr (assq key alist)))
 
 (defmacro message-get-parameter-with-eval (key &optional alist)
-  `(message-eval-parameter (message-get-parameter ,alist ,key)))
+  `(message-eval-parameter (message-get-parameter ,key ,alist)))
 
 (defmacro message-y-or-n-p (question show &rest text)
   "Ask QUESTION, displaying the rest of the arguments in a temp. buffer if SHOW"
@@ -2222,31 +2219,31 @@ the user from the mailer."
 	(save-excursion
 	  (set-buffer errbuf)
 	  (erase-buffer))))
-    (let ((default-directory "/")
-	  (coding-system-for-write message-send-coding-system))
-      (apply 'call-process-region
-	     (append (list (point-min) (point-max)
-			   (if (boundp 'sendmail-program)
-			       sendmail-program
-			     "/usr/lib/sendmail")
-			   nil errbuf nil "-oi")
-		     ;; Always specify who from,
-		     ;; since some systems have broken sendmails.
-		     ;; But some systems are more broken with -f, so
-		     ;; we'll let users override this.
-		     (if (null message-sendmail-f-is-evil)
-			 (list "-f" (user-login-name)))
-		     ;; These mean "report errors by mail"
-		     ;; and "deliver in background".
-		     (if (null message-interactive) '("-oem" "-odb"))
-		     ;; Get the addresses from the message
-		     ;; unless this is a resend.
-		     ;; We must not do that for a resend
-		     ;; because we would find the original addresses.
-		     ;; For a resend, include the specific addresses.
-		     (if resend-to-addresses
-			 (list resend-to-addresses)
-		       '("-t")))))
+    (let ((default-directory "/"))
+      (as-binary-process
+       (apply 'call-process-region
+	      (append (list (point-min) (point-max)
+			    (if (boundp 'sendmail-program)
+				sendmail-program
+			      "/usr/lib/sendmail")
+			    nil errbuf nil "-oi")
+		      ;; Always specify who from,
+		      ;; since some systems have broken sendmails.
+		      ;; But some systems are more broken with -f, so
+		      ;; we'll let users override this.
+		      (if (null message-sendmail-f-is-evil)
+			  (list "-f" (user-login-name)))
+		      ;; These mean "report errors by mail"
+		      ;; and "deliver in background".
+		      (if (null message-interactive) '("-oem" "-odb"))
+		      ;; Get the addresses from the message
+		      ;; unless this is a resend.
+		      ;; We must not do that for a resend
+		      ;; because we would find the original addresses.
+		      ;; For a resend, include the specific addresses.
+		      (if resend-to-addresses
+			  (list resend-to-addresses)
+			'("-t"))))))
     (when message-interactive
       (save-excursion
 	(set-buffer errbuf)
@@ -2271,28 +2268,28 @@ to find out how to use this."
   (run-hooks 'message-send-mail-hook)
   ;; send the message
   (case
-      (let ((coding-system-for-write message-send-coding-system))
-	(apply
-	 'call-process-region 1 (point-max) message-qmail-inject-program
-	 nil nil nil
-	 ;; qmail-inject's default behaviour is to look for addresses on the
-	 ;; command line; if there're none, it scans the headers.
-	 ;; yes, it does The Right Thing w.r.t. Resent-To and it's kin.
-	 ;;
-	 ;; in general, ALL of qmail-inject's defaults are perfect for simply
-	 ;; reading a formatted (i. e., at least a To: or Resent-To header)
-	 ;; message from stdin.
-	 ;;
-	 ;; qmail also has the advantage of not having been raped by
-	 ;; various vendors, so we don't have to allow for that, either --
-	 ;; compare this with message-send-mail-with-sendmail and weep
-	 ;; for sendmail's lost innocence.
-	 ;;
-	 ;; all this is way cool coz it lets us keep the arguments entirely
-	 ;; free for -inject-arguments -- a big win for the user and for us
-	 ;; since we don't have to play that double-guessing game and the user
-	 ;; gets full control (no gestapo'ish -f's, for instance).  --sj
-	 message-qmail-inject-args))
+      (as-binary-process
+       (apply
+	'call-process-region 1 (point-max) message-qmail-inject-program
+	nil nil nil
+	;; qmail-inject's default behaviour is to look for addresses on the
+	;; command line; if there're none, it scans the headers.
+	;; yes, it does The Right Thing w.r.t. Resent-To and it's kin.
+	;;
+	;; in general, ALL of qmail-inject's defaults are perfect for simply
+	;; reading a formatted (i. e., at least a To: or Resent-To header)
+	;; message from stdin.
+	;;
+	;; qmail also has the advantage of not having been raped by
+	;; various vendors, so we don't have to allow for that, either --
+	;; compare this with message-send-mail-with-sendmail and weep
+	;; for sendmail's lost innocence.
+	;;
+	;; all this is way cool coz it lets us keep the arguments entirely
+	;; free for -inject-arguments -- a big win for the user and for us
+	;; since we don't have to play that double-guessing game and the user
+	;; gets full control (no gestapo'ish -f's, for instance).  --sj
+	message-qmail-inject-args))
     ;; qmail-inject doesn't say anything on it's stdout/stderr,
     ;; we have to look at the retval instead
     (0 nil)

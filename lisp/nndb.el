@@ -59,12 +59,6 @@
 (eval-when-compile (require 'cl))
 
 (eval-and-compile
-  (unless (fboundp 'open-network-stream)
-    (require 'tcp)))
-
-(eval-when-compile (require 'cl))
-
-(eval-and-compile
   (autoload 'news-setup "rnewspost")
   (autoload 'news-reply-mode "rnewspost")
   (autoload 'cancel-timer "timer")
