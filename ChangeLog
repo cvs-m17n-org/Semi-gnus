@@ -1,3 +1,12 @@
+2002-04-22  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Tweak BBDB message
+	caching.
+	(gnus-bbdb/extract-message-sender-function): New user option.
+	(gnus-bbdb/extract-message-sender): New function.
+
 2002-04-20  Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
