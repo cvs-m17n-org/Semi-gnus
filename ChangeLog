@@ -1,5 +1,13 @@
 1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/nnheader.el (mail-header-id): Use `mime-fetch-field' and
+	`mail-header-entity'.
+	(mail-header-set-id): Use `mail-header-set-field'.
+	(make-full-mail-header): Modify data structure to store Message-Id
+	to mime-entity.
+
+1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/nnheader.el (mail-header-entity): New macro.
 	(mail-header-set-entity): New macro.
 	(mail-header-set-field): New macro.
