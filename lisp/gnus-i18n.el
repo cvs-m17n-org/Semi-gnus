@@ -77,13 +77,13 @@ It is specified by variable `gnus-newsgroup-default-charset-alist'
 		   (setq alist (cdr alist)))
 		 ))))
 	(if charset
-            (progn
-              (save-excursion
-                (set-buffer gnus-summary-buffer)
-                (make-local-variable 'default-mime-charset)
-                (setq default-mime-charset charset))
-              (make-local-variable 'default-mime-charset)
-              (setq default-mime-charset charset))
+	    (progn
+	      (save-excursion
+		(set-buffer gnus-summary-buffer)
+		(make-local-variable 'default-mime-charset)
+		(setq default-mime-charset charset))
+	      (make-local-variable 'default-mime-charset)
+	      (setq default-mime-charset charset))
 	  (kill-local-variable 'default-mime-charset)))))
 
 

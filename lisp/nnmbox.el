@@ -4,7 +4,7 @@
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -271,8 +271,8 @@
 	      (progn
 		(unless (eq nnmail-expiry-target 'delete)
 		  (with-temp-buffer
-		    (nnmbox-request-article (car articles) 
-					     newsgroup server 
+		    (nnmbox-request-article (car articles)
+					     newsgroup server
 					     (current-buffer))
 		    (let ((nnml-current-directory nil))
 		      (nnmail-expiry-target-group
@@ -629,7 +629,7 @@
 				 nnmbox-file-coding-system))
 			    (nnheader-find-file-noselect
 			     nnmbox-mbox-file nil t))))
- 	(buffer-disable-undo)
+	(buffer-disable-undo)
 
 	;; Go through the group alist and compare against the mbox file.
 	(while alist

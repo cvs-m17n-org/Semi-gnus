@@ -138,12 +138,12 @@
 (eval-and-compile
   (defalias 'mm-read-coding-system
     (cond
-     ((fboundp 'read-coding-system) 
+     ((fboundp 'read-coding-system)
       (if (and (featurep 'xemacs)
-               (<= (string-to-number emacs-version) 21.1))
-          (lambda (prompt &optional default-coding-system)
-            (read-coding-system prompt))
-        'read-coding-system))
+	       (<= (string-to-number emacs-version) 21.1))
+	  (lambda (prompt &optional default-coding-system)
+	    (read-coding-system prompt))
+	'read-coding-system))
      (t (lambda (prompt &optional default-coding-system)
 	  "Prompt the user for a coding system."
 	  (completing-read
@@ -254,7 +254,7 @@ used as the line break code type of the coding system."
 Only do this if the default value of `enable-multibyte-characters' is
 non-nil.  This is a no-op in XEmacs."
   (when (and (not (featurep 'xemacs))
-             (boundp 'default-enable-multibyte-characters)
+	     (boundp 'default-enable-multibyte-characters)
 	     default-enable-multibyte-characters
 	     (fboundp 'set-buffer-multibyte))
     (set-buffer-multibyte t)))
@@ -270,7 +270,7 @@ This is a no-op in XEmacs."
   "Enable multibyte in the current buffer.
 Only used in Emacs Mule 4."
   (when (and (not (featurep 'xemacs))
-             (boundp 'default-enable-multibyte-characters)
+	     (boundp 'default-enable-multibyte-characters)
 	     default-enable-multibyte-characters
 	     (fboundp 'set-buffer-multibyte)
 	     (fboundp 'charsetp)
@@ -435,7 +435,7 @@ Mule4 only."
   "Return a list of Emacs charsets in the region B to E."
   (cond
    ((and (mm-multibyte-p)
- 	 (fboundp 'find-charset-region))
+	 (fboundp 'find-charset-region))
     ;; Remove composition since the base charsets have been included.
     ;; Remove eight-bit-*, treat them as ascii.
     (let ((css (find-charset-region b e)))
@@ -505,7 +505,7 @@ If INHIBIT is non-nil, inhibit mm-inhibit-file-name-handlers.
 	(auto-mode-alist (if inhibit nil (mm-auto-mode-alist)))
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
-        (after-insert-file-functions nil)
+	(after-insert-file-functions nil)
 	(enable-local-eval nil)
 	(find-file-hooks nil)
 	(inhibit-file-name-operation (if inhibit

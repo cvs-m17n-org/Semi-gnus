@@ -131,7 +131,7 @@
 (defvar gnus-format-specs-compiled nil
   "Alist of compiled format specs.  Each element should be the form:
 \(TYPE (FORMAT-STRING-1 . COMPILED-FUNCTION-1)
-                 :
+		 :
        (FORMAT-STRING-n . COMPILED-FUNCTION-n)).")
 
 (defvar gnus-article-mode-line-format-spec nil)

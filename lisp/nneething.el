@@ -4,7 +4,7 @@
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -365,7 +365,7 @@ included.")
 (defun nneething-file-name (article)
   "Return the file name of ARTICLE."
   (let ((dir (file-name-as-directory nneething-address))
-        fname)
+	fname)
     (if (numberp article)
 	(if (setq fname (cadr (assq article nneething-map)))
 	    (expand-file-name fname dir)

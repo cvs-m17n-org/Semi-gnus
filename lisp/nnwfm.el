@@ -57,7 +57,7 @@
 (defvoo nnwfm-groups nil)
 (defvoo nnwfm-headers nil)
 (defvoo nnwfm-articles nil)
-(defvar nnwfm-table-regexp 
+(defvar nnwfm-table-regexp
   "postings.*editpost\\|forumdisplay\\|Forum[0-9]+/HTML\\|getbio")
 
 ;;; Interface functions
@@ -378,7 +378,7 @@
 	nnwfm-groups-alist)
   (with-temp-file (expand-file-name "groups" nnwfm-directory)
     (prin1 nnwfm-groups-alist (current-buffer))))
-    
+
 (defun nnwfm-init (server)
   "Initialize buffers and such."
   (unless (file-exists-p nnwfm-directory)

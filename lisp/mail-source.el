@@ -842,11 +842,11 @@ This only works when `display-time' is enabled."
 				  (insert-file-contents file)
 				  (goto-char (point-min))
 ;;;                               ;; Unix mail format
-;;; 				  (unless (looking-at "\n*From ")
-;;; 				    (insert "From maildir "
-;;; 					    (current-time-string) "\n"))
-;;; 				  (while (re-search-forward "^From " nil t)
-;;; 				    (replace-match ">From "))
+;;;				  (unless (looking-at "\n*From ")
+;;;				    (insert "From maildir "
+;;;					    (current-time-string) "\n"))
+;;;				  (while (re-search-forward "^From " nil t)
+;;;				    (replace-match ">From "))
 ;;;                               (goto-char (point-max))
 ;;;				  (insert "\n\n")
 				  ;; MMDF mail format

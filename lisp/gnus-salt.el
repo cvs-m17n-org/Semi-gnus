@@ -153,11 +153,11 @@ If given a prefix, mark all unpicked articles as read."
   (interactive "P")
   (if gnus-newsgroup-processable
       (progn
-        (gnus-summary-limit-to-articles nil)
-        (when (or catch-up gnus-mark-unpicked-articles-as-read)
+	(gnus-summary-limit-to-articles nil)
+	(when (or catch-up gnus-mark-unpicked-articles-as-read)
 	  (gnus-summary-limit-mark-excluded-as-read))
-        (gnus-summary-first-article)
-        (gnus-configure-windows
+	(gnus-summary-first-article)
+	(gnus-configure-windows
 	 (if gnus-pick-display-summary 'article 'pick) t))
     (if gnus-pick-elegant-flow
 	(progn
@@ -228,7 +228,7 @@ This must be bound to a button-down mouse event."
   (let* ((echo-keystrokes 0)
 	 (start-posn (event-start start-event))
 	 (start-point (posn-point start-posn))
-         (start-line (1+ (count-lines 1 start-point)))
+	 (start-line (1+ (count-lines 1 start-point)))
 	 (start-window (posn-window start-posn))
 	 (bounds (gnus-window-edges start-window))
 	 (top (nth 1 bounds))

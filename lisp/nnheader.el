@@ -5,7 +5,7 @@
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;	Katsumi Yamaoka <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
@@ -294,7 +294,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 					     (match-end 0)))
 		       (when (> (length ref2) (length ref))
 			 (setq ref ref2)))
-                     ref)
+		     ref)
 		 nil)))
 	   ;; Chars.
 	   0
@@ -835,7 +835,7 @@ an alarming frequency on NFS mounted file systems. If it is nil,
 (defun nnheader-directory-articles (dir)
   "Return a list of all article files in directory DIR."
   (mapcar 'nnheader-file-to-number
-	  (if nnheader-directory-files-is-safe 
+	  (if nnheader-directory-files-is-safe
 	      (directory-files
 	       dir nil nnheader-numerical-short-files t)
 	    (nnheader-directory-files-safe
@@ -844,7 +844,7 @@ an alarming frequency on NFS mounted file systems. If it is nil,
 (defun nnheader-article-to-file-alist (dir)
   "Return an alist of article/file pairs in DIR."
   (mapcar (lambda (file) (cons (nnheader-file-to-number file) file))
-	  (if nnheader-directory-files-is-safe 
+	  (if nnheader-directory-files-is-safe
 	      (directory-files
 	       dir nil nnheader-numerical-short-files t)
 	    (nnheader-directory-files-safe
@@ -876,7 +876,7 @@ If FULL, translate everything."
 	    ;; file-name-nondirectory is not enough to split
 	    ;; file names, containing ':', e.g.
 	    ;; "d:\\Work\\News\\nntp+news.fido7.ru:fido7.ru.gnu.SCORE"
-	    ;; 
+	    ;;
 	    ;; we are trying to correctly split such names:
 	    ;; "d:file.name" -> "a:" "file.name"
 	    ;; "aaa:bbb.ccc" -> "" "aaa:bbb.ccc"
@@ -1069,7 +1069,7 @@ find-file-hooks, etc.
 	(auto-mode-alist (nnheader-auto-mode-alist))
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
-        (after-insert-file-functions nil)
+	(after-insert-file-functions nil)
 	(enable-local-eval nil)
 	(find-file-hooks nil))
     (insert-file-contents-as-coding-system

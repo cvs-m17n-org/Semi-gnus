@@ -5,7 +5,7 @@
 ;; Author: ShengHuo Zhu <zsh@cs.rochester.edu> (adding NOV)
 ;;      Scott Byer <byer@mv.us.adobe.com>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: mail
 
 ;; This file is part of GNU Emacs.
@@ -105,7 +105,7 @@ message, a huge time saver for large mailboxes.")
 (defvoo nnfolder-scantime-alist nil)
 (defvoo nnfolder-active-timestamp nil)
 (defvoo nnfolder-active-file-coding-system nnheader-text-coding-system)
-(defvoo nnfolder-active-file-coding-system-for-write 
+(defvoo nnfolder-active-file-coding-system-for-write
     nnmail-active-file-coding-system)
 (defvoo nnfolder-file-coding-system nnheader-text-coding-system)
 (defvoo nnfolder-file-coding-system-for-write nnheader-file-coding-system
@@ -146,7 +146,7 @@ all.  This may very well take some time.")
 	    'headers
 	  (if (nnfolder-retrieve-headers-with-nov articles fetch-old)
 	      'nov
-	    (setq articles (gnus-sorted-intersection 
+	    (setq articles (gnus-sorted-intersection
 			    ;; Is ARTICLES sorted?
 			    (sort articles '<)
 			    (nnfolder-existing-articles)))
@@ -222,7 +222,7 @@ all.  This may very well take some time.")
 	      (cons nnfolder-current-group article)
 	    (goto-char (point-min))
 	    (cons nnfolder-current-group
-		  (if (search-forward (concat "\n" nnfolder-article-marker) 
+		  (if (search-forward (concat "\n" nnfolder-article-marker)
 				      nil t)
 		      (string-to-int
 		       (buffer-substring
@@ -385,7 +385,7 @@ all.  This may very well take some time.")
 		       force nnfolder-inhibit-expiry))
 	    (unless (eq nnmail-expiry-target 'delete)
 	      (with-temp-buffer
-		(nnfolder-request-article (car maybe-expirable) 
+		(nnfolder-request-article (car maybe-expirable)
 					  newsgroup server (current-buffer))
 		(let ((nnml-current-directory nil))
 		  (nnmail-expiry-target-group
@@ -419,7 +419,7 @@ all.  This may very well take some time.")
 	 (goto-char (point-min))
 	 (while (re-search-forward
 		 (concat "^" nnfolder-article-marker)
-		 (save-excursion (and (search-forward "\n\n" nil t) (point))) 
+		 (save-excursion (and (search-forward "\n\n" nil t) (point)))
 		 t)
 	   (delete-region (progn (beginning-of-line) (point))
 			  (progn (forward-line 1) (point))))
@@ -505,7 +505,7 @@ all.  This may very well take some time.")
       (unless (or gnus-nov-is-evil nnfolder-nov-is-evil)
 	(save-excursion
 	  (set-buffer buffer)
-	  (let ((headers (nnfolder-parse-head article 
+	  (let ((headers (nnfolder-parse-head article
 					      (point-min) (point-max))))
 	    (with-current-buffer (nnfolder-open-nov group)
 	      (if (nnheader-find-nov-line article)
@@ -674,7 +674,7 @@ deleted.  Point is left where the deleted region was."
 	      ;; See whether we need to create the new file.
 	      (unless (file-exists-p file)
 		(gnus-make-directory (file-name-directory file))
-		(let ((nnmail-file-coding-system 
+		(let ((nnmail-file-coding-system
 		       (or nnfolder-file-coding-system-for-write
 			   nnfolder-file-coding-system-for-write)))
 		  (nnmail-write-region 1 1 file t 'nomesg)))
@@ -795,7 +795,7 @@ deleted.  Point is left where the deleted region was."
   (let* ((file (nnfolder-group-pathname group))
 	 (nov  (nnfolder-group-nov-pathname group))
 	 (buffer (set-buffer
-		  (let ((nnheader-file-coding-system 
+		  (let ((nnheader-file-coding-system
 			 nnfolder-file-coding-system))
 		    (nnheader-find-file-noselect file)))))
     (if (equal (cadr (assoc group nnfolder-scantime-alist))
@@ -867,7 +867,7 @@ deleted.  Point is left where the deleted region was."
 	      (with-current-buffer novbuf
 		(dolist (article articles)
 		  (when (nnheader-find-nov-line article)
-		    (delete-region (point) 
+		    (delete-region (point)
 				   (progn (forward-line 1) (point)))))))
 	    (setcar active (max 1 (min minid maxid)))
 	    (setcdr active (max maxid (cdr active)))
@@ -907,7 +907,7 @@ deleted.  Point is left where the deleted region was."
 	      (narrow-to-region start end)
 	      (nnmail-insert-lines)
 	      (nnfolder-insert-newsgroup-line
-	       (cons nil 
+	       (cons nil
 		     (setq newnum
 			   (nnfolder-active-number nnfolder-current-group))))
 	      (when novbuf
@@ -940,32 +940,32 @@ This command does not work if you use short group names."
   (interactive)
   (nnmail-activate 'nnfolder)
   (unless (or gnus-nov-is-evil nnfolder-nov-is-evil)
-    (dolist (file (directory-files (or nnfolder-nov-directory 
+    (dolist (file (directory-files (or nnfolder-nov-directory
 				       nnfolder-directory)
-				   t 
-				   (concat 
+				   t
+				   (concat
 				    (regexp-quote nnfolder-nov-file-suffix)
 				    "$")))
       (when (not (message-mail-file-mbox-p file))
 	(ignore-errors
 	  (delete-file file)))))
   (let ((files (directory-files nnfolder-directory))
-        file)
+	file)
     (while (setq file (pop files))
       (when (and (not (backup-file-name-p file))
-                 (message-mail-file-mbox-p
+		 (message-mail-file-mbox-p
 		  (nnheader-concat nnfolder-directory file)))
-        (let ((oldgroup (assoc file nnfolder-group-alist)))
-          (if oldgroup
-              (nnheader-message 5 "Refreshing group %s..." file)
-            (nnheader-message 5 "Adding group %s..." file))
+	(let ((oldgroup (assoc file nnfolder-group-alist)))
+	  (if oldgroup
+	      (nnheader-message 5 "Refreshing group %s..." file)
+	    (nnheader-message 5 "Adding group %s..." file))
 	  (if oldgroup
 	      (setq nnfolder-group-alist
 		    (delq oldgroup (copy-sequence nnfolder-group-alist))))
-          (push (list file (cons 1 0)) nnfolder-group-alist)
-          (nnfolder-possibly-change-folder file)
-          (nnfolder-possibly-change-group file)
-          (nnfolder-close-group file))))
+	  (push (list file (cons 1 0)) nnfolder-group-alist)
+	  (nnfolder-possibly-change-folder file)
+	  (nnfolder-possibly-change-group file)
+	  (nnfolder-close-group file))))
     (nnheader-message 5 "")))
 
 (defun nnfolder-group-pathname (group)
@@ -1024,7 +1024,7 @@ This command does not work if you use short group names."
       (when (buffer-name (cdar nnfolder-nov-buffer-alist))
 	(set-buffer (cdar nnfolder-nov-buffer-alist))
 	(when (buffer-modified-p)
-	  (gnus-make-directory (file-name-directory 
+	  (gnus-make-directory (file-name-directory
 				nnfolder-nov-buffer-file-name))
 	  (nnmail-write-region 1 (point-max) nnfolder-nov-buffer-file-name
 			       nil 'nomesg))

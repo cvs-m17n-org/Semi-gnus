@@ -428,7 +428,7 @@ in which case `gnus-group-jump-to-group' offers \"Group: nnml:\"
 in the minibuffer prompt."
   :group 'gnus-group-various
   :type '(choice (string :tag "Prompt string")
-                 (const :tag "Empty" nil)))
+		 (const :tag "Empty" nil)))
 
 (defvar gnus-group-listing-limit 1000
   "*A limit of the number of groups when listing.
@@ -483,10 +483,10 @@ simple manner.")
     (?l gnus-tmp-grouplens ?s)
     (?z gnus-tmp-news-method-string ?s)
     (?m (gnus-group-new-mail gnus-tmp-group) ?c)
-    (?w (if (gnus-news-group-p gnus-tmp-group) 
+    (?w (if (gnus-news-group-p gnus-tmp-group)
 	    ""
-	  (int-to-string 
-	   (length 
+	  (int-to-string
+	   (length
 	    (nnmail-new-mail-numbers (gnus-group-real-name gnus-tmp-group))
 	    )))
 	?s)
@@ -1373,17 +1373,17 @@ if it is a string, only list groups matching REGEXP."
 	 (method (gnus-server-get-method group (gnus-info-method info)))
 	 (marked (gnus-info-marks info))
 	 (mailp (apply 'append
-                       (mapcar
-                        (lambda (x)
-                          (memq x (assoc (symbol-name
-                                          (car (or method gnus-select-method)))
-                                         gnus-valid-select-methods)))
-                        '(mail post-mail))))
-         (level (or (gnus-info-level info) gnus-level-killed))
-         (score (or (gnus-info-score info) 0))
-         (ticked (gnus-range-length (cdr (assq 'tick marked))))
-         (group-age (gnus-group-timestamp-delta group))
-         (inhibit-read-only t))
+		       (mapcar
+			(lambda (x)
+			  (memq x (assoc (symbol-name
+					  (car (or method gnus-select-method)))
+					 gnus-valid-select-methods)))
+			'(mail post-mail))))
+	 (level (or (gnus-info-level info) gnus-level-killed))
+	 (score (or (gnus-info-score info) 0))
+	 (ticked (gnus-range-length (cdr (assq 'tick marked))))
+	 (group-age (gnus-group-timestamp-delta group))
+	 (inhibit-read-only t))
     ;; Eval the cars of the lists until we find a match.
     (while (and list
 		(not (eval (caar list))))
@@ -3850,7 +3850,7 @@ or `gnus-group-catchup-group-hook'."
   "Return the offset in seconds from the timestamp for GROUP to the current time, as a floating point number."
   (let* ((time (or (gnus-group-timestamp group)
 		   (list 0 0)))
-         (delta (subtract-time (current-time) time)))
+	 (delta (subtract-time (current-time) time)))
     (+ (* (nth 0 delta) 65536.0)
        (nth 1 delta))))
 
@@ -3958,7 +3958,7 @@ This command may read the active file."
     (gnus-group-list-plus args)))
 
 (defun gnus-group-mark-article-read (group article)
-  "Mark ARTICLE read." 
+  "Mark ARTICLE read."
   (gnus-activate-group group)
   (let ((buffer (gnus-summary-buffer-name group))
 	(mark gnus-read-mark))

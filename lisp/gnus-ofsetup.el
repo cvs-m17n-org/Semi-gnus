@@ -145,7 +145,7 @@
 			  "(add-hook"
 			  "'gnus-before-startup-hook"
 			  "(lambda () (setq nnmail-spool-file nil)
-           (setq mail-sources nil)))")))
+	   (setq mail-sources nil)))")))
 
 	;; Write stting about mail-source.el
 	(insert "(setq gnus-offline-mail-source '"
@@ -251,7 +251,7 @@ if you want to use movemail instead of pop3.el which comes with
 Gnus, you can set a specifier using the kerword :program as shown
 below:
 
-          (pop :program \"movemail -pf po:%u %t %p\")
+	  (pop :program \"movemail -pf po:%u %t %p\")
 
 If you want to know more about mail source specifiers and keywords,
 click the button below.")
@@ -334,7 +334,7 @@ POP パスワードを .newsrc.eld に保存するか否かを指定します。")
 (movemail など) を使いたい、という場合には、:program をいうキーワー
 ドを指定して以下の様に記述します。
 
-        (pop :program \"movemail -pf po:%u %t %p\")
+	(pop :program \"movemail -pf po:%u %t %p\")
 
 mail source specifier とか上記のようなキーワードについてもっとよく
 知りたい場合は、以下のボタンをクリックしてください。(Info の該当箇所

@@ -77,7 +77,7 @@ the user confirms the creation."
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)
-  "Add a line to the end of the Notes field of the BBDB record 
+  "Add a line to the end of the Notes field of the BBDB record
 corresponding to the sender of this message.  If REPLACE is non-nil,
 replace the existing notes entry (if any)."
   (interactive (list (if bbdb-readonly-p
@@ -212,7 +212,7 @@ BBDB-FIELD values is returned.  Otherwise, GROUP is returned."
 	(throw 'done (when rest (cons '& rest))))
        (t
 	(while records
-	  (when (or (null bbdb-field) 
+	  (when (or (null bbdb-field)
 		    (and (setq prop (bbdb-record-getprop (car records)
 							 bbdb-field))
 			 (string-match regexp prop)))
@@ -335,8 +335,8 @@ strings.  In the future this should change."
 		      (error nil))))
 	 (name (car data))
 	 (net (car (cdr data)))
-	 (record (and data 
-		      (bbdb-search-simple name 
+	 (record (and data
+		      (bbdb-search-simple name
 		       (if (and net bbdb-canonicalize-net-hook)
 			   (bbdb-canonicalize-address net)
 			 net))))
@@ -346,7 +346,7 @@ strings.  In the future this should change."
 	;; bogon!
 	(setq record nil))
 
-    (setq name 
+    (setq name
 	  (or (and gnus-bbdb/summary-prefer-bbdb-data
 		   (or (and gnus-bbdb/summary-prefer-real-names
 			    (and record (bbdb-record-name record)))
@@ -392,15 +392,15 @@ This function is meant to be used with the user function defined in
 		      (error nil))))
 	 (name (car data))
 	 (net (car (cdr data)))
-	 (record (and data 
-		      (bbdb-search-simple name 
+	 (record (and data
+		      (bbdb-search-simple name
 		       (if (and net bbdb-canonicalize-net-hook)
 			   (bbdb-canonicalize-address net)
 			 net)))))
     (if (and record name (member (downcase name) (bbdb-record-net record)))
 	;; bogon!
 	(setq record nil))
-    (setq name 
+    (setq name
 	  (or (and gnus-bbdb/summary-prefer-bbdb-data
 		   (or (and gnus-bbdb/summary-prefer-real-names
 			    (and record (bbdb-record-name record)))
@@ -547,12 +547,12 @@ beginning of the message headers."
 
 (defun gnus-bbdb/extract-address-components (str)
   (let* ((ret     (std11-extract-address-components str))
-         (phrase  (car ret))
-         (address (car (cdr ret)))
-         (methods gnus-bbdb/canonicalize-full-name-methods))
+	 (phrase  (car ret))
+	 (address (car (cdr ret)))
+	 (methods gnus-bbdb/canonicalize-full-name-methods))
     (while (and phrase methods)
       (setq phrase  (funcall (car methods) phrase)
-            methods (cdr methods)))
+	    methods (cdr methods)))
     (if (string= address "") (setq address nil))
     (if (string= phrase "") (setq phrase nil))
     (when (or phrase address)
@@ -567,7 +567,7 @@ beginning of the message headers."
       (setq dest (cons (substring str 0 (match-beginning 0)) dest))
       (setq str (substring str (match-end 0))))
     (or (string= str "")
-        (setq dest (cons str dest)))
+	(setq dest (cons str dest)))
     (setq dest (nreverse dest))
     (mapconcat 'identity dest " ")))
 
@@ -577,7 +577,7 @@ beginning of the message headers."
       (setq dest (cons (substring str 0 (match-end 0)) dest))
       (setq str (substring str (match-end 0))))
     (or (string= str "")
-        (setq dest (cons str dest)))
+	(setq dest (cons str dest)))
     (setq dest (nreverse dest))
     (mapconcat 'identity dest " ")))
 
@@ -614,7 +614,7 @@ beginning of the message headers."
 Please redefine `gnus-bbdb/summary-user-format-letter' to a different letter."
 			gnus-bbdb/summary-user-format-letter))
 	     (fset get-author-user-fun 'gnus-bbdb/summary-get-author))))
-    
+
     ; One tick.  One tick only, please
     (cond (gnus-bbdb/summary-in-bbdb-format-letter
 	   (if (and (fboundp in-bbdb-user-fun)
@@ -625,7 +625,7 @@ Please redefine `gnus-bbdb/summary-user-format-letter' to a different letter."
 Redefine `gnus-bbdb/summary-in-bbdb-format-letter' to a different letter."
 			gnus-bbdb/summary-in-bbdb-format-letter))
 	     (fset in-bbdb-user-fun 'gnus-bbdb/summary-author-in-bbdb)))))
-  
+
   ;; Scoring
   (add-hook 'bbdb-after-change-hook 'gnus-bbdb/score-invalidate-alist)
 ;  (setq gnus-score-find-score-files-function

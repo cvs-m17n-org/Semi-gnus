@@ -149,20 +149,20 @@
     ;;("TNL.net newsletter" "http://www.tnl.net/newsletter/channel100.asp" "A newsletter about Internet technology and issues.")
     ("W3C" "http://www.w3.org/2000/08/w3c-synd/home.rss" "The latest news at the World Wide Web Consortium.")
     ;;("XML News: RSS Live Content" "http://www.xmlnews.org/RSS/content.html" "A listing of well-known RSS feeds.")
-    ("|fr| XMLfr" "http://xmlfr.org/actualites/general.rss10" 
+    ("|fr| XMLfr" "http://xmlfr.org/actualites/general.rss10"
      "French speaking portal site dedicated to XML.")
-    ("XMLhack" "http://xmlhack.com/rss10.php" 
+    ("XMLhack" "http://xmlhack.com/rss10.php"
      "Developer news from the XML community.")
-    ("The Register" 
-     "http://www.theregister.co.uk/tonys/slashdot.rdf" 
+    ("The Register"
+     "http://www.theregister.co.uk/tonys/slashdot.rdf"
      "The Register -- Biting the hand that feeds IT.")
-    ("|de| Heise-Ticker" 
-     "http://www.heise.de/newsticker/heise.rdf" 
+    ("|de| Heise-Ticker"
+     "http://www.heise.de/newsticker/heise.rdf"
      "German news ticker about technology.")
-    ("|de| Telepolis News" 
-     "http://www.heise.de/tp/news.rdf" 
+    ("|de| Telepolis News"
+     "http://www.heise.de/tp/news.rdf"
      "German background news about technology.")
-    ("Kuro5hin" 
+    ("Kuro5hin"
      "http://www.kuro5hin.org/backend.rdf"
      "Technology and culture, from the trenches.")
     ("JabberCentral"
@@ -208,20 +208,20 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
 		    "0" "\t" ;; lines
 		    "" "\t" ;; Xref
 		    (if (and (nth 6 e)
-                             (memq nnrss-description-field 
-                                   nnmail-extra-headers))
+			     (memq nnrss-description-field
+				   nnmail-extra-headers))
 			(concat (symbol-name nnrss-description-field)
 				": "
-                                (nnrss-format-string (nth 6 e))
-                                "\t")
+				(nnrss-format-string (nth 6 e))
+				"\t")
 		      "")
-                    (if (and (nth 2 e)
-                             (memq nnrss-url-field 
-                                   nnmail-extra-headers))
+		    (if (and (nth 2 e)
+			     (memq nnrss-url-field
+				   nnmail-extra-headers))
 			(concat (symbol-name nnrss-url-field)
 				": "
-                                (nnrss-format-string (nth 2 e))
-                                "\t")
+				(nnrss-format-string (nth 2 e))
+				"\t")
 		      "")
 		    "\n")))))
   'nov)
@@ -250,8 +250,8 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
 	(with-current-buffer nntp-server-buffer
 	  (erase-buffer)
 	  (goto-char (point-min))
-          (if group
-              (insert "Newsgroups: " group "\n"))
+	  (if group
+	      (insert "Newsgroups: " group "\n"))
 	  (if (nth 3 e)
 	      (insert "Subject: " (nnrss-format-string (nth 3 e)) "\n"))
 	  (if (nth 4 e)
@@ -294,7 +294,7 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
       (if (and (setq e (assq art nnrss-group-data))
 	       (nnmail-expired-article-p
 		group
-		(if (listp (setq days (nth 1 e))) days 
+		(if (listp (setq days (nth 1 e))) days
 		  (days-to-time (- days (time-to-days '(0 0)))))
 		force))
 	  (setq nnrss-group-data (delq e nnrss-group-data)
@@ -309,7 +309,7 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
   (setq nnrss-server-data
 	(delq (assoc group nnrss-server-data) nnrss-server-data))
   (nnrss-save-server-data server)
-  (let ((file (expand-file-name 
+  (let ((file (expand-file-name
 	       (nnrss-translate-file-chars
 		(concat group (and server
 				   (not (equal server ""))
@@ -360,7 +360,7 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
 
 (defun nnrss-read-server-data (server)
   (setq nnrss-server-data nil)
-  (let ((file (expand-file-name 
+  (let ((file (expand-file-name
 	       (nnrss-translate-file-chars
 		(concat "nnrss" (and server
 				     (not (equal server ""))
@@ -371,15 +371,15 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
     (when (file-exists-p file)
       (with-temp-buffer
 	(let ((coding-system-for-read 'binary)
-              emacs-lisp-mode-hook)
+	      emacs-lisp-mode-hook)
 	  (insert-file-contents file)
-          (emacs-lisp-mode)
-          (goto-char (point-min))
-          (eval-buffer))))))
+	  (emacs-lisp-mode)
+	  (goto-char (point-min))
+	  (eval-buffer))))))
 
 (defun nnrss-save-server-data (server)
   (gnus-make-directory nnrss-directory)
-  (let ((file (expand-file-name 
+  (let ((file (expand-file-name
 	       (nnrss-translate-file-chars
 		(concat "nnrss" (and server
 				     (not (equal server ""))
@@ -387,7 +387,7 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
 			server ".el"))
 	       nnrss-directory)))
     (let ((coding-system-for-write 'binary)
-          print-level print-length)
+	  print-level print-length)
       (with-temp-file file
 	(insert "(setq nnrss-server-data '"
 		(prin1-to-string nnrss-server-data)
@@ -399,7 +399,7 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
   (let ((pair (assoc group nnrss-server-data)))
     (setq nnrss-group-max (or (cadr pair) 0))
     (setq nnrss-group-min (+ nnrss-group-max 1)))
-  (let ((file (expand-file-name 
+  (let ((file (expand-file-name
 	       (nnrss-translate-file-chars
 		(concat group (and server
 				   (not (equal server ""))
@@ -409,11 +409,11 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
     (when (file-exists-p file)
       (with-temp-buffer
 	(let ((coding-system-for-read 'binary)
-              emacs-lisp-mode-hook)
+	      emacs-lisp-mode-hook)
 	  (insert-file-contents file)
-          (emacs-lisp-mode)
-          (goto-char (point-min))
-          (eval-buffer)))
+	  (emacs-lisp-mode)
+	  (goto-char (point-min))
+	  (eval-buffer)))
       (dolist (e nnrss-group-data)
 	(gnus-sethash (nth 2 e) e nnrss-group-hashtb)
 	(if (and (car e) (> nnrss-group-min (car e)))
@@ -423,7 +423,7 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
 
 (defun nnrss-save-group-data (group server)
   (gnus-make-directory nnrss-directory)
-  (let ((file (expand-file-name 
+  (let ((file (expand-file-name
 	       (nnrss-translate-file-chars
 		(concat group (and server
 				   (not (equal server ""))
@@ -431,7 +431,7 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
 			server ".el"))
 	       nnrss-directory)))
     (let ((coding-system-for-write 'binary)
-          print-level print-length)
+	  print-level print-length)
       (with-temp-file file
 	(insert "(setq nnrss-group-data '"
 		(prin1-to-string nnrss-group-data)
@@ -498,7 +498,7 @@ To use the description in headers, put this name into `nnmail-extra-headers'.")
 	  (if (re-search-forward "<rdf\\|<rss" nil t)
 	      (goto-char (match-beginning 0)))
 	  (setq xml (xml-parse-region (point) (point-max))))
-      (error 
+      (error
        (nnheader-message 1 "Error in group %s: %s" group (cadr err))))
     (while (and xml (not (assq 'item xml)))
       (unless (listp (car (setq xml (cddar xml))))
@@ -545,7 +545,7 @@ It is useful when `(setq nnrss-use-local t)'."
   (dolist (elem nnrss-server-data)
     (let ((url (or (nth 2 elem)
 		   (second (assoc (car elem) nnrss-group-alist)))))
-    (insert "$WGET -q -O \"$RSSDIR\"/'" 
+    (insert "$WGET -q -O \"$RSSDIR\"/'"
 	    (nnrss-translate-file-chars (concat (car elem) ".xml"))
 	    "' '" url "'\n"))))
 
@@ -554,7 +554,7 @@ It is useful when `(setq nnrss-use-local t)'."
 	 (append nnheader-file-name-translation-alist '((?' . ?_)))))
     (nnheader-translate-file-chars name)))
 
-(defvar nnrss-moreover-url 
+(defvar nnrss-moreover-url
   "http://w.moreover.com/categories/category_list_rss.html"
   "The url of moreover.com categories.")
 
@@ -565,13 +565,13 @@ It is useful when `(setq nnrss-use-local t)'."
     (with-temp-buffer
       (nnrss-insert nnrss-moreover-url)
       (goto-char (point-min))
-      (while (re-search-forward 
+      (while (re-search-forward
 	      "<A NAME=\"\\([^\"]+\\)\">\\|<A HREF=\"\\(http://[^\"]*moreover\\.com[^\"]+page\\?c=\\([^\"&]+\\)&o=rss\\)" nil t)
 	(if (match-string 1)
 	    (setq category (match-string 1))
 	  (setq url (match-string 2)
 		name (nnweb-decode-entities-string
-		      (rfc2231-decode-encoded-string 
+		      (rfc2231-decode-encoded-string
 		       (match-string 3))))
 	  (if category
 	      (setq name (concat category "." name)))

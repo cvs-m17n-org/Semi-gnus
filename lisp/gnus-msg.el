@@ -55,7 +55,7 @@ methods.  If that is the case, the user will be queried for what select
 method to use when posting."
   :group 'gnus-group-foreign
   :type `(choice (const nil)
-                 (const current)
+		 (const current)
 		 (const native)
 		 (sexp :tag "Methods" ,gnus-select-method)))
 
@@ -657,9 +657,9 @@ header line with the old Message-ID."
 
 (defun gnus-msg-treat-broken-reply-to (&optional force)
   "Remove the Reply-to header iff broken-reply-to."
-  (when (or force 
-            (gnus-group-find-parameter
-             gnus-newsgroup-name 'broken-reply-to))
+  (when (or force
+	    (gnus-group-find-parameter
+	     gnus-newsgroup-name 'broken-reply-to))
     (save-restriction
       (message-narrow-to-head)
       (message-remove-header "reply-to"))))
@@ -1548,8 +1548,8 @@ this is a reply."
       (when (or name address)
 	(add-hook 'message-setup-hook
 		  `(lambda ()
- 		     (set (make-local-variable 'user-mail-address)
- 			  ,(or (cdr address) user-mail-address))
+		     (set (make-local-variable 'user-mail-address)
+			  ,(or (cdr address) user-mail-address))
 		     (let ((user-full-name ,(or (cdr name) (user-full-name)))
 			   (user-mail-address
 			    ,(or (cdr address) user-mail-address)))
@@ -1565,7 +1565,7 @@ this is a reply."
 (defun gnus-maybe-setup-default-charset ()
   (let ((charset
 	 (and (boundp 'gnus-summary-buffer)
-              (buffer-live-p gnus-summary-buffer)
+	      (buffer-live-p gnus-summary-buffer)
 	      (save-excursion
 		(set-buffer gnus-summary-buffer)
 		default-mime-charset))))

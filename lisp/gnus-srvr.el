@@ -338,7 +338,7 @@ The following commands are available:
 	  (setq alist (cdr alist)))
 	(if alist
 	    (setcdr alist (cons killed (cdr alist)))
- 	  (setq gnus-server-alist (list killed)))))
+	  (setq gnus-server-alist (list killed)))))
     (gnus-server-update-server (car killed))
     (setq gnus-server-killed-servers (cdr gnus-server-killed-servers))
     (gnus-server-position-point)))
@@ -836,7 +836,7 @@ buffer.
     (unless server
       (error "No server on the current line"))
     (condition-case ()
-	(gnus-get-function (gnus-server-to-method server) 
+	(gnus-get-function (gnus-server-to-method server)
 			   'request-regenerate)
       (error
 	(error "This backend doesn't support regeneration")))

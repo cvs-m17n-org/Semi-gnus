@@ -36,7 +36,7 @@
 ;;; Note.
 ;;;   This file works only with after version of Emacs 19.30.
 ;;;   This file needs miee.el and SEMI.
-;;;   If you set gnus-offline-drafts-queue-type to 'agent , you don't need 
+;;;   If you set gnus-offline-drafts-queue-type to 'agent , you don't need
 ;;;   miee.el
 ;;;   You must use T-gnus 6.12.0 or later.
 ;;;
@@ -642,7 +642,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   ;;
   (setenv "MAILHOST" nil))
 ;;
-;; Hangup line function 
+;; Hangup line function
 ;;
 (defun gnus-offline-hangup-line ()
   "*Hangup line function."

@@ -1467,7 +1467,7 @@ When called interactively, prompt for REGEXP."
 		(let ((nnheader-file-name-translation-alist
 		       '((?/ . ?,) (?  . ?_) (?* . ?_) (?$ . ?_))))
 		  (nnheader-translate-file-chars (match-string 1))))
-          (replace-match (concat "begin 644 " gnus-uu-file-name) t t)
+	  (replace-match (concat "begin 644 " gnus-uu-file-name) t t)
 
 	  ;; Remove any non gnus-uu-body-line right after start.
 	  (forward-line 1)
@@ -1808,7 +1808,7 @@ Gnus might fail to display all of it.")
       (push (list (aref arg new-pos)) accum)
       (setq pos (1+ new-pos)))
     (if (= pos 0)
-        arg
+	arg
       (apply 'concat (nconc (nreverse accum) (list (substring arg pos)))))))
 
 ;; Inputs an action and a filename and returns a full command, making sure

@@ -49,7 +49,7 @@
 (defvar vm-folder-history)
 (defvar vm-primary-inbox)
 (defvar vm-use-toolbar)
-  
+
 (defun gnus-vm-make-folder (&optional buffer)
   (let ((article (or buffer (current-buffer)))
 	(tmp-folder (generate-new-buffer " *tmp-folder*"))

@@ -338,9 +338,9 @@ noticing asynchronous data.")
 	  (nntp-decode-text (not decode))
 	  (unless discard
 	    (save-excursion
- 	      (set-buffer buffer)
- 	      (goto-char (point-max))
- 	      (insert-buffer-substring (process-buffer process))
+	      (set-buffer buffer)
+	      (goto-char (point-max))
+	      (insert-buffer-substring (process-buffer process))
 	      ;; Nix out "nntp reading...." message.
 	      (when nntp-have-messaged
 		(setq nntp-have-messaged nil)
@@ -531,7 +531,7 @@ noticing asynchronous data.")
 	     (not nntp-nov-is-evil)
 	     (nntp-retrieve-headers-with-xover articles fetch-old))
 	;; We successfully retrieved the headers via XOVER.
-        'nov
+	'nov
       ;; XOVER didn't work, so we do it the hard, slow and inefficient
       ;; way.
       (let ((number (length articles))

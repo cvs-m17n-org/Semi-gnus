@@ -164,9 +164,9 @@ it's not cached."
       (when (and number
 		 (> number 0)		; Reffed article.
 		 (or force
-                     (and (or (not gnus-cacheable-groups)
-                              (string-match gnus-cacheable-groups group))
-                          (or (not gnus-uncacheable-groups)
+		     (and (or (not gnus-cacheable-groups)
+			      (string-match gnus-cacheable-groups group))
+			  (or (not gnus-uncacheable-groups)
 			      (not (string-match
 				    gnus-uncacheable-groups group)))
 			  (gnus-cache-member-of-class
@@ -633,8 +633,8 @@ Returns the list of articles removed."
 			   )
 			 ;;(if nhrest
 			 (setcdr hrest (cons cached-header nhrest))
-                         ;; (setq headers
-                         ;;         (nconc headers (list cached-header)))
+			 ;; (setq headers
+			 ;;         (nconc headers (list cached-header)))
 			 ;; (throw 'tag nil)
 			 ;;)
 			 )

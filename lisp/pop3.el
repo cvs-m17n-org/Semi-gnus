@@ -217,16 +217,16 @@ Argument PORT specifies connecting port."
 	 (ssl-program-arguments
 	  `(,@pop3-ssl-program-arguments ,extra-arg
 	    "-connect" ,(format "%s:%d" host service)))
-         (process (open-ssl-stream name buffer host service)))
+	 (process (open-ssl-stream name buffer host service)))
     (when process
       (with-current-buffer buffer
 	(goto-char (point-min))
 	(while (and (memq (process-status process) '(open run))
-                    (goto-char (point-max))
-                    (forward-line -1)
-                    (not (looking-at "+OK")))
-          (accept-process-output process 1)
-          (sit-for 1))
+		    (goto-char (point-max))
+		    (forward-line -1)
+		    (not (looking-at "+OK")))
+	  (accept-process-output process 1)
+	  (sit-for 1))
 	(delete-region (point-min) (point)))
       (and process (memq (process-status process) '(open run))
 	   process))))
@@ -620,7 +620,7 @@ where
   (if msgno
       (pop3-send-command process (format "UIDL %d" msgno))
     (pop3-send-command process "UIDL"))
-  
+
   (if (null (pop3-read-response process t))
       nil ;; UIDL is not supported on this server
     (let (pairs uidl)

@@ -302,8 +302,8 @@ and add a new \"Re: \".  If it is nil, use the subject \"as-is\".  If it
 is the symbol `guess', try to detect \"Re: \" within an encoded-word."
   :group 'message-various
   :type '(choice (const :tag "off" nil)
-                 (const :tag "on" t)
-                 (const guess)))
+		 (const :tag "on" t)
+		 (const guess)))
 
 ;;;###autoload
 (defcustom message-signature-separator "^-- *$"
@@ -546,7 +546,7 @@ is never used."
 		 (const :tag "always" use)
 		 (const :tag "ask" ask)))
 
-(defcustom message-use-mail-followup-to t
+(defcustom message-use-mail-followup-to 'use
   "*Specifies what to do with Mail-Followup-To header.
 If nil, always ignore the header.  If it is the symbol `ask', always
 query the user whether to use the value.  If it is t or the symbol
@@ -1246,7 +1246,7 @@ no, only reply back to the author."
      ;; can be removed, e.g.
      ;;		From: joe@y.z (Joe	K
      ;;			User)
-     ;; can yield `From joe@y.z (Joe 	K Fri Mar 22 08:11:15 1996', and
+     ;; can yield `From joe@y.z (Joe	K Fri Mar 22 08:11:15 1996', and
      ;;		From: Joe User
      ;;			<joe@y.z>
      ;; can yield `From Joe User Fri Mar 22 08:11:15 1996'.
@@ -1410,7 +1410,7 @@ is used by default."
 		((and (eq (char-after) ?\))
 		      (not quoted))
 		 (setq paren nil))))
-        (nreverse elems)))))
+	(nreverse elems)))))
 
 (defun message-mail-file-mbox-p (file)
   "Say whether FILE looks like a Unix mbox file."
@@ -2277,7 +2277,7 @@ Mail and USENET news headers are not rotated."
   (save-excursion
     (save-restriction
       (when (message-goto-body)
-        (narrow-to-region (point) (point-max)))
+	(narrow-to-region (point) (point-max)))
       (shell-command-on-region
        (point-min) (point-max) program nil t))))
 
@@ -2991,7 +2991,7 @@ This sub function is for exclusive use of `message-send-mail'."
 	      (widen)
 	      (mm-with-unibyte-current-buffer
 		(funcall (or message-send-mail-real-function
-                             message-send-mail-function))))
+			     message-send-mail-function))))
 	    (setq n (+ n 1))
 	    (setq p (pop plist))
 	    (erase-buffer)))
@@ -3448,23 +3448,23 @@ This sub function is for exclusive use of `message-send-news'."
 		     (if followup-to
 			 (concat newsgroups "," followup-to)
 		       newsgroups)))
-            (known-groups
-             (mapcar '(lambda (n) (gnus-group-real-name n))
-                     (gnus-groups-from-server
-                      (cond ((equal gnus-post-method 'current)
-                             gnus-current-select-method)
-                            (gnus-post-method gnus-post-method)
-                            (t gnus-select-method)))))
+	    (known-groups
+	     (mapcar '(lambda (n) (gnus-group-real-name n))
+		     (gnus-groups-from-server
+		      (cond ((equal gnus-post-method 'current)
+			     gnus-current-select-method)
+			    (gnus-post-method gnus-post-method)
+			    (t gnus-select-method)))))
 	    errors)
        (while groups
-         (unless (or (equal (car groups) "poster")
-                     (member (car groups) known-groups))
-           (push (car groups) errors))
-         (pop groups))
+	 (unless (or (equal (car groups) "poster")
+		     (member (car groups) known-groups))
+	   (push (car groups) errors))
+	 (pop groups))
        (cond
 	;; Gnus is not running.
 	((or (not (and (boundp 'gnus-active-hashtb)
-                       gnus-active-hashtb))
+		       gnus-active-hashtb))
 	     (not (boundp 'gnus-read-active-file)))
 	 t)
 	;; We don't have all the group names.
@@ -3557,12 +3557,12 @@ This sub function is for exclusive use of `message-send-news'."
 	      (reply-to (message-fetch-field "reply-to"))
 	      ad)
 	 (cond
-          ((not reply-to)
-           t)
-          ((string-match "," reply-to)
-           (y-or-n-p
-            (format "Multiple Reply-To addresses: \"%s\". Really post? "
-                    reply-to)))
+	  ((not reply-to)
+	   t)
+	  ((string-match "," reply-to)
+	   (y-or-n-p
+	    (format "Multiple Reply-To addresses: \"%s\". Really post? "
+		    reply-to)))
 	  ((or (not (string-match
 		     "@[^\\.]*\\."
 		     (setq ad (nth 1 (mail-extract-address-components
@@ -3572,10 +3572,10 @@ This sub function is for exclusive use of `message-send-news'."
 	       (string-match "\\.$" ad)	;larsi@ifi.uio.
 	       (not (string-match "^[^@]+@[^@]+$" ad)) ;larsi.ifi.uio
 	       (string-match "(.*).*(.*)" reply-to)) ;(lars) (lars)
-           (y-or-n-p
-            (format
-             "The Reply-To looks strange: \"%s\". Really post? " 
-             reply-to)))
+	   (y-or-n-p
+	    (format
+	     "The Reply-To looks strange: \"%s\". Really post? "
+	     reply-to)))
 	  (t t))))))
 
 (defun message-check-news-body-syntax ()
@@ -3838,7 +3838,7 @@ If NOW, use that time instead."
   "Make a followup Subject."
   (cond
    ((and (eq message-use-subject-re 'guess)
-         (string-match message-subject-encoded-re-regexp subject))
+	 (string-match message-subject-encoded-re-regexp subject))
     subject)
    (message-use-subject-re
     (concat "Re: " (message-strip-subject-re subject)))
@@ -4284,11 +4284,11 @@ Headers already prepared in the buffer are not modified."
 	    (when (not quoted)
 	      (if (and (> (current-column) 78)
 		       last)
-                  (save-excursion
-                    (goto-char last)
+		  (save-excursion
+		    (goto-char last)
 		    (looking-at "[ \t]*")
-                    (replace-match "\n " t t)))
-              (setq last (1+ (point))))
+		    (replace-match "\n " t t)))
+	      (setq last (1+ (point))))
 	  (setq quoted (not quoted)))
 	(unless (eobp)
 	  (forward-char 1))))
@@ -4470,7 +4470,7 @@ than 988 characters long, and if they are not, trim them until they are."
   ;; list of buffers.
   (setq message-buffer-list (delq (current-buffer) message-buffer-list))
   (while (and message-max-buffers
-              message-buffer-list
+	      message-buffer-list
 	      (>= (length message-buffer-list) message-max-buffers))
     ;; Kill the oldest buffer -- unless it has been changed.
     (let ((buffer (pop message-buffer-list)))
@@ -4546,10 +4546,10 @@ than 988 characters long, and if they are not, trim them until they are."
 ;;;(defvar mc-modes-alist)
 (defun message-setup-1 (headers &optional replybuffer actions)
 ;;;   (when (and (boundp 'mc-modes-alist)
-;;; 	     (not (assq 'message-mode mc-modes-alist)))
+;;;	     (not (assq 'message-mode mc-modes-alist)))
 ;;;     (push '(message-mode (encrypt . mc-encrypt-message)
-;;; 			 (sign . mc-sign-message))
-;;; 	  mc-modes-alist))
+;;;			 (sign . mc-sign-message))
+;;;	  mc-modes-alist))
   (when actions
     (setq message-send-actions actions))
   (setq message-reply-buffer
@@ -5817,7 +5817,7 @@ regexp varstr."
 			 (mail-strip-quoted-names
 			  (message-fetch-field "from")))
     (message-options-set 'message-recipients
- 			 (mail-strip-quoted-names
+			 (mail-strip-quoted-names
 			  (let ((to (message-fetch-field "to"))
 				(cc (message-fetch-field "cc"))
 				(bcc (message-fetch-field "bcc")))

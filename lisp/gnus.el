@@ -820,23 +820,23 @@ be set in `.emacs' instead."
 	     t))))
    (t
     (insert "
-          _    ___ _             _
-          _ ___ __ ___  __    _ ___
-          __   _     ___    __  ___
-              _           ___     _
-             _  _ __             _
-             ___   __            _
-                   __           _
-                    _      _   _
-                   _      _    _
-                      _  _    _
-                  __  ___
-                 _   _ _     _
-                _   _
-              _    _
-             _    _
-            _
-          __
+	  _    ___ _             _
+	  _ ___ __ ___  __    _ ___
+	  __   _     ___    __  ___
+	      _           ___     _
+	     _  _ __             _
+	     ___   __            _
+		   __           _
+		    _      _   _
+		   _      _    _
+		      _  _    _
+		  __  ___
+		 _   _ _     _
+		_   _
+	      _    _
+	     _    _
+	    _
+	  __
 
 "
 	    )
@@ -884,14 +884,14 @@ be set in `.emacs' instead."
 
 For example:
    ((\"mail\\\\..*\"  (gnus-show-threads nil)
-                  (gnus-use-scoring nil)
-                  (gnus-summary-line-format
-                        \"%U%R%z%I%(%[%d:%ub%-20,20f%]%) %s\\n\")
-                  (gcc-self . t)
-                  (display . all))
+		  (gnus-use-scoring nil)
+		  (gnus-summary-line-format
+			\"%U%R%z%I%(%[%d:%ub%-20,20f%]%) %s\\n\")
+		  (gcc-self . t)
+		  (display . all))
      (\"mail\\\\.me\" (gnus-use-scoring  t))
      (\"list\\\\..*\" (total-expire . t)
-                  (broken-reply-to . t)))")
+		  (broken-reply-to . t)))")
 
 (defvar gnus-group-parameters-more nil)
 
@@ -1114,9 +1114,9 @@ If you want to save your mail in one group and the news articles you
 write in another group, you could say something like:
 
  \(setq gnus-message-archive-group
-        '((if (message-news-p)
-              \"misc-news\"
-            \"misc-mail\")))
+	'((if (message-news-p)
+	      \"misc-news\"
+	    \"misc-mail\")))
 
 Normally the group names returned by this variable should be
 unprefixed -- which implicitly means \"store on the archive server\".
@@ -1231,7 +1231,7 @@ If the default site is too slow, try one of these:
 		  ftp.seas.gwu.edu		 /pub/rtfm
 		  rtfm.mit.edu			 /pub/usenet
    Europe:	  ftp.uni-paderborn.de		 /pub/FAQ
-                  src.doc.ic.ac.uk               /usenet/news-FAQS
+		  src.doc.ic.ac.uk               /usenet/news-FAQS
 		  ftp.sunet.se			 /pub/usenet
 	          sunsite.auc.dk                 /pub/usenet
    Asia:	  nctuccca.edu.tw		 /USENET/FAQ
@@ -1596,7 +1596,7 @@ Use with caution.")
  :function-document
  "Return the default charset of GROUP."
  :variable gnus-group-charset-alist
- :variable-default 
+ :variable-default
  '(("\\(^\\|:\\)hk\\>\\|\\(^\\|:\\)tw\\>\\|\\<big5\\>" cn-big5)
    ("\\(^\\|:\\)cn\\>\\|\\<chinese\\>" cn-gb-2312)
    ("\\(^\\|:\\)fj\\>\\|\\(^\\|:\\)japan\\>" iso-2022-jp-2)
@@ -2818,7 +2818,7 @@ You should probably use `gnus-find-method-for-group' instead."
 	params-list)
     (while alist
       (when (string-match (caar alist) group)
-	(setq params-list 
+	(setq params-list
 	      (nconc (copy-sequence (cdar alist))
 		     params-list)))
       (pop alist))
@@ -2829,7 +2829,7 @@ You should probably use `gnus-find-method-for-group' instead."
 If SYMBOL, return the value of that symbol in the group parameters."
   (save-excursion
     (set-buffer gnus-group-buffer)
-    (let ((parameters 
+    (let ((parameters
 	   (nconc
 	    (copy-sequence
 	     (funcall gnus-group-get-parameter-function group))
@@ -3132,7 +3132,7 @@ Disallow invalid group names."
 (defun gnus-read-method (prompt)
   "Prompt the user for a method.
 Allow completion over sensible values."
-  (let* ((open-servers 
+  (let* ((open-servers
 	  (mapcar (lambda (i) (cons (format "%s:%s" (caar i) (cadar i)) i))
 		  gnus-opened-servers))
 	 (valid-methods

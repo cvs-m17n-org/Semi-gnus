@@ -22,13 +22,13 @@
 
 ;;; Commentary:
 
-;; Jaap-Henk Hoepman (jhh@xs4all.nl): 
+;; Jaap-Henk Hoepman (jhh@xs4all.nl):
 ;;
 ;; Added support for delayed destroy of external MIME viewers. All external
 ;; viewers for mime types in mm-keep-viewer-alive-types will remain active
 ;; after switching articles or groups, and will only be removed when exiting
 ;; gnus.
-;; 
+;;
 
 ;;; Code:
 
@@ -36,7 +36,7 @@
 (require 'gnus-mailcap)
 (require 'mm-bodies)
 (eval-when-compile (require 'cl)
-                   (require 'term))
+		   (require 'term))
 
 (eval-and-compile
   (autoload 'mm-inline-partial "mm-partial")
@@ -206,7 +206,7 @@ type inline."
 when selecting a different article."
   :type '(repeat string)
   :group 'mime-display)
- 
+
 (defcustom mm-automatic-display
   '("text/plain" "text/enriched" "text/richtext" "text/html"
     "text/x-vcard" "image/.*" "message/delivery-status" "multipart/.*"
@@ -443,20 +443,20 @@ for types in mm-keep-viewer-alive-types."
 	   (let ((mm-dissect-default-type (if (equal subtype "digest")
 					      "message/rfc822"
 					    "text/plain")))
-             (add-text-properties 0 (length (car ctl))
-                                  (mm-alist-to-plist (cdr ctl)) (car ctl))
+	     (add-text-properties 0 (length (car ctl))
+				  (mm-alist-to-plist (cdr ctl)) (car ctl))
 
 	     ;; what really needs to be done here is a way to link a
 	     ;; MIME handle back to it's parent MIME handle (in a multilevel
 	     ;; MIME article).  That would probably require changing
 	     ;; the mm-handle API so we simply store the multipart buffert
 	     ;; name as a text property of the "multipart/whatever" string.
-             (add-text-properties 0 (length (car ctl))
+	     (add-text-properties 0 (length (car ctl))
 				  (list 'buffer (mm-copy-to-buffer))
-                                  (car ctl))
-             (add-text-properties 0 (length (car ctl))
+				  (car ctl))
+	     (add-text-properties 0 (length (car ctl))
 				  (list 'from from)
-                                  (car ctl))
+				  (car ctl))
 	     (cons (car ctl) (mm-dissect-multipart ctl))))
 	  (t
 	   (mm-dissect-singlepart
@@ -623,33 +623,33 @@ external if displayed external."
 	  (message "Viewing with %s" method)
 	  (cond (needsterm
 		 (unwind-protect
-                     (if window-system
-                         (start-process "*display*" nil
-                                        mm-external-terminal-program
-                                        "-e" shell-file-name
-                                        shell-command-switch
-                                        (mm-mailcap-command
-                                         method file (mm-handle-type handle)))
-                       (require 'term)
-                       (require 'gnus-win)
-                       (set-buffer
-                        (setq buffer
-                              (make-term "display"
-                                         shell-file-name
-                                         nil
-                                         shell-command-switch
-                                         (mm-mailcap-command
-                                          method file 
-                                          (mm-handle-type handle)))))
-                       (term-mode)
-                       (term-char-mode)
-                       (set-process-sentinel 
-                        (get-buffer-process buffer)
-                        `(lambda (process state)
-                           (if (eq 'exit (process-status process))
-                               (gnus-configure-windows 
-                                ',gnus-current-window-configuration))))
-                       (gnus-configure-windows 'display-term))
+		     (if window-system
+			 (start-process "*display*" nil
+					mm-external-terminal-program
+					"-e" shell-file-name
+					shell-command-switch
+					(mm-mailcap-command
+					 method file (mm-handle-type handle)))
+		       (require 'term)
+		       (require 'gnus-win)
+		       (set-buffer
+			(setq buffer
+			      (make-term "display"
+					 shell-file-name
+					 nil
+					 shell-command-switch
+					 (mm-mailcap-command
+					  method file
+					  (mm-handle-type handle)))))
+		       (term-mode)
+		       (term-char-mode)
+		       (set-process-sentinel
+			(get-buffer-process buffer)
+			`(lambda (process state)
+			   (if (eq 'exit (process-status process))
+			       (gnus-configure-windows
+				',gnus-current-window-configuration))))
+		       (gnus-configure-windows 'display-term))
 		   (mm-handle-set-external-undisplayer handle (cons file buffer)))
 		 (message "Displaying %s..." (format method file))
 		 'external)
@@ -885,7 +885,7 @@ external if displayed external."
     (save-excursion
       (if (member (mm-handle-media-supertype handle) '("text" "message"))
 	  (with-temp-buffer
- 	    (insert-buffer-substring (mm-handle-buffer handle))
+	    (insert-buffer-substring (mm-handle-buffer handle))
 	    (mm-decode-content-transfer-encoding
 	     (mm-handle-encoding handle)
 	     (mm-handle-media-type handle))
@@ -1246,12 +1246,12 @@ If RECURSIVE, search recursively."
     parts))
 
 (defun mm-multiple-handles (handles)
-   (and (listp (car handles)) 
+   (and (listp (car handles))
 	(> (length handles) 1)))
 
-(defun mm-merge-handles (handles1 handles2) 
+(defun mm-merge-handles (handles1 handles2)
   (append
-   (if (listp (car handles1)) 
+   (if (listp (car handles1))
        handles1
      (list handles1))
    (if (listp (car handles2))

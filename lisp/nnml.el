@@ -3,7 +3,7 @@
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -335,8 +335,8 @@ check twice.")
     (and
      (nnml-deletable-article-p group article)
      (nnml-request-article article group server)
-     (let (nnml-current-directory 
-	   nnml-current-group 
+     (let (nnml-current-directory
+	   nnml-current-group
 	   nnml-article-file-alist)
        (save-excursion
 	 (set-buffer buf)
@@ -505,13 +505,13 @@ check twice.")
     (if (setq file (cdr (assq article nnml-article-file-alist)))
 	(expand-file-name file nnml-current-directory)
       (if nnml-check-directory-twice
-          ;; Just to make sure nothing went wrong when reading over NFS --
-          ;; check once more.
-          (when (file-exists-p
-                 (setq file (expand-file-name (number-to-string article)
-                                              nnml-current-directory)))
-            (nnml-update-file-alist t)
-            file)))))
+	  ;; Just to make sure nothing went wrong when reading over NFS --
+	  ;; check once more.
+	  (when (file-exists-p
+		 (setq file (expand-file-name (number-to-string article)
+					      nnml-current-directory)))
+	    (nnml-update-file-alist t)
+	    file)))))
 
 (defun nnml-deletable-article-p (group article)
   "Say whether ARTICLE in GROUP can be deleted."

@@ -85,8 +85,8 @@ else, you could do something like this:
 
  (setq nnmail-split-methods
        '((\"mail.4ad\" \"From:.*4ad\")
-         (\"mail.junk\" \"From:.*Lars\\\\|Subject:.*buy\")
-         (\"mail.misc\" \"\")))
+	 (\"mail.junk\" \"From:.*Lars\\\\|Subject:.*buy\")
+	 (\"mail.misc\" \"\")))
 
 As you can see, this variable is a list of lists, where the first
 element in each \"rule\" is the name of the group (which, by the way,
@@ -158,8 +158,8 @@ Eg.:
 
 \(setq nnmail-expiry-wait-function
       (lambda (newsgroup)
-        (cond ((string-match \"private\" newsgroup) 31)
-              ((string-match \"junk\" newsgroup) 1)
+	(cond ((string-match \"private\" newsgroup) 31)
+	      ((string-match \"junk\" newsgroup) 1)
 	      ((string-match \"important\" newsgroup) 'never)
 	      (t 7))))"
   :group 'nnmail-expire
@@ -237,9 +237,9 @@ running (\"xwatch\", etc.)
 Eg.
 
 \(add-hook 'nnmail-read-incoming-hook
-          (lambda ()
-            (call-process \"/local/bin/mailsend\" nil nil nil
-                          \"read\" nnmail-spool-file)))
+	  (lambda ()
+	    (call-process \"/local/bin/mailsend\" nil nil nil
+			  \"read\" nnmail-spool-file)))
 
 If you have xwatch running, this will alert it that mail has been
 read.
@@ -363,13 +363,13 @@ Example:
 	     ;; Other mailing lists...
 	     (any \"procmail@informatik\\\\.rwth-aachen\\\\.de\" \"procmail.list\")
 	     (any \"SmartList@informatik\\\\.rwth-aachen\\\\.de\" \"SmartList.list\")
-             ;; Both lists below have the same suffix, so prevent
-             ;; cross-posting to mkpkg.list of messages posted only to
-             ;; the bugs- list, but allow cross-posting when the
-             ;; message was really cross-posted.
-             (any \"bugs-mypackage@somewhere\" \"mypkg.bugs\")
-             (any \"mypackage@somewhere\" - \"bugs-mypackage\" \"mypkg.list\")
-             ;;
+	     ;; Both lists below have the same suffix, so prevent
+	     ;; cross-posting to mkpkg.list of messages posted only to
+	     ;; the bugs- list, but allow cross-posting when the
+	     ;; message was really cross-posted.
+	     (any \"bugs-mypackage@somewhere\" \"mypkg.bugs\")
+	     (any \"mypackage@somewhere\" - \"bugs-mypackage\" \"mypkg.list\")
+	     ;;
 	     ;; People...
 	     (any \"larsi@ifi\\\\.uio\\\\.no\" \"people.Lars Magne Ingebrigtsen\"))
 	  ;; Unmatched mail goes to the catch all group.
@@ -1096,19 +1096,19 @@ Return the number of characters in the body."
 
 (defun nnmail-remove-list-identifiers ()
   "Remove list identifiers from Subject headers."
-  (let ((regexp 
-	 (if (consp nnmail-list-identifiers) 
+  (let ((regexp
+	 (if (consp nnmail-list-identifiers)
 	     (mapconcat 'identity nnmail-list-identifiers " *\\|")
 	   nnmail-list-identifiers)))
     (when regexp
       (goto-char (point-min))
       (while (re-search-forward
-              (concat "^Subject: +\\(R[Ee]: +\\)*\\(" regexp " *\\)")
-              nil t)
-        (delete-region (match-beginning 2) (match-end 0))
-        (beginning-of-line))
+	      (concat "^Subject: +\\(R[Ee]: +\\)*\\(" regexp " *\\)")
+	      nil t)
+	(delete-region (match-beginning 2) (match-end 0))
+	(beginning-of-line))
       (when (re-search-forward "^Subject: +\\(\\(R[Ee]: +\\)+\\)R[Ee]: +" nil t)
-        (delete-region (match-beginning 1) (match-end 1))
+	(delete-region (match-beginning 1) (match-end 1))
 	(beginning-of-line)))))
 
 (defun nnmail-remove-tabs ()
@@ -1138,8 +1138,8 @@ Calls ACCEPT-FUNC (which should be `nnchoke-request-accept-article')
 to actually put the message in the right group."
   (let ((success t))
     (dolist (mbx (message-unquote-tokens
-                  (message-tokenize-header
-                   (message-fetch-field "Newsgroups") ", ")) success)
+		  (message-tokenize-header
+		   (message-fetch-field "Newsgroups") ", ")) success)
       (let ((to-newsgroup (gnus-group-prefixed-name mbx gnus-command-method)))
 	(or (gnus-active to-newsgroup)
 	    (gnus-activate-group to-newsgroup)
@@ -1413,34 +1413,34 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
     ;; length of the list is equal to 1? -- kai
     (let ((g nil))
       (cond ((and (boundp 'group) group)
-             (setq g group))
-            ((and (boundp 'group-art-list) group-art-list
-                  (listp group-art-list))
-             (setq g (caar group-art-list)))
-            ((and (boundp 'group-art) group-art (listp group-art))
-             (setq g (caar group-art)))
-            (t (setq g "")))
+	     (setq g group))
+	    ((and (boundp 'group-art-list) group-art-list
+		  (listp group-art-list))
+	     (setq g (caar group-art-list)))
+	    ((and (boundp 'group-art) group-art (listp group-art))
+	     (setq g (caar group-art)))
+	    (t (setq g "")))
       (unless (gnus-buffer-live-p nnmail-cache-buffer)
-        (nnmail-cache-open))
+	(nnmail-cache-open))
       (save-excursion
-        (set-buffer nnmail-cache-buffer)
-        (goto-char (point-max))
-        (if (and g (not (string= "" g))
-                 (gnus-methods-equal-p gnus-command-method
-                                       (nnmail-cache-primary-mail-backend)))
-            (insert id "\t" g "\n")
-          (insert id "\n"))))))
+	(set-buffer nnmail-cache-buffer)
+	(goto-char (point-max))
+	(if (and g (not (string= "" g))
+		 (gnus-methods-equal-p gnus-command-method
+				       (nnmail-cache-primary-mail-backend)))
+	    (insert id "\t" g "\n")
+	  (insert id "\n"))))))
 
 (defun nnmail-cache-primary-mail-backend ()
   (let ((be-list (cons gnus-select-method gnus-secondary-select-methods))
-        (be nil)
-        (res nil))
+	(be nil)
+	(res nil))
     (while (and (null res) be-list)
       (setq be (car be-list))
       (setq be-list (cdr be-list))
       (when (and (gnus-method-option-p be 'respool)
-                 (eval (intern (format "%s-get-new-mail" (car be)))))
-        (setq res be)))
+		 (eval (intern (format "%s-get-new-mail" (car be)))))
+	(setq res be)))
     res))
 
 ;; Fetch the group name corresponding to the message id stored in the
@@ -1451,12 +1451,12 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
       (set-buffer nnmail-cache-buffer)
       (goto-char (point-max))
       (when (search-backward id nil t)
-        (beginning-of-line)
-        (skip-chars-forward "^\n\r\t")
-        (unless (eolp)
-          (forward-char 1)
-          (buffer-substring (point)
-                            (progn (end-of-line) (point))))))))
+	(beginning-of-line)
+	(skip-chars-forward "^\n\r\t")
+	(unless (eolp)
+	  (forward-char 1)
+	  (buffer-substring (point)
+			    (progn (end-of-line) (point))))))))
 
 ;; Function for nnmail-split-fancy: look up all references in the
 ;; cache and if a match is found, return that group.
@@ -1471,18 +1471,18 @@ see which group that message was put in.  This group is returned.
 
 See the Info node `(gnus)Fancy Mail Splitting' for more details."
   (let* ((refstr (or (message-fetch-field "references")
-                     (message-fetch-field "in-reply-to")))
-         (references nil)
-         (res nil))
+		     (message-fetch-field "in-reply-to")))
+	 (references nil)
+	 (res nil))
     (when refstr
       (setq references (nreverse (gnus-split-references refstr)))
       (unless (gnus-buffer-live-p nnmail-cache-buffer)
-        (nnmail-cache-open))
+	(nnmail-cache-open))
       (mapcar (lambda (x)
-                (setq res (or (nnmail-cache-fetch-group x) res))
-                (when (string= "drafts" res)
-                  (setq res nil)))
-              references)
+		(setq res (or (nnmail-cache-fetch-group x) res))
+		(when (string= "drafts" res)
+		  (setq res nil)))
+	      references)
       res)))
 
 (defun nnmail-cache-id-exists-p (id)

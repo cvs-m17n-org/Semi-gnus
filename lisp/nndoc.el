@@ -3,7 +3,7 @@
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -246,8 +246,8 @@ from the document.")
 
 (deffoo nndoc-request-type (group &optional article)
   (cond ((not article) 'unknown)
-        (nndoc-post-type nndoc-post-type)
-        (t 'unknown)))
+	(nndoc-post-type nndoc-post-type)
+	(t 'unknown)))
 
 (deffoo nndoc-close-group (group &optional server)
   (nndoc-possibly-change-buffer group server)
@@ -436,7 +436,7 @@ from the document.")
     t))
 
 (defun nndoc-forward-type-p ()
-  (when (and (re-search-forward "^-+ \\(Start of \\)?forwarded message.*\n+" 
+  (when (and (re-search-forward "^-+ \\(Start of \\)?forwarded message.*\n+"
 				nil t)
 	     (not (re-search-forward "^Subject:.*digest" nil t))
 	     (not (re-search-backward "^From:" nil t 2))
@@ -464,11 +464,11 @@ from the document.")
 	(limit (search-forward "\n\n" nil t)))
     (goto-char (point-min))
     (when (and limit
- 	       (re-search-forward
- 		(concat "\
+	       (re-search-forward
+		(concat "\
 ^Content-Type:[ \t]*multipart/[a-z]+ *; *\\(\\(\n[ \t]\\)?.*;\\)*"
- 			"\\(\n[ \t]\\)?[ \t]*boundary=\"?[^\"\n]*[^\" \t\n]")
- 		limit t))
+			"\\(\n[ \t]\\)?[ \t]*boundary=\"?[^\"\n]*[^\" \t\n]")
+		limit t))
       t)))
 
 (defun nndoc-transform-mime-parts (article)
@@ -568,25 +568,25 @@ from the document.")
 
 (defun nndoc-generate-lanl-gov-head (article)
   (let ((entry (cdr (assq article nndoc-dissection-alist)))
- 	(e-mail "no address given")
- 	subject from)
+	(e-mail "no address given")
+	subject from)
     (save-excursion
       (set-buffer nndoc-current-buffer)
       (save-restriction
- 	(narrow-to-region (car entry) (nth 1 entry))
- 	(goto-char (point-min))
- 	(when (looking-at "^Paper.*: \\([a-z-]+/[0-9]+\\)")
- 	  (setq subject (concat " (" (match-string 1) ")"))
- 	  (when (re-search-forward "^From: \\([^ ]+\\)" nil t)
- 	    (setq e-mail (match-string 1)))
- 	  (when (re-search-forward "^Title: \\([^\f]*\\)\nAuthors?: \\(.*\\)"
- 				   nil t)
- 	    (setq subject (concat (match-string 1) subject))
- 	    (setq from (concat (match-string 2) " <" e-mail ">"))))))
+	(narrow-to-region (car entry) (nth 1 entry))
+	(goto-char (point-min))
+	(when (looking-at "^Paper.*: \\([a-z-]+/[0-9]+\\)")
+	  (setq subject (concat " (" (match-string 1) ")"))
+	  (when (re-search-forward "^From: \\([^ ]+\\)" nil t)
+	    (setq e-mail (match-string 1)))
+	  (when (re-search-forward "^Title: \\([^\f]*\\)\nAuthors?: \\(.*\\)"
+				   nil t)
+	    (setq subject (concat (match-string 1) subject))
+	    (setq from (concat (match-string 2) " <" e-mail ">"))))))
     (while (and from (string-match "(\[^)\]*)" from))
       (setq from (replace-match "" t t from)))
     (insert "From: "  (or from "unknown")
- 	    "\nSubject: " (or subject "(no subject)") "\n")))
+	    "\nSubject: " (or subject "(no subject)") "\n")))
 
 (defun nndoc-nsmail-type-p ()
   (when (looking-at "From - ")
@@ -637,7 +637,7 @@ from the document.")
 	       (funcall nndoc-head-begin-function))
 	      (nndoc-head-begin
 	       (nndoc-search nndoc-head-begin)))
- 	(if (or (eobp)
+	(if (or (eobp)
 		(and nndoc-file-end
 		     (looking-at nndoc-file-end)))
 	    (goto-char (point-max))

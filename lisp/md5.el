@@ -148,7 +148,7 @@ Returns a vector of 16 bytes containing the message digest."
 (defsubst md5-add (x y)
   "Return 32-bit sum of 32-bit integers X and Y."
   (let ((m (+ (car x) (car y)))
-        (l (+ (cdr x) (cdr y))))
+	(l (+ (cdr x) (cdr y))))
     (cons (logand 65535 (+ m (lsh l -16))) (logand l 65535))))
 
 ;; FF, GG, HH and II are basic MD5 functions, providing transformations
@@ -172,16 +172,16 @@ Returns a vector of 16 bytes containing the message digest."
   (`
    (defun (, name) (a b c d x s ac)
      (let*
-         ((m1 (+ (car a) ((, func) (car b) (car c) (car d)) (car x) (car ac)))
-          (l1 (+ (cdr a) ((, func) (cdr b) (cdr c) (cdr d)) (cdr x) (cdr ac)))
-          (m2 (logand 65535 (+ m1 (lsh l1 -16))))
-          (l2 (logand 65535 l1))
-          (m3 (logand 65535 (if (> s 15)
-                                (+ (lsh m2 (- s 32)) (lsh l2 (- s 16)))
-                              (+ (lsh m2 s) (lsh l2 (- s 16))))))
-          (l3 (logand 65535 (if (> s 15)
-                                (+ (lsh l2 (- s 32)) (lsh m2 (- s 16)))
-                              (+ (lsh l2 s) (lsh m2 (- s 16)))))))
+	 ((m1 (+ (car a) ((, func) (car b) (car c) (car d)) (car x) (car ac)))
+	  (l1 (+ (cdr a) ((, func) (cdr b) (cdr c) (cdr d)) (cdr x) (cdr ac)))
+	  (m2 (logand 65535 (+ m1 (lsh l1 -16))))
+	  (l2 (logand 65535 l1))
+	  (m3 (logand 65535 (if (> s 15)
+				(+ (lsh m2 (- s 32)) (lsh l2 (- s 16)))
+			      (+ (lsh m2 s) (lsh l2 (- s 16))))))
+	  (l3 (logand 65535 (if (> s 15)
+				(+ (lsh l2 (- s 32)) (lsh m2 (- s 16)))
+			      (+ (lsh l2 s) (lsh m2 (- s 16)))))))
        (md5-add (cons m3 l3) b)))))
 
 (md5-make-step md5-FF md5-F)
@@ -203,8 +203,8 @@ Returns a vector of 16 bytes containing the message digest."
 (defun md5-update (string)
   "Update the current MD5 state with STRING (an array of bytes)."
   (let ((len (length string))
-        (i 0)
-        (j 0))
+	(i 0)
+	(j 0))
     (while (< i len)
       ;; Compute number of bytes modulo 64
       (setq j (% (/ (aref md5-bits 0) 8) 64))
@@ -214,11 +214,11 @@ Returns a vector of 16 bytes containing the message digest."
 
       ;; Update number of bits by 8 (modulo 2^64)
       (let ((c 8) (k 0))
-        (while (and (> c 0) (< k 4))
-          (let ((b (aref md5-bits k)))
-            (aset md5-bits k (logand 65535 (+ b c)))
-            (setq c (if (> b (- 65535 c)) 1 0)
-                  k (1+ k)))))
+	(while (and (> c 0) (< k 4))
+	  (let ((b (aref md5-bits k)))
+	    (aset md5-bits k (logand 65535 (+ b c)))
+	    (setq c (if (> b (- 65535 c)) 1 0)
+		  k (1+ k)))))
 
       ;; Increment number of bytes processed
       (setq i (1+ i))
@@ -226,32 +226,32 @@ Returns a vector of 16 bytes containing the message digest."
       ;; When 64 bytes accumulated, pack them into sixteen 32-bit
       ;; integers in the array `in' and then tranform them.
       (if (= j 63)
-          (let ((in (make-vector 16 (cons 0 0)))
-                (k 0)
-                (kk 0))
-            (while (< k 16)
-              (aset in k (md5-pack md5-input kk))
-              (setq k (+ k 1) kk (+ kk 4)))
-            (md5-transform in))))))
+	  (let ((in (make-vector 16 (cons 0 0)))
+		(k 0)
+		(kk 0))
+	    (while (< k 16)
+	      (aset in k (md5-pack md5-input kk))
+	      (setq k (+ k 1) kk (+ kk 4)))
+	    (md5-transform in))))))
 
 (defun md5-pack (array i)
   "Pack the four bytes at ARRAY reference I to I+3 into a 32-bit integer."
   (cons (+ (lsh (aref array (+ i 3)) 8) (aref array (+ i 2)))
-        (+ (lsh (aref array (+ i 1)) 8) (aref array (+ i 0)))))
+	(+ (lsh (aref array (+ i 1)) 8) (aref array (+ i 0)))))
 
 (defun md5-byte (array n b)
   "Unpack byte B (0 to 3) from Nth member of ARRAY of 32-bit integers."
   (let ((e (aref array n)))
     (cond ((eq b 0) (logand 255 (cdr e)))
-          ((eq b 1) (lsh (cdr e) -8))
-          ((eq b 2) (logand 255 (car e)))
-          ((eq b 3) (lsh (car e) -8)))))
+	  ((eq b 1) (lsh (cdr e) -8))
+	  ((eq b 2) (logand 255 (car e)))
+	  ((eq b 3) (lsh (car e) -8)))))
 
 (defun md5-final ()
   (let ((in (make-vector 16 (cons 0 0)))
-        (j 0)
-        (digest (make-vector 16 0))
-        (padding))
+	(j 0)
+	(digest (make-vector 16 0))
+	(padding))
 
     ;; Save the number of bits in the message
     (aset in 14 (cons (aref md5-bits 1) (aref md5-bits 0)))
@@ -268,18 +268,18 @@ Returns a vector of 16 bytes containing the message digest."
     ;; Append length in bits and transform
     (let ((k 0) (kk 0))
       (while (< k 14)
-        (aset in k (md5-pack md5-input kk))
-        (setq k (+ k 1) kk (+ kk 4))))
+	(aset in k (md5-pack md5-input kk))
+	(setq k (+ k 1) kk (+ kk 4))))
     (md5-transform in)
 
     ;; Store the results in the digest
     (let ((k 0) (kk 0))
       (while (< k 4)
-        (aset digest (+ kk 0) (md5-byte md5-buffer k 0))
-        (aset digest (+ kk 1) (md5-byte md5-buffer k 1))
-        (aset digest (+ kk 2) (md5-byte md5-buffer k 2))
-        (aset digest (+ kk 3) (md5-byte md5-buffer k 3))
-        (setq k (+ k 1) kk (+ kk 4))))
+	(aset digest (+ kk 0) (md5-byte md5-buffer k 0))
+	(aset digest (+ kk 1) (md5-byte md5-buffer k 1))
+	(aset digest (+ kk 2) (md5-byte md5-buffer k 2))
+	(aset digest (+ kk 3) (md5-byte md5-buffer k 3))
+	(setq k (+ k 1) kk (+ kk 4))))
 
     ;; Return digest
     digest))
@@ -291,9 +291,9 @@ Returns a vector of 16 bytes containing the message digest."
 (defun md5-transform (in)
   "Basic MD5 step. Transform md5-buffer based on array IN."
   (let ((a (aref md5-buffer 0))
-        (b (aref md5-buffer 1))
-        (c (aref md5-buffer 2))
-        (d (aref md5-buffer 3)))
+	(b (aref md5-buffer 1))
+	(c (aref md5-buffer 2))
+	(d (aref md5-buffer 3)))
     (setq
      a (md5-FF a b c d (aref in  0)  7 '(55146 . 42104))
      d (md5-FF d a b c (aref in  1) 12 '(59591 . 46934))

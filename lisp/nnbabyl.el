@@ -4,7 +4,7 @@
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -283,8 +283,8 @@
 	      (progn
 		(unless (eq nnmail-expiry-target 'delete)
 		  (with-temp-buffer
-		    (nnbabyl-request-article (car articles) 
-					     newsgroup server 
+		    (nnbabyl-request-article (car articles)
+					     newsgroup server
 					     (current-buffer))
 		    (let ((nnml-current-directory nil))
 		      (nnmail-expiry-target-group

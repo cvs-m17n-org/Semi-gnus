@@ -143,12 +143,12 @@ It is provided only to ease porting of broken FSF Emacs programs."
   (if (stringp buffer)
       nil
     (map-extents (lambda (extent ignored)
-                   (remove-text-properties
-                    start end
-                    (list (extent-property extent 'text-prop) nil)
-                    buffer)
+		   (remove-text-properties
+		    start end
+		    (list (extent-property extent 'text-prop) nil)
+		    buffer)
 		   nil)
-                 buffer start end nil nil 'text-prop)
+		 buffer start end nil nil 'text-prop)
     (gnus-add-text-properties start end props buffer)))
 
 (defun gnus-xmas-highlight-selected-summary ()
@@ -293,19 +293,19 @@ call it with the value of the `gnus-data' text property."
 (defun gnus-xmas-appt-select-lowest-window ()
   (let* ((lowest-window (selected-window))
 	 (bottom-edge (car (cdr (cdr (cdr (window-pixel-edges))))))
-         (last-window (previous-window))
-         (window-search t))
+	 (last-window (previous-window))
+	 (window-search t))
     (while window-search
       (let* ((this-window (next-window))
-             (next-bottom-edge (car (cdr (cdr (cdr
-                                               (window-pixel-edges
+	     (next-bottom-edge (car (cdr (cdr (cdr
+					       (window-pixel-edges
 						this-window)))))))
-        (when (< bottom-edge next-bottom-edge)
+	(when (< bottom-edge next-bottom-edge)
 	  (setq bottom-edge next-bottom-edge)
 	  (setq lowest-window this-window))
 
-        (select-window this-window)
-        (when (eq last-window this-window)
+	(select-window this-window)
+	(when (eq last-window this-window)
 	  (select-window lowest-window)
 	  (setq window-search nil))))))
 
@@ -432,7 +432,7 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-window-edges 'window-pixel-edges)
 
   (if (and (<= emacs-major-version 19)
- 	   (< emacs-minor-version 14))
+	   (< emacs-minor-version 14))
       (defalias 'gnus-set-text-properties 'gnus-xmas-set-text-properties))
 
   (unless (boundp 'standard-display-table)
@@ -617,23 +617,23 @@ the resulting string may be narrower than END-COLUMN.
       (set-window-start (selected-window) (point-min))))
    (t
     (insert "
-          _    ___ _             _
-          _ ___ __ ___  __    _ ___
-          __   _     ___    __  ___
-              _           ___     _
-             _  _ __             _
-             ___   __            _
-                   __           _
-                    _      _   _
-                   _      _    _
-                      _  _    _
-                  __  ___
-                 _   _ _     _
-                _   _
-              _    _
-             _    _
-            _
-          __
+	  _    ___ _             _
+	  _ ___ __ ___  __    _ ___
+	  __   _     ___    __  ___
+	      _           ___     _
+	     _  _ __             _
+	     ___   __            _
+		   __           _
+		    _      _   _
+		   _      _    _
+		      _  _    _
+		  __  ___
+		 _   _ _     _
+		_   _
+	      _    _
+	     _    _
+	    _
+	  __
 
 "
 	    )

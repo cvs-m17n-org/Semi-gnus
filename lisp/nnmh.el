@@ -122,7 +122,7 @@ as unread by Gnus.")
 	(when large
 	  (nnheader-message 5 "nnmh: Receiving headers...done"))
 
-        ;; (nnheader-fold-continuation-lines)
+	;; (nnheader-fold-continuation-lines)
 	'headers))))
 
 (deffoo nnmh-retrieve-parsed-headers (articles

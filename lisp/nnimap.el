@@ -128,10 +128,10 @@ the syntax of this variable have been extended along the lines of:
 
 (setq nnimap-split-rule
       '((\"my1server\"    (\".*\"    ((\"ding\"    \"ding@gnus.org\")
-                                  (\"junk\"    \"From:.*Simon\")))
-        (\"my2server\"    (\"INBOX\" nnimap-split-fancy))
-        (\"my[34]server\" (\".*\"    ((\"private\" \"To:.*Simon\")
-                                  (\"junk\"    my-junk-func)))))
+				  (\"junk\"    \"From:.*Simon\")))
+	(\"my2server\"    (\"INBOX\" nnimap-split-fancy))
+	(\"my[34]server\" (\".*\"    ((\"private\" \"To:.*Simon\")
+				  (\"junk\"    my-junk-func)))))
 
 The virtual server name is in fact a regexp, so that the same rules
 may apply to several servers.  In the example, the servers
@@ -341,13 +341,13 @@ If SERVER is nil, uses the current server."
 	 (new-uidvalidity (imap-mailbox-get 'uidvalidity))
 	 (old-uidvalidity (gnus-group-get-parameter gnusgroup 'uidvalidity))
 	 (dir (file-name-as-directory (expand-file-name nnimap-directory)))
-         (nameuid (nnheader-translate-file-chars
-                   (concat nnimap-nov-file-name
-                           (if (equal server "")
-                               "unnamed"
-                             server) "." group "." old-uidvalidity
-                             nnimap-nov-file-name-suffix) t))
-         (file (if (or nnmail-use-long-file-names
+	 (nameuid (nnheader-translate-file-chars
+		   (concat nnimap-nov-file-name
+			   (if (equal server "")
+			       "unnamed"
+			     server) "." group "." old-uidvalidity
+			     nnimap-nov-file-name-suffix) t))
+	 (file (if (or nnmail-use-long-file-names
 		       (file-exists-p (expand-file-name nameuid dir)))
 		   (expand-file-name nameuid dir)
 		 (expand-file-name
@@ -385,7 +385,7 @@ If EXAMINE is non-nil the group is selected read-only."
 				    maxuid (if maxuid (max maxuid uid) uid)))
 			    'UID))
 	(list (imap-mailbox-get 'exists) minuid maxuid)))))
-  
+
 (defun nnimap-possibly-change-group (group &optional server)
   "Make GROUP the current group, and SERVER the current server."
   (when (nnimap-possibly-change-server server)
@@ -594,8 +594,8 @@ If EXAMINE is non-nil the group is selected read-only."
 		    ;; remove nov's for articles which has expired on server
 		    (goto-char (point-min))
 		    (dolist (uid (gnus-set-difference articles uids))
-                      (when (re-search-forward (format "^%d\t" uid) nil t)
-                        (gnus-delete-line)))))
+		      (when (re-search-forward (format "^%d\t" uid) nil t)
+			(gnus-delete-line)))))
 	      ;; nothing cached, fetch whole range from server
 	      (nnimap-retrieve-headers-from-server
 	       (cons low high) group server))
@@ -618,9 +618,9 @@ If EXAMINE is non-nil the group is selected read-only."
 	   (port (if nnimap-server-port
 		     (int-to-string nnimap-server-port)
 		   "imap"))
-	   (alist (gnus-netrc-machine list (or nnimap-server-address 
-                                               nnimap-address server)
-                                      port "imap"))
+	   (alist (gnus-netrc-machine list (or nnimap-server-address
+					       nnimap-address server)
+				      port "imap"))
 	   (user (gnus-netrc-get alist "login"))
 	   (passwd (gnus-netrc-get alist "password")))
       (if (imap-authenticate user passwd nnimap-server-buffer)
@@ -702,7 +702,7 @@ function is generally only called when Gnus is shutting down."
   (with-current-buffer nnimap-callback-buffer
     (insert
      (with-current-buffer nnimap-server-buffer
-       (if (imap-capability 'IMAP4rev1) 
+       (if (imap-capability 'IMAP4rev1)
 	   ;; xxx don't just use car? alist doesn't contain
 	   ;; anything else now, but it might...
 	   (nth 2 (car (imap-message-get (imap-current-message) 'BODYDETAIL)))
@@ -825,9 +825,9 @@ function is generally only called when Gnus is shutting down."
 	      (let ((info (nnimap-find-minmax-uid mbx 'examine)))
 		(when info
 		  (with-current-buffer nntp-server-buffer
-                   (insert (format "\"%s\" %d %d y\n"
-                                   mbx (or (nth 2 info) 0)
-                                   (max 1 (or (nth 1 info) 1)))))))))))
+		   (insert (format "\"%s\" %d %d y\n"
+				   mbx (or (nth 2 info) 0)
+				   (max 1 (or (nth 1 info) 1)))))))))))
     (gnus-message 5 "nnimap: Generating active list%s...done"
 		  (if (> (length server) 0) (concat " for " server) ""))
     t))
@@ -876,7 +876,7 @@ function is generally only called when Gnus is shutting down."
       (with-current-buffer nnimap-server-buffer
 	(gnus-message 5 "nnimap: Updating info for %s..."
 		      (gnus-info-group info))
-	
+
 	(when (nnimap-mark-permanent-p 'read)
 	  (let (seen unseen)
 	    ;; read info could contain articles marked unread by other
@@ -917,7 +917,7 @@ function is generally only called when Gnus is shutting down."
 	  ;; nnimap mark dormant article as ticked too (for other clients)
 	  ;; so we remove that mark for gnus since we support dormant
 	  (gnus-info-set-marks
-	   info 
+	   info
 	   (nnimap-update-alist-soft
 	    'tick
 	    (gnus-remove-from-range
@@ -925,7 +925,7 @@ function is generally only called when Gnus is shutting down."
 	     (cdr-safe (assoc 'dormant (gnus-info-marks info))))
 	    (gnus-info-marks info))
 	   t))
-	
+
 	(gnus-message 5 "nnimap: Updating info for %s...done"
 		      (gnus-info-group info))
 
@@ -1008,7 +1008,7 @@ function is generally only called when Gnus is shutting down."
 		      to-groups)
 		(or nnimap-split-crosspost
 		    (throw 'split-done to-groups))))))))))
-  
+
 (defun nnimap-assoc-match (key alist)
   (let (element)
     (while (and alist (not element))
@@ -1019,9 +1019,9 @@ function is generally only called when Gnus is shutting down."
 
 (defun nnimap-split-find-rule (server inbox)
   (if (and (listp nnimap-split-rule) (listp (car nnimap-split-rule))
-           (list (cdar nnimap-split-rule)) (listp (cadar nnimap-split-rule)))
+	   (list (cdar nnimap-split-rule)) (listp (cadar nnimap-split-rule)))
       ;; extended format
-      (cadr (nnimap-assoc-match inbox (cdr (nnimap-assoc-match 
+      (cadr (nnimap-assoc-match inbox (cdr (nnimap-assoc-match
 					    server nnimap-split-rule))))
     nnimap-split-rule))
 
@@ -1081,7 +1081,7 @@ function is generally only called when Gnus is shutting down."
       (nnimap-before-find-minmax-bugworkaround)
       (dolist (pattern (nnimap-pattern-to-list-arguments
 			nnimap-list-pattern))
-	(dolist (mbx (imap-mailbox-lsub "*" (car pattern) nil 
+	(dolist (mbx (imap-mailbox-lsub "*" (car pattern) nil
 					nnimap-server-buffer))
 	  (or (catch 'found
 		(dolist (mailbox (imap-mailbox-get 'list-flags mbx
@@ -1097,7 +1097,7 @@ function is generally only called when Gnus is shutting down."
       (gnus-message 5 "nnimap: Listing subscribed mailboxes%s%s...done"
 		    (if (> (length server) 0) " on " "") server))
     t))
-      
+
 (deffoo nnimap-request-create-group (group &optional server args)
   (when (nnimap-possibly-change-server server)
     (or (imap-mailbox-status group 'uidvalidity nnimap-server-buffer)
@@ -1195,7 +1195,7 @@ function is generally only called when Gnus is shutting down."
 	       result)
 	     (nnimap-request-expire-articles (list article) group server t))
 	result))))
-  
+
 (deffoo nnimap-request-accept-article (group &optional server last)
   (when (nnimap-possibly-change-server server)
     (let (uid)
@@ -1217,9 +1217,9 @@ function is generally only called when Gnus is shutting down."
 		    ;; turn into rfc822 format (\r\n eol's)
 		    (while (search-forward "\n" nil t)
 		      (replace-match "\r\n")))
-                  ;; this 'or' is for Cyrus server bug
-                  (or (null (imap-current-mailbox nnimap-server-buffer))
-                      (imap-mailbox-unselect nnimap-server-buffer))
+		  ;; this 'or' is for Cyrus server bug
+		  (or (null (imap-current-mailbox nnimap-server-buffer))
+		      (imap-mailbox-unselect nnimap-server-buffer))
 		  (imap-message-append group (current-buffer) nil nil
 				       nnimap-server-buffer)))
 	  (cons group (nth 1 uid))
@@ -1288,12 +1288,12 @@ function is generally only called when Gnus is shutting down."
   (mapcar
    (lambda (pair)			; cdr is the mark
      (or (assoc (cdr pair)
-                '((read . "SEEN")
-                  (tick . "FLAGGED")
-                  (draft . "DRAFT")
-                  (reply . "ANSWERED")))
-         (cons (cdr pair)
-               (format "KEYWORD gnus-%s" (symbol-name (cdr pair))))))
+		'((read . "SEEN")
+		  (tick . "FLAGGED")
+		  (draft . "DRAFT")
+		  (reply . "ANSWERED")))
+	 (cons (cdr pair)
+	       (format "KEYWORD gnus-%s" (symbol-name (cdr pair))))))
    (cons '(read . read) gnus-article-mark-lists)))
 
 (defun nnimap-mark-to-predicate (pred)
@@ -1306,12 +1306,12 @@ to be used within a IMAP SEARCH query."
   (mapcar
    (lambda (pair)
      (or (assoc (cdr pair)
-                '((read . "\\Seen")
-                  (tick . "\\Flagged")
-                  (draft . "\\Draft")
-                  (reply . "\\Answered")))
-         (cons (cdr pair)
-               (format "gnus-%s" (symbol-name (cdr pair))))))
+		'((read . "\\Seen")
+		  (tick . "\\Flagged")
+		  (draft . "\\Draft")
+		  (reply . "\\Answered")))
+	 (cons (cdr pair)
+	       (format "gnus-%s" (symbol-name (cdr pair))))))
    (cons '(read . read) gnus-article-mark-lists)))
 
 (defun nnimap-mark-to-flag-1 (preds)
@@ -1352,7 +1352,7 @@ sure of changing the value of `foo'."
 	(cdr alist)
       (setcdr alist (nnimap-remassoc key (cdr alist)))
       alist)))
-  
+
 (defun nnimap-update-alist-soft (key value alist)
   (if value
       (cons (cons key value) (nnimap-remassoc key alist))
@@ -1362,7 +1362,7 @@ sure of changing the value of `foo'."
   (require 'trace)
   (buffer-disable-undo (get-buffer-create nnimap-debug))
   (mapcar (lambda (f) (trace-function-background f nnimap-debug))
-        '(
+	'(
 	  nnimap-possibly-change-server
 	  nnimap-verify-uidvalidity
 	  nnimap-find-minmax-uid
@@ -1420,7 +1420,7 @@ sure of changing the value of `foo'."
 	  nnimap-mark-permanent-p
 	  nnimap-remassoc
 	  nnimap-update-alist-soft
-          )))
+	  )))
 
 (provide 'nnimap)
 

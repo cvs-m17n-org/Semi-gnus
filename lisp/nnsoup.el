@@ -4,7 +4,7 @@
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; 	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
+;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;; Keywords: news, mail
 
 ;; This file is part of GNU Emacs.
@@ -258,7 +258,7 @@ backend for the messages.")
 		  (nth 1 (nnsoup-article-to-area
 			  article nnsoup-current-group))))))
       (cond ((= kind ?m) 'mail)
-	    ((= kind ?n) 'news) 
+	    ((= kind ?n) 'news)
 	    (t 'unknown)))))
 
 (deffoo nnsoup-close-group (group &optional server)
