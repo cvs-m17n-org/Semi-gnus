@@ -1,3 +1,7 @@
+2001-09-16  Katsuhiro Hermit Endo  <hermit@koka-in.org>
+
+	* gnus-ja.texi (Drafts): Fix typo.
+
 2001-09-12  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/lpath.el: Removed `current-language-environment' and
