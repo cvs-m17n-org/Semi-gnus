@@ -1,5 +1,7 @@
 2002-03-04  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-art.el (gnus-article-edit-mode): Don't call `mml-mode'.
+
 	* lisp/nnheader.el (mm-7bit-chars): Copied from mm-bodies.el.
 	(mm-multibyte-p): New alias.
 	(mm-char-int): Alias to `char-int'.
