@@ -5442,9 +5442,13 @@ If FORCE (the prefix), also save the .newsrc file(s)."
 	  (progn
 	    (goto-char group-point)
 	    (gnus-configure-windows 'group 'force)
-	    (when (and (interactive-p)
-		       (not (pos-visible-in-window-p)))
-	      (recenter)))
+	    (unless (pos-visible-in-window-p)
+	      (forward-line (/ (static-if (featurep 'xemacs)
+				   (window-displayed-height)
+				 (1- (window-height)))
+			       -2))
+	      (set-window-start (selected-window) (point))
+	      (goto-char group-point)))
 	(gnus-handle-ephemeral-exit quit-config))
       ;; Clear the current group name.
       (unless quit-config
