@@ -1,3 +1,142 @@
+2000-02-10  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 6.12.20 released.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.20
+
+	* Nana-TIPS.ja: Add information for changing 6.12.19 to 20.
+
+	*lisp/gnus-agent.el, lisp/gnus-bbdb.el, lisp/gnus-msg.el,
+	lisp/gnus-offline.el, lisp/gnus-ofsetup.el, lisp/gnus-score.el,
+	lisp/gnus-util.el, lisp/gnus.el, lisp/message.el,
+	lisp/nnheader.el, lisp/nnmail.el, lisp/pop3-fma.el, lisp/pop3.el:
+	Sync up with nana-gnus-1_13_12.
+
+* 1999-12-27  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-util.el (gnus-write-active-file): Copy from Gnus 5.8.2.
+
+	* lisp/gnus-score.el (gnus-enter-score-words-into-hashtb): Ignore
+	invalid character error.
+
+	* lisp/gnus-msg.el (gnus-post-method): Do not duplicate methods.
+
+	* lisp/gnus-agent.el (gnus-agent-expire): Sync up with Gnus
+	5.8.2.
+
+* 1999-12-09  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/split-mail-1): Fix bug for last
+	change.
+
+* 1999-12-09  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/split-mail): New implementation,
+	and supports crosspost.
+	(gnus-bbdb/split-mail-1): New function.
+
+* 1999-12-06  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/message.el (message-yank-add-new-references): New option
+	value `message-id-only'.
+	(message-yank-original): Likewise.
+	(message-list-references-add-position): New user option.
+	(message-list-references): When
+	`message-list-references-add-position' is integer value, the order
+	of designate number message-ids is kept.
+
+* 1999-11-09  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-util.el (TopLevel): Do not require `rmail'.
+
+* 1999-10-05  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-msg.el (gnus-bug): Do not send bug report to
+	`bugs@gnus.org'.
+
+* 1999-09-21  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-agent.el (gnus-agent-toggle-plugged): Don't change
+	buffer modified status.
+
+	* lisp/nnheader.el (TopLevel): Require `poem'.
+
+* 1999-09-07  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/nnmail.el (nnmail-move-inbox): Do not change current
+	buffer. And change require timing of password.
+
+* 1999-08-24  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-TIPS.ja : New section; `How to get information for the
+	latest version'. Refine here and there.
+
+* 1999-08-19  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/nnmail.el (nnmail-split-it): Match whole word for getting
+	group name with `\N'.
+
+* 1999-08-10  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/gnus-ofsetup.el (gnus-ofsetup-read-pop-account): Add prefix
+	"po:" to POP file name.
+
+* 1999-08-09  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/nnmail.el (nnmail-movemail-program-pop-password-required):
+	New variable.
+	(nnmail-exec-movemail-program): Require password, when needed.
+	(TopLevel): Remove autoload cookie.
+	(nnmail-pop3-movemail): Require `pop3'.
+
+	* lisp/gnus-ofsetup.el (gnus-ofsetup-read-pop-account): Fix bug.
+	(gnus-setup-for-offline): Generate nnmail-pop-password-required's
+	value.
+
+	* lisp/gnus-offline.el: Do not use pop3-fma.el. (Thank you,
+	Tsukamoto Tetsuo <czkmt@remus.dti.ne.jp>)
+
+* 1999-08-06  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* README-offline.ja: Match with Nana-gnus.
+
+	* lisp/gnus-ofsetup.el (gnus-offline-setting-file): Change to
+	"~/.nana-gnus-offline.el".
+	(gnus-ofsetup-read-from-minibuffer): New function.
+	(gnus-ofsetup-completing-read-symbol): Ditto.
+	(gnus-ofsetup-read-pop-account): Ditto.
+	(gnus-setup-for-offline): Refine.
+
+* 1999-08-05  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/nnmail.el (nnmail-get-spool-files): Fix bug in latest changes.
+	(nnmail-pop3-movemail): Ditto.
+
+	* Nana-TIPS.ja : Fix typo.
+
+* 1999-08-02  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* lisp/nnmail.el (nnmail-get-new-mail): Fix typo.
+
+	* Nana-TIPS.ja: New sections `pop3-fma.el', `nnmail.el' and
+	`pop3.el'.
+
+	* lisp/pop3.el (pop3-authentication-scheme-alist): Abolished.
+	(pop3-movemail): Do not use `pop3-authentication-scheme-alist'.
+
+	* lisp/pop3-fma.el: Delete file.
+
+	* lisp/nnmail.el (nnmail-movemail-program-apop-option): New
+	variable.
+	(nnmail-move-inbox): Support `Spool file option'.
+	(nnmail-spool-file): Ditto.
+	(nnmail-move-inbox): Ditto.
+	(nnmail-get-new-mail): Ditto.
+	(nnmail-pop3-movemail): Ditto.
+	(nnmail-move-inbox): Use `nnmail-exec-movemail-program'.
+	(nnmail-exec-movemail-program): New function.
+
+
 1999-07-14  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 6.12.19 released.
@@ -72,6 +211,7 @@
 	`backward-char' and `char-before'.
 	;; Thanks for Shuhei KOBAYASHI's suggestion.
 
+
 1999-05-14  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 6.12.16 released.
@@ -198,6 +338,7 @@
 	* lisp/gnus-score.el (gnus-score-string): Remove score data, when
 	scoring error occured.
 
+
 1999-04-28  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 6.12.15 released.
@@ -212,6 +353,7 @@
 	lisp/mess-lcl.el, lisp/message.el, lisp/pop3-fma.el: Modify my
 	mail address.
 
+
 1999-04-16  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 6.12.14 released.
