@@ -807,6 +807,20 @@ find-file-hooks, etc.
 (fset 'nnheader-cancel-timer 'cancel-timer)
 (fset 'nnheader-cancel-function-timers 'cancel-function-timers)
 
+(defun nnheader-Y-or-n-p (prompt)
+  "Ask user a \"Y/n\" question. Return t if answer is neither \"n\", \"N\" nor \"C-g\"."
+  (if (and (featurep 'xemacs) (should-use-dialog-box-p))
+      (yes-or-no-p-dialog-box prompt)
+    (let ((cursor-in-echo-area t)
+	  (echo-keystrokes 0)
+	  (log-message-max-size 0)
+	  (inhibit-quit t)
+	  message-log-max ans)
+      (while (not (memq ans '(?\  ?N ?Y ?\C-g ?\e ?\n ?\r ?n ?y)))
+	(message "%s(Y/n) " prompt)
+	(setq ans (read-char-exclusive)))
+      (not (memq ans '(?\C-g ?N ?n))))))
+
 (when (string-match "XEmacs\\|Lucid" emacs-version)
   (require 'nnheaderxm))
 
