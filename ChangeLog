@@ -1,3 +1,8 @@
+1998-09-22  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-agent.el (gnus-agent-expire): Bug fix when variable
+	expired is nil.
+
 1998-09-18  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-draft.el: (gnus-draft-edit-message): Fix typo.

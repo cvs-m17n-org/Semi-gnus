@@ -1433,12 +1433,13 @@ The following commands are available:
 	       ;; Maybe everything has been expired from `gnus-article-alist'
 	       ;; and so the above marking as read could not be conducted,
 	       ;; or there are expired article within the range of the alist.
-	       (when (or (not (caar gnus-agent-article-alist))
-			 (> (car expired) (caar gnus-agent-article-alist)))  
-	       (setcar (nthcdr 2 info)
-		       (gnus-add-to-range
-			(nth 2 info)
-			(nreverse expired))))
+	       (if expired
+		   (when (or (not (caar gnus-agent-article-alist))
+			     (> (car expired) (caar gnus-agent-article-alist)))  
+		     (setcar (nthcdr 2 info)
+			     (gnus-add-to-range
+			      (nth 2 info)
+			      (nreverse expired)))))
 	       (gnus-dribble-enter
 		(concat "(gnus-group-set-info '"
 			(gnus-prin1-to-string info)
