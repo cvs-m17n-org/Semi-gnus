@@ -5431,7 +5431,7 @@ gnus-exit-group-hook is called with no arguments if that value is non-nil."
       (gnus-async-halt-prefetch)
       (mapcar 'funcall
 	      (delq 'gnus-summary-expire-articles
-		    (copy-list gnus-summary-prepare-exit-hook)))
+		    (copy-sequence gnus-summary-prepare-exit-hook)))
       ;; If we have several article buffers, we kill them at exit.
       (unless gnus-single-article-buffer
 	(gnus-kill-buffer gnus-article-buffer)
