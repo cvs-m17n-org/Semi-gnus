@@ -1,3 +1,25 @@
+1999-08-25  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 12.
+
+	* lisp/gnus-sum.el (gnus-summary-search-article): Rearrange.
+	(gnus-summary-search-article-highlight-matched-text): Rearrange.
+	(gnus-summary-search-article-position-point): New macro.
+	(gnus-summary-search-article-matched-data): Rename from
+	`gnus-summary-search-article-matched-text'.
+	(gnus-summary-isearch-article): Bind `gnus-inhibit-treatment' to t;
+	use `gnus-article-show-all-headers' for exposing the visited
+	article.
+	(gnus-summary-select-article): Bind
+	`gnus-summary-search-article-matched-data' in the article buffer
+	locally.
+
+	* lisp/gnus-art.el (gnus-treat-article): Don't treat the article
+	if the value of `gnus-inhibit-treatment' is non-nil.
+	(article-toggle-headers): Don't redisplay X-Face if the value of
+	`gnus-inhibit-treatment' is non-nil.
+	(gnus-article-treat-custom): Add new treatment variable `mime'.
+
 1999-08-25  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/gnus-group.el (gnus-group-line-format): Fix typo in
