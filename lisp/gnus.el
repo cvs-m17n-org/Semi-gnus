@@ -1331,7 +1331,6 @@ want."
 	     gnus-article-emphasize
 	     gnus-article-fill-cited-article
 	     gnus-article-remove-cr
-	     gnus-article-de-quoted-unreadable
 	     gnus-summary-stop-page-breaking
 	     ;; gnus-summary-caesar-message
 	     ;; gnus-summary-verbose-headers
@@ -1646,7 +1645,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-article-hide-headers gnus-article-hide-boring-headers
       gnus-article-treat-overstrike gnus-article-word-wrap
       gnus-article-remove-cr gnus-article-remove-trailing-blank-lines
-      gnus-article-display-x-face gnus-article-de-quoted-unreadable
+      gnus-article-display-x-face
       gnus-article-mime-decode-quoted-printable gnus-article-hide-pgp
       gnus-article-hide-pem gnus-article-hide-signature
       gnus-article-strip-leading-blank-lines gnus-article-date-local
