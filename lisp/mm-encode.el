@@ -25,7 +25,7 @@
 ;;; Code:
 
 (require 'mail-parse)
-(require 'mailcap)
+(require 'mm-mailcap)
 
 (defvar mm-content-transfer-encoding-defaults
   '(("text/x-patch" 8bit)
@@ -58,7 +58,7 @@ or base64 will be used, depending on what is more efficient.")
   "Return a default encoding for FILE."
   (if (not (string-match "\\.[^.]+$" file))
       "application/octet-stream"
-    (mailcap-extension-to-mime (match-string 0 file))))
+    (mm-mailcap-extension-to-mime (match-string 0 file))))
 
 (defun mm-encode-content-transfer-encoding (encoding &optional type)
   (cond

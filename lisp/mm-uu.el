@@ -30,7 +30,7 @@
 (require 'message)
 (require 'nnheader)
 (require 'mm-decode)
-(require 'mailcap)
+(require 'mm-mailcap)
 
 (eval-and-compile
   (autoload 'binhex-decode-region "binhex")
@@ -186,7 +186,7 @@ To disable dissecting shar codes, for instance, add
 	       (mm-make-handle (mm-uu-copy-to-buffer start-char end-char)
 		     (list (or (and file-name
 				    (string-match "\\.[^\\.]+$" file-name)
-				    (mailcap-extension-to-mime
+				    (mm-mailcap-extension-to-mime
 				     (match-string 0 file-name)))
 			       "application/octet-stream"))
 		     'x-uuencode nil
@@ -197,7 +197,7 @@ To disable dissecting shar codes, for instance, add
 	       (mm-make-handle (mm-uu-copy-to-buffer start-char end-char)
 		     (list (or (and file-name
 				    (string-match "\\.[^\\.]+$" file-name)
-				    (mailcap-extension-to-mime
+				    (mm-mailcap-extension-to-mime
 				     (match-string 0 file-name)))
 			       "application/octet-stream"))
 		     'x-binhex nil
