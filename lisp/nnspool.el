@@ -82,9 +82,6 @@ there.")
 (defvoo nnspool-rejected-article-hook nil
   "*A hook that will be run when an article has been rejected by the server.")
 
-(defvoo nnspool-file-coding-system nnheader-file-coding-system
-  "Coding system for nnspool.")
-
 
 
 (defconst nnspool-version "nnspool 2.0"
