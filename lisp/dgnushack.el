@@ -52,7 +52,7 @@
 (require 'bytecomp)
 
 ;; Attempt to pickup the additional load-path(s).
-(load "./paths.el" nil nil t)
+(load (expand-file-name "./dgnuspath.el") nil nil t)
 (condition-case err
     (load "~/.lpath.el" t nil t)
   (error (message "Error in \"~/.lpath.el\" file: %s" err)))
@@ -154,7 +154,8 @@ You also then need to add the following to the lisp/dgnushack.el file:
      (push \"~/lisp/custom\" load-path)
 
 Modify to suit your needs."))
-  (let ((files (directory-files "." nil "^[^=].*\\.el$"))
+  (let ((files (delete "dgnuspath.el"
+		       (directory-files "." nil "^[^=].*\\.el$")))
 	(xemacs (string-match "XEmacs" emacs-version))
 	;;(byte-compile-generate-call-tree t)
 	file elc)
@@ -232,7 +233,9 @@ Modify to suit your needs."))
 	      lisp-dir
 	      (mapconcat
 	       'identity
-	       (sort (directory-files "." nil "\\.elc?$")
+	       (sort (delete "dgnuspath.el"
+			     (delete "patchs.elc"
+				     (directory-files "." nil "\\.elc?$")))
 		     'string-lessp)
 	       (concat "\n" lisp-dir))
 	      "\ninfo/"
@@ -282,7 +285,11 @@ You must specify the name of the package path as follows:
     (unless (file-directory-p pkginfo-dir)
       (make-directory pkginfo-dir))
 
-    (setq files (sort (directory-files "." nil "\\.elc?$") 'string-lessp))
+    (setq files
+	  (sort (delete "dgnuspath.el"
+			(delete "dgnuspath.elc"
+				(directory-files "." nil "\\.elc?$")))
+		'string-lessp))
     (mapcar
      (lambda (file)
        (unless (member file files)
