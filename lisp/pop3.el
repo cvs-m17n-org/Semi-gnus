@@ -100,6 +100,8 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 	 (msglen 0)
 	 message-count
 	 (pop3-password pop3-password)
+	 (pop3-uidl-file-name 
+	  (concat pop3-uidl-file-name "-" pop3-mailhost))
 	 (retrieved-messages nil)
 	 messages)
     ;; for debugging only
@@ -322,12 +324,6 @@ Return the response string if optional second argument is non-nil."
 	 (reverse messages)))
        (t messages)))))
 
-(defun pop3-get-list (process)
-  "Use PROCESS to get a list of message numbers."
-  (let ((messages (pop3-list process)))
-    (when messages
-      (reverse messages))))
-
 (defun pop3-get-uidl (process)
   "Use PROCESS to get a list of unread message numbers."
   (let ((messages (pop3-uidl process)) uidl)
@@ -342,14 +338,16 @@ Return the response string if optional second argument is non-nil."
 	  (while (looking-at "\\([^ \n\t]+\\)")
 	    (set (intern (match-string 1) pop3-uidl-obarray)
 		 (cons nil t))
-	    (forward-line 1))))
+	    (forward-line 1))
+	  ))
       (dolist (message (cdr messages))
 	(if (setq uidl (intern-soft (cdr message) pop3-uidl-obarray))
 	    (setcar (symbol-value uidl) (car message))
 	  (set (intern (cdr message) pop3-uidl-obarray)
 	       (cons (car message) nil))))
-      (pop3-get-unread-message-numbers))))
-	    
+      (pop3-get-unread-message-numbers))
+    ))
+
 (defun pop3-get-unread-message-numbers ()
   "Return a sorted list of unread msg numbers to retrieve."
   (let (nums)
@@ -422,11 +420,11 @@ Return the response string if optional second argument is non-nil."
   (pop3-send-command process (format "RETR %s" msg))
   (pop3-read-response process)
   (save-excursion
-    (save-restriction
-      (apply 'narrow-to-region (pop3-get-extended-response process))
-      (pop3-munge-message-separator (point-min) (point-max))
-      (append-to-buffer crashbuf (point-min) (point-max))
-      (delete-region (point-min) (point-max)))))
+    (let ((region (pop3-get-extended-response process)))
+      (apply 'pop3-munge-message-separator region)
+      (apply 'append-to-buffer crashbuf region)
+      (apply 'delete-region region)
+      )))
 
 (defun pop3-dele (process msg)
   "Mark message-id MSG as deleted."
@@ -458,11 +456,12 @@ Tell server to remove all messages marked as deleted, unlock the maildrop,
 and close the connection."
   (pop3-send-command process "QUIT")
   (pop3-read-response process t)
-  (if process
-      (save-excursion
-	(set-buffer (process-buffer process))
-	(goto-char (point-max))
-	(delete-process process))))
+  (when process
+    (save-excursion
+      (set-buffer (process-buffer process))
+      (goto-char (point-max))
+      (delete-process process)
+      )))
 
 (defun pop3-uidl (process &optional msgno)
   "Return the results of a UIDL command in PROCESS for optional MSGNO.
@@ -480,22 +479,20 @@ where
       (pop3-send-command process (format "UIDL %d" msgno))
     (pop3-send-command process "UIDL"))
   
-  (let ((uidl-not-supported 
-	 (condition-case nil
-	     (progn (pop3-read-response process t) nil)
-	   (error t))))
-    (unless uidl-not-supported
-      (let (pairs uidl)
-        (save-excursion
-	  (save-restriction
-	    (apply 'narrow-to-region (pop3-get-extended-response process))
-	    (goto-char (point-min))
-	    (while (looking-at "\\([^ \n\t]*\\) \\([^ \n\t]*\\)")
-	      (setq msgno (string-to-int (match-string 1))
-		    uidl (match-string 2))
-	      (push (cons msgno uidl) pairs)
-	      (beginning-of-line 2))
-	    (cons (length pairs) (nreverse pairs))))))))
+  (if (null (pop3-read-response process t))
+      nil ;; UIDL is not supported on this server
+    (let (pairs uidl)
+      (save-excursion
+	(save-restriction
+	  (apply 'narrow-to-region (pop3-get-extended-response process))
+	  (goto-char (point-min))
+	  (while (looking-at "\\([^ \n\t]*\\) \\([^ \n\t]*\\)")
+	    (setq msgno (string-to-int (match-string 1))
+		  uidl (match-string 2))
+	    (push (cons msgno uidl) pairs)
+	    (beginning-of-line 2))
+	  (cons (length pairs) (nreverse pairs))
+	  )))))
 
 (defun pop3-list (process &optional msgno)
   "Return the results of a LIST command for PROCESS and optional MSGNO.
@@ -512,22 +509,20 @@ where
       (pop3-send-command process (format "LIST %d" msgno))
     (pop3-send-command process "LIST"))
 
-  (let ((bad-msgno 
-	 (condition-case nil
-	     (progn (pop3-read-response process t) nil)
-	   (error t))))
-    (unless bad-msgno
-      (let (pairs len)
-	(save-excursion
-	  (save-restriction
-	    (apply 'narrow-to-region (pop3-get-extended-response process))
-	    (goto-char (point-min))
-	    (while (looking-at "\\([^ \n\t]*\\) \\([^ \n\t]*\\)")
-	      (setq msgno (string-to-int (match-string 1))
-		    len (string-to-int (match-string 2)))
-	      (push (cons msgno len) pairs)
-	      (beginning-of-line 2))
-	    (cons (length pairs) (nreverse pairs))))))))
+  (if (null (pop3-read-response process t))
+      nil ;; MSGNO is not valid number
+    (let (pairs len)
+      (save-excursion
+	(save-restriction
+	  (apply 'narrow-to-region (pop3-get-extended-response process))
+	  (goto-char (point-min))
+	  (while (looking-at "\\([^ \n\t]*\\) \\([^ \n\t]*\\)")
+	    (setq msgno (string-to-int (match-string 1))
+		  len (string-to-int (match-string 2)))
+	    (push (cons msgno len) pairs)
+	    (beginning-of-line 2))
+	  (cons (length pairs) (nreverse pairs))
+	  )))))
 
 ;;; Utility code
 
@@ -535,8 +530,9 @@ where
   "Get the extended pop3 response in the PROCESS buffer."
   (let ((start pop3-read-point) end)
     (set-buffer (process-buffer process))
-    (while (not (re-search-forward "^\\.\r\n" nil t))
-      (accept-process-output process)
+    (goto-char start)
+    (while (not (re-search-forward "\\.\r\n" nil t))
+      (accept-process-output process 3)
       (goto-char start))
     (setq pop3-read-point (point-marker))
     (goto-char (match-beginning 0))
