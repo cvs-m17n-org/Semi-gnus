@@ -37,6 +37,11 @@
   (require 'gnus-win)
   (require 'cl))
 
+(add-to-list 'gnus-user-group-parameters
+	     '(bbdb-auto-create-p
+	       (const :tag "Auto register address to BBDB" t)
+	       "Create new bbdb records people you receive mail from."))
+
 (defvar gnus-bbdb/decode-field-body-function 'nnheader-decode-field-body
   "*Field body decoder.")
 
@@ -71,6 +76,11 @@ the user confirms the creation."
 	  (bbdb-annotate-message-sender from t
 					(or (bbdb-invoke-hook-for-value
 					     bbdb/news-auto-create-p)
+					    (gnus-group-find-parameter
+					     (with-current-buffer
+						 gnus-article-current-summary
+					       gnus-newsgroup-name)
+					     'bbdb-auto-create-p t)
 					    offer-to-create)
 					offer-to-create))))))
 
