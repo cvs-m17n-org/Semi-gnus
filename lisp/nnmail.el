@@ -538,7 +538,7 @@ parameter.  It should return nil, `warn' or `delete'."
   "Coding system used in reading inbox")
 
 (defvar nnmail-pathname-coding-system nil
-  "*Coding system for pathname.")
+  "*Coding system for file name.")
 
 (defun nnmail-find-file (file)
   "Insert FILE in server buffer safely."
@@ -555,7 +555,7 @@ parameter.  It should return nil, `warn' or `delete'."
       (file-error nil))))
 
 (defun nnmail-group-pathname (group dir &optional file)
-  "Make pathname for GROUP."
+  "Make file name for GROUP."
   (concat
    (let ((dir (file-name-as-directory (expand-file-name dir))))
      (setq group (nnheader-replace-duplicate-chars-in-string
@@ -786,7 +786,9 @@ If SOURCE is a directory spec, try to return the group name component."
     (if (not (and (re-search-forward "^From " nil t)
 		  (goto-char (match-beginning 0))))
 	;; Possibly wrong format?
-	(error "Error, unknown mail format! (Possibly corrupted.)")
+	(error "Error, unknown mail format! (Possibly corrupted %s `%s'.)"
+	       (if (buffer-file-name) "file" "buffer")
+	       (or (buffer-file-name) (buffer-name)))
       ;; Carry on until the bitter end.
       (while (not (eobp))
 	(setq start (point)

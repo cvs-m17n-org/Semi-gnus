@@ -1004,14 +1004,14 @@ care in handling it.
 @subsection Using PGP/MIME
 
 @sc{pgp/mime} requires an external OpenPGP implementation, such as GNU
-Privacy Guard (@uref{http://www.gnupg.org/}).  It also requires an
-Emacs interface to it, such as Mailcrypt (available from
-@uref{http://www.nb.net/~lbudney/linux/software/mailcrypt.html}) or
-Florian Weimer's @code{gpg.el}.
+Privacy Guard (@uref{http://www.gnupg.org/}).  One Emacs interface to
+OpenPGP implementations, PGG (@pxref{Top, ,PGG, pgg, PGG Manual}), is
+included, but Mailcrypt and Florian Weimer's @code{gpg.el} are also
+supported.
 
 @vindex gpg-temp-directory
 Note, if you are using the @code{gpg.el} you must make sure that the
-path specified by @code{gpg-temp-directory} have permissions 0700.
+directory specified by @code{gpg-temp-directory} have permissions 0700.
 
 Creating your own OpenPGP key is described in detail in the
 documentation of your OpenPGP implementation, so we refer to it.
@@ -1413,9 +1413,9 @@ the problem will actually occur.
 
 @item message-send-mail-partially-limit
 @vindex message-send-mail-partially-limit
-The limitation of messages sent as message/partial.
-The lower bound of message size in characters, beyond which the message
-should be sent in several parts. If it is nil, the size is unlimited.
+The limitation of messages sent as message/partial.  The lower bound
+of message size in characters, beyond which the message should be sent
+in several parts.  If it is @code{nil}, the size is unlimited.
 
 @end table
 
@@ -1834,11 +1834,13 @@ This function won't add the header if the header is already present.
 
 @item message-send-mail-hook
 @vindex message-send-mail-hook
-Hook run before sending mail messages.
+Hook run before sending mail messages.  This hook is run very late --
+just before the message is actually sent as mail.
 
 @item message-send-news-hook
 @vindex message-send-news-hook
-Hook run before sending news messages.
+Hook run before sending news messages.  This hook is run very late --
+just before the message is actually sent as news.
 
 @item message-sent-hook
 @vindex message-sent-hook

@@ -1,5 +1,5 @@
 ;;; gnus-ems.el --- functions for making Gnus work under different Emacsen
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -147,6 +147,10 @@
        transient-mark-mode
        (boundp 'mark-active)
        mark-active))
+
+(defun gnus-mark-active-p ()
+  "Non-nil means the mark and region are currently active in this buffer."
+  mark-active) ; aliased to region-exists-p in XEmacs.
 
 (if (fboundp 'add-minor-mode)
     (defalias 'gnus-add-minor-mode 'add-minor-mode)

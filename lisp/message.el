@@ -1178,18 +1178,23 @@ candidates:
 The cdr of each entry is a function for applying the face to a region.")
 
 (defcustom message-send-hook nil
-  "Hook run before sending messages."
+  "Hook run before sending messages.
+This hook is run quite early when sending."
   :group 'message-various
   :options '(ispell-message)
   :type 'hook)
 
 (defcustom message-send-mail-hook nil
-  "Hook run before sending mail messages."
+  "Hook run before sending mail messages.
+This hook is run very late -- just before the message is sent as
+mail."
   :group 'message-various
   :type 'hook)
 
 (defcustom message-send-news-hook nil
-  "Hook run before sending news messages."
+  "Hook run before sending news messages.
+This hook is run very late -- just before the message is sent as
+news."
   :group 'message-various
   :type 'hook)
 
@@ -1410,6 +1415,10 @@ no, only reply back to the author."
   "Delete the current line (and the next N lines)."
   `(delete-region (progn (beginning-of-line) (point))
 		  (progn (forward-line ,(or n 1)) (point))))
+
+(defun message-mark-active-p ()
+  "Non-nil means the mark and region are currently active in this buffer."
+  mark-active)
 
 (defun message-unquote-tokens (elems)
   "Remove double quotes (\") from strings in list ELEMS."
@@ -2053,13 +2062,19 @@ Point is left at the beginning of the narrowed-to region."
 (easy-menu-define
   message-mode-menu message-mode-map "Message Menu."
   `("Message"
-    ["Yank Original" message-yank-original t]
+    ["Yank Original" message-yank-original message-reply-buffer]
     ["Fill Yanked Message" message-fill-yanked-message t]
     ["Insert Signature" message-insert-signature t]
     ["Caesar (rot13) Message" message-caesar-buffer-body t]
-    ["Caesar (rot13) Region" message-caesar-region (mark t)]
-    ["Elide Region" message-elide-region (mark t)]
-    ["Delete Outside Region" message-delete-not-region (mark t)]
+    ["Caesar (rot13) Region" message-caesar-region (message-mark-active-p)]
+    ["Elide Region" message-elide-region 
+     :active (message-mark-active-p)
+     ,@(if (featurep 'xemacs) nil
+	 '(:help "Replace text in region with an ellipsis"))]
+    ["Delete Outside Region" message-delete-not-region 
+     :active (message-mark-active-p)
+     ,@(if (featurep 'xemacs) nil
+	 '(:help "Delete all quoted text outside region"))]
     ["Kill To Signature" message-kill-to-signature t]
     ["Newline and Reformat" message-newline-and-reformat t]
     ["Rename buffer" message-rename-buffer t]
@@ -2068,7 +2083,8 @@ Point is left at the beginning of the narrowed-to region."
 	 '(:help "Spellcheck this message"))]
     "----"
     ["Insert Region Marked" message-mark-inserted-region
-     ,@(if (featurep 'xemacs) '(t)
+     :active (message-mark-active-p)
+     ,@(if (featurep 'xemacs) nil
 	 '(:help "Mark region with enclosing tags"))]
     ["Insert File Marked..." message-mark-insert-file
      ,@(if (featurep 'xemacs) '(t)
@@ -3136,6 +3152,7 @@ It should typically alter the sending method in some way or other."
       (when (funcall (cadr elem))
 	(when (and (or (not (memq (car elem)
 				  message-sent-message-via))
+		       (not (message-fetch-field "supersedes"))
 		       (if (or (message-gnksa-enable-p 'multiple-copies)
 			       (not (eq (car elem) 'news)))
 			   (y-or-n-p

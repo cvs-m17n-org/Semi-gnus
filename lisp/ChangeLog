@@ -1,3 +1,266 @@
+2003-01-21 07:15:41 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
+
+	* gnus.el: Oort Gnus v0.13 is released.
+
+2003-01-21  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-button-url-regexp): Removed |.
+
+	* message.el (message-send-hook): Doc fix.
+
+	* gnus-win.el (gnus-buffer-configuration): Display article
+	instead of article-copy when `reply'.
+
+2003-01-21  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.el (gnus-format): Change customize group to gnus.
+	(gnus-cache): Add link.
+	(gnus-group-charter-alist): Fix docstring.
+
+2003-01-20  Jesper Harder  <harder@ifa.au.dk>
+
+	* mailcap.el (mailcap-print-command): lpr-command might be
+	unbound in XEmacs.
+
+2002-01-18  Kevin Greiner  <kgreiner@xpediantsolutions.com>
+
+	* gnus-agent.el (gnus-agent-regenerate-group): Added interactive form.
+
+	* gnus-sum.el (gnus-summary-update-article-line): Fixed
+	calculation of net characters added for use in the gnus-data
+	structure.
+	
+2003-01-18  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* nnmail.el (nnmail-process-unix-mail-format): Improve error
+	message.  Suggested by Jari Aalto.
+
+2003-01-17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-article-followup-with-original): Clean up. 
+	(gnus-article-reply-with-original): Ditto.
+
+	* gnus-sum.el (gnus-summary-catchup): Make sure downloadable,
+	read articles don't become unread.
+
+2003-01-17  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-fun.el (gnus-x-face-from-file): 
+	(gnus-face-from-file): Suggest image format in minibuffer prompt.
+
+	* gnus-fun.el (gnus-convert-image-to-x-face-command)
+	(gnus-convert-image-to-face-command): Doc fix.
+
+2003-01-17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-fun.el (gnus-convert-face-to-png): Protect against errors.
+
+2003-01-17  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-mime-print-part): Use mm-save-part-to-file to
+	avoid encoding problems.
+
+	* mailcap.el (mailcap-ps-command): New variable.
+	(mailcap-mime-data): Add print entry where applicable.  Use
+	pdftotext on a tty.
+
+2003-01-16  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-alter-header-function): Add type and group.
+
+2003-01-16  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-fun.el (gnus-convert-image-to-x-face-command) 
+	(gnus-convert-image-to-face-command, gnus-x-face-from-file) 
+	(gnus-face-from-file): Doc fix; don't mention image format.
+
+2003-01-16  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-get-article-as-filename): new function (unused for now)
+	(spam-get-article-as-buffer): new function
+	(spam-get-article-as-string): use spam-get-article-as-buffer
+	(spam-summary-prepare-exit): fixed bug, noticed by Malcolm Purvis
+
+2003-01-15  ShengHuo ZHU  <zsh@cs.rochester.edu>
+ 
+	* gnus-agent.el: Don't use `path'.
+	From the GNU coding standards:
+	
+	    Please do not use the term ``pathname'' that is used in Unix
+	    documentation; use ``file name'' (two words) instead.  We use
+	    the term ``path'' only for search paths, which are lists of
+	    directory names.
+
+	* nnsoup.el (nnsoup-file-name): Ditto.
+ 
+	* nnmail.el (nnmail-pathname-coding-system): Ditto.
+       	(nnmail-group-pathname): Ditto.
+ 
+	* nnimap.el (nnimap-group-overview-filename): Ditto.
+ 
+	* nnheader.el (nnheader-pathname-coding-system): Ditto.
+	(nnheader-group-pathname): Ditto.
+ 
+	* nnfolder.el (nnfolder-group-pathname): Ditto.
+ 
+	* gnus.el (gnus-home-directory): Ditto.
+ 
+	* gnus-group.el (gnus-group-icon-list): Ditto.
+ 
+2003-01-16  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-mime-print-part): Use mm-handle-media-type.
+
+	* message.el (message-mode-menu): Use it.
+	(message-mode-menu): Deactivate "Yank Original" if there's no
+	reply buffer.
+
+	* messagexmas.el (message-xmas-redefine): Redefine in XEmacs.
+
+	* message.el (message-mark-active-p): New function.
+
+2003-01-15  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-use-bogofilter-headers, spam-bogofilter-header) 
+	(spam-bogofilter-database-directory): new variables
+	(spam-check-bogofilter-headers, spam-check-bogofilter) 
+	(spam-bogofilter-register-with-bogofilter) 
+	(spam-bogofilter-register-spam-routine) 
+	(spam-bogofilter-register-ham-routine) 
+	(spam-group-ham-processor-bogofilter-p): new functions for the new
+	Bogofilter interface
+	(spam-summary-prepare-exit): use the new Bogofilter functions
+	(spam-list-of-checks): added spam-use-bogofilter-headers
+	(spam-bogofilter-score): rewrote function
+	(spam-check-bogofilter): optional score parameter, uses
+	spam-check-bogofilter-headers better
+	(spam-check-bogofilter-headers): optional score parameter
+
+	* gnus.el (gnus-install-group-spam-parameters): new variable, t by
+	default, in the gnus-start customization group.  Used to disable
+	the spam-*/ham-* parameters.
+	(gnus-group-ham-exit-processor-bogofilter): new ham processor
+
+2003-01-15  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-xmas.el (gnus-xmas-redefine): Use region-exists-p in
+	XEmacs.
+
+	* gnus-ems.el (gnus-mark-active-p): do.
+
+2003-01-15  Kevin Ryde  <user42@zip.com.au>
+
+	* gnus.texi (Using MIME): Mention auto-compression-mode with
+	gnus-mime-copy-part.
+
+2003-01-15  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-send): Don't warn about duplicates when
+	superseding. 
+
+2003-01-15  Simon Josefsson  <jas@extundo.com>
+
+	* nnimap.el (nnimap-split-download-body): New variable.
+	(nnimap-split-articles): Use it.
+
+2002-01-14  Kevin Greiner  <kgreiner@xpediantsolutions.com>
+
+	* gnus-agent.el (gnus-agent-check-overview-buffer): This data
+	integrity checker was incorrectly flagging, and removing, articles
+	whose article number was negative.
+	(gnus-agent-fetch-group-1): When executed in the group's summary
+	buffer, refresh each downloaded line to update the status flag and
+	font.  Preserve the value of gnus-newsgroup-headers so that
+	gnus-agent-fetch-articles can split the requests by size.
+	(gnus-agent-expire): Corrected day calculation for when
+	gnus-agent-expire-days contains a list.
+
+2003-01-14  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-audio.el (gnus-audio-au-player): Use executable-find. 
+
+2003-01-13  Jhair Tocancipa Triana <jhair_tocancipa@@gmx.net>
+
+	* gnus-audio.el (gnus-audio-au-player, gnus-audio-wav-player): Use
+	  /usr/bin/play as default player. 
+	  (gnus-audio-play): Added ARG-DESCRIPTOR to prompt for a file to play.
+
+2003-01-14  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-msg.el (gnus-inews-add-send-actions): Allow a list of
+	articles to be marked as well.
+
+2002-01-14  Kevin Greiner  <kgreiner@xpediantsolutions.com>
+	* gnus-agent.el (gnus-agent-get-undownloaded-list): Include the
+	fictious headers generated by nnagent (ie. Undownloaded Article
+	####) in the list of articles that have not been downloaded.
+	
+	* gnus-int.el (): Added require declarations to resolve
+	compile-time warnings.
+	(gnus-open-server): If the server status is set to offline,
+	recursively execute gnus-open-server to open the offline backend
+	(e.g. nnagent).
+
+2003-01-14  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-article-reply-with-original): Use
+	gnus-mark-active-p.
+	(gnus-article-followup-with-original): do.
+
+2003-01-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-sum.el: Removed `(when t ...)' around `gnus-define-keys'.
+
+2003-01-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-score.el (gnus-score-edit-file-at-point): New function.
+	(gnus-score-find-trace): Bind it to `e' key.  Added `q' for quit.
+
+2003-01-13  Romain FRANCOISE  <romain@orebokech.com>
+
+	* gnus-fun.el (gnus-x-face-from-file): Quote file name. 
+	(gnus-face-from-file): Ditto.
+
+2003-01-13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-articles-to-read): Don't just apply
+	gnus-alter-articles-to-read-function to the unread articles. 
+
+2003-01-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* deuglify.el (gnus-article-outlook-unwrap-lines)
+	(gnus-article-outlook-repair-attribution)
+	(gnus-article-outlook-rearrange-citation): New function names,
+	renamed from "gnus-outlook-" to "gnus-article-outlook-".  Changed
+	doc-string.
+
+	* gnus-sum.el (gnus-summary-mode-map): Use new function names,
+	removed `W k' key binding (use `W Y f' instead).
+	(gnus-summary-make-menu-bar): Use new function names.
+
+2003-01-13  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-fun.el (gnus-random-x-face): Doc fix.
+	(gnus-insert-random-x-face-header): New function.
+
+2003-01-13  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-sum.el (gnus-summary-make-menu-bar): Deactivate items if
+	mark is not active.
+
+	* gnus-msg.el (gnus-inews-do-gcc): Comment.
+
+	* gnus-ems.el (gnus-mark-active-p): New function.
+
+	* gnus-group.el (gnus-topic-mode-p): New function.
+	(gnus-group-make-menu-bar): Show more key bindings in topic mode.
+	Deactivate items if mark is not active.
+
+2003-01-12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.el (gnus-version-number): Bumped version.
+	(gnus-summary-line-format): Doc fix.
+
 2003-01-12 22:02:49 Lars Magne Ingebrigtsen <lars@ingebrigtsen.no>
 
 	* gnus.el: Oort Gnus v0.12 is released.

@@ -1,3 +1,84 @@
+2003-01-21  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Various Summary Stuff): Add
+	gnus-summary-display-while-building.
+	(Group Parameters): Index gnus-parameters.
+	(Startup Files): Index gnus-site-init-file
+
+2003-01-20  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Summary Buffer Lines): Additions to %B.
+
+	* gnus.texi: Markup fixes: use @code for nil and t, use @file for
+	files.
+	
+	* message.texi: do.
+
+	* emacs-mime.texi: do.
+	
+2003-01-19  Jesper Harder  <harder@ifa.au.dk>
+
+	* dir (File): Add pgg.
+
+	* gnus.texi (Selecting a Group): Index gnus-auto-select-subject
+
+	* emacs-mime.texi (Display Customization): Add mm-keep-viewer-alive-types
+
+2003-01-16  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Summary Agent Commands): Addition.
+
+2003-01-16  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Filtering Spam Using The Spam ELisp Package):
+	clarified syntax of gnus-spam-process-destinations and
+	gnus-ham-process-destinations variables
+	(Extending the spam elisp package): fixed typo in node name
+	(Bogofilter): new functionality and variables noted
+	(Filtering Spam Using The Spam ELisp Package): added mention of
+	nnimap-split-download-body
+
+2003-01-15  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi: Don't use `path' in some cases. 
+	From the GNU coding standards:
+	
+	    Please do not use the term ``pathname'' that is used in Unix
+	    documentation; use ``file name'' (two words) instead.  We use
+	    the term ``path'' only for search paths, which are lists of
+	    directory names.
+
+	* message.texi: Ditto.
+
+2003-01-15  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (X-Face): Revert substantial part of last fix.
+	(Splitting in IMAP): Add.
+
+2003-01-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Window Layout): Fixed braces in example.
+
+2003-01-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Article Washing): Use new function names in
+	`deuglify.el'.  Addition.
+
+2003-01-13  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (X-Face): Fix.
+
+	* message.texi (Security): Fix.
+
+	* gnus.texi (Security): Fix.
+	(Signing and encrypting): Fix.
+
+2003-01-12  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Filtering Spam Using The Spam ELisp Package): removed
+	spam.el and spam-stat.el from the node and section names wherever
+	possible, since info indexing doesn't like `.' in the name
+
 2003-01-12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Article Display): Addition.

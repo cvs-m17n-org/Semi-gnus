@@ -234,12 +234,12 @@ node `(gnus)Server Buffer'.")
 	    (cadr gnus-command-method))))
 
 (defsubst gnus-agent-directory ()
-  "Path of the Gnus agent directory."
+  "The name of the Gnus agent directory."
   (nnheader-concat gnus-agent-directory
 		   (nnheader-translate-file-chars (gnus-agent-method)) "/"))
 
 (defun gnus-agent-lib-file (file)
-  "The full path of the Gnus agent library FILE."
+  "The full name of the Gnus agent library FILE."
   (expand-file-name file
 		    (file-name-as-directory
 		     (expand-file-name "agent.lib" (gnus-agent-directory)))))
@@ -757,7 +757,11 @@ article's mark is toggled."
 	    (cond ((< a h)
 		   (pop alist)) ; ignore IDs in the alist that are not being displayed in the summary
 		  ((> a h)
-		   (pop headers)) ; ignore headers that are not in the alist as these should be fictious (see nnagent-retrieve-headers).
+                   ;; headers that are not in the alist should be
+                   ;; fictious (see nnagent-retrieve-headers); they
+                   ;; imply that this article isn't in the agent.
+		   (gnus-agent-append-to-list tail h)
+                   (pop headers)) 
 		  ((cdar alist)
 		   (pop alist)
 		   (pop headers)
@@ -767,6 +771,9 @@ article's mark is toggled."
 		   (pop alist)
 		   (pop headers)
 		   (gnus-agent-append-to-list tail a)))))
+
+	(while headers
+          (gnus-agent-append-to-list tail (mail-header-number (pop headers))))
 	(setq gnus-newsgroup-undownloaded (cdr undownloaded))))))
 
 (defun gnus-agent-catchup ()
@@ -926,7 +933,7 @@ This can be added to `gnus-select-article-hook' or
 	  (delete-char 1))))))
 
 (defun gnus-agent-group-path (group)
-  "Translate GROUP into a path."
+  "Translate GROUP into a file name."
   (if nnmail-use-long-file-names
       (gnus-group-real-name group)
     (nnheader-translate-file-chars
@@ -1167,18 +1174,13 @@ and that there are no duplicates."
               (gnus-message 1
 			    "Duplicate overview line for %d" cur)
 	      (delete-region (point) (progn (forward-line 1) (point))))
-	     ((< cur 0)
+	     ((< cur prev-num)
 	      (or backed-up
                   (setq backed-up (gnus-agent-backup-overview-buffer)))
-              (gnus-message 1 "Junk article number %d" cur)
-	      (delete-region (point) (progn (forward-line 1) (point))))
-	     ((< cur prev-num)
+              (gnus-message 1 "Overview buffer not sorted!")
 	      (sort-numeric-fields 1 (point-min) (point-max))
 	      (goto-char (point-min))
-	      (setq prev-num -1)
-	      (or backed-up
-                  (setq backed-up (gnus-agent-backup-overview-buffer)))
-              (gnus-message 1 "Overview buffer not sorted!"))
+	      (setq prev-num -1))
 	     (t
 	      (setq prev-num cur)))
 	    (forward-line 1)))))))
@@ -1577,7 +1579,6 @@ of FILE placing the combined headers in nntp-server-buffer."
           (setq gnus-newsgroup-dependencies
                 (or gnus-newsgroup-dependencies
                     (make-vector (length articles) 0)))
-
           (setq gnus-newsgroup-headers
                 (or gnus-newsgroup-headers
                     (gnus-get-newsgroup-headers-xover articles nil nil
@@ -1615,7 +1616,8 @@ of FILE placing the combined headers in nntp-server-buffer."
             (let ((arts (list nil)))
               (let ((arts-tail arts)
                     (alist (gnus-agent-load-alist group))
-                    (marked-articles marked-articles))
+                    (marked-articles marked-articles)
+                    (gnus-newsgroup-headers gnus-newsgroup-headers))
                 (while (setq gnus-headers (pop gnus-newsgroup-headers))
                   (let ((num (mail-header-number gnus-headers)))
                     ;; Determine if this article is already in the cache
@@ -1649,15 +1651,21 @@ of FILE placing the combined headers in nntp-server-buffer."
 
                 (let ((unfetched-articles (gnus-sorted-ndifference (cdr arts) fetched-articles)))
                   (if gnus-newsgroup-active
+                      ;; Update the summary buffer
                       (progn
                         (dolist (article marked-articles)
                           (when (gnus-summary-goto-subject article nil t)
                             (gnus-summary-set-agent-mark article t)))
                         (dolist (article fetched-articles)
                           (if gnus-agent-mark-unread-after-downloaded
-                              (gnus-summary-mark-article article gnus-unread-mark)))
+                              (gnus-summary-mark-article article gnus-unread-mark))
+                          (when (gnus-summary-goto-subject article nil t)
+                            (gnus-summary-update-download-mark article)))
                         (dolist (article unfetched-articles)
                           (gnus-summary-mark-article article gnus-canceled-mark)))
+
+                    ;; Update the group buffer.
+
                     ;; When some, or all, of the marked articles came
                     ;; from the download mark.  Remove that mark.  I
                     ;; didn't do this earlier as I only want to remove
@@ -2078,7 +2086,20 @@ FORCE is equivalent to setting gnus-agent-expire-days to zero(0)."
 				     (gnus-agent-directory)
 				     (gnus-agent-group-path expiring-group) "/"))
 			       (active
-				(gnus-gethash-safe expiring-group orig)))
+				(gnus-gethash-safe expiring-group orig))
+                               (day (if (numberp day)
+                                        day
+                                      (let (found
+                                            (days gnus-agent-expire-days))
+                                        (catch 'found
+                                          (while (and (not found)
+                                                      days)
+                                            (when (eq 0 (string-match (caar days) expiring-group))
+                                              (throw 'found (- (time-to-days (current-time)) (cadar days))))
+                                            (pop days))
+                                          ;; No regexp matched so set a limit that will block expiration in this group
+                                          0)))))
+                                        
 			  (when active
 			    (gnus-agent-load-alist expiring-group)
 			    (gnus-message 5 "Expiring articles in %s" expiring-group)
@@ -2232,17 +2253,7 @@ FORCE is equivalent to setting gnus-agent-expire-days to zero(0)."
 
 					     ;; We now have the arrival day, so we see
 					     ;; whether it's old enough to be expired.
-					     ((< fetch-date
-						 (if (numberp day)
-						     day
-						   (let (found
-							 (days gnus-agent-expire-days))
-						     (while (and (not found)
-								 days)
-						       (when (eq 0 (string-match (caar days) expiring-group))
-							 (setq found (cadar days)))
-						       (pop days))
-						     found)))
+					     ((< fetch-date day)
 					      'expired)
 					     (force
 					      'forced)))
@@ -2493,6 +2504,15 @@ FORCE is equivalent to setting gnus-agent-expire-days to zero(0)."
 
 (defun gnus-agent-regenerate-group (group &optional reread)
   "Regenerate GROUP.  If REREAD is t, all articles in the .overview are marked as unread.  If REREAD is not nil, downloaded articles are marked as unread."
+  (interactive (list (let ((def (or (gnus-group-group-name)
+                                    gnus-newsgroup-name)))
+                       (let ((select (read-string (if def (concat "Group Name (" def "): ")
+                                          "Group Name: "))))
+                         (if (and (equal "" select)
+                                  def)
+                             def
+                           select)))
+                     (intern-soft (read-string "Reread (nil)? (t=>all, nil=>none, some=>all downloaded): "))))
   (gnus-message 5 "Regenerating in %s" group)
   (let* ((gnus-command-method (or gnus-command-method
                                   (gnus-find-method-for-group group)))

@@ -36,12 +36,16 @@
   :type 'string)
 
 (defcustom gnus-convert-image-to-x-face-command "giftopnm %s | ppmnorm | pnmscale -width 48 -height 48 | ppmtopgm | pgmtopbm | pbmtoxbm | compface"
-  "Command for converting a GIF to an X-Face."
+  "Command for converting an image to an X-Face.
+By default it takes a GIF filename and output the X-Face header data
+on stdout."
   :group 'gnus-fun
   :type 'string)
 
 (defcustom gnus-convert-image-to-face-command "djpeg %s | ppmnorm | pnmscale -width 48 -height 48 | ppmquant %d | pnmtopng"
-  "Command for converting a GIF to an X-Face."
+  "Command for converting an image to an Face.
+By default it takes a JPEG filename and output the Face header data
+on stdout."
   :group 'gnus-fun
   :type 'string)
 
@@ -60,7 +64,7 @@ Output to the current buffer, replace text, and don't mingle error."
 
 ;;;###autoload
 (defun gnus-random-x-face ()
-  "Insert a random X-Face header from `gnus-x-face-directory'."
+  "Return X-Face header data chosen randomly from `gnus-x-face-directory'."
   (interactive)
   (when (file-exists-p gnus-x-face-directory)
     (let* ((files (directory-files gnus-x-face-directory t "\\.pbm$"))
@@ -71,18 +75,31 @@ Output to the current buffer, replace text, and don't mingle error."
 		 (shell-quote-argument file)))))))
 
 ;;;###autoload
+(defun gnus-insert-random-x-face-header ()
+  "Insert a random X-Face header from `gnus-x-face-directory'."
+  (interactive)
+  (let ((data (gnus-random-x-face)))
+    (save-excursion
+      (message-goto-eoh)
+      (if data
+	  (insert "X-Face: " data)
+	(message
+	 "No face returned by `gnus-random-x-face'.  Does %s/*.pbm exist?"
+	 gnus-x-face-directory)))))
+
+;;;###autoload
 (defun gnus-x-face-from-file (file)
   "Insert an X-Face header based on an image file."
-  (interactive "fImage file name:" )
+  (interactive "fImage file name (by default GIF): ")
   (when (file-exists-p file)
     (gnus-shell-command-to-string
      (format gnus-convert-image-to-x-face-command
-	     (shell-quote-argument file)))))
+	     (shell-quote-argument (expand-file-name file))))))
 
 ;;;###autoload
 (defun gnus-face-from-file (file)
   "Return an Face header based on an image file."
-  (interactive "fImage file name:" )
+  (interactive "fImage file name (by default JPEG): ")
   (when (file-exists-p file)
     (let ((done nil)
 	  (attempt "")
@@ -93,7 +110,7 @@ Output to the current buffer, replace text, and don't mingle error."
 	(setq attempt
 	      (gnus-shell-command-to-string
 	       (format gnus-convert-image-to-face-command
-		       (shell-quote-argument file)
+		       (shell-quote-argument (expand-file-name file))
 		       quant)))
 	(if (> (length attempt) 740)
 	    (progn
@@ -121,7 +138,8 @@ Output to the current buffer, replace text, and don't mingle error."
 (defun gnus-convert-face-to-png (face)
   (mm-with-unibyte-buffer
     (insert face)
-    (base64-decode-region (point-min) (point-max))
+    (ignore-errors
+      (base64-decode-region (point-min) (point-max)))
     (buffer-string)))
 
 (defun gnus-convert-image-to-gray-x-face (file depth)
