@@ -12554,6 +12554,11 @@ Gnus を使って新しいメールを読む事は非常に簡単です。あなたのメールバック
 ("list.\\1" "From:.* \\(.*\\)-list@@majordomo.com")
 @end lisp
 
+@noindent
+この場合、挿入されるテキストを小文字にすべきかどうか
+を @code{nnmail-split-lowercase-expanded} が制御します。@xref{Fancy Mail
+Splitting}.
+
 二番目の要素は関数である事もできます。その場合は、それは法則の最初の要素
 を引数として、ヘッダーに範囲を狭めて (narrowed to headers) 呼ばれます。
 それは、メールがそのグループに属すると考えるのであれば、@code{nil} でな
@@ -13422,6 +13427,14 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 もし文字列が要素 @samp{\&} を含んでいると、代わりに前で合致した文字列が
 使われます。同様に、要素 @samp{\\1} から @samp{\\9} まではグループ付
 け 1 から 9 までで合致した文字列で代替されます。
+
+@vindex nnmail-split-lowercase-expanded
+ここで、合致した文字列を小文字にしたもので代替するべきかどうか
+を @code{nnmail-split-lowercase-expanded} が制御します。これを
+非-@code{nil} にすることによって、アドレスに大文字と小文字が区別せずに使
+われている (例えば mailing-list@@domain と Mailing-List@@Domain) 場合で
+も、複数のグループが生成されてしまうことを避けることができます。ディフォ
+ルトは @code{t} です。
 
 @vindex nnmail-split-fancy-match-partial-words
 @code{nnmail-split-fancy-match-partial-words} は、特級分割で部分的な語が
