@@ -2,11 +2,11 @@ prefix = @prefix@
 datadir = @datadir@
 lispdir = @lispdir@
 srcdir = @srcdir@
-PACKAGEDIR =
 
 @SET_MAKE@
 EMACS = @EMACS@
 XEMACS = xemacs
+PACKAGEDIR =
 
 all: lick info
 
@@ -19,19 +19,29 @@ install:
 	cd lisp && $(MAKE) EMACS=$(EMACS) lispdir=$(lispdir) install
 	cd texi && $(MAKE) EMACS=$(EMACS) install
 
-package: all
-	cd lisp && $(MAKE) EMACS="$(EMACS)" package
+# Rule for XEmacs package.
+package: xlick xinfo
+	cd lisp && $(MAKE) EMACS=$(XEMACS) package
 
-install-package: info
-	cd lisp && $(MAKE) EMACS="$(EMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
+install-package: xinfo
+	cd lisp && $(MAKE) EMACS=$(XEMACS) PACKAGEDIR=$(PACKAGEDIR) \
 		install-package
 
-package-ja: all-ja
-	cd lisp && $(MAKE) EMACS="$(EMACS)" package
+package-ja: xlick xinfo xinfo-ja
+	cd lisp && $(MAKE) EMACS=$(XEMACS) package
 
-install-package-ja: info info-ja
-	cd lisp && $(MAKE) EMACS="$(EMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
+install-package-ja: xinfo xinfo-ja
+	cd lisp && $(MAKE) EMACS=$(XEMACS) PACKAGEDIR=$(PACKAGEDIR) \
 		install-package
+
+xlick:
+	cd lisp && $(MAKE) EMACS=$(XEMACS) lispdir=$(lispdir) all
+
+xinfo:
+	cd texi && $(MAKE) EMACS=$(XEMACS) all
+
+xinfo-ja:
+	cd texi && $(MAKE) EMACS=$(XEMACS) MAKEINFO=no ja
 
 # Rule for Lars and nobody else.
 some:
@@ -55,7 +65,7 @@ elclean:
 	rm lisp/*.elc
 
 x:
-	make EMACS=xemacs
+	make EMACS=$(XEMACS)
 
 distclean:
 	make clean
