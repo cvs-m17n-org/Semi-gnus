@@ -213,7 +213,9 @@ regexp.  If it matches, the text in question is not a signature."
   :group 'gnus-article-hiding)
 
 (defcustom gnus-article-x-face-command
-  (if (module-installed-p 'x-face-mule)
+  (if (and (not gnus-xemacs)
+	   window-system
+	   (module-installed-p 'x-face-mule))
       'x-face-mule-gnus-article-display-x-face
     "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | display -"
     )
@@ -885,7 +887,9 @@ See the manual for details."
 
 (defcustom gnus-treat-display-smileys
   (if (or (and gnus-xemacs (featurep 'xpm))
-	  (module-installed-p 'smiley-mule))
+	  (and (not gnus-xemacs)
+	       window-system
+	       (module-installed-p 'smiley-mule)))
       t
     nil)
   "Display smileys.
