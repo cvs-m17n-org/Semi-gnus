@@ -1,5 +1,12 @@
 2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
+	* lisp/nnshimbun.el: Add `Yomiuri' support.
+	(nnshimbun-regexp-opt): New function.
+	(nnshimbun-wired-get-all-headers): Replace regexp-opt with
+	nnshimbun-regexp-opt.
+
+2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
 	* lisp/nnshimbun.el: Add `Wired News' support.
 
 2000-05-24  Katsumi Yamaoka <yamaoka@jpl.org>
