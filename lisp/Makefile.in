@@ -42,12 +42,22 @@ install: clever
 	  fi; \
 	done
 
-package:
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-package
+# Rule for XEmacs package.
+install-package-lick:
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
+		-f dgnushack-install-package-lick $(PACKAGEDIR)
 
-install-package: clever
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-package \
-		-f dgnushack-install-package $(PACKAGEDIR)
+install-package-info:
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
+		-f dgnushack-install-package-info $(PACKAGEDIR)
+
+install-package-info-ja:
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
+		-f dgnushack-install-package-info-ja $(PACKAGEDIR)
+
+compose-package:
+	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compose-package
+#
 
 tags:
 	etags *.el

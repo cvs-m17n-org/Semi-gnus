@@ -1,3 +1,28 @@
+2000-11-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* Makefile.in (install-package-ja): Compile and install lisp files
+	first.
+	(install-package): Ditto.
+	(compose-package, install-package-info-ja, install-package-info,
+	install-package-lick): New sub targets.
+
+	* lisp/Makefile.in (install-package-info-ja, install-package-info,
+	install-package-lick): New targets.
+	(compose-package): Rename from `package'.
+	(install-package): Remove.
+
+	* lisp/dgnushack.el (dgnushack-install-package-info-ja,
+	dgnushack-install-package-info, dgnushack-install-package-lick,
+	dgnushack-install-package-pkginfo,
+	dgnushack-install-package-info-files, dgnushack-make-manifest,
+	dgnushack-gnus-product-name, dgnushack-examine-package-dir,
+	dgnushack-make-autoloads): New functions.
+	(dgnushack-install-package): Remove.
+	(dgnushack-compose-package): Rename from `dgnushack-make-package'.
+	(dgnushack-info-file-regexp-ja, dgnushack-info-file-regexp): Split
+	from `dgnushack-info-file-regexp'.
+	(dgnushack-texi-file-regexp): Remove.
+
 2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-texi-format): Remove @ignore'd areas

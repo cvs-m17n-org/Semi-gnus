@@ -17,7 +17,7 @@ lick:
 
 install: install-lisp install-info
 
-install-ja: install-lisp install-info install-info-ja
+install-ja: install install-info-ja
 
 install-lisp:
 	cd lisp && $(MAKE) EMACS="$(EMACS)" lispdir="$(lispdir)" install
@@ -28,20 +28,31 @@ install-info:
 install-info-ja:
 	cd texi && $(MAKE) EMACS="$(EMACS)" install-ja
 
-# Rule for XEmacs package.
-package: xlick xinfo
-	cd lisp && $(MAKE) EMACS="$(XEMACS)" package
+## Rule for XEmacs package.
+install-package: xlick install-package-lick xinfo install-package-info
 
-install-package: xinfo
+install-package-ja: install-package xinfo-ja install-package-info-ja
+
+package: xlick xinfo compose-package
+
+package-ja: xlick xinfo xinfo-ja compose-package
+
+# Sub-rule for XEmacs package.
+install-package-lick:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
-		install-package
+		install-package-lick
 
-package-ja: xlick xinfo xinfo-ja
-	cd lisp && $(MAKE) EMACS="$(XEMACS)" package
-
-install-package-ja: xinfo xinfo-ja
+install-package-info:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
-		install-package
+		install-package-info
+
+install-package-info-ja:
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR="$(PACKAGEDIR)" \
+		install-package-info-ja
+
+compose-package:
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" compose-package
+##
 
 xlick:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" lispdir="$(lispdir)" all
