@@ -1,3 +1,45 @@
+2004-01-07  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-score.el (gnus-score-find-trace): Add `k' (kill-buffer).
+
+2004-01-07  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-split): do not require spam-use-CHECK to be
+	enabled if that check is passed to spam-split explicitly; also
+	fix so 'spam doesn't get converted to spam-split-group when
+	spam-split-symbolic-return is t
+	(spam-find-spam): find registrations of the article and use those
+	instead of re-running spam-split to find the spam/ham
+	classification of the article
+	(spam-log-processing-to-registry, spam-log-registered-p)
+	(spam-log-unregistration-needed-p, spam-log-undo-registration):
+	use gnus-error instead of gnus-message
+	(spam-log-registration-type): new function to determine the
+	classification of a message based on registry entries; will
+	return nil if both 'spam and 'ham are found
+	(spam-check-BBDB): expand all the BBDB macros here so we can have
+	a reasonably fast local cache without the loading errors
+	(spam-cache-lookups): set to t by default
+	(spam-find-spam): don't try to guess spam-cache-lookups
+	(spam-enter-whitelist, spam-enter-blacklist): also clear the
+	spam-caches entry
+	(spam-filelist-build-cache, spam-filelist-check-cache): better
+	caching of whitelist/blacklist entries
+	(spam-check-whitelist, spam-check-blacklist): invoke
+	spam-from-listed-p with a type, not a cache variable
+	(spam-from-listed-p): wrap around spam-filelist-check-cache
+
+2004-01-07  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.el (message-cite-prefix-regexp): Use with-syntax-table.
+
+	* nnmail.el (nnmail-split-fancy): do.
+
+	* mml.el (mml-parse): do.
+
+	* gnus-score.el (gnus-enter-score-words-into-hashtb)
+	(gnus-score-adaptive): do.
+
 2004-01-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-art.el (gnus-treat-emphasize): Ignore Emacs version number.

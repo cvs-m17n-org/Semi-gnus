@@ -428,7 +428,7 @@ spamoracle database."
   "Msx" gnus-summary-mark-as-spam
   "\M-d" gnus-summary-mark-as-spam)
 
-(defvar spam-cache-lookups nil
+(defvar spam-cache-lookups t
   "Whether spam.el will try to cache lookups using spam-caches.")
 
 (defvar spam-caches (make-hash-table
@@ -906,9 +906,11 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		  decision)
 	      (while (and list-of-checks (not decision))
 		(let ((pair (pop list-of-checks)))
-		  (when (and (symbol-value (car pair))
-			     (or (null specific-checks)
-				 (memq (car pair) specific-checks)))
+		  (when (or
+			 ;; either, given specific checks, this is one of them
+			 (and specific-checks (memq (car pair) specific-checks))
+			 ;; or, given no specific checks, spam-use-CHECK is set
+			 (and (null specific-checks) (symbol-value (car pair))))
 		    (gnus-message 5 "spam-split: calling the %s function"
 				  (symbol-name (cdr pair)))
 		    (setq decision (funcall (cdr pair)))
@@ -917,8 +919,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 		      (setq spam-split-last-successful-check (car pair)))
 
 		    (when (eq decision 'spam)
-		      (if spam-split-symbolic-return
-			  (setq decision spam-split-group)
+		      (unless spam-split-symbolic-return
 			(gnus-error
 			 5
 			 (format "spam-split got %s but %s is nil"
@@ -938,8 +939,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	 (first-method (nth 0 methods))
 	 (articles (if spam-autodetect-recheck-messages
 		       gnus-newsgroup-articles
-		     gnus-newsgroup-unseen))
-	 (spam-cache-lookups (< 2 (length articles))))
+		     gnus-newsgroup-unseen)))
 
     (when (and autodetect
 	       (not (equal first-method 'none)))
@@ -947,35 +947,48 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
      (lambda (article)
        (let ((id (spam-fetch-field-message-id-fast article))
 	     (subject (spam-fetch-field-subject-fast article))
-	     (sender (spam-fetch-field-from-fast article)))
-	 (unless (and spam-log-to-registry
-		      (spam-log-registered-p id 'incoming))
-	   (let* ((spam-split-symbolic-return t)
-		  (spam-split-symbolic-return-positive t)
-		  (split-return
-		   (with-temp-buffer
-		     (gnus-request-article-this-buffer
-		      article
-		      group)
-		     (if (or (null first-method)
-			     (equal first-method 'default))
-			 (spam-split)
-		       (apply 'spam-split methods)))))
-	     (if (equal split-return 'spam)
-		 (gnus-summary-mark-article article gnus-spam-mark))
+	     (sender (spam-fetch-field-from-fast article))
+	     registry-lookup)
+	 
+	 (unless id
+	   (gnus-error 5 "Article %d has no message ID!" article))
+	 
+	 (when (and id spam-log-to-registry)
+	   (setq registry-lookup (spam-log-registration-type id 'incoming))
+	   (when registry-lookup
+	     (gnus-message 
+	      9 
+	      "spam-find-spam: message %s was already registered incoming"
+	      id)))
 
-	     (when (and split-return spam-log-to-registry)
-	       (when (zerop (gnus-registry-group-count id))
-		 (gnus-registry-add-group
-		  id group subject sender))
+	 (let* ((spam-split-symbolic-return t)
+		(spam-split-symbolic-return-positive t)
+		(split-return 
+		 (or registry-lookup
+		     (with-temp-buffer
+		       (gnus-request-article-this-buffer
+			article
+			group)
+		       (if (or (null first-method)
+			       (equal first-method 'default))
+			   (spam-split)
+			 (apply 'spam-split methods))))))
+	   (if (equal split-return 'spam)
+	       (gnus-summary-mark-article article gnus-spam-mark))
+	   
+	   (when (and id split-return spam-log-to-registry)
+	     (when (zerop (gnus-registry-group-count id))
+	       (gnus-registry-add-group
+		id group subject sender))
 	       
+	     (unless registry-lookup
 	       (spam-log-processing-to-registry
 		id
 		'incoming
 		split-return
 		spam-split-last-successful-check
 		group))))))
-     articles))))
+    articles))))
 
 (defvar spam-registration-functions
   ;; first the ham register, second the spam register function
@@ -1122,8 +1135,8 @@ functions")
 	   type
 	   cell-list))
 
-      (gnus-message 5 (format "%s called with bad ID, type, classification, check, or group"
-			      "spam-log-processing-to-registry")))))
+      (gnus-error 5 (format "%s called with bad ID, type, classification, check, or group"
+			    "spam-log-processing-to-registry")))))
 
 ;;; check if a ham- or spam-processor registration has been done
 (defun spam-log-registered-p (id type)
@@ -1132,9 +1145,25 @@ functions")
 	     (spam-process-type-valid-p type))
 	(cdr-safe (gnus-registry-fetch-extra id type))
       (progn
-	(gnus-message 5 (format "%s called with bad ID, type, classification, or check"
-				"spam-log-registered-p"))
+	(gnus-error 5 (format "%s called with bad ID, type, classification, or check"
+			      "spam-log-registered-p"))
 	nil))))
+
+;;; check what a ham- or spam-processor registration says
+;;; returns nil if conflicting registrations are found
+(defun spam-log-registration-type (id type)
+  (let ((count 0)
+	decision)
+    (dolist (reg (spam-log-registered-p id type))
+      (let ((classification (nth 0 reg)))
+	(when (spam-classification-valid-p classification)
+	  (when (and decision
+		     (not (eq classification decision)))
+	    (setq count (+ 1 count)))
+	  (setq decision classification))))
+    (if (< 0 count)
+	nil
+      decision)))
 
 ;;; check if a ham- or spam-processor registration needs to be undone
 (defun spam-log-unregistration-needed-p (id type classification check)
@@ -1152,8 +1181,8 @@ functions")
 		(setq found t))))
 	  found)
       (progn
-	(gnus-message 5 (format "%s called with bad ID, type, classification, or check"
-				"spam-log-unregistration-needed-p"))
+	(gnus-error 5 (format "%s called with bad ID, type, classification, or check"
+			      "spam-log-unregistration-needed-p"))
 	nil))))
 
 
@@ -1176,8 +1205,8 @@ functions")
 	   type
 	   new-cell-list))
       (progn
-	(gnus-message 5 (format "%s called with bad ID, type, check, or group"
-				"spam-log-undo-registration"))
+	(gnus-error 5 (format "%s called with bad ID, type, check, or group"
+			      "spam-log-undo-registration"))
 	nil))))
 
 ;;; set up IMAP widening if it's necessary
@@ -1339,19 +1368,26 @@ functions")
 	      (spam-split-group (if spam-split-symbolic-return
 				    'spam
 				  spam-split-group))
-	      bbdb-cache)
+	      bbdb-cache bbdb-hashtable)
 	  
 	  (when spam-cache-lookups
 	    (setq bbdb-cache (gethash 'spam-use-BBDB spam-caches))
 	    (unless bbdb-cache
-	      (setq bbdb-cache (bbdb-hashtable))
+	      (setq bbdb-cache
+		    ;; this is the expanded (bbdb-hashtable) macro
+		    ;; without the debugging support
+		    (with-current-buffer (bbdb-buffer)
+		      (save-excursion
+			(save-window-excursion
+			  (bbdb-records nil t)
+			  bbdb-hashtable))))
 	      (puthash 'spam-use-BBDB bbdb-cache spam-caches)))
-
 	  (when who
 	    (setq who (nth 1 (gnus-extract-address-components who)))
 	    (if
 		(if spam-cache-lookups
-		    (bbdb-gethash who bbdb-cache)
+		    (symbol-value 
+		     (intern-soft who bbdb-cache))
 		  (bbdb-search-simple nil who))
 		t
 	      (if spam-use-BBDB-exclusive
@@ -1360,8 +1396,8 @@ functions")
 
   (file-error (progn
 		(defalias 'bbdb-search-simple 'ignore)
-		(defalias 'bbdb-hashtable 'ignore)
-		(defalias 'bbdb-gethash 'ignore)
+		(defalias 'bbdb-records 'ignore)
+		(defalias 'bbdb-buffer 'ignore)
 		(defalias 'spam-check-BBDB 'ignore)
 		(defalias 'spam-BBDB-register-routine 'ignore)
 		(defalias 'spam-enter-ham-BBDB 'ignore)
@@ -1522,7 +1558,8 @@ Uses `gnus-newsgroup-name' if category is nil (for ham registration)."
 With a non-nil REMOVE, remove them."
   (interactive "sAddress: ")
   (spam-enter-list address spam-whitelist remove)
-  (setq spam-whitelist-cache nil))
+  (setq spam-whitelist-cache nil)
+  (spam-clear-cache 'spam-use-whitelist))
 
 ;;; address can be a list, too
 (defun spam-enter-blacklist (address &optional remove)
@@ -1530,7 +1567,8 @@ With a non-nil REMOVE, remove them."
 With a non-nil REMOVE, remove them."
   (interactive "sAddress: ")
   (spam-enter-list address spam-blacklist remove)
-  (setq spam-blacklist-cache nil))
+  (setq spam-blacklist-cache nil)
+  (spam-clear-cache 'spam-use-whitelist))
 
 (defun spam-enter-list (addresses file &optional remove)
   "Enter ADDRESSES into the given FILE.
@@ -1559,6 +1597,32 @@ REMOVE not nil, remove the ADDRESSES."
 	      (insert a "\n")))))
       (save-buffer))))
 
+(defun spam-filelist-build-cache (type)
+  (let ((cache (if (eq type 'spam-use-blacklist)
+		   spam-blacklist-cache
+		 spam-whitelist-cache))
+	parsed-cache)
+    (unless (gethash type spam-caches)
+      (while cache
+	(let ((address (pop cache)))
+	  (unless (zerop (length address)) ; 0 for a nil address too
+	    (setq address (regexp-quote address))
+	    ;; fix regexp-quote's treatment of user-intended regexes
+	    (while (string-match "\\\\\\*" address)
+	      (setq address (replace-match ".*" t t address))))
+	  (push address parsed-cache)))
+      (puthash type parsed-cache spam-caches))))
+
+(defun spam-filelist-check-cache (type from)
+  (when (stringp from)
+    (spam-filelist-build-cache type)
+    (let (found)
+      (dolist (address (gethash type spam-caches))
+	(when (and address (string-match address from))
+	  (setq found t)
+	  (return)))
+      found)))
+
 ;;; returns t if the sender is in the whitelist, nil or
 ;;; spam-split-group otherwise
 (defun spam-check-whitelist ()
@@ -1568,7 +1632,7 @@ REMOVE not nil, remove the ADDRESSES."
 			    spam-split-group)))
     (unless spam-whitelist-cache
       (setq spam-whitelist-cache (spam-parse-list spam-whitelist)))
-    (if (spam-from-listed-p spam-whitelist-cache)
+    (if (spam-from-listed-p 'spam-use-whitelist)
 	t
       (if spam-use-whitelist-exclusive
 	  spam-split-group
@@ -1581,7 +1645,7 @@ REMOVE not nil, remove the ADDRESSES."
 			    spam-split-group)))
     (unless spam-blacklist-cache
       (setq spam-blacklist-cache (spam-parse-list spam-blacklist)))
-    (and (spam-from-listed-p spam-blacklist-cache) spam-split-group)))
+    (and (spam-from-listed-p 'spam-use-blacklist) spam-split-group)))
 
 (defun spam-parse-list (file)
   (when (file-readable-p file)
@@ -1597,20 +1661,10 @@ REMOVE not nil, remove the ADDRESSES."
 	      (push (or pure-address address) contents)))))
       (nreverse contents))))
 
-(defun spam-from-listed-p (cache)
+(defun spam-from-listed-p (type)
   (let ((from (nnmail-fetch-field "from"))
 	found)
-    (while cache
-      (let ((address (pop cache)))
-	(unless (zerop (length address)) ; 0 for a nil address too
-	  (setq address (regexp-quote address))
-	  ;; fix regexp-quote's treatment of user-intended regexes
-	  (while (string-match "\\\\\\*" address)
-	    (setq address (replace-match ".*" t t address))))
-	(when (and address (string-match address from))
-	  (setq found t
-		cache nil))))
-    found))
+    (spam-filelist-check-cache type from)))
 
 (defun spam-filelist-register-routine (articles blacklist &optional unregister)
   (let ((de-symbol (if blacklist 'spam-use-whitelist 'spam-use-blacklist))

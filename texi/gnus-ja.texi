@@ -13245,8 +13245,9 @@ UNDELETED} $B$O$*$=$i$/$?$$$F$$$N?M$K$O:GNI$NA*Br$G$7$g$&$,!"$H$-$I(B
 $B$9!#$=$l$,>e5-$NNc$G(B @code{save-excursion} $B$H(B @code{save-restriction} $B$N(B
 $B8e$G(B @code{(widen)} $B$,8F$P$l$kI,MW$,$"$kM}M3$G$9!#$5$i$K(B nnimap $B%P%C%/%((B
 $B%s%I$N>l9g!"%G%#%U%)%k%H$G$O5-;v$N%\%G%#$,%@%&%s%m!<%I$5$l$J$$$3$H$KCm0U(B
-$B$7$F2<$5$$!#$=$l$r$9$k$?$a$K$O(B @code{nnimap-split-download-body} $B$r(B t $B$K(B
-$B@_Dj$9$kI,MW$,$"$j$^$9(B (@pxref{Splitting in IMAP})$B!#(B
+$B$7$F2<$5$$!#$=$l$r$9$k$?$a$K(B
+$B$O(B @code{nnimap-split-download-body} $B$r(B @code{t} $B$K@_Dj$9$kI,MW$,$"$j$^(B
+$B$9(B (@pxref{Splitting in IMAP})$B!#(B
 
 @item (! @var{func} @var{split})
 $BJ,3d$,%j%9%H$G!":G=i$NMWAG$,(B @code{!} $B$G$"$k$H(B @var{split} $B$,<B9T$5$l!"(B
@@ -21545,7 +21546,7 @@ Spam $B$rHr$1$k$?$a$NA09`$N%R%s%H$,==J,$@$C$?F|!9$O2a$.5n$j$^$7$?!#:#$G$O(B
 
 $B$5$i$K(B nnimap $B%P%C%/%(%s%I$N>l9g!"%G%#%U%)%k%H$G$O5-;v$N%\%G%#$,%@%&%s%m!<(B
 $B%I$5$l$J$$$3$H$KCm0U$7$F2<$5$$!#$=$l$r$9$k$?$a$K$O!"(B
-@code{nnimap-split-download-body} $B$r(B t $B$K@_Dj$9$kI,MW$,$"$j$^(B
+@code{nnimap-split-download-body} $B$r(B @code{t} $B$K@_Dj$9$kI,MW$,$"$j$^(B
 $B$9(B (@pxref{Splitting in IMAP})$B!#(B
 
 $B0J>e$,$3$l$K4X$9$k$3$H$G$9!#$$$/$D$+$N(B spam $B$O$I$&$7$F$bAGDL$j$7$F$7$^$&(B
@@ -21779,7 +21780,8 @@ Variables}) $B$K4p$E$$$F(B ham $B$^$?$O(B spam $B%0%k!<%W$H9M$($i$l$k$+!"L$
 $B$F(B @code{ham-process-destination} $B$+(B @code{spam-process-destination} $B$K(B
 $B0\F0$5$;$i$l$^$9!#(B@code{ham-process-destination} $B$^$?(B
 $B$O(B @code{spam-process-destination} $B$N$I$A$i$+$,(B ($BLuCp(B: $B0\F0@h$H$7$F(B) $BE,(B
-$B@Z$G!"$=$l$i$,(B nil $B$@$C$?>l9g!"$=$N5-;v$O8=:_$N%0%k!<%W$K;D$5$l$^$9!#(B
+$B@Z$G!"$=$l$i$,(B @code{nil} $B$@$C$?>l9g!"$=$N5-;v$O8=:_$N%0%k!<%W$K;D$5$l$^(B
+$B$9!#(B
 
 $B$I$l$+$N%0%k!<%W$G(B spam $B$,8+$D$+$C$?$i(B ($BHs(B-spam $B%0%k!<%W$K8B$C(B
 $B$F(B @code{spam-move-spam-nonspam-groups-only} $B$GJQ992D(B)$B!"%0%k!<%W$rH4$1$k(B
@@ -21790,8 +21792,8 @@ Package Global Variables}) $B$K0\F0$5$;$i$l$^$9!#(BSpam $B$,:F;0=hM}$5$l$k$3$
 $B$rK>$^$J$$$J$i$P!"(B@file{gnus-registry.el} $B%Q%C%1!<%8$rFI$_9~$_!"(B
 @code{spam-log-to-registry} $BJQ?t$rM-8z$K$7$J$1$l$P$J$j$^$;$s!#$3$N$h$&(B
 $B$K(B spam $B$O$I$3$G$b8!CN$5$l=hM}$5$l$^$9!#$=$l$O$[$H$s$I$N?M!9$,K>$`$b$N$G(B
-$B$9!#(B@code{spam-process-destination} $B$,(B nil $B$@$C$?>l9g!"(Bspam $B$K$O4|8B@Z$l(B
-$B>C5n$N0u$,IU$1$i$l$^$9!#IaDL$=$l$O@5$7$$9T$J$$$G$9!#(B
+$B$9!#(B@code{spam-process-destination} $B$,(B @code{nil} $B$@$C$?>l9g!"(Bspam $B$K$O(B
+$B4|8B@Z$l>C5n$N0u$,IU$1$i$l$^$9!#IaDL$=$l$O@5$7$$9T$J$$$G$9!#(B
 
 Spam $B$,0\F0$G$-$J$$>l9g(B ($BNc$($P(B NNTP $B$N$h$&$JFI$_9~$_@lMQ%P%C%/%(%s%I$N(B
 $B$?$a$K(B)$B!"$=$l$O%3%T!<$5$l$^$9!#(B
@@ -22076,7 +22078,7 @@ Ham $B$H(B spam $B$K4X$9$kLdBj$O!"(BGnus $B$,%G%#%U%)%k%H$G$O$3$N=hM}$rDI@W
 @vindex spam-mark-only-unseen-as-spam
 Spam $B%0%k!<%W$K$"$k!"$^$@FI$^$l$?$3$H$,L5$$5-;v$@$1$K(B spam $B$N0u$rIU$1$?(B
 $B$$>l9g$O!"$3$NJQ?t$r%;%C%H$7$F2<$5$$!#%G%#%U%)%k%H$G$O%;%C%H$5$l$F$$$^$9!#(B
-$B$3$l$r(B nil $B$K$9$k$H!"L$FI$N5-;v$K$b(B spam $B0u$,IU$1$i$l$^$9!#(B
+$B$3$l$r(B @code{nil} $B$K$9$k$H!"L$FI$N5-;v$K$b(B spam $B0u$,IU$1$i$l$^$9!#(B
 
 @vindex spam-mark-ham-unread-before-move-from-spam-group
 Ham $B$,(B spam $B%0%k!<%W$+$i0\F0$5$l$kA0$K0u$r>C$7$?$$>l9g$O!"$3$NJQ?t$r%;%C(B
@@ -22250,7 +22252,7 @@ groups as spam and reports the to Gmane at group exit:
     (spam-process (gnus-group-spam-exit-processor-report-gmane)))
 @end lisp
 
-Additionally, I use `(setq spam-report-gmane-use-article-number nil)'
+Additionally, I use @code{(setq spam-report-gmane-use-article-number nil)}
 because I don't read the groups directly from news.gmane.org, but
 through my local news server (leafnode).  I.e. the article numbers are
 not the same as on news.gmane.org, thus @code{spam-report.el} has to check
