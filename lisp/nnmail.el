@@ -1159,7 +1159,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 		    (setq value (cdr (assq value nnmail-split-abbrev-alist))))
 		;; Someone might want to do a \N sub on this match, so get the
 		;; correct match positions.
-		(re-search-backward value start-of-value))
+		(re-search-backward (concat "\\<" value "\\>") start-of-value))
 	      (dolist (sp (nnmail-split-it (car split-rest)))
 		(unless (memq sp split-result)
 		  (push sp split-result))))))
