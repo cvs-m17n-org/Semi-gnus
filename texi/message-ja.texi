@@ -526,6 +526,16 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 ますが、署名は省きます。Supercite を使うために、それ
 を @code{sc-cite-original} に設定する事もできます。
 
+@item message-suspend-font-lock-when-citing
+@vindex message-suspend-font-lock-when-citing
+@code{nil} でなければ、本記事を引用している間 font-lock の動作を止めます。
+いくつかの、Emacs が暇なときに遅れて動作する font-lock のためのツー
+ル (または Emacs 自身) にはバグがあり、それらはしばしば font-lock の動作
+を行なう対象となるバッファを取り違えます。それはたいてい Emacs がミニバッ
+ファでユーザに何かの入力を促すときに起こります。これはその場しのぎの対策
+ではあるのですが、このオプションを非-@code{nil} にすることによって、あな
+たは不愉快なエラーを回避できるかもしれません。
+
 @item message-indent-citation-function
 @vindex message-indent-citation-function
 ちょうどメールバッファに挿入された引用文を修正するための関数です。これは

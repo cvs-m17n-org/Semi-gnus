@@ -1,3 +1,13 @@
+2001-06-28  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* texi/message-ja.texi (message-suspend-font-lock-when-citing): Add
+	a description.
+	* texi/message.texi (message-suspend-font-lock-when-citing): Ditto.
+
+	* lisp/message.el (message-yank-original): Suspend font-lock'ing
+	while citing an original message.
+	(message-suspend-font-lock-when-citing): New user option.
+
 2001-06-25  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-clfns.el (find-cl-run-time-functions): New

@@ -716,6 +716,17 @@ Note that `message-cite-original' uses `mail-citation-hook' if that is non-nil."
   :group 'message-insertion)
 
 ;;;###autoload
+(defcustom message-suspend-font-lock-when-citing nil
+  "Non-nil means suspend font-lock'ing while citing an original message.
+Some lazy demand-driven fontification tools (or Emacs itself) have a
+bug that they often miss a buffer to be fontified.  It will mostly
+occur when Emacs prompts user for any inputs in the minibuffer.
+Setting this option to non-nil may help you to avoid unpleasant errors
+even if it is an add-hoc expedient."
+  :type 'boolean
+  :group 'message-insertion)
+
+;;;###autoload
 (defcustom message-indent-citation-function 'message-indent-citation
   "*Function for modifying a citation just inserted in the mail buffer.
 This can also be a list of functions.  Each function can find the
@@ -2577,7 +2588,15 @@ be added to \"References\" field.
 	      (backward-delete-char 1)))))
 
       (unless arg
-	(funcall message-cite-function))
+	(if (and message-suspend-font-lock-when-citing
+		 (boundp 'font-lock-mode)
+		 (symbol-value 'font-lock-mode))
+	    (progn
+	      (sit-for 0)
+	      (font-lock-mode 0)
+	      (funcall message-cite-function)
+	      (font-lock-mode 1))
+	  (funcall message-cite-function)))
       (message-exchange-point-and-mark)
       (unless (bolp)
 	(insert ?\n))

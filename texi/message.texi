@@ -544,6 +544,15 @@ and prepends @samp{> } to each line.
 the signature.  You can also set it to @code{sc-cite-original} to use
 Supercite.
 
+@item message-suspend-font-lock-when-citing
+@vindex message-suspend-font-lock-when-citing
+If non-@code{nil}, suspend font-lock'ing while citing an original
+message.  Some lazy demand-driven fontification tools (or Emacs itself)
+have a bug that they often miss a buffer to be fontified.  It will
+mostly occur when Emacs prompts user for any inputs in the minibuffer.
+Setting this option to non-@code{nil} may help you to avoid unpleasant
+errors even if it is an add-hoc expedient.
+
 @item message-indent-citation-function
 @vindex message-indent-citation-function
 Function for modifying a citation just inserted in the mail buffer.
