@@ -33,6 +33,15 @@ of this file should be applied. If not, it might not.
 (bbdb-initialize 'sc)  ;; 'Gnus of 'gnus should be deleted.
 (add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
 
+ If you would like to decode the quoted encoded words forcibly, even
+though FLIM does not decode them, put the following lines in your
+.gnus file.
+
+(setq gnus-bbeb/decode-field-body-function
+      (function
+       (lambda (field-body field-name)
+         (eword-decode-string field-body))))
+
 ---
  This is a patch for bbdb.el / bbdb-hooks.el.
 
