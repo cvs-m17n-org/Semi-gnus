@@ -755,14 +755,27 @@ be set in `.emacs' instead."
 	 (let ((image (find-image '((:type xpm :file "gnus.xpm")
 				    (:type xbm :file "gnus.xbm")))))
 	   (when image
-	     (newline)			; Have somewhere for cursor to
-					; go, not stretched over image.
-	     (insert-image image " ")
+	     (insert-image image)
 	     (goto-char (point-min))
-	     (while (not (eobp))
-	       (insert (make-string (/ (max (- (window-width) (or x 35)) 0) 2)
-				    ?\ ))
-	       (forward-line 1))
+	     (insert-char
+	      ?\ ;; space
+	      (max 0 (let ((cw (frame-char-width)))
+		       (/ (+ (- (* (window-width) cw) 271) cw) 2 cw))))
+	     (goto-char (point-min))
+	     (insert gnus-product-name " " gnus-version-number
+		     (if (zerop (string-to-number gnus-revision-number))
+			 ""
+		       (concat " (r" gnus-revision-number ")"))
+		     " based on " gnus-original-product-name " v"
+		     gnus-original-version-number "\n")
+	     (goto-char (point-min))
+	     (insert-char ?\ ;; space
+			  (max 0 (/ (- (window-width) (gnus-point-at-eol)) 2)))
+	     (forward-line 1)
+	     (insert-char
+	      ?\n (max 0
+		       (let ((ch (frame-char-height)))
+			 (/ (+ (- (* (1- (window-height)) ch) 273) ch) 2 ch))))
 	     (setq gnus-simple-splash nil)
 	     t))))
    (t

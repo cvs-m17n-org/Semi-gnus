@@ -210,6 +210,8 @@ regexp.  If it matches, the text in question is not a signature."
 
 (defcustom gnus-article-x-face-command
   (cond
+   ;; Fixme: This isn't the right thing for mixed graphical and and
+   ;; non-graphical frames in a session.
    ((and (fboundp 'image-type-available-p)
 	 (image-type-available-p 'xbm))
     'gnus-article-display-xface)
