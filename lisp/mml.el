@@ -1014,6 +1014,7 @@ If RAW, don't highlight the article."
   (save-excursion
     (let* ((buf (current-buffer))
 	   (message-options message-options)
+	   (message-this-is-mail (message-mail-p))
 	   (message-this-is-news (message-news-p))
 	   (message-posting-charset (or (gnus-setup-posting-charset
 					 (save-restriction
