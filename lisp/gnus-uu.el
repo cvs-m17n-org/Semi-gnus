@@ -877,8 +877,9 @@ When called interactively, prompt for REGEXP."
 	    (save-excursion
 	      (set-buffer (gnus-get-buffer-create "*gnus-uu-pre*"))
 	      (erase-buffer)
-	      (unless gnus-uu-digest-buffer
-		(insert (format "From: %s\nSubject: %s Digest\n\n" name name)))
+	      (insert (format
+		       "Date: %s\nFrom: %s\nSubject: %s Digest\n\n"
+		       (current-time-string) name name))
 	      (insert "Topics:\n")))
 	(when (not (eq in-state 'end))
 	  (setq state (list 'middle))))
@@ -925,7 +926,8 @@ When called interactively, prompt for REGEXP."
 	(goto-char beg)
 	(when (re-search-forward "^Subject:" nil t)
 	  (setq subj (nnheader-decode-subject
-		      (buffer-substring (match-end 0) (std11-field-end))))
+		      (buffer-substring (match-end 0) (std11-field-end)))))
+	(when subj
 	  (save-excursion
 	    (set-buffer "*gnus-uu-pre*")
 	    (insert (format "   %s\n" subj)))))

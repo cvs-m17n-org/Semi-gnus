@@ -2209,10 +2209,11 @@ With the prefix argument FORCE, insert the header anyway."
 (defun message-newline-and-reformat (&optional not-break)
   "Insert four newlines, and then reformat if inside quoted text."
   (interactive)
-  (let (quoted point beg end leading-space)
+  (let (quoted point beg end leading-space bolp)
     (setq point (point))
     (beginning-of-line)
     (setq beg (point))
+    (setq bolp (= beg point))
     ;; Find first line of the paragraph.
     (if not-break
 	(while (and (not (eobp))
@@ -2227,8 +2228,9 @@ With the prefix argument FORCE, insert the header anyway."
       (setq leading-space (match-string 0)))
     (if (and quoted
 	     (not not-break)
+	     (not bolp)
 	     (< (- point beg) (length quoted)))
-	;; break in the cite prefix.
+	;; break inside the cite prefix.
 	(setq quoted nil
 	      end nil))
     (if quoted
@@ -2269,11 +2271,13 @@ With the prefix argument FORCE, insert the header anyway."
       (narrow-to-region beg end)
       (if not-break
 	  (setq point nil)
-	(insert "\n\n")
+	(if bolp
+	    (insert "\n")
+	  (insert "\n\n"))
 	(setq point (point))
 	(insert "\n\n")
 	(delete-region (point) (re-search-forward "[ \t]*"))
-	(when quoted
+	(when (and quoted (not bolp))
 	  (insert quoted leading-space)))
       (if quoted
 	  (let* ((adaptive-fill-regexp
