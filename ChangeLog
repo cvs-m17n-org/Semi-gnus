@@ -1,3 +1,15 @@
+1998-09-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/message.el (message-reply): Use `make-full-mail-header'.
+	(message-followup): Likewise.
+
+	* lisp/nnheader.el (mail-header-references): Use
+	`mime-fetch-field' and `mail-header-entity'.
+	(mail-header-set-references): Use `mail-header-set-field'.
+	Define mm-backend `nil' and its method `fetch-field'.
+	(make-full-mail-header): Modify data structure to store References
+	to mime-entity.
+
 1998-09-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/nnheader.el (mail-header-id): Use `mime-fetch-field' and
