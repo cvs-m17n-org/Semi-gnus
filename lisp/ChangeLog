@@ -1,3 +1,29 @@
+2004-10-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* mm-uu.el (mm-uu-text-plain-type): New variable.
+	(mm-uu-pgp-signed-extract-1): Use it.
+	(mm-uu-pgp-encrypted-extract-1): Use it.
+	(mm-uu-dissect): Allow MIME type and parameters as an optional arg;
+	bind mm-uu-text-plain-type with that value.
+	(mm-uu-dissect-text-parts): Pass MIME type and parameters to
+	mm-uu-dissect.
+
+2004-10-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-group.el (gnus-update-group-mark-positions):
+	* gnus-sum.el (gnus-update-summary-mark-positions):
+	* message.el (message-check-news-body-syntax):
+	* gnus-msg.el (gnus-debug): Use mm-string-as-multibyte instead
+	of string-as-multibyte.
+
+2004-10-05  Juri Linkov  <juri@jurta.org>
+
+	* gnus-group.el (gnus-update-group-mark-positions):
+	* gnus-sum.el (gnus-update-summary-mark-positions):
+	* message.el (message-check-news-body-syntax):
+	* gnus-msg.el (gnus-debug): Use `string-as-multibyte' to convert
+	8-bit unibyte values to a multibyte string for search functions.
+
 2004-10-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* mm-uu.el (mm-uu-dissect): Allow optional arg.
