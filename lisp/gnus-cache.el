@@ -129,7 +129,7 @@ it's not cached."
 	  (set-buffer buffer)
 	  (if (> (buffer-size) 0)
 	      ;; Non-empty overview, write it to a file.
-	      (gnus-write-buffer-as-specified-coding-system
+	      (gnus-write-buffer-as-coding-system
 	       overview-file gnus-cache-overview-coding-system)
 	    ;; Empty overview file, remove it
 	    (when (file-exists-p overview-file)
@@ -183,7 +183,7 @@ it's not cached."
 		  (gnus-article-decode-hook nil))
 	      (gnus-request-article-this-buffer number group))
 	    (when (> (buffer-size) 0)
-	      (gnus-write-buffer-as-specified-coding-system
+	      (gnus-write-buffer-as-coding-system
 	       file gnus-cache-write-file-coding-system)
 	      (gnus-cache-change-buffer group)
 	      (set-buffer (cdr gnus-cache-buffer))

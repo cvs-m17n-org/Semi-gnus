@@ -770,18 +770,18 @@ find-file-hooks, etc.
 	(enable-local-variables nil)
         (after-insert-file-functions nil)
 	(find-file-hooks nil))
-    (insert-file-contents-as-specified-coding-system
-     filename visit beg end replace nnheader-file-coding-system)))
+    (insert-file-contents-as-coding-system
+     filename nnheader-file-coding-system visit beg end replace)))
 
 (defun nnheader-find-file-noselect (&rest args)
   (let ((format-alist nil)
 	(auto-mode-alist (nnheader-auto-mode-alist))
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
-        (after-insert-file-functions nil)
+	(after-insert-file-functions nil)
 	(find-file-hooks nil))
-    (find-file-noselect-as-specified-coding-system
-     (car args) (append (cdr args) (list nnheader-file-coding-system)))))
+    (apply 'find-file-noselect-as-coding-system
+	   (car args) nnheader-file-coding-system (cdr args))))
 
 (defun nnheader-auto-mode-alist ()
   "Return an `auto-mode-alist' with only the .gz (etc) thingies."

@@ -560,13 +560,13 @@ Bind `print-quoted' and `print-readably' to t while printing."
   ;; Write the buffer.
   (write-region-as-binary (point-min) (point-max) file nil 'quietly))
 
-(defun gnus-write-buffer-as-specified-coding-system (file coding-system)
+(defun gnus-write-buffer-as-coding-system (file coding-system)
   "Write the current buffer's contents to FILE with code conversion."
   ;; Make sure the directory exists.
   (gnus-make-directory (file-name-directory file))
   ;; Write the buffer.
-  (write-region-as-specified-coding-system
-   (point-min) (point-max) file nil 'quietly coding-system))
+  (write-region-as-coding-system
+   (point-min) (point-max) file coding-system nil 'quietly))
 
 (defun gnus-delete-file (file)
   "Delete FILE if it exists."

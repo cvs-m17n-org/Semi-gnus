@@ -1236,7 +1236,7 @@ EXTRA is the possible non-standard header."
 	(setq gnus-score-alist nil)
       ;; Read file.
       (with-temp-buffer
-	(insert-file-contents-as-specified-coding-system
+	(insert-file-contents-as-coding-system
 	 file score-mode-coding-system)
 	(goto-char (point-min))
 	;; Only do the loading if the score file isn't empty.
@@ -1370,7 +1370,7 @@ EXTRA is the possible non-standard header."
 	      (delete-file file)
 	    ;; There are scores, so we write the file.
 	    (when (file-writable-p file)
-	      (gnus-write-buffer-as-specified-coding-system
+	      (gnus-write-buffer-as-coding-system
 	       file score-mode-coding-system)
 	      (when gnus-score-after-write-file-function
 		(funcall gnus-score-after-write-file-function file)))))
