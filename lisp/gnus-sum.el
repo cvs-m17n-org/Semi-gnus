@@ -3268,13 +3268,13 @@ If LINE, insert the rebuilt thread starting on line LINE."
 	(headers in-headers)
 	references)
     (while (and parent
-		headers
 		(not (zerop generation))
 		(setq references (mail-header-references headers)))
-      (when (and references
-		 (setq parent (gnus-parent-id references))
-		 (setq headers (car (gnus-id-to-thread parent))))
-	(decf generation)))
+      (setq headers (if (and references
+			     (setq parent (gnus-parent-id references)))
+			(car (gnus-id-to-thread parent))
+		      nil))
+      (decf generation))
     (and (not (eq headers in-headers))
 	 headers)))
 
@@ -4088,8 +4088,7 @@ If READ-ALL is non-nil, all articles in the group are selected."
 
 (defun gnus-update-marks ()
   "Enter the various lists of marked articles into the newsgroup info list."
-  (let ((types (gnus-delete-alist 'cached
-				  (copy-sequence gnus-article-mark-lists)))
+  (let ((types gnus-article-mark-lists)
 	(info (gnus-get-info gnus-newsgroup-name))
 	(uncompressed '(score bookmark killed))
 	type list newmarked symbol)
