@@ -45,6 +45,7 @@
     "This variable decides which language will be used for display."))
 
 (eval-when-compile
+  (require 'gnus)
   (require 'gnus-offline))
 
 (defvar gnus-offline-setting-file
@@ -160,8 +161,6 @@
 			"(add-hook"
 			"'message-send-hook"
 			"'gnus-offline-message-add-header)"))
-	(insert "(autoload 'gnus-offline-setup \"gnus-offline\")\n")
-	(insert "(add-hook 'gnus-load-hook 'gnus-offline-setup)\n")
 
 	;; Write stting about mail-source.el
 	(insert "(setq gnus-offline-mail-source '"
@@ -524,6 +523,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
       (gnus-ofsetup-prepare gnus-ofsetup-update-setting-file)))
   (load gnus-offline-setting-file))
 
+
 ;; Suppport for customizing gnus-ofsetup parameters.
 
 (defvar sendmail-to-spool-directory)
@@ -720,5 +720,13 @@ mail source specifier とか上記のようなキーワードについてもっとよく
       (load gnus-offline-setting-file)))
   (bury-buffer)
   (switch-to-buffer gnus-group-buffer))
+
+
+;;; Code for making Gnus and Gnus Offline cooperate with each other.
+
+;; advice.
+(defadvice gnus (around gnus-ofsetup-advice activate preactivate)
+  "Setup offline environment when Gnus is invoked."
+  (require 'gnus-offline) ad-do-it (gnus-offline-setup))
 
 ;; gnus-ofsetup.el Ends here.
