@@ -416,9 +416,16 @@
 	   (user-defined
 	    (setq elem
 		  (list
-		   (list (intern (format "gnus-user-format-function-%c"
-					 user-defined))
-			 'gnus-tmp-header)
+		   (list 'condition-case 'err
+			 (list (intern (format "gnus-user-format-function-%c"
+					       user-defined))
+			       'gnus-tmp-header)
+			 (list 'error
+			       (list 'gnus-error 1
+				     (format
+				      "Error occured in `gnus-user-format-function-%c: %%s"
+				      user-defined)
+				     'err) ""))
 		   ?s)))
 	   ;; Find the specification from `spec-alist'.
 	   ((setq elem (cdr (assq spec spec-alist))))
