@@ -1,3 +1,36 @@
+2003-03-01  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus-art.el (gnus-article-refer-article): Be more permissive.
+
+2003-03-01  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* spam.el: Fix typo.
+
+2003-03-01  Satyaki Das  <satyaki@theforce.stanford.edu>
+	(Trivial patch.)
+
+	* pgg-gpg.el (pgg-gpg-process-region): Insert process status into
+	errors-buffer. This produces a nicer error message in case of
+	problems.
+	
+2003-03-01  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* spam.el (spam-maybe-spam-stat-load, spam-maybe-spam-stat-load):
+	load stats iff spam-use-stat is on
+
+	* spam.el: add spam-maybe-spam-stat-load to gnus-startup hook,
+	also use spam-maybe-spam-stat-load and spam-maybe-spam-stat-save
+	instead of spam-stat-load and spam-stat-save in the
+	gnus-get-new-news-hook and gnus-save-newsrc-hook, respectively
+
+2003-03-01  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-view.el (mm-inline-text): Ignore errors from enriched-decode.
+
+2003-03-01  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* message.el (message-make-fqdn): Protect against nil user-mail. 
+
 2003-02-28  Vasily Korytov <deskpot@myrealbox.com>
 
 	* gnus-art.el (gnus-boring-article-headers): New values:

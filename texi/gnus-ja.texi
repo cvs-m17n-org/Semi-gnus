@@ -2925,8 +2925,8 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $BL$FI!"4{FI5-;v$NN>J}$rA4$FI=<($7$^$9!#(B
 
 @item an integer
-$B$=$N%0%k!<%W$N:G8e$N@0?t8D$N5-;v$rI=<($7$^$9!#$3$l$O(B C-u $B@0?t(B $B$G$=$N%0%k!<(B
-$B%W$KF~$k$N$HF1$8$G$9!#(B
+$B$=$N%0%k!<%W$N:G8e$N(B @var{integer} $B8D$N5-;v$rI=<($7$^$9!#$3$l$O(B C-u
+@var{integer} $B$G$=$N%0%k!<%W$KF~$k$N$HF1$8$G$9!#(B
 
 @item default
 $B=i4|@_Dj$G$NI=<(5-;v$rI=<($7$^$9!#$3$l$ODL>o$OL$FI5-;v$H0uIU$-5-;v$G$9!#(B
@@ -8007,14 +8007,15 @@ Fonts})$B!#F1$8%a%C%;!<%8$NCf$KJ#?t$N5-;v$+$i$N0zMQ$,$"$k$H!"(Bgnus $B$O$=$l$
 @item gnus-article-address-banner-alist
 @vindex gnus-article-address-banner-alist
 $B%a!<%k%"%I%l%9$H%P%J!<$NO"A[%j%9%H$G$9!#$=$l$>$l$NMWAG(B
-$B$O(B @code{(ADDRESS . BANNER)} $B$N7A<0$r;}$A!"$3$3$G(B ADDRESS $B$O(B From $B%X%C%@!<(B
-$B$K$"$k%a!<%k%"%I%l%9$K%^%C%A$9$k@55,I=8=!"(BBANNER $B$O%7%s%\(B
-$B%k(B @code{signature}$B!"(B@code{gnus-article-banner-alist} $B$NMWAG!"@55,I=8=$^(B
-$B$?$O(B @code{nil} $B$N$&$A$N0l$D$G$9!#(BADDRESS $B$,Cx<T$N%a!<%k%"%I%l%9$K%^%C%A(B
-$B$9$k$H!"9-9p$N$h$&$J$b$N$r>C$7$^$9!#Nc$($P!"Aw?.<T(B
-$B$,(B @samp{hail@@yoo-hoo.co.jp} $B$H$$$&%a!<%k%"%I%l%9$r;}$C$F$$$F!"H`$,Aw?.(B
-$B$9$k$9$Y$F$N5-;v$K(B @samp{Do You Yoo-hoo!?} $B$N$h$&$J$b$N$,$"$k>l9g!"0J2<(B
-$B$NMWAG$G$=$l$i$r>C$9$3$H$,$G$-$^$9!#(B
+$B$O(B @code{(@var{address} . @var{banner})} $B$N7A<0$r;}$A!"$3$3(B
+$B$G(B @var{address} $B$O(B From $B%X%C%@!<$K$"$k%a!<%k%"%I%l%9$K%^%C%A$9$k@55,I=(B
+$B8=!"(B@var{banner} $B$O%7%s%\%k(B @code{signature}$B!"(B
+@code{gnus-article-banner-alist} $B$NMWAG!"@55,I=8=$^$?$O(B @code{nil} $B$N$&(B
+$B$A$N0l$D$G$9!#(B@var{address} $B$,Cx<T$N%a!<%k%"%I%l%9$K%^%C%A$9$k$H!"9-9p$N(B
+$B$h$&$J$b$N$r>C$7$^$9!#Nc$($P!"Aw?.<T$,(B @samp{hail@@yoo-hoo.co.jp} $B$H$$$&(B
+$B%a!<%k%"%I%l%9$r;}$C$F$$$F!"H`$,Aw?.$9$k$9$Y$F$N5-;v$K(B @samp{Do You
+Yoo-hoo!?} $B$N$h$&$J$b$N$,$"$k>l9g!"0J2<$NMWAG$G$=$l$i$r>C$9$3$H$,$G$-$^(B
+$B$9!#(B
 
 @lisp
 ("@@yoo-hoo\\.co\\.jp\\'" . "\n_+\nDo You Yoo-hoo!\\?\n.*\n.*\n")
@@ -9996,6 +9997,12 @@ Gnus $B$O%X%C%@!<$NJB$YBX$((B (sort) $B$b9T$$$^$9(B ($B$3$l$O%G%#%U%)%k%H$G
 @item to-address
 @code{To} $BMs$,8=:_$N%0%k!<%W$N(B @code{to-address} $B%Q%i%a!<%?$HF1$8$b$N$7(B
 $B$+4^$s$G$$$J$$>l9g$K$O>C5n$7$^$9!#(B
+@item to-list
+@code{To} $BMs$,8=:_$N%0%k!<%W$N(B @code{to-list} $B%Q%i%a!<%?$HF1$8$b$N$7$+4^(B
+$B$s$G$$$J$$>l9g$K$O>C5n$7$^$9!#(B
+@item cc-list
+@code{CC} $BMs$,8=:_$N%0%k!<%W$N(B @code{to-list} $B%Q%i%a!<%?$HF1$8$b$N$7$+4^(B
+$B$s$G$$$J$$>l9g$K$O>C5n$7$^$9!#(B
 @item date
 $B$=$N5-;v$,2a5n;0F|0JFb$N$b$N$G$"$l$P!"(B@code{Date} $BMs$r>C5n$7$^$9!#(B
 @item long-to
@@ -17630,7 +17637,7 @@ Gnus $B$O2?EY$b%9%3%"O"A[%j%9%H$rFI$_9~$`$N$rHr$1$k$?$a$K!"$=$l$N%-%c%C%7%e(B
 @item gnus-score-file-suffix
 @vindex gnus-score-file-suffix
 $B%9%3%"%U%!%$%k$K$?$I$jCe$/$?$a$K%0%k!<%WL>$K2C$($k@\Hx8l$G$9(B ($B=i4|CM(B
-$B$G(B @samp{SCORE} $B$G$9!#(B)
+$B$G(B @file{SCORE} $B$G$9!#(B)
 
 @item gnus-score-uncacheable-files
 @vindex gnus-score-uncacheable-files
@@ -18162,7 +18169,7 @@ gnus $B$K$O$3$l$i$rA4$F<+F0E*$K(B --- $B$^$k$GKbK!$G$b;H$C$?$h$&$K:n@.(B
 
 @vindex gnus-adaptive-file-suffix
 $BE,1~@-%9%3%"EPO?9`L\$O!"%0%k!<%WL>$K(B @code{gnus-adaptive-file-suffix} $B$r(B
-$BIU2C$7$?L>A0$N%U%!%$%k$KF~$l$i$l$^$9!#=i4|@_DjCM$O(B @samp{ADAPT} $B$G$9!#(B
+$BIU2C$7$?L>A0$N%U%!%$%k$KF~$l$i$l$^$9!#=i4|@_DjCM$O(B @file{ADAPT} $B$G$9!#(B
 
 @vindex gnus-score-exact-adapt-limit
 $BE,1~@-%9%3%"$r9T$&$H$-$O!"ItJ,J8;zNs0lCW$d%U%!%8!<$J0lCW$r9T$C$?J}$,!"$*(B
@@ -20918,11 +20925,12 @@ Spam $B$H@o$&$?$a$N?7$7$$5;K!$O!"%a%C%;!<%8$rAw?.$9$k:]$K$$$/$P$/$+$NIiC4(B
 @item hashcash-payment-alist
 @vindex hashcash-payment-alist
 $B2??M$+$N<u<h?M$O!"$"$J$?$K%G%#%U%)%k%H$h$jB?$/$N(B CPU $B;~4V$rHq$d$9$3$H$r(B
-$BMW5a$9$k$+$b$7$l$^$;$s!#$3$NJQ?t$O(B @samp{(ADDR AMOUNT)} $B$N7A<0$NMWAG$N%j(B
-$B%9%H$G!"(BADDR $B$O<u<h?M(B ($B%a!<%k%"%I%l%9$+%K%e!<%9%0%k!<%W(B)$B!"(BAMOUNT $B$OI,MW(B
-$B$H$5$l$k>WFM$N%S%C%H?t$G$9!#$3$l$O$^$?(B @samp{(ADDR STRING AMOUNT)} $B$NMW(B
-$BAG$r;}$D$3$H$b2DG=$G!"(BSTRING $B$OJ8;zNs(B ($BDL>o$O%a!<%k%"%I%l%9$+%K%e!<%9%0(B
-$B%k!<%WL>(B) $B$H$7$F;H$o$l$^$9!#(B
+$BMW5a$9$k$+$b$7$l$^$;$s!#$3$NJQ?t$O(B @samp{(@var{addr} @var{amount})} $B$N7A(B
+$B<0$NMWAG$N%j%9%H$G!"(B@var{addr} $B$O<u<h?M(B ($B%a!<%k%"%I%l%9$+%K%e!<%9%0%k!<(B
+$B%W(B)$B!"(B@var{amount} $B$OI,MW$H$5$l$k>WFM$N%S%C%H?t$G$9!#$3$l$O$^(B
+$B$?(B @samp{(@var{addr} @var{string} @var{amount})} $B$NMWAG$r;}$D$3$H$b2DG=(B
+$B$G!"(B@var{string} $B$OJ8;zNs(B ($BDL>o$O%a!<%k%"%I%l%9$+%K%e!<%9%0%k!<%WL>(B) $B$H(B
+$B$7$F;H$o$l$^$9!#(B
 
 @item hashcash
 @vindex hashcash
