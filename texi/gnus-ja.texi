@@ -11513,11 +11513,13 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 @code{nnmail-split-fancy-with-parent} は、対象となる各記事の References
 (と In-Reply-To) ヘッダを調べ、@code{nnmail-message-id-cache-file} に指
 定されているファイルにそれらのメッセージ ID があるかどうか調べます。親記
-事が見つかると、この関数は対応するグループ名を返すわけです。ここで、変数
-@code{nnmail-message-id-cache-length} の値を既定値よりも幾らか大きな値に
-設定することをお勧めします。そうすると、今調べられたメッセージ ID 達は今
-しばらくキャッシュの中に存続できます (5000 に設定するとキャッシュファイ
-ルの大きさはだいたい 300 キロバイトぐらいになるみたいです)。
+事が見つかると、そのグループ名が正規表
+現 @code{nnmail-split-fancy-with-parent-ignore-groups} にマッチしなけれ
+ば、この関数は対応するグループ名を返すわけです。ここで、変
+数 @code{nnmail-message-id-cache-length} の値を既定値よりも幾らか大きな
+値に設定することをお勧めします。そうすると、今調べられたメッセージ ID 達
+は今しばらくキャッシュの中に存続できます (5000 に設定するとキャッシュファ
+イルの大きさはだいたい 300 キロバイトぐらいになるみたいです)。
 @vindex nnmail-cache-accepted-message-ids
 さらに、変数 @code{nnmail-cache-accepted-message-ids} の値を
 非 @code{nil} に設定すれば、gnus は移動された記事のメッセージ ID をも記

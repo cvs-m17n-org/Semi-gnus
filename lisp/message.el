@@ -3449,7 +3449,7 @@ This sub function is for exclusive use of `message-send-news'."
 			 (concat newsgroups "," followup-to)
 		       newsgroups)))
 	    (known-groups
-	     (mapcar '(lambda (n) (gnus-group-real-name n))
+	     (mapcar (lambda (n) (gnus-group-real-name n))
 		     (gnus-groups-from-server
 		      (cond ((equal gnus-post-method 'current)
 			     gnus-current-select-method)

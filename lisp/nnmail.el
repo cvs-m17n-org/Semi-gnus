@@ -114,6 +114,14 @@ If nil, the first match found will be used."
   :group 'nnmail-split
   :type 'boolean)
 
+(defcustom nnmail-split-fancy-with-parent-ignore-groups nil
+  "Regexp that matches group names to be ignored when applying
+`nnmail-split-fancy-with-parent'.  This can also be a list of regexps."
+  :group 'nnmail-split
+  :type '(choice (const :tag "none" nil)
+		 (regexp :value ".*")
+		 (repeat :value (".*") regexp)))
+
 ;; Added by gord@enci.ucalgary.ca (Gordon Matzigkeit).
 (defcustom nnmail-keep-last-article nil
   "If non-nil, nnmail will never delete/move a group's last article.
@@ -1473,14 +1481,18 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
   (let* ((refstr (or (message-fetch-field "references")
 		     (message-fetch-field "in-reply-to")))
 	 (references nil)
-	 (res nil))
+	 (res nil)
+	 (regexp (if (consp nnmail-split-fancy-with-parent-ignore-groups)
+		     (mapconcat 'nnmail-split-fancy-with-parent-ignore-groups " *\\|")
+		   nnmail-split-fancy-with-parent-ignore-groups)))
     (when refstr
       (setq references (nreverse (gnus-split-references refstr)))
       (unless (gnus-buffer-live-p nnmail-cache-buffer)
 	(nnmail-cache-open))
       (mapcar (lambda (x)
 		(setq res (or (nnmail-cache-fetch-group x) res))
-		(when (string= "drafts" res)
+		(when (or (string= "drafts" res)
+			  (and regexp (string-match regexp res)))
 		  (setq res nil)))
 	      references)
       res)))
@@ -1591,10 +1603,11 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	    (setq source (append source
 				 (list
 				  :predicate
-				  `(lambda (file)
-				     (string-equal
-				      ,(concat group suffix)
-				      (file-name-nondirectory file))))))))
+				  (gnus-byte-compile
+				   `(lambda (file)
+				      (string-equal
+				       ,(concat group suffix)
+				       (file-name-nondirectory file)))))))))
 	(when nnmail-fetched-sources
 	  (if (member source nnmail-fetched-sources)
 	      (setq source nil)
@@ -1615,14 +1628,15 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	(when (setq new
 		    (mail-source-fetch
 		     source
-		     `(lambda (file orig-file)
-			(nnmail-split-incoming
-			 file ',(intern (format "%s-save-mail" method))
-			 ',spool-func
-			 (if (equal file orig-file)
-			     nil
-			   (nnmail-get-split-group orig-file ',source))
-			 ',(intern (format "%s-active-number" method))))))
+		     (gnus-byte-compile
+		      `(lambda (file orig-file)
+			 (nnmail-split-incoming
+			  file ',(intern (format "%s-save-mail" method))
+			  ',spool-func
+			  (if (equal file orig-file)
+			      nil
+			    (nnmail-get-split-group orig-file ',source))
+			  ',(intern (format "%s-active-number" method)))))))
 	  (incf total new)
 	  (incf i)))
       ;; If we did indeed read any incoming spools, we save all info.

@@ -1,3 +1,37 @@
+2001-07-25 12:54:00  Danny Siu <dsiu@adobe.com>
+	
+	* gnus-sum.el (gnus-summary-prepare-threads): Shouldn't do tree
+	display (%B) for threads if threading is off.
+ 
+2001-07-25 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	From Henrik Enberg <henrik@enberg.org>
+
+	* gnus-msg.el: Customization patch.
+
+2001-07-25 22:22:22  Raymond Scholz  <rscholz@zonix.de>
+
+	* nnmail.el (nnmail-split-fancy-with-parent-ignore-groups): New
+	variable.
+	(nnmail-split-fancy-with-parent): Ignore certain groups.
+	
+2001-07-25 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-util.el (gnus-byte-compile): New.
+	(gnus-use-byte-compile): New.
+	(gnus-make-sort-function): Use it.
+
+	* nnmail.el (nnmail-get-new-mail): Use it.
+
+	* gnus-agent.el (gnus-category-make-function): Simple function or
+	compiled function.
+	(gnus-agent-fetch-group-1): Don't use (caaddr predicate).
+
+	* gnus-gl.el (bbb-build-rate-command): Remove quote before lambda.
+	* gnus-topic.el (gnus-topic-sort-topics-1): Ditto.
+	(gnus-topic-sort-topics-1): Use gnus-byte-compile.
+
+	* message.el (message-check-news-header-syntax): Remove quote.
+
 2001-07-24 19:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* message.el (message-use-mail-followup-to): `t' is not a
