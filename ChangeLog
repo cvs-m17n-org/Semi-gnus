@@ -1,3 +1,26 @@
+2000-03-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 13.
+
+	* texi/gnus.texi: Update.
+	* texi/gnus-ja.texi: Update.
+
+	* lisp/gnus-start.el (gnus-setup-news): Update all format specs
+	just before `gnus-setup-news-hook' is evaluated.
+	(gnus-setup-news-hook): Default to `gnus-compile'.
+
+	* lisp/gnus-spec.el (gnus-compile): Don't modify the value of
+	`gnus-format-specs', generate compiled specs in
+	`gnus-format-specs-compiled' instead; don't touch the dribble
+	buffer.
+	(gnus-update-format-specifications): Bind `gnus-format-specs' to
+	`gnus-format-specs-compiled' if the latter is non-nil; use
+	`gnus-update-format-specifications-1'.
+	(gnus-update-format-specifications-1): Rename from
+	`gnus-update-format-specifications'; update the value of
+	`gnus-newsrc-file-version' if the updating is forced.
+	(gnus-format-specs-compiled): New internal variable.
+
 2000-03-05  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus-spec.el (gnus-update-format-specifications): Force
