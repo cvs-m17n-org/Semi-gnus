@@ -5290,37 +5290,18 @@ The prefix argument ALL means to select all articles."
   (when (gnus-ephemeral-group-p gnus-newsgroup-name)
     (error "Ephemeral groups can't be reselected"))
   (let ((current-subject (gnus-summary-article-number))
-	(group gnus-newsgroup-name)
-	masquerade)
-    (when rescan
-      (setq masquerade (get-buffer-create " *masquerade-summary*"))
-      (let ((pos (- (point) (window-start)))
-	    (id mode-line-buffer-identification))
-	(copy-to-buffer masquerade (window-start) (point-max))
-	(with-current-buffer masquerade
-	  (set-buffer-modified-p nil)
-	  (goto-char (1+ (max 0 pos)))
-	  (setq mode-line-buffer-identification id
-		mode-name "Masquerade"
-		truncate-lines t))))
+	(group gnus-newsgroup-name))
     (setq gnus-newsgroup-begin nil)
     (gnus-summary-exit)
-    (if rescan
-	(progn
-	  (switch-to-buffer masquerade)
-	  (set-window-start (selected-window) (point-min))
-	  (static-when (featurep 'xemacs)
-	    (gnus-xmas-switch-horizontal-scrollbar-off)
-	    (redraw-frame))
-	  (set-buffer gnus-group-buffer)
-	  (gnus-group-jump-to-group group)
-	  (unwind-protect
-	      (save-excursion
-		(gnus-group-get-new-news-this-group 1))
-	    (kill-buffer masquerade)))
-      ;; We have to adjust the point of group mode buffer because
-      ;; point was moved to the next unread newsgroup by exiting.
-      (gnus-summary-jump-to-group group))
+    ;; We have to adjust the point of group mode buffer because
+    ;; point was moved to the next unread newsgroup by exiting.
+    (gnus-summary-jump-to-group group)
+    (when rescan
+      (save-excursion
+	(save-window-excursion
+	  ;; Don't show group contents.
+	  (set-window-start (selected-window) (point-max))
+	  (gnus-group-get-new-news-this-group 1))))
     (gnus-group-read-group all t)
     (gnus-summary-goto-subject current-subject nil t)))
 
