@@ -131,6 +131,8 @@ Such articles will be transmitted to `bogofilter -s' on group exit.")
 (gnus-define-keys gnus-summary-mode-map
   "St" spam-bogofilter-score
   "Sx" gnus-summary-mark-as-spam
+  "Mst" spam-bogofilter-score
+  "Msx" gnus-summary-mark-as-spam
   "\M-d" gnus-summary-mark-as-spam)
 
 ;;; How to highlight a spam summary line.
@@ -195,8 +197,8 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	decision)
     (while (and list-of-checks (not decision))
       (let ((pair (pop list-of-checks)))
-	(when (eval (car pair))
-	  (setq decision (apply (cdr pair))))))
+	(when (symbol-value (car pair))
+	  (setq decision (funcall (cdr pair))))))
     (if (eq decision t)
 	nil
       decision)))
@@ -374,7 +376,7 @@ The regular expression is matched against the address.")
 ;;;     make install
 ;;;
 ;;; Here as well, you need to become super-user for the last step.  Now,
-;;; initialises your word lists by doing, under your own identity:
+;;; initialize your word lists by doing, under your own identity:
 ;;;
 ;;;     mkdir ~/.bogofilter
 ;;;     touch ~/.bogofilter/badlist
