@@ -21499,6 +21499,11 @@ Spam と ham のプロセッサーと @code{spam-split} のため
 @code{spam-check-blackbox} 関数を書いて下さい。それ
 は @samp{nil} か @code{spam-split-group} を返さなければなりません。あな
 たにできることの例は、既存の @code{spam-check-*} 関数を参照してください。
+
+ブラックボックスが、それが動作するためにメッセージ全体を必要とする統計的
+メール分析器であるのならば、
+@code{spam-list-of-statistical-checks} に @code{spam-use-blackbox} を追
+加することを忘れないで下さい。
 @end enumerate
 
 Spam と ham メッセージを処理するには、以下を用意して下さい:
