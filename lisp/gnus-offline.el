@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.2 1999-08-20 23:20:32 czkmt Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.3 1999-08-25 14:29:18 czkmt Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -192,6 +192,11 @@ If mail , gnus-offline only fetch mail articles.
   "*Function to hangup."
   :group 'gnus-offline
   :type 'function)
+
+(defcustom gnus-offline-agent-automatic-expire t
+  "*Non-nil means expire articles pn every session."
+  :group 'gnus-offline
+  :type 'boolean)
 
 ;; These variables should be customized using `gnus-offline-customize',
 ;; not by `customize'.
@@ -564,8 +569,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   (if (eq gnus-offline-articles-to-fetch 'mail)
       (gnus-offline-restore-mail-group-level))
   (if (eq gnus-offline-news-fetch-method 'nnagent)
-      (or gnus-agent-expire-all
-	  (gnus-offline-agent-expire)))
+      (gnus-offline-agent-expire))
   (if (and (featurep 'xemacs)
 	   (fboundp 'play-sound-file))
       (ding nil 'drum)
@@ -675,7 +679,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 (defun gnus-offline-agent-expire ()
   "*Expire expirable article on News group."
   (interactive)
-  (gnus-agent-expire))
+  (when gnus-offline-agent-automatic-expire
+    (let ((gnus-agent-expire-all (if (eq 0 gnus-agent-expire-days)
+				     nil
+				   gnus-agent-expire-all)))
+      (gnus-agent-expire))))
 ;;
 ;; Menu.
 ;;
