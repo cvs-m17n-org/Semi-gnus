@@ -8885,7 +8885,7 @@ groups."
   (interactive "P")
   (save-excursion
     (set-buffer gnus-article-buffer)
-    (gnus-smiley-display arg)))
+    (gnus-article-smiley-display arg)))
 
 ;;; Respooling
 

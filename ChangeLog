@@ -1,3 +1,18 @@
+2002-01-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el: Don't autoload "gnus-bitmap".
+
+	* lisp/gnus-sum.el (gnus-summary-toggle-smiley): Replace
+	`gnus-smiley-display' with `gnus-article-smiley-display'.
+
+	* lisp/gnus-art.el (gnus-article-smiley-display): Re-implement to
+	integrate smiley functions for various Emacsen.
+	(gnus-treatment-function-alist): Always use
+	`gnus-article-smiley-display' for `gnus-treat-display-smileys'.
+	(gnus-treat-display-smileys): Use `gnus-image-type-available-p'.
+	(gnus-article-smiley-mule-loaded-p): New internal variable.
+	(gnus-article-should-use-smiley-mule): New user option.
+
 2002-01-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* texi/gnus-ja.texi (Web Newspaper): Update the document of

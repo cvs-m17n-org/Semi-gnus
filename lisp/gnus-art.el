@@ -1101,11 +1101,36 @@ See the manual for details."
   :type gnus-article-treat-head-custom)
 (put 'gnus-treat-display-xface 'highlight t)
 
+(defcustom gnus-article-should-use-smiley-mule
+  (not (or (featurep 'xemacs)
+	   (gnus-image-type-available-p 'xpm)
+	   (gnus-image-type-available-p 'pbm)))
+  "If non-nil, gnus uses `smiley-mule' for displaying smileys rather than
+`smiley-ems'.  It defaults to t when Emacs 20 or earlier is running.
+`smiley-mule' is boundled in BITMAP-MULE package.  You can set it to t
+even if you are using Emacs 21+.  It has no effect on XEmacs."
+  :group 'gnus-article-various
+  :type 'boolean
+  :get (lambda (symbol)
+	 (and (default-value symbol)
+	      (not (featurep 'xemacs))
+	      (module-installed-p 'smiley-mule)
+	      t))
+  :set (lambda (symbol value)
+	 (set-default symbol (and value
+				  (not (featurep 'xemacs))
+				  (module-installed-p 'smiley-mule)
+				  t))))
+
+(defvar gnus-article-smiley-mule-loaded-p nil
+  "Internal variable used to say whether `smiley-mule' is loaded (whether
+smiley functions are not overridden by `smiley-ems').")
+
 (defcustom gnus-treat-display-smileys
   (if (or (and (featurep 'xemacs)
 	       (featurep 'xpm))
-	  (and (fboundp 'image-type-available-p)
-	       (image-type-available-p 'pbm))
+	  (gnus-image-type-available-p 'xpm)
+	  (gnus-image-type-available-p 'pbm)
 	  (and (not (featurep 'xemacs))
 	       window-system
 	       (module-installed-p 'smiley-mule)))
@@ -1235,7 +1260,7 @@ It is a string, such as \"PGP\". If nil, ask user."
 
 (defvar gnus-article-mime-handle-alist-1 nil)
 (defvar gnus-treatment-function-alist
-  `((gnus-treat-decode-article-as-default-mime-charset
+  '((gnus-treat-decode-article-as-default-mime-charset
      gnus-article-decode-article-as-default-mime-charset)
     (gnus-treat-x-pgp-sig gnus-article-verify-x-pgp-sig)
     (gnus-treat-strip-banner gnus-article-strip-banner)
@@ -1276,10 +1301,7 @@ It is a string, such as \"PGP\". If nil, ask user."
     (gnus-treat-unfold-headers gnus-article-treat-unfold-headers)
     (gnus-treat-fold-newsgroups gnus-article-treat-fold-newsgroups)
     (gnus-treat-buttonize-head gnus-article-add-buttons-to-head)
-    (gnus-treat-display-smileys ,(if (or (featurep 'xemacs)
-					 (>= emacs-major-version 21))
-				     'gnus-smiley-display
-				   'gnus-article-smiley-display))
+    (gnus-treat-display-smileys gnus-article-smiley-display)
     (gnus-treat-capitalize-sentences gnus-article-capitalize-sentences)
     (gnus-treat-emphasize gnus-article-emphasize)
     (gnus-treat-display-xface gnus-article-display-x-face)
@@ -5981,9 +6003,29 @@ specified by `gnus-button-alist'."
 (eval-when-compile
   ;; Silence the byte-compiler.
   (autoload 'smiley-toggle-buffer "gnus-bitmap"))
-(defun gnus-article-smiley-display ()
-  "Display \"smileys\" as small graphical icons."
-  (smiley-toggle-buffer 1 (current-buffer) (point-min) (point-max)))
+(defun gnus-article-smiley-display (&optional arg)
+  "Display smileys as small graphical icons.
+With arg, turn displaying on if and only if arg is positive."
+  (interactive "P")
+  (cond ((featurep 'xemacs)
+	 (gnus-smiley-display arg))
+	((>= emacs-major-version 21)
+	 (if gnus-article-should-use-smiley-mule
+	     (progn
+	       (unless gnus-article-smiley-mule-loaded-p
+		 (load "smiley-mule" nil t)
+		 (setq gnus-article-smiley-mule-loaded-p t))
+	       (smiley-toggle-buffer arg))
+	   (when gnus-article-smiley-mule-loaded-p
+	     (load "smiley-ems" nil t)
+	     (setq gnus-article-smiley-mule-loaded-p nil))
+	   (gnus-smiley-display arg)))
+	(t
+	 (setq gnus-article-should-use-smiley-mule t)
+	 (unless gnus-article-smiley-mule-loaded-p
+	   (load "smiley-mule" nil t)
+	   (setq gnus-article-smiley-mule-loaded-p t))
+	 (smiley-toggle-buffer arg))))
 
 ;;; Next/prev buttons in the article buffer.
 

@@ -2204,8 +2204,6 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
   (unless (featurep 'xemacs)
     (if (>= emacs-major-version 21)
 	(autoload 'x-face-decode-message-header "x-face-e21")
-      (autoload 'gnus-smiley-display "gnus-bitmap" nil t)
-      (autoload 'smiley-toggle-buffer "gnus-bitmap")
       (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule"))))
 
 (unless (and (fboundp 'base64-encode-string)
