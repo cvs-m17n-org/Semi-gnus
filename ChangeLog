@@ -1,3 +1,7 @@
+1998-08-28  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el: Repair `multi frame control'.
+
 1998-08-27  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.16.
