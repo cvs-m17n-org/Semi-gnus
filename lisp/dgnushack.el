@@ -141,8 +141,10 @@
 ;; optimized because it requires `poe' and then modify the functions.
 (or (featurep 'path-util)
     (load "apel/path-util"))
-(add-path "apel")
-(add-path "flim")
+(or (locate-library "poe")
+    (add-path "apel"))
+(or (locate-library "mel")
+    (add-path "flim"))
 (unless (module-installed-p 'mel)
   ;; FLIM 1.14 may have installed in two "flim" subdirectories.
   (push (expand-file-name "flim"

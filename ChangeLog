@@ -1,3 +1,8 @@
+2001-05-28  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/dgnushack.el (toplevel): Add paths if and only if APEL and
+	FLIM can't be found.
+
 2001-05-17  Kai =?iso-8859-1?q?Gro=DFjohann?=  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* etc/Makefile.in (datadir): Set this variable, like in the other
