@@ -1,6 +1,6 @@
 2001-01-11  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lisp/gnus-msg.el (gnus-copy-article-buffer): Revome smiley
+	* lisp/gnus-msg.el (gnus-copy-article-buffer): Remove smiley
 	extents for XEmacs 21.1 using `format'.
 
 	* lisp/dgnushack.el (dgnushack-texi-format): Cancel last change.
