@@ -226,7 +226,11 @@
   "Rertrieve URL contents and insert to current buffer."
   (let ((coding-system-for-read 'binary)
 	(coding-system-for-write 'binary))
-    (set-buffer-multibyte nil)
+    ;; XXX: Ad hok.
+    (when (or no-cache
+	      (not (file-exists-p
+		    (url-cache-create-filename url))))
+      (set-buffer-multibyte nil))
     ;; Following code is imported from `url-insert-file-contents'.
     (save-excursion
       (let ((old-asynch (default-value 'url-be-asynchronous))
@@ -547,10 +551,12 @@
   (if (fboundp 'eword-encode-string)
       ;; For Semi-Gnus.
       (defun nnshimbun-mime-encode-string (string)
-	(mapconcat
-	 #'identity
-	 (split-string (eword-encode-string (nnweb-decode-entities-string string)) "\n")
-	 ""))
+	(if (zerop (length string))
+	    ""
+	  (mapconcat
+	   #'identity
+	   (split-string (eword-encode-string (nnweb-decode-entities-string string)) "\n")
+	   "")))
     ;; For pure Gnus.
     (defun nnshimbun-mime-encode-string (string)
       (mapconcat
