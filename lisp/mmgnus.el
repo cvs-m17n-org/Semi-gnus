@@ -25,21 +25,92 @@
 
 ;;; Code:
 
-(require 'mmbuffer)
+(require 'mime)
+(require 'eword-decode)
 
-(luna-define-class mime-gnus-handle-entity (mime-buffer-entity)
-		   (undisplayer content-description cache content-id))
+(luna-define-class mmgnus-entity (mime-entity)
+		   (body
+		    header undisplayer content-description cache content-id))
 
-(luna-define-internal-accessors 'mime-gnus-handle-entity)
+(luna-define-internal-accessors 'mmgnus-entity)
 
-(luna-define-method initialize-instance ((entity mime-gnus-handle-entity)
+(luna-define-method initialize-instance ((entity mmgnus-entity)
 					 &rest init-args)
   (apply (car (luna-class-find-functions
 	       (luna-find-class 'standard-object)
 	       'initialize-instance))
 	 entity init-args))
 
-(luna-define-class mime-gnus-entity (mime-gnus-handle-entity)
+(defun mmgnus-visible-field-p (field-name visible-fields invisible-fields)
+  (or (catch 'found
+	(while visible-fields
+	  (let ((regexp (car visible-fields)))
+	    (if (string-match regexp field-name)
+		(throw 'found t)
+	      ))
+	  (setq visible-fields (cdr visible-fields))
+	  ))
+      (catch 'found
+	(while invisible-fields
+	  (let ((regexp (car invisible-fields)))
+	    (if (string-match regexp field-name)
+		(throw 'found nil)
+	      ))
+	  (setq invisible-fields (cdr invisible-fields))
+	  )
+	t)))
+
+(defun mmgnus-insert-header-from-string (string
+					 &optional invisible-fields
+					 visible-fields)
+  (let ((the-buf (current-buffer))
+	(mode-obj (mime-find-field-presentation-method 'wide))
+	field-decoder
+	f-b p f-e field-name len field field-body buffer)
+    (with-temp-buffer
+      (setq buffer (current-buffer))
+      (insert string)
+      (goto-char (point-min))
+      (while (re-search-forward std11-field-head-regexp nil t)
+	(setq f-b (match-beginning 0)
+	      p (match-end 0)
+	      field-name (buffer-substring f-b p)
+	      len (string-width field-name)
+	      f-e (std11-field-end))
+	(when (mmgnus-visible-field-p field-name
+				      visible-fields invisible-fields)
+	  (setq field (intern
+		       (capitalize (buffer-substring f-b (1- p))))
+		field-body (buffer-substring p f-e)
+		field-decoder (inline (mime-find-field-decoder-internal
+				       field mode-obj)))
+	  (with-current-buffer the-buf
+	    (insert field-name)
+	    (insert (if field-decoder
+			(funcall field-decoder field-body len)
+		      ;; Don't decode
+		      field-body))
+	    (insert "\n")
+	    ))))))
+
+(luna-define-method mime-insert-header ((entity mmgnus-entity)
+					&optional invisible-fields
+					visible-fields)
+  (mmgnus-insert-header-from-string
+   (mmgnus-entity-header-internal entity)
+   invisible-fields visible-fields))
+
+(luna-define-method mime-entity-content ((entity mmgnus-entity))
+  (save-excursion
+    (cond
+     ((bufferp (mmgnus-entity-body-internal entity))
+      (set-buffer (mmgnus-entity-body-internal entity))
+      (mime-decode-string (buffer-string) (mime-entity-encoding entity)))
+     (t
+      (error "Invalid body object. %s"
+	     (mmgnus-entity-body-internal entity))))))
+
+(luna-define-class mime-gnus-entity (mmgnus-entity)
 		   (number
 		    subject from date id references chars lines xref extra))
 
@@ -51,6 +122,14 @@
 	       (luna-find-class 'standard-object)
 	       'initialize-instance))
 	 entity init-args))
+
+(luna-define-method mime-insert-header :around ((entity mime-gnus-entity)
+						&optional invisible-fields
+						visible-fields)
+  (luna-call-next-method))
+
+(luna-define-method mime-entity-content :around ((entity mime-gnus-entity))
+  (luna-call-next-method))
 
 ;;; @ end
 ;;;
