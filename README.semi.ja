@@ -40,7 +40,7 @@ http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 (1) checkout
 
     % cvs -d :pserver:anonymous@cvs.m17n.org:/cvs/root \
-	checkout -r t-gnus-6_16 gnus
+	checkout -r t-gnus-6_16-quimby gnus
 
 (2) compile
 
@@ -50,7 +50,7 @@ http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
 (3) update
 
-    % cvs update -r t-gnus-6_16 gnus
+    % cvs update -r t-gnus-6_16-quimby gnus
 
 主なタグは以下のようになっています:
 
