@@ -270,6 +270,14 @@ Optional prefix (or REVERSE argument) means sort in reverse order."
 
 (defvar gnus-summary-misc-menu)
 
+;; The function `easy-menu-add-item' is not available under Emacs
+;; versions prior to 20.3.  Could anyone try to emulate it?
+(if (eval-when-compile
+      (require 'easymenu)
+      (or (fboundp 'easy-menu-add-item)
+	  (progn
+	    (defalias 'easy-menu-add-item 'ignore)
+	    nil)))
 (add-hook 'gnus-summary-menu-hook
 	  (lambda ()
 	    (easy-menu-add-item gnus-summary-misc-menu
@@ -280,6 +288,7 @@ Optional prefix (or REVERSE argument) means sort in reverse order."
 					   gnus-newsgroup-name))
 				     'nndiary)]
 				"Sort by number")))
+  )
 
 
 
