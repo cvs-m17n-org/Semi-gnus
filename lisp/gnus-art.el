@@ -1198,7 +1198,10 @@ See Info node `(gnus)Customizing Articles' for details."
   :type gnus-article-treat-custom)
 (put 'gnus-treat-overstrike 'highlight t)
 
-(defcustom gnus-treat-display-xface
+(make-obsolete-variable 'gnus-treat-display-xface
+			'gnus-treat-display-x-face)
+
+(defcustom gnus-treat-display-x-face
   (and (not noninteractive)
        (or (memq gnus-article-x-face-command
 		 '(x-face-decode-message-header
@@ -1218,8 +1221,23 @@ See Info node `(gnus)Customizing Articles' and Info node
   ;;:version "21.1"
   :link '(custom-manual "(gnus)Customizing Articles")
   :link '(custom-manual "(gnus)X-Face")
-  :type gnus-article-treat-head-custom)
-(put 'gnus-treat-display-xface 'highlight t)
+  :type gnus-article-treat-head-custom
+  :set (lambda (symbol value)
+	 (custom-set-default
+	  symbol
+	  (cond ((boundp 'gnus-treat-display-xface)
+		 (message "\
+** gnus-treat-display-xface is an obsolete variable;\
+ use gnus-treat-display-x-face instead")
+		 (default-value 'gnus-treat-display-xface))
+		((get 'gnus-treat-display-xface 'saved-value)
+		 (message "\
+** gnus-treat-display-xface is an obsolete variable;\
+ use gnus-treat-display-x-face instead")
+		 (eval (car (get 'gnus-treat-display-xface 'saved-value))))
+		(t
+		 value)))))
+(put 'gnus-treat-display-x-face 'highlight t)
 
 (defcustom gnus-article-should-use-smiley-mule
   (not (or (featurep 'xemacs)
@@ -1501,7 +1519,7 @@ This requires GNU Libidn, and by default only enabled if it is found."
     (gnus-treat-fold-headers gnus-article-treat-fold-headers)
     ;; Displaying X-Face should be done after unfolding headers
     ;; to protect bitmap lines.
-    (gnus-treat-display-xface gnus-article-display-x-face)
+    (gnus-treat-display-x-face gnus-article-display-x-face)
     (gnus-treat-fold-newsgroups gnus-article-treat-fold-newsgroups)
     (gnus-treat-buttonize-head gnus-article-add-buttons-to-head)
     (gnus-treat-display-smileys gnus-treat-smiley)
