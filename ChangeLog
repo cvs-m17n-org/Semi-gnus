@@ -1,3 +1,32 @@
+2000-04-11  Keiichi Suzuki  <keiichi@mdcnet.co.jp>
+
+	* Nana-gnus: Version 7.1.0.15 (This is alpha status.)
+	Fix a bug.  Modify internal cache data structures.
+
+	* lisp/mess-lcl.el (message-mime-charset-recover-by-ask):
+	Abolished argments.
+
+	* lisp/gnus.el (gnus-version): Restore string format.
+	(gnus-product-variable-file-list): Update file compatibility
+	version numbers.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.15.
+	(gnus-product-name): Revived.
+	(gnus-version-number): Likewise.
+
+	* lisp/gnus-start.el (gnus-product-directory): Use
+	`gnus-product-name'.
+	(gnus-product-variable-touch): Support multiple arguments.
+
+	* lisp/gnus-spec.el (gnus-format-specs): Modify data structure.
+	(gnus-format-specs-compiled): Likewise.
+	(gnus-update-format): Support new data structure of
+	`gnus-format-specs'.
+	(gnus-update-format-specification-1): Support new data structure
+	of `gnus-format-specs-compiled'.
+	(gnus-update-format-specifications): Likewise.
+	(gnus-search-or-regist-spec): New utility macro.
+
 2000-03-14  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.14 (This is alpha status.)
