@@ -1,3 +1,7 @@
+2001-08-15  Yoichi NAKAYAMA  <yoichi@eken.phys.nagoya-u.ac.jp>
+
+	* texi/gnus-ja.texi (Browsing the Web): Fix typo.
+
 2001-08-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 06.
