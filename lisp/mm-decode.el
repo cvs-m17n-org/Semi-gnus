@@ -620,18 +620,17 @@ Postpone undisplaying of viewers for types in
 (defun mm-copy-to-buffer ()
   "Copy the contents of the current buffer to a fresh buffer."
   (save-excursion
-    (let ((flag enable-multibyte-characters)
-	  (new-buffer (generate-new-buffer " *mm*")))
+    (let ((obuf (current-buffer))
+	  (multibyte enable-multibyte-characters)
+	  beg)
       (goto-char (point-min))
       (search-forward-regexp "^\n" nil t)
-      (save-restriction
-	(narrow-to-region (point) (point-max))
-	(when flag
-	  (set-buffer-multibyte nil))
-	(copy-to-buffer new-buffer (point-min) (point-max))
-	(when flag
-	  (set-buffer-multibyte t)))
-      new-buffer)))
+      (setq beg (point))
+      (set-buffer (generate-new-buffer " *mm*"))
+      ;; Preserve the data's unibyteness (for url-insert-file-contents).
+      (set-buffer-multibyte multibyte)
+      (insert-buffer-substring obuf beg)
+      (current-buffer))))
 
 (defun mm-display-parts (handle &optional no-default)
   (if (stringp (car handle))
