@@ -1050,6 +1050,39 @@ The following commands are available:
   (let ((charset (gnus-group-name-charset nil string)))
     (gnus-group-name-decode string charset)))
 
+(defun gnus-group-name-encode (string charset)
+  (if (and string charset (featurep 'mule))
+      (encode-coding-string string charset)
+    string))
+
+(defun gnus-group-encoded-name (string)
+  (let ((charset (gnus-group-name-charset nil string)))
+    (gnus-group-name-encode string charset)))
+
+(defun gnus-group-completing-read-group-name
+  (prompt table &optional predicate require-match initial-contents history)
+  (if (vectorp table)
+      (let ((decoded-table (make-vector (length table) 0)))
+	(mapatoms
+	 (lambda (atom)
+	   (set (intern (gnus-group-decoded-name (symbol-name atom))
+			decoded-table)
+		(symbol-value atom)))
+	 table)
+	(setq table decoded-table))
+    (setq table (mapcar
+		 (lambda (entry)
+		   (cons (gnus-group-decoded-name
+			  (car entry))
+			 (cdr entry)))
+		 table)))
+  (gnus-group-encoded-name
+   (completing-read
+    prompt table predicate
+    require-match
+    initial-contents
+    history)))
+
 (defun gnus-group-list-groups (&optional level unread lowest)
   "List newsgroups with level LEVEL or lower that have unread articles.
 Default is all subscribed groups.
@@ -1856,7 +1889,8 @@ be permanent."
 (defun gnus-fetch-group (group)
   "Start Gnus if necessary and enter GROUP.
 Returns whether the fetching was successful or not."
-  (interactive (list (completing-read "Group name: " gnus-active-hashtb)))
+  (interactive (list (gnus-group-completing-read-group-name
+		      "Group name: " gnus-active-hashtb)))
   (unless (get-buffer gnus-group-buffer)
     (gnus-no-server))
   (gnus-group-read-group nil nil group))
@@ -1935,7 +1969,7 @@ Return the name of the group if selection was successful."
 (defun gnus-group-jump-to-group (group)
   "Jump to newsgroup GROUP."
   (interactive
-   (list (completing-read
+   (list (gnus-group-completing-read-group-name
 	  "Group: " gnus-active-hashtb nil
 	  (gnus-read-active-file-p)
 	  gnus-group-jump-to-group-prompt
@@ -3120,7 +3154,7 @@ If given numerical prefix, toggle the N next groups."
 Killed newsgroups are subscribed.  If SILENT, don't try to update the
 group line."
   (interactive
-   (list (completing-read
+   (list (gnus-group-completing-read-group-name
 	  "Group: " gnus-active-hashtb nil
 	  (gnus-read-active-file-p)
 	  nil

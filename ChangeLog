@@ -1,5 +1,14 @@
 2002-02-21   Daiki Ueno  <ueno@unixuser.org>
 
+	* lisp/gnus-group.el (gnus-group-name-encode): New function.
+	(gnus-group-encoded-name): New function.
+	(gnus-group-completing-read-group-name): New function.
+	(gnus-fetch-group): Use it.
+	(gnus-group-jump-to-group): Use it.
+	(gnus-group-unsubscribe-current-group): Use it.
+
+2002-02-21   Daiki Ueno  <ueno@unixuser.org>
+
 	* lisp/nnheader.el (mm-string-as-unibyte): Undo the last change.
 	* lisp/gnus-srvr.el (gnus-browse-foreign-server): Ditto.
 
