@@ -6,6 +6,7 @@
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
 ;;      Katsumi Yamaoka  <yamaoka@jpl.org>
+;;      Kiyokazu SUTO    <suto@merry.xmath.ous.ac.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -308,13 +309,26 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
   (gnus-summary-followup (gnus-summary-work-articles arg) t))
 
 (defun gnus-inews-yank-articles (articles)
-  (let (beg article)
+  (let* ((more-than-one (cdr articles))
+	 (frame (when (and message-use-multi-frames more-than-one)
+		  (window-frame (get-buffer-window (current-buffer)))))
+	 refs beg article)
     (message-goto-body)
     (while (setq article (pop articles))
       (save-window-excursion
 	(set-buffer gnus-summary-buffer)
 	(gnus-summary-select-article nil nil nil article)
 	(gnus-summary-remove-process-mark article))
+      (when frame
+	(select-frame frame))
+
+      ;; Gathering references.
+      (when more-than-one
+	(setq refs (message-list-references
+		    refs
+		    (mail-header-references gnus-current-headers)
+		    (mail-header-message-id gnus-current-headers))))
+
       (gnus-copy-article-buffer)
       (let ((message-reply-buffer gnus-article-copy)
 	    (message-reply-headers gnus-current-headers))
@@ -323,6 +337,25 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
       (when articles
 	(insert "\n")))
     (push-mark)
+
+    ;; Replace with the gathered references.
+    (when refs
+      (push-mark beg)
+      (save-restriction
+	(message-narrow-to-headers)
+	(let ((case-fold-search t))
+	  (if (re-search-forward "^References:\\([\t ]+.+\n\\)+" nil t)
+	      (replace-match "")
+	    (goto-char (point-max))))
+	(mail-header-format
+	 (list (or (assq 'References message-header-format-alist)
+		   '(References . message-fill-references)))
+	 (list (cons 'References
+		     (mapconcat 'identity (nreverse refs) " "))))
+	(backward-delete-char 1))
+      (setq beg (mark t))
+      (pop-mark))
+
     (goto-char beg)))
 
 (defun gnus-summary-cancel-article (&optional n symp)
@@ -685,7 +718,7 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
   "Digest and forwards all articles in this series to a newsgroup."
   (interactive "P")
   (gnus-summary-mail-digest n t))
- 
+
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."
   (interactive "sResend message(s) to: \nP")
