@@ -1,3 +1,8 @@
+2002-02-14  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu-kill-summary-buffers): New
+	advice.
+
 2002-02-12  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/mm-view.el: Require `gnus-mailcap' rather than `mailcap'.
