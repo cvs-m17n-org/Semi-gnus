@@ -131,9 +131,11 @@ on your system, you could say something like:
 		    :extra (mapcar
 			    (lambda (field)
 			      (cons (car field)
-				    (funcall (mime-find-field-decoder
-					      (car field) 'nov)
-					     (cdr field))))
+				    (let ((func (mime-find-field-decoder
+						 (car field) 'nov)))
+				      (if func
+					  (funcall func (cdr field))
+					(cdr field)))))
 			    extra)
 		    :original-header
 		    (apply 'list
