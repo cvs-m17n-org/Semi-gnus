@@ -1,3 +1,8 @@
+2000-06-09  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-news-group-p): Sync with Gnus.
+	(gnus-select-method): Remove "*" from doc string.
+
 2000-06-08  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/message.el (message-fix-before-sending): Expose all

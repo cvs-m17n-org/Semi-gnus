@@ -904,7 +904,7 @@ used to 899, you would say something along these lines:
 	   nil
 	 (list gnus-nntp-service)))
     (error nil))
-  "*Default method for selecting a newsgroup.
+  "Default method for selecting a newsgroup.
 This variable should be a list, where the first element is how the
 news is to be fetched, the second is the address.
 
@@ -2299,7 +2299,14 @@ that that variable is buffer-local to the summary buffers."
   "Return non-nil if GROUP (and ARTICLE) come from a news server."
   (or (gnus-member-of-valid 'post group) ; Ordinary news group.
       (and (gnus-member-of-valid 'post-mail group) ; Combined group.
-	   (eq (gnus-request-type group article) 'news))))
+	   (if (or (null article)
+		   (not (< article 0)))
+	       (eq (gnus-request-type group article) 'news)
+	     (if (not (vectorp article))
+		 nil
+	       ;; It's a real article.
+	       (eq (gnus-request-type group (mail-header-id article))
+		   'news))))))
 
 ;; Returns a list of writable groups.
 (defun gnus-writable-groups ()
