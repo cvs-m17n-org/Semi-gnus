@@ -803,6 +803,7 @@ Choosing a Mail Back End
                                 マットを使う
 * Mail Spool::                  あなたのメールを私的なスプールに溜める?
 * MH Spool::                    mhspool のようなバックエンド
+* Maildir::                     もう一つの１ファイル/１メッセージ形式
 * Mail Folders::                それぞれのグループに対して一つのファイル
                                 を持つ
 * Comparing Mail Back Ends::    得失の深い洞察
