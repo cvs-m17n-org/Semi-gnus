@@ -702,6 +702,12 @@ without formatting."
 (defvar nnheader-pathname-coding-system 'binary
   "*Coding system for pathname.")
 
+(defvar nnheader-message-coding-system-for-read 'raw-text-dos
+  "*Coding system for reading message.")
+
+(defvar nnheader-message-coding-system-for-write 'raw-text
+  "*Coding system for writing message.")
+
 (defun nnheader-group-pathname (group dir &optional file)
   "Make pathname for GROUP."
   (concat
