@@ -962,6 +962,9 @@ pairs (also vectors, actually)."
 ;; send queries as literals
 ;; handle errors
 
+(eval-when-compile
+  (defvar nnimap-server-buffer))
+
 (defun nnir-run-imap (query &optional group)
   (require 'imap)
   (require 'nnimap)
@@ -1214,13 +1217,17 @@ Tested with Namazu 2.0.6 on a GNU/Linux system."
                  ,nnir-namazu-index-directory ; index directory
                  ))
              (exitstatus
-              (progn
+	      (let ((process-environement process-environment))
+		;; Disable locale of Namazu.
+		(dolist (env process-environment)
+		  (when (string-match "\
+\\`\\(L\\(ANG\\|C_\\(ALL\\|CTYPE\\|COLLATE\\|TIME\\|NUMERIC\\|MONETARY\\|MESSAGES\\)\\)\\)=" env)
+		    (setenv (match-string 1 env) nil)))
+		(setenv "LANG" "C")
                 (message "%s args: %s" nnir-namazu-program
                          (mapconcat 'identity (cddddr cp-list) " "))
-		(let ((process-environement process-environment))
-		  (setenv "LANG" "C")
-		  (apply 'call-process cp-list)))))
-        (unless (or (null exitstatus)
+		(apply 'call-process cp-list))))
+	(unless (or (null exitstatus)
                     (zerop exitstatus))
           (nnheader-report 'nnir "Couldn't run namazu: %s" exitstatus)
           ;; Namazu failure reason is in this buffer, show it if

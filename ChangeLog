@@ -1,3 +1,9 @@
+2001-09-04  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnir.el (top): Added code to avoid byte-compile warning
+	about `nnimap-server-buffer'.
+	(nnir-run-namazu): Disable locale of Namazu.
+
 2001-09-04  KOSEKI Yoshinori  <kose@meadowy.org>
 
 	* lisp/nnir.el (gnus-group-mode-hook): Fix typo.
