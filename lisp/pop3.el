@@ -507,21 +507,44 @@ If NOW, use that time instead."
     (if (not (and response (string-match "+OK" response)))
 	(pop3-quit process))))
 
-;; Note that `pop3-md5' won't encode a given string to use for the
-;; apop authentication.
+;; When this file is being compiled in the Gnus (not T-gnus) source
+;; tree, `md5' might have been defined in w3/md5.el, ./lpath.el or one
+;; of some other libraries and `md5' will accept only 3 arguments.  We
+;; will deceive the byte-compiler not to say warnings.
 (eval-and-compile
-  (if (and (fboundp 'md5)
-	   (subrp (symbol-function 'md5)))
+  (if (fboundp 'eval-when)
+      ;; `eval-when' might not be provided when loading .el file.
+      (eval-when 'compile
+	(let ((def (assq 'md5 byte-compile-function-environment)))
+	  (if def
+	      (setcdr def '(lambda (object &optional start end
+					   coding-system noerror)))
+	    (setq byte-compile-function-environment
+		  (cons '(md5 . (lambda (object &optional start end
+						coding-system noerror)))
+			byte-compile-function-environment)))))))
+
+;; Note that `pop3-md5' should never encode a given string to use for
+;; the apop authentication.
+(eval-and-compile
+  (if (fboundp 'md5)
       (if (condition-case nil
-	      (md5 "Check whether the 3rd argument CODING is allowed"
+	      (md5 "\
+Check whether the 4th argument CODING-SYSTEM is allowed"
 		   nil nil 'binary)
 	    (error nil))
-	  ;; XEmacs 20
-	  (defalias 'pop3-md5 'md5)
-	;; Emacs 21 or XEmacs 21
-	(defun pop3-md5 (string)
-	  (md5 string nil nil 'binary)))
-    ;; The lisp function provided by FLIM
+	  ;; Emacs 21 or XEmacs 21
+	  ;; (md5 OBJECT &optional START END CODING-SYSTEM NOERROR)
+	  (defun pop3-md5 (string)
+	    (md5 string nil nil 'binary))
+	;; The reason why the program reaches here:
+	;; 1. XEmacs 20 is running and the built-in `md5' doesn't
+	;;    allow the 4th argument.
+	;; 2. `md5' has been defined by one of some lisp libraries.
+	;; 3. This file is being compiled in the Gnus source tree,
+	;;    and `md5' has been defined in lpath.el.
+	(defalias 'pop3-md5 'md5))
+    ;; The lisp function will be provided by FLIM or other libraries.
     (autoload 'md5 "md5")
     (defalias 'pop3-md5 'md5)))
 
