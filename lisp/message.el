@@ -233,6 +233,43 @@ any confusion."
   :group 'message-various
   :type 'regexp)
 
+(defcustom message-subject-encoded-re-regexp
+  (concat
+   "^[ \t]*"
+   (regexp-quote "=?")
+   "[-!#$%&'*+0-9A-Z^_`a-z{|}~]+" ; charset
+   (regexp-quote "?")
+   "\\("
+   "[Bb]" (regexp-quote "?") ; B encoding
+   "\\(\\(CQk\\|CSA\\|IAk\\|ICA\\)[Jg]\\)*" ; \([ \t][ \t][ \t]\)*
+   "\\("
+   "[Uc][km]U6" ; [Rr][Ee]:
+   "\\|"
+   "\\(C[VX]\\|I[FH]\\)J[Fl]O[g-v]" ; [ \t][Rr][Ee]:
+   "\\|"
+   "\\(CQl\\|CSB\\|IAl\\|ICB\\)[Sy][RZ]T[o-r]" ; [ \t][ \t][Rr][Ee]:
+   "\\)"
+   "\\|"
+   "[Qb]" (regexp-quote "?") ; Q encoding
+   "\\(_\\|=09\\|=20\\)*"
+   "\\([Rr]\\|=[57]2\\)\\([Ee]\\|=[46]5\\)\\(:\\|=3[Aa]\\)"
+   "\\)"
+   )
+  "*Regexp matching \"Re: \" in the subject line.
+Unlike `message-subject-re-regexp', this regexp matches \"Re: \" within
+an encoded-word."
+  :group 'message-various
+  :type 'regexp)
+
+(defcustom message-use-subject-re t
+  "*If non-nil, remove any (buggy) \"Re: \"'s from the subject of the
+precursor and add a new \"Re: \".  If nil, use the subject \"as-is\".
+If it is the symbol `guess', try to find \"Re: \" within an encoded-word."
+  :group 'message-various
+  :type '(choice (const :tag "off" nil)
+		 (const :tag "on" t)
+		 (const guess)))
+
 ;;;###autoload
 (defcustom message-signature-separator "^-- *$"
   "Regexp matching the signature separator."
@@ -2788,6 +2825,16 @@ to find out how to use this."
     (timezone-make-date-arpa-standard
      (current-time-string now) (current-time-zone now))))
 
+(defun message-make-followup-subject (subject)
+  "Make a followup Subject."
+  (cond
+   ((and (eq message-use-subject-re 'guess)
+         (string-match message-subject-encoded-re-regexp subject))
+    subject)
+   (message-use-subject-re
+    (concat "Re: " (message-strip-subject-re subject)))
+   (t subject)))
+
 (defun message-make-message-id ()
   "Make a unique Message-ID."
   (concat "<" (message-unique-id)
@@ -3460,9 +3507,7 @@ Headers already prepared in the buffer are not modified."
 	(setq message-id (match-string 0 gnus-warning)))
       ;; Remove any (buggy) Re:'s that are present and make a
       ;; proper one.
-      (when (string-match message-subject-re-regexp subject)
-	(setq subject (substring subject (match-end 0))))
-      (setq subject (concat "Re: " subject))
+      (setq subject (message-make-followup-subject subject))
       (widen))
 
     ;; Handle special values of Mail-Copies-To.
@@ -3625,9 +3670,7 @@ that further discussion should take place only in "
 	(setq distribution nil))
       ;; Remove any (buggy) Re:'s that are present and make a
       ;; proper one.
-      (when (string-match message-subject-re-regexp subject)
-	(setq subject (substring subject (match-end 0))))
-      (setq subject (concat "Re: " subject))
+      (setq subject (message-make-followup-subject subject))
       (widen))
 
     ;; Handle special values of Mail-Copies-To.
