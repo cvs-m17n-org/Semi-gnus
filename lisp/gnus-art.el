@@ -1850,7 +1850,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
        ["Hide citation" gnus-article-hide-citation t]
        ["Treat overstrike" gnus-article-treat-overstrike t]
        ["Remove carriage return" gnus-article-remove-cr t]
-       ["Remove quoted-unreadable" gnus-article-de-quoted-unreadable t]))
+       ))
 
     (when nil
       (when (boundp 'gnus-summary-article-menu)
