@@ -765,9 +765,6 @@ If FILE, find the \".../etc/PACKAGE\" file instead."
       (when (string-match (car ange-ftp-path-format) path)
 	(ange-ftp-re-read-dir path)))))
 
-(defvar nnheader-file-coding-system 'raw-text
-  "Coding system used in file backends of Gnus.")
-
 (defun nnheader-insert-file-contents (filename &optional visit beg end replace)
   "Like `insert-file-contents', q.v., but only reads in the file.
 A buffer may be modified in several ways after reading into the buffer due
@@ -780,8 +777,7 @@ find-file-hooks, etc.
 	(enable-local-variables nil)
 	(after-insert-file-functions nil)
 	(find-file-hooks nil))
-    (insert-file-contents-as-coding-system
-     nnheader-file-coding-system filename visit beg end replace)))
+    (insert-file-contents-as-raw-text-CRLF filename visit beg end replace)))
 
 (defun nnheader-find-file-noselect (&rest args)
   (let ((format-alist nil)
@@ -790,8 +786,7 @@ find-file-hooks, etc.
 	(enable-local-variables nil)
 	(after-insert-file-functions nil)
 	(find-file-hooks nil))
-    (apply 'find-file-noselect-as-coding-system
-	   nnheader-file-coding-system args)))
+    (apply 'find-file-noselect-raw-text-CRLF args)))
 
 (defun nnheader-auto-mode-alist ()
   "Return an `auto-mode-alist' with only the .gz (etc) thingies."
