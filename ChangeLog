@@ -1,3 +1,22 @@
+1998-11-13  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/nnheader.el (nnheader-decode-subject): Change mode to `nov'
+	instead of `unfolding'.
+	(nnheader-decode-from): Ditto.
+
+1998-11-11  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/message.el: (message-default-encoding): Delete unused
+	variable.
+	(message-check-news-body-syntax): Change symbol	to `8bit' instead
+	of `encoding'. Use `message-check-8bit'.
+	(message-check-mail-body-syntax): Ditto.
+	(message-check-8bit): Renamed from `message-check-encode'.
+
+	* lisp/gnus-bbdb.el (gnus-bbdb/extract-address-components): Normalize
+	return value.
+	(gnus-bbdb/update-record): Change condition for checking own message.
+
 1998-11-10  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/message.el (message-do-fcc): Sync up with Semi-gnus 6.8.
