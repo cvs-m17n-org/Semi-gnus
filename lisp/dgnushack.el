@@ -124,14 +124,21 @@ to the specified name LIBRARY (a la calling `load' instead of `load-library')."
 	nil))
     (byte-compile 'locate-library)))
 
-(unless (fboundp 'si:byte-optimize-form-code-walker)
-  (byte-optimize-form nil);; Load `byte-opt' or `byte-optimize'.
-  (setq max-specpdl-size 3000)
-  (defalias 'si:byte-optimize-form-code-walker
-    (symbol-function 'byte-optimize-form-code-walker))
-  (defun byte-optimize-form-code-walker (form for-effect)
+(setq max-specpdl-size 3000)
+
+(when (equal
+       (cadr
+	(byte-optimize-form
+	 '(and
+	   (< 0 1)
+	   (message "The subform `(< 0 1)' should be optimized to `t'"))
+	 'for-effect))
+       '(< 0 1))
+  (defadvice byte-optimize-form-code-walker
+    (around fix-bug-in-and/or-forms (form for-effect) activate)
+    "Fix a bug in the optimizing and/or forms.
+It has already been fixed in XEmacs since 1999-12-06."
     (if (and for-effect (memq (car-safe form) '(and or)))
-	;; Fix bug in and/or forms.
 	(let ((fn (car form))
 	      (backwards (reverse (cdr form))))
 	  (while (and backwards
@@ -141,14 +148,11 @@ to the specified name LIBRARY (a la calling `load' instead of `load-library')."
 	  (if (and (cdr form) (null backwards))
 	      (byte-compile-log
 	       "  all subforms of %s called for effect; deleted" form))
-	  (if backwards
-	      (let ((head backwards))
-		(while (setq backwards (cdr backwards))
-		  (setcar backwards (byte-optimize-form (car backwards)
-							nil)))
-		(cons fn (nreverse head)))))
-      (si:byte-optimize-form-code-walker form for-effect)))
-  (byte-compile 'byte-optimize-form-code-walker))
+	  (when backwards
+	    (setcdr backwards
+		    (mapcar 'byte-optimize-form (cdr backwards))))
+	  (setq ad-return-value (cons fn (nreverse backwards))))
+      ad-do-it)))
 
 (condition-case nil
     (char-after)

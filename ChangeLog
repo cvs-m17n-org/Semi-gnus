@@ -1,3 +1,9 @@
+2002-07-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (byte-optimize-form-code-walker): Don't modify
+	the function definition if the bug has already gone; revert to the
+	use of `defadvice'.
+
 2002-07-03  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* lisp/gnus-logic.el (gnus-advanced-index): Use luna based index
