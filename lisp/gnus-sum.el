@@ -1069,11 +1069,15 @@ gnus-simplify-subject-fuzzy-regexp."
 	(gnus-simplify-buffer-fuzzy-step gnus-simplify-subject-fuzzy-regexp)))
       (gnus-simplify-buffer-fuzzy-step "^ *\\[[-+?*!][-+?*!]\\] *")
       (gnus-simplify-buffer-fuzzy-step
-       "^ *\\(re\\|fw\\|fwd\\)[[{(^0-9]*[])}]?[:;] *")
+       "^ *\\(\\(re\\|fw\\|fwd\\)[[{(^0-9]*[])}]?[:;] *\\)+")
       (gnus-simplify-buffer-fuzzy-step "^[[].*:\\( .*\\)[]]$" "\\1"))
 
     (gnus-simplify-buffer-fuzzy-step " *[[{(][^()\n]*[]})] *$")
-    (gnus-simplify-buffer-fuzzy-step "  +" " ")
+    (gnus-simplify-buffer-fuzzy-step " +" " ")
+    (gnus-simplify-buffer-fuzzy-step
+     "\\([\000-\177]\\) ?\\([^\000-\177]\\)" "\\1 \\2")
+    (gnus-simplify-buffer-fuzzy-step
+     "\\([^\000-\177]\\) ?\\([\000-\177]\\)" "\\1 \\2")
     (gnus-simplify-buffer-fuzzy-step " $")
     (gnus-simplify-buffer-fuzzy-step "^ +")))
 
