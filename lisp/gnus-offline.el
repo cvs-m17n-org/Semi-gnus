@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.11 1998-11-29 09:34:45 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.12 1998-12-08 22:51:13 yamaoka Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -582,8 +582,12 @@ If value is nil , dialup line is disconnected status.")
   (if (eq gnus-offline-articles-to-fetch 'mail)
       (gnus-offline-restore-mail-group-level))
   (if (eq gnus-offline-news-fetch-method 'nnagent)
-      (gnus-offline-agent-expire))
-  (ding)
+      (or (featurep 'xemacs)
+	  (gnus-offline-agent-expire)))
+  (if (and (featurep 'xemacs)
+	   (fboundp 'play-sound-file))
+      (ding nil 'drum)
+    (ding))
   (gnus-group-save-newsrc)
   (message "All online jobs has done."))
 
