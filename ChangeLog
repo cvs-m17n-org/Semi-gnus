@@ -1,3 +1,19 @@
+1998-10-23  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.9.3.
+
+	* Nana-TIPS.ja: New file.
+
+	* lisp/message.el (message-header-hook): Change default valiable
+	to `nil' instead of `'(eword-decode-header)'. Update doc string.
+	(message-encode-header-function): New variable.
+	(message-after-header-encode-hook): New variable.
+	(message-send-mail): Funcall `message-encode-header-function'
+	after run `message-header-hook'.
+	And run hooks `message-after-header-encode-hook'.
+	(message-send-news): Ditto.
+	(message-do-fcc): Ditto.
+
 1998-10-21  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.9.2.
