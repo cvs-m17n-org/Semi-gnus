@@ -2858,8 +2858,7 @@ The following commands are available:
 	      (gnus-data-update-list odata offset)))
 	;; Find the last element in the list to be spliced into the main
 	;; list.
-	(while (cdr list)
-	  (setq list (cdr list)))
+	(setq list (last list))
 	(if (not data)
 	    (progn
 	      (setcdr list gnus-newsgroup-data)
@@ -3476,12 +3475,8 @@ This function is intended to be used in
 
 (defun gnus-summary-set-local-parameters (group)
   "Go through the local params of GROUP and set all variable specs in that list."
-  (let ((params (gnus-group-find-parameter group))
-	(vars '(quit-config))		; Ignore quit-config.
-	elem)
-    (while params
-      (setq elem (car params)
-	    params (cdr params))
+  (let ((vars '(quit-config)))          ; Ignore quit-config.
+    (dolist (elem (gnus-group-find-parameter group))
       (and (consp elem)			; Has to be a cons.
 	   (consp (cdr elem))		; The cdr has to be a list.
 	   (symbolp (car elem))		; Has to be a symbol in there.
@@ -6179,8 +6174,7 @@ executed with point over the summary line of the articles."
 (defun gnus-summary-process-mark-set (set)
   "Make SET into the current process marked articles."
   (gnus-summary-unmark-all-processable)
-  (while set
-    (gnus-summary-set-process-mark (pop set))))
+  (mapc 'gnus-summary-set-process-mark set))
 
 ;;; Searching and stuff
 
@@ -8392,12 +8386,11 @@ This will allow you to read digests and other similar
 documents as newsgroups.
 Obeys the standard process/prefix convention."
   (interactive "P")
-  (let* ((articles (gnus-summary-work-articles n))
-	 (ogroup gnus-newsgroup-name)
+  (let* ((ogroup gnus-newsgroup-name)
 	 (params (append (gnus-info-params (gnus-get-info ogroup))
 			 (list (cons 'to-group ogroup))))
-	 article group egroup groups vgroup)
-    (while (setq article (pop articles))
+	 group egroup groups vgroup)
+    (dolist (article (gnus-summary-work-articles n))
       (setq group (format "%s-%d" gnus-newsgroup-name article))
       (gnus-summary-remove-process-mark article)
       (when (gnus-summary-display-article article)
@@ -8857,8 +8850,7 @@ strokes are `C-u g'."
 	    (or (cdr (assq arg gnus-summary-show-article-charset-alist))
 		(mm-read-coding-system
 		 "View as charset: " ;; actually it is coding system.
-		 (save-excursion
-		   (set-buffer gnus-article-buffer)
+		 (with-current-buffer gnus-article-buffer
 		   (mm-detect-coding-region (point) (point-max))))))
 	   (default-mime-charset gnus-newsgroup-charset)
 	   (gnus-newsgroup-ignored-charsets 'gnus-all))
