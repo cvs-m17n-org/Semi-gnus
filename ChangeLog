@@ -1,3 +1,8 @@
+1999-09-13  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* README-offline.en: Rewrite the usage description.
+	* README-offline.ja: Ditto.
+
 1999-09-12  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
