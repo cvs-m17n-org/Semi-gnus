@@ -60,7 +60,7 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'gnus-clfns))
-(eval-and-compile (require 'imap))
+(require 'imap)
 
 (require 'nnoo)
 (require 'nnmail)
@@ -846,9 +846,9 @@ function is generally only called when Gnus is shutting down."
     (when (and (imap-opened)
 	       (nnimap-possibly-change-group group server))
       (case nnimap-expunge-on-close
-	('always (imap-mailbox-expunge nnimap-close-asynchronous)
+	(always (imap-mailbox-expunge nnimap-close-asynchronous)
 		 (imap-mailbox-close nnimap-close-asynchronous))
-	('ask (if (and (imap-search "DELETED")
+	(ask (if (and (imap-search "DELETED")
 		       (gnus-y-or-n-p (format
 				       "Expunge articles in group `%s'? "
 				       imap-current-mailbox)))
