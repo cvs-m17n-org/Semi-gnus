@@ -204,7 +204,7 @@ Valid types include `google', `dejanews', and `gmane'.")
   (nnweb-possibly-change-server group server))
 
 (deffoo nnweb-asynchronous-p ()
-  t)
+  nil)
 
 (deffoo nnweb-request-create-group (group &optional server args)
   (nnweb-possibly-change-server nil server)
