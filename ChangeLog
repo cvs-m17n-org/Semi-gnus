@@ -1,5 +1,8 @@
 1998-10-26  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/pop3-fma.el: Require `mel-b-ccl' or `mel-b-el' if `mel-b'
+	does not exist.
+
 	* lisp/nnheader.el (nnheader-file-coding-system): Restore the
 	previous default value.
 
