@@ -37,10 +37,10 @@
 ;;; Code:
 
 (eval-when-compile
-  (require 'canlock)
   (require 'cl)
   (require 'smtp)
-  (defvar gnus-list-identifiers))	; gnus-sum is required where necessary
+  (defvar gnus-list-identifiers)) ; gnus-sum is required where necessary
+(require 'canlock)
 (require 'mailheader)
 (require 'nnheader)
 ;; This is apparently necessary even though things are autoloaded:
@@ -249,7 +249,7 @@ included.  Organization, Lines and User-Agent are optional."
   :group 'message-headers
   :type 'regexp)
 
-(defcustom message-ignored-supersedes-headers "^Path:\\|^Date\\|^NNTP-Posting-Host:\\|^Xref:\\|^Lines:\\|^Received:\\|^X-From-Line:\\|^X-Trace:\\|^X-Complaints-To:\\|Return-Path:\\|^Supersedes:\\|^NNTP-Posting-Date:\\|^X-Trace:\\|^X-Complaints-To:"
+(defcustom message-ignored-supersedes-headers "^Path:\\|^Date\\|^NNTP-Posting-Host:\\|^Xref:\\|^Lines:\\|^Received:\\|^X-From-Line:\\|^X-Trace:\\|^X-Complaints-To:\\|Return-Path:\\|^Supersedes:\\|^NNTP-Posting-Date:\\|^X-Trace:\\|^X-Complaints-To:\\|^Cancel-Lock:\\|^Cancel-Key:"
   "*Header lines matching this regexp will be deleted before posting.
 It's best to delete old Path and Date headers before posting to avoid
 any confusion."
@@ -3384,7 +3384,6 @@ Otherwise, generate and save a value for `canlock-password' first."
 
 (defun message-insert-canlock ()
   (when message-insert-canlock
-    (require 'canlock)
     (message-canlock-password)
     (canlock-insert-header)))
 
@@ -5282,15 +5281,31 @@ If ARG, allow editing of the cancellation message."
 	      message-id (message-fetch-field "message-id" t)
 	      distribution (message-fetch-field "distribution")))
       ;; Make sure that this article was written by the user.
-      (unless (or (message-gnksa-enable-p 'cancel-messages)
-		  (and sender
-		       (string-equal
-			(downcase sender)
-			(downcase (message-make-sender))))
-		  (string-equal
-		   (downcase (cadr (std11-extract-address-components from)))
-		   (downcase (cadr (std11-extract-address-components
-				    (message-make-from))))))
+      (unless (or
+	       ;; Canlock-logic as suggested by Per Abrahamsen
+	       ;; <abraham@dina.kvl.dk>
+	       ;;
+	       ;; IF article has cancel-lock THEN
+	       ;;   IF we can verify it THEN
+	       ;;     issue cancel
+	       ;;   ELSE
+	       ;;     error: cancellock: article is not yours
+	       ;; ELSE
+	       ;;   Use old rules, comparing sender...
+	       (if (message-fetch-field "Cancel-Lock")
+		   (if (null (canlock-verify))
+		       t
+		     (error "Failed to verify Cancel-lock: This article is not yours"))
+		 nil)
+	       (message-gnksa-enable-p 'cancel-messages)
+	       (and sender
+		    (string-equal
+		     (downcase sender)
+		     (downcase (message-make-sender))))
+	       (string-equal
+		(downcase (cadr (std11-extract-address-components from)))
+		(downcase (cadr (std11-extract-address-components
+				 (message-make-from))))))
 	(error "This article is not yours"))
       (when (yes-or-no-p "Do you really want to cancel this article? ")
 	;; Make control message.
@@ -5332,15 +5347,31 @@ header line with the old Message-ID."
 	(sender (message-fetch-field "sender"))
 	(from (message-fetch-field "from")))
     ;; Check whether the user owns the article that is to be superseded.
-    (unless (or (message-gnksa-enable-p 'cancel-messages)
-		(and sender
-		     (string-equal
-		      (downcase sender)
-		      (downcase (message-make-sender))))
-		(string-equal
-		 (downcase (cadr (std11-extract-address-components from)))
-		 (downcase (cadr (std11-extract-address-components
-				  (message-make-from))))))
+    (unless (or
+	     ;; Canlock-logic as suggested by Per Abrahamsen
+	     ;; <abraham@dina.kvl.dk>
+	     ;;
+	     ;; IF article has cancel-lock THEN
+	     ;;   IF we can verify it THEN
+	     ;;     issue cancel
+	     ;;   ELSE
+	     ;;     error: cancellock: article is not yours
+	     ;; ELSE
+	     ;;   Use old rules, comparing sender...
+	     (if (message-fetch-field "Cancel-Lock")
+		 (if (null (canlock-verify))
+		     t
+		   (error "Failed to verify Cancel-lock: This article is not yours"))
+	       nil)
+	     (message-gnksa-enable-p 'cancel-messages)
+	     (and sender
+		  (string-equal
+		   (downcase sender)
+		   (downcase (message-make-sender))))
+	     (string-equal
+	      (downcase (cadr (std11-extract-address-components from)))
+	      (downcase (cadr (std11-extract-address-components
+			       (message-make-from))))))
       (error "This article is not yours"))
     ;; Get a normal message buffer.
     (message-pop-to-buffer (message-buffer-name "supersede"))
