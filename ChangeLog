@@ -1,3 +1,186 @@
+1999-02-08  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/mess-bbdb.el: New file.
+
+	* lisp/message.el (message-mail-follow-up-address-checker): New
+	variable.
+	(message-reply): Use `message-mail-follow-up-address-checker'.
+	(message-mailing-list-address-list): New variable.
+	(message-check-mailing-list-with-address-list): New function.
+	(message-mailing-list-address-p): New variable.
+	(message-check-mailing-list-with-function): New function.
+
+	* lisp/gnus-bbdb.el: Update required Gnus version.
+
+	* lisp/dgnushack.el (dgnushack-compile): New file `mess-bbdb.el'.
+
+	* Nana-TIPS.ja: New section
+	`message-mail-follow-up-address-checker'.
+
+1999-02-05  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.1.
+
+	* Sync up with gnus-6_10.
+
+* 1999-02-04  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-nov-parse-line): Use `following-char'
+	instead of `char-after'. NOTE: It's a temporary step.
+
+* 1999-02-03  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Add default value.
+
+* 1999-02-02  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): Ask save password
+	information to .newsrc file.
+
+* 1999-02-02  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-ofsetup.el (gnus-setup-for-offline): To work with
+	external movemail program.
+
+* 1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/{gnus-cache,gnus-int,gnus-sum,gnus,nnheader,nnmh}.el: Undo
+	the last changes -- don't sync with chaos-1_12.
+
+* 1999-02-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-gnus-get-new-news): Undo my
+	change.
+
+* 1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-offline.el (gnus-offline-define-menu-on-miee): Close
+	parentheses.
+	(gnus-offline-define-menu-on-agent): Ditto.
+
+* 1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.3.
+	(gnus-version): Modify for SEMI 1.13.
+
+	* lisp/gnus-sum.el (gnus-nov-parse-line): Use `char-after' instead
+	of `following-char'.
+
+* 1999-02-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* README-offline.ja: Add description written by YOSHIZAWA Masahiro
+	<manbou@ceres.dti.ne.jp>.
+
+* 1999-01-31  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el: Abolish macro `gnus-nov-read-integer',
+	`gnus-nov-skip-field' and `gnus-nov-field'.
+	(gnus-nov-parse-line): Use `nnheader-nov-field' and
+	`nnheader-nov-read-integer' instead of `gnus-nov-field' and
+	`gnus-nov-read-integer'.
+	(gnus-get-newsgroup-headers-xover): Use
+	`gnus-retrieve-parsed-headers'.
+
+	* lisp/gnus-cache.el (gnus-cache-retrieve-parsed-headers): Use
+	`gnus-cache-braid-headers',
+	`nnheader-get-newsgroup-headers-xover*' and
+	`nnheader-retrieve-headers-from-directory*' instead of
+	`gnus-get-newsgroup-headers-xover'.
+	(gnus-cache-braid-headers): New function.
+
+	* lisp/nnheader.el (nnheader-nov-read-integer): Use
+	`(search-forward "\t" eol 'move)' instead of `(forward-char 1)' as
+	same as `gnus-nov-read-integer'.
+	(nnheader-retrieve-headers-from-directory*): New function.
+	(nnheader-retrieve-headers-from-directory): Use
+	`nnheader-retrieve-headers-from-directory*'.
+	(nnheader-get-newsgroup-headers-xover*): New function.
+
+* 1999-01-30  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnmh.el (nnmh-retrieve-parsed-headers): Use
+	`nnheader-retrieve-headers-from-directory'.
+
+	* lisp/nnheader.el (nnheader-retrieve-headers-from-directory): New
+	function.
+
+* 1999-01-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-int.el (gnus-retrieve-parsed-headers): Use
+	`gnus-cache-retrieve-parsed-headers' instead of
+	`gnus-cache-retrieve-headers'.
+
+	* lisp/gnus-cache.el (gnus-cache-retrieve-parsed-headers): New
+	function.
+
+* 1999-01-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (gnus-read-active-file): Eliminate duplicated
+	select methods.
+
+* 1999-01-25  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-article-sort-by-author): fixed.
+
+* 1999-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-int.el (gnus-retrieve-parsed-headers): Add new
+	optional arguments `dependencies' and `force-new'; new
+	implementation; call `retrieve-parsed-headers' if it is found.
+
+	* lisp/nnmh.el (nnmh-retrieve-parsed-headers): New function.
+
+* 1999-01-12  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-select-newsgroup): Use
+	`gnus-retrieve-parsed-headers' instead of `gnus-retrieve-headers'
+	and `gnus-get-newsgroup-headers-xover' or
+	`gnus-get-newsgroup-headers'.
+
+	* lisp/gnus-int.el (gnus-retrieve-parsed-headers): New function.
+
+* 1999-02-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+            Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-gnus-get-new-news): Modify for
+	pGnus 0.73 or later.
+
+	* lisp/gnus-offline.el: Use (running-pterodactyl-gnus-0_73-or-later)
+        to check pGnus 0.73 or later instead of (locate-library "mail-source")
+
+* 1999-01-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el: Rewrite to work with pGnus v0.74 based T-gnus.
+	* lisp/gnus-ofsetup.el: Ditto.
+
+* 1999-01-28  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-summary-mail-digest): Reselect the message
+	frame after selecting a new article if the value of
+	`message-use-multi-frames' is non-nil and more than one articles
+	are given.
+
+* 1999-01-26  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el: Add security notice.
+
+* 1999-01-25  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* README-offline.ja: New file - Variable and command description
+	for gnus-offline(Japanese edition).
+	* README-offline.en: New file - Ditto (English edition).
+
+* 1999-01-25  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-pop-password-file): New
+	variable.
+	(gnus-offline-pop-password-decoding-function): New variable.
+	(gnus-offline-get-new-news): When `gnus-offline-pop-password-file'
+	is non-nil, get one's password information from a file specified
+	by this variable, and don't store the passwords as a variable.
+	* lisp/smiley.el (smiley-buffer): Avoid a few duplicate
+	translations.
+
 1999-01-28  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* lisp/gnus-sum.el (gnus-summary-move-article): Fix, could not
