@@ -291,7 +291,7 @@ Return the response string if optional second argument RETURN is non-nil."
       (set-buffer (process-buffer process))
       (goto-char pop3-read-point)
       (while (not (search-forward "\r\n" nil t))
-	(accept-process-output process 3)
+	(accept-process-output process 0 500)
 	(goto-char pop3-read-point))
       (setq match-end (point))
       (goto-char pop3-read-point)

@@ -3515,6 +3515,7 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	;; Mark this buffer as "prepared".
 	(setq gnus-newsgroup-prepared t)
 	(gnus-run-hooks 'gnus-summary-prepared-hook)
+	(gnus-group-update-group group)
 	t)))))
 
 (defun gnus-summary-auto-select-subject ()
@@ -6324,6 +6325,7 @@ If FORCE (the prefix), also save the .newsrc file(s)."
   (gnus-async-halt-prefetch)
   (let* ((group gnus-newsgroup-name)
 	 (quit-config (gnus-group-quit-config gnus-newsgroup-name))
+	 (gnus-group-is-exiting-p t)
 	 (mode major-mode)
 	 (group-point nil)
 	 (buf (current-buffer)))
@@ -6419,6 +6421,7 @@ If FORCE (the prefix), also save the .newsrc file(s)."
   "Quit reading current newsgroup without updating read article info."
   (interactive)
   (let* ((group gnus-newsgroup-name)
+	 (gnus-group-is-exiting-p t)
 	 (quit-config (gnus-group-quit-config group)))
     (when (or no-questions
 	      gnus-expert-user
@@ -6455,6 +6458,7 @@ If FORCE (the prefix), also save the .newsrc file(s)."
       (gnus-configure-windows 'group 'force)
       ;; Clear the current group name.
       (setq gnus-newsgroup-name nil)
+      (gnus-group-update-group group)
       (when (equal (gnus-group-group-name) group)
 	(gnus-group-next-unread-group 1))
       (when quit-config
