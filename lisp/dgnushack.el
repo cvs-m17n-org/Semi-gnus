@@ -428,7 +428,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 		    (symbol-function name))))
       (if (subrp fn)
 	  ;; Give up on inlining.
-	  form
+	  (setq ad-return-value form)
 	ad-do-it))))
 
 ;; Unknown variables and functions.
