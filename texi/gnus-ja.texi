@@ -12769,13 +12769,12 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 @code{shimbun} ライブラリが提供する値が関係し、以下の優先度で期間が決定
 されることです。
 
-@c Note: `texinfmt' has a bug that the command `@*' affects all the
-@c line-breaks in a paragraph even though `makeinfo' processes only the
-@c line itself.  We should never use it except for a case as such as:
-  グループパラメータの @code{expiry-wait}@*
-  @code{nnmail-expiry-wait-function} を評価した値@*
-  @code{shimbun} ライブラリが提供するグループ毎のディフォルト値@*
-  @code{nnmail-expiry-wait} の値
+@example
+グループパラメータの @code{expiry-wait}
+@code{nnmail-expiry-wait-function} を評価した値
+@code{shimbun} ライブラリが提供するグループ毎のディフォルト値
+@code{nnmail-expiry-wait} の値
+@end example
 
 第二に、@code{nnmail-expiry-wait-function} が関数だった場合に、その引数
 に与えられる文字列に ``nnshimbin+asahi:national'' のようにバックエンドと
