@@ -6,60 +6,78 @@
 \def\subsec{\subsection*}
 \def\subsubsec{\subsubsection*}
 \documentstyle{article}
-\textwidth 7.26in \textheight 10in \topmargin -1.0in
+\textwidth 7.26in \textheight 10.3in \topmargin -1.2in
 % the same settings work for A4, although there is a bit of space at the
-% top and bottom of the page. 
+% top and bottom of the page.
 \oddsidemargin -0.5in \evensidemargin -0.5in
 \begin{document}
-\twocolumn\scriptsize\pagestyle{empty}
+\twocolumn\footnotesize\pagestyle{empty}
 \input{gnusref-ja}
 
-% page 1, left column
+\vspace*{\fill}
 \Title
-\par
-\vspace{0.5\baselineskip}
+\vspace*{2ex}
 \Logo{refcard}
 \vspace*{\fill}
-\GroupLevels
-\GroupMode
-\pagebreak
-
-% page 1, right column
-\Notes
-\vspace*{\fill}
-\GroupCommands
-\pagebreak
-
-% page 2, left column
-\SummaryMode
-\Asubmap
-\Bsubmap
-\Gsubmap
-\Hsubmap
-\Tsubmap
-\pagebreak
-
-% page 2, right column
-\Msubmap
 \Marks
+\GroupLevels
 \pagebreak
 
-% page 3
-\Osubmap
-\Ssubmap
-\Xsubmap
-\Vsubmap
-\SortSummary
-\Wsubmap
-\Zsubmap
+\Notes
+\General
 \ArticleMode
-\ServerMode
-
-% page 4
-\BrowseServer
-\pagebreak
-\onecolumn
 \vspace*{\fill}
 \CopyRight
+\pagebreak
+
+\GroupMode
+\SOUP
+\pagebreak
+
+\ListGroups
+\CreateGroups
+\SortGroups
+\MarkGroups
+\pagebreak
+
+\Unsubscribe
+\GroupTopics
+\vspace*{\fill}
+\SummaryMode
+\SortSummary
+\Article
+\pagebreak
+
+\MailGroup
+\GotoArticle
+\Score
+\pagebreak
+
+\MarkArticles
+%\vspace*{-0.5ex}
+\MarkScore
+%\vspace*{-0.5ex}
+\ProcessMark
+%\vspace*{-0.5ex}
+\OutputArticles
+\pagebreak
+
+\Send
+%\vspace*{-1.1ex}
+\Thread
+%\vspace*{-1.1ex}
+\Exit
+\pagebreak
+
+\Wash
+\Hide
+\Highlight
+\Extract
+\pagebreak
+
+\Limit
+\PickAndRead
+\ServerMode
+\BrowseServer
 
 \end{document}

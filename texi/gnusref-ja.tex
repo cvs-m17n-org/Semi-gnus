@@ -1,6 +1,7 @@
+% -*- mode:LaTeX; eval:(set (make-local-variable 'LaTeX-version) "2"); truncate-lines:t; -*-
 % include file for the Gnus refcard and booklet
-\def\progver{5.0}\def\refver{5.0} % program and refcard versions
-\def\date{16 September 1995}
+\def\version{5.5}
+\def\date{2 May 1998}
 \def\author{Vladimir Alexiev $<$vladimir@cs.ualberta.ca$>$}
 \raggedbottom\raggedright
 \newlength{\logowidth}\setlength{\logowidth}{6.861in}
@@ -14,11 +15,12 @@
    \begin{tabular}{@{}l@{\hspace{\tabcolsep}}p{-\keycolwidth}@{}}}%
   {\end{tabular}\\}
 \catcode`\^=12 % allow ^ to be typed literally
+\catcode`\~=12 % allow ~ to be typed literally
 \newcommand{\B}[1]{{\bf#1})}    % bold l)etter
 
 \def\Title{
 \begin{center}
-{\bf\LARGE Gnus \progver\ Reference \Guide\\}
+{\bf\LARGE Gnus \version\ Reference \Guide\\}
 %{\normalsize \Guide\ version \refver}
 \end{center}
 }
@@ -30,8 +32,8 @@
 \def\CopyRight{
 \begin{center}
 Copyright \copyright\ 1995 Free Software Foundation, Inc.\\*
-Copyright \copyright\ 1995 \author.\\*
-Created from the Gnus manual Copyright \copyright\ 1994 Lars Magne
+Copyright \copyright\ 1995-97 \author.\\*
+Created from the Gnus manual Copyright \copyright\ 1994-97 Lars Magne
 Ingebrigtsen.\\*
 and the Emacs Help Bindings feature (C-h b).\\*
 Gnus logo copyright \copyright\ 1995 Luis Fernandes.\\*
@@ -46,49 +48,50 @@ above email address. \Guide{} last edited on \date.
 \def\Notes{
 \subsec{Notes}
 {\samepage
-Gnus $B$OJ#;($G$9(B. $B8=:_$O(B 346 $B$b$NBPOCE*(B ($BMxMQ<T$N;HMQ$G$-$k(B) $B4X?t$,$"$j(B
-$B$^$9(B. $B$3$l$i$N(B 279 $B$O(B 2 $B$D$N<g%b!<%I(B ($B%0%k!<%W$H35N,(B/$B5-;v(B) $B$N$b$N$G$9(B. 
-$B$3$l$i$N4X?t$NB?$/$O0l$D$rD6$($k%-!<B+G{$,$"$j(B, $BCf$K$O(B 3, $B$5$i$K$O(B 4
-$BB+G{$N$b$N$5$($"$j$^$9(B. $B%-!<B+G{$NAm?t$O(B 389 $B$G$9(B. $B$G$9$+$i(B,  40 \% $B$N(B
-$B>l=j$N@aLs$N$?$a$K(B, $B$3$N(B \guide $B$G$OA4$F$N4X?t$O(B ``$B$h$jO@M}E*(B'' $B$JB+G{(B
-$B$G0lEY$@$1I=<($5$l$F$$$^$9(B. $BB>$NB+G{$O5-=R$N:G=i$K3g8L$NCf$GM?$($i$l$F(B
-$B$$$^$9(B. 
+Gnus $B$O5pBg$G$9(B. $B8=:_$O(B 633 $B$b$NBPOCE*(B ($BMxMQ<T$N;HMQ$G$-$k(B) $BL?Na$,$"$j(B
+$B$^$9(B.  $B$3$l$i$NL?Na$NB?$/$O0l$D$rD6$($k%-!<B+G{$,$"$j$^$9(B. 40 \% $B$N>l(B
+$B=j$N@aLs$N$?$a$K(B, $B$3$N(B \guide $B$G$OA4$F$N4X?t$O(B ``$B$h$jO@M}E*(B'' $B$JB+G{$G(B
+$B0lEY$@$1I=<($5$l$F$$$^$9(B. $BB>$NB+G{$O5-=R$N:G=i$K3g8L$NCf$GM?$($i$l$F$$(B
+$B$^$9(B. $B$3$N(B \guide{} $B$O%-!<B+G{$@$1$r@bL@$7$F$$$^$9$N$G(B, $BB?$/$N$9$P$i$7(B
+$B$$5!G=$r8+$D$1$k$?$a$K$O(B, $B>/$/$H$b$r$6$C$HD/$a$k(B {\em $BI,MW(B\/} $B$,$"$j$^(B
+$B$9(B.
 
-$BB?$/$N(B gnus $B$NL?Na$O?tCM0z?t$K1F6A$5$l$^$9(B. $BIaDL$O%a%?%-!<$r2!$7$F$$$k(B
+$BB?$/$N(B gnus $B$NL?Na$O?tCM0z?t$r;H$$$^$9(B. $BIaDL$O%a%?%-!<$r2!$7$F$$$k(B
 $B4V$K@\F,0z?t$rF~NO$7$^$9$,(B, $B$?$$$F$$$N(B gnus $B$N%b!<%I$G$O(B, $B?t;z$,<+J,<+(B
 $B?H$rA^F~$7$J$$$?$a(B, $B%a%?$r;H$&I,MW$O$"$j$^$;$s(B. $B@\F,0z?t$NIU$$$?$H$-$N(B
 $B?6$kIq$$$O(B [$B3Q3g8L(B] $B$G=q$+$l$F$$$^$9(B. $B@\F,0z?t$O$7$P$7$P$3$l$i$r;XDj$9(B
 $B$k$N$KMQ$$$i$l$^$9(B:
 
-\quad [$B5wN%(B] $B%]%$%s%H$,$I$N$/$i$$$N%*%V%8%'%/%H$rHt$P$9$+(B. 
+\quad [$B5wN%(B] $B%]%$%s%H$,$I$N$/$i$$$N%*%V%8%'%/%H$rHt$P$9$+(B.
 
-\quad [$BHO0O(B] $B$I$N$/$i$$$N%*%V%8%'%/%H$,:nMQ$5$l$k$+(B ($B8=:_$NJ*$r4^$`(B). 
+\quad [$BHO0O(B] $B$I$N$/$i$$$N%*%V%8%'%/%H$,:nMQ$5$l$k$+(B ($B8=:_$NJ*$r4^$`(B).
 
 \quad [p/p] ``$B%W%m%;%9(B/$B@\F,0z?t$N=,47(B'': $B@\F,0z?t$,M?$($i$l$k$H(B, $B:nMQ(B
-$B$9$kBP>]$N?t$r7hDj$7$^$9(B. $B%W%m%;%90u(B \# $B$G0u$NIU$$$?BP>]$,$"$l$P(B, $B$=$l(B
-$B$i$,:nMQ$5$l$^$9(B. $B$=$&$G$J$1$l$P(B, $B8=:_$NBP>]$@$1$,1F6A$r<u$1$^$9(B. 
+$B$9$kBP>]$N?t$r7hDj$7$^$9(B ($BIi$O5U8~$-$H$$$&0UL#$G$9(B).
+transient-mark-mode $B$+(B zmacs-region $B$,@_Dj$5$l$F$$$F%j!<%8%g%s$,(Bactive
+$B$G$"$k$H(B, $B$=$N%j!<%8%g%s$rA`:n$7$^$9(B. $B%W%m%;%90u(B \# $B$G0u$NIU$$$?BP>]$,(B
+$B$"$l$P(B, $B$=$l$i$rA`:n$7$^$9(B. $B$=$&$G$J$1$l$P(B, $B8=:_$NBP>]$@$1$rA`:n$7$^$9(B.
 
 \quad [$B%l%Y%k(B] $B%0%k!<%W9VFIEY%l%Y%k$G$9(B. $BF1Ey$+$=$l$h$jDc$$%0%k!<%W$N(B
-$B$_$,:nMQ$N1F6A$r<u$1$^$9(B. $B@\F,0z?t$,M?$($i$l$J$$$H(B, 
-`gnus-group-default-list-level' $B$,;H$o$l$^$9(B. 
+$B$_$,:nMQ$N1F6A$r<u$1$^$9(B. $B@\F,0z?t$,M?$($i$l$J$$$H(B,
+`gnus-group-default-list-level' $B$,;H$o$l$^$9(B.
 `gnus-group-use-permanent-levels' $B$,??$G$"$k$H(B, `g' $B$H(B `l' $BL?Na$X$N@\(B
-$BF,0z?t$O=i4|%l%Y%k$b@_Dj$7$^$9(B. 
+$BF,0z?t$O=i4|%l%Y%k$b@_Dj$7$^$9(B.
 
-\quad [score] $B5-;v$N%9%3%"$G$9(B. $B@\F,0z?t$,M?$($i$l$J$$$H(B, 
-`gnus-summary-default-score' $B$,;H$o$l$^$9(B. 
+\quad [score] $B5-;v$N%9%3%"$G$9(B. $B@\F,0z?t$,M?$($i$l$J$$$H(B,
+`gnus-summary-default-score' $B$,;H$o$l$^$9(B.
+
+\quad [GL $BEY?t(B] GroupLens $B$NEY?t(B (1-5) $B$r(B, $BJL$N5-;v$K0\F0$9$kA0$K8=:_(B
+$B$N5-;v$KM?$($^$9(B.
+
 %Some functions were not yet documented at the time of creating this
 %\guide and are clearly indicated as such.
-\\*[\baselineskip]
-\begin{keys}{C-c C-i}
-C-c C-i & Gnus $B$N%*%s%i%$%s(B {\bf info} $B$K0\F0$7$^$9(B.\\
-C-c C-b & Gnus $B$N(B {\bf bug} $BJs9p$rAw$j$^$9(B.\\
-\end{keys}
 }}
 
 \def\GroupLevels{
-\subsec{$B%0%k!<%W9VFIEY%l%Y%k(B}
+\subsec{$B%0%k!<%W9VFIEY%l%Y%k(B}{\samepage
 $B2<$NI=$O=i4|(B gnus $B%l%Y%k$r;H$C$F$$$k$3$H$r2>Dj$7$F$$$^$9(B. $BMxMQ<TMQ%l%Y(B
-$B%k$r6u$NMs$K=q$$$F$/$@$5$$(B. \\[1\baselineskip]
+$B%k$r6u$NMs$K=q$$$F$/$@$5$$(B. \\*
 
 \begin{tabular}{|c|l|l|}
 \hline
@@ -96,23 +99,22 @@ C-c C-b & Gnus $B$N(B {\bf bug} $BJs9p$rAw$j$^$9(B.\\
 \hline
 1 & $B%a!<%k%0%k!<%W(B &             \\
 2 & $B%a!<%k%0%k!<%W(B &             \\
-3 &               & $B9VFI(B         \\
-4 &               &              \\
+3 & $B=i4|9VFI%l%Y%k(B & $B9VFI(B        \\
+4 &                &             \\
 5 & $B=i4|0lMw%l%Y%k(B &             \\
 \hline
-6 &               & $BHs9VFI(B       \\
-7 &               &              \\
+6 & $B=i4|Hs9VFI%l%Y%k(B & $BHs9VFI(B    \\
+7 &                  &           \\
 \hline
-8 &               & $B%>%s%S(B       \\
+8 &                  & $B%>%s%S(B    \\
 \hline
-9 &               & $B:o=|(B         \\
+9 &                  & $B:o=|(B      \\
 \hline
 \end{tabular}
-}
+}}
 
-\def\Marks{
-\subsec{$B0u;X<(J8;z(B}
-{\samepage $BL?Na$,D>@\0u$rIU$1$k>l9g$O(B, $B3g8L$GI=<($5$l$F$$$^$9(B. \\*
+\def\Marks{\subsec{$B0u;X<(J8;z(B}{\samepage
+$BL?Na$,D>@\0u$rIU$1$k>l9g$O(B, $B3g8L$GI=<($5$l$F$$$^$9(B. \\*
 \newlength{\markcolwidth}
 \settowidth{\markcolwidth}{` '}% widest character
 \addtolength{\markcolwidth}{4\tabcolsep}
@@ -122,48 +124,76 @@ C-c C-b & Gnus $B$N(B {\bf bug} $BJs9p$rAw$j$^$9(B.\\
 \addtolength{\markdblcolwidth}{-2\tabcolsep}
 \begin{tabular}{|c|p{-\markcolwidth}|}
 \hline
-\multicolumn{2}{|p{\markdblcolwidth}|}{{\bf ``$B4{FI(B'' $B0u(B.}
+\multicolumn{2}{|p{\markdblcolwidth}|}
+{{\bf ``$B4{FI(B'' $B0u(B.}
   $B$3$l$i$N0u$NA4$F$O35N,9T$N:G=i$N7e$K8=$l$^$9$N$G(B, $B6&B8$9$k$3$H$O$G$-(B
   $B$^$;$s(B.}\\
 \hline
 ` ' & (M-u, M SPC, M c) $BL$FI(B.\\
-!   & (!, M !, M t) $B2D;k(B ($B6=L#?<$$(B).\\
+!   & (!, M t) $B2D;k(B ($B6=L#?<$$(B).\\ %(M !)
 ?   & (?, M ?) $BJ]N1(B ($B%U%)%m!<%"%C%W$N$_$K6=L#$,$"$k(B).\\
-C   & (C, S c) {\bf $B%-%c%s%;%k:Q$_(B} ($B<+J,<+?H$N5-;v$N$_(B.\\
+E   & (E, M e) {\bf $B;~8B>C5n2DG=(B}. $B%a!<%k%0%k!<%W$G$N$_0UL#$,$"$k(B.\\ %(M x)
 \hline\hline
-\multicolumn{2}{|p{\markdblcolwidth}|}{$B2<$N0u$O5-;v$,4{FI(B ($B@Z$i$l$?(B, 
+\multicolumn{2}{|p{\markdblcolwidth}|}{$B2<$N0u$O5-;v$,4{FI(B ($B@Z$i$l$?(B,
   $B6=L#$N$J$$(B) $B$H$$$&$3$H$r0UL#$7(B, $BBgBNF1MM$J8z2L$r;}$A$^$9(B. $B$7$+$7L?Na(B
-  $B$K$O$=$l$i$GL@$i$+$J0c$$$,$"$k$b$N$b$"$j$^$9(B ($BNc(B. \ M M-C-r, $BE,1~%9(B
-  $B%3%"(B).}\\
+  $B$K$O$=$l$i$GL@$i$+$J0c$$$,$"$k$b$N$b$"$j$^$9(B ($BNc(B.{} M M-C-r, $BE,1~%9%3(B
+  $B%"(B).}\\
 \hline
 r   & (d, M d, M r) $B>C5n(B ($B4{FI(B ({\bf read}) $B$H$7$F0uIU$1$i$l$?(B).\\
 C   & (M C; M C-c; M H; c, Z c; Z n; Z C) {\bf catch-up} $B$G@Z$i$l$?(B.\\
+F   & (O s; G s b) SOUP $B$5$l$F$$$k(B.\\
+G   & (S C, C) $B<h$j>C$7:Q$_(B ($B<+J,<+?H$N5-;v$N$_(B).\\
 O   & $B8E$$(B ({\bf old}) ($BA02s$N%;%C%7%g%s$G4{FI$N0u$,IU$$$?(B).\\
 K   & (k, M k; C-k, M K) $B@Z$i$l$?(B ({\bf Killed}).\\
+M   & $B=EJ#>C5n$K$h$C$F0u$,IU$$$?(B.\\
+Q   & $B$^$P$i%9%l%C%I$N:n@.Cf$KJ,$1$i$l$?(B.\\
 R   & $B4{FI(B ({\bf read}) ($B<B:]$K1\Mw$5$l$?(B).\\
 X   & $B%-%k%U%!%$%k$G@Z$i$l$?(B.\\
 Y   & $BDc%9%3%"$K$h$C$F@Z$i$l$?(B.\\
-\hline\multicolumn{2}{c}{\vspace{1ex}}\\\hline
-\multicolumn{2}{|p{\markdblcolwidth}|}{$BB>$N0u(B ({\bf Other marks})}\\
+\hline\hline
+\multicolumn{2}{|p{\markdblcolwidth}|}
+{{\bf $BB>$N0u(B}}\\
 \hline
-\#  & (\#, M \#, M P p) $B<B9T2DG=(B ($B<!$N:nMQ$G1F6A$r<u$1$k(B).\\
+\#  & (\#, M \#, M P p) $B<B9T2DG=(B ($B<!$N:nMQ$G1F6A$r<u$1$k(B).\\ %(M \#)
+*   & (*) $B1JB3(B ($B$b$7$/$OB>$NM}M3$G%-%c%C%7%e$5$l$F$$$k(B).\\
 A   & $B1~Ez:Q$_(B ({\bf answered}) ($B%U%)%m!<%"%C%W$b$7$/$OJVEz$r$7$?(B).\\
+S   & (O {\bf x}) $BJ]B8:Q$_(B {\bf Saved}.\\
 +   & $B=i4|%9%3%"$h$j>e(B.\\
 $-$ & $B=i4|%9%3%"$h$j2<(B.\\
 =   & $B;R$r;}$D(B ($B$=$N2<$K%9%l%C%I$r(B). `\%e' `gnus-summary-line-format'
 $B$r2C$($^$9(B.\\
-
 \hline
 \end{tabular}
 }}
 
-\def\GroupMode{
-\sec{$B%0%k!<%W%b!<%I(B}
+
+\def\General{\sec{(H) $B0lHLE*$J%3%^%s%I$H%X%k%W%3%^%s%I(B}{\samepage
+$B$3$l$i$NL?Na$O$I$3$G$bF0:n$7$^$9(B.
+\begin{keys}{C-c C-i}
+C-c C-i & Gnus $B$N%*%s%i%$%s(B {\bf info} $B$K0\F0$7$^$9(B.\\
+C-c C-b & Gnus $B$N(B {\bf bug} $BJs9p$rAw$j$^$9(B.\\
+\end{keys}
+
+$B$3$l$i$NL?Na$O35N,%b!<%I$GF0:n$7(B, $B$[$H$s$I$O%0%k!<%W%b!<%I$G$bF0:n$7$^(B
+$B$9(B.\\*
+\begin{keys}{H d}
+H d     & (C-c C-d) $B$3$N%0%k!<%W$N@bL@(B ({\bf Describe}) $B$r$7$^$9(B. [$B@\(B
+ $BF,<-(B: $B%5!<%P!<$+$i@bL@$r:FEYFI$_9~$_$^$9(B.]\\
+H f     & ange-ftp $B$r;H$C$F(B, $B$3$N%0%k!<%W$N(B {\bf FAQ} $B$r<hF@$7$h$&$H$7(B
+ $B$^$9(B.\\
+H h     & $BHs>o$KC;$$%X%k%W(B ({\bf help}) $B%a%C%;!<%8$rI=<($7$^$9(B.\\
+
+H i     & (C-c C-i) Gnus $B$N%*%s%i%$%s(B {\bf info} $B$K0\F0$7$^$9(B.\\
+H v     & Gnus $B$N%P!<%8%g%s(B ({\bf version}) $BHV9f$rI=<($7$^$9(B.\\
+\end{keys}}}
+
+\def\GroupMode{\sec{$B%0%k!<%W%b!<%I(B}
 \begin{keys}{C-c M-C-x}
-RET     & (=) $B$3$N%0%k!<%W$rA*Br$7$^$9(B. [$B@\F,0z?t(B: $B$I$l$/$i$$$N(B ($B4{FI(B)
-$B5-;v$r<hF@$9$k$+(B. $B@5(B: $B:G?7$N5-;v(B, $BIi(B: $B:G8E$N$b$N(B.]\\
+RET     & (=) $B$3$N%0%k!<%W$rA*Br$7$^$9(B [$B@\F,0z?t(B: $B$I$l$/$i$$$N(B ($B4{FI(B)
+          $B5-;v$r<hF@$9$k$+(B. $B@5(B: $B:G?7$N5-;v(B, $BIi(B: $B:G8E$N$b$N(B, C-u: $BHV9f(B
+          $B$r?R$M$^$9(B]. $B2C$($F(B: $B%H%T%C%/$N@^$jJV$7$r@Z$j49$($^$9(B.\\
 SPC     & $B$3$N%0%k!<%W$rA*Br$7$F(B, $B:G=i$NL$FI5-;v$rI=<($7$^$9(B. [$B@\F,0z(B
-$B?t$O>e$HF1$8$G$9(B.]\\ 
+$B?t$O>e$HF1$8$G$9(B.]\\
 ?       & $BHs>o$KC;$$%X%k%W%a%C%;!<%8$rM?$($^$9(B.\\
 $<$     & $B%0%k!<%W%P%C%U%!$N:G=i$K0\F0$7$^$9(B.\\
 $>$     & $B%0%k!<%W%P%C%U%!$N:G8e$K0\F0$7$^$9(B.\\
@@ -174,264 +204,336 @@ a       & $B5-;v(B ({\bf article}) $B$r%0%k!<%W$KEj9F$7$^$9(B.\\
 b       & $B56(B ({\bf bogus}) $B%0%k!<%W$r8+$D$1$F>C5n$7$^$9(B.\\
 c       & $BA4$F$NL$0u5-;v$K4{FI$N0u$rIU$1$^$9(B ({\bf catch-up}). [p/p]\\
 g       & $B?7$7$$5-;v$,$"$k$+(B, $B%5!<%P!<$rD4$Y$^$9(B ({\bf get}). [$B%l%Y%k(B]\\
-j       & $B%0%k!<%W$KHt$S$^$9(B ({\bf jump}).\\
+j       & $B;XDj$5$l$?%0%k!<%W$KHt$S$^$9(B ({\bf jump}) ($B$b$7$+$7$?$i@Z$i(B
+          $B$l$F$$$k$+$b$7$l$^$;$s(B).\\
 m       & $BC/$+$K%a!<%k(B ({\bf mail}) $B$rAw$j$^$9(B.\\
 n       & $BL$FI5-;v$N$"$k<!(B ({\bf next}) $B$N%0%k!<%W$K0\F0$7$^$9(B.
 [$B5wN%(B]\\
 p       & (DEL) $BL$FI5-;v$N$"$kA0(B ({\bf previous}) $B$N%0%k!<%W$K0\F0$7$^(B
 $B$9(B.
-[$B5wN%(B]\\ 
-q       & Gnus $B$r=*N;(B ({\bf Quit}) $B$7$^$9(B.\\
-r       & $B=i4|2=%U%!%$%k$rFI$_9~$_$^$9(B ($B:F@_Dj(B ({\bf reset})).\\
-s       & `.newsrc.eld' $B%U%!%$%k$rJ]B8(B ({\bf save}) $B$7$^$9(B ($B$=$l$H(B, 
-`gnus-save-newsrc-file' $B$,??$G$"$l$P(B `.newsrc' $B$bJ]B8$7$^$9(B.)\\ 
-z       & Gnus $B$r0l;~Dd;_$7$^$9(B ($B%P%C%U%!$r@Z$j$^$9(B).\\
-B       & $B30It%5!<%P!<$r354Q(B ({\bf browse}) $B$7$^$9(B.\\
+[$B5wN%(B]\\
+q       & Gnus $B$r=*N;(B ({\bf Quit}) $B$7$^$9(B. $B%a%b%j!<$+$i>C5n$9$k$K$O(B
+          M-x gnus-unload $B$r<B9T$7$F$/$@$5$$(B.\\
+r       & $B=i4|2=%U%!%$%k(B `.gnus' $B$r:FEYFI$_9~$_$^$9(B ({\bf Re-read}).\\
+s       & `.newsrc.eld' $B%U%!%$%k$rJ]B8(B ({\bf save}) $B$7$^$9(B ($B$=$l$H(B,
+`gnus-save-newsrc-file' $B$,??$G$"$l$P(B `.newsrc' $B$bJ]B8$7$^$9(B.)\\
+t       & {\bf Topic} $B%b!<%I$r@Z$j49$($^$9(B. $B%H%T%C%/$O%0%k!<%W$N3,AX9=(B
+          $BB$$G$9(B.\\
+z       & Gnus $B$r0l;~Dd;_$7$^$9(B ($B%0%k!<%W%P%C%U%!0J30$N%P%C%U%!$r@Z$j(B
+          $B$^$9(B).\\
+B       & $B30It%5!<%P!<$r354Q(B ({\bf browse}) $B$7$^$9(B ($BJ}K!$HL>A0$r;XDj$7(B
+          $B$^$9(B).\\
 C       & $B$3$N%0%k!<%W$NA4$F$N5-;v$r4{FI$H$7$F0uIU$1$^$9(B ({\bf
-Catch-up}). [p/p]\\
-F       & $B?7$7$$%0%k!<%W$r8+$D$1(B ({\bf find}) $B$=$l$i$K:n6H$r<B9T$7$^$9(B.\\ 
+          Catch-up}). [p/p]\\
+F       & $B?7$7$$%0%k!<%W$r8+$D$1(B ({\bf find}) $B$=$l$i$K:n6H$r<B9T$7$^$9(B.
+          [$B@\F,<-(B: $B%5!<%P!<$K?R$M$^$9(B]\\
 N       & $B<!(B ({\bf next}) $B$N%0%k!<%W$K0\F0$7$^$9(B. [$B5wN%(B]\\
 P       & $BA0(B ({\bf previous}) $B$N%0%k!<%W$K0\F0$7$^$9(B. [$B5wN%(B]\\
-Q       & $B5/F0(B (.newsrc) $B%U%!%$%k$rJ]B8$;$:$K(B Gnus $B$r=*N;(B ({\bf Quit})
-$B$7$^$9(B.\\
+Q       & .newsrc $B%U%!%$%k$rJ]B8$;$:$K(B Gnus $B$r=*N;(B ({\bf Quit})$B$7$^$9(B.\\
 R       & Gnus $B$r:F5/F0(B ({\bf Restart}) $B$7$^$9(B.\\
 V       & Gnus $B%P!<%8%g%s(B ({\bf version}) $BHV9f$rI=<($7$^$9(B.\\
+W f     & $BA4$F$N%0%k!<%W$N%9%3%"%-%c%C%7%e$r=q$-9~$_$^$9(B ({\bf Flush}).\\
 Z       & $B%I%j%V%k%P%C%U%!$r>C5n$7$^$9(B.\\
-C-c C-d & $B$3$N%0%k!<%W$N@bL@(B ({\bf description}) $B$rI=<($7$^$9(B. [$B@\F,0z(B
-$B?t(B: $B%5!<%P!<$+$i:FFI$_9~$_$r$7$^$9(B.]\\ 
-C-c C-s & $B%0%k!<%W$rL>A0(B, $B%0%k!<%WL>(B, $B%l%Y%k(B
-(`gnus-group-sort-function' $B$K0MB8$7$^$9(B) $B$GL$FI5-;v$N?t$GJB$S49$((B
-({\bf Sort}) $B$^$9(B.   .\\
+C-c C-s & `gnus-group-sort-function'. $B$K=>$C$FJB$S49$((B({\bf Sort}) $B$^$9(B.\\
 C-c C-x & $B$3$N%0%k!<%W$NA4$F$N;~8B>C5n2DG=5-;v$r;~8B>C5n(B ({\bf
 expiry}) $B$N2aDx$K$+$1$^$9(B.\\
 C-c M-C-x & $B$3$N%0%k!<%W$NA4$F$N5-;v$r;~8B>C5n(B ({\bf expiry}) $B$N2aDx$K(B
 $B$+$1$^$9(B.\\
+C-c M-g & $B40A4$KA4$F$N%0%k!<%W$r3hF02=$7$^$9(B.\\
 C-x C-t & 2$B$D$N%0%k!<%W$N0LCV$rJQ99$7$^$9(B ({\bf transpose}).\\
-M-d     & $BA4$F$N%0%k!<%W$N@bL@(B ({\bf describe}) $B$r$7$^$9(B. [$B@\F,0z?t(B:
-$B%5!<%P!<$+$i@bL@$r:FFI$_9~$_$7$^$9(B.]\\
+M-\&    & $B<B9T0u$NIU$$$?A4$F$N%0%k!<%W$KL?Na$r<B9T$7$^$9(B.\\
+M-c     & $B$3$N%0%k!<%W$N%G!<%?$r>C5n(B ({\bf clear}) $B$7$^$9(B ($B4{FI$dB>$N(B
+          $B0u(B). [p/p] $B%5!<%P!<$rJQ99$7$F(B, $B5-;vHV9f$,9gCW$7$J$$$H$-$O(B
+          M-x gnus-group-clear-data-on-native-groups $B$r;H$C$F$/$@$5$$(B.
+          $B$b$7$/$O(B, $B5-;v$K:FHV9fIU$1$r$9$k$?$a$K(B M-x gnus-chage-server
+          $B$r;H$C$F$/$@$5$$(B. $B$G$b(B, $B$3$l$OCY$$$G$9(B.\\
+\end{keys}
+\begin{keys}{C-c M-C-x}
+\newlength{\keywidth}\settowidth{\keywidth}{C-c M-C-x}%
+\makebox[\keywidth][l]%
+{M-d}   & {\em $BA4$F(B\/} $B$N%0%k!<%W$N@bL@(B ({\bf describe}) $B$r$7$^$9(B. [$B@\F,0z?t(B:
+$B%5!<%P!<$+$i@bL@$r:FFI$_9~$_$7$^$9(B]\\
 M-f     & $B$3$N%0%k!<%W$N(B {\bf FAQ} $B$r(B (ange-ftp $B$r;H$C$F(B) $B<hF@$7$^$9(B.\\
 M-g     & $B$3$N%0%k!<%W$K?7$7$$5-;v$,$"$k$+$I$&$+(B, $B%5!<%P!<$rD4$Y$^$9(B.
 ({\bf get}). [p/p]\\
 M-n     & $BA0(B ({\bf previous}) $B$NF1$8$+Dc$$%l%Y%k$NL$FI%0%k!<%W$X0\F0$7(B
-$B$^$9(B. [$B5wN%(B]\\ 
+$B$^$9(B. [$B5wN%(B]\\
 M-p     & $B<!(B ({\bf next}) $B$NF1$8$+Dc$$%l%Y%k$NL$FI%0%k!<%W$X0\F0$7$^$9(B.
-[$B5wN%(B]\\ 
-\end{keys}
-}
+[$B5wN%(B]\\
+\end{keys}}
 
-\def\GroupCommands{
-\subsec{$B%0%k!<%W$N0lMwI=<((B}
+\def\ListGroups{\subsec{(A) $B%0%k!<%W$N0lMwI=<((B}{\samepage
 {\samepage
 \begin{keys}{A m}
 A a     & (C-c C-a) $B@55,I=8=$K9g$&A4$F$N%0%k!<%W$r0lMwI=<($7$^$9(B ({\bf
-apropos}).\\ 
+apropos}).\\
 A d     & $BL>A0$+@bL@(B ({\bf descriptions}) $B$,@55,I=8=$K9g$&A4$F$N%0%k!<(B
-$B%W$r0lMwI=<($7$^$9(B.\\ 
-A k     & (C-c C-l) $BA4$F$N:o=|$5$l$?(B ({\bf killed}) $B%0%k!<%W$r0lMwI=<((B
-$B$7$^$9(B.\\
+$B%W$r0lMwI=<($7$^$9(B.\\
+A k     & $BA4$F$N:o=|$5$l$?(B ({\bf killed}) $B%0%k!<%W$r0lMwI=<($7$^$9(B.
+[$B@\F,<-(B: [$BHs(B]$B9XFI$r=|$/A4$F$N%0%k!<%W(B]\\
+A l     & $B;XDj$5$l$?%l%Y%k(B {\bf level} $B$NL$FI%0%k!<%W$r0lMwI=<($7$^$9(B.
+[$B@\F,<-(B: $B4{FI%0%k!<%W$b(B]\\
 A m     & $B@55,I=8=$K9g$$(B ({\bf match}), $BL$FI5-;v$r;}$D%0%k!<%W$r0lMwI=(B
-$B<($7$^$9(B. [$B%l%Y%k(B]\\ 
+$B<($7$^$9(B. [$B%l%Y%k(B]\\
 A s     & (l) $BL$FI5-;v$N$"$k9VFI%0%k!<%W(B {\bf subscribed} $B$r0lMwI=<($7(B
 $B$^$9(B. [$B%l%Y%k(B]\\
 A u     & (L) $BA4$F$N%0%k!<%W(B ($BHs9VFI(B ({\bf unsubscribed}) $B$r4^$`(B) $B$r0l(B
-$BMwI=<($7$^$9(B. [$B@\F,<-$,M?$($i$l$J$$$H(B, $B=i4|CM$O%l%Y%k(B7$B$G$9(B]\\ 
+$BMwI=<($7$^$9(B. [$B%l%Y%k(B, $B=i4|CM$O(B7]\\
 A z     & $B%>%s%S(B ({\bf zombie}) $B%0%k!<%W$r0lMwI=<($7$^$9(B.\\
+A A     & $BA4$F$N%5!<%P!<$NA4$F$N2DG=$J3hF0(B ({\bf active}) $B%0%k!<%W$r0l(B
+$BMwI=<($7$^$9(B ($BCY$$$+$b$7$l$^$;$s(B).\\
 A M     & $B@55,I=8=$K9g$&(B ({\bf match}) $BA4$F$N%0%k!<%W$r0lMwI=<($7$^$9(B.\\
-\end{keys}
-}
+A T     & $B%H%T%C%/(B ({\bf topic}) $B$GJT;<$5$l$F$$$kA4$F$N3hF0%0%k!<%W$r(B
+$B0lMwI=<($7$^$9(B.\\
+\end{keys}}}}
 
-\subsec{$B30It%0%k!<%W$N:n@.(B/$BJT=8(B}
-{\samepage
+\def\CreateGroups{\subsec{(G) $B30It%0%k!<%W$N:n@.(B/$BJT=8(B}{\samepage
 $BA*BrJ}K!$O3g8L$NCf$K<($5$l$F$$$^$9(B.\\*
-\begin{keys}{G m}
+\begin{keys}{G DEL}
+G DEL   & $B$3$N%0%k!<%W$r>C5n(B ({\bf Delete}) $B$7$^$9(B. [$B@\F,<-(B: $B5-;v$b(B
+          {\bf $BA4$F(B} $B>C5n$7$^$9(B]\\
 G a     & Gnus $B%j%9%H(B {\bf archive} $B%0%k!<%W$r:n$j$^$9(B. (ange-ftp $B$rDL(B
-$B$8$F$N(B nndir)\\
+          $B$8$F$N(B nndir)\\
+G c     & $B$3$N%0%k!<%W$N%Q%i%a!<%?$r(B {\bf customize} $B$7$^$9(B.\\
 G d     & $B%G%#%l%/%H%j!<(B ({\bf directory}) $B%0%k!<%W(B $B$r:n$j$^$9(B ($BA4$F$N(B
-$B%U%!%$%k$OEj9F5-;v$G(B, $B%U%!%$%k$O?t;z$NL>A0$G$J$/$F$O$J$^$;$s(B).
-(nndir)\\
-G e     & (M-e) $B$3$N%0%k!<%W$NA*BrJ}K!$rJT=8(B ({\bf edit}) $B$7$^$9(B.\\
+          $B%U%!%$%k$O?t;z$NL>A0$NEj9F$G$9(B). (nndir)\\
+G e     & $B$3$N%0%k!<%W$NA*BrJ}K!$rJT=8(B ({\bf edit}) $B$7$^$9(B.\\
 G f     & $B%U%!%$%k(B ({\bf file}) $B$K4p$E$$$?%0%k!<%W$r:n$j$^$9(B.
-(nndoc)\\
-G h     & Gnus $B$N%X%k%W(B ({\bf help}) ($B@bL@(B) $B%0%k!<%W$r:n@.$7$^$9(B.
-(nndoc)\\
-G k     & {\bf kiboze} $B%0%k!<%W$r:n@.$7$^$9(B. (nnkiboze)\\
-G m     & $B?7$7$$%0%k!<%W$r:n@.(B ({\bf make}) $B$7$^$9(B.\\
-G p     & $B$3$N%0%k!<%W$N%Q%i%a!<%?(B ({\bf parameters}) $B$rJT=8$7$^$9(B.\\
-G v     & $B$3$N%0%k!<%W$r2>A[(B ({\bf virtual}) $B%0%k!<%W$KDI2C$7$^$9(B.
-[p/p]\\
+          (nndoc: mbox, babyl, digest, mmdf, news, rnews,
+          clari-briefs, rfc934,rfc822, forward) [$B@\F,<-(B: $B$I$N7A<0$+$r(B
+          $B?dB,$7$^$;$s(B]\\
+G h     & Gnus $B$N%X%k%W(B ({\bf help}) ($B@bL@(B/$B%A%e!<%H%j%"%k(B) $B%0%k!<%W$r(B
+          $B:n@.$7$^$9(B. (nndoc)\\
+G k     & {\bf kiboze} $B%0%k!<%W$r:n@.$7$^$9(B. ($BL>A0(B, $B%0%k!<%W(B, $B@55,I=8=(B
+          $B$r;XDj$7$^$9(B). (nnkiboze)\\
+G m     & $B?7$7$$%0%k!<%W$r:n@.(B ({\bf make}) $B$7$^$9(B ($BL>A0(B, $BJ}K!(B, $B%"%I%l(B
+          $B%9$r;XDj$7$^$9(B).\\
+G p     & $B$3$N%0%k!<%W(B/$B%H%T%C%/$N%Q%i%a!<%?(B ({\bf parameters}) $B$rJT=8(B
+          $B$7$^$9(B.\\
+G r     & $B$3$N%0%k!<%W$r2~L>(B ({\bf rename}) $B$7$^$9(B ($B%a!<%k%0%k!<%W$N$_(B).\\
+G v     & $B$3$N%0%k!<%W$r2>A[(B ({\bf virtual}) $B%0%k!<%W$KDI2C$7$^$9(B. [p/p]\\
+G w     & {\bf web} $B$K4p$$$?%0%k!<%W$r:n@.$7$^$9(B. (nnweb: dejanews,
+          altavista, reference) [$B@\F,<-(B: $B%0%k!<%W$r1JB3$K(B]\\
 G D     & $B%G%#%l%/%H%j!<(B ({\bf directory}) $B$K(B ($B0l;~(B) $B%0%k!<%W$H$7$FF~(B
-$B$j$^$9(B. ($B5-;v$N4{FI$r5-O?$7$J$$(B nneething.)\\
+$B$j$^$9(B. ($B4{FI0u$r5-O?$7$J$$(B nneething.)\\
 G E     & $B$3$N%0%k!<%W$N>pJs(B ($BA*BrJ}K!(B, $B5-;v$N4{FI(B, $B$J$I$J$I(B) $B$rJT=8(B
 ({\bf edit}) $B$7$^$9(B.\\
-G V     & $B?7$7$$6u$N2>A[(B ({\bf virtual}) $B%0%k!<%W$r:n@.$7$^$9(B.
+G V     & $B6u$N2>A[(B ({\bf virtual}) $B%0%k!<%W$r:n@.$7$^$9(B.
 (nnvirtual)\\
 \end{keys}
 $B%a!<%k%0%k!<%W$r:n@.$7$F%a!<%k$r(B nnmbox, nnbabyl, nnml, nnmh, nnfolder
 $B$N(B1$B$D$NJ}K!$r;H$C$F(BGnus $B$GFI$`$3$H$b$G$-$^$9(B ($B%a!<%j%0%j%9%H$r9VFI$7$F(B
 $B$$$k$HHs>o$KLr$KN)$A$^$9(B). $B%*%s%i%$%s(B info $B$GFI$s$G$/$@$5$$(B (C-c C-i g
 Reading Mail RET).
-}
+}}
 
-%\subsubsec{Soup Commands}
-%\begin{keys}{G s w}
-%G s b   & gnus-group-brew-soup: not documented.\\
-%G s p   & gnus-soup-pack-packet: not documented.\\
-%G s r   & nnsoup-pack-replies: not documented.\\
-%G s s   & gnus-soup-send-replies: not documented.\\
-%G s w   & gnus-soup-save-areas: not documented.\\
-%\end{keys}
-
-\subsec{$B%0%k!<%W$N0uIU$1(B}
-\begin{keys}{M m}
-M m     & (\#) $B$3$N%0%k!<%W$K%W%m%;%90u(B {\bf mark} $B$rIU$1$^$9(B. [$BHO0O(B]\\
-M u     & (M-\#) $B$3$N%0%k!<%W$+$i%W%m%;%90u$r<h$j=|$-$^$9(B ($B0u>C5n(B {\bf
-unmark}).
-[$BHO0O(B]\\ 
-M w     & $B8=:_$N%j!<%8%g%s$NA4$F$N%0%k!<%W$K0u$rIU$1$^$9(B.\\
+\def\SortGroups{\subsubsec{(G S) $B%0%k!<%W$NJB$S49$((B}{\samepage
+$BJ#?t$N4p=`$GJB$S49$($r$9$k$?$a$K$O(B, $B$^$:$"$^$j=EMW$G$J$$$b$N$rE,MQ$7(B,
+$B:G8e$K0lHV=EMW$J$b$N$rE,MQ$7$^$9(B.\\*
+\begin{keys}{G P \bf x}
+G S a     & $B%0%k!<%WL>$r%"%k%U%!%C%Y%H=g(B ({\bf Alphabetically}) $B$KJB$S(B
+$B49$($^$9(B. [$B@\F,<-(B: $B5U$N=gHV(B]\\
+G S l     & $B%l%Y%k$G(B ({\bf level}) $BJB$S49$($^$9(B. [$B@\F,<-(B: $B5U$N=gHV(B]\\
+G S m     & $BJ}K!(B ({\bf method}) $BL>$GJB$S49$($^$9(B. [$B@\F,<-(B: $B5U$N=gHV(B]\\
+G S r     & $B3,5i(B ($B%l%Y%k$H%9%3%"(B) $B$GJB$S49$($^$9(B. [$B@\F,<-(B: $B5U$N=gHV(B]\\
+G S u     & $BL$FI(B ({\bf unread}) $B5-;v$N?t$GJB$S49$($^$9(B. [$B@\F,<-(B: $B5U$N(B
+$B=gHV(B]\\
+G S v     & $B%0%k!<%W%9%3%"(B ($BCM(B ({\bf value})) $B$GJB$S49$($^$9(B. [$B@\F,<-(B:
+$B5U$N=gHV(B]\\
 \end{keys}
+$B$3$3$G(B, {\bf x} $B$O(B a,l,m,r,u,v $B$N$I$l$+$G$9(B:\\*
+\begin{keys}{G P \bf x}
+G P \bf x & [p/p] $B$GA*Br$5$l$?%0%k!<%W$N$_$rJB$S49$($^$9(B.\\
+T S \bf x & $B8=:_$N%H%T%C%/$N$_$GJB$S49$($^$9(B.\\
+\end{keys}
+}}
 
-\subsec{$BHs9VFI(B, $B%0%k!<%W$r@Z$jE=$j$9$k(B}
-\begin{keys}{S w}
-S k     & (C-k) $B$3$N%0%k!<%W$r@Z$j$^$9(B ({\bf kill}).\\
+\def\SOUP{\subsubsec{(G s) SOUP $B%3%^%s%I(B}{\samepage
+SOUP $B$OB?$/$N5-;v(B/$BJVEz$r%Q%1%C%H$KF~$l$F(B, $B0lEY$KE>Aw$7(B, $B$=$l$i$r%*%U%i(B
+$B%$%s$GFI$_9~$_(B/$B:n@.$9$k%W%m%H%3%k$G$9(B. $B%Q%1%C%H$NA`:n$K$O0J2<$NL?Na$r(B
+$B;H$$(B, $BFI$`$?$a$K$O(B nnsoup $BJ}K!$r;HMQ$7$F$/$@$5$$(B.\\*
+\begin{keys}{G s w}
+G s b   & $BA4$F$N5-;v$r:-Jq$7$^$9(B (soup $B$r:n$j$^$9(B ({\bf
+brew})). [p/p]\\
+G s p   & $BA4$F$N(B SOUP $B%G!<%?$r(B SOUP $B%Q%1%C%H$K:-Jq(B ({\bf pack}) $B$7$^$9(B.\\
+G s r   & $BA4$F$NJVEz(B ({\bf replies}) $B$rJVEz%Q%1%C%H$K:-Jq$7$^$9(B.\\
+G s s   & $BJVEz%Q%1%C%H$KF~$l$?A4$F$NJVEz$rAw?.(B ({\bf send}) $B$7$^$9(B.\\
+G s w   & $BA4$F$N(B SOUP $B%G!<%?%U%!%$%k$r=q$-$^$9(B ({\bf Write}).\\
+\end{keys}}}
+
+\def\MarkGroups{\subsec{(M) $B%0%k!<%W$N0uIU$1(B}{\samepage
+\begin{keys}{M m}
+M b     & $B%P%C%U%!(B ({\bf buffer}) $B$NA4$F$N%0%k!<%W$K%W%m%;%90u$rIU$1$^(B
+$B$9(B.\\
+M r     & $B@55,I=8=(B ({\bf regexp}) $B$K9gCW$9$kA4$F$N%0%k!<%W$K0u$rIU$1$^(B
+$B$9(B.\\
+M m     & (\#) $B$3$N%0%k!<%W$K0u(B {\bf mark} $B$rIU$1$^$9(B. [$BHO0O(B]\\
+M u     & (M-\#) $B$3$N%0%k!<%W$+$i0u$r<h$j=|$-$^$9(B ({\bf unmark}). [$BHO0O(B]\\
+M w     & $B8=:_$N%j!<%8%g%s$NA4$F$N%0%k!<%W$K0u$rIU$1$^$9(B.\\
+M U     & $B%P%C%U%!$NA4$F$N%0%k!<%W$N0u$r<h$j=|$-$^$9(B ({\bf Unmark}).\\
+\end{keys}}}
+
+\def\Unsubscribe{\subsec{(S) ($BHs(B)$B9VFI(B, $B%0%k!<%W$r@Z$jE=$j$9$k(B}{\samepage
+\begin{keys}{S C-k}
+S C-k   & $BFCDj$N%l%Y%k$NA4$F$N%0%k!<%W$r@Z$j$^$9(B ({\kill}).\\
+S k     & (C-k) $B$3$N%0%k!<%W(B/$B%H%T%C%/(B ($B$H$=$l$NA4$F$N%0%k!<%W(B)$B$r@Z$j$^(B
+$B$9(B ({\bf kill}).\\
 S l     & $B$3$N%0%k!<%W$N%l%Y%k(B ({\bf level}) $B$r@_Dj$7$^$9(B. [p/p]\\
 S s     & (U) $B%0%k!<%W$NF~NO$rB%?J$7$F$=$N9VFI(B ({\bf subscription}) $B$r(B
 $B@Z$jBX$($^$9(B.\\
 S t     & (u) $B$3$N%0%k!<%W$N9VFI$r@Z$jBX$((B ({\bf toggle}) $B$^$9(B.
 [p/p]\\
 S w     & (C-w) $B%j!<%8%g%s$NA4$F$N%0%k!<%W$r@Z$j$^$9(B.\\
-S y     & (C-y) $B:G8e$K(B kill $B$5$l$?%0%k!<%W$rE=$j$^$9(B ({\bf yank}) .\\
+S y     & (C-y) $B:G8e$K(B kill $B$5$l$?%0%k!<%W(B/$B%H%T%C%/$rE=$j$^$9(B ({\bf yank}) .\\
 S z     & $BA4$F$N%>%s%S(B ({\bf zombie}) $B%0%k!<%W$r@Z$j$^$9(B.\\
-\end{keys}
-}
+\end{keys}}}
 
-\def\SummaryMode{
-\sec{$B35N,%b!<%I(B}  %{Summary and Article Modes}
-\begin{keys}{SPC}
-SPC     & (A SPC, A n) $B5-;v$NA*Br(B, 1$B%Z!<%8%9%/%m!<%k(B, $B<!$N5-;v$X$N0\F0(B, 
-$B$G$9(B.\\ 
-DEL     & (A DEL, A p, b) $B$3$N5-;v$r(B1$B%Z!<%8%9%/%m!<%k$7$FLa$7$^$9(B. [$B5w(B
-$BN%(B]\\
+\def\GroupTopics{\subsec{(T) $B%0%k!<%W%H%T%C%/(B}{\samepage
+$B%H%T%C%/$OFI$s$@$j4IM}$7$?$j$9$k$N$r4JC1$K$9$k$?$a$N%0%k!<%W$N3,AXE*$J(B
+$BAH9g$;$G$9(B.
+\begin{keys}{T TAB}
+T TAB   & $B$3$N%H%T%C%/$r0JA0$N$b$N$NI{%H%T%C%/$K$J$k$h$&$K;z2<$2$r$7$^(B
+          $B$9(B. [$B@\F,<-(B: $B;z2<$2$rLa$7$$$^$9(B]\\
+T DEL   & $B6u$N%H%T%C%/$r>C5n(B ({\bf delete}) $B$7$^$9(B.\\
+T \#    & $B$3$N%H%T%C%/$NA4$F$N%0%k!<%W$K<B9T0u$rIU$1$^$9(B.\\
+T M-\#  & $B$3$N%H%T%C%/$N<B9T0u$NIU$$$F$$$kA4$F$N%0%k!<%W$+$i0u$r<h$j=|(B
+          $B$-$^$9(B.\\
+T c     & $B$3$N%0%k!<%W$rB>$N%H%T%C%/$KJ#@=(B ({\bf copy}) $B$7$^$9(B.
+          [p/p]\\
+T h     & $B6u$N%H%T%C%/$r1#$9(B ({\bf hiding}) $B$+$r@Z$j49$($^$9(B.\\
+T m     & $B$3$N%0%k!<%W$rB>$N%H%T%C%/$K0\F0(B ({\bf move}) $B$7$^$9(B.
+          [p/p]\\
+T n     & $B?7$7$$(B ({\bf new}) $B%H%T%C%/$r:n@.$7$^$9(B.\\
+T r     & $B%H%T%C%/$r2~L>(B ({\bf rename}) $B$7$^$9(B.\\
+T C     & $B@55,I=8=$K9gCW$9$kA4$F$N%0%k!<%W$r%H%T%C%/$KJ#@=(B ({\bf
+          copy}) $B$7$^$9(B.\\
+T D     & $B$3$N%H%T%C%/$r$3$N%0%k!<%W$+$i>C5n(B ({\bf delete}) $B$7$^$9(B. [p/p]\\
+T M     & $B@55,I=8=$K9gCW$9$kA4$F$N%0%k!<%W$r%H%T%C%/$K0\F0(B ({\bf
+          move}) $B$7$^$9(B.\\
+\end{keys}}}
+
+\def\SummaryMode{\sec{$B35N,%b!<%I(B}{\samepage
+\begin{keys}{M-C-d}
+SPC     & $B5-;v$NA*Br(B, 1$B%Z!<%8%9%/%m!<%k(B, $B<!$N5-;v$X$N0\F0(B,
+$B$G$9(B.\\
+% (A SPC, A n)
+DEL     & (b) $B$3$N5-;v$r(B1$B%Z!<%8%9%/%m!<%k$7$FLa$7$^$9(B. [$B5w(B
+$BN%(B]\\ %(A DEL, A p)
 RET     & $B$3$N5-;v$r0l9T@h$K%9%/%m!<%k$7$^$9(B. [$B5wN%(B]\\
 =       & $B35N,$N%&%#%s%I%&$r3HD%$7$^$9(B. [$B@\F,<-(B: $B5-;v%&%#%s%I%&$rI=<((B
 $B$9$k$h$&$K=L$a$^$9(B]\\
-$<$     & (A $<$, A b) $B$3$N5-;v$N:G=i$K%9%/%m!<%k$7$^$9(B.\\
-$>$     & (A $>$, A e) $B$3$N5-;v$N:G8e$K%9%/%m!<%k$7$^$9(B.\\
+$<$     & (A $<$) $B$3$N5-;v$N:G=i$K%9%/%m!<%k$7$^$9(B.\\ %(A b)
+$>$     & (A $>$) $B$3$N5-;v$N:G8e$K%9%/%m!<%k$7$^$9(B.\\ %(A e)
 \&      & $B@55,I=8=$K9g$&A4$F$N5-;v$KL?Na$r<B9T$7$^$9(B. [$B@\F,<-(B: $B8e$m$K(B
 $B0\F0$7$^$9(B.]\\
-j       & (G g) $B5-;vHV9f$r?R$M$F(B, $B$=$N35N,9T$KHt$S(B ({\bf jump}) $B$^$9(B.\\
+k       & $B$3$N%9%l%C%I$K(B GroupLens $B$N3,5i(B (rating) (1-5) $B$rM?$($^$9(B.\\
+r       & $B$3$N5-;v$K(B GroupLens $B$N3,5i(B (rating) (1-5) $B$rM?$($^$9(B.\\
+Y g     & $B35N,%P%C%U%!$r:F:n@.(B (re{\bf generate}) $B$7$^$9(B.\\
+Y c     & $BA4$F$N%-%c%C%7%e$7$F$$$k(B ({\bf cached}) $B5-;v$r$r$r35N,$KF~$l(B
+$B$^$9(B.\\
 C-t     & $B35N,9T$N@Z$j<h$j(B ({\bf truncation}) $B$r@Z$j49$($^$9(B.\\
-M-\&    & $B%W%m%;%90u$NIU$$$F$$$kA4$F$N5-;v$KL?Na$r<B9T$7$^$9(B.\\
+C-d     & $B$3$l$rJL$N%0%k!<%W$K%@%$%8%'%9%H$NE83+(B (un-{\bf digestify})
+$B$7$^$9(B.\\
+M-C-d   & $BA4$F$NA*Br$7$F$$$k5-;v$r0l$D$N%0%k!<%W$K%@%$%8%'%9%H$rE83+$7(B
+$B$^$9(B (un-{\bf digestify}).\\
 M-k     & $B$3$N%0%k!<%W$N(B {\bf kill} $B%U%!%$%k$rJT=8$7$^$9(B.\\
-M-n     & (G M-n) $B<!$N(B ({\bf next}) $BL$FI5-;v$N35N,9T$K0\F0$7$^$9(B. [$B5w(B
-$BN%(B]\\ 
-M-p     & (G M-p) $BA0$N(B ({\bf previous}) $BL$FI5-;v$N35N,9T$K0\F0$7$^$9(B.
-[$B5wN%(B]\\ 
-M-r     & $B@55,I=8=$GA0$NA4$F$N5-;v$r8!:w$7$^$9(B.\\
-M-s     & $B@55,I=8=$GB3$/A4$F$N5-;v$r8!:w(B ({\bf earch}) $B$7$^$9(B.\\
+M-r     & $B@55,I=8=$GA0$N5-;v$r8!:w$7$^$9(B.\\
+M-s     & $B@55,I=8=$GB3$/5-;v$r8!:w(B ({\bf search}) $B$7$^$9(B.\\
 M-K     & $BAm9g(B {\bf kill} $B%U%!%$%k$rJT=8$7$^$9(B.\\
-\end{keys}
-}
+\end{keys}}}
 
-\def\SortSummary{
-\subsec{$B35N,%P%C%U%!$NJB$S49$((B}
+\def\SortSummary{\subsec{(C-c C-s) $B35N,%P%C%U%!$NJB$S49$((B}{\samepage
+$B%9%l%C%I%b!<%I$G$O(B, $B$3$l$i$NL?Na$O%9%l%C%I$N:,$@$1$rJB$S49$($^$9(B.\\*
 \begin{keys}{C-c C-s C-a}
 C-c C-s C-a & $BCx<T(B ({\bf author}) $B$G35N,$rJB$S49$($^$9(B.\\
 C-c C-s C-d & $BF|IU$1(B ({\bf date}) $B$G35N,$rJB$S49$($^$9(B.\\
 C-c C-s C-i & $B5-;v$N%9%3%"$G35N,$rJB$S49$($^$9(B.\\
+C-c C-s C-l & $B9T?t(B ({\bf line}) $B$GJB$S49$($^$9(B.\\
 C-c C-s C-n & $B5-;v$NHV9f(B ({\bf number}) $B$G35N,$rJB$S49$($^$9(B.\\
 C-c C-s C-s & $BI=Bj(B ({\bf subject}) $B$G35N,$rJB$S49$($^$9(B.\\
-\end{keys}
-}
+\end{keys}}}
 
-\def\Asubmap{
-\subsec{$B5-;v%P%C%U%!L?Na(B}
+\def\Article{\subsec{(A) $B5-;vL?Na(B}{\samepage
 \begin{keys}{A m}
-A g     & (g) $B$3$N5-;v$r(B($B:F(B)$B<hF@$7$^$9(B ({\bf get}). [$B@\F,<-(B: $B5-;v$rI=(B
-$B<($9$k$@$1$G$9(B.]\\ 
-A r     & (^, A ^) $B$3$N5-;v$N?F$K0\F0$7$^$9(B ({\bf References} $B%X%C%@!<(B
-$B$G$9(B).\\ 
-M-^     & $BM?$($i$l$?(B Message-ID $B$N5-;v$r<hF@$7$^$9(B.\\
+A g     & (g) $B$3$N5-;v$r(B($B:F(B)$B<hF@$7$^$9(B ({\bf get}). [$B@\F,<-(B: $B2?$b<B9T(B
+$B$7$^$;$s(B.]\\
+A r     & (^) $B$3$N5-;v$N?F$K0\F0$7$^$9(B ({\bf References} $B%X%C%@!<(B
+$B$G$9(B.) [$B@\F,<-(B: $B$I$N$/$i$$@h$KLa$k$+(B; $BIi(B: $n$ $BHVL\$NAD@h$@$1(B].\\  %(A ^)
+M-^     & $BM?$($i$l$?(B Message-ID $B$N5-;v$K0\F0$7$^$9(B. [$B@\F,<-(B: $BJ}K!$b;X(B
+$BDj$7$^$9(B.]\\
 A s     & (s) $B5-;v%P%C%U%!$G(B i{\bf search} $B$r<B9T$7$^$9(B.\\
-A D     & (C-d) $BJL$N%0%k!<%W$K=8G[G[Aw%a%C%;!<%8$r:FG[Aw(B ({\bf
-digestify}) $B$7$^$9(B.\\
-\end{keys}
-}
+A P     & $B5-;v$r%]%9%H%9%/%j%W%H$H$7$F0u:~(B ({\bf print}) $B$7$^$9(B.\\
+A R     & $B$3$N5-;v$NA4$F$NAD@h(B ({\bf References}) $B$r<hF@$7$^$9(B.\\
+\end{keys}}}
 
-\def\Bsubmap{
-\subsec{$B%a!<%k%0%k!<%WL?Na(B}
-{\samepage
+\def\MailGroup{\subsec{(B) $B%a!<%k%0%k!<%WL?Na(B}{\samepage
 $B$3$l$i$NL?Na(B (`B c' $B$r=|$/(B) $B$O%a!<%k%0%k!<%W$G$N$_M-8z$G$9(B.\\*
 \begin{keys}{B M-C-e}
-B DEL   & {$B%a!<%k5-;v$r%G%#%9%/$+$i>C5n(B (\bf delete}) $B$7$^$9(B (!). [p/p]\\
+B DEL   & {$B%a!<%k5-;v$r%G%#%9%/$+$i>C5n(B (\bf delete}) $B$7$^$9(B. [p/p]\\
 B c     & $B$3$N5-;v$r$I$3$+$N%0%k!<%W$+$i%a!<%k%0%k!<%W$KJ#@=(B ({\bf
 copy}) $B$7$^$9(B. [p/p]\\
 B e     & $B$3$N%0%k!<%W$NA4$F$N;~8B>C5n2DG=5-;v$r;~8B>C5n(B ({\bf
 expire}) $B$7$^$9(B. [p/p]\\
-B i     & $B%i%s%@%`$J%U%!%$%k$r$3$N%0%k!<%W$N<h$j9~$_(B ({\bf import}) $B$^(B
-$B$9(B.\\
+B i     & $BG$0U$N%U%!%$%k$r$3$N%a!<%k%0%k!<%W$N<h$j9~$_(B ({\bf import}) $B$^(B
+$B$9(B (From $B$H(B Subject $B$rM?$($^$9(B).\\
 B m     & $B$"$k%a!<%k%0%k!<%W$+$iJL$N%0%k!<%W$X5-;v$r0\F0(B ({\bf move})
 $B$7$^$9(B. [p/p]\\
-B q     & $BFC5iJ,3d$G5-;v$,$I$3$K9T$/$+$r?R$M$^$9(B ({\bf query}).\\
+B p     & $B$I$3$K%a%C%;!<%8$N9%0U$NJ#@=$bEj9F$5$l$?(B ({\bf posted}) $B$+$I(B
+$B$&$+$rD4$Y$^$9(B.\\
+B q     & $B:F%9%W!<%k$5$l$?$H$-$K(B, $B5-;v$,$I$3$K9T$/$+$r?R$M$^$9(B ({\bf
+query}).\\
 B r     & $B$3$N%a!<%k5-;v$r:F%9%W!<%k(B ({\bf respool}) $B$7$^$9(B. [p/p]\\
-B w     & (e) $B$3$N5-;v$rJT=8$7$^$9(B.\\
+B w     & (e) $B$3$N%a!<%k5-;v$rJT=8$7$^$9(B.\\
 B M-C-e & $B$3$N%0%k!<%W$NA4$F$N;~8B>C5n2DG=5-;v$r:o=|(B ({\bf expunge})
-($B%G%#%9%/$+$i>C$7$^$9(B) (!). [p/p]\\ 
-\end{keys}
-}}
+($B%G%#%9%/$+$i>C$7$^$9(B). [p/p]\\
+B C     & $B$3$N5-;v$rJL$N%0%k!<%W$KAj8_Ej9F(B ({\bf crosspost}) $B$7$^$9(B.\\
+\end{keys}}}
 
-\def\Gsubmap{
-\subsec{$B5-;vA*Br(B}
-{\samepage
+\def\GotoArticle{\subsec{(G) $B5-;v$X$N0\F0(B}{\samepage
 $B$3$l$i$NL?Na$OBP>]5-;v$rA*Br$7$^$9(B. $B@\F,0z?t$OM}2r$7$^$;$s(B. \\*
 \begin{keys}{G C-n}
 G b     & (,) $B:G9b(B ({\bf best}) $B$N5-;v$K0\F0$7$^$9(B ($B:G9b%9%3%"$N$b$N$G(B
-$B$9(B).\\
+$B$9(B). [GL rating]\\
 G f     & (.) $B:G=i(B ({\bf first}) $B$NL$FI5-;v$K0\F0$7$^$9(B.\\
+G g     & $B5-;vHV9f$r?V$$$F$+$i$=$N35N,9T$X0\F0(B ({\bf go to}) $B$7$^$9(B.\\
+G j     & (j) $B5-;vHV9f$r?V$$$F$+$i$=$N5-;v$XHt$S$^$9(B ({\bf jump}).\\
 G l     & (l) $B:G8e(B ({\bf last}) $B$N4{FI5-;v$K0\F0$7$^$9(B.\\
+G o     & $B35N,$NMzNr$+$i5-;v$r<h$j=P$7(B, $B$=$l$K0\F0$7$^$9(B.\\
 G n     & (n) $B<!(B ({\bf next}) $B$NL$FI5-;v$K0\F0$7$^$9(B.\\
-p       & $BA0(B ({\bf previous}) $B$NL$FI5-;v$K0\F0$7$^$9(B.\\
-G p     & $B35N,$NMzNr$+$i5-;v$r<h$j=P$7(B ({\bf pop}) $B$=$l$K0\F0$7$^$9(B.\\
+G p     & (p) $BA0(B ({\bf previous}) $B$NL$FI5-;v$K0\F0$7$^$9(B.\\
 G N     & (N) $B<!(B ({\bf next}) $B$N5-;v$K0\F0$7$^$9(B\\
 G P     & (P) $BA0(B ({\bf previous}) $B$N5-;v$K0\F0$7$^$9(B.\\
 G C-n   & (M-C-n) $BF1$8I=Bj$N<!(B ({\bf next}) $B$N5-;v$K0\F0$7$^$9(B.\\
 G C-p   & (M-C-p) $BF1$8I=Bj$NA0(B ({\bf previous}) $B$N5-;v$K0\F0$7$^$9(B.\\
-\end{keys}
-}}
+G M-n   & (M-n) $B35N,9T$G<!(B ({\bf next}) $B$NL$FI5-;v$K0\F0$7$^$9(B. [$B5wN%(B]\\
+G M-p   & (M-p) $B35N,9T$GA0(B ({\bf previous}) $B$NL$FI5-;v$K0\F0$7$^$9(B.
+[$B5wN%(B]\\
+\end{keys}}}
 
-\def\Hsubmap{
-\subsec{$B%X%k%WL?Na(B}
-\begin{keys}{H d}
-H d     & (C-c C-d) $B$3$N%0%k!<%W$N5-=R(B ({\bf describe}) $B$r$7$^$9(B. [$B@\(B
-$BF,<-(B: $B%5!<%P!<$+$i@bL@$r:FFI$_9~$_$7$^$9(B.]\\
-H f     & ange-ftp $B$r;H$C$F$3$N%0%k!<%W$N(B {\bf FAQ} $B$r<hF@$7$h$&$H$7$^(B
-$B$9(B.\\
-H h     & $BHs>o$KC;$$%X%k%W(B ({\bf help}) $B%a%C%;!<%8$rI=<($7$^$9(B.\\
-H i     & (C-c C-i) Gnus $B$N%*%s%i%$%s(B {\bf info} $B$K0\F0$7$^$9(B.\\
-H v     & Gnus $B$N%P!<%8%g%s(B ({\bf version}) $BHV9f$rI=<($7$^$9(B.\\
-\end{keys}
-}
-
-\def\Msubmap{
-\subsec{$B5-;v$K0u$rIU$1$k(B}
+\def\MarkArticles{\subsec{(M) $B5-;v$K0u$rIU$1$k(B}{\samepage
 \begin{keys}{M M-C-r}
-d       & (M d, M r) $B$3$N5-;v$K4{FI$N0u$rIU$1$F(B, $B<!$N$b$N$K0\F0$7$^$9(B.
-[$BHO0O(B]\\ 
+d       & (M d, M r) $B$3$N5-;v$K4{FI(B ({\bf read}) ($B$=$l$N>C5n(B ({\bf
+delete})) $B$N0u$rIU$1$F(B, $B<!$N$b$N$K0\F0$7$^$9(B. [$BHO0O(B]\\
 D       & $B$3$N5-;v$K4{FI$N0u$rIU$1$F(B, $BA0$N$b$N$K0\F0$7$^$9(B. [$BHO0O(B]\\
-u       & (!, M !, M t) $B$3$N5-;v$K2D;k0u(B ($B6=L#?<$$$H$7$F0u$rIU$1(B) $B<!$N(B
-$B$b$N$K0\F0$7$^$9(B. [$BHO0O(B]\\
-U       & $B$3$N5-;v$K2D;k0u$rIU$1(B, $BA0$N$b$N$K0\F0$7$^$9(B. [$BHO0O(B]\\ 
-M-u     & (M SPC, M c) $B$3$N5-;v$NA4$F$N0u$r>C5n$7(B, $B<!$N5-;v$K0\F0$7$^(B
-$B$9(B. [$BHO0O(B]\\ 
-M-U     & $B$3$N5-;v$NA4$F$N0u$r>C5n$7(B, $BA0$N5-;v$K0\F0$7$^$9(B. [$BHO0O(B]\\ 
+u       & (!, M t) $B$3$N5-;v$K2D;k0u(B ({\bf Tick}) ($B6=L#?<$$$H$7$F0u$rIU(B
+$B$1(B) $B<!$N$b$N$K0\F0$7$^$9(B. [$BHO0O(B]\\ %(M !)
+U       & $B$3$N5-;v$K2D;k0u$rIU$1(B, $BA0$N$b$N$K0\F0$7$^$9(B. [$BHO0O(B]\\
+M-u     & (M SPC, M c) $B$3$N5-;v$NA4$F$N0u$r>C5n$7(B ({\bf Clear}), $B<!$N(B
+$B5-;v$K0\F0$7$^$9(B. [$BHO0O(B]\\
+M-U     & $B$3$N5-;v$NA4$F$N0u$r>C5n$7(B, $BA0$N5-;v$K0\F0$7$^$9(B. [$BHO0O(B]\\
 M ?     & (?) $B$3$N5-;v$KJ]N1$N0u$rIU$1$^$9(B ($B%U%)%m!<%"%C%W$K$@$16=L#$,(B
-$B$"$k(B). [$BHO0O(B]\\ 
+$B$"$k(B). [$BHO0O(B]\\
+*       & $B%-%c%C%7%e$K5-;v$rF~$l$^$9(B ($B1JB3$K$7$^$9(B). [p/p]\\
+M-*     & $B$3$N5-;v$r%-%c%C%7%e$+$i<h$j=|$-$^$9(B ($B1JB3$GL5$/$7$^$9(B).
+[p/p]\\
 M b     & $B$3$N5-;v$K$7$*$j(B ({\bf bookmark}) $B$r@_Dj$7$^$9(B.\\
-M e     & (E, M x) $B$3$N5-;v$r;~8B>C5n2DG=(B ({\bf expirable}) $B$H$7$F0u$r(B
-$BIU$1$^$9(B. [$BHO0O(B]\\
+M e     & (E) $B$3$N5-;v$r;~8B>C5n2DG=(B ({\bf expirable}) $B$H$7$F0u$rIU$1(B
+$B$^$9(B. [$BHO0O(B]\\ %(M x)
 M k     & (k) $BF1$8I=Bj$NA4$F$N5-;v$r@Z$j(B ({\bf kill}), $B<!$N5-;v$rA*Br(B
 $B$7$^$9(B.\\
 M B     & $B$3$N5-;v$+$i$7$*$j(B ({\bf bookmark}) $B$r<h$j=|$-$^$9(B.\\
-M C     & $B2D;k0u$G$J$$5-;v$r%-%c%C%A%"%C%W(B ({\bf catch-up}) $B$7$^$9(B.\\
+M C     & $B2D;k0u$G$J$$5-;v$r%-%c%C%A%"%C%W(B ({\bf catch-up}) ($B4{FI$N0u(B
+$B$rIU$1$k(B) $B$7$^$9(B.\\
 M D     & $BA4$F$NJ]N1(B ({\bf dormant}) $B5-;v$rI=<($7$^$9(B ($BIaDL$O%U%)%m!<(B
 $B%"%C%W$,$J$$8B$j1#$5$l$F$$$^$9(B).\\
 M H     & $B$3$N%0%k!<%W$G$3$3(B ({\bf here}) $B$^$G%-%c%C%A%"%C%W(B ($B4{FI$N0u(B
@@ -444,9 +546,9 @@ M C-c   & $B$3$N%0%k!<%W$NA4$F$N5-;v$r%-%c%C%A%"%C%W(B ({\bf catch-up}) $B$7
 M M-r   & (x) $B$3$N%0%k!<%W$NA4$F$N4{FI(B ({\bf read}) $B5-;v$r>C5n$7$^$9(B.\\
 M M-D   & $BA4$F$NJ]N1(B ({\bf dormant}) $B5-;v$r1#$7$^$9(B.\\
 M M-C-r & $BM?$($i$l$?0u$NA4$F$N5-;v$r>C5n$7$^$9(B.\\
-\end{keys}
+\end{keys}}}
 
-\subsubsec{$B%9%3%"$K4p$E$$$?0u(B}
+\def\MarkScore{\subsubsec{(M V) $B%9%3%"(B ($BCM(B) $B$K4p$E$$$?0u(B}{\samepage
 \begin{keys}{M s m}
 M V c   & $BA4$F$N9b%9%3%"$N5-;v$+$iA4$F$N0u$r>C5n(B ({\bf clear}) $B$7$^$9(B.
 [score]\\
@@ -455,149 +557,188 @@ M V m   & $BA4$F$N9b%9%3%"$N5-;v$KM?$($i$($l$?0u(B ({\bf mark}) $B$rIU$1$^$9
 [score]\\
 M V u   & $BA4$F$N9b%9%3%"$N5-;v$r$*$b$7$m$$$H$7$F0u$rIU$1$^$9(B ($B2D;k0u$r(B
 $BIU$1$^$9(B). [score]\\
-\end{keys}
+\end{keys}}}
 
-\subsubsec{$B%W%m%;%90u(B}
-{\samepage 
+\def\ProcessMark{\subsubsec{(M P) $B%W%m%;%90u(B}{\samepage
 $B$3$l$i$NL?Na$O%W%m%;%90u(B \# $B$rIU$1$?$j>C5n$7$?$j$7$^$9(B. $BA`:n$7$?$$5-;v(B
 $B$,O"B3$7$F$$$J$$$H$-$@$1$=$l$r;H$&I,MW$,$"$k$G$7$g$&(B. $B$=$&$G$J$1$l$P?t(B
 $BCM0z?t$r;H$$$^$9(B.\\*
 \begin{keys}{M P R}
 M P a   & $BA4$F(B ({\bf all}) $B$N5-;v$K0u$rIU$1$^$9(B ($B=gHV$K(B).\\
-M P p   & (\#, M \#) $B$3$N5-;v$K0u$rIU$1$^$9(B.\\
+M P b   & $B%P%C%U%!(B ({\bf buffer}) $B$K8=$l$?=g$KA4$F$N5-;v$K0u$rIU$1$^$9(B.\\
+M P i   & $BA4$F$N<B9T0u$r5U$K$7$^$9(B ({\bf invert}).\\
+M P k   & $BA4$F$N0u$r%9%?%C%/$K@Q$s$G(B, $B$=$l$+$i@Z$j$^$9(B ({\bf kill}).\\
+M P p   & (\#) $B$3$N5-;v$K0u$rIU$1$^$9(B.\\ %(M \#)
 M P r   & $B6h0h(B ({\bf region}) $B$NA4$F$N5-;v$K0u$rIU$1$^$9(B.\\
 M P s   & $B8=:_$NO"B3J*(B ({\bf series}) $B$NA4$F$K0u$rIU$1$^$9(B.\\
 M P t   & $B$3$N(B ($BI{(B)$B%9%l%C%I(B ({\bf thread}) $B$NA4$F$N5-;v$K0u$rIU$1$^$9(B.\\
-M P u   & (M-\#, M M-\#) $B$3$N5-;v$+$i0u$r>C$7$^$9(B ({\bf unmark}).\\
+M P u   & (M-\#) $B$3$N5-;v$+$i0u$r>C$7$^$9(B ({\bf unmark}).\\ %(M M-\#)
+M P v   & $BA4$F$N9b$$%9%3%"$N5-;v(B ($BCM(B ({\bf value})) $B$K0u$rIU$1$^$9(B.
+[score]\\
+M P w   & $BA4$F$N0u$r%9%?%C%/$K@Q$_$^$9(B.\\
+M P y   & `M P y', `M P w' $B$d0u$r>C5n$9$kA`:n$N8e$G%9%?%C%/$+$i0u$rE=(B
+$B$j(B ({\bf yank}), $BI|85$7$^$9(B.\\
 M P R   & $B@55,I=8=(B ({\bf regexp}) $B$K9g$&A4$F$N5-;v$K0u$rIU$1$^$9(B.\\
 M P S   & $B0uIU$-$N5-;v$r4^$`A4$F$NO"B3$7$?5-;v(B ({\bf series}) $B$K0u$rIU(B
 $B$1$^$9(B.\\
+M P T   & $B$3$N(B ($BI{(B)$B%9%l%C%I(B ({\bf thread}) $B$K$"$kA4$F$N5-;v$N0u$r<h$j(B
+$B=|$-$^$9(B.\\
 M P U   & $BA4$F$N5-;v$+$i0u$r>C$7$^$9(B ({\bf unmark}).\\
-\end{keys}
-}}
+\end{keys}}}
 
-\def\Osubmap{
-\subsec{$B5-;v$N=PNO(B}
+\def\OutputArticles{\subsec{(O) $B5-;v$N=PNO(B}{\samepage
 \begin{keys}{O m}
+O b     & $B5-;v$NK\BN(B ({bf body} $B$r%W%l%$%s%U%!%$%k7A<0$GJ]B8$7$^$9(B.
+[p/p]\\
 O f     & $B$3$N5-;v$r%W%l%$%s%U%!%$%k(B ({\bf file}) $B7A<0$GJ]B8$7$^$9(B.
 [p/p]\\
 O h     & $B$3$N5-;v$r(B {\bf mh} $B%U%)%k%@!<$N7A<0$GJ]B8$7$^$9(B. [p/p]\\
 O m     & $B$3$N5-;v$r%a!<%k(B ({\bf mail}) $B7A<0$GJ]B8$7$^$9(B. [p/p]\\
-O o     & (o, C-o) $B$3$N5-;v$r=i4|5-;vJ]B84o$r;H$C$FJ]B8$7$^$9(B. [p/p]\\
+O o     & (o, C-o) $B$3$N5-;v$r(B gnus-default-article-saver $B$r;H$C$FJ]B8(B
+$B$7$^$9(B. [p/p]\\
 O p     & ($\mid$) $B$3$N5-;v$r%7%'%k%3%^%s%I$K%Q%$%W$GAw$j$^$9(B. [p/p]\\
-O r     & $B$3$N5-;v$r(B {\bf rmail} $B7A<0$GJ]B8$7$^$9(B. [p/p]\\
+O r     & $B$3$N5-;v$r(B {\bf RMAIL} $B7A<0$GJ]B8$7$^$9(B. [p/p]\\
+O s     & $B$3$N5-;v$r(B {\bf SOUP} $B%Q%1%C%H$r5-;v$KDI2C$7$^$9(B. [p/p]\\
 O v     & $B$3$N5-;v$r(B {\bf vm} $B$N7A<0$GJ]B8$7$^$9(B. [p/p]\\
-\end{keys}
-}
+O F     & $B$3$N5-;v$r(B, $BB8:_$9$k%U%!%$%k$r>e=q$-$7$F(B, $B%W%l%$%s%U%!%$%k(B
+({\bf file}) $B$KJ]B8$7$^$9(B. [p/p]\\
+\end{keys}}}
 
-\def\Ssubmap{
-\subsec{$BEj9F(B, $B%U%)%m!<%"%C%W(B, $BJVEz(B, $BE>Aw(B, $B<h$j>C$7(B}
-{\samepage
-$B$3$l$i$NL?Na$OJL$NEj9F$+%a!<%k%P%C%U%!$K9T$-$^$9(B. $B5-;v$rJT=8$7$?8e(B,
+\def\Send{\subsec{(S) $BEj9F(B, $B%U%)%m!<%"%C%W(B, $BJVEz(B, $BE>Aw(B, $B<h$j>C$7(B}{\samepage
+$B$3$l$i$NL?Na$OJL$N(B Message $B%P%C%U%!$K9T$-$^$9(B. $B5-;v$rJT=8$7$?8e(B,
 C-c C-c $B$r2!$7$FAw?.$7$^$9(B. $B30It%0%k!<%W$K$$$F(B, $B30It%5!<%P!<$r;H$C$F5-(B
-$B;v$rEj9F$7$?$$$J$i(B, C-c C-c $B$K@\F,<-$rM?$($F$/$@$5$$(B.\\*
+$B;v$rEj9F$7$?$$$J$i(B, C-c C-c $B$K@\F,<-$rM?$($F$/$@$5$$(B. [$B0l;~E*(B] $B$K%5!<(B
+$B%P!<$,Ej9F$G$-$J$$$J$/$F(B, $B%a!<%k$+$i%K%e!<%9$X$N%2!<%H%&%'%$$r;H$C$FEj(B
+$B9F$7$?$$$H$-$K$O(B, `gnus-post-method' $B$r(B `nngateway' $B$K@_Dj$7$F$/$@$5$$(B.
+\\*
 \begin{keys}{S O m}
-S b     & $B$3$N5-;v$X$N%U%)%m!<%"%C%W$NEj9F$H(B, $BJVEz$NAw?.$NN>J}(B ({\bf
-both}) $B$r$7$^$9(B.\\
+%S b     & $B$3$N5-;v$X$N%U%)%m!<%"%C%W$NEj9F$H(B, $BJVEz$NAw?.$NN>J}(B ({\bf
+%both}) $B$r$7$^$9(B.\\
 S c     & (C) $B$3$N5-;v$r<h$j>C$7$^$9(B ({\bf cancel}) ($B<+J,<+?H$N$b$N$K(B
 $B$N$_F0:n$7$^$9(B).\\
-S f     & (f) $B$3$N5-;v$X$N%U%)%m!<%"%C%W(B ({\bf followup}) $B$rEj9F$7$^$9(B.\\
-S m     & (m) $BC/$+JL$N?M$K%a!<%k(B {\bf mail} $B$rAw$j$^$9(B.\\
+S f     & (f) $B$3$N5-;v$X$N%U%)%m!<%"%C%W(B ({\bf followup}) $B$rEj9F$7$^$9(B.
+[$B@\F,<-(B: $B855-;v$r4^$a$^$9(B]\\
+S m     & (m) $BC/$+$K%a!<%k(B {\bf mail} $B$rAw$j$^$9(B.\\
+S n     & $B%a!<%k$G<u$1<h$C$?%a%C%;!<%8$K(B, $B%K%e!<%9%0%k!<%W(B ({\bf
+newsgroup}) $B$G%U%)%m!<%"%C%W$7$^$9(B.\\
 S o m   & (C-c C-f) $B$3$N5-;v$r0l$K%a!<%k$rAw$k(B ({\bf mail}) $B$3$H$GE>Aw(B
-$B$7$^$9(B.\\
+$B$7$^$9(B. [$B@\F,<-(B: $B40A4$J%X%C%@!<$r4^$a$^$9(B]\\
 S o p   & $B$3$N5-;v$r%K%e!<%9%0%k!<%W$X$NEj9F(B ({\bf post}) $B$H$7$FE>Aw$7(B
 $B$^$9(B.\\
 S p     & (a) $B$3$N%0%k!<%W$K5-;v$rEj9F(B ({\bf post}) $B$7$^$9(B.\\
-S r     & (r) $B$3$N5-;v$NCx<T$K%a!<%k$GJVEz(B ({\bf reply}) $B$7$^$9(B.\\
+S r     & (r) $B$3$N5-;v$NCx<T$K%a!<%k$GJVEz(B ({\bf reply}) $B$7$^$9(B. [$B@\F,(B
+$B<-(B: $B855-;v$r4^$_$^$9(B]\\
 S s     & $B$3$N5-;v$r?7$7$$5-;v$GBeBX$7$^$9(B ({\bf supersede}) ($B<+J,$N5-(B
-$B;v$N$_(B).\\ 
-S u     & $B%U%!%$%k$r(B {\bf uuencode} $B$7$FO"B3$H$7$FEj9F$7$^$9(B.\\
+$B;v$N$_(B).\\
+S u     & $B%U%!%$%k$r(B {\bf uuencode} $B$7(B, $BO"B3J*$KJ,3d$7$FEj9F$7$^$9(B.\\
+S w     & $B5-;v$N:n<T$H<u$1<h$j<j$K9-$$(B ({\bf wide}) $BJVEz$r%a!<%k$GAw$j(B
+$B$^$9(B. [$B@\F,<-(B: $B855-;v$r4^$_$^$9(B]\\
 S B     & $B855-;v$r0zMQ$7$F%U%)%m!<%"%C%W$NEj9F(B, $BJVEz$NAw?.$NN>J}(B ({\bf
-both}) $B$r$7$^$9(B. [p/p]\\ 
+both}) $B$r$7$^$9(B. [p/p]\\
+S D b   & $B<:GT$7$?(B ({\bf bounced}) $B%a!<%k$r<u$1<h$j<j$N%"%I%l%9$r=$@5(B
+$B$7$?8e$G:FAw$7$^$9(B.  [$B@\F,<-(B:  $B$3$l$,JVEz$K$J$C$F$$$k%a%C%;!<%8$N%X%C(B
+$B%@!<$rI=<($7$^$9(B]\\
+S D r   & $BC/$+$K$3$N%a%C%;!<%8$r:FAw(B ({\bf Resend}) $B$7$^$9(B. [p/p]\\
 S F     & (F) $B855-;v$r0zMQ$7$F%U%)%m!<%"%C%W(B ({\bf followup}) $B$rEj9F$7(B
 $B$^$9(B. [p/p]\\
+S N     & $B%K%e!<%9%0%k!<%W(B ({\bf newsgroup}) $B$N%U%)%m!<%"%C%W$r%a!<%k(B
+$B%a%C%;!<%8$G$7(B, $B855-;v$r4^$_$^$9(B.  [p/p]\\
 S O m   & $B$3$l$i$NO"B3$r=8G[7A<0$K$7$F%a!<%k(B ({\bf mail}) $B$GE>Aw$7$^$9(B.
 [p/p]\\
 S O p   & $B$3$l$i$NO"B3$r=8G[7A<0$K$7$F%K%e!<%9%0%k!<%W$KEj9F(B ({\bf
-post}) $B$7$^$9(B. [p/p]\\ 
+post}) $B$7$^$9(B. [p/p]\\
 S R     & (R) $B855-;v$r0zMQ$7$F%a!<%k$GJVEz(B ({\bf reply}) $B$7$^$9(B.
 [p/p]\\
+S W     & $B855-;v$r0zMQ$7$F9-$$(B ({\bf wide}) $BJVEz$r%a!<%k$GAw$j$^$9(B.
+[p/p]\\
+S W-c   & $B2a>jAj8_Ej9F(B ({\bf crossposting}) $B$X$NJ86g(B ({\bf complaint})
+$B$rAw?.$7$^$9(B. [p/p]\\
 \end{keys}
-$B$?$C$?:#Ej9F$7$?5-;v$r<h$j>C$7$?$jBeBX$7$?$1$l$P(B ($B%5!<%P!<$K8=$l$kA0$K(B), 
-*post-news* $B%P%C%U%!$K0\F0$7$F(B, `Message-ID' $B$r(B `Cancel' $B$+(B
-`Supersedes' $B$K49$($F(B C-c C-c $B$G$b$&0lEYAw?.$7$F$/$@$5$$(B. 
+$B$?$C$?:#Ej9F$7$?5-;v$r<h$j>C$7$?$jBeBX$7$?$1$l$P(B ($B%5!<%P!<$K8=$l$kA0$K(B),
+*sent \ldots* $B%P%C%U%!$K0\F0$7$F(B, `Message-ID' $B$r(B `Cancel' $B$+(B
+`Supersedes' $B$K49$($F(B C-c C-c $B$G$b$&0lEYAw?.$7$F$/$@$5$$(B.
 }}
 
-\def\Tsubmap{
-\subsec{$B%9%l%C%IL?Na(B}
-\begin{keys}{T \#}
-T \#    & $B$3$N%9%l%C%I$K%W%m%;%90u$rIU$1$^$9(B.\\
-T d     & $B$3$N%9%l%C%I$N<!$N5-;v$K0\F0$7$^$9(B ({\bf down}). [$B5wN%(B]\\
+\def\Thread{\subsec{(T) $B%9%l%C%IL?Na(B}{\samepage
+\begin{keys}{T M-\#}
+T ^     & $B$3$N5-;v$rA0$N$b$N$+<B9T0u$NIU$$$?$b$N$N;R6!$K$7$^$9(B. \\
+T \#    & $B$3$N(B($BI{(B)$B%9%l%C%I$K%W%m%;%90u$rIU$1$^$9(B.\\
+T M-\#  & $B$3$N(B($BI{(B)$B%9%C%I$+$i<B9T0u$r>C5n$7$^$9(B.\\
+T d     & $B$3$N%9%l%C%I$r2<$,$j$^$9(B ({\bf down}). [$B5wN%(B]\\
 T h     & $B$3$N(B ($BI{(B)$B%9%l%C%I$r1#$7$^$9(B ({\bf hide}).\\
-T i     & $B$3$N%9%l%C%I$N%9%3%"$r>e$2$^$9(B ({\bf increase}).\\
-T k     & (M-C-k) $B8=:_$N(B ($BI{(B)$B%9%l%C%I$r@Z$j$^$9(B ({\bf kill}). [$BIi$N0z(B
-$B?t(B: $B2D;k0u(B, $B@5$N0z?t(B: $B0u$r>C$9(B.]\\
-T l     & (M-C-l) $B$3$N%9%l%C%I$N%9%3%"$r2<$2$^$9(B ({\bf lower}).\\
+T i     & $B$3$N%9%l%C%I$N%9%3%"$r>e$2$^$9(B ({\bf increase}).  [$B%9%3%"(B]\\
+T k     & (M-C-k) $B8=:_$N(B ($BI{(B)$B%9%l%C%I$r@Z$j$^$9(B ({\bf kill}). [$B0z?t(B:
+$BIi(B--$B2D;k0u(B, $B@5(B: $B0u$r>C$9(B.]\\
+T l     & (M-C-l) $B$3$N%9%l%C%I$N%9%3%"$r2<$2$^$9(B ({\bf lower}). [$B%9%3(B
+$B%"(B]\\
 T n     & (M-C-f) $B<!(B ({\bf next}) $B$N%9%l%C%I$K0\F0$7$^$9(B. [$B5wN%(B]\\
+T o     & $B$3$N%9%l%C%I$N@hF,(B ({\bf top}) $B$K0\F0$7$^$9(B.\\
 T p     & (M-C-b) $BA0(B ({\bf previous}) $B$N%9%l%C%I$K0\F0$7$^$9(B. [$B5wN%(B]\\
 T s     & $B$3$N5-;v$G1#$l$F$$$k%9%l%C%I$rI=<((B ({\bf show}) $B$7$^$9(B.\\
-T u     & $B$3$N%9%l%C%I$NA0$N5-;v$K0\F0$7$^$9(B ({\bf up}). [$B5wN%(B]\\
+T t     & $B$3$N%9%l%C%I$r:F%9%l%C%I(B ({\bf thread}) $B$7$^$9(B.\\
+T u     & $B$3$N%9%l%C%I$N>e$,$j$^$9(B ({\bf up}). [$B5wN%(B]\\
 T H     & $BA4$F$N%9%l%C%I$r1#$7$^$9(B ({\bf hide}).\\
 T S     & $BA4$F$N1#$5$l$?%9%l%C%I$rI=<((B ({\bf show}) $B$7$^$9(B.\\
 T T     & (M-C-t) $B%9%l%C%II=<($r@Z$jBX$($^$9(B ({\bf toggle}).\\
-\end{keys}
-}
+\end{keys}}}
 
-\def\Vsubmap{
-\subsec{$B%9%3%"(B ($BCM(B) $BL?Na(B}
-{\samepage
+\def\Score{\subsec{(V) $B%9%3%"(B ($BCM(B) $BL?Na(B}{\samepage
 $B%*%s%i%$%s(B info $B$GE,1~%9%3%"$rFI$s$G$/$@$5$$(B.\\*
 \begin{keys}{\bf A p m l}
 V a     & $BA4$F$NMWAG$r;XDj$7$F?7$7$$%9%3%"EPO?$r2C$((B ({\bf add}) $B$^$9(B.\\
-V c     & $B?7$7$$%9%3%"%U%!%$%k$r8=:_$N$b$N(B ({\bf current}) $B$H$7$F;XDj(B
+V c     & $B?7$7$$%9%3%"%U%!%$%k$r8=:_$N$b$N(B ({\bf current}) $B$H$7$FA*Br(B
 $B$7$^$9(B.\\
-V e     & $B8=:_$N%9%3%"$NO"A[%j%9%H$rJT=8(B ({\bf edit}) $B$7$^$9(B.\\
+V e     & $B8=:_$N%9%3%"%U%!%$%k$rJT=8(B ({\bf edit}) $B$7$^$9(B.\\
 V f     & $B%9%3%"%U%!%$%k(B ({\bf file}) $B$rJT=8$7$F8=:_$N$b$N$H$7$^$9(B.\\
 V m     & $BM?$($i$l$?%9%3%"$h$j2<$N5-;v$K4{FI$K0u(B ({\bf mark}) $B$rIU$1$^(B
-$B$9(B.\\
-V s     & $B$3$N5-;v$N%9%3%"(B ({\bf score}) $B$r@_Dj$7$^$9(B.\\
-V t     & $B$3$N5-;v$KE,MQ$5$l$?A4$F$N%9%3%"5,B'$rI=<($7$^$9(B ({\bf track}).\\
+$B$9(B. [$B%9%3%"(B]\\
+V s     & $B$3$N5-;v$N%9%3%"$r@_Dj(B ({\bf set}) $B$7$^$9(B.\\
+V t     & $B$3$N5-;v$KE,MQ$5$l$?A4$F$N%9%3%"5,B'$rDI@W(B ({\bf trace}) $B$7(B
+$B$^$9(B.\\
 V x     & $BA4$F$NDc%9%3%"$N5-;v$r>C5n(B ({\bf expunge}) $B$7$^$9(B. [score]\\
-V C     & $B8=:_$N%9%3%"%U%!%$%k$rMxMQ<T$KJ,$+$j$d$9$$%$%s%?!<%U%'!<%9$G(B
-$B%+%9%?%^%$%:(B ({\bf customize}) $B$7$^$9(B.\\ 
-V S     & $B$3$N5-;v$N%9%3%"(B ({\bf score}) $B$rI=<($7$^$9(B.\\
+V C     & $B8=:_$N%9%3%"%U%!%$%k$rMxMQ<T$KJ,$+$j$d$9$$%$%s%?!<%U%'!<%9$r(B
+$B;H$C$F%+%9%?%^%$%:(B ({\bf customize}) $B$7$^$9(B.\\
+V F     & $B%U%!%$%k$HF14|$r<h$k$?$a$K%9%3%"%-%c%C%7%e$r=q$-=P$7$^$9(B
+({\bf Flush}).\\
+V R     & $B%<%m$+$i$3$N35N,%P%C%U%!$r:F$S%9%3%"IU$1$7$^$9(B ({\bf
+re-score}).\\
+V S     & $B$3$N5-;v$N%9%3%"$rI=<((B ({\bf show}) $B$7$^$9(B.\\
+I C-i   & $B$3$N5-;v$N%9%3%"$rA}2C(B ({\bf increase}) $B$7$^$9(B.\\
+L C-i   & $B$3$N5-;v$N%9%3%"$r2<$2(B ({\bf lower}) $B$^$9(B.\\
 \bf A p m l& $B$3$N5-;v$K4p$E$$$?%9%3%"EPO?$r:n$j$^$9(B.\\
 \end{keys}
 
 4$B$D$NJ8;z$O0J2<$N0UL#$G$9(B:\\*
 \quad \B{A}ction: I)ncrease, L)ower;\\*
-\quad \B{p}art: a)utor (from), s)ubject, x)refs (cross-posting), d)ate, l)ines,
-message-i)d, t)references (parent), f)ollowup, b)ody, h)ead ($BA4$F$N%X%C(B
-$B%@!<(B);\\*
+\quad \B{p}art: a)uthor (from), b)ody, d)ate, f)ollowups, h)ead ($BA4$F$N%X%C%@!<(B),
+message-i)d, l)ines, s)ubject, t)hread (references), x)refs (cross-posting);\\*
 \quad \B{m}atch type:\\*
-\qquad string: s)ubstring, e)xact, r)egexp, f)uzzy,\\*
-\qquad date: b)efore, a)t, n)this,\\*
+\qquad string: e)xact, f)uzzy, r)egexp, s)ubstring\\*
+\qquad date: a)t, b)efore, n)this,\\*
 \qquad number: $<$, =, $>$;\\*
 \quad \B{l}ifetime: t)emporary, p)ermanent, i)mmediate.
 
-2$BHVL\$NJ8;z$rBgJ8;z$GF~NO$9$k$H(B, $B;D$j$N(B2$B$D$O(B s)ubstring $B$H(B t)emporary
+2/3$BHVL\$NJ8;z$rBgJ8;z$GF~NO$9$k$H(B, $B;D$j$NJ8;z$O(B s)ubstring $B$H(B t)emporary
 $B$G$"$k$H$_$J$5$l$^$9(B. 3$BHVL\$NJ8;z$rBgJ8;z$GF~NO$9$k$H(B, $B:G8e$N$b$N$O(B
-t)emporary $B$G$"$k$H$_$J$5$l$^$9(B. 
+t)emporary $B$G$"$k$H$_$J$5$l$^$9(B.
 
 \quad $B%9%3%"%U%!%$%k$N<j$G$NJT=8$N$?$a$NDI2C$N%-!<(B:\\*
 \begin{keys}{C-c C-c}
 C-c C-c & $B%9%3%"%U%!%$%k$NJT=8$r=*$($^$9(B.\\
 C-c C-d & $B8=:_$NF|IU$1(B ({\bf date}) $B$rF|?t$H$7$FA^F~$7$^$9(B.\\
-\end{keys}
-}}
+C-c C-p & [$BE,1~(B] $B%9%3%"%U%!%$%k$r$-$l$$$K0u;z(B ({\bf pretty-print}) $B$7(B
+$B$^$9(B.\\
+\end{keys}}}
 
-\def\Wsubmap{
-\subsec{$B5-;v%P%C%U%!$N@vBu(B}
+\def\Wash{\subsec{(W) $B5-;v%P%C%U%!$N@vBu(B}{\samepage
 \begin{keys}{W C-c}
-W b     & $B5-;v$NCf$N(B Message-ID $B$H(B URL $B$r%^%&%9$G%/%j%C%/2DG=$K$7$^$9(B {\bf
-  buttons}.\\  
-W c     & $B5-;v$+$iM>J,$J(B {\bf CRs} (^M) $B$r<h$j=|$-$^$9(B.\\
-W f     & X-{\bf Face} $B%X%C%@!<$rC5$7$FI=<($7$^$9(B.\\
+W b     & $B5-;v$NCf$N(B Message-ID $B$H(B URL $B$H0zMQ$H=pL>$r%^%&%9$G%/%j%C%/(B
+$B2DG=$J%\%?%s$K(B ({\bf buttons}) $B$7$^$9(B.\\
+W c     & $BM>J,$J(B {\bf CR} (^M) $B$r<h$j=|$-$^$9(B.\\
+W e     & $B6/D4$5$l$?(B ({\bf emphasized}) $B%F%-%9%H(B, $B$?$H$($P(B, *this* $B$d(B
+\_that\_). $B$r$-$l$$$K8+$;$^$9(B.\\
+W f     & X-{\bf Face} $B%X%C%@!<$rI=<($7$^$9(B.\\
+W h     & HTML $B$r%F%-%9%H$H$7$FI=<($7$^$9(B.\\
 W l     & (w) $B5-;v$+$i%Z!<%8$N6h@Z$j(B ({\bf^L}) $B$r<h$j=|$-$^$9(B.\\
 W m     & {\bf MIME} $B$N<B9T$r@Z$j49$($^$9(B.\\
 W o     & $B5-;v$N(B {\bf overstrike} $B$+(B $B2<@~(B(^H\_) $B$r07$$$^$9(B.\\
@@ -610,42 +751,41 @@ W T e   & $B5-;v$N;~9o$rAw$i$l$?;~$+$i7P2a$7$?(B ({\bf elapsed}) $B;~4V$KJQ(
   $B49$7$^$9(B.\\
 W T l   & $B5-;v$N;~9o$r%m!<%+%k(B ({\bf local}) $BI8=`;~9oBS$KJQ49$7$^$9(B.\\
 W T u   & (W T z) $B5-;v$N;~9o$r(B {\bf UTC} ({\bf Zulu}, GMT) $B$KJQ49$7$^(B
-  $B$9(B.\\ 
-\end{keys}
+  $B$9(B.\\
+\end{keys}}}
 
-\subsubsec{$B5-;v$NItJ,$r1#$9(B/$B%O%$%i%$%H$9$k(B}
+\def\Hide{\subsubsec{(W W) $B5-;v$NItJ,$r1#$9(B/$B%O%$%i%$%H$9$k(B}{\samepage
+$B@\F,<-$,L5$$$H!"$3$l$i$NL?Na$O1#$9$+$I$&$+$r@Z$j49$($^$9!#@5$N0z?t$O1#(B
+$B$7!"Ii$N0z?t$OI=<($7$^$9(B.\\*
 \begin{keys}{W W C-c}
-W W a   & $BA4$F$N(B ({\bf all}) $BK>$^$7$/$J$$ItJ,$r1#$7$^$9(B. W W h, W W s,
-W W C-c $B$r<B9T$7$^$9(B.\\
-W W c   & $B5-;v$N0zMQ(B ({\bf citation}) $B$r1#$7$^$9(B.\\
-W W h   & $B5-;v$N%X%C%@!<(B ({\bf headers}) $B$r1#$7$^$9(B.\\
-W W s   & $B5-;v$N=pL>(B ({\bf signature}) $B$r1#$7$^$9(B.\\
-W W C-c & $B5-;v$N0zMQ(B ({\bf citation}) $B$r$h$j@vN}$5$l$?%"%k%4%j%:%`$r;H$C(B
-$B$F1#$7$^$9(B.\\
-%\end{keys}
-%
-%\subsubsec{Highlight Parts of the Article}
-%\begin{keys}{W H A}
-W H a   & $BA4$F(B ({\bf all}) $B$NItJ,$r1#$7$^$9(B. W b, W H c, W H h, W H
-s. $B$r<B9T$7$^$9(B\\
-W H c   & $B5-;v$N0zMQ(B ({\bf citation}) $B$r%O%$%i%$%H$7$^$9(B.\\
-W H h   & $B5-;v$N%X%C%@!<(B ({\bf headers}) $B$r%O%$%i%$%H$7$^$9(B.\\
-W H s   & $B5-;v$N=pL>(B ({\bf signature}) $B$r%O%$%i%$%H$7$^$9(B.\\
-\end{keys}
-}
+W W C-c & $BB0@-9T$r;}$D0zMQ$5$l$?(B  ({\bf cited}) $B%F%-%9%H$r1#$7$^$9(B.\\
+W W a   & $BA4$F$N(B ({\bf all}) $BK>$^$7$/$J$$ItJ,$r1#$7$^$9(B.\\
+W W b   & $BB`6~$J(B ({\bf boring}) $B%X%C%@!<$r1#$7$^$9(B.\\
+W W c   & $B0zMQ$5$l$?(B ({\bf cited}) $B%F%-%9%H$r1#$7$^$9(B.\\
+W W h   & (t, W t) $BK>$^$7$/$J$$%X%C%@!<(B ({\bf headers}) $B$r1#$7$^$9(B.\\
+W W p   & {\bf PGP} $B$N%X%C%@!<$H=pL>$r1#$7$^$9(B.\\
+W W s   & $B=pL>(B ({\bf signature}) $B$r1#$7$^$9(B.\\
+W W P   & {\bf PEM} $B%X%C%@!<$H=pL>$r1#$7$^$9(B.
+\end{keys}}}
 
-\def\Xsubmap{
-\subsec{$BO"B3$NE83+(B (Uudecode $B$J$I(B)}
-{\samepage
+\def\Highlight{\subsubsec{(W H) $B5-;v$N0lItJ,$r%O%$%i%$%H$9$k(B}{\samepage
+\begin{keys}{W H A}
+W H a   & $BA4$F(B ({\bf all}) $B$NItJ,$r1#$7$^$9(B.\\
+W H c   & $B0zMQ$5$l$?(B ({\bf cited}) $B%F%-%9%H$r%O%$%i%$%H$7$^$9(B.\\
+W H h   & $B%X%C%@!<(B ({\bf headers}) $B$r%O%$%i%$%H$7$^$9(B.\\
+W H s   & $B=pL>(B ({\bf signature}) $B$r%O%$%i%$%H$7$^$9(B.\\
+\end{keys}}}
+
+\def\Extract{\subsec{(X) $BO"B3$NE83+(B (Uudecode $B$J$I(B)}{\samepage
 Gnus $B$O8=:_$N5-;v$,O"B3J*(B ($B$=$l$>$l$NItJ,$,I=Bj$K$*$$$F(B, $BNc$($P(B
-{}1/10\dots10/10 $B$N$h$&$K(B, $B?t;z$GF1Dj$5$l$kJ#?t$NEj9F(B) $B$N0lIt$G$"$k$H(B, 
-$B$=$l$rG'<1$7$F$=$NO"B3J*$r$=$l$>$l<B9T2aDx$K$+$1$^$9(B. 1$B$D0J>e$NO"B3J*(B
-$B$K0u$rIU$1$F<B9T$9$k$3$H$,$G$-$^$9(B. $BEj9F$,%"!<%+%$%V$r4^$s$G$$$l$P(B, $B?7(B
-$B$7$$%0%k!<%W$GE83+$5$l(B, $B=8$a$i$l$^$9(B.\\*
+{}1/10\dots10/10 $B$N$h$&$K(B, $B?t;z$GF1Dj$5$l$kJ#?t$NEj9F(B) $B$N0lIt$G$"$k$H(B,
+$B$=$l$rG'<1$7$^$9(B. 1$B$D0J>e$NO"B3J*$K0u$rIU$1$F<B9T$9$k$3$H$,$G$-$^(B
+$B$9(B. $BEj9F$,%"!<%+%$%V$r4^$s$G$$$l$P(B, $B?7$7$$%0%k!<%W$GE83+$5$l(B, $B=8$a$i$l(B
+$B$^$9(B.\\*
 \begin{keys}{X p}
 X b     & $BO"B3J*$r(B {\bf binhex} $B$GE83+$7$^$9(B. [p/p]\\
 X o     & $BC1$KO"B3J*$r=PNO(B ({\bf output}) $B$7$^$9(B ($BI|9f2=$O$7$^$;$s(B).
-[p/p]\\ 
+[p/p]\\
 X p     & $B%]%9%H%9%/%j%W%H(B ({\bf postscript}) $B$NO"B3J*$rE83+$7$^$9(B.
 [p/p]\\
 X s     & $BO"B3J*$r(B {\bf shar} $B$GE83+$7$^$9(B. [p/p]\\
@@ -665,64 +805,113 @@ X v \bf Z & $BO"B3J*$rI|9f2=$7(B, $BJ]B8$7(B, $B1\Mw$7$^$9(B. [p/p]\\
 \begin{keys}{C-c C-v C-v}
 C-c C-v C-v & (X v u) $BO"B3J*$r(B uudecode $B$71\Mw$7$^$9(B. [p/p]\\
 \end{keys}
+$BI|9f2=$r<+F0E*$K9T$J$&$K$O(B, `M-x gnus-binary-mode' $B$r;H$C$F$/$@$5$$(B
+($B$=$l$+$i5-;v$N85$N%F%-%9%H$r8+$k$?$a$K(B `g' $B$r;H$C$F$/$@$5$$(B).
 }}
 
-\def\Zsubmap{
-\subsec{$B8=:_$N%0%k!<%W$r=P$k(B}
+\def\Exit{\subsec{(Z) $B8=:_$N%0%k!<%W$r=P$k(B}{\samepage
 \begin{keys}{Z G}
 Z c     & (c) $BA4$F$N2D;k0uIU$-$G$J$$5-;v$K4{FI$N0u$rIU$1(B ({\bf
 catch-up}, $B%-%c%C%A%"%C%W(B) $B=*N;$7$^$9(B.\\
 Z n     & $BA4$F$N5-;v$K4{FI$N0u$rIU$1(B, $B<!(B ({\bf next}) $B$N%0%k!<%W$K0\F0(B
 $B$7$^$9(B.\\
+Z s     & ($B$3$N%0%k!<%W$N>pJs$r%I%j%V%k%U%!%$%k$KJ]B8(B {\bf save}) $B$7$^(B
+$B$9(B. [$B@\F,<-(B: .newsrc $B$bJ]B8$7$^$9(B]\\
 Z C     & $BA4$F$N5-;v$K4{FI$N0u$rIU$1(B ({\bf catch-up}, $B%-%c%C%A%"%C%W(B)
 $B=*N;$7$^$9(B.\\
 Z E     & (Q) $B%0%k!<%W>pJs$r99?7$;$:$K=*N;(B ({\bf Exit}) $B$7$^$9(B.\\
 Z G     & (M-g) $B%0%k!<%W$N?7$7$$5-;v$rD4$Y$^$9(B ({\bf get}, $B<hF@(B).\\
 Z N     & $B=*N;$7$F<!$N(B ({\bf next}) $B%0%k!<%W$X0\F0$7$^$9(B.\\
 Z P     & $B=*N;$7$FA0$N(B ( {\bf previous}) $B%0%k!<%W$K0\F0$7$^$9(B.\\
-Z R     & $B%0%k!<%W$r=*N;$7$F(B, $B:F$SF~$j$^$9(B ({\bf reenter}, $B:F<B9T(B).
+Z R     & $B%0%k!<%W$r=*N;$7$F(B, $B:F$SF~$j$^$9(B ({\bf reenter}).
 [$B@\F,0z?t(B: $BL$FI$b4{FI$bA4$F$N5-;v$rA*Br$7$^$9(B.]\\
 Z Z     & (q, Z Q) $B%0%k!<%W$r=*N;$7$^$9(B.\\
-\end{keys}
-}
+\end{keys}}}
 
-\def\ArticleMode{
-\sec{$B5-;v%b!<%I(B}
-{\samepage
-% $B35N,%b!<%I$NA4$F$N%-!<$O5-;v%b!<%I$G$bF0:n$7$^$9(B.
-$BIaDL$NA`:n%-!<$O5-;v%b!<%I$GF0:n$7$^$9(B.
+\def\Limit{\subsec{(/) $B35N,$N@)8B(B}{\samepage
+\begin{keys}{/ D}
+/ a  & $BM?$($i$l$?Cx<T(B ({\bf author}) $B$N@55,I=8=$K@)8B$7$^$9(B.\\
+/ c  & $B$3$I$b(B ({\bf children}) (follow-up) $B$r;}$?$J$$J]N15-;v$r1#$7$^$9(B.\\
+/ d  & $BA4$F$NJ]N1(B ({\bf dormant}) $B5-;v$r1#$7$^$9(B.\\
+/ m  & $BM?$($i$l$?0u(B ({\bf mark}) $B$r;}$D5-;v$K@)8B$7$^$9(B. [$B@\F,<-(B: $B0u$r(B
+$B;}$?$J$$$N$b$N$K$7$^$9(B]\\
+/ n  & $B8=:_$N5-;v$K@)8B$7$^$9(B.[p/p]\\
+/ s  & (/ /) $BM?$($i$l$?I=Bj(B ({\bf subject}) $B$N@55,I=8=$K@)8B$7$^$9(B.\\
+/ t  & $B;~4V(B ({\bf time}) ($BM?$($i$l$?F|IU$h$j$b8E$$$b$N(B).
+[$B@\F,<-(B: $B?7$7$$$b$N(B]\\
+/ u  & (x) $BL$FI(B ({\bf unread}) $B5-;v$K@)8B$7$^$9(B. [$B@\F,<-(B: ! $B$H(B ? $B5-;v(B
+$B$b>C5n$7$^$9(B]\\
+/ v  & $B%9%3%"$N9b$$5-;v$K@)8B$7$^$9(B($BCM(B ({\bf value})). [$B%9%3%"(B]\\
+/ w  & $BA0$N@)8B$r%9%?%C%/$+$i<h$j=P$7$FI|85$7$^$9(B. [$B@\F,<-(B: $BA4$F$N@)8B(B
+$B$r<h$j=P$7$^$9(B]\\
+/ C  & $B@)8B$N30$NA4$F$NL$FI5-;v$r4{FI$K$7$^$9(B ({\bf catch-up}). [$B@\F,(B
+$B<-(B: ! $B$H(B ? $B5-;v$b(B]\\
+/ D  & $BA4$F$NJ]N1(B ({\bf dormant}) $B5-;v$rI=<($7$^$9(B.\\
+/ E  & (M S, C-c M-C-s) $BA4$F$N:o=|$5$l$?5-;v$rI=<((B ({\bf show}) $B$7$^$9(B.\\
+\end{keys}}}
+
+\def\PickAndRead{\subsec{$BA*Br(B-$BFI=q%b!<%I(B}{\samepage
+$B$^$:9%$-$J5-;v$r$rA*Br$7$F(B, $B8e$K$N$_FI$`$H$-$@$1(B `M-x gnus-pick-mode'
+$B$r;H$C$F$/$@$5$$(B.\\*
+\begin{keys}{SPC}
+SPC  & $BFI$_;O$a$k:G8e$J$i35N,$r%9%/%m!<%k$7$^$9(B.\\
+RET  & $BFI$_;O$a$^$9(B. [$B@\F,<-(B: $BA*Br$5$l$?$F$$$J$$A4$F$N5-;v$r4{FI$K$7$^(B
+$B$9(B]\\
+.    & $B$3$N5-;v$rA*Br$7$^$9(B. [$B@\F,<-(B: $B$=$NHV9f$N5-;v$rA*Br$7$^$9(B]\\
+r    & $B%j!<%8%g%s(B ({\bf region}) $B$NA4$F$N5-;v$rA*Br$7$^$9(B.\\
+R    & $B%j!<%8%g%s(B ({\bf region}) $B$NA4$F$N5-;v$rL$A*Br$K$7$^$9(B.\\
+t    & $B$3$N%9%l%C%I(B ({\bf thread}) $B$rA*Br$7$^$9(B.\\
+u    & $B$3$N5-;v$rL$A*Br(B ({\bf unpick}) $B$K$7$^$9(B.\\
+T    & $B$3$N%9%l%C%I$r(B ({\bf thread}) $BL$A*Br$K$7$^$9(B.\\
+U    & $BA4$F$N5-;v$rL$A*Br(B ({\bf unpick}) $B$K$7$^$9(B.\\
+e    & $B@55,I=8=$K9gCW$9$k5-;v$rA*Br$7$^$9(B.\\
+b    & $B%P%C%U%!(B ({\bf buffer}) $B$NA4$F$N5-;v$rA*Br$7$^$9(B.\\
+B    & $B%P%C%U%!(B ({\bf buffer}) $B$NA4$F$N5-;v$rL$A*Br$K$7$^$9(B.\\
+\end{keys}}}
+
+\def\ArticleMode{\sec{$B5-;v%b!<%I(B}{\samepage
+$B35N,%b!<%I$NA4$F$N%-!<$O5-;v%b!<%I$G$bF0:n$7$^$9(B.($B$b$A$m$s(B,
+$BIaDL$NA`:n%-!<$O5-;v%P%C%U%!$rA`:n$7$^$9(B.)
 $BDI2C$N%-!<$O(B:\\*
 \begin{keys}{C-c C-m}
 RET     & ($B??Cf$N%^%&%9%\%?%s(B) $B%]%$%s%H$N$"$k%\%?%s$r3hF02=$7$F(B, URL
-$B$d(B Message-ID $B$K0\F0$7$^$9(B.\\
+$B$d(B Message-ID $B$K0\F0$7$?$j(B, $B0zMQ(B/$B=pL>(B, $B$J$I$r1#$7$?$j$7$^$9(B.\\
 TAB     & $B%]%$%s%H$r<!$N%\%?%s$K0\F0$7$^$9(B.\\
+M-TAB   & $B%]%$%s%H$rA0$N%\%?%s$K0\F0$7$^$9(B.\\
+?       & $BC;$$%X%k%W%a%C%;!<%8$rI=<($7$^$9(B.\\
 h       & (s) {\bf $B35N,(B} $B%P%C%U%!$N5-;v$N%X%C%@!<(B ({\bf header}) $B9T$K(B
-$B0\F0$7$^$9(B.\\ 
-C-c ^   & $B%]%$%s%H$N6a$/$N(B Message-ID $B$N5-;v$r<hF@$7$^$9(B.\\
+$B0\F0$7$^$9(B.\\
+C-c ^   & (r) $B%]%$%s%H$N6a$/$N(B Message-ID $B$N5-;v$r<hF@$7$^$9(B. ($B;2>H(B
+({\bf refer}))\\
 C-c C-m & $B%]%$%s%H$N6a$/$N%"%I%l%9$K%a!<%k(B ({\bf mail}) $B$GJVEz$7$^$9(B
-($B@\F,0z?t(B: $B85$N5-;v$r4^$a$k(B).\\ 
-\end{keys}
-}}
+($B@\F,0z?t(B: $B5-;v$r0zMQ$7$^$9(B).\\
+\end{keys}}}
 
-\def\ServerMode{
-\sec{$B%5!<%P!<%b!<%I(B}
-{\samepage
+\def\ServerMode{\sec{$B%5!<%P!<%b!<%I(B}{\samepage
 $B$3$N%b!<%I$KF~$k$?$a$K$O(B, $B%0%k!<%W%b!<%I$G(B `^' $B$r2!$7$F$/$@$5$$(B.\\*
 \begin{keys}{SPC}
 SPC     & (RET) $B$3$N%5!<%P!<$r354Q$7$^$9(B.\\
 a       & $B?7$7$$%5!<%P!<$rDI2C(B {\bf add} $B$7$^$9(B.\\
 c       & $B$3$N%5!<%P!<$rJ#<L(B {\bf copy} $B$7$^$9(B.\\
 e       & $B%5!<%P!<$rJT=8(B {\bf edit} $B$7$^$9(B.\\
+g       & $BA4$F$N%G!<%?9=B$$r:F:n@.(B ({\bf generate}) $B$9$k$h$&$K%5!<%P!<(B
+$B$K?R$M$^$9(B.\\
 k       & $B$3$N%5!<%P!<$r@Z$j$^$9(B {\bf kill}. [$BHO0O(B]\\
 l       & $BA4$F$N%5!<%P!<$r0lMwI=<((B {\bf list} $B$7$^$9(B.\\
 q       & $B%0%k!<%W%P%C%U%!$KLa$j$^$9(B ($B=*N;(B {\bf quit}).\\
+s       & $B?7$7$$%a%C%;!<%8$rD4$Y$k(B ({\bf scan}) $B$h$&$K%5!<%P!<$K?R$M$^(B
+$B$9(B.\\
 y       & $B0JA0$K@Z$C$?%5!<%P!<$rE=$jIU$1(B {\bf yank} $B$^$9(B.\\
-\end{keys}
-}}
+c       & $B$3$N%5!<%P!<$X$N@\B3$rJD$8$^$9(B ({\bf close}).\\
+O       & $B$3$N%5!<%P!<$X$N@\B3$r(B($B:F$S(B)$B3+$-$^$9(B ({\bf open}).\\
+D       & $B$3$N%5!<%P!<$r;HMQIT2DG=$H$7$F0u$rIU$1$^$9(B ($B5qH]$7$^$9(B ({\bf
+deny})).\\
+R       & $BA4$F$N;HMQIT2DG=(B ($B5qH](B) $B0u$r:F@_Dj$7$^$9(B ({\bf reset}).\\
+M-c     & $BA4$F$N%5!<%P!<$X$N@\B3$rJD$8$^$9(B ({\bf close}).\\
+M-o     & $BA4$F$N%5!<%P$X$N@\B3$r(B($B:F$S(B)$B3+$-$^$9(B ({\bf open}).\\
+\end{keys}}}
 
-\def\BrowseServer{
-\sec{$B%5!<%P!<354Q%b!<%I(B}
-{\samepage
+\def\BrowseServer{\sec{$B%5!<%P!<354Q%b!<%I(B}{\samepage
 $B$3$N%b!<%I$KF~$k$?$a$K$O(B, $B%0%k!<%W%b!<%I$G(B `B' $B$r2!$7$F$/$@$5$$(B.\\*
 \begin{keys}{RET}
 RET     & $B8=:_$N%0%k!<%W$KF~$j$^$9(B.\\
@@ -731,6 +920,5 @@ SPC     & $B8=:_$N%0%k!<%W$KF~$C$F:G=i$N5-;v$rI=<($7$^$9(B.\\
 n       & {\bf $B<!(B} $B$N%0%k!<%W$K0\F0$7$^$9(B. [$B5wN%(B]\\
 p       & {\bf $BA0(B} $B$N%0%k!<%W$K0\F0$7$^$9(B. [$B5wN%(B]\\
 q       & (l) $B354Q%b!<%I$r(B {\bf $B=*N;(B} $B$7$^$9(B.\\
-u       & $B8=:_$N%0%k!<%W$r9VFI$7$^$9(B. [$BHO0O(B]\\
-\end{keys}
-}}
+u       & $B8=:_$N%0%k!<%W$r(B[$BHs(B]$B9VFI(B ({\bf [Un]subscribe})$B$7$^$9(B. [$BHO0O(B]\\
+\end{keys}}}

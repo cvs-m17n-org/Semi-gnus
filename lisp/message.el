@@ -2965,12 +2965,15 @@ This sub function is for exclusive use of `message-send-news'."
    (message-check 'from
      (let* ((case-fold-search t)
 	    (from (message-fetch-field "from"))
-	    (ad (nth 1 (std11-extract-address-components from))))
+	    ad)
        (cond
 	((not from)
 	 (message "There is no From line.  Posting is denied.")
 	 nil)
-	((or (not (string-match "@[^\\.]*\\." ad)) ;larsi@ifi
+	((or (not (string-match
+		   "@[^\\.]*\\."
+		   (setq ad (nth 1 (mail-extract-address-components
+				    from))))) ;larsi@ifi
 	     (string-match "\\.\\." ad) ;larsi@ifi..uio
 	     (string-match "@\\." ad)	;larsi@.ifi.uio
 	     (string-match "\\.$" ad)	;larsi@ifi.uio.
@@ -3953,6 +3956,7 @@ OTHER-HEADERS is an alist of header/value pairs."
 	from subject date to cc
 	references message-id follow-to
 	(inhibit-point-motion-hooks t)
+	(message-this-is-mail t)
 	mct never-mct mft mrt gnus-warning in-reply-to)
     (save-restriction
       (message-narrow-to-head)

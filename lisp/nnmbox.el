@@ -59,6 +59,13 @@
 (defvoo nnmbox-group-alist nil)
 (defvoo nnmbox-active-timestamp nil)
 
+(defvoo nnmbox-file-coding-system
+    (if (memq system-type '(windows-nt ms-dos ms-windows))
+	'raw-text-dos 'raw-text))
+(defvoo nnmbox-file-coding-system-for-write nil)
+(defvoo nnmbox-active-file-coding-system nnmbox-file-coding-system)
+(defvoo nnmbox-active-file-coding-system-for-write nil)
+
 
 
 ;;; Interface functions
@@ -181,6 +188,18 @@
 		       (1+ (- (cdr active) (car active)))
 		       (car active) (cdr active) group)))))
 
+(defun nnmbox-save-buffer ()
+  (let ((coding-system-for-write 
+	 (or nnmbox-file-coding-system-for-write
+	     nnmbox-file-coding-system)))
+	 (save-buffer)))
+
+(defun nnmbox-save-active (group-alist active-file)
+  (let ((nnmail-active-file-coding-system
+	 (or nnmbox-active-file-coding-system-for-write
+	     nnmbox-active-file-coding-system)))
+    (nnmail-save-active group-alist active-file)))
+
 (deffoo nnmbox-request-scan (&optional group server)
   (nnmbox-possibly-change-newsgroup group server)
   (nnmbox-read-mbox)
@@ -189,7 +208,7 @@
    (lambda ()
      (save-excursion
        (set-buffer nnmbox-mbox-buffer)
-       (save-buffer)))
+       (nnmbox-save-buffer)))
    (file-name-directory nnmbox-mbox-file)
    group
    (lambda ()
@@ -198,7 +217,7 @@
 	 (set-buffer nnmbox-mbox-buffer)
 	 (goto-char (point-max))
 	 (insert-buffer-substring in-buf)))
-     (nnmail-save-active nnmbox-group-alist nnmbox-active-file))))
+     (nnmbox-save-active nnmbox-group-alist nnmbox-active-file))))
 
 (deffoo nnmbox-close-group (group &optional server)
   t)
@@ -208,12 +227,14 @@
   (unless (assoc group nnmbox-group-alist)
     (push (list group (cons 1 0))
 	  nnmbox-group-alist)
-    (nnmail-save-active nnmbox-group-alist nnmbox-active-file))
+    (nnmbox-save-active nnmbox-group-alist nnmbox-active-file))
   t)
 
 (deffoo nnmbox-request-list (&optional server)
   (save-excursion
-    (nnmail-find-file nnmbox-active-file)
+    (let ((nnmail-file-coding-system
+	   nnmbox-active-file-coding-system))
+      (nnmail-find-file nnmbox-active-file))
     (setq nnmbox-group-alist (nnmail-get-active))
     t))
 
@@ -246,7 +267,7 @@
 		(nnmbox-delete-mail))
 	    (push (car articles) rest)))
 	(setq articles (cdr articles)))
-      (save-buffer)
+      (nnmbox-save-buffer)
       ;; Find the lowest active article in this group.
       (let ((active (nth 1 (assoc newsgroup nnmbox-group-alist))))
 	(goto-char (point-min))
@@ -255,7 +276,7 @@
 		    (<= (car active) (cdr active)))
 	  (setcar active (1+ (car active)))
 	  (goto-char (point-min))))
-      (nnmail-save-active nnmbox-group-alist nnmbox-active-file)
+      (nnmbox-save-active nnmbox-group-alist nnmbox-active-file)
       (nconc rest articles))))
 
 (deffoo nnmbox-request-move-article
@@ -283,7 +304,7 @@
        (goto-char (point-min))
        (when (search-forward (nnmbox-article-string article) nil t)
 	 (nnmbox-delete-mail))
-       (and last (save-buffer))))
+       (and last (nnmbox-save-buffer))))
     result))
 
 (deffoo nnmbox-request-accept-article (group &optional server last)
@@ -323,8 +344,8 @@
        (when last
 	 (when nnmail-cache-accepted-message-ids
 	   (nnmail-cache-close))
-	 (nnmail-save-active nnmbox-group-alist nnmbox-active-file)
-	 (save-buffer))))
+	 (nnmbox-save-active nnmbox-group-alist nnmbox-active-file)
+	 (nnmbox-save-buffer))))
     result))
 
 (deffoo nnmbox-request-replace-article (article group buffer)
@@ -336,7 +357,7 @@
 	nil
       (nnmbox-delete-mail t t)
       (insert-buffer-substring buffer)
-      (save-buffer)
+      (nnmbox-save-buffer)
       t)))
 
 (deffoo nnmbox-request-delete-group (group &optional force server)
@@ -354,13 +375,13 @@
 	  (setq found t)
 	  (nnmbox-delete-mail))
 	(when found
-	  (save-buffer)))))
+	  (nnmbox-save-buffer)))))
   ;; Remove the group from all structures.
   (setq nnmbox-group-alist
 	(delq (assoc group nnmbox-group-alist) nnmbox-group-alist)
 	nnmbox-current-group nil)
   ;; Save the active file.
-  (nnmail-save-active nnmbox-group-alist nnmbox-active-file)
+  (nnmbox-save-active nnmbox-group-alist nnmbox-active-file)
   t)
 
 (deffoo nnmbox-request-rename-group (group new-name &optional server)
@@ -375,13 +396,13 @@
 	(replace-match new-ident t t)
 	(setq found t))
       (when found
-	(save-buffer))))
+	(nnmbox-save-buffer))))
   (let ((entry (assoc group nnmbox-group-alist)))
     (when entry
       (setcar entry new-name))
     (setq nnmbox-current-group nil)
     ;; Save the new group alist.
-    (nnmail-save-active nnmbox-group-alist nnmbox-active-file)
+    (nnmbox-save-active nnmbox-group-alist nnmbox-active-file)
     t))
 
 
@@ -425,8 +446,10 @@
 	    (not (buffer-name nnmbox-mbox-buffer)))
     (save-excursion
       (set-buffer (setq nnmbox-mbox-buffer
-			(nnheader-find-file-noselect
- 			 nnmbox-mbox-file nil t)))
+			(let ((nnheader-file-coding-system
+			       nnmbox-file-coding-system))
+			  (nnheader-find-file-noselect
+			   nnmbox-mbox-file nil t))))
       (buffer-disable-undo)))
   (when (not nnmbox-group-alist)
     (nnmail-activate 'nnmbox))
@@ -496,7 +519,9 @@
 
 (defun nnmbox-create-mbox ()
   (when (not (file-exists-p nnmbox-mbox-file))
-    (nnmail-write-region 1 1 nnmbox-mbox-file t 'nomesg)))
+    (let ((nnmail-file-coding-system
+	   nnmbox-file-coding-system-for-write))
+      (nnmail-write-region 1 1 nnmbox-mbox-file t 'nomesg))))
 
 (defun nnmbox-read-mbox ()
   (nnmail-activate 'nnmbox)
@@ -512,8 +537,10 @@
 	    (alist nnmbox-group-alist)
 	    start end number)
 	(set-buffer (setq nnmbox-mbox-buffer
-			  (nnheader-find-file-noselect
- 			   nnmbox-mbox-file nil t)))
+			  (let ((nnheader-file-coding-system
+				 nnmbox-file-coding-system))
+			    (nnheader-find-file-noselect
+			     nnmbox-mbox-file nil t))))
  	(buffer-disable-undo)
 
 	;; Go through the group alist and compare against

@@ -1045,6 +1045,8 @@ variable (string, integer, character, etc).")
 (defvar gnus-last-article nil)
 (defvar gnus-newsgroup-history nil)
 (defvar gnus-newsgroup-charset nil)
+(defvar gnus-newsgroup-ephemeral-charset nil)
+(defvar gnus-newsgroup-ephemeral-ignored-charsets nil)
 
 (defconst gnus-summary-local-variables
   '(gnus-newsgroup-name
@@ -4531,7 +4533,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	headers id end ref
 	(mail-parse-charset gnus-newsgroup-charset)
 	(mail-parse-ignored-charsets
-	 (or (and (buffer-live-p gnus-summary-buffer)
+	 (or (and (gnus-buffer-live-p gnus-summary-buffer)
 		  (save-excursion (set-buffer gnus-summary-buffer)
 				  gnus-newsgroup-ignored-charsets))
 	     gnus-newsgroup-ignored-charsets)))
@@ -6725,11 +6727,14 @@ to guess what the document format is."
 	(delete-matching-lines "^\\(Path\\):\\|^From ")
 	(widen))
       (unwind-protect
-          (if (gnus-group-read-ephemeral-group
-               name `(nndoc ,name (nndoc-address ,(get-buffer dig))
-                            (nndoc-article-type
-                             ,(if force 'digest 'guess))) t)
-              ;; Make all postings to this group go to the parent group.
+          (if (let ((gnus-newsgroup-ephemeral-charset gnus-newsgroup-charset)
+		    (gnus-newsgroup-ephemeral-ignored-charsets
+		     gnus-newsgroup-ignored-charsets))
+		(gnus-group-read-ephemeral-group
+		 name `(nndoc ,name (nndoc-address ,(get-buffer dig))
+			      (nndoc-article-type
+			       ,(if force 'digest 'guess))) t))
+	      ;; Make all postings to this group go to the parent group.
               (nconc (gnus-info-params (gnus-get-info name))
                      params)
             ;; Couldn't select this doc group.
@@ -7256,7 +7261,8 @@ and `request-accept' functions."
 	       (entry
 		(gnus-gethash pto-group gnus-newsrc-hashtb))
 	       (info (nth 2 entry))
-	       (to-group (gnus-info-group info)))
+               (to-group (gnus-info-group info))
+	       to-marks)
 	  ;; Update the group that has been moved to.
 	  (when (and info
 		     (memq action '(move copy)))
@@ -7264,6 +7270,7 @@ and `request-accept' functions."
 	      (push to-group to-groups))
 
 	    (unless (memq article gnus-newsgroup-unreads)
+	      (push 'read to-marks)
 	      (gnus-info-set-read
 	       info (gnus-add-to-range (gnus-info-read info)
 				       (list (cdr art-group)))))
@@ -7297,6 +7304,7 @@ and `request-accept' functions."
 		(when (memq article (symbol-value
 				     (intern (format "gnus-newsgroup-%s"
 						     (caar marks)))))
+                  (push (cdar marks) to-marks)
 		  ;; If the other group is the same as this group,
 		  ;; then we have to add the mark to the list.
 		  (when (equal to-group gnus-newsgroup-name)
@@ -7309,6 +7317,10 @@ and `request-accept' functions."
 		  (gnus-add-marked-articles
 		   to-group (cdar marks) (list to-article) info))
 		(setq marks (cdr marks)))
+
+              (gnus-request-set-mark to-group (list (list (list to-article)
+                                                          'set
+                                                          to-marks)))
 
 	      (gnus-dribble-enter
 	       (concat "(gnus-group-set-info '"
@@ -9392,21 +9404,23 @@ If REVERSE, save parts that do not match TYPE."
   (let* ((name (and gnus-newsgroup-name
 		   (gnus-group-real-name gnus-newsgroup-name)))
 	 (ignored-charsets 
-	  (append
-	   (and gnus-newsgroup-name
-		(or (gnus-group-find-parameter gnus-newsgroup-name
-					       'ignored-charsets t)
-		    (let ((alist gnus-group-ignored-charsets-alist)
-			  elem (charsets nil))
-		      (while (setq elem (pop alist))
-			(when (and name
-				   (string-match (car elem) name))
-			 (setq alist nil
-			       charsets (cdr elem))))
-		      charsets)))
-	   gnus-newsgroup-ignored-charsets)))
+	  (or gnus-newsgroup-ephemeral-ignored-charsets
+	      (append
+	       (and gnus-newsgroup-name
+		    (or (gnus-group-find-parameter gnus-newsgroup-name
+						   'ignored-charsets t)
+			(let ((alist gnus-group-ignored-charsets-alist)
+			   elem (charsets nil))
+			  (while (setq elem (pop alist))
+			    (when (and name
+				       (string-match (car elem) name))
+			      (setq alist nil
+				    charsets (cdr elem))))
+			  charsets))))
+	      gnus-newsgroup-ignored-charsets)))
     (setq gnus-newsgroup-charset
-	  (or (and gnus-newsgroup-name
+	  (or gnus-newsgroup-ephemeral-charset
+	      (and gnus-newsgroup-name
 		   (or (gnus-group-find-parameter gnus-newsgroup-name
 						  'charset)
 		       (let ((alist gnus-group-charset-alist)

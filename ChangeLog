@@ -1,8 +1,53 @@
+1999-07-05  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.10.069.
+	(gnus-revision-number): Fresh start from 00.
+
+	* texi/gnus-ja.texi (Mail in a Newsreader): Translate into Japanese.
+
+	* texi/{message.texi,message-ja.texi,gnus.texi,gnus-ja.texi}:
+	Update for T-gnus 6.10.069.
+	* README.T-gnus: Ditto.
+
+	* lisp/nnmbox.el (nnmbox-active-file-coding-system,
+	nnmbox-file-coding-system): Default to `raw-text-dos' or 'raw-text'.
+	* lisp/nnfolder.el (nnfolder-file-coding-system,
+	nnfolder-active-file-coding-system): Ditto.
+
+	* lisp/gnus-util.el (gnus-write-active-file): Abolish function.
+	(gnus-write-active-file-as-coding-system): New function.
+
+	* lisp/gnus-cache.el (gnus-cache-write-active): Use
+	`gnus-write-active-file-as-coding-system' instead of
+	`gnus-write-active-file'.
+	* lisp/gnus-agent.el (gnus-agent-expire, gnus-agent-write-active):
+	Ditto.
+
+	* lisp/gnus-agent.el (gnus-agent-expire, gnus-agent-write-active,
+	gnus-agent-save-active-1): Use
+	`insert-file-contents-as-coding-system' instead of
+	`insert-file-contents-literally' or `insert-file-contents'.
+
+1999-07-05  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* texi/{emacs-mime.texi,ChangeLog}: Sync up with Pterodactyl Gnus
+	v0.91.
+	* lisp/{smiley.el,rfc2047.el,qp.el,nnml.el,nnmbox.el,nnmail.el,
+	nnheader.el,nnfolder.el,mml.el,mm-view.el,mm-uu.el,mm-util.el,
+	mm-encode.el,mm-decode.el,message.el,lpath.el,gnus-util.el,
+	gnus-sum.el,gnus-start.el,gnus-srvr.el,gnus-msg.el,gnus-mailcap.el,
+	gnus-cache.el,gnus-art.el,gnus-agent.el,base64.el}: Ditto.
+	* GNUS-NEWS: Ditto.
+
+1999-07-04  Yoshiki Hayashi   <t90553@mail.ecc.u-tokyo.ac.jp>
+
+	* texi/{gnusref-ja.tex,refcard-ja.tex}: Update to the version 5.5.
+
 1999-07-04  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
 
-1999-07-04  Tsukamoto Tetsuo   <czkmt@remus.dti.ne.jp>
+1999-07-04  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus-sum.el (gnus-get-newsgroup-headers): Don't bind the
 	value of `mail-parse-ignored-charsets' if its local value in
