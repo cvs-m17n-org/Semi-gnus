@@ -41,32 +41,36 @@ message-ja.info: message-ja.texi
 most: texi2latex.elc latex latexps
 
 %-ja: %-ja.texi
-	rm -f $@; \
+	rm -f $@
 	$(EMACSINFO) $<
 
 %-ja.info: %-ja.texi
-	rm -f $@; \
+	rm -f $@
 	$(EMACSINFO) $< t
 
 %.info: %.texi
-	if test "x$(MAKEINFO)" = "xno" \
+	@if test "x$(MAKEINFO)" = "xno" \
 	  -o "$<" = "gnus-ja.texi" \
 	  -o "$<" = "message-ja.texi"; then \
+	  echo "rm -f $@"; echo "$(EMACSINFO) $< t"; \
 	  rm -f $@; \
 	  $(EMACSINFO) $< t; \
 	else \
+	  echo "$(MAKEINFO) -I $(srcdir) -o $@ $<"; \
 	  $(MAKEINFO) -I $(srcdir) -o $@ $<; \
 	fi
 
 .SUFFIXES: .texi .dvi .ps .pdf .latexi .dvi-x .pdf-x
 
 .texi:
-	if test "x$(MAKEINFO)" = "xno" \
+	@if test "x$(MAKEINFO)" = "xno" \
 	  -o "$<" = "gnus-ja.texi" \
 	  -o "$<" = "message-ja.texi"; then \
+	  echo "rm -f $@"; echo "$(EMACSINFO) $<"; \
 	  rm -f $@; \
 	  $(EMACSINFO) $<; \
 	else \
+	  echo "$(MAKEINFO) -I $(srcdir) -o $* $<"; \
 	  $(MAKEINFO) -I $(srcdir) -o $* $<; \
 	fi
 

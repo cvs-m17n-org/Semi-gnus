@@ -1,5 +1,5 @@
 ;;; mm-util.el --- Utility functions for Mule and low level things
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -43,7 +43,6 @@
      (coding-system-list . ignore)
      (decode-coding-region . ignore)
      (char-int . identity)
-     (device-type . ignore)
      (coding-system-equal . equal)
      (annotationp . ignore)
      (set-buffer-file-coding-system . ignore)
@@ -72,6 +71,7 @@
 	      (setq idx (1+ idx)))
 	    string)))
      (string-as-unibyte . identity)
+     (string-make-unibyte . identity)
      (string-as-multibyte . identity)
      (multibyte-string-p . ignore))))
 
@@ -271,19 +271,20 @@ Valid elements include:
 	mm-iso-8859-15-compatible))
   "A table of the difference character between ISO-8859-X and ISO-8859-15.")
 
-(defcustom mm-coding-system-priorities nil
+(defcustom mm-coding-system-priorities
+  (if (boundp 'current-language-environment)
+      (let ((lang (symbol-value 'current-language-environment)))
+	(cond ((string= lang "Japanese")
+	       ;; Japanese users may prefer iso-2022-jp to shift-jis.
+	       '(iso-2022-jp iso-2022-jp-2 japanese-shift-jis
+			     iso-latin-1 utf-8)))))
   "Preferred coding systems for encoding outgoing mails.
 
 More than one suitable coding systems may be found for some texts.  By
 default, a coding system with the highest priority is used to encode
 outgoing mails (see `sort-coding-systems').  If this variable is set,
-it overrides the default priority.  For example, Japanese users may
-prefer iso-2022-jp to japanese-shift-jis:
-
-\(setq mm-coding-system-priorities
-  '(iso-2022-jp iso-2022-jp-2 japanese-shift-jis iso-latin-1 utf-8))
-"
-  :type '(repeat (coding-system :tag "Coding system"))
+it overrides the default priority."
+  :type '(repeat (symbol :tag "Coding system"))
   :group 'mime)
 
 (defvar mm-use-find-coding-systems-region

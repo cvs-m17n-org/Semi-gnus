@@ -1,16 +1,161 @@
+2003-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.10 revision 00.
+
+2003-01-03  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Bind the
+	color for the symbol `oort' as `gnus-group-startup-message' does.
+
+2002-12-31  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-start.el (gnus-re-read-newsrc-el-file): Commented out.
+	(gnus-load): Allow coding-system as an argument.
+
+2002-12-16  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
+
+	* lisp/nnimap.el (nnimap-callback): Use `nnimap-demule'.
+	(nnimap-request-article-part): Ditto.
+
+2002-12-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/Makefile.in (%.info, .texi): Conceal control procedures.
+
+2002-12-05  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* etc/smilies/*.pbm: Made them binary.
+
+2002-11-28  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Don't refer to
+	the value of `gnus-agent-file-name'.
+
+2002-11-28  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-agent.el (gnus-agent-fetch-group-1): Article numbers
+	should be accessed through `mail-header-number'.
+
 2002-11-24  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
 
 	* lisp/mm-url.el (mm-url-program): Use `exec-installed-p' instead of
 	`executable-find'.
+
+2002-11-13  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* etc/smilies/blink.xpm: Changed smileys and some new ones from
+	Alex Schroeder <alex@emacswiki.org>.
+
+2002-11-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-inherit-default-charset): Inherit
+	the value for `default-mime-charset-unlimited' as well.
+	(gnus-summary-setup-default-charset): Bind
+	`default-mime-charset-unlimited' to nil for nndraft:delayed or
+	nndraft:drafts groups.
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Don't use
+	MIME-View for nndraft:delayed or nndraft:drafts groups.
+	(gnus-article-decode-article-as-default-mime-charset): Don't
+	decode an article for nndraft:delayed or nndraft:drafts groups.
+
+2002-11-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nndraft.el (nndraft-request-article): Don't give a special
+	treatment to Mule.
+
+	* lisp/nnheader.el (nnheader-auto-save-coding-system): Undo last
+	change to restore the default value to emacs-mule or escape-quoted.
+
+2002-11-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-mime-edit-article-setup): Don't
+	perform `mime-edit-again' for a delayed or a queued article.
+	(gnus-article-mime-edit-done): Bind `inhibit-read-only' to t while
+	running `gnus-article-edit-done'.
 
 2002-10-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/dgnushack.el (dgnushack-bind-colon-keywords): Protect
 	against unexpected data structure.
 
+2002-10-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el: Clean up codes.
+	(nnshimbun-buffer, nnshimbun-current-directory)
+	(nnshimbun-current-group, nnshimbun-server-directory): Removed.
+	(nnshimbun-current-server, nnshimbun-server-directory)
+	(nnshimbun-current-group, nnshimbun-current-directory): New macros.
+	(nnshimbun-backlog, nnshimbun-find-parameter): Use
+	`nnshimbun-current-server'.
+	(nnshimbun-possibly-change-group, nnshimbun-open-server):
+	Reimplemented.
+	(nnshimbun-close-server): Do not kill `nnshimbun-buffer'.
+	(nnshimbun-request-article-1, nnshimbun-request-list): Use
+	`erase-buffer' instead of `delete-region'.
+	(nnshimbun-request-article): Use `nnshimbun-current-group'.
+	(nnshimbun-request-group): Remove redundant checks.
+	(nnshimbun-request-scan): Check arguments strictly.
+	(nnshimbun-retrieve-headers, nnshimbun-retrieve-headers-with-nov):
+	Reimplemented.
+	(nnshimbun-generate-nov-database, nnshimbun-search-id)
+	(nnshimbun-write-nov, nnshimbun-request-expire-articles):
+	Simplified.
+	(nnshimbun-nov-buffer-name, nnshimbun-nov-file-name): Make the
+	first argument optional.
+	(nnshimbun-open-nov): Bind variables to set coding systems for
+	path names.
+	(nnshimbun-possibly-change-group, nnshimbun-request-article)
+	(nnshimbun-write-nov): Strict checking.
+	(nnshimbun-request-expire-articles): Small fix.
+
+2002-10-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 05.
+
+	* lisp/nnheader.el (nnheader-auto-save-coding-system): Default to
+	`iso-2022-7bit'.
+
+2002-10-29  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el (nnshimbun-request-article-1): Install trick
+	to keep compatibility between T-gnus and Oort Gnus.
+
+2002-10-29  Tadashi Watanabe  <watanabe@sigmaitec.co.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Do not
+	use removed variables.
+
+2002-10-29  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnshimbun.el: Clean up.
+	(nnshimbun-nov-last-check): Removed.
+	(nnshimbun-nov-buffer-alist): Removed.
+	(nnshimbun-nov-buffer-file-name): Removed.
+	(nnshimbun-close-server): Use `nnshimbun-write-nov' instead of
+	`nnshimbun-save-nov'.
+	(nnshimbun-mail-header-subject): Removed.
+	(nnshimbun-mail-header-from): Removed.
+	(nnshimbun-make-shimbun-header): Removed.
+	(nnshimbun-parse-nov): New function.
+	(nnshimbun-request-article-1): Use `nnshimbun-parse-nov' instead
+	of `nnheader-parse-nov'.
+	(nnshimbun-retrieve-headers): Likewise.
+	(nnshimbun-nov-buffer-name): New function.
+	(nnshimbun-nov-file-name): Ditto.
+	(nnshimbun-open-nov): Clean up.
+	(nnshimbun-write-nov): Ditto; Aceept the 2nd optional argument.
+	(nnshimbun-save-nov): Removed.
+
+2002-10-18  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-dont-compile-files): New constant
+	containing almost all mm*.el.
+	(dgnushack-compile): Don't byte-compile the file in
+	`dgnushack-dont-compile-files'.
+
 2002-10-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
 	(gnus-version): T-gnus supports SEMI 1.14 and FLIM 1.14.
 
 	* lisp/mmgnus.el: Remove commented obsolete definitions.
@@ -25,7 +170,55 @@
 	`file-coding-system' instead of `buffer-file-coding-system' when
 	Mule 2 is running.
 
+	* lisp/gnus-group.el: Require `mm-url' only when compiling.
+	(gnus-group-fetch-charter): Require `mm-url'.
+
 	* lisp/gnus.el (gnus-default-charset): Default to `iso-8859-1'.
+
+2002-09-13  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnheader.el (toplevel) [XEmacs]: Remove code to define
+	`emacs-mule' coding-system, because the generated coding system is
+	not compatible to the original coding system of FSF Emacs.
+
+2002-09-12  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/nnheader.el (toplevel) [XEmacs]: Define `emacs-mule' coding
+	system in order to cancel difference on coding systems of
+	auto-saved files between FSF Emacs and XEmacs.
+	(nnheader-auto-save-coding-system) [Mule]: The default value of
+	Mule2 is changed from `*junet*' to `*internal*', in order to unify
+	coding system of files auto-saved by Mule2.
+
+2002-09-08  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-msg.el (gnus-configure-posting-styles): Follow the
+	change of arglist of gnus-configure-posting-style.
+	(gnus-configure-posting-style): Check circular import.
+
+2002-09-08  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-msg.el (gnus-named-posting-styles): Defcustom.
+	(gnus-posting-styles): Allow (import "...").
+	(gnus-configure-posting-style): Splitted from
+	gnus-configure-posting-styles.
+	(gnus-summary-execute-command-with-posting-style): Fix prompt string.
+
+	* lisp/gnus-cus.el (gnus-group-parameters): Allow (import "...")
+	in posting-styles.
+
+2002-09-08  Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-msg.el (gnus-named-posting-styles): New variable.
+	(gnus-summary-send-map): Bind "P" to
+	gnus-summary-execute-command-with-posting-style.
+	(gnus-configure-posting-styles): Expand named entries in
+	gnus-posting-styles.
+	(gnus-summary-execute-command-with-posting-style): New command.
 
 2002-09-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -41,9 +234,30 @@
 	@ifplaintext, @ifnotplaintext, @ifhtml.  Remove obsolete commands.
 	(texinfo-format-ifhtml, texinfo-format-ifplaintext): New function.
 
+2002-09-04  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/highlight-words): Stricten
+	regular expression to highlight keywords.
+
+2002-08-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/lpath.el: Fbind `smtpmail-send-it' for Mule 2.
+
+2002-08-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-util.el (frame-parameter): New function for oldies.
+
+2002-08-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-frame): Remove.
+
+2002-08-11  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: Fix T-gnus version number.
+
 2002-08-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/gnus-vers.el: T-gnus 6.15.7 revision 00.
+	* lisp/gnus-vers.el: T-gnus 6.15.8 revision 00.
 
 2002-08-06  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
@@ -267,6 +481,10 @@
 	`ietf-drums-unfold-fws'.
 	(ietf-drums-unfold-fws): Alias to `nnheader-unfold-fws'.
 
+2002-05-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.15.7 revision 00.
+
 2002-04-30  Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/message.el (message-expand-name-function): New user option.
@@ -328,7 +546,7 @@
 	(gnus-summary-inherit-default-charset): New function.
 	(gnus-parse-headers-hook): Use it.
 	(gnus-summary-setup-default-charset): Set default-mime-charset here.
-	
+
 	* lisp/gnus-delay.el (gnus-delay-article): Undo the last change.
 
 	* lisp/gnus-draft.el: Revert to the original implementation.

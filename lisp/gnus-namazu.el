@@ -616,8 +616,18 @@ generate possible group names from it."
     (while (re-search-forward "[^　 \t\r\f\n]+" nil t)
       (push (match-string 0) query))
     (when query
-      (list (list (regexp-opt query)
-		  0 0 'gnus-namazu-query-highlight-face)))))
+      (let (en ja)
+	(dolist (q query)
+	  (if (string-match "\\cj" q)
+	      (push q ja)
+	    (push q en)))
+	(append
+	 (when en
+	   (list (list (concat "\\b\\(" (regexp-opt en) "\\)\\b")
+		       0 0 'gnus-namazu-query-highlight-face)))
+	 (when ja
+	   (list (list (regexp-opt ja)
+		       0 0 'gnus-namazu-query-highlight-face))))))))
 
 (defun gnus-namazu/truncate-article-list (articles)
   (let ((hit (length articles)))

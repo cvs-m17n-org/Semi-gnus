@@ -371,7 +371,8 @@ This hook is called as the first thing when Gnus is started."
   :group 'gnus-start
   :type 'hook)
 
-(defcustom gnus-setup-news-hook nil
+(defcustom gnus-setup-news-hook 
+  '(gnus-fixup-nnimap-unread-after-getting-new-news)
   "A hook after reading the .newsrc file, but before generating the buffer."
   :group 'gnus-start
   :type 'hook)
@@ -382,7 +383,8 @@ This hook is called as the first thing when Gnus is started."
   :type 'hook)
 
 (defcustom gnus-after-getting-new-news-hook
-  '(gnus-display-time-event-handler)
+  '(gnus-display-time-event-handler
+    gnus-fixup-nnimap-unread-after-getting-new-news)
   "A hook run after Gnus checks for new news when Gnus is already running."
   :group 'gnus-group-new
   :type 'hook)
@@ -754,6 +756,9 @@ prompt the user for the name of an NNTP server to use."
 	    (add-hook 'gnus-summary-mode-hook 'gnus-grouplens-mode))
 
 	  ;; Do the actual startup.
+	  (if gnus-agent
+	      (gnus-request-create-group "queue" '(nndraft "")))
+	  (gnus-request-create-group "drafts" '(nndraft ""))
 	  (gnus-setup-news nil level dont-connect)
 	  (gnus-run-hooks 'gnus-setup-news-hook)
 	  (gnus-start-draft-setup)
@@ -1594,7 +1599,7 @@ newsgroup."
 		 (t 0))
 	   level))
 	 scanned-methods info group active method retrieve-groups)
-    (gnus-message 5 "Checking new news...")
+    (gnus-message 6 "Checking new news...")
 
     (while newsrc
       (setq active (gnus-active (setq group (gnus-info-group
@@ -1702,7 +1707,7 @@ newsgroup."
 	      (gnus-set-active group nil)
 	      (setcar (gnus-gethash group gnus-newsrc-hashtb) t)))))))
 
-    (gnus-message 5 "Checking new news...done")))
+    (gnus-message 6 "Checking new news...done")))
 
 ;; Create a hash table out of the newsrc alist.  The `car's of the
 ;; alist elements are used as keys.
@@ -1762,8 +1767,82 @@ newsgroup."
 	     (setq article (pop articles)) ranges)
 	(push article news)))
     (when news
+      ;; Enter this list into the group info.
       (gnus-info-set-read
        info (gnus-remove-from-range (gnus-info-read info) (nreverse news)))
+
+      ;; Set the number of unread articles in gnus-newsrc-hashtb.
+      (gnus-get-unread-articles-in-group info (gnus-active group))
+
+      ;; Insert the change into the group buffer and the dribble file.
+      (gnus-group-update-group group t))))
+
+(defun gnus-make-ascending-articles-unread (group articles)
+  "Mark ascending ARTICLES in GROUP as unread."
+  (let* ((entry (or (gnus-gethash group gnus-newsrc-hashtb)
+                    (gnus-gethash (gnus-group-real-name group)
+                                  gnus-newsrc-hashtb)))
+         (info (nth 2 entry))
+	 (ranges (gnus-info-read info))
+         (r ranges)
+	 modified)
+
+    (while articles
+      (let ((article (pop articles))) ; get the next article to remove from ranges
+        (while (let ((range (car ranges))) ; note the current range
+                 (if (atom range)       ; single value range
+                     (cond ((not range)
+                            ;; the articles extend past the end of the ranges
+                            ;; OK - I'm done
+                            (setq articles nil))
+                           ((< range article)
+                            ;; this range preceeds the article. Leave the range unmodified.
+                            (pop ranges)
+                            ranges)
+                           ((= range article)
+                            ;; this range exactly matches the article; REMOVE THE RANGE.
+                            ;; NOTE: When the range being removed is the last range, the list is corrupted by inserting null at its end.
+                            (setcar ranges (cadr ranges))
+                            (setcdr ranges (cddr ranges))
+                            (setq modified (if (car ranges) t 'remove-null))
+                            nil))
+                   (let ((min (car range))
+                         (max (cdr range)))
+                     ;; I have a min/max range to consider
+                     (cond ((> min max) ; invalid range introduced by splitter
+                            (setcar ranges (cadr ranges))
+                            (setcdr ranges (cddr ranges))
+                            (setq modified (if (car ranges) t 'remove-null))
+                            ranges)
+                           ((= min max)
+                            ;; replace min/max range with a single-value range
+                            (setcar ranges min)
+                            ranges)
+                           ((< max article)
+                            ;; this range preceeds the article. Leave the range unmodified.
+                            (pop ranges)
+                            ranges)
+                           ((< article min)
+                            ;; this article preceeds the range.  Return null to move to the
+                            ;; next article
+                            nil)
+                           (t
+                            ;; this article splits the range into two parts
+                            (setcdr ranges (cons (cons (1+ article) max) (cdr ranges)))
+                            (setcdr range (1- article))
+                            (setq modified t)
+                            ranges))))))))
+                  
+    (when modified
+      (when (eq modified 'remove-null)
+        (setq r (delq nil r)))
+      ;; Enter this list into the group info.
+      (gnus-info-set-read info r)
+
+      ;; Set the number of unread articles in gnus-newsrc-hashtb.
+      (gnus-get-unread-articles-in-group info (gnus-active group))
+
+      ;; Insert the change into the group buffer and the dribble file.
       (gnus-group-update-group group t))))
 
 ;; Enter all dead groups into the hashtb.
@@ -2077,41 +2156,40 @@ If FORCE is non-nil, the .newsrc file is read."
 	  (kill-buffer (current-buffer))
 	  (gnus-message 5 "Reading %s...done" newsrc-file))))))
 
+(defun gnus-load (file &optional coding-system)
+  "Load FILE, but in such a way that read errors can be reported."
+  (with-temp-buffer
+    (if coding-system
+	(insert-file-contents-as-coding-system coding-system file)
+      (insert-file-contents file))
+    (while (not (eobp))
+      (condition-case type
+	  (let ((form (read (current-buffer))))
+	    (eval form))
+	(error
+	 (unless (eq (car type) 'end-of-file)
+	   (let ((error (format "Error in %s line %d" file
+				(count-lines (point-min) (point)))))
+	     (ding)
+	     (unless (gnus-yes-or-no-p (concat error "; continue? "))
+	       (error "%s" error)))))))))
+
 (defun gnus-read-newsrc-el-file (file)
   (let ((ding-file (concat file "d")))
     ;; We always, always read the .eld file.
     (gnus-message 5 "Reading %s..." ding-file)
     (let (gnus-newsrc-assoc)
-      (when (file-exists-p ding-file)
-	(with-temp-buffer
-	  (if (or debug-on-error debug-on-quit)
-	      (progn
-		(insert-file-contents-as-coding-system
-		 gnus-ding-file-coding-system ding-file)
-		(eval-region (point-min) (point-max)))
-	    (condition-case nil
-		(progn
-		  (insert-file-contents-as-coding-system
-		   gnus-ding-file-coding-system ding-file)
-		  (eval-region (point-min) (point-max)))
-	      (error
-	       (ding)
-	       (or (not (or (zerop (buffer-size))
-			    (eq 'binary gnus-ding-file-coding-system)
-			    (gnus-re-read-newsrc-el-file ding-file)))
-		   (gnus-yes-or-no-p
-		    (format "Error in %s; continue? " ding-file))
-		   (error "Error in %s" ding-file))))))
-;;	;; Older versions of `gnus-format-specs' are no longer valid
-;;	;; in Oort Gnus 0.01.
-;;	(let ((version
-;;	       (and gnus-newsrc-file-version
-;;		    (gnus-continuum-version gnus-newsrc-file-version))))
-;;	  (when (or (not version)
-;;		    (< version 5.090009))
-;;	    (setq gnus-format-specs gnus-default-format-specs)))
-	(when gnus-newsrc-assoc
-	  (setq gnus-newsrc-alist gnus-newsrc-assoc))))
+      (gnus-load ding-file gnus-ding-file-coding-system)
+;;      ;; Older versions of `gnus-format-specs' are no longer valid
+;;      ;; in Oort Gnus 0.01.
+;;      (let ((version
+;;	     (and gnus-newsrc-file-version
+;;		  (gnus-continuum-version gnus-newsrc-file-version))))
+;;	(when (or (not version)
+;;		  (< version 5.090009))
+;;	  (setq gnus-format-specs gnus-default-format-specs)))
+      (when gnus-newsrc-assoc
+	(setq gnus-newsrc-alist gnus-newsrc-assoc)))
     (gnus-make-hashtable-from-newsrc-alist)
     (when (file-newer-than-file-p file ding-file)
       ;; Old format quick file
@@ -2126,35 +2204,35 @@ If FORCE is non-nil, the .newsrc file is read."
 	(apply 'gnus-product-read-variable-file-1 (car list))
 	(setq list (cdr list))))))
 
-(defun gnus-re-read-newsrc-el-file (file)
-  "Attempt to re-read .newsrc.eld file.  Returns `nil' if successful.
-The backup file \".newsrc.eld_\" will be created before re-reading."
-  (message "Error in %s; retrying..." file)
-  (if (and
-       (condition-case nil
-	   (let ((backup (concat file "_")))
-	     (copy-file file backup 'ok-if-already-exists 'keep-time)
-	     (message " (The backup file %s has been created)" backup)
-	     t)
-	 (error nil))
-       (progn
-	 (insert-file-contents-as-binary file nil nil nil 'replace)
-	 (goto-char (point-min))
-	 (when (re-search-forward
-		"^[\t ]*([\t\n\r ]*setq[\t\n\r ]+gnus-format-specs" nil t)
-	   (delete-region (goto-char (match-beginning 0)) (forward-list 1))
-	   (decode-coding-region (point-min) (point-max)
-				 gnus-ding-file-coding-system)
-	   (condition-case nil
-	       (progn
-		 (eval-region (point-min) (point-max))
-		 t)
-	     (error nil)))))
-      (prog1
-	  nil
-	(message "Error in %s; retrying...done" file))
-    (message "Error in %s; retrying...failed" file)
-    t))
+;;(defun gnus-re-read-newsrc-el-file (file)
+;;  "Attempt to re-read .newsrc.eld file.  Returns `nil' if successful.
+;;The backup file \".newsrc.eld_\" will be created before re-reading."
+;;  (message "Error in %s; retrying..." file)
+;;  (if (and
+;;       (condition-case nil
+;;	   (let ((backup (concat file "_")))
+;;	     (copy-file file backup 'ok-if-already-exists 'keep-time)
+;;	     (message " (The backup file %s has been created)" backup)
+;;	     t)
+;;	 (error nil))
+;;       (progn
+;;	 (insert-file-contents-as-binary file nil nil nil 'replace)
+;;	 (goto-char (point-min))
+;;	 (when (re-search-forward
+;;		"^[\t ]*([\t\n\r ]*setq[\t\n\r ]+gnus-format-specs" nil t)
+;;	   (delete-region (goto-char (match-beginning 0)) (forward-list 1))
+;;	   (decode-coding-region (point-min) (point-max)
+;;				 gnus-ding-file-coding-system)
+;;	   (condition-case nil
+;;	       (progn
+;;		 (eval-region (point-min) (point-max))
+;;		 t)
+;;	     (error nil)))))
+;;      (prog1
+;;	  nil
+;;	(message "Error in %s; retrying...done" file))
+;;    (message "Error in %s; retrying...failed" file)
+;;    t))
 
 (defun gnus-product-read-variable-file-1 (file checking-methods coding
 					       &rest variables)
@@ -2917,6 +2995,21 @@ If this variable is nil, don't do anything."
   "Like `display-time-event-handler', but test `display-time-timer'."
   (when (gnus-boundp 'display-time-timer)
     (display-time-event-handler)))
+
+;;;###autoload
+(defun gnus-fixup-nnimap-unread-after-getting-new-news ()
+  (let (server group info)
+    (mapatoms
+     (lambda (sym)
+       (when (and (setq group (symbol-name sym))
+		  (gnus-group-entry group)
+		  (setq info (symbol-value sym)))
+	 (gnus-sethash group (cons (nth 2 info) (cdr (gnus-group-entry group)))
+		       gnus-newsrc-hashtb)))
+     (if (boundp 'nnimap-mailbox-info)
+	 (symbol-value 'nnimap-mailbox-info)
+       (make-vector 1 0)))))
+
 
 (provide 'gnus-start)
 

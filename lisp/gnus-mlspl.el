@@ -1,20 +1,22 @@
 ;;; gnus-mlspl.el --- a group params-based mail splitting mechanism
 
-;; Copyright (C) 1998, 1999, 2000, 2001
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Alexandre Oliva <oliva@lsd.ic.unicamp.br>
 ;; Keywords: news, mail
 
-;; This program is free software; you can redistribute it and/or modify
-;; it under the terms of the GNU General Public License as published by
-;; the Free Software Foundation; either version 2, or (at your option)
-;; any later version.
+;; This file is part of GNU Emacs.
 
-;; This program is distributed in the hope that it will be useful,
-;; but WITHOUT ANY WARRANTY; without even the implied warranty of
-;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.	 See the
-;; GNU General Public License for more details.
+;; GNU Emacs is free software; you can redistribute it and/or modify
+;; it under the terms of the GNU General Public License as published
+;; by the Free Software Foundation; either version 2, or (at your
+;; option) any later version.
+
+;; GNU Emacs is distributed in the hope that it will be useful, but
+;; WITHOUT ANY WARRANTY; without even the implied warranty of
+;; MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
+;; General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program; see the file COPYING.  If not, write to
@@ -61,7 +63,7 @@ unless overridden by any group marked as a catch-all group.  Typical
 uses are as simple as the name of a default mail group, but more
 elaborate fancy splits may also be useful to split mail that doesn't
 match any of the group-specified splitting rules.  See
-gnus-group-split-fancy for details."
+`gnus-group-split-fancy' for details."
   (interactive "P")
   (setq nnmail-split-methods 'nnmail-split-fancy)
   (when catch-all
@@ -87,7 +89,7 @@ instead.  This variable is set by gnus-group-split-setup."
 ;;;###autoload
 (defun gnus-group-split ()
   "Uses information from group parameters in order to split mail.
-See gnus-group-split-fancy for more information.
+See `gnus-group-split-fancy' for more information.
 
 gnus-group-split is a valid value for nnmail-split-methods."
   (let (nnmail-split-fancy)
@@ -103,10 +105,10 @@ It can be embedded into `nnmail-split-fancy' lists with the SPLIT
 \(: gnus-group-split-fancy GROUPS NO-CROSSPOST CATCH-ALL\)
 
 GROUPS may be a regular expression or a list of group names, that will
-be used to select candidate groups.  If it is ommited or nil, all
+be used to select candidate groups.  If it is omitted or nil, all
 existing groups are considered.
 
-if NO-CROSSPOST is ommitted or nil, a & split will be returned,
+if NO-CROSSPOST is omitted or nil, a & split will be returned,
 otherwise, a | split, that does not allow crossposting, will be
 returned.
 
@@ -139,7 +141,7 @@ nnml:mail.foo:
 nnml:mail.others:
 \((split-spec . catch-all))
 
-Calling (gnus-group-split-fancy nil nil \"mail.misc\") returns:
+Calling (gnus-group-split-fancy nil nil \"mail.others\") returns:
 
 \(| (& (any \"\\\\(bar@femail\\\\.com\\\\|.*@femail\\\\.com\\\\)\"
 	   \"mail.bar\")

@@ -298,7 +298,8 @@ so I simply dropped them."
     "^MIME-Version:" "^Content-Disposition:" "^Content-Description:"
     "^Content-ID:" "^User-Agent:" "^X-Face:")
   "*List of regexps to match headers included in digested messages.
-The headers will be included in the sequence they are matched."
+The headers will be included in the sequence they are matched.  If nil
+include all headers."
   :group 'gnus-extract
   :type '(repeat regexp))
 

@@ -970,7 +970,6 @@ EXTRA is the possible non-standard header."
 
 ;; All score code written by Per Abrahamsen <abraham@iesd.auc.dk>.
 
-;; Added by Per Abrahamsen <amanda@iesd.auc.dk>.
 (defun gnus-score-set-mark-below (score)
   "Automatically mark articles with score below SCORE as read."
   (interactive
@@ -2960,7 +2959,7 @@ In the `new' case, the string is a safe replacement for REGEXP.
 In the `bad' case, the string is a unsafe subexpression of REGEXP,
 and we do not have a simple replacement to suggest.
 
-See `(Gnus)Scoring Tips' for examples of good regular expressions."
+See Info node `(gnus)Scoring Tips' for examples of good regular expressions."
   (let (case-fold-search)
     (and
      ;; First, try a relatively fast necessary condition.

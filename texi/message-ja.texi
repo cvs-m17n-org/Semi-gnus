@@ -640,8 +640,11 @@ MFT $B$rB:=E$9$k$3$H$ONI$$%M%A%1%C%H(B (nettiquette) $B$G$"$k$H9M$($i$l$F$$$^
 @item C-a
 @kindex C-a
 @findex message-beginning-of-line
+@vindex message-beginning-of-line
 $B%X%C%@!<$NCM$N$H$3$m$K$$$k$H$-$O9T$N@hF,$K0\F0$7!"$=$&$G$J$$$H$-$O%X%C%@!<(B
-$B$NCM$N@hF,$K0\F0$7$^$9!#(B($B%X%C%@!<$NCM$O%X%C%@!<L>$H%3%m%s$N8e$KMh$^$9!#(B)
+$B$NCM$N@hF,$K0\F0$7$^$9!#(B($B%X%C%@!<$NCM$O%X%C%@!<L>$H%3%m%s$N8e$KMh$^(B
+$B$9!#(B) $B$3$NF0:n$OJQ?t(B @code{message-beginning-of-line} $B$r%H%0%k$9$k$3$H$K(B
+$B$h$C$FL58z$K$9$k$3$H$,$G$-$^$9!#(B
 @end table
 
 @node Insertion
@@ -788,18 +791,26 @@ a multipart tag will be used; if no other parts are present in your
 message a single part tag will be used.  This way, message mode will
 do the Right Thing (TM) with signed/encrypted multipart messages.
 
+@vindex mml-signencrypt-style-alist
 By default, when encrypting a message, Gnus will use the "signencrypt"
 mode.  If you would like to disable this for a particular message,
 give the mml-secure-message-encrypt-* command a prefix argument. (for
 example, C-u C-c C-m c p).  Additionally, by default Gnus will
 separately sign, then encrypt a message which has the mode
-signencrypt.  If you would like to change this behavior use the
-@code{mml-signencrypt-style} function.  For example
+signencrypt.  If you would like to change this behavior you can
+customize the @code{mml-signencrypt-style-alist} variable.  For
+example:
 
-@code{(mml-signencrypt-style "pgpmime" 'combined)}
+@lisp
+(setq mml-signencrypt-style-alist '(("smime" combined)
+                                    ("pgp" combined)
+                                    ("pgpmime" combined)))
+@end lisp
 
 Will cause Gnus to sign and encrypt in one pass, thus generating a
-single signed and encrypted part.
+single signed and encrypted part.  Note that combined sign and encrypt
+does not work with all supported OpenPGP implementations (in
+particular, PGP version 2 do not support this).
 
 Since signing and especially encryption often is used when sensitive
 information is sent, you may want to have some way to ensure that your
@@ -974,6 +985,15 @@ documentation of your OpenPGP implementation, so we refer to it.
 @findex message-rename-buffer
 $B%P%C%U%!$NL>A0$rJQ99$7$^$9(B (@code{message-rename-buffer})$B!#@\F,0z?t$rM?(B
 $B$($i$l$l$P!"?7$7$$%P%C%U%!L>$NF~NO$rB%?J$7$^$9!#(B
+
+@item TAB
+@kindex TAB
+@findex message-tab
+@vindex message-tab-body-function
+@code{message-tab-body-function} $B$K@_Dj$5$l$F$$$k4X?t$r<B9T$7$^$9!#$5$b(B
+$B$J$1$l$P(B ($B$=$l$,(B @code{nil} $B$@$C$?$i(B)$B!"(B
+@code{text-mode-map} $B$+(B @code{global-map} $B$N(B @kbd{TAB} $B%-!<$K3d$jEv$F$i(B
+$B$l$F$$$k%3%^%s%I$r;H$$$^$9!#(B
 @end table
 
 @node Sending
@@ -1114,14 +1134,29 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 
 @item message-generate-headers-first
 @vindex message-generate-headers-first
-@code{nil} $B$G$J$1$l$P!"%a%C%;!<%8$N:n@.$r;O$a$kA0$KA4$F$NI,MW$J%X%C%@!<(B
-$B$r:n@.$7$^$9!#(B
+@code{t} $B$J$i$P!"%a%C%;!<%8$N:n@.$r;O$a$kA0$KA4$F$NI,MW$J%X%C%@!<$r:n@.(B
+$B$7$^$9!#$3$l$O:n@.$9$k%X%C%@!<$N%j%9%H$G$"$k$3$H$b$G$-$^$9(B:
 
-$BJQ?t(B @code{message-required-mail-headers} $B$H(B @code{message-required-news-headers} $B$G!"(B
-$B$I$N%X%C%@!<$,I,MW$+$r;XDj$7$^$9!#(B
+@lisp
+(setq message-generate-headers-first
+      '(References))
+@end lisp
+
+@vindex message-required-headers
+$BJQ?t(B @code{message-required-headers}$B!"(B
+@code{message-required-mail-headers} $B$*$h(B
+$B$S(B @code{message-required-news-headers} $B$G!"$I$N%X%C%@!<$,I,MW$+$r;XDj$7(B
+$B$^$9!#(B
 
 $B$$$/$D$+$N%X%C%@!<$O!"Aw?.$9$kA0$K>C$5$l$?$j:n$jD>$5$l$?$j$7$^$9!#$3$l$K(B
 $B$OJQ?t(B @code{message-deletable-headers} ($B8e=R(B) $B$,4X78$7$^$9!#(B
+
+@item message-draft-headers
+@vindex message-draft-headers
+Message $B$,(B gnus $B>e$GAv$C$F$$$k>l9g!"%a%C%;!<%8%P%C%U%!$O%I%i%U%H%0%k!<%W(B
+$B$H4XO"IU$1$i$l$F$$$^$9!#(B@code{message-draft-headers} $B$O!"$=$N%I%i%U%H%0(B
+$B%k!<%W$K%I%i%U%H$,5-O?$5$l$k$H$-$K!"$I$N%X%C%@!<$,:n@.$5$l$k$Y$-$+$r;X<((B
+$B$7$^$9!#(B
 
 @item message-from-style
 @vindex message-from-style
@@ -1188,6 +1223,13 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 ($BLuCm(B: To $B$+(B Cc $B$K$"$k%"%I%l%9$G!":G=i$K$3$N@55,I=8=$K9gCW$7!"(B
 $B$+$D(B @code{user-mail-address} $B$H$O0c$&$b$N$,!"(B@code{From} $B%U%#!<%k%I$N%a!<(B
 $B%k%"%I%l%9$H$7$F;H$o$l$^$9!#(B)
+
+@item message-allow-no-recipients
+@vindex message-allow-no-recipients
+@code{Gcc} $B$H(B @code{Fcc} $B0J30$K<u<h?M$,$$$J$+$C$?>l9g$K!"2?$r$9$k$+$r@_(B
+$BDj$7$^$9!#(B@code{always} $B$@$C$?$i$H$K$+$/Aw?.$7!"(B@code{never} $B$@$C$?$iAw(B
+$B?.$7$^$;$s!#(B@code{ask} ($B$=$l$,%G%#%U%)%k%H(B) $B$@$C$?$i!"$I$&$9$k$+?R$M$i$l(B
+$B$^$9!#(B
 @end table
 
 @node Mail Headers
@@ -1221,13 +1263,15 @@ Lines (optional . User-Agent))} $B$G$9!#(B
 @findex message-send-mail-with-mh
 @findex message-send-mail-with-qmail
 @findex message-send-mail-with-smtp
+@findex message-smtpmail-send-it
 @findex smtpmail-send-it
 @findex feedmail-send-it
 $B8=:_$N%P%C%U%!$r%a!<%k$H$7$FAw$k$?$a$K;H$o$l$k4X?t$G$9!#=i4|CM(B
 $B$O(B @code{message-send-mail-with-sendmail} $B$G$9!#B>(B
 $B$K(B @code{message-send-mail-with-mh},
 @code{message-send-mail-with-qmail}, @code{message-send-mail-with-smtp},
-@code{smtpmail-send-it} $B$*$h$S(B @code{feedmail-send-it} $B$,;H$($^$9!#(B
+@code{message-smtpmail-send-it}, @code{smtpmail-send-it} $B$*$h(B
+$B$S(B @code{feedmail-send-it} $B$,;H$($^$9!#(B
 
 @item message-mh-deletable-headers
 @vindex message-mh-deletable-headers
@@ -1584,6 +1628,11 @@ Hallvard B Furuseth <h.b.furuseth@@usit.uio.no> writes:
 @vindex message-signature-file
 $B%P%C%U%!$N:G8e$KA^F~$5$l$k=pL>$NF~$C$F$$$k%U%!%$%k$G$9!#=i4|CM(B
 $B$O(B @file{~/.signature} $B$G$9!#(B
+
+@item message-signature-insert-empty-line
+@vindex message-signature-insert-empty-line
+@code{t} ($B%G%#%U%)%k%H(B) $B$@$C$?$i!"=pL>$HK\BN$rJ,N%$9$k5-9f$NA0$K6u9T$,A^(B
+$BF~$5$l$^$9!#(B
 @end table
 
 RFC1036bis $B$O!"=pL>$O$=$NA0$K(B @samp{-- } $B$N(B3$BJ8;z$@$1$N9T$,$"$k$Y$-$G$"$k(B
@@ -1612,7 +1661,8 @@ RFC1036bis $B$O!"=pL>$O$=$NA0$K(B @samp{-- } $B$N(B3$BJ8;z$@$1$N9T$,$"$k$Y$
 @c
 @item message-signature-separator
 @vindex message-signature-separator
-$B=pL>J,N%$K9gCW$9$k@55,I=8=$G$9!#=i4|CM$O(B @samp{^-- *$} $B$G$9!#(B
+$B=pL>$HK\BN$rJ,N%$9$k5-9f$K9gCW$9$k@55,I=8=$G$9!#=i4|CM(B
+$B$O(B @samp{^-- *$} $B$G$9!#(B
 
 @item mail-header-separator
 @vindex mail-header-separator
@@ -1871,7 +1921,7 @@ Message $B$O$3$l$i$N%j%9%H$H:nMQ$9$k4X?t$rDs6!$7$F$$$^$9(B:
    'exit 'postpone 'kill)
 @end lisp
 
-$B$3$l$O!"%a%C%;!<%8%P%C%U%!$,:o=|!"1d4|!"<mND$5$l$?$H$-$K(B gnus $B$N%&%#%s(B
+$B$3$l$O!"%a%C%;!<%8%P%C%U%!$,:o=|!"1d4|!"=*N;$5$l$?$H$-$K(B gnus $B$N%&%#%s(B
 $B%I%&@_Dj$rI|3h$5$;$^$9!#(B
 
 @dfn{$BF0:n(B} $B$O<!$N$I$l$+$G$9(B: $BIaDL$N4X?t!"$b$7$/$O(B @code{car} $B$,4X?t$G!"(B

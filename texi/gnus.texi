@@ -33,7 +33,7 @@
 \makeindex
 \begin{document}
 
-\newcommand{\gnusversionname}{Oort Gnus v0.07}
+\newcommand{\gnusversionname}{Oort Gnus v0.10}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
 
@@ -56,6 +56,7 @@
 \newcommand{\gnussamp}[1]{``{\fontencoding{OT1}\gnusselectttfont{}#1}''}
 \newcommand{\gnuslisp}[1]{\gnustt{#1}}
 \newcommand{\gnuskbd}[1]{`\gnustt{#1}'}
+\newcommand{\gnuskey}[1]{`\gnustt{#1}'}
 \newcommand{\gnusfile}[1]{`\gnustt{#1}'}
 \newcommand{\gnusdfn}[1]{\textit{#1}}
 \newcommand{\gnusi}[1]{\textit{#1}}
@@ -434,6 +435,13 @@ the program.
 * Index::                       Variable, function and concept index.
 * Key Index::                   Key Index.
 
+Other related manuals
+
+* Message:(message).            Composing messages.
+* Emacs-MIME:(emacs-mime).      Composing messages; MIME-specific parts.
+* Sieve:(sieve).                Managing Sieve scripts in Emacs.
+* PGG:(pgg).                    PGP/MIME with Gnus.
+
 @detailmenu
  --- The Detailed Node Listing ---
 
@@ -506,7 +514,7 @@ Summary Buffer
 * Choosing Articles::           Reading articles.
 * Paging the Article::          Scrolling the current article.
 * Reply Followup and Post::     Posting articles.
-* Delayed Articles::            
+* Delayed Articles::            Send articles at a later time.
 * Marking Articles::            Marking articles as read, expirable, etc.
 * Limiting::                    You can limit the summary buffer.
 * Threading::                   How threads are made.
@@ -715,8 +723,10 @@ Browsing the Web
 @sc{imap}
 
 * Splitting in IMAP::           Splitting mail with nnimap.
+* Expiring in IMAP::            Expiring mail with nnimap.
 * Editing IMAP ACLs::           Limiting/enabling other users access to a mailbox.
 * Expunging mailboxes::         Equivalent of a "compress mailbox" button.
+* A note on namespaces::        How to (not) use IMAP namespace in Gnus.
 
 Other Sources
 
@@ -746,6 +756,7 @@ Gnus Unplugged
 * Agent Basics::                How it all is supposed to work.
 * Agent Categories::            How to tell the Gnus Agent what to download.
 * Agent Commands::              New commands for all the buffers.
+* Agent as Cache::              The Agent is a big cache too.
 * Agent Expiry::                How to make old articles go away.
 * Agent and IMAP::              How to use the Agent with IMAP.
 * Outgoing Messages::           What happens when you post/mail something?
@@ -850,9 +861,12 @@ Picons
 
 Thwarting Email Spam
 
+* The problem of spam::         Some background, and some solutions
 * Anti-Spam Basics::            Simple steps to reduce the amount of spam.
 * SpamAssassin::                How to use external anti-spam tools.
 * Hashcash::                    Reduce spam by burning CPU time.
+* Filtering Spam Using spam.el::  
+* Filtering Spam Using Statistics (spam-stat.el)::  
 
 Appendices
 
@@ -1734,7 +1748,7 @@ lines of a @code{format} specification, which is pretty much the same as
 a @code{printf} specifications, for those of you who use (feh!) C.
 @xref{Formatting Variables}.
 
-@samp{%M%S%5y: %(%g%)\n} is the value that produced those lines above.
+@samp{%M%S%5y:%B%(%g%)\n} is the value that produced those lines above.
 
 There should always be a colon on the line; the cursor always moves to
 the colon after performing an operation.  @xref{Positioning
@@ -1796,6 +1810,10 @@ Full group name.
 @item G
 Group name.
 
+@item C
+Group comment (@pxref{Group Parameters}) or group name if there is no
+comment element in the group parameters.
+
 @item D
 Newsgroup description.
 
@@ -1807,6 +1825,9 @@ Newsgroup description.
 
 @item s
 Select method.
+
+@item B
+If the summary buffer for the group is open or not.
 
 @item n
 Select from where.
@@ -2128,7 +2149,7 @@ Place point on the subject line of the highest-scored unread article.
 @end table
 
 This variable can also be a function.  In that case, that function
-will be called to place point on a subject line.  
+will be called to place point on a subject line.
 
 If you want to prevent automatic selection in some group (say, in a
 binary group with Huge articles) you can set the
@@ -2745,8 +2766,8 @@ be inserted literally as a @code{gcc} header.  This parameter takes
 precedence over any default @code{Gcc} rules as described later
 (@pxref{Archived Messages}).  CAVEAT:: It yields an error putting
 @code{(gcc-self . t)} in groups of a @code{nntp} server or so, because
-a @code{nntp} server doesn't accept artciles.
- 
+a @code{nntp} server doesn't accept articles.
+
 @item auto-expire
 @cindex auto-expire
 If the group parameter has an element that looks like @code{(auto-expire
@@ -2768,11 +2789,12 @@ See also @code{gnus-total-expirable-newsgroups}.
 @item expiry-wait
 @cindex expiry-wait
 @vindex nnmail-expiry-wait-function
-If the group parameter has an element that looks like @code{(expiry-wait
-. 10)}, this value will override any @code{nnmail-expiry-wait} and
-@code{nnmail-expiry-wait-function} when expiring expirable messages.
-The value can either be a number of days (not necessarily an integer) or
-the symbols @code{never} or @code{immediate}.
+If the group parameter has an element that looks like
+@code{(expiry-wait . 10)}, this value will override any
+@code{nnmail-expiry-wait} and @code{nnmail-expiry-wait-function}
+(@pxref{Expiring Mail}) when expiring expirable messages.  The value
+can either be a number of days (not necessarily an integer) or the
+symbols @code{never} or @code{immediate}.
 
 @item score-file
 @cindex score file group parameter
@@ -2841,10 +2863,9 @@ command (@pxref{Limiting}).
 
 @item comment
 @cindex comment
-Elements that look like @code{(comment . "This is a comment")}
-are arbitrary comments on the group.  They are currently ignored by
-gnus, but provide a place for you to store information on particular
-groups.
+Elements that look like @code{(comment . "This is a comment")} are
+arbitrary comments on the group.  You can display comments in the
+group line (@pxref{Group Line Specification}).
 
 @item charset
 @cindex charset
@@ -3197,6 +3218,12 @@ Sort the group buffer by group rank
 Sort the group buffer alphabetically by back end name
 (@code{gnus-group-sort-groups-by-method}).
 
+@item G S n
+@kindex G S n (Group)
+@findex gnus-group-sort-groups-by-real-name
+Sort the group buffer alphabetically by real (unprefixed) group name
+(@code{gnus-group-sort-groups-by-real-name}).
+
 @end table
 
 All the commands below obey the process/prefix convention
@@ -3243,6 +3270,12 @@ Sort the groups by group rank
 @findex gnus-group-sort-selected-groups-by-method
 Sort the groups alphabetically by back end name
 (@code{gnus-group-sort-selected-groups-by-method}).
+
+@item G P n
+@kindex G P n (Group)
+@findex gnus-group-sort-selected-groups-by-real-name
+Sort the groups alphabetically by real (unprefixed) group name
+(@code{gnus-group-sort-selected-groups-by-real-name}).
 
 @item G P s
 @kindex G P s (Group)
@@ -3347,6 +3380,11 @@ subscribe to it (@code{gnus-browse-unsubscribe-current-group}).
 @kindex l (Browse)
 @findex gnus-browse-exit
 Exit browse mode (@code{gnus-browse-exit}).
+
+@item d
+@kindex d (Browse)
+@findex gnus-browse-describe-group
+Describe the current group (@code{gnus-browse-describe-group}).
 
 @item ?
 @kindex ? (Browse)
@@ -3857,7 +3895,7 @@ topic.
 
 @item subscribe-level
 When subscribing new groups by topic (see the @code{subscribe} parameter),
-the group will be subscribed with the level specified in the 
+the group will be subscribed with the level specified in the
 @code{subscribe-level} instead of @code{gnus-level-default-subscribed}.
 
 @end table
@@ -4084,6 +4122,37 @@ for fetching the file.
 If fetching from the first site is unsuccessful, gnus will attempt to go
 through @code{gnus-group-faq-directory} and try to open them one by one.
 
+@item H c
+@kindex H c (Group)
+@findex gnus-group-fetch-charter
+@vindex gnus-group-charter-alist
+@cindex charter
+Try to open the charter for the current group in a web browser
+(@code{gnus-group-fetch-charter}).  Query for a group if given a
+prefix argument.
+
+Gnus will use @code{gnus-group-charter-alist} to find the location of
+the charter.  If no location is known, Gnus will fetch the control
+messages for the group, which in some cases includes the charter.
+
+@item H C
+@kindex H C (Group)
+@findex gnus-group-fetch-control
+@vindex gnus-group-fetch-control-use-browse-url
+@cindex control message
+Fetch the control messages for the group from the archive at
+@code{ftp.isc.org} (@code{gnus-group-fetch-control}). Query for a
+group if given a prefix argument.
+
+If @code{gnus-group-fetch-control-use-browse-url} is non-nil, Gnus
+will open the control messages in a browser using @code{browse-url}.
+Otherwise they are fetched using @code{ange-ftp} and displayed in an
+ephemeral group.
+
+Note that the control messages are compressed.  To use this command
+you need to turn on @code{auto-compression-mode}
+(@pxref{(emacs)Compressed Files}).
+
 @item H d
 @itemx C-c C-d
 @c @icon{gnus-group-describe-group}
@@ -4164,7 +4233,7 @@ something like:
 
 If you would like greater control of the time format, you can use a
 user-defined format spec.  Something like the following should do the
-trick: 
+trick:
 
 @lisp
 (setq gnus-group-line-format
@@ -4175,7 +4244,7 @@ trick:
         (format-time-string "%b %d  %H:%M" time)
       "")))
 @end lisp
-            
+
 
 @node File Commands
 @subsection File Commands
@@ -4287,7 +4356,7 @@ You can have as many summary buffers open as you wish.
 * Choosing Articles::           Reading articles.
 * Paging the Article::          Scrolling the current article.
 * Reply Followup and Post::     Posting articles.
-* Delayed Articles::            
+* Delayed Articles::            Send articles at a later time.
 * Marking Articles::            Marking articles as read, expirable, etc.
 * Limiting::                    You can limit the summary buffer.
 * Threading::                   How threads are made.
@@ -4413,6 +4482,9 @@ Number of lines in the article.
 @item c
 Number of characters in the article. This specifier is not supported
 in some methods (like nnfolder).
+@item k
+Pretty-printed version of the number of characters in the article;
+for example, @samp{1.2k} or @samp{0.4M}.
 @item I
 Indentation based on thread level (@pxref{Customizing Threading}).
 @item B
@@ -4727,13 +4799,13 @@ no more unread articles after the current one, gnus will offer to go to
 the next group.  If this variable is @code{t} and the next group is
 empty, gnus will exit summary mode and return to the group buffer.  If
 this variable is neither @code{t} nor @code{nil}, gnus will select the
-next group, no matter whether it has any unread articles or not.  As a
-special case, if this variable is @code{quietly}, gnus will select the
-next group without asking for confirmation.  If this variable is
-@code{almost-quietly}, the same will happen only if you are located on
-the last article in the group.  Finally, if this variable is
-@code{slightly-quietly}, the @kbd{Z n} command will go to the next group
-without confirmation.  Also @pxref{Group Levels}.
+next group with unread articles.  As a special case, if this variable
+is @code{quietly}, Gnus will select the next group without asking for
+confirmation.  If this variable is @code{almost-quietly}, the same
+will happen only if you are located on the last article in the group.
+Finally, if this variable is @code{slightly-quietly}, the @kbd{Z n}
+command will go to the next group without confirmation.  Also
+@pxref{Group Levels}.
 
 @item gnus-auto-select-same
 @vindex gnus-auto-select-same
@@ -5072,6 +5144,19 @@ Mail a very wide reply to the author of the current article and include the
 original message (@code{gnus-summary-very-wide-reply-with-original}).  This
 command uses the process/prefix convention.
 
+@item S B r
+@kindex S B r (Summary)
+@findex gnus-summary-reply-broken-reply-to
+Mail a reply to the author of the current article but ignore the
+@code{Reply-To} field (@code{gnus-summary-reply-broken-reply-to}).
+
+@item S B R
+@kindex S B R (Summary)
+@findex gnus-summary-reply-broken-reply-to-with-original
+Mail a reply to the author of the current article and include the
+original message but ignore the @code{Reply-To} field
+(@code{gnus-summary-reply-broken-reply-to-with-original}).
+
 @item S o m
 @itemx C-c C-f
 @kindex S o m (Summary)
@@ -5401,17 +5486,16 @@ execute the @code{gnus-delay-send-queue} function.
 @table @code
 @item gnus-delay-initialize
 @findex gnus-delay-initialize
-By default, this function installs the @kbd{C-c C-j} key binding in
-Message mode and @code{gnus-delay-send-queue} in
-@code{gnus-get-new-news-hook}.  But it accepts two optional arguments,
-@code{no-keymap} and @code{no-check}.  If @code{no-keymap} is non-nil,
-the @kbd{C-c C-j} binding is not intalled.  If @code{no-check} is
-non-nil, @code{gnus-get-new-news-hook} is not changed.
 
-For example, @code{(gnus-delay-initialize nil t)} means to change the
-keymap but not to change @code{gnus-get-new-news-hook}.  Presumably, you
-want to use the demon for sending due delayed articles.  Just don't
-forget to set that up :-)
+By default, this function installs @code{gnus-delay-send-queue} in
+@code{gnus-get-new-news-hook}.  But it accepts the optional second
+argument @code{no-check}.  If it is non-nil,
+@code{gnus-get-new-news-hook} is not changed.  The optional first
+argument is ignored.
+
+For example, @code{(gnus-delay-initialize nil t)} means to do nothing.
+Presumably, you want to use the demon for sending due delayed articles.
+Just don't forget to set that up :-)
 @end table
 
 
@@ -5600,15 +5684,34 @@ religiously) are marked with an @samp{S} in the second column
 
 @item
 @vindex gnus-recent-mark
-Articles that according to the back end haven't been seen by the user
+Articles that according to the server haven't been shown to the user
 before are marked with a @samp{N} in the second column
-(@code{gnus-recent-mark}).  Note that not all back ends support this
-mark, in which case it simply never appears.
+(@code{gnus-recent-mark}).  Note that not all servers support this
+mark, in which case it simply never appears. Compare with
+@code{gnus-unseen-mark}.
 
 @item
 @vindex gnus-unseen-mark
-Articles that haven't been seen by the user before are marked with a
-@samp{.} in the second column (@code{gnus-unseen-mark}).
+Articles that haven't been seen before in Gnus by the user are marked
+with a @samp{.} in the second column (@code{gnus-unseen-mark}).
+Compare with @code{gnus-recent-mark}.
+
+@item
+@vindex gnus-undownloaded-mark
+When using the Gnus agent @pxref{Agent Basics}, some articles might not
+have been downloaded.  Such articles cannot be viewed while you are
+offline (unplugged).  These articles get the @samp{@@} mark in the
+first column.  (The variable @code{gnus-undownloaded-mark} controls
+which character to use.)
+
+@item
+@vindex gnus-downloadable-mark
+The Gnus agent @pxref{Agent Basics} downloads some articles
+automatically, but it is also possible to explicitly mark articles for
+download, even if they would not be downloaded automatically.  Such
+explicitly-marked articles get the @samp{%} mark in the first column.
+(The variable @code{gnus-downloadable-mark} controls which character to
+use.)
 
 @item
 @vindex gnus-not-empty-thread-mark
@@ -5875,6 +5978,11 @@ expression (@code{gnus-uu-unmark-by-regexp}).
 @findex gnus-uu-mark-region
 Mark articles in region (@code{gnus-uu-mark-region}).
 
+@item M P g
+@kindex M P g
+@findex gnus-uu-unmark-region
+Unmark articles in region (@code{gnus-uu-unmark-region}).
+
 @item M P t
 @kindex M P t (Summary)
 @findex gnus-uu-mark-thread
@@ -6013,6 +6121,12 @@ convention (@pxref{Process/Prefix}).
 Pop the previous limit off the stack and restore it
 (@code{gnus-summary-pop-limit}).  If given a prefix, pop all limits off
 the stack.
+
+@item / .
+@kindex / . (Summary)
+@findex gnus-summary-limit-to-unseen
+Limit the summary buffer to the unseen articles
+(@code{gnus-summary-limit-to-unseen}).
 
 @item / v
 @kindex / v (Summary)
@@ -6197,12 +6311,15 @@ square brackets (@samp{[]}).  This is the default method.
 
 @item dummy
 @vindex gnus-summary-dummy-line-format
+@vindex gnus-summary-make-false-root-always
 Gnus will create a dummy summary line that will pretend to be the
 parent.  This dummy line does not correspond to any real article, so
 selecting it will just select the first real article after the dummy
 article.  @code{gnus-summary-dummy-line-format} is used to specify the
 format of the dummy roots.  It accepts only one format spec:  @samp{S},
 which is the subject of the article.  @xref{Formatting Variables}.
+If you want all threads to have a dummy root, even the non-gathered
+ones, set @code{gnus-summary-make-false-root-always} to t.
 
 @item empty
 Gnus won't actually make any article the parent, but simply leave the
@@ -6412,7 +6529,7 @@ If non-@code{nil}, all threads will be hidden when the summary buffer is
 generated.
 
 This can also be a predicate specifier (@pxref{Predicate Specifiers}).
-Avaliable predicates are @code{gnus-article-unread-p} and
+Available predicates are @code{gnus-article-unread-p} and
 @code{gnus-article-unseen-p}).
 
 Here's an example:
@@ -7065,6 +7182,8 @@ Save the current article in a VM folder
 @findex gnus-summary-pipe-output
 Save the current article in a pipe.  Uhm, like, what I mean is---Pipe
 the current article to a process (@code{gnus-summary-pipe-output}).
+If given a symbolic prefix (@pxref{Symbolic Prefixes}), include the
+complete headers in the piped output.
 
 @item O P
 @kindex O P (Summary)
@@ -7955,6 +8074,8 @@ Hide @sc{pem} (privacy enhanced messages) cruft
 @item W W B
 @kindex W W B (Summary)
 @findex gnus-article-strip-banner
+@vindex gnus-article-banner-alist
+@vindex gnus-article-address-banner-alist
 @cindex banner
 @cindex OneList
 @cindex stripping advertisements
@@ -7970,6 +8091,30 @@ removed, or the symbol @code{signature}, meaning that the (last)
 signature should be removed, or other symbol, meaning that the
 corresponding regular expression in @code{gnus-article-banner-alist} is
 used.
+
+Regardless of a group, you can hide things like advertisements only when
+the sender of an article has a certain mail address specified in
+@code{gnus-article-address-banner-alist}.
+
+@table @code
+
+@item gnus-article-address-banner-alist
+@vindex gnus-article-address-banner-alist
+Alist of mail addresses and banners.  Each element has the form
+@code{(ADDRESS . BANNER)}, where ADDRESS is a regexp matching a mail
+address in the From header, BANNER is one of a symbol @code{signature},
+an item in @code{gnus-article-banner-alist}, a regexp and @code{nil}.
+If ADDRESS matches author's mail address, it will remove things like
+advertisements.  For example, if a sender has the mail address
+@samp{hail@@yoo-hoo.co.jp} and there is a banner something like
+@samp{Do You Yoo-hoo!?} in all articles he sends, you can use the
+following element to remove them:
+
+@lisp
+("@@yoo-hoo\\.co\\.jp\\'" . "\n_+\nDo You Yoo-hoo!\\?\n.*\n.*\n")
+@end lisp
+
+@end table
 
 @item W W c
 @kindex W W c (Summary)
@@ -8090,6 +8235,12 @@ positions in the alphabet, e. g. @samp{B} (letter #2) -> @samp{O} (letter
 #15).  It is sometimes referred to as ``Caesar rotate'' because Caesar
 is rumored to have employed this form of, uh, somewhat weak encryption.
 
+@item W m
+@kindex W m (Summary)
+@findex gnus-summary-morse-message
+@c @icon{gnus-summary-morse-message}
+Morse decode the article buffer (@code{gnus-summary-morse-message}).
+
 @item W t
 @item t
 @kindex W t (Summary)
@@ -8204,7 +8355,7 @@ If a prefix is given, a charset will be asked for.
 
 @vindex gnus-article-wash-function
 The default is to use the function specified by
-@code{mm-inline-text-html-renderer} (@pxref{Customization, , , emacs-mime}) 
+@code{mm-inline-text-html-renderer} (@pxref{Customization, , , emacs-mime})
 to convert the @sc{html}, but this is controlled by the
 @code{gnus-article-wash-function} variable.  Pre-defined functions you
 can use include:
@@ -8330,7 +8481,7 @@ Fold the @code{Newsgroups} and @code{Followup-To} headers
 
 @item W G f
 @kindex W G f (Summary)
-@findex gnus-article-treat-fold-header
+@findex gnus-article-treat-fold-headers
 Fold all the message headers
 (@code{gnus-article-treat-fold-headers}).
 
@@ -8352,10 +8503,11 @@ be nice if Gnus could just fetch whatever it is that people talk about
 with the minimum of fuzz when you hit @kbd{RET} or use the middle mouse
 button on these references.
 
+@vindex gnus-button-man-handler
 Gnus adds @dfn{buttons} to certain standard references by default:
-Well-formed URLs, mail addresses and Message-IDs.  This is controlled by
-two variables, one that handles article bodies and one that handles
-article heads:
+Well-formed URLs, mail addresses, Message-IDs, Info links and man pages.
+This is controlled by two variables, one that handles article bodies and
+one that handles article heads:
 
 @table @code
 
@@ -8370,10 +8522,11 @@ This is an alist where each entry has this form:
 @table @var
 
 @item regexp
-All text that match this regular expression will be considered an
-external reference.  Here's a typical regexp that matches embedded URLs:
-@samp{<URL:\\([^\n\r>]*\\)>}. This can also be a variable containing a
-regexp, useful variables to use include @code{gnus-button-url-regexp}.
+All text that match this regular expression (case insensitive) will be
+considered an external reference.  Here's a typical regexp that matches
+embedded URLs: @samp{<URL:\\([^\n\r>]*\\)>}.  This can also be a
+variable containing a regexp, useful variables to use include
+@code{gnus-button-url-regexp}.
 
 @item button-par
 Gnus has to know which parts of the matches is to be highlighted.  This
@@ -8524,7 +8677,7 @@ preferred format automatically.
 @cindex x-face
 @cindex smileys
 
-These commands add various frivolous display gimmics to the article
+These commands add various frivolous display gimmicks to the article
 buffer in Emacs versions that support them.
 
 @code{X-Face} headers are small black-and-white images supplied by the
@@ -8717,17 +8870,19 @@ convention (@pxref{Process/Prefix}).
 
 @item M-t
 @kindex M-t (Summary)
-@findex gnus-summary-display-buttonized
+@findex gnus-summary-toggle-display-buttonized
 Toggle the buttonized display of the article buffer
 (@code{gnus-summary-toggle-display-buttonized}).
 
 @item W M w
 @kindex W M w (Summary)
+@findex gnus-article-decode-mime-words
 Decode RFC 2047-encoded words in the article headers
 (@code{gnus-article-decode-mime-words}).
 
 @item W M c
 @kindex W M c (Summary)
+@findex gnus-article-decode-charset
 Decode encoded article bodies as well as charsets
 (@code{gnus-article-decode-charset}).
 
@@ -8740,6 +8895,7 @@ parameter to the required charset (@pxref{Group Parameters}).
 
 @item W M v
 @kindex W M v (Summary)
+@findex gnus-mime-view-all-parts
 View all the @sc{mime} parts in the current article
 (@code{gnus-mime-view-all-parts}).
 
@@ -8765,7 +8921,7 @@ To have all Vcards be ignored, you'd say something like this:
 @vindex gnus-unbuttonized-mime-types
 This is a list of regexps.  @sc{mime} types that match a regexp from
 this list won't have @sc{mime} buttons inserted unless they aren't
-displayed or this variable is overriden by
+displayed or this variable is overridden by
 @code{gnus-buttonized-mime-types}.  The default value is
 @code{(".*/.*")}.
 
@@ -8778,7 +8934,12 @@ displayed.  This variable overrides
 
 To see e.g. security buttons but no other buttons, you could set this
 variable to @code{("multipart/signed")} and leave
-@code{gnus-unbuttonized-mime-types} to the default value.
+@code{gnus-unbuttonized-mime-types} at the default value.
+
+@item gnus-inhibit-mime-unbuttonizing
+@vindex gnus-inhibit-mime-unbuttonizing
+If this is non-nil, then all @sc{mime} parts get buttons.  The default
+value is @code{nil}.
 
 @item gnus-article-mime-part-function
 @vindex gnus-article-mime-part-function
@@ -9098,7 +9259,7 @@ then ask Google if that fails:
 @lisp
 (setq gnus-refer-article-method
       '(current
-        (nnweb "refer" (nnweb-type google))))
+        (nnweb "google" (nnweb-type google))))
 @end lisp
 
 Most of the mail back ends support fetching by @code{Message-ID}, but
@@ -9697,6 +9858,12 @@ Regenerate the current summary buffer (@code{gnus-summary-prepare}).
 @findex gnus-summary-insert-cached-articles
 Pull all cached articles (for the current group) into the summary buffer
 (@code{gnus-summary-insert-cached-articles}).
+
+@item Y d
+@kindex Y d (Summary)
+@findex gnus-summary-insert-dormant-articles
+Pull all dormant articles (for the current group) into the summary buffer
+(@code{gnus-summary-insert-dormant-articles}).
 
 @end table
 
@@ -10377,6 +10544,7 @@ possible but those listed are probably sufficient for most people.
 @item gnus-treat-strip-pgp (t, last, integer)
 @item gnus-treat-strip-trailing-blank-lines (t, last, integer)
 @item gnus-treat-unsplit-urls (t, integer)
+@item gnus-treat-wash-html (t, integer)
 @item gnus-treat-decode-article-as-default-mime-charset (t, integer)
 
 @xref{Article Washing}.
@@ -10664,7 +10832,8 @@ Variables for customizing outgoing mail:
 @item gnus-uu-digest-headers
 @vindex gnus-uu-digest-headers
 List of regexps to match headers included in digested messages.  The
-headers will be included in the sequence they are matched.
+headers will be included in the sequence they are matched.  If
+@code{nil} include all headers.
 
 @item gnus-add-to-list
 @vindex gnus-add-to-list
@@ -10688,7 +10857,7 @@ When you press those magical @kbd{C-c C-c} keys to ship off your latest
 
 Thank you for asking.  I hate you.
 
-It can be quite complicated.  
+It can be quite complicated.
 
 @vindex gnus-post-method
 When posting news, Message usually invokes @code{message-send-news}
@@ -10734,7 +10903,11 @@ package correctly.  An example:
       smtpmail-default-smtp-server "YOUR SMTP HOST")
 @end lisp
 
-Other possible choises for @code{message-send-mail-function} includes
+To the thing similar to this, there is @code{message-smtpmail-send-it}.
+It is useful if your ISP requires the POP-before-SMTP authentication.
+See the documentation for the function @code{mail-source-touch-pop}.
+
+Other possible choices for @code{message-send-mail-function} includes
 @code{message-send-mail-with-mh}, @code{message-send-mail-with-qmail},
 and @code{feedmail-send-it}.
 
@@ -10991,11 +11164,14 @@ The first element in each style is called the @code{match}.  If it's a
 string, then Gnus will try to regexp match it against the group name.
 If it is the form @code{(header MATCH REGEXP)}, then Gnus will look in
 the original article for a header whose name is MATCH and compare that
-REGEXP.  MATCH and REGEXP are strings. If it's a function symbol, that
-function will be called with no arguments.  If it's a variable symbol,
-then the variable will be referenced.  If it's a list, then that list
-will be @code{eval}ed.  In any case, if this returns a non-@code{nil}
-value, then the style is said to @dfn{match}.
+REGEXP.  MATCH and REGEXP are strings.  (There original article is the
+one you are replying or following up to.  If you are not composing a
+reply or a followup, then there is nothing to match against.)  If the
+@code{match} is a function symbol, that function will be called with no
+arguments.  If it's a variable symbol, then the variable will be
+referenced.  If it's a list, then that list will be @code{eval}ed.  In
+any case, if this returns a non-@code{nil} value, then the style is said
+to @dfn{match}.
 
 Each style may contain an arbitrary amount of @dfn{attributes}.  Each
 attribute consists of a @code{(@var{name} @var{value})} pair.  The
@@ -11063,6 +11239,32 @@ So here's a new example:
 The @samp{nnml:.*} rule means that you use the @code{To} address as the
 @code{From} address in all your outgoing replies, which might be handy
 if you fill many roles.
+
+Setting the @code{gnus-named-posting-styles} variable will make
+posting-styles allow to have distinctive names.  You can specify an
+arbitrary posting-style when article posting with @kbd{S P} in the
+summary buffer.  @code{gnus-named-posting-styles} is an alist which maps
+the names to styles.  Once a posting-style is added to the alist, we can
+import it from @code{gnus-posting-styles}.  If an attribute whose name
+is @code{import} is found, Gnus will look for the attribute value in
+@code{gnus-named-posting-styles} and expand it in place.
+
+Here's an example:
+
+@lisp
+(setq gnus-named-posting-styles
+      '(("Default"
+         (signature-file "~/.signature")
+         (name "User Name")
+         ("X-Home-Page" (getenv "WWW_HOME"))
+         (organization "People's Front Against MWM"))
+        ("Emacs"
+         (import "Default")
+         (organization "The Church of Emacs"))))
+@end lisp
+
+The posting-style named "Emacs" will inherit all the attributes from
+"Default" except @code{organization}.
 
 
 @node Drafts
@@ -11985,10 +12187,11 @@ define a server as follows:
 ;; Type `C-c C-c' after you've finished editing.
 ;;
 ;; "snews" is port 563 and is predefined in our /etc/services
+;; however, openssl s_client -port doesn't like named ports
 ;;
 (nntp "snews.bar.com"
       (nntp-open-connection-function nntp-open-ssl-stream)
-      (nntp-port-number "snews")
+      (nntp-port-number 563)
       (nntp-address "snews.bar.com"))
 @end lisp
 
@@ -12126,6 +12329,9 @@ The address of the @sc{nntp} server.
 @item nntp-port-number
 @vindex nntp-port-number
 Port number to connect to the @sc{nntp} server.  The default is @samp{nntp}.
+If you use @sc{nntp} over @sc{ssl}, you may want to use integer ports rather
+than named ports (i.e, use @samp{563} instead of @samp{snews}), because
+external SSL tools may not work with named ports.
 
 @item nntp-end-of-line
 @vindex nntp-end-of-line
@@ -12437,6 +12643,15 @@ can be turned off completely by binding
 @code{nnmail-mail-splitting-decodes} to nil, which is useful if you
 want to match articles based on the raw header data.
 
+@vindex nnmail-resplit-incoming
+By default, splitting is performed on all incoming messages.  If
+you specify a @code{directory} entry for the variable
+@code{mail-sources} @pxref{Mail Source Specifiers}, however, then
+splitting does @emph{not} happen by default.  You can set the variable
+@code{nnmail-resplit-incoming} to a non-nil value to make splitting
+happen even in this case.  (This variable has no effect on other kinds
+of entries.)
+
 Gnus gives you all the opportunity you could possibly want for shooting
 yourself in the foot.  Let's say you create a group that will contain
 all the mail you get from your boss.  And then you accidentally
@@ -12495,7 +12710,8 @@ Keywords:
 @table @code
 @item :path
 The path of the file.  Defaults to the value of the @code{MAIL}
-environment variable or @file{/usr/mail/spool/user-name}.
+environment variable or the value of @code{rmail-spool-directory}
+(usually something like @file{/usr/mail/spool/user-name}).
 @end table
 
 An example file mail source:
@@ -12538,14 +12754,21 @@ Alter this script to fit find the @samp{movemail} you want to use.
 
 
 @item directory
-Get mail from several files in a directory.  This is typically used
-when you have procmail split the incoming mail into several files.
-That is, mail from the file @file{foo.bar.spool} will be put in the
-group @code{foo.bar}.  (You can change the suffix to be used instead
+@vindex nnmail-scan-directory-mail-source-once
+Get mail from several files in a directory.  This is typically used when
+you have procmail split the incoming mail into several files.  That is,
+there is a one-to-one correspondence between files in that directory and
+groups, so that mail from the file @file{foo.bar.spool} will be put in
+the group @code{foo.bar}.  (You can change the suffix to be used instead
 of @code{.spool}.)  Setting
-@code{nnmail-scan-directory-mail-source-once} to non-nil forces Gnus
-to scan the mail source only once. This is particularly useful if you
-want to scan mail groups at a specified level.
+@code{nnmail-scan-directory-mail-source-once} to non-nil forces Gnus to
+scan the mail source only once.  This is particularly useful if you want
+to scan mail groups at a specified level.
+
+@vindex nnmail-resplit-incoming
+There is also the variable @code{nnmail-resplit-incoming}, if you set
+that to a non-nil value, then the normal splitting process is applied
+to all the files from the directory, @ref{Splitting Mail}.
 
 Keywords:
 
@@ -12809,7 +13032,7 @@ which normally is the mailbox which receive incoming mail.
 The predicate used to find articles to fetch.  The default, @samp{UNSEEN
 UNDELETED}, is probably the best choice for most people, but if you
 sometimes peek in your mailbox with a @sc{imap} client and mark some
-articles as read (or; SEEN) you might want to set this to @samp{nil}.
+articles as read (or; SEEN) you might want to set this to @samp{1:*}.
 Then all articles in the mailbox is fetched, no matter what.  For a
 complete list of predicates, see RFC 2060 section 6.4.4.
 
@@ -13469,20 +13692,45 @@ Gnus will not delete your old, read mail.  Unless you ask it to, of
 course.
 
 To make Gnus get rid of your unwanted mail, you have to mark the
-articles as @dfn{expirable}.  This does not mean that the articles will
-disappear right away, however.  In general, a mail article will be
+articles as @dfn{expirable}.  (With the default keybindings, this means
+that you have to type @kbd{E}.)  This does not mean that the articles
+will disappear right away, however.  In general, a mail article will be
 deleted from your system if, 1) it is marked as expirable, AND 2) it is
 more than one week old.  If you do not mark an article as expirable, it
 will remain on your system until hell freezes over.  This bears
 repeating one more time, with some spurious capitalizations: IF you do
 NOT mark articles as EXPIRABLE, Gnus will NEVER delete those ARTICLES.
 
+You do not have to mark articles as expirable by hand.  Gnus provides
+two features, called `auto-expire' and `total-expire', that can help you
+with this.  In a nutshell, `auto-expire' means that Gnus hits @kbd{E}
+for you when you select an article.  And `total-expire' means that Gnus
+considers all articles as expirable that are read.  So, in addition to
+the articles marked @samp{E}, also the articles marked @samp{r},
+@samp{R}, @samp{O}, @samp{K}, @samp{Y} and so on are considered
+expirable.
+
+When should either auto-expire or total-expire be used?  Most people
+who are subscribed to mailing lists split each list into its own group
+and then turn on auto-expire or total-expire for those groups.
+(@xref{Splitting Mail}, for more information on splitting each list
+into its own group.)
+
+Which one is better, auto-expire or total-expire?  It's not easy to
+answer.  Generally speaking, auto-expire is probably faster.  Another
+advantage of auto-expire is that you get more marks to work with: for
+the articles that are supposed to stick around, you can still choose
+between tick and dormant and read marks.  But with total-expire, you
+only have dormant and ticked to choose from.  The advantage of
+total-expire is that it works well with adaptive scoring @pxref{Adaptive
+Scoring}.  Auto-expire works with normal scoring but not with adaptive
+scoring.
+
 @vindex gnus-auto-expirable-newsgroups
-You do not have to mark articles as expirable by hand.  Groups that
-match the regular expression @code{gnus-auto-expirable-newsgroups} will
-have all articles that you read marked as expirable automatically.  All
-articles marked as expirable have an @samp{E} in the first
-column in the summary buffer.
+Groups that match the regular expression
+@code{gnus-auto-expirable-newsgroups} will have all articles that you
+read marked as expirable automatically.  All articles marked as
+expirable have an @samp{E} in the first column in the summary buffer.
 
 By default, if you have auto expiry switched on, Gnus will mark all the
 articles you read as expirable, no matter if they were read or unread
@@ -13643,7 +13891,7 @@ laugh.
 
 Gnus provides a plethora of functions for washing articles while
 displaying them, but it might be nicer to do the filtering before
-storing the mail to disc.  For that purpose, we have three hooks and
+storing the mail to disk.  For that purpose, we have three hooks and
 various functions that can be put in these hooks.
 
 @table @code
@@ -14209,7 +14457,7 @@ headers/status bits stuff.  RMAIL itself still exists as well, of
 course, and is still maintained by Stallman.
 
 Both of the above forms leave your mail in a single file on your
-filesystem, and they must parse that entire file each time you take a
+file system, and they must parse that entire file each time you take a
 look at your mail.
 
 @item nnml
@@ -14230,10 +14478,10 @@ extremely fast on access because of what amounts to the indexing support
 provided by the active file and overviews.
 
 @code{nnml} costs @dfn{inodes} in a big way; that is, it soaks up the
-resource which defines available places in the filesystem to put new
+resource which defines available places in the file system to put new
 files.  Sysadmins take a dim view of heavy inode occupation within
-tight, shared filesystems.  But if you live on a personal machine where
-the filesystem is your own and space is not at a premium, @code{nnml}
+tight, shared file systems.  But if you live on a personal machine where
+the file system is your own and space is not at a premium, @code{nnml}
 wins big.
 
 It is also problematic using this back end if you are living in a
@@ -14277,7 +14525,7 @@ per article, so it uses about twice as many inodes as @code{nnml}.  (Use
 @code{df -i} to see how plentiful your inode supply is.)  If this slows
 you down or takes up very much space, consider switching to ReiserFS
 (@uref{http://www.namesys.com/}) or another non-block-structured
-filesystem.
+file system.
 
 Since maildirs don't require locking for delivery, the maildirs you use
 as groups can also be the maildirs your mail is directly delivered to.
@@ -14307,21 +14555,21 @@ it's not as easy to work with them from outside Gnus as with
 @code{nnmaildir}.
 
 For configuring expiry and other things, @code{nnmaildir} uses group
-parameters slightly different from those of other mail backends.
+parameters slightly different from those of other mail back ends.
 
 @code{nnmaildir} uses a significant amount of memory to speed things up.
 (It keeps in memory some of the things that @code{nnml} stores in files
 and that @code{nnmh} repeatedly parses out of message files.)  If this
 is a problem for you, you can set the @code{nov-cache-size} group
-parameter to somthing small (0 would probably not work, but 1 probably
+parameter to something small (0 would probably not work, but 1 probably
 would) to make it use less memory.
 
 Startup and shutdown are likely to be slower with @code{nnmaildir} than
-with other backends.  Everything in between is likely to be faster,
-depending in part on your filesystem.
+with other back ends.  Everything in between is likely to be faster,
+depending in part on your file system.
 
 @code{nnmaildir} does not use @code{nnoo}, so you cannot use @code{nnoo}
-to write an @code{nnmaildir}-derived backend.
+to write an @code{nnmaildir}-derived back end.
 
 @end table
 
@@ -14397,7 +14645,7 @@ to shut down Gnus, so archiving may be invoked by @code{cron} or
 similar.  You restore the data by restoring the directory tree, and
 adding a server definition pointing to that directory in Gnus. The
 @ref{Article Backlog}, @ref{Asynchronous Fetching} and other things
-might interfer with overwriting data, so you may want to shut down Gnus
+might interfere with overwriting data, so you may want to shut down Gnus
 before you restore the data.
 
 It is also possible to archive individual @code{nnml},
@@ -14543,7 +14791,7 @@ default is @code{t}.  To be able to display threads, @code{nnslashdot}
 has to retrieve absolutely all comments in a group upon entry.  If a
 threaded display is not required, @code{nnslashdot} will only retrieve
 the comments that are actually wanted by the user.  Threading is nicer,
-but much, much slower than untreaded.
+but much, much slower than unthreaded.
 
 @item nnslashdot-login-name
 @vindex nnslashdot-login-name
@@ -14703,7 +14951,9 @@ summary buffer.
                      (assq (gnus-summary-article-number)
                            gnus-newsgroup-data))))))
     (if url
-        (browse-url (cdr url))
+        (progn
+          (browse-url (cdr url))
+          (gnus-summary-mark-as-read-forward 1))
       (gnus-summary-scroll-up arg))))
 
 (eval-after-load "gnus"
@@ -14890,7 +15140,7 @@ program.
 @vindex imap-ssl-program
 For SSL connections, the OpenSSL program is available from
 @uref{http://www.openssl.org/}. OpenSSL was formerly known as SSLeay,
-and nnimap support it too - altough the most recent versions of
+and nnimap support it too - although the most recent versions of
 SSLeay, 0.9.x, are known to have serious bugs making it
 useless. Earlier versions, especially 0.8.x, of SSLeay are known to
 work. The variable @code{imap-ssl-program} contain parameters to pass
@@ -14932,7 +15182,7 @@ external library @code{digest-md5.el}.
 @item
 @dfn{login:} Plain-text username/password via LOGIN.
 @item
-@dfn{anonymous:} Login as `anonymous', supplying your emailadress as password.
+@dfn{anonymous:} Login as `anonymous', supplying your email address as password.
 @end itemize
 
 @item nnimap-expunge-on-close
@@ -15020,8 +15270,10 @@ variable @code{nntp-authinfo-file} for exact syntax; also see
 
 @menu
 * Splitting in IMAP::           Splitting mail with nnimap.
+* Expiring in IMAP::            Expiring mail with nnimap.
 * Editing IMAP ACLs::           Limiting/enabling other users access to a mailbox.
 * Expunging mailboxes::         Equivalent of a "compress mailbox" button.
+* A note on namespaces::        How to (not) use IMAP namespace in Gnus.
 @end menu
 
 
@@ -15099,6 +15351,9 @@ instance:
 @lisp
 ("INBOX.lists.\\1"     "^Sender: owner-\\([a-z-]+\\)@@")
 @end lisp
+
+The first element can also be the symbol @code{junk} to indicate that
+matching messages should simply be deleted.  Use with care.
 
 The second element can also be a function.  In that case, it will be
 called with the first element of the rule as the argument, in a buffer
@@ -15181,6 +15436,43 @@ Nnmail equivalent: @code{nnmail-split-fancy}.
 
 @end table
 
+@node Expiring in IMAP
+@subsection Expiring in IMAP
+@cindex expiring imap mail
+
+Even though @sc{nnimap} is not a proper @sc{nnmail} derived back end,
+it supports most features in regular expiring (@pxref{Expiring Mail}).
+Unlike splitting in IMAP (@pxref{Splitting in IMAP}) it do not clone
+the @sc{nnmail} variables (i.e., creating @var{nnimap-expiry-wait})
+but reuse the @sc{nnmail} variables.  What follows below are the
+variables used by the @sc{nnimap} expiry process.
+
+A note on how the expire mark is stored on the @sc{imap} server is
+appropriate here as well.  The expire mark is translated into a
+@sc{imap} client specific mark, @code{gnus-expire}, and stored on the
+message.  This means that likely only Gnus will understand and treat
+the @code{gnus-expire} mark properly, although other clients may allow
+you to view client specific flags on the message.  It also means that
+your server must support permanent storage of client specific flags on
+messages.  Most do, fortunately.
+
+@table @code
+
+@item nnmail-expiry-wait
+@item nnmail-expiry-wait-function
+
+These variables are fully supported.  The expire value can be a
+number, the symbol @var{immediate} or @var{never}.
+
+@item nnmail-expiry-target
+
+This variable is supported, and internally implemented by calling the
+@sc{nnmail} functions that handle this.  It contains an optimization
+that if the destination is a IMAP group on the same server, the
+article is copied instead of appended (that is, uploaded again).
+
+@end table
+
 @node Editing IMAP ACLs
 @subsection Editing IMAP ACLs
 @cindex editing imap acls
@@ -15228,7 +15520,46 @@ manually.  This is exactly what @kbd{G x} does.
 Currently there is no way of showing deleted articles, you can just
 delete them.
 
+@node A note on namespaces
+@subsection A note on namespaces
+@cindex IMAP namespace
+@cindex namespaces
 
+The IMAP protocol has a concept called namespaces, described by the
+following text in the RFC:
+
+@example
+5.1.2.  Mailbox Namespace Naming Convention
+
+   By convention, the first hierarchical element of any mailbox name
+   which begins with "#" identifies the "namespace" of the remainder of
+   the name.  This makes it possible to disambiguate between different
+   types of mailbox stores, each of which have their own namespaces.
+
+      For example, implementations which offer access to USENET
+      newsgroups MAY use the "#news" namespace to partition the USENET
+      newsgroup namespace from that of other mailboxes.  Thus, the
+      comp.mail.misc newsgroup would have an mailbox name of
+      "#news.comp.mail.misc", and the name "comp.mail.misc" could refer
+      to a different object (e.g. a user's private mailbox).
+@end example
+
+While there is nothing in this text that warrants concern for the IMAP
+implementation in Gnus, some servers use namespace prefixes in a way
+that does not work with how Gnus uses mailbox names.
+
+Specifically, University of Washington's IMAP server uses mailbox
+names like @code{#driver.mbx/read-mail} which are valid only in the
+@sc{create} and @sc{append} commands.  After the mailbox is created
+(or a messages is appended to a mailbox), it must be accessed without
+the namespace prefix, i.e @code{read-mail}.  Since Gnus do not make it
+possible for the user to guarantee that user entered mailbox names
+will only be used with the CREATE and APPEND commands, you should
+simply not use the namespace prefixed mailbox names in Gnus.
+
+See the UoW @sc{imapd} documentation for the @code{#driver.*/} prefix
+for more information on how to use the prefixes.  They are a power
+tool and should be used only if you are sure what the effects are.
 
 @node Other Sources
 @section Other Sources
@@ -16043,7 +16374,7 @@ line from the article you respond to in these cases.
 
 @code{nnvirtual} groups do not inherit anything but articles and marks
 from component groups---group parameters, for instance, are not
-inherited. 
+inherited.
 
 
 @node Kibozed Groups
@@ -16122,24 +16453,8 @@ for some years, but doing that's a bore.  Moving the news server
 functionality up to the newsreader makes sense if you're the only person
 reading news on a machine.
 
-Using Gnus as an ``offline'' newsreader is quite simple.
-
-@itemize @bullet
-@item
-First, set up Gnus as you would do if you were running it on a machine
-that has full connection to the net.  Go ahead.  I'll still be waiting
-here.
-
-@item
-Then, put the following magical incantation in your @file{.gnus.el}
-file:
-
-@lisp
-(setq gnus-agent t)
-@end lisp
-@end itemize
-
-That's it.  Gnus is now an ``offline'' newsreader.
+Setting up Gnus as an ``offline'' newsreader is quite simple.  In
+fact, you don't even have to configure anything.
 
 Of course, to use it as such, you have to learn a few new commands.
 
@@ -16147,6 +16462,7 @@ Of course, to use it as such, you have to learn a few new commands.
 * Agent Basics::                How it all is supposed to work.
 * Agent Categories::            How to tell the Gnus Agent what to download.
 * Agent Commands::              New commands for all the buffers.
+* Agent as Cache::              The Agent is a big cache too.
 * Agent Expiry::                How to make old articles go away.
 * Agent and IMAP::              How to use the Agent with IMAP.
 * Outgoing Messages::           What happens when you post/mail something?
@@ -16214,9 +16530,11 @@ the Agent.
 Decide which servers should be covered by the Agent.  If you have a mail
 back end, it would probably be nonsensical to have it covered by the
 Agent.  Go to the server buffer (@kbd{^} in the group buffer) and press
-@kbd{J a} the server (or servers) that you wish to have covered by the
-Agent (@pxref{Server Agent Commands}).  This will typically be only the
-primary select method, which is listed on the bottom in the buffer.
+@kbd{J a} on the server (or servers) that you wish to have covered by the
+Agent (@pxref{Server Agent Commands}), or @kbd{J r} on automatically
+added servers you do not wish to have covered by the Agent.  By default,
+all @code{nntp} and @code{nnimap} groups in @code{gnus-select-method} and
+@code{gnus-secondary-select-methods} are agentized.
 
 @item
 Decide on download policy.  @xref{Agent Categories}.
@@ -16365,7 +16683,7 @@ with the predicate then defined as:
 
 or you could append your predicate to the predefined
 @code{gnus-category-predicate-alist} in your @file{~/.gnus.el} or
-wherever. 
+wherever.
 
 @lisp
 (require 'gnus-agent)
@@ -16749,6 +17067,22 @@ Agent (@code{gnus-agent-remove-server}).
 @end table
 
 
+@node Agent as Cache
+@subsection Agent as Cache
+
+When Gnus is plugged, it is not efficient to download headers or
+articles from the server again, if they are already stored in the
+Agent.  So, Gnus normally only downloads headers once, and stores them
+in the Agent.  These headers are later used when generating the summary
+buffer, regardless of whether you are plugged or unplugged.  Articles
+are not cached in the Agent by default though (that would potentially
+consume lots of disk space), but if you have already downloaded an
+article into the Agent, Gnus will not download the article from the
+server again but use the locally stored copy instead.
+
+This behaviour can be controlled by @code{gnus-agent-cache}
+(@pxref{Agent Variables}).
+
 @node Agent Expiry
 @subsection Agent Expiry
 
@@ -16804,23 +17138,22 @@ are kept on the @sc{imap} server, rather than in @code{.newsrc} as is the
 case for nntp.  Thus Gnus need to remember flag changes when
 disconnected, and synchronize these flags when you plug back in.
 
-Gnus keep track of flag changes when reading nnimap groups under the
-Agent by default.  When you plug back in, by default Gnus will check if
-you have any changed any flags and ask if you wish to synchronize these
-with the server.  This behavior is customizable with
-@code{gnus-agent-synchronize-flags}.
+Gnus keeps track of flag changes when reading nnimap groups under the
+Agent.  When you plug back in, Gnus will check if you have any changed
+any flags and ask if you wish to synchronize these with the server.
+The behavior is customizable by @code{gnus-agent-synchronize-flags}.
 
 @vindex gnus-agent-synchronize-flags
 If @code{gnus-agent-synchronize-flags} is @code{nil}, the Agent will
-never automatically synchronize flags.  If it is @code{ask}, the
-default, the Agent will check if you made any changes and if so ask if
-you wish to synchronize these when you re-connect.  If it has any other
-value, all flags will be synchronized automatically.
+never automatically synchronize flags.  If it is @code{ask}, which is
+the default, the Agent will check if you made any changes and if so
+ask if you wish to synchronize these when you re-connect.  If it has
+any other value, all flags will be synchronized automatically.
 
-If you do not wish to automatically synchronize flags when you
-re-connect, this can be done manually with the
+If you do not wish to synchronize flags automatically when you
+re-connect, you can do it manually with the
 @code{gnus-agent-synchronize-flags} command that is bound to @kbd{J Y}
-in the group buffer by default.
+in the group buffer.
 
 Some things are currently not implemented in the Agent that you'd might
 expect from a disconnected @sc{imap} client, including:
@@ -16849,8 +17182,8 @@ directory.  It's emptied when you synchronize flags.
 @subsection Outgoing Messages
 
 When Gnus is unplugged, all outgoing messages (both mail and news) are
-stored in the draft groups (@pxref{Drafts}).  You can view them there
-after posting, and edit them at will.
+stored in the draft group ``queue'' (@pxref{Drafts}).  You can view
+them there after posting, and edit them at will.
 
 When Gnus is plugged again, you can send the messages either from the
 draft group with the special commands available there, or you can use
@@ -16889,8 +17222,9 @@ Hook run when after finishing fetching articles.
 
 @item gnus-agent-cache
 @vindex gnus-agent-cache
-Variable to control whether use the locally stored @sc{nov} and articles when
-plugged.
+Variable to control whether use the locally stored @sc{nov} and
+articles when plugged, e.g. essentially using the Agent as a cache.
+The default is non-nil, which means to use the Agent as a cache.
 
 @item gnus-agent-go-online
 @vindex gnus-agent-go-online
@@ -16900,6 +17234,16 @@ automatically switch offline servers into online status.  If it is
 offline servers into online status when you re-connect.  If it has any
 other value, all offline servers will be automatically switched into
 online status.
+
+@item gnus-server-unopen-status
+@vindex gnus-server-unopen-status
+Perhaps not a Agent variable, but closely related to the Agent, this
+variable says what will happen if Gnus cannot open a server.  If the
+Agent is enabled, the default, @code{nil}, makes Gnus ask the user
+whether to deny the server or whether to unplug the agent.  If the
+Agent is disabled, Gnus always simply deny the server.  Other choices
+for this variable include @code{denied} and @code{offline} the latter
+is only valid if the Agent is used.
 
 @end table
 
@@ -16925,7 +17269,7 @@ setup, you may be able to use something like the following as your
 
 ;;; Make Gnus into an offline newsreader.
 ;;; (gnus-agentize) ; The obsolete setting.
-(setq gnus-agent t)
+;;; (setq gnus-agent t) ; Now the default.
 @end lisp
 
 That should be it, basically.  Put that in your @file{~/.gnus.el} file,
@@ -17941,7 +18285,7 @@ will be ignored.  If you wish to add more words to be ignored, use the
 Some may feel that short words shouldn't count when doing adaptive
 scoring.  If so, you may set @code{gnus-adaptive-word-length-limit} to
 an integer.  Words shorter than this number will be ignored.  This
-variable defaults til @code{nil}.
+variable defaults to @code{nil}.
 
 @vindex gnus-adaptive-word-syntax-table
 When the scoring is done, @code{gnus-adaptive-word-syntax-table} is the
@@ -18853,6 +19197,8 @@ four days, Gnus will decay the scores four times, for instance.
 @include emacs-mime.texi
 @chapter Sieve
 @include sieve.texi
+@c @chapter PGG
+@c @include pgg.texi
 @end iflatex
 @end iftex
 
@@ -19205,14 +19551,16 @@ and so on.  Create as many faces as you wish.  The same goes for the
 @code{mouse-face} specs---you can say @samp{%3(hello%)} to have
 @samp{hello} mouse-highlighted with @code{gnus-mouse-face-3}.
 
-Text inside the @samp{%<} and @samp{%>} specifiers will get the special
-@code{balloon-help} property set to @code{gnus-balloon-face-0}.  If you
-say @samp{%1<}, you'll get @code{gnus-balloon-face-1} and so on.  The
-@code{gnus-balloon-face-*} variables should be either strings or symbols
-naming functions that return a string.  Under @code{balloon-help-mode},
-when the mouse passes over text with this property set, a balloon window
-will appear and display the string.  Please refer to the doc string of
-@code{balloon-help-mode} for more information on this.
+Text inside the @samp{%<<} and @samp{%>>} specifiers will get the
+special @code{balloon-help} property set to @code{gnus-balloon-face-0}.
+If you say @samp{%1<<}, you'll get @code{gnus-balloon-face-1} and so on.
+The @code{gnus-balloon-face-*} variables should be either strings or
+symbols naming functions that return a string.  When the mouse passes
+over text with this property set, a balloon window will appear and
+display the string.  Please refer to @ref{(emacs)Help Echo} (in GNU
+Emacs) or the doc string of @code{balloon-help-mode} (in XEmacs) for
+more information on this.  (For technical reasons, the guillemets have
+been approximated as @samp{<<} and @samp{>>} in this paragraph.)
 
 Here's an alternative recipe for the group buffer:
 
@@ -19288,13 +19636,13 @@ characters---most notable East Asian countries.
 
 The problem is that when formatting, Gnus assumes that if a string is 10
 characters wide, it'll be 10 Latin characters wide on the screen.  In
-these coutries, that's not true.
+these countries, that's not true.
 
 @vindex gnus-use-correct-string-widths
 To help fix this, you can set @code{gnus-use-correct-string-widths} to
 @code{t}.  This makes buffer generation slower, but the results will be
-prettieer.  The default value is @code{t}.
-
+prettier.  The default value under XEmacs is @code{t} but @code{nil}
+for Emacs.
 
 
 @node Window Layout
@@ -20096,7 +20444,7 @@ functions all take one parameter.
 Internally, Gnus calls @code{gnus-make-predicate} on these specifiers
 to create a function that can be called.  This input parameter to this
 function will be passed along to all the functions in the predicate
-specifier. 
+specifier.
 
 
 @node Moderation
@@ -20560,12 +20908,12 @@ converts it to the X-Face format by using the
 @code{gnus-convert-pbm-to-x-face-command} shell command.  The
 @samp{pbm} files should be 48x48 pixels big.
 
-@code{gnus-x-face-from-file} takes a file as the parameter, and then
+@code{gnus-x-face-from-file} takes a GIF file as the parameter, and then
 converts the file to X-Face format by using the
 @code{gnus-convert-image-to-x-face-command} shell command.
 
 Here's how you would typically use the former function.  Put something
-like the folllowing in your @file{.gnus.el} file:
+like the following in your @file{.gnus.el} file:
 
 @lisp
 (setq message-required-news-headers
@@ -20696,13 +21044,84 @@ mail group, only to find two pyramid schemes, seven advertisements
 (``New!  Miracle tonic for growing full, lustrous hair on your toes!'')
 and one mail asking me to repent and find some god.
 
-This is annoying.
+This is annoying.  Here's what you can do about it.
 
 @menu
+* The problem of spam::         Some background, and some solutions
 * Anti-Spam Basics::            Simple steps to reduce the amount of spam.
 * SpamAssassin::                How to use external anti-spam tools.
 * Hashcash::                    Reduce spam by burning CPU time.
+* Filtering Spam Using spam.el::  
+* Filtering Spam Using Statistics (spam-stat.el)::  
 @end menu
+
+@node The problem of spam
+@subsection The problem of spam
+@cindex email spam
+@cindex spam filtering approaches
+@cindex filtering approaches, spam
+@cindex UCE
+@cindex unsolicited commercial email
+
+First, some background on spam.
+
+If you have access to e-mail, you are familiar with spam (technically
+termed @acronym{UCE}, Unsolicited Commercial E-mail).  Simply put, it exists
+because e-mail delivery is very cheap compared to paper mail, so only
+a very small percentage of people need to respond to an UCE to make it
+worthwhile to the advertiser.  Ironically, one of the most common
+spams is the one offering a database of e-mail addresses for further
+spamming.  Senders of spam are usually called @emph{spammers}, but terms like
+@emph{vermin}, @emph{scum}, and @emph{morons} are in common use as well.
+
+Spam comes from a wide variety of sources.  It is simply impossible to
+dispose of all spam without discarding useful messages.  A good
+example is the TMDA system, which requires senders
+unknown to you to confirm themselves as legitimate senders before
+their e-mail can reach you.  Without getting into the technical side
+of TMDA, a downside is clearly that e-mail from legitimate sources may
+be discarded if those sources can't or won't confirm themselves
+through the TMDA system.  Another problem with TMDA is that it
+requires its users to have a basic understanding of e-mail delivery
+and processing.
+
+The simplest approach to filtering spam is filtering.  If you get 200
+spam messages per day from @email{random-address@@vmadmin.com}, you
+block @samp{vmadmin.com}.  If you get 200 messages about
+@samp{VIAGRA}, you discard all messages with @samp{VIAGRA} in the
+message.  This, unfortunately, is a great way to discard legitimate
+e-mail.  For instance, the very informative and useful RISKS digest
+has been blocked by overzealous mail filters because it
+@strong{contained} words that were common in spam messages.
+Nevertheless, in isolated cases, with great care, direct filtering of
+mail can be useful.
+
+Another approach to filtering e-mail is the distributed spam
+processing, for instance DCC implements such a system.  In essence,
+@code{N} systems around the world agree that a machine @samp{X} in
+China, Ghana, or California is sending out spam e-mail, and these
+@code{N} systems enter @samp{X} or the spam e-mail from @samp{X} into
+a database.  The criteria for spam detection vary - it may be the
+number of messages sent, the content of the messages, and so on.  When
+a user of the distributed processing system wants to find out if a
+message is spam, he consults one of those @code{N} systems.
+
+Distributed spam processing works very well against spammers that send
+a large number of messages at once, but it requires the user to set up
+fairly complicated checks.  There are commercial and free distributed
+spam processing systems.  Distributed spam processing has its risks as
+well.  For instance legitimate e-mail senders have been accused of
+sending spam, and their web sites have been shut down for some time
+because of the incident.
+
+The statistical approach to spam filtering is also popular.  It is
+based on a statistical analysis of previous spam messages.  Usually
+the analysis is a simple word frequency count, with perhaps pairs of
+words or 3-word combinations thrown into the mix.  Statistical
+analysis of spam works very well in most of the cases, but it can
+classify legitimate e-mail as spam in some cases.  It takes time to
+run the analysis, the full message must be analyzed, and the user has
+to store the database of spam analyses.
 
 @node Anti-Spam Basics
 @subsection Anti-Spam Basics
@@ -20801,7 +21220,7 @@ Specifiers}) follows.
 (setq mail-sources
       '((file :prescript "formail -bs spamassassin < /var/mail/%u")
         (pop :user "jrl"
-             :server "pophost" 
+             :server "pophost"
              :postscript "mv %t /tmp/foo; formail -bs spamc < /tmp/foo > %t")))
 @end lisp
 
@@ -20862,7 +21281,7 @@ spam.  And here is the nifty function:
 A novel technique to fight spam is to require senders to do something
 costly for each message they send.  This has the obvious drawback that
 you cannot rely on that everyone in the world uses this technique,
-since it is not part of the internet standards, but it may be useful
+since it is not part of the Internet standards, but it may be useful
 in smaller communities.
 
 While the tools in the previous section work well in practice, they
@@ -20926,6 +21345,534 @@ Currently there is no built in functionality in Gnus to verify
 hashcash cookies, it is expected that this is performed by your hand
 customized mail filtering scripts.  Improvements in this area would be
 a useful contribution, however.
+
+@node Filtering Spam Using spam.el
+@subsection Filtering Spam Using spam.el
+@cindex spam filtering
+@cindex spam.el
+
+The idea behind @code{spam.el} is to have a control center for spam detection
+and filtering in Gnus.  To that end, @code{spam.el} does two things: it
+filters incoming mail, and it analyzes mail known to be spam.
+
+So, what happens when you load @code{spam.el}?  First of all, you get
+the following keyboard commands:
+
+@table @kbd
+
+@item M-d
+@itemx M s x
+@itemx S x
+@kindex M-d
+@kindex S x
+@kindex M s x
+@findex gnus-summary-mark-as-spam
+@code{gnus-summary-mark-as-spam}.
+
+Mark current article as spam, showing it with the @samp{H} mark.
+Whenever you see a spam article, make sure to mark its summary line
+with @kbd{M-d} before leaving the group.
+
+@item M s t
+@itemx S t
+@kindex M s t
+@kindex S t
+@findex spam-bogofilter-score
+@code{spam-bogofilter-score}.
+
+You must have bogofilter processing enabled for that command to work
+properly.
+
+@xref{Bogofilter}.
+
+@end table
+
+Gnus can learn from the spam you get.  All you have to do is collect
+your spam in one or more spam groups, and set the variable
+@code{spam-junk-mailgroups} as appropriate.  In these groups, all messages
+are considered to be spam by default: they get the @samp{H} mark.  You must
+review these messages from time to time and remove the @samp{H} mark for
+every message that is not spam after all.  When you leave a spam
+group, all messages that continue with the @samp{H} mark, are passed on to
+the spam-detection engine (bogofilter, ifile, and others).  To remove
+the @samp{H} mark, you can use @kbd{M-u} to "unread" the article, or @kbd{d} for
+declaring it read the non-spam way.  When you leave a group, all @samp{H}
+marked articles, saved or unsaved, are sent to Bogofilter or ifile
+(depending on @code{spam-use-bogofilter} and @code{spam-use-ifile}), which will study
+them as spam samples.
+
+Messages may also be deleted in various other ways, and unless
+@code{spam-ham-marks-form} gets overridden below, marks @samp{R} and @samp{r} for
+default read or explicit delete, marks @samp{X} and @samp{K} for automatic or
+explicit kills, as well as mark @samp{Y} for low scores, are all considered
+to be associated with articles which are not spam.  This assumption
+might be false, in particular if you use kill files or score files as
+means for detecting genuine spam, you should then adjust
+@code{spam-ham-marks-form}.  When you leave a group, all _unsaved_ articles
+bearing any the above marks are sent to Bogofilter or ifile, which
+will study these as not-spam samples.  If you explicit kill a lot, you
+might sometimes end up with articles marked @samp{K} which you never saw,
+and which might accidentally contain spam.  Best is to make sure that
+real spam is marked with @samp{H}, and nothing else.
+
+All other marks do not contribute to Bogofilter or ifile
+pre-conditioning.  In particular, ticked, dormant or souped articles
+are likely to contribute later, when they will get deleted for real,
+so there is no need to use them prematurely.  Explicitly expired
+articles do not contribute, command @kbd{E} is a way to get rid of an
+article without Bogofilter or ifile ever seeing it.
+
+@strong{TODO: @code{spam-use-ifile} does not process spam articles on group exit.
+I'm waiting for info from the author of @code{ifile-gnus.el}, because I think
+that functionality should go in @code{ifile-gnus.el} rather than @code{spam.el}.}
+
+To use the @code{spam.el} facilities for incoming mail filtering, you
+must add the following to your fancy split list
+@code{nnmail-split-fancy} or @code{nnimap-split-fancy}:
+
+@example
+(: spam-split)
+@end example
+
+Note that the fancy split may be called @code{nnmail-split-fancy} or
+@code{nnimap-split-fancy}, depending on whether you use the nnmail or
+nnimap back ends to retrieve your mail.
+
+The @code{spam-split} function will process incoming mail and send the mail
+considered to be spam into the group name given by the variable
+@code{spam-split-group}.  Usually that group name is @samp{spam}.
+
+The following are the methods you can use to control the behavior of
+@code{spam-split}:
+
+@menu
+* Blacklists and Whitelists::   
+* BBDB Whitelists::             
+* Blackholes::                  
+* Bogofilter::                  
+* Ifile spam filtering::        
+* Extending spam.el::           
+@end menu
+
+@node Blacklists and Whitelists
+@subsubsection Blacklists and Whitelists
+@cindex spam filtering
+@cindex whitelists, spam filtering
+@cindex blacklists, spam filtering
+@cindex spam.el
+
+@defvar spam-use-blacklist
+Set this variables to t (the default) if you want to use blacklists.
+@end defvar
+
+@defvar spam-use-whitelist
+Set this variables to t if you want to use whitelists.
+@end defvar
+
+Blacklists are lists of regular expressions matching addresses you
+consider to be spam senders.  For instance, to block mail from any
+sender at @samp{vmadmin.com}, you can put @samp{vmadmin.com} in your
+blacklist.  Since you start out with an empty blacklist, no harm is
+done by having the @code{spam-use-blacklist} variable set, so it is
+set by default.  Blacklist entries use the Emacs regular expression
+syntax.
+
+Conversely, whitelists tell Gnus what addresses are considered
+legitimate.  All non-whitelisted addresses are considered spammers.
+This option is probably not useful for most Gnus users unless the
+whitelists is very comprehensive.  Also see @ref{BBDB Whitelists}.
+Whitelist entries use the Emacs regular expression syntax.
+
+The Blacklist and whitelist location can be customized with the
+@code{spam-directory} variable (@file{~/News/spam} by default).  The whitelist
+and blacklist files will be in that directory, named @file{whitelist} and
+@file{blacklist} respectively.
+
+@node BBDB Whitelists
+@subsubsection BBDB Whitelists
+@cindex spam filtering
+@cindex BBDB whitelists, spam filtering
+@cindex BBDB, spam filtering
+@cindex spam.el
+
+@defvar spam-use-bbdb
+
+Analogous to @code{spam-use-whitelist} (@pxref{Blacklists and
+Whitelists}), but uses the BBDB as the source of whitelisted addresses,
+without regular expressions.  You must have the BBDB loaded for
+@code{spam-use-bbdb} to work properly.  Only addresses in the BBDB
+will be allowed through; all others will be classified as spam.
+
+@end defvar
+
+@node Blackholes
+@subsubsection Blackholes
+@cindex spam filtering
+@cindex blackholes, spam filtering
+@cindex spam.el
+
+@defvar spam-use-blackholes
+
+This option is disabled by default.  You can let Gnus consult the
+blackhole-type distributed spam processing systems (DCC, for instance)
+when you set this option.  The variable @code{spam-blackhole-servers}
+holds the list of blackhole servers Gnus will consult.  The current
+list is fairly comprehensive, but make sure to let us know if it
+contains outdated servers.
+
+The blackhole check uses the @code{dig.el} package, but you can tell
+@code{spam.el} to use @code{dns.el} instead for better performance if
+you set @code{spam-use-dig} to nil.  It is not recommended at this
+time to set @code{spam-use-dig} to nil despite the possible
+performance improvements, because some users may be unable to use it,
+but you can try it and see if it works for you.
+
+@end defvar
+
+@node Bogofilter
+@subsubsection Bogofilter
+@cindex spam filtering
+@cindex bogofilter, spam filtering
+@cindex spam.el
+
+@defvar spam-use-bogofilter
+
+Set this variable if you want to use Eric Raymond's speedy Bogofilter.
+This has been tested with a locally patched copy of version 0.4.  Make
+sure to read the installation comments in @code{spam.el}.
+
+With a minimum of care for associating the @samp{H} mark for spam
+articles only, Bogofilter training all gets fairly automatic.  You
+should do this until you get a few hundreds of articles in each
+category, spam or not.  The shell command @command{head -1
+~/.bogofilter/*} shows both article counts.  The command @kbd{S t} in
+summary mode, either for debugging or for curiosity, triggers
+Bogofilter into displaying in another buffer the @emph{spamicity}
+score of the current article (between 0.0 and 1.0), together with the
+article words which most significantly contribute to the score.
+
+@end defvar
+
+@node Ifile spam filtering
+@subsubsection Ifile spam filtering
+@cindex spam filtering
+@cindex ifile, spam filtering
+@cindex spam.el
+
+@defvar spam-use-ifile
+
+Enable this variable if you want to use Ifile, a statistical analyzer
+similar to Bogofilter.  Currently you must have @code{ifile-gnus.el}
+loaded.  The integration of Ifile with @code{spam.el} is not finished
+yet, but you can use @code{ifile-gnus.el} on its own if you like.
+
+@end defvar
+
+@node Extending spam.el
+@subsubsection Extending spam.el
+@cindex spam filtering
+@cindex spam.el, extending
+@cindex extending spam.el
+
+Say you want to add a new back end called blackbox.  Provide the following:
+
+@enumerate
+@item
+documentation
+
+@item
+code
+
+@example
+(defvar spam-use-blackbox nil
+  "True if blackbox should be used.")
+@end example
+
+Add
+@example
+    (spam-use-blackbox	 . spam-check-blackbox)
+@end example
+to @code{spam-list-of-checks}.
+
+@item
+functionality
+
+Write the @code{spam-check-blackbox} function.  It should return
+@samp{nil} or @code{spam-split-group}.  See the existing
+@code{spam-check-*} functions for examples of what you can do.
+@end enumerate
+
+@node Filtering Spam Using Statistics (spam-stat.el)
+@subsection Filtering Spam Using Statistics (spam-stat.el)
+@cindex Paul Graham
+@cindex Graham, Paul
+@cindex naive Bayesian spam filtering
+@cindex Bayesian spam filtering, naive
+@cindex spam filtering, naive Bayesian
+
+Paul Graham has written an excellent essay about spam filtering using
+statistics: @uref{http://www.paulgraham.com/spam.html,A Plan for
+Spam}.  In it he describes the inherent deficiency of rule-based
+filtering as used by SpamAssassin, for example: Somebody has to write
+the rules, and everybody else has to install these rules.  You are
+always late.  It would be much better, he argues, to filter mail based
+on whether it somehow resembles spam or non-spam.  One way to measure
+this is word distribution.  He then goes on to describe a solution
+that checks whether a new mail resembles any of your other spam mails
+or not.
+
+The basic idea is this:  Create a two collections of your mail, one
+with spam, one with non-spam.  Count how often each word appears in
+either collection, weight this by the total number of mails in the
+collections, and store this information in a dictionary.  For every
+word in a new mail, determine its probability to belong to a spam or a
+non-spam mail.  Use the 15 most conspicuous words, compute the total
+probability of the mail being spam.  If this probability is higher
+than a certain threshold, the mail is considered to be spam.
+
+Gnus supports this kind of filtering.  But it needs some setting up.
+First, you need two collections of your mail, one with spam, one with
+non-spam.  Then you need to create a dictionary using these two
+collections, and save it.  And last but not least, you need to use
+this dictionary in your fancy mail splitting rules.
+
+@menu
+* Creating a spam-stat dictionary::  
+* Splitting mail using spam-stat::  
+* Low-level interface to the spam-stat dictionary::  
+@end menu
+
+@node Creating a spam-stat dictionary
+@subsubsection Creating a spam-stat dictionary
+
+Before you can begin to filter spam based on statistics, you must
+create these statistics based on two mail collections, one with spam,
+one with non-spam.  These statistics are then stored in a dictionary
+for later use.  In order for these statistics to be meaningful, you
+need several hundred emails in both collections.
+
+Gnus currently supports only the nnml back end for automated dictionary
+creation.  The nnml back end stores all mails in a directory, one file
+per mail.  Use the following:
+
+@defun spam-stat-process-spam-directory
+Create spam statistics for every file in this directory.  Every file
+is treated as one spam mail.
+@end defun
+
+@defun spam-stat-process-non-spam-directory
+Create non-spam statistics for every file in this directory.  Every
+file is treated as one non-spam mail.
+@end defun
+
+Usually you would call @code{spam-stat-process-spam-directory} on a
+directory such as @file{~/Mail/mail/spam} (this usually corresponds
+the the group @samp{nnml:mail.spam}), and you would call
+@code{spam-stat-process-non-spam-directory} on a directory such as
+@file{~/Mail/mail/misc} (this usually corresponds the the group
+@samp{nnml:mail.misc}).
+
+@defvar spam-stat
+This variable holds the hash-table with all the statistics -- the
+dictionary we have been talking about.  For every word in either
+collection, this hash-table stores a vector describing how often the
+word appeared in spam and often it appeared in non-spam mails.
+
+If you want to regenerate the statistics from scratch, you need to
+reset the dictionary.
+
+@end defvar
+
+@defun spam-stat-reset
+Reset the @code{spam-stat} hash-table, deleting all the statistics.
+
+When you are done, you must save the dictionary.  The dictionary may
+be rather large.  If you will not update the dictionary incrementally
+(instead, you will recreate it once a month, for example), then you
+can reduce the size of the dictionary by deleting all words that did
+not appear often enough or that do not clearly belong to only spam or
+only non-spam mails.
+@end defun
+
+@defun spam-stat-reduce-size
+Reduce the size of the dictionary.  Use this only if you do not want
+to update the dictionary incrementally.
+@end defun
+
+@defun spam-stat-save
+Save the dictionary.
+@end defun
+
+@defvar spam-stat-file
+The filename used to store the dictionary.  This defaults to
+@file{~/.spam-stat.el}.
+@end defvar
+
+@node Splitting mail using spam-stat
+@subsubsection Splitting mail using spam-stat
+
+In order to use @code{spam-stat} to split your mail, you need to add the
+following to your @file{~/.gnus} file:
+
+@example
+(require 'spam-stat)
+(spam-stat-load)
+@end example
+
+This will load the necessary Gnus code, and the dictionary you
+created.
+
+Next, you need to adapt your fancy splitting rules:  You need to
+determine how to use @code{spam-stat}.  In the simplest case, you only have
+two groups, @samp{mail.misc} and @samp{mail.spam}.  The following expression says
+that mail is either spam or it should go into @samp{mail.misc}.  If it is
+spam, then @code{spam-stat-split-fancy} will return @samp{mail.spam}.
+
+@example
+(setq nnmail-split-fancy
+      `(| (: spam-stat-split-fancy)
+	  "mail.misc"))
+@end example
+
+@defvar spam-stat-split-fancy-spam-group
+The group to use for spam.  Default is @samp{mail.spam}.
+@end defvar
+
+If you also filter mail with specific subjects into other groups, use
+the following expression.  It only the mails not matching the regular
+expression are considered potential spam.
+
+@example
+(setq nnmail-split-fancy
+      `(| ("Subject" "\\bspam-stat\\b" "mail.emacs")
+	  (: spam-stat-split-fancy)
+	  "mail.misc"))
+@end example
+
+If you want to filter for spam first, then you must be careful when
+creating the dictionary.  Note that @code{spam-stat-split-fancy} must
+consider both mails in @samp{mail.emacs} and in @samp{mail.misc} as
+non-spam, therefore both should be in your collection of non-spam
+mails, when creating the dictionary!
+
+@example
+(setq nnmail-split-fancy
+      `(| (: spam-stat-split-fancy)
+          ("Subject" "\\bspam-stat\\b" "mail.emacs")
+	  "mail.misc"))
+@end example
+
+You can combine this with traditional filtering.  Here, we move all
+HTML-only mails into the @samp{mail.spam.filtered} group.  Note that since
+@code{spam-stat-split-fancy} will never see them, the mails in
+@samp{mail.spam.filtered} should be neither in your collection of spam mails,
+nor in your collection of non-spam mails, when creating the
+dictionary!
+
+@example
+(setq nnmail-split-fancy
+      `(| ("Content-Type" "text/html" "mail.spam.filtered")
+	  (: spam-stat-split-fancy)
+          ("Subject" "\\bspam-stat\\b" "mail.emacs")
+	  "mail.misc"))
+@end example
+
+
+@node Low-level interface to the spam-stat dictionary
+@subsubsection Low-level interface to the spam-stat dictionary
+
+The main interface to using @code{spam-stat}, are the following functions:
+
+@defun spam-stat-buffer-is-spam
+called in a buffer, that buffer is considered to be a new spam mail;
+use this for new mail that has not been processed before
+
+@end defun
+
+@defun spam-stat-buffer-is-no-spam
+called in a buffer, that buffer is considered to be a new non-spam
+mail; use this for new mail that has not been processed before
+
+@end defun
+
+@defun spam-stat-buffer-change-to-spam
+called in a buffer, that buffer is no longer considered to be normal
+mail but spam; use this to change the status of a mail that has
+already been processed as non-spam
+
+@end defun
+
+@defun spam-stat-buffer-change-to-non-spam
+called in a buffer, that buffer is no longer considered to be spam but
+normal mail; use this to change the status of a mail that has already
+been processed as spam
+
+@end defun
+
+@defun spam-stat-save
+save the hash table to the file; the filename used is stored in the
+variable @code{spam-stat-file}
+
+@end defun
+
+@defun spam-stat-load
+load the hash table from a file; the filename used is stored in the
+variable @code{spam-stat-file}
+
+@end defun
+
+@defun spam-stat-score-word
+return the spam score for a word
+
+@end defun
+
+@defun spam-stat-score-buffer
+return the spam score for a buffer
+
+@end defun
+
+@defun spam-stat-split-fancy
+for fancy mail splitting; add the rule @samp{(: spam-stat-split-fancy)} to
+@code{nnmail-split-fancy}
+
+This requires the following in your @file{~/.gnus} file:
+
+@example
+(require 'spam-stat)
+(spam-stat-load)
+@end example
+
+@end defun
+
+Typical test will involve calls to the following functions:
+
+@example
+Reset: (setq spam-stat (make-hash-table :test 'equal))
+Learn spam: (spam-stat-process-spam-directory "~/Mail/mail/spam")
+Learn non-spam: (spam-stat-process-non-spam-directory "~/Mail/mail/misc")
+Save table: (spam-stat-save)
+File size: (nth 7 (file-attributes spam-stat-file))
+Number of words: (hash-table-count spam-stat)
+Test spam: (spam-stat-test-directory "~/Mail/mail/spam")
+Test non-spam: (spam-stat-test-directory "~/Mail/mail/misc")
+Reduce table size: (spam-stat-reduce-size)
+Save table: (spam-stat-save)
+File size: (nth 7 (file-attributes spam-stat-file))
+Number of words: (hash-table-count spam-stat)
+Test spam: (spam-stat-test-directory "~/Mail/mail/spam")
+Test non-spam: (spam-stat-test-directory "~/Mail/mail/misc")
+@end example
+
+Here is how you would create your dictionary:
+
+@example
+Reset: (setq spam-stat (make-hash-table :test 'equal))
+Learn spam: (spam-stat-process-spam-directory "~/Mail/mail/spam")
+Learn non-spam: (spam-stat-process-non-spam-directory "~/Mail/mail/misc")
+Repeat for any other non-spam group you need...
+Reduce table size: (spam-stat-reduce-size)
+Save table: (spam-stat-save)
+@end example
 
 @node Various Various
 @section Various Various
@@ -21089,7 +22036,8 @@ XEmacs is distributed as a collection of packages.  You should install
 whatever packages the Gnus XEmacs package requires.  The current
 requirements are @samp{gnus}, @samp{w3}, @samp{mh-e},
 @samp{mailcrypt}, @samp{rmail}, @samp{eterm}, @samp{mail-lib},
-@samp{xemacs-base}, and @samp{fsf-compat}.
+@samp{xemacs-base}, and @samp{fsf-compat}.  The @samp{misc-games}
+package is required for Morse decoding.
 
 
 @node History
@@ -21340,7 +22288,7 @@ format.  Gnus supports both encoding (signing and encryption) and
 decoding (verification and decryption).
 
 @item PGP/MIME - RFC 2015/3156
-RFC 2015 (superceded by 3156 which references RFC 2440 instead of RFC
+RFC 2015 (superseded by 3156 which references RFC 2440 instead of RFC
 1991) describes the @sc{mime}-wrapping around the RF 1991/2440 format.
 Gnus supports both encoding and decoding.
 
@@ -22593,9 +23541,31 @@ are reading.
 
 @item back end
 @cindex back end
-Gnus gets fed articles from a number of back ends, both news and mail
-back ends.  Gnus does not handle the underlying media, so to speak---this
-is all done by the back ends.
+Gnus considers mail and news to be mostly the same, really.  The only
+difference is how to access the actual articles.  News articles are
+commonly fetched via the protocol NNTP, whereas mail messages could be
+read from a file on the local disk.  The internal architecture of Gnus
+thus comprises a `front end' and a number of `back ends'.  Internally,
+when you enter a group (by hitting @key{RET}, say), you thereby invoke
+a function in the front end in Gnus.  The front end then `talks' to a
+back end and says things like ``Give me the list of articles in the foo
+group'' or ``Show me article number 4711''.
+
+So a back end mainly defines either a protocol (the @code{nntp} back end
+accesses news via NNTP, the @code{nnimap} back end accesses mail via
+IMAP) or a file format and directory layout (the @code{nnspool} back end
+accesses news via the common `spool directory' format, the @code{nnml}
+back end access mail via a file format and directory layout that's
+quite similar).
+
+Gnus does not handle the underlying media, so to speak---this is all
+done by the back ends.  A back end is a collection of functions to
+access the articles.
+
+However, sometimes the term `back end' is also used where `server'
+would have been more appropriate.  And then there is the term `select
+method' which can mean either.  The Gnus terminology can be quite
+confusing.
 
 @item native
 @cindex native
@@ -22954,6 +23924,44 @@ the bug report.
 If you would like to contribute a patch to fix bugs or make
 improvements, please produce the patch using @samp{diff -u}.
 
+@cindex edebug
+If you want to debug your problem further before reporting, possibly
+in order to solve the problem yourself and send a patch, you can use
+edebug.  Debugging lisp code is documented in the Elisp manual
+(@pxref{Debugging, , Debugging Lisp Programs, elisp, The GNU Emacs
+Lisp Reference Manual}).  To get you started with edebug, consider if
+you discover some weird behaviour when pressing @kbd{c}, the first
+step is to do @kbd{C-h k c} and click on the hyperlink (Emacs only) in
+the documentation buffer that leads you to the function definition,
+then press @kbd{M-x edebug-defun RET} with point inside that function,
+return to Gnus and press @kbd{c} to invoke the code.  You will be
+placed in the lisp buffer and can single step using @kbd{SPC} and
+evaluate expressions using @kbd{M-:} or inspect variables using
+@kbd{C-h v}, abort execution with @kbd{q}, and resume execution with
+@kbd{c} or @kbd{g}.
+
+@cindex elp
+@cindex profile
+@cindex slow
+Sometimes, a problem do not directly generate a elisp error but
+manifests itself by causing Gnus to be very slow.  In these cases, you
+can use @kbd{M-x toggle-debug-on-quit} and press C-j when things are
+slow, and then try to analyze the backtrace (repeating the procedure
+helps isolating the real problem areas).  A fancier approach is to use
+the elisp profiler, ELP.  The profiler is (or should be) fully
+documented elsewhere, but to get you started there are a few steps
+that need to be followed.  First, instrument the part of Gnus you are
+interested in for profiling, e.g. @kbd{M-x elp-instrument-package RET
+gnus} or @kbd{M-x elp-instrument-packagre RET message}.  Then perform
+the operation that is slow and press @kbd{M-x elp-results}.  You will
+then see which operations that takes time, and can debug them further.
+If the entire operation takes much longer than the time spent in the
+slowest function in the profiler output, you probably profiled the
+wrong part of Gnus.  To reset profiling statistics, use @kbd{M-x
+elp-reset-all}.  @kbd{M-x elp-restore-all} is supposed to remove
+profiling, but given the complexities and dynamic code generation in
+Gnus, it might not always work perfectly.
+
 If you just need help, you are better off asking on
 @samp{gnu.emacs.gnus}.  I'm not very helpful.
 
@@ -23182,6 +24190,10 @@ if there are holes in the article numbering sequence.  However, due to
 the `no-reuse' restriction, holes cannot be avoided altogether.  It's
 also useful for the article numbers to start at 1 to avoid running out
 of numbers as long as possible.
+
+Note that by convention, backends are named @code{nnsomething}, but
+Gnus also comes with some @code{nnnotbackends}, such as
+@file{nnheader.el}, @file{nnmail.el} and @file{nnoo.el}.
 
 In the examples and definitions I will refer to the imaginary back end
 @code{nnchoke}.
@@ -23449,7 +24461,7 @@ A Gnus group info (@pxref{Group Info}) is handed to the back end for
 alterations.  This comes in handy if the back end really carries all the
 information (as is the case with virtual and imap groups).  This
 function should destructively alter the info to suit its needs, and
-should return the (altered) group info.
+should return a non-nil value.
 
 There should be no result data from this function.
 

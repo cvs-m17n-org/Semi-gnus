@@ -1,6 +1,6 @@
 ;;; gnus-vers.el --- Declare gnus version
 
-;; Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Keiichi Suzuki <keiichi@nanap.org>
 ;;         Katsumi Yamaoka <yamaoka@jpl.org>
@@ -34,16 +34,16 @@
 (require 'product)
 (provide 'gnus-vers)
 
-(defconst gnus-revision-number "02"
+(defconst gnus-revision-number "00"
   "Revision number for this version of gnus.")
 
 ;; Product information of this gnus.
 (product-provide 'gnus-vers
   (product-define "T-gnus" nil
-		  (list 6 15 7
+		  (list 6 15 10
 			(string-to-number gnus-revision-number))))
 
-(defconst gnus-original-version-number "0.07"
+(defconst gnus-original-version-number "0.10"
   "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)
@@ -62,7 +62,7 @@
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "%s %s r%s (based on %s v%s ; for SEMI 1.14, FLIM 1.14)"
+  (format "%s %s r%s (based on %s v%s ; for SEMI 1.14 FLIM 1.14)"
 	  gnus-product-name gnus-version-number gnus-revision-number
 	  gnus-original-product-name gnus-original-version-number)
   "Version string for this version of gnus.")

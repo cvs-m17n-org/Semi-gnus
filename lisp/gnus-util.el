@@ -377,15 +377,22 @@
     ((gnus-seconds-year) . "%b %d")
     (t . "%b %d '%y"))                      ;;this one is used when no
 					    ;;other does match
-  "Alist of time in seconds and format specification used to display dates not older.
-The first element must be a number or a function returning a
-number. The second element is a format-specification as described in
-the documentation for format-time-string.  The list must be ordered
-smallest number up. When there is an element, which is not a number,
-the corresponding format-specification will be used, disregarding any
-following elements.  You can use the functions gnus-seconds-today,
-gnus-seconds-month, gnus-seconds-year which will return the number of
-seconds which passed today/this month/this year.")
+  "Specifies date format depending on age of article.
+This is an alist of items (AGE . FORMAT).  AGE can be a number (of
+seconds) or a Lisp expression evaluating to a number.  When the age of
+the article is less than this number, then use `format-time-string'
+with the corresponding FORMAT for displaying the date of the article.
+If AGE is not a number or a Lisp expression evaluating to a
+non-number, then the corresponding FORMAT is used as a default value.
+
+Note that the list is processed from the beginning, so it should be
+sorted by ascending AGE.  Also note that items following the first
+non-number AGE will be ignored.
+
+You can use the functions `gnus-seconds-today', `gnus-seconds-month'
+and `gnus-seconds-year' in the AGE spec.  They return the number of
+seconds passed since the start of today, of this month, of this year,
+respectively.")
 
 (defun gnus-user-date (messy-date)
   "Format the messy-date acording to gnus-user-date-format-alist.
@@ -550,9 +557,9 @@ If N, return the Nth ancestor instead."
 	  (set-window-hscroll (gnus-get-buffer-window (current-buffer) t) 0))
 	max))))
 
-(defun gnus-read-event-char ()
+(defun gnus-read-event-char (&optional prompt)
   "Get the next event."
-  (let ((event (read-event)))
+  (let ((event (read-event prompt)))
     ;; should be gnus-characterp, but this can't be called in XEmacs anyway
     (cons (and (numberp event) event) event)))
 
@@ -761,7 +768,7 @@ non-locally exits.  The variables listed in PROTECT are updated atomically.
 It is safe to use gnus-atomic-progn-assign with long computations.
 
 Note that if any of the symbols in PROTECT were unbound, they will be
-set to nil on a sucessful assignment.  In case of an error or other
+set to nil on a successful assignment.  In case of an error or other
 non-local exit, it will still be unbound."
   (let* ((temp-sym-map (mapcar (lambda (x) (list (make-symbol
 						  (concat (symbol-name x)
@@ -1310,6 +1317,52 @@ CHOICE is a list of the choice char and help message at IDX."
     (if (buffer-live-p buf)
 	(kill-buffer buf))
     tchar))
+
+(defun gnus-select-frame-set-input-focus (frame)
+  "Select FRAME, raise it, and set input focus, if possible."
+  (cond ((featurep 'xemacs)
+	 (raise-frame frame)
+	 (select-frame frame)
+	 (focus-frame frame))
+	;; The function `select-frame-set-input-focus' won't set
+	;; the input focus under Emacs 21.2 and X window system.
+	;;((fboundp 'select-frame-set-input-focus)
+	;; (defalias 'gnus-select-frame-set-input-focus
+	;;   'select-frame-set-input-focus)
+	;; (select-frame-set-input-focus frame))
+	(t
+	 (raise-frame frame)
+	 (select-frame frame)
+	 (cond ((and (eq window-system 'x)
+		     (fboundp 'x-focus-frame))
+		(x-focus-frame frame))
+	       ((eq window-system 'w32)
+		(w32-focus-frame frame)))
+	 (when (or (not (boundp 'focus-follows-mouse))
+		   (symbol-value 'focus-follows-mouse))
+	   (set-mouse-position frame (1- (frame-width frame)) 0)))))
+
+(unless (fboundp 'frame-parameter)
+  (defalias 'frame-parameter
+    (lambda (frame parameter)
+      "Return FRAME's value for parameter PARAMETER.
+If FRAME is nil, describe the currently selected frame."
+      (cdr (assq parameter (frame-parameters frame))))))
+
+(defun gnus-frame-or-window-display-name (object)
+  "Given a frame or window, return the associated display name.
+Return nil otherwise."
+  (if (featurep 'xemacs)
+      (device-connection (dfw-device object))
+    (if (or (framep object)
+	    (and (windowp object)
+		 (setq object (window-frame object))))
+	(let ((display (frame-parameter object 'display)))
+	  (if (and (stringp display)
+		   ;; Exclude invalid display names.
+		   (string-match "\\`[^:]*:[0-9]+\\(\\.[0-9]+\\)?\\'"
+				 display))
+	      display)))))
 
 (provide 'gnus-util)
 

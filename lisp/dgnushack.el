@@ -545,6 +545,12 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
   "Print name of files which will be installed."
   (princ (mapconcat 'identity dgnushack-exporting-files " ")))
 
+(defconst dgnushack-dont-compile-files
+  '("mm-bodies.el" "mm-decode.el" "mm-encode.el" "mm-extern.el"
+    "mm-partial.el" "mm-url.el" "mm-uu.el" "mm-view.el" "mml-sec.el"
+    "mml-smime.el" "mml.el" "mml1991.el" "mml2015.el")
+  "Files which should not be byte-compiled.")
+
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
   (unless warn
@@ -570,20 +576,22 @@ Modify to suit your needs."))
 	       (file-newer-than-file-p file elc))
       (delete-file elc)))
 
+  ;; Avoid barfing (from gnus-xmas) because the etc directory is not yet
+  ;; installed.
+  (when (featurep 'xemacs)
+    (setq gnus-xmas-glyph-directory "dummy"))
+
   (let ((files dgnushack-exporting-files)
 	;;(byte-compile-generate-call-tree t)
 	file elc)
-    ;; Avoid barfing (from gnus-xmas) because the etc directory is not yet
-    ;; installed.
-    (when (featurep 'xemacs)
-      (setq gnus-xmas-glyph-directory "dummy"))
     (while (setq file (pop files))
-      (setq file (expand-file-name file srcdir))
-      (when (or (not (file-exists-p
-		      (setq elc (concat (file-name-nondirectory file) "c"))))
-		(file-newer-than-file-p file elc))
-	(ignore-errors
-	  (byte-compile-file file))))))
+      (unless (member file dgnushack-dont-compile-files)
+	(setq file (expand-file-name file srcdir))
+	(when (or (not (file-exists-p
+			(setq elc (concat (file-name-nondirectory file) "c"))))
+		  (file-newer-than-file-p file elc))
+	  (ignore-errors
+	    (byte-compile-file file)))))))
 
 (defun dgnushack-recompile ()
   (require 'gnus)

@@ -56,7 +56,7 @@
   :group 'nnmail)
 
 (defgroup nnmail-split nil
-  "Organizing the incomming mail in folders."
+  "Organizing the incoming mail in folders."
   :group 'nnmail)
 
 (defgroup nnmail-files nil
@@ -116,17 +116,16 @@ If nil, the first match found will be used."
   :type 'boolean)
 
 (defcustom nnmail-split-fancy-with-parent-ignore-groups nil
-  "Regexp that matches group names to be ignored when applying
-`nnmail-split-fancy-with-parent'.  This can also be a list of regexps."
+  "Regexp that matches group names to be ignored when applying `nnmail-split-fancy-with-parent'.
+This can also be a list of regexps."
   :group 'nnmail-split
   :type '(choice (const :tag "none" nil)
 		 (regexp :value ".*")
 		 (repeat :value (".*") regexp)))
 
 (defcustom nnmail-cache-ignore-groups nil
-  "Regexp that matches group names to be ignored when inserting message
-ids into the cache (`nnmail-cache-insert').  This can also be a list
-of regexps."
+  "Regexp that matches group names to be ignored when inserting message ids into the cache (`nnmail-cache-insert').
+This can also be a list of regexps."
   :group 'nnmail-split
   :type '(choice (const :tag "none" nil)
 		 (regexp :value ".*")
@@ -833,7 +832,7 @@ If SOURCE is a directory spec, try to return the group name component."
 	(setq head-end (point))
 	;; We try the Content-Length value.  The idea: skip over the header
 	;; separator, then check what happens content-length bytes into the
-	;; message body.  This should be either the end ot the buffer, the
+	;; message body.  This should be either the end of the buffer, the
 	;; message separator or a blank line followed by the separator.
 	;; The blank line should probably be deleted.  If neither of the
 	;; three is met, the content-length header is probably invalid.
@@ -1227,7 +1226,7 @@ to actually put the message in the right group."
 
 (defun nnmail-split-fancy ()
   "Fancy splitting method.
-See the documentation for the variable `nnmail-split-fancy' for documentation."
+See the documentation for the variable `nnmail-split-fancy' for details."
   (let ((syntab (syntax-table)))
     (unwind-protect
 	(progn
@@ -1272,6 +1271,8 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 
      ;; Builtin : operation.
      ((eq (car split) ':)
+      (when nnmail-split-tracing
+	(push split nnmail-split-trace))
       (nnmail-split-it (save-excursion (eval (cdr split)))))
 
      ;; Builtin ! operation.
@@ -1518,7 +1519,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
       (when (search-backward id nil t)
 	(beginning-of-line)
 	(skip-chars-forward "^\n\r\t")
-	(unless (eolp)
+	(unless (looking-at "[\r\n]")
 	  (forward-char 1)
 	  (buffer-substring (point)
 			    (progn (end-of-line) (point))))))))
@@ -1551,7 +1552,7 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 	(nnmail-cache-open))
       (mapcar (lambda (x)
 		(setq res (or (nnmail-cache-fetch-group x) res))
-		(when (or (string= "drafts" res)
+		(when (or (member res '("delayed" "drafts" "queue"))
 			  (and regexp res (string-match regexp res)))
 		  (setq res nil)))
 	      references)
@@ -1748,7 +1749,9 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
     (when (nnheader-functionp target)
       (setq target (funcall target group)))
     (unless (eq target 'delete)
-      (gnus-request-accept-article target nil nil t))))
+      (let ((group-art (gnus-request-accept-article target nil nil t)))
+	(when (consp group-art)
+	  (gnus-group-mark-article-read target (cdr group-art)))))))
 
 (defun nnmail-fancy-expiry-target (group)
   "Returns a target expiry group determined by `nnmail-fancy-expiry-targets'."
