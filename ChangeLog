@@ -1,5 +1,19 @@
 1998-11-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus-msg.el (gnus-summary-resend-bounced-mail): Bind
+	`gnus-message-setup-hook' to minimum setting.
+
+	* lisp/message.el (message-bounce-setup-for-mime-edit): New
+	function.
+	(message-bounce-setup-function): New user option. Use
+	`message-bounce-setup-for-mime-edit' in default.
+	(message-bounce): Call `message-bounce-setup-function' if it is
+	non-nil.
+	(message-bounce-setup-hook): New user option.
+	(message-send-mail): Delete useless things.
+
+1998-11-12  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/message.el (message-maybe-split-and-send-mail): New function.
 	(message-send-mail): Use it.
 	(message-maybe-split-and-send-news): New function.
