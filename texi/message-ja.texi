@@ -337,8 +337,8 @@ Message はフォローアップがどこに行くかを普通の方法を使って決定しますが、
 @node Header Commands
 @section ヘッダー命令
 
-これらの全ての命令は当のヘッダーに移動します。もしそれが存在しないと、そ
-れは挿入されます。
+これらの全ての命令は当のヘッダーに移動します (@samp{Importance:} 系のコ
+マンドは例外)。もしそれが存在しないと、それは挿入されます。
 
 @table @kbd
 
@@ -401,6 +401,26 @@ Message はフォローアップがどこに行くかを普通の方法を使って決定しますが、
 @kindex C-c C-f C-u
 @findex message-goto-summary
 @code{Summary} ヘッダーに行きます (@code{message-goto-summary})。
+
+@item C-c C-f C-i
+@kindex C-c C-f C-i
+@findex message-insert-or-toggle-importance
+値 @samp{high} を持つ @samp{Importance:} ヘッダーを挿入します。このヘッ
+ダーは受信者にそのメッセージの重要性を知らせるために使われるものです。も
+しバッファにすでにこのヘッダーがある場合は、RFC 1376 に準じた三つの
+値 @samp{low}、@samp{normal} および @samp{high} を循環させます。
+
+@item M-x message-insert-importance-high
+@kindex M-x message-insert-importance-high
+@findex message-insert-importance-high
+値 @samp{high} を持つ @samp{Importance:} ヘッダーを挿入します。必要な
+ら (すでにある) ヘッダーを消去してから。
+
+@item M-x message-insert-importance-low
+@kindex M-x message-insert-importance-low
+@findex message-insert-importance-low
+値 @samp{low} を持つ @samp{Importance:} ヘッダーを挿入します。必要な
+ら (すでにある) ヘッダーを消去してから。
 @end table
 
 @node Movement
@@ -461,26 +481,6 @@ message buffer (@code{message-yank-buffer}).
 @kindex C-c M-h
 @findex message-insert-headers
 メッセージのヘッダーを挿入します (@code{message-insert-headers})。
-
-@item C-c C-u
-@kindex C-c C-u
-@findex message-insert-or-toggle-importance
-値 @samp{high} を持つ @samp{Importance:} ヘッダーを挿入します。このヘッ
-ダーは受信者にそのメッセージの重要性を知らせるために使われるものです。も
-しバッファにすでにこのヘッダーがある場合は、RFC 1376 に準じた三つの
-値 @samp{low}、@samp{normal} および @samp{high} を循環させます。
-
-@item M-x message-insert-importance-high
-@kindex M-x message-insert-importance-high
-@findex message-insert-importance-high
-値 @samp{high} を持つ @samp{Importance:} ヘッダーを挿入します。必要な
-ら (すでにある) ヘッダーを消去してから。
-
-@item M-x message-insert-importance-low
-@kindex M-x message-insert-importance-low
-@findex message-insert-importance-low
-値 @samp{low} を持つ @samp{Importance:} ヘッダーを挿入します。必要な
-ら (すでにある) ヘッダーを消去してから。
 @end table
 
 @c FIXTGNUS We should provide MIME manual.
