@@ -65,6 +65,13 @@
 ;; In group buffer or in summary buffer, type C-c C-n query RET.
 
 
+;;; Important Notice:
+
+;; This package does not update index files of Namazu.  So, it is
+;; necessary to run `mknmz' periodically in order to update them for
+;; incoming mails and articles.
+
+
 ;;; Code:
 
 (eval-when-compile (require 'cl))
@@ -80,9 +87,7 @@
 ;; To suppress byte-compile warning.
 (eval-when-compile
   (defvar nnml-directory)
-  (defvar nnml-group-alist)
-  (defvar nnmh-directory)
-  (defvar nnmh-group-alist))
+  (defvar nnmh-directory))
 
 
 (defgroup gnus-namazu nil
@@ -206,16 +211,6 @@ options make any sense in this context."
 	   (push (cons gnus-namazu/group-name-regexp
 		       gnus-namazu-coding-system)
 		 gnus-group-name-charset-group-alist)))))
-
-(defun gnus-namazu/request-list (server)
-  "Return groups of the server SERVER."
-  (and (memq (car server) '(nnml nnmh))
-       (nnoo-change-server (car server) (nth 1 server) (nthcdr 2 server))
-       (gnus-request-list server)
-       (mapcar (function car)
-	       (if (eq 'nnml (car server))
-		   nnml-group-alist
-		 nnmh-group-alist))))
 
 (defun gnus-namazu/server-directory (server)
   "Return the top directory of the server SERVER."
@@ -421,6 +416,15 @@ generate possible group names from it."
 		  (mail-header-from
 		   (gnus-summary-article-header))))))))
 
+(defun gnus-namazu/get-current-to ()
+  (and gnus-namazu/read-query-original-buffer
+       (bufferp gnus-namazu/read-query-original-buffer)
+       (with-current-buffer gnus-namazu/read-query-original-buffer
+	 (when (eq major-mode 'gnus-summary-mode)
+	   (cadr (mail-extract-address-components
+		  (cdr (assq 'To (mail-header-extra
+				  (gnus-summary-article-header))))))))))
+
 (defmacro gnus-namazu/minibuffer-prompt-end ()
   (if (fboundp 'minibuffer-prompt-end)
       '(minibuffer-prompt-end)
@@ -488,6 +492,13 @@ generate possible group names from it."
 	(when f
 	  (goto-char pos)
 	  (insert "\"" f "\"")
+	  (setq pos (point)))))
+     ((and (looking-at "\\+to:")
+	   (= pos (match-end 0)))
+      (let ((to (gnus-namazu/get-current-to)))
+	(when to
+	  (goto-char pos)
+	  (insert "\"" to "\"")
 	  (setq pos (point))))))
     (goto-char pos)))
 

@@ -1,3 +1,9 @@
+2002-07-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/request-list): Removed.
+	(gnus-namazu/get-current-to): New function.
+	(gnus-namazu/complete-query): Call the above.
+
 2002-07-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/pop3.el: Don't autoload "ssl".
