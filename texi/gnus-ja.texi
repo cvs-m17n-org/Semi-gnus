@@ -9874,9 +9874,10 @@ Gnus $(B$,$I$l$+$N%5!<%P!<$+$i@\B35qH]$r<u$1$?$+$I$&$+$NA4$F$N0u$r>C5n$7$^(B
 @item
 $(B$=$l$>$l$N9T$OG$0U$N?t$N(B $(B6h@Z$j0u(B/$(BCM(B $(B$NBP$r4^$`;v$,$G$-$^$9!#M-8z$J6h@Z(B
 $(B$j0u$O(B @samp{machine}$(B!"(B@samp{login}$(B!"(B@samp{password}$(B!"(B@samp{default}$(B!"(B
-@samp{force} $(B$G$9!#(B($(B:G8e$N$b$N$OM-8z$J(B @code{.netrc}/@code{ftp} $(B$N6h@Z$j(B
-$(B0u$G$O$"$j$^$;$s!#$3$l$,%U%!%$%k(B @file{.authinfo} $(B$,(B @file{.netrc} $(B%U%!(B
-$(B%$%kMM<0$+$i0o$l$kM#0l$NJ}K!$G$9!#(B)
+@samp{port}$(B!"(B@samp{force} $(B$G$9!#(B
+($(B:G8e$N$b$N$OM-8z$J(B @code{.netrc}/@code{ftp} $(B$N6h@Z$j0u$G$O$"$j$^$;$s!#(B
+$(B$3$l$,%U%!%$%k(B @file{.authinfo} $(B$,(B @file{.netrc} $(B%U%!%$%kMM<0$+$i0o$l$k(B
+$(B$[$H$s$IM#0l$NJ}K!$G$9!#(B)
 
 @end enumerate
 
@@ -20404,6 +20405,12 @@ When I type W W c (gnus-article-hide-citation) in the summary
 buffer, the citations are revealed, but the [+] buttons don't turn
 into [-] buttons.  (If I click on one of the [+] buttons, it does
 turn into a [-] button.)
+
+@item
+Perhaps there should be a command to "attach" a buffer of comments to
+a message?  That is, `B WHATEVER', you're popped into a buffer, write
+something, end with `C-c C-c', and then the thing you've written gets
+to be the child of the message you're commenting.
 
 @item
 Solve the halting problem.
