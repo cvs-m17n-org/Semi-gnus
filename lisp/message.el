@@ -350,7 +350,7 @@ value may go against RFC-1036 and draft-ietf-usefor-article-05.txt. "
   :type 'string
   :group 'message-various)
 
-(defcustom message-interactive nil
+(defcustom message-interactive t
   "Non-nil means when sending a message wait for and display errors.
 nil means let mailer mail back a message to report errors."
   :group 'message-sending
@@ -3505,7 +3505,7 @@ This sub function is for exclusive use of `message-send-mail'."
 				(list resend-to-addresses)
 			      '("-t")))))))
       (unless (or (null cpr) (zerop cpr))
-	(error "Sending...failed: %s" cpr)))
+	(error "Sending...failed with exit value %d" cpr)))
     (when message-interactive
       (save-excursion
 	(set-buffer errbuf)
