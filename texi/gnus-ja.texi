@@ -13181,18 +13181,19 @@ UNDELETED} はおそらくたいていの人には最良の選択でしょうが、ときど
 @lisp
 (defun split-on-body ()
   (save-excursion
-    (widen)
-    (goto-char (point-min))
-    (when (re-search-forward "Some.*string" nil t)
-      "string.group")))
+    (save-restriction
+      (widen)
+      (goto-char (point-min))
+      (when (re-search-forward "Some.*string" nil t)
+        "string.group"))))
 @end lisp
 
 @var{function} が走らされるとき、バッファはメッセージの部分に狭められま
-す。それが、上記の例で @code{save-excursion} の後で @code{(widen)} が呼
-ばれる必要がある理由です。さらに nnimap バックエンドの場合、ディフォルト
-では記事のボディがダウンロードされないことに注意して下さい。それをするた
-めには、@code{nnimap-split-download-body} を t に設定する必要がありま
-す (@pxref{Splitting in IMAP})。
+す。それが上記の例で @code{save-excursion} と @code{save-restriction} の
+後で @code{(widen)} が呼ばれる必要がある理由です。さらに nnimap バックエ
+ンドの場合、ディフォルトでは記事のボディがダウンロードされないことに注意
+して下さい。それをするためには @code{nnimap-split-download-body} を t に
+設定する必要があります (@pxref{Splitting in IMAP})。
 
 @item (! @var{func} @var{split})
 分割がリストで、最初の要素が @code{!} であると @var{split} が実行され、
