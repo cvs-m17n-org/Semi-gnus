@@ -3295,7 +3295,9 @@ forbidden in URL encoding."
 
 (defun gnus-following-method (buf)
   (set-buffer buf)
-  (message-followup)
+  (if (std11-field-body "Newsgroup")
+      (message-followup)
+    (message-wide-reply))
   (message-yank-original)
   (kill-buffer buf)
   (goto-char (point-min))
