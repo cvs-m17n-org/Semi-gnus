@@ -75,7 +75,7 @@
 				  (const on)
 				  (const off)))
 		    (list :inline t :format "%v"
-			  (const :format "" encapsulate-article)
+			  (const :format "" encapsulate-images)
 			  (choice :tag "Encapsulate article"
 				  :value on
 				  (const on)
@@ -100,7 +100,7 @@
 ;; The group parameter `nnshimbun-group-parameters' will have a
 ;; property list like the following:
 ;;
-;; '(index-range all prefetch-articles off encapsulate-article on
+;; '(index-range all prefetch-articles off encapsulate-images on
 ;;               expiry-wait 6)
 
 (gnus-define-group-parameter
@@ -117,7 +117,7 @@ a group name regexp and a plist which consists of a keyword and a value
 pairs like the following:
 
 '(\"^nnshimbun\\\\+asahi:\" index-range all prefetch-articles off
-  encapsulate-article on expiry-wait 6)
+  encapsulate-images on expiry-wait 6)
 
 `index-range' specifies a range of header indices as described below:
       all: Retrieve all header indices.
@@ -127,7 +127,7 @@ integer N: Retrieve N pages of header indices.
 `prefetch-articles' specifies whether to pre-fetch the unread articles
 when scanning the group.
 
-`encapsulate-article' specifies whether inline images in the shimbun
+`encapsulate-images' specifies whether inline images in the shimbun
 article are encapsulated.
 
 `expiry-wait' is similar to the generic group parameter `expiry-wait',
@@ -178,11 +178,11 @@ groups.  Note that this variable has just a default value for all the
 nnshimbun groups.  You can specify the nnshimbun group parameter
 `prefecth-articles' for each nnshimbun group.")
 
-(defvoo nnshimbun-encapsulate-article shimbun-encapsulate-article
+(defvoo nnshimbun-encapsulate-images shimbun-encapsulate-images
   "*If non-nil, inline images in the shimbun article are encapsulated.
 Note that this variable has just a default value for all the nnshimbun
 groups.  You can specify the nnshimbun group parameter
-`encapsulate-article' for each nnshimbun group.")
+`encapsulate-images' for each nnshimbun group.")
 
 (defvoo nnshimbun-index-range nil
   "*Range of indices to detect new pages.  Note that this variable has
@@ -240,10 +240,10 @@ GROUP has a full name."
 				    'prefetch-articles)
 			 nnshimbun-pre-fetch-article)))
 	      (if (eq v 'off) nil v)))
-	  ((eq 'encapsulate-article (eval symbol))
+	  ((eq 'encapsulate-images (eval symbol))
 	   `(let ((v (or (plist-get (nnshimbun-find-group-parameters ,name)
-				    'encapsulate-article)
-			 nnshimbun-encapsulate-article)))
+				    'encapsulate-images)
+			 nnshimbun-encapsulate-images)))
 	      (if (eq v 'off) nil v)))
 	  ((eq 'expiry-wait (eval symbol))
 	   (if full-name-p
@@ -366,8 +366,8 @@ GROUP has a full name."
       (when header
 	(with-current-buffer (or to-buffer nntp-server-buffer)
 	  (delete-region (point-min) (point-max))
-	  (let ((shimbun-encapsulate-article
-		 (nnshimbun-find-parameter group 'encapsulate-article)))
+	  (let ((shimbun-encapsulate-images
+		 (nnshimbun-find-parameter group 'encapsulate-images)))
 	    (shimbun-article nnshimbun-shimbun header))
 	  (when (> (buffer-size) 0)
 	    ;; Kludge! replace a date string in `gnus-newsgroup-data'

@@ -1,3 +1,13 @@
+2001-06-18  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/nnshimbun.el (nnshimbun-encapsulate-images): Renamed from
+	`nnshimbun-encapsulate-article'.
+	(nnshimbun-request-article-1): Replace `encapsulate-article' with
+	`encapsulate-images'.
+	(nnshimbun-find-parameter): Ditto.
+	(nnshimbun-group-parameters): Ditto.
+	(nnshimbun-group-parameters-custom): Ditto.
+
 2001-06-15  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnshimbun.el (nnshimbun-group-parameters-custom): Add
