@@ -1,6 +1,6 @@
 ;;; gnus-namazu.el --- Search mail with Namazu -*- coding: iso-2022-7bit; -*-
 
-;; Copyright (C) 2000,2001,2002 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
+;; Copyright (C) 2000,2001,2002,2003 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 
 ;; Author: TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;; Keywords: mail searching namazu
@@ -315,115 +315,76 @@ options make any sense in this context."
 	     ,query
 	     ,@gnus-namazu-index-directories))))
 
-(defsubst gnus-namazu/group-prefixed-name (group &optional method)
-  "Return the whole name from GROUP and METHOD."
-  (setq group (gnus-group-prefixed-name group method))
-  (if gnus-namazu-case-sensitive-filesystem
-      (when (gnus-gethash group gnus-newsrc-hashtb)
-	group)
-    (let ((key (downcase group)))
-      (catch 'found-group
-	(mapatoms (lambda (sym)
-		    (when (string= key (downcase (symbol-name sym)))
-		      (throw 'found-group (symbol-name sym))))
-		  gnus-newsrc-hashtb)))))
-
-(defun gnus-namazu/real-group-name (cond group &optional method)
-  "Generate the real group name from the partial path, STR."
-  (if cond
-      (gnus-namazu/group-prefixed-name group method)
-    (gnus-namazu/decode-group-name
-     (nnheader-replace-chars-in-string group ?/ ?.)
-     method)))
-
-(defun gnus-namazu/decode-group-name (str &optional method)
-  "Decode the string STR as the partial path of the cached article."
-  (if (string-match "_\\(_\\(_\\)?\\)?" str)
-      (let ((prefix (substring str 0 (match-beginning 0)))
-	    (suffix (substring str (match-end 0))))
-	(cond
-	 ((match-beginning 2) ;; The number of discoverd underscores = 3
-	  (or
-	   (gnus-namazu/decode-group-name (concat prefix "/__" suffix) method)
-	   (gnus-namazu/decode-group-name (concat prefix ".._" suffix) method)))
-	 ((match-beginning 1) ;; The number of disucoverd underscores = 2
-	  (or
-	   (gnus-namazu/decode-group-name (concat prefix "//" suffix) method)
-	   (gnus-namazu/decode-group-name (concat prefix ".." suffix) method)))
-	 (t ;; The number of discoverd underscores = 1
-	  (gnus-namazu/decode-group-name (concat prefix "/" suffix) method))))
-    (or (and (not method)
-	     (string-match "\\." str)
-	     ;; Handle the first occurence of period.
-	     (gnus-namazu/group-prefixed-name
-	      (concat (substring str 0 (match-beginning 0))
-		      ":"
-		      (substring str (match-end 0)))))
-	(gnus-namazu/group-prefixed-name str method))))
+(defvar gnus-namazu/directory-table nil)
+(defun gnus-namazu/make-directory-table (&optional force)
+  (interactive (list t))
+  (unless (and (not force)
+	       gnus-namazu/directory-table
+	       (eq gnus-namazu-case-sensitive-filesystem
+		   (car gnus-namazu/directory-table)))
+    (let ((table (make-vector (length gnus-newsrc-hashtb) 0))
+	  cache agent alist dir method)
+      (mapatoms
+       (lambda (group)
+	 (unless (gnus-ephemeral-group-p (setq group (symbol-name group)))
+	   (when (file-directory-p
+		  (setq dir (file-name-as-directory
+			     (gnus-cache-file-name group ""))))
+	     (push (cons dir group) cache))
+	   (when (file-directory-p
+		  (setq dir (gnus-agent-group-pathname group)))
+	     (push (cons dir group) agent))
+	   (when (memq (car (setq method (gnus-find-method-for-group group)))
+		       '(nnml nnmh))
+	     (when (file-directory-p
+		    (setq dir (nnmail-group-pathname
+			       (gnus-group-short-name group)
+			       (gnus-namazu/server-directory method))))
+	       (push (cons dir group) alist)))))
+       gnus-newsrc-hashtb)
+      (dolist (pair (nconc agent cache alist))
+	(set (intern (if gnus-namazu-case-sensitive-filesystem
+			 (car pair)
+		       (downcase (car pair)))
+		     table)
+	     (cdr pair)))
+      (setq gnus-namazu/directory-table
+	    (cons gnus-namazu-case-sensitive-filesystem table)))))
 
 (defun gnus-namazu/search (groups query)
+  (gnus-namazu/make-directory-table)
   (with-temp-buffer
     (let ((exit-status (gnus-namazu/call-namazu query)))
       (unless (zerop exit-status)
-	(error "Namazu finished abnormally: %d" exit-status))
-      (let* ((articles)
-	     (server-alist
-	      (delq nil
-		    (let (dir)
-		      (mapcar
-		       (lambda (s)
-			 (when (setq dir (gnus-namazu/server-directory s))
-			   (cons (file-name-as-directory dir) s)))
-		       (gnus-namazu/indexed-servers)))))
-	     (topdir-regexp (regexp-opt (mapcar 'car server-alist)))
-	     (cache-regexp (concat
-			    (regexp-quote
-			     (file-name-as-directory
-			      (expand-file-name gnus-cache-directory)))
-			    "\\(.*\\)/\\([0-9]+\\)$"))
-	     (agent-regexp (concat
-			    (regexp-quote
-			     (file-name-as-directory
-			      (expand-file-name gnus-agent-directory)))
-			    "\\(.*\\)/\\([0-9]+\\)$")))
-	(gnus-namazu/normalize-results)
-	(goto-char (point-min))
-	(while (not (eobp))
-	  (let (server group file)
-	    (and (or
-		  ;; Check the discovered file is managed by Gnus servers.
-		  (and (looking-at topdir-regexp)
-		       (setq file (buffer-substring-no-properties
-				   (match-end 0) (gnus-point-at-eol))
-			     server (cdr (assoc (match-string-no-properties 0)
-						server-alist)))
-		       ;; Check validity of the file name.
-		       (string-match "/\\([0-9]+\\)\\'" file)
-		       (progn
-			 (setq group (substring file 0 (match-beginning 0))
-			       file (match-string 1 file))
-			 (setq group (gnus-namazu/real-group-name
-				      nnmail-use-long-file-names
-				      group server))))
-		  ;; Check the discoverd file is the persistent article.
-		  (and (looking-at cache-regexp)
-		       (setq file (match-string-no-properties 2)
-			     group (gnus-namazu/real-group-name
-				    (gnus-use-long-file-name 'not-cache)
-				    (match-string-no-properties 1))))
-		  ;; Check the discoverd file is covered by the agent.
-		  (and (looking-at agent-regexp)
-		       (setq file (match-string-no-properties 2)
-			     group (gnus-namazu/real-group-name
-				    nnmail-use-long-file-names
-				    (match-string-no-properties 1)))))
-		 (or (not groups)
-		     (member group groups))
-		 (push (gnus-namazu/make-article group (string-to-number file))
-		       articles)))
-	  (forward-line 1))
-	(nreverse articles)))))
-
+	(error "Namazu finished abnormally: %d" exit-status)))
+    (gnus-namazu/normalize-results)
+    (goto-char (point-min))
+    (let (articles group)
+      (while (not (eobp))
+	(setq group (buffer-substring-no-properties
+		     (point)
+		     (progn
+		       (end-of-line)
+		       ;; NOTE: Only numeric characters are permitted
+		       ;; as file names of articles.
+		       (skip-chars-backward "0-9")
+		       (point))))
+	(and (setq group
+		   (symbol-value
+		    (intern-soft (if gnus-namazu-case-sensitive-filesystem
+				     group
+				   (downcase group))
+				 (cdr gnus-namazu/directory-table))))
+	     (or (not groups)
+		 (member group groups))
+	     (push (gnus-namazu/make-article
+		    group
+		    (string-to-number
+		     (buffer-substring-no-properties (point)
+						     (gnus-point-at-eol))))
+		   articles))
+	(forward-line 1))
+      (nreverse articles))))
 
 ;;; User Interface:
 (defun gnus-namazu/get-target-groups ()
@@ -748,7 +709,8 @@ and make a virtual group contains its results."
 	  (gnus-namazu/mknmz-cleanup directory))
 	(message "Make index at %s...done" directory)
 	(unless force
-	  (kill-buffer (current-buffer)))))))
+	  (kill-buffer (current-buffer)))))
+    (gnus-namazu/make-directory-table t)))
 
 (defun gnus-namazu/lapse-seconds (start end)
   "Return lapse seconds from START to END.
@@ -828,15 +790,17 @@ than the period that is set to `gnus-namazu-index-update-interval'"
 	  nil)))))
 
 ;;;###autoload
-(defun gnus-namazu-update-all-indices (&optional directories force)
+(defun gnus-namazu-update-all-indices (&optional force)
   "Update all indices which is set to `gnus-namazu-index-directories'."
-  (interactive (list nil t))
+  (interactive (list t))
+  (gnus-namazu-update-indices gnus-namazu-index-directories force))
+
+(defun gnus-namazu-update-indices (&optional directories force)
   (when (setq directories
-	      (delq nil (mapcar
-			 (lambda (d) (gnus-namazu/update-p d force))
-			 (or directories gnus-namazu-index-directories))))
-    (setq gnus-namazu/update-directories (cdr directories))
-    (gnus-namazu-update-index (car directories))))
+	      (delq nil (mapcar (lambda (d) (gnus-namazu/update-p d force))
+				directories)))
+    (setq gnus-namazu/update-directories (cons force (cdr directories)))
+    (gnus-namazu-update-index (car directories) force)))
 
 (defun gnus-namazu/update-sentinel (process event)
   (let ((buffer (process-buffer process)))
@@ -856,8 +820,9 @@ than the period that is set to `gnus-namazu-index-update-interval'"
 	  (unless (or debug-on-error debug-on-quit)
 	    (kill-buffer buffer)))))))
   (setq gnus-namazu/update-process nil)
-  (when gnus-namazu/update-directories
-    (gnus-namazu-update-all-indices gnus-namazu/update-directories)))
+  (unless (gnus-namazu-update-indices (cdr gnus-namazu/update-directories)
+				      (car gnus-namazu/update-directories))
+    (gnus-namazu/make-directory-table t)))
 
 ;;;###autoload
 (defun gnus-namazu-stop-update ()

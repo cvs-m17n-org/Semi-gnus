@@ -99,6 +99,43 @@
 ;  (cons 'progn (cdr form)))
 ;(defalias 'byte-compile-file-form-defsubst 'byte-compile-file-form-defun)
 
+(when (and (not (featurep 'xemacs))
+	   (= emacs-major-version 21)
+	   (= emacs-minor-version 3)
+	   (condition-case code
+	       (let ((byte-compile-error-on-warn t))
+		 (byte-optimize-form (quote (pop x)) t)
+		 nil)
+	     (error (string-match "called for effect"
+				  (error-message-string code)))))
+  (defadvice byte-optimize-form-code-walker (around silence-warn-for-pop
+						    (form for-effect)
+						    activate)
+    "Silence the warning \"...called for effect\" for the `pop' form.
+It is effective only when the `pop' macro is defined by cl.el rather
+than subr.el."
+    (let (tmp)
+      (if (and (eq (car-safe form) 'car)
+	       for-effect
+	       (setq tmp (get 'car 'side-effect-free))
+	       (not byte-compile-delete-errors)
+	       (not (eq tmp 'error-free))
+	       (eq (car-safe (cadr form)) 'prog1)
+	       (let ((var (cadr (cadr form)))
+		     (last (nth 2 (cadr form))))
+		 (and (symbolp var)
+		      (null (nthcdr 3 (cadr form)))
+		      (eq (car-safe last) 'setq)
+		      (eq (cadr last) var)
+		      (eq (car-safe (nth 2 last)) 'cdr)
+		      (eq (cadr (nth 2 last)) var))))
+	  (progn
+	    (put 'car 'side-effect-free 'error-free)
+	    (unwind-protect
+		ad-do-it
+	      (put 'car 'side-effect-free tmp)))
+	ad-do-it))))
+
 (when (boundp 'MULE)
   (let (current-load-list)
     ;; Make the function to be silent at compile-time.
@@ -602,7 +639,9 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 	  (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
 	    '("md5.el"))
 	  (unless (boundp 'MULE)
-	    '("canlock-om.el")))
+	    '("canlock-om.el"))
+	  (when (featurep 'xemacs)
+	    '("gnus-load.el")))
   "Files which will not be installed.")
 
 (defconst dgnushack-exporting-files
@@ -617,7 +656,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
   (princ (mapconcat 'identity dgnushack-exporting-files " ")))
 
 (defconst dgnushack-dont-compile-files
-  '("mm-bodies.el" "mm-decode.el" "mm-encode.el" "mm-extern.el"
+  '("gnus-load.el"
+    "mm-bodies.el" "mm-decode.el" "mm-encode.el" "mm-extern.el"
     "mm-partial.el" "mm-url.el" "mm-uu.el" "mm-view.el" "mml-sec.el"
     "mml-smime.el" "mml.el" "mml1991.el" "mml2015.el")
   "Files which should not be byte-compiled.")
@@ -629,15 +669,11 @@ dgnushack-compile-verbosely.  All other users should continue to use
 dgnushack-compile."
   (dgnushack-compile t))
 
-(defun dgnushack-compile-verbosely ()
-  "Call dgnushack-compile with warnings ENABLED.  If you are compiling
-patches to gnus, you should consider modifying make.bat to call
-dgnushack-compile-verbosely.  All other users should continue to use
-dgnushack-compile."
-  (dgnushack-compile t))
-
 (defun dgnushack-compile (&optional warn)
   ;;(setq byte-compile-dynamic t)
+  (when (and (not (featurep 'xemacs))
+	     (< emacs-major-version 21))
+    (setq max-specpdl-size 1200))
   (unless warn
     (setq byte-compile-warnings
 	  '(free-vars unresolved callargs redefine)))
@@ -682,18 +718,33 @@ Modify to suit your needs."))
   (require 'gnus)
   (byte-recompile-directory "." 0))
 
-(defvar dgnushack-gnus-load-file (expand-file-name "gnus-load.el" srcdir))
-(defvar dgnushack-cus-load-file (expand-file-name "cus-load.el" srcdir))
-(defvar dgnushack-auto-load-file (expand-file-name "auto-autoloads.el" srcdir))
+(defvar dgnushack-gnus-load-file
+  (if (featurep 'xemacs)
+      (expand-file-name "auto-autoloads.el" srcdir)
+    (expand-file-name "gnus-load.el" srcdir)))
+
+(defvar	dgnushack-cus-load-file
+  (if (featurep 'xemacs)
+      (expand-file-name "custom-load.el" srcdir)
+    (expand-file-name "cus-load.el" srcdir)))
 
 (defun dgnushack-make-cus-load ()
   (when (condition-case nil
 	    (load "cus-dep")
-	  (error nil))
+	  (error
+	   (when (boundp 'MULE)
+	     (if (file-exists-p "../contrib/cus-dep.el")
+		 ;; Use cus-dep.el of the version of Emacs 20.7.
+		 (load-file "../contrib/cus-dep.el")
+	       (error "\
+You need contrib/cus-dep.el to build T-gnus with Mule 2.3@19.34; exiting.")))))
     (let ((cusload-base-file dgnushack-cus-load-file))
       (if (fboundp 'custom-make-dependencies)
 	  (custom-make-dependencies)
-	(Custom-make-dependencies)))))
+	(Custom-make-dependencies))
+      (when (featurep 'xemacs)
+	(message "Compiling %s..." dgnushack-cus-load-file)
+	(byte-compile-file dgnushack-cus-load-file)))))
 
 (defun dgnushack-make-auto-load ()
   (require 'autoload)
@@ -715,11 +766,8 @@ Modify to suit your needs."))
 	(make-backup-files nil)
 	(autoload-package-name "gnus"))
     (if (featurep 'xemacs)
-	(progn
-	  (if (file-exists-p generated-autoload-file)
-	      (delete-file generated-autoload-file))
-	  (if (file-exists-p dgnushack-auto-load-file)
-	      (delete-file dgnushack-auto-load-file)))
+	(if (file-exists-p generated-autoload-file)
+	    (delete-file generated-autoload-file))
       (with-temp-file generated-autoload-file
 	(insert ?\014)))
     (if (featurep 'xemacs)
@@ -738,55 +786,44 @@ Modify to suit your needs."))
       (batch-update-autoloads))))
 
 (defun dgnushack-make-load ()
-  (message "Generating %s..." dgnushack-gnus-load-file)
-  (with-temp-file dgnushack-gnus-load-file
-    (if (file-exists-p dgnushack-cus-load-file)
-	(progn
-	  (insert-file-contents dgnushack-cus-load-file)
-	  (delete-file dgnushack-cus-load-file)
-	  (goto-char (point-min))
-	  (search-forward ";;; Code:")
-	  (forward-line)
-	  (delete-region (point-min) (point))
-	  (unless (re-search-forward "\
-^[\t ]*(autoload[\t\n ]+\\('\\|(quote[\t\n ]+\\)custom-add-loads[\t\n ]"
-				     nil t)
-	    (insert "\n(autoload 'custom-add-loads \"cus-load\")\n"))
-	  (goto-char (point-min))
-	  (insert "\
+  (unless (featurep 'xemacs)
+    (message "Generating %s..." dgnushack-gnus-load-file)
+    (with-temp-file dgnushack-gnus-load-file
+      (insert-file-contents dgnushack-cus-load-file)
+      (delete-file dgnushack-cus-load-file)
+      (goto-char (point-min))
+      (search-forward ";;; Code:")
+      (forward-line)
+      (delete-region (point-min) (point))
+      (insert "\
 ;;; gnus-load.el --- automatically extracted custom dependencies and autoload
 ;;
 ;;; Code:
 ")
-	  (goto-char (point-max))
-	  (if (search-backward "custom-versions-load-alist" nil t)
-	      (forward-line -1)
-	    (forward-line -1)
-	    (while (eq (char-after) ?\;)
-	      (forward-line -1))
-	    (forward-line))
-	  (delete-region (point) (point-max))
-	  (insert "\n"))
+      (goto-char (point-max))
+      (if (search-backward "custom-versions-load-alist" nil t)
+	  (forward-line -1)
+	(forward-line -1)
+	(while (eq (char-after) ?\;)
+	  (forward-line -1))
+	(forward-line))
+      (delete-region (point) (point-max))
+      (insert "\n")
+      ;; smiley-* are duplicated. Remove them all.
+      (let ((point (point)))
+	(insert-file-contents dgnushack-gnus-load-file)
+	(goto-char point)
+	(while (search-forward "smiley-" nil t)
+	  (beginning-of-line)
+	  (if (looking-at "(autoload ")
+	      (delete-region (point) (progn (forward-sexp) (point)))
+	    (forward-line))))
+      ;;
+      (goto-char (point-max))
+      (when (search-backward "\n(provide " nil t)
+	(forward-line -1)
+	(delete-region (point) (point-max)))
       (insert "\
-;;; gnus-load.el --- automatically extracted autoload
-;;
-;;; Code:
-"))
-    ;; smiley-* are duplicated. Remove them all.
-    (let ((point (point)))
-      (insert-file-contents dgnushack-gnus-load-file)
-      (goto-char point)
-      (while (search-forward "smiley-" nil t)
-	(beginning-of-line)
-	(if (looking-at "(autoload ")
-	    (delete-region (point) (progn (forward-sexp) (point)))
-	  (forward-line))))
-    ;;
-    (goto-char (point-max))
-    (when (search-backward "\n(provide " nil t)
-      (forward-line -1)
-      (delete-region (point) (point-max)))
-    (insert "\
 
 \(provide 'gnus-load)
 
@@ -797,72 +834,22 @@ Modify to suit your needs."))
 ;;; End:
 ;;; gnus-load.el ends here
 ")
-    ;; Workaround the bug in some version of XEmacs.
-    (when (featurep 'xemacs)
-      (condition-case nil
-	  (require 'cus-load)
-	(error nil))
-      (goto-char (point-min))
-      (when (and (fboundp 'custom-add-loads)
-		 (not (search-forward "\n(autoload 'custom-add-loads " nil t)))
-	(search-forward "\n;;; Code:" nil t)
-	(forward-line 1)
-	(insert "\n(autoload 'custom-add-loads \"cus-load\")\n"))))
+      ))
   (message "Compiling %s..." dgnushack-gnus-load-file)
-  (byte-compile-file dgnushack-gnus-load-file))
-
-
-(defun dgnushack-compose-package ()
-  "Re-split the file gnus-load.el into custom-load.el and
-auto-autoloads.el.  It is silly, should be improved!"
-  (message "
-Re-splitting gnus-load.el into custom-load.el and auto-autoloads.el...")
-  (let ((customload (expand-file-name "custom-load.el" srcdir))
-	(autoloads (expand-file-name "auto-autoloads.el" srcdir))
-	start)
-    (with-temp-buffer
-      (insert-file-contents dgnushack-gnus-load-file)
-      (delete-file dgnushack-gnus-load-file)
-      (when (file-exists-p (concat dgnushack-gnus-load-file "c"))
-	(delete-file (concat dgnushack-gnus-load-file "c")))
-      (while (prog1
-		 (looking-at "[\t ;]")
-	       (forward-line 1)))
-      (setq start (point))
+  (byte-compile-file dgnushack-gnus-load-file)
+  (when (featurep 'xemacs)
+    (message "Creating dummy gnus-load.el...")
+    (with-temp-file (expand-file-name "gnus-load.el")
       (insert "\
-;;; custom-load.el --- automatically extracted custom dependencies\n
-;;; Code:\n\n")
-      (goto-char (point-max))
-      (while (progn
-	       (forward-line -1)
-	       (not (looking-at "[\t ]*(custom-add-loads[\t\n ]"))))
-      (forward-list 1)
-      (forward-line 1)
-      (insert "\n;;; custom-load.el ends here\n")
-      (write-region start (point) customload)
-      (while (looking-at "[\t ]*$")
-	(forward-line 1))
-      (setq start (point))
-      (if (re-search-forward "^[\t\n ]*(if[\t\n ]+(featurep[\t\n ]" nil t)
-	  (let ((from (goto-char (match-beginning 0))))
-	    (delete-region from (progn
-				  (forward-list 1)
-				  (forward-line 1)
-				  (point))))
-	(while (looking-at "[\t ;]")
-	  (forward-line 1)))
-      (insert "(if (featurep 'gnus-autoloads) (error \"Already loaded\"))\n")
-      (goto-char (point-max))
-      (while (progn
-	       (forward-line -1)
-	       (not (looking-at "[\t ]*(provide[\t\n ]"))))
-      (insert "(provide 'gnus-autoloads)\n")
-      (write-region start (point) autoloads))
-    (byte-compile-file customload)
-    (byte-compile-file autoloads))
-  (message "\
-Re-splitting gnus-load.el into custom-load.el and auto-autoloads.el...done
-\n"))
+
+\(provide 'gnus-load)
+
+;;; Local Variables:
+;;; version-control: never
+;;; no-byte-compile: t
+;;; no-update-autoloads: t
+;;; End:
+;;; gnus-load.el ends here"))))
 
 
 (defconst dgnushack-info-file-regexp-en

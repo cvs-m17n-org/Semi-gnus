@@ -225,6 +225,9 @@ Argument PORT specifies connecting port."
 			 (+ 1 (or (string-match ">" response) -1)))))
       process)))
 
+(eval-when-compile
+  (autoload 'open-ssl-stream "ssl"))
+
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
   (require 'ssl)
   (let* ((ssl-program-name
@@ -293,7 +296,8 @@ Return the response string if optional second argument RETURN is non-nil."
     (save-excursion
       (set-buffer (process-buffer process))
       (goto-char pop3-read-point)
-      (while (not (search-forward "\r\n" nil t))
+      (while (and (memq (process-status process) '(open run))
+		  (not (search-forward "\r\n" nil t)))
 	(nnheader-accept-process-output process)
 	(goto-char pop3-read-point))
       (setq match-end (point))

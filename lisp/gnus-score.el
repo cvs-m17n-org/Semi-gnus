@@ -239,7 +239,8 @@ This variable allows the same syntax as `gnus-home-score-file'."
 (defcustom gnus-adaptive-word-length-limit nil
   "*Words of a length lesser than this limit will be ignored when doing adaptive scoring."
   :group 'gnus-score-adapt
-  :type 'integer)
+  :type '(radio (const :format "Unlimited " nil)
+		(integer :format "Maximum length: %v\n" :size 0)))
 
 (defcustom gnus-ignored-adaptive-words nil
   "List of words to be ignored when doing adaptive word scoring."
@@ -526,7 +527,8 @@ of the last successful match.")
   "Make a score entry based on the current article.
 The user will be prompted for header to score on, match type,
 permanence, and the string to be used.  The numerical prefix will be
-used as score."
+used as score.  A symbolic prefix of `a' says to use the `all.SCORE'
+file for the command instead of the current score file."
   (interactive (gnus-interactive "P\ny"))
   (gnus-summary-increase-score (- (gnus-score-delta-default score)) symp))
 
@@ -540,7 +542,8 @@ used as score."
   "Make a score entry based on the current article.
 The user will be prompted for header to score on, match type,
 permanence, and the string to be used.  The numerical prefix will be
-used as score."
+used as score.  A symbolic prefix of `a' says to use the `all.SCORE'
+file for the command instead of the current score file."
   (interactive (gnus-interactive "P\ny"))
   (let* ((nscore (gnus-score-delta-default score))
 	 (prefix (if (< nscore 0) ?L ?I))
@@ -909,7 +912,7 @@ If optional argument `EXTRA' is non-nil, it's a non-standard overview header."
     ;; Return the new scoring rule.
     new))
 
-(defun gnus-summary-score-effect (header match type score extra)
+(defun gnus-summary-score-effect (header match type score &optional extra)
   "Simulate the effect of a score file entry.
 HEADER is the header being scored.
 MATCH is the string we are looking for.
@@ -921,8 +924,8 @@ EXTRA is the possible non-standard header."
 				      (lambda (x) (fboundp (nth 2 x)))
 				      t)
 		     (read-string "Match: ")
-		     (y-or-n-p "Use regexp match? ")
-		     (prefix-numeric-value current-prefix-arg)))
+		     (if (y-or-n-p "Use regexp match? ") 'r 's)
+		     (string-to-int (read-string "Score: "))))
   (save-excursion
     (unless (and (stringp match) (> (length match) 0))
       (error "No match"))
@@ -2952,13 +2955,19 @@ If ADAPT, return the home adaptive file instead."
 
 (defun gnus-decay-score (score)
   "Decay SCORE according to `gnus-score-decay-constant' and `gnus-score-decay-scale'."
-  (floor
-   (- score
-      (* (if (< score 0) -1 1)
-	 (min (abs score)
-	      (max gnus-score-decay-constant
-		   (* (abs score)
-		      gnus-score-decay-scale)))))))
+  (let ((n (- score
+	      (* (if (< score 0) -1 1)
+		 (min (abs score)
+		      (max gnus-score-decay-constant
+			   (* (abs score)
+			      gnus-score-decay-scale)))))))
+    (if (and (featurep 'xemacs)
+	     ;; XEmacs' floor can handle only the floating point
+	     ;; number below the half of the maximum integer.
+	     (> (abs n) (lsh -1 -2)))
+	(string-to-number
+	 (car (split-string (number-to-string n) "\\.")))
+      (floor n))))
 
 (defun gnus-decay-scores (alist day)
   "Decay non-permanent scores in ALIST."

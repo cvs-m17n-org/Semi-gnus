@@ -1130,21 +1130,17 @@ used to 899, you would say something along these lines:
   :group 'gnus-server
   :type 'file)
 
-;; This function is used to check both the environment variable
-;; NNTPSERVER and the /etc/nntpserver file to see whether one can find
-;; an nntp server name default.
 (defun gnus-getenv-nntpserver ()
+  "Find default nntp server.
+Check the NNTPSERVER environment variable and the
+`gnus-nntpserver-file' file."
   (or (getenv "NNTPSERVER")
       (and (file-readable-p gnus-nntpserver-file)
-	   (save-excursion
-	     (set-buffer (gnus-get-buffer-create " *gnus nntp*"))
+	   (with-temp-buffer
 	     (insert-file-contents gnus-nntpserver-file)
 	     (let ((name (buffer-string)))
-	       (prog1
-		   (if (string-match "\\'[ \t\n]*$" name)
-		       nil
-		     name)
-		 (kill-buffer (current-buffer))))))))
+	       (unless (string-match "\\`[ \t\n]*$" name)
+		 name))))))
 
 (defcustom gnus-select-method
   (condition-case nil
@@ -1186,7 +1182,8 @@ see the manual for details."
 This should be a mail method."
   :group 'gnus-server
   :group 'gnus-message
-  :type 'gnus-select-method)
+  :type '(choice (const :tag "Default archive method" "archive")
+		 gnus-select-method))
 
 (defcustom gnus-message-archive-group nil
   "*Name of the group in which to save the messages you've written.
@@ -1275,6 +1272,7 @@ It can also be a list of select methods, as well as the special symbol
 list, Gnus will try all the methods in the list until it finds a match."
   :group 'gnus-server
   :type '(choice (const :tag "default" nil)
+		 (const current)
 		 (const :tag "Google" (nnweb "refer" (nnweb-type google)))
 		 gnus-select-method
 		 (repeat :menu-tag "Try multiple"
@@ -1295,7 +1293,7 @@ list, Gnus will try all the methods in the list until it finds a match."
     "/ftp@rtfm.mit.edu:/pub/usenet/"
     "/ftp@ftp.uni-paderborn.de:/pub/FAQ/"
     "/ftp@ftp.sunet.se:/pub/usenet/"
-    "/ftp@nctuccca.edu.tw:/USENET/FAQ/"
+    "/ftp@nctuccca.nctu.edu.tw:/pub/Documents/rtfm/usenet-by-group/"
     "/ftp@hwarang.postech.ac.kr:/pub/usenet/"
     "/ftp@ftp.hk.super.net:/mirror/faqs/")
   "*Directory where the group FAQs are stored.
@@ -1319,7 +1317,7 @@ If the default site is too slow, try one of these:
 		  src.doc.ic.ac.uk		 /usenet/news-FAQS
 		  ftp.sunet.se			 /pub/usenet
 		  ftp.pasteur.fr		 /pub/FAQ
-   Asia:	  nctuccca.edu.tw		 /USENET/FAQ
+   Asia:	  nctuccca.nctu.edu.tw		 /pub/Documents/rtfm/usenet-by-group/
 		  hwarang.postech.ac.kr		 /pub/usenet
 		  ftp.hk.super.net		 /mirror/faqs"
   :group 'gnus-group-various
@@ -1332,22 +1330,21 @@ If the default site is too slow, try one of these:
     ("dk" . (concat "http://www.usenet.dk/grupper.pl?get=" name))
     ("england" . (concat "http://england.news-admin.org/charters/" name))
     ("fr" . (concat "http://www.usenet-fr.net/fur/chartes/" name ".html"))
-    ("europa" . (concat "http://www.europa.usenet.eu.org/chartas/charta-en-" 
+    ("europa" . (concat "http://www.europa.usenet.eu.org/chartas/charta-en-"
 			(gnus-replace-in-string name "europa\\." "") ".html"))
     ("nl" . (concat "http://www.xs4all.nl/~sister/usenet/charters/" name))
-    ("aus" . (concat "http://aus.news-admin.org/groupinfo.php/" name))
+    ("aus" . (concat "http://aus.news-admin.org/groupinfo.cgi/" name))
     ("pl" . (concat "http://www.usenet.pl/opisy/" name))
     ("ch" . (concat "http://www.use-net.ch/Usenet/charter.html#" name))
     ("at" . (concat "http://www.usenet.at/chartas/" name "/charta"))
     ("uk" . (concat "http://www.usenet.org.uk/" name ".html"))
-    ("wales" . (concat "http://www.wales-usenet.org/english/groups/" name ".html"))
     ("dfw" . (concat "http://www.cirr.com/dfw/charters/" name ".html"))
-    ("se" . (concat "http://www.usenet-se.net/Reglementen/" 
+    ("se" . (concat "http://www.usenet-se.net/Reglementen/"
 		    (gnus-replace-in-string name "\\." "_") ".html"))
-    ("milw" . (concat "http://usenet.mil.wi.us/" 
+    ("milw" . (concat "http://usenet.mil.wi.us/"
 		      (gnus-replace-in-string name "milw\\." "") "-charter"))
     ("ca" . (concat "http://www.sbay.org/ca/charter-" name ".html"))
-    ("netins" . (concat "http://www.netins.net/usenet/charter/" 
+    ("netins" . (concat "http://www.netins.net/usenet/charter/"
 			(gnus-replace-in-string name "\\." "-") "-charter.html")))
   "*An alist of (HIERARCHY . FORM) pairs used to construct the URL of a charter.
 When FORM is evaluated `name' is bound to the name of the group."
@@ -1401,7 +1398,14 @@ Note that the default for this variable varies according to what system
 type you're using.  On `usg-unix-v' and `xenix' this variable defaults
 to nil while on all other systems it defaults to t."
   :group 'gnus-start
-  :type 'boolean)
+  :type '(radio (sexp :format "Non-nil\n"
+		      :match (lambda (widget value)
+			       (and value (not (listp value))))
+		      :value t)
+		(const nil)
+		(checklist (const :format "%v " not-score)
+			   (const :format "%v " not-save)
+			   (const not-kill))))
 
 (defcustom gnus-kill-files-directory gnus-directory
   "*Name of the directory where kill files will be stored (default \"~/News\")."
@@ -1484,7 +1488,7 @@ It calls `gnus-summary-expire-articles' by default."
   :type 'hook)
 
 (defcustom gnus-novice-user t
-  "*Non-nil means that you are a usenet novice.
+  "*Non-nil means that you are a Usenet novice.
 If non-nil, verbose messages may be displayed and confirmations may be
 required."
   :group 'gnus-meta
@@ -1615,7 +1619,7 @@ If this variable is nil, screen refresh may be quicker."
 (defcustom gnus-mode-non-string-length nil
   "*Max length of mode-line non-string contents.
 If this is nil, Gnus will take space as is needed, leaving the rest
-of the modeline intact.  Note that the default of nil is unlikely
+of the mode line intact.  Note that the default of nil is unlikely
 to be desirable; see the manual for further details."
   :group 'gnus-various
   :type '(choice (const nil)
@@ -1813,7 +1817,7 @@ total number of articles in the group.")
 
 ;; group parameters for spam processing added by Ted Zlatanov <tzz@lifelogs.com>
 (defcustom gnus-install-group-spam-parameters t
-  "*Disable the group parameters for spam detection.  
+  "*Disable the group parameters for spam detection.
 Enable if `G c' in XEmacs is giving you trouble, and make sure to submit a bug report."
   :type 'boolean
   :group 'gnus-start)
@@ -1848,7 +1852,7 @@ regexps that should match all groups in which to do automatic spam
 tagging, associated with a classification (spam, ham, or neither).
 This only makes sense for mail groups."
    :variable-group spam
-   :variable-type '(repeat 
+   :variable-type '(repeat
 		    (list :tag "Group contents spam/ham classification"
 			  (regexp :tag "Group")
 			  (choice
@@ -1866,65 +1870,89 @@ This only makes sense for mail groups."
 When a spam group is entered, all unread articles are marked as spam.")
 
   (defvar gnus-group-spam-exit-processor-ifile "ifile"
-    "The ifile summary exit spam processor.")
+    "OBSOLETE: The ifile summary exit spam processor.")
 
   (defvar gnus-group-spam-exit-processor-stat "stat"
-    "The spam-stat summary exit spam processor.")
+    "OBSOLETE: The spam-stat summary exit spam processor.")
 
   (defvar gnus-group-spam-exit-processor-bogofilter "bogofilter"
-    "The Bogofilter summary exit spam processor.")
+    "OBSOLETE: The Bogofilter summary exit spam processor.")
 
   (defvar gnus-group-spam-exit-processor-blacklist "blacklist"
-    "The Blacklist summary exit spam processor.")
+    "OBSOLETE: The Blacklist summary exit spam processor.")
 
   (defvar gnus-group-spam-exit-processor-report-gmane "report-gmane"
-    "The Gmane reporting summary exit spam processor.
+    "OBSOLETE: The Gmane reporting summary exit spam processor.
 Only applicable to NNTP groups with articles from Gmane.  See spam-report.el")
 
+  (defvar gnus-group-spam-exit-processor-spamoracle "spamoracle-spam"
+    "OBSOLETE: The spamoracle summary exit spam processor.")
+
   (defvar gnus-group-ham-exit-processor-ifile "ifile-ham"
-    "The ifile summary exit ham processor.
+    "OBSOLETE: The ifile summary exit ham processor.
 Only applicable to non-spam (unclassified and ham) groups.")
 
   (defvar gnus-group-ham-exit-processor-bogofilter "bogofilter-ham"
-    "The Bogofilter summary exit ham processor.
+    "OBSOLETE: The Bogofilter summary exit ham processor.
 Only applicable to non-spam (unclassified and ham) groups.")
 
   (defvar gnus-group-ham-exit-processor-stat "stat-ham"
-    "The spam-stat summary exit ham processor.
+    "OBSOLETE: The spam-stat summary exit ham processor.
 Only applicable to non-spam (unclassified and ham) groups.")
 
   (defvar gnus-group-ham-exit-processor-whitelist "whitelist"
-    "The whitelist summary exit ham processor.
+    "OBSOLETE: The whitelist summary exit ham processor.
 Only applicable to non-spam (unclassified and ham) groups.")
 
   (defvar gnus-group-ham-exit-processor-BBDB "bbdb"
-    "The BBDB summary exit ham processor.
+    "OBSOLETE: The BBDB summary exit ham processor.
 Only applicable to non-spam (unclassified and ham) groups.")
 
   (defvar gnus-group-ham-exit-processor-copy "copy"
-    "The ham copy exit ham processor.
+    "OBSOLETE: The ham copy exit ham processor.
+Only applicable to non-spam (unclassified and ham) groups.")
+
+  (defvar gnus-group-ham-exit-processor-spamoracle "spamoracle-ham"
+    "OBSOLETE: The spamoracle summary exit ham processor.
 Only applicable to non-spam (unclassified and ham) groups.")
 
   (gnus-define-group-parameter
    spam-process
    :type list
-   :parameter-type '(choice :tag "Spam Summary Exit Processor"
-			    :value nil
-			    (list :tag "Spam Summary Exit Processor Choices"
-				  (set 
-				   (variable-item gnus-group-spam-exit-processor-ifile)
-				   (variable-item gnus-group-spam-exit-processor-stat)
-				   (variable-item gnus-group-spam-exit-processor-bogofilter)
-				   (variable-item gnus-group-spam-exit-processor-blacklist)
-				   (variable-item gnus-group-spam-exit-processor-report-gmane)
-				   (variable-item gnus-group-ham-exit-processor-bogofilter)
-				   (variable-item gnus-group-ham-exit-processor-ifile)
-				   (variable-item gnus-group-ham-exit-processor-stat)
-				   (variable-item gnus-group-ham-exit-processor-whitelist)
-				   (variable-item gnus-group-ham-exit-processor-BBDB)
-				   (variable-item gnus-group-ham-exit-processor-copy))))
+   :parameter-type 
+   '(choice 
+     :tag "Spam Summary Exit Processor"
+     :value nil
+     (list :tag "Spam Summary Exit Processor Choices"
+	   (set
+	    (variable-item gnus-group-spam-exit-processor-ifile)
+	    (variable-item gnus-group-spam-exit-processor-stat)
+	    (variable-item gnus-group-spam-exit-processor-bogofilter)
+	    (variable-item gnus-group-spam-exit-processor-blacklist)
+	    (variable-item gnus-group-spam-exit-processor-spamoracle)
+	    (variable-item gnus-group-spam-exit-processor-report-gmane)
+	    (variable-item gnus-group-ham-exit-processor-bogofilter)
+	    (variable-item gnus-group-ham-exit-processor-ifile)
+	    (variable-item gnus-group-ham-exit-processor-stat)
+	    (variable-item gnus-group-ham-exit-processor-whitelist)
+	    (variable-item gnus-group-ham-exit-processor-BBDB)
+	    (variable-item gnus-group-ham-exit-processor-spamoracle)
+	    (variable-item gnus-group-ham-exit-processor-copy)
+	    (const :tag "Spam: Gmane Report"  (spam spam-use-gmane))
+	    (const :tag "Spam: Bogofilter"    (spam spam-use-bogofilter))
+	    (const :tag "Spam: Blacklist"     (spam spam-use-blacklist))
+	    (const :tag "Spam: ifile"         (spam spam-use-ifile))
+	    (const :tag "Spam: Spam-stat"     (spam spam-use-stat))
+	    (const :tag "Spam: Spam Oracle"   (spam spam-use-spamoracle))
+	    (const :tag "Ham: ifile"          (ham spam-use-ifile))
+	    (const :tag "Ham: Bogofilter"     (ham spam-use-bogofilter))
+	    (const :tag "Ham: Spam-stat"      (ham spam-use-stat))
+	    (const :tag "Ham: Whitelist"      (ham spam-use-whitelist))
+	    (const :tag "Ham: BBDB"           (ham spam-use-BBDB))
+	    (const :tag "Ham: Copy"           (ham spam-use-ham-copy))
+	    (const :tag "Ham: Spam Oracle"    (ham spam-use-spamoracle)))))
    :function-document
-   "Which spam or ham processors will be applied to the GROUP articles at summary exit."
+   "Which spam or ham processors will be applied when the summary is exited."
    :variable gnus-spam-process-newsgroups
    :variable-default nil
    :variable-document
@@ -1933,29 +1961,133 @@ a backend on summary exit.  If non-nil, this should be a list of group
 name regexps that should match all groups in which to do automatic
 spam processing, associated with the appropriate processor."
    :variable-group spam
-   :variable-type '(repeat :tag "Spam/Ham Processors" 
-			   (list :tag "Spam Summary Exit Processor Choices"
-				 (regexp :tag "Group Regexp") 
-				 (set :tag "Spam/Ham Summary Exit Processor"
-				      (variable-item gnus-group-spam-exit-processor-ifile)
-				      (variable-item gnus-group-spam-exit-processor-stat)
-				      (variable-item gnus-group-spam-exit-processor-bogofilter)
-				      (variable-item gnus-group-spam-exit-processor-blacklist)
-				      (variable-item gnus-group-spam-exit-processor-report-gmane)
-				      (variable-item gnus-group-ham-exit-processor-bogofilter)
-				      (variable-item gnus-group-ham-exit-processor-ifile)
-				      (variable-item gnus-group-ham-exit-processor-stat)
-				      (variable-item gnus-group-ham-exit-processor-whitelist)
-				      (variable-item gnus-group-ham-exit-processor-BBDB)
-				      (variable-item gnus-group-ham-exit-processor-copy))))
+   :variable-type 
+   '(repeat :tag "Spam/Ham Processors"
+	    (list :tag "Spam Summary Exit Processor Choices"
+		  (regexp :tag "Group Regexp")
+		  (set 
+		   :tag "Spam/Ham Summary Exit Processor"
+		   (variable-item gnus-group-spam-exit-processor-ifile)
+		   (variable-item gnus-group-spam-exit-processor-stat)
+		   (variable-item gnus-group-spam-exit-processor-bogofilter)
+		   (variable-item gnus-group-spam-exit-processor-blacklist)
+		   (variable-item gnus-group-spam-exit-processor-spamoracle)
+		   (variable-item gnus-group-spam-exit-processor-report-gmane)
+		   (variable-item gnus-group-ham-exit-processor-bogofilter)
+		   (variable-item gnus-group-ham-exit-processor-ifile)
+		   (variable-item gnus-group-ham-exit-processor-stat)
+		   (variable-item gnus-group-ham-exit-processor-whitelist)
+		   (variable-item gnus-group-ham-exit-processor-BBDB)
+		   (variable-item gnus-group-ham-exit-processor-spamoracle)
+		   (variable-item gnus-group-ham-exit-processor-copy)
+		   (const :tag "Spam: Gmane Report"  (spam spam-use-gmane))
+		   (const :tag "Spam: Bogofilter"    (spam spam-use-bogofilter))
+		   (const :tag "Spam: Blacklist"     (spam spam-use-blacklist))
+		   (const :tag "Spam: ifile"         (spam spam-use-ifile))
+		   (const :tag "Spam: Spam-stat"     (spam spam-use-stat))
+		   (const :tag "Spam: Spam Oracle"   (spam spam-use-spamoracle))
+		   (const :tag "Ham: ifile"          (ham spam-use-ifile))
+		   (const :tag "Ham: Bogofilter"     (ham spam-use-bogofilter))
+		   (const :tag "Ham: Spam-stat"      (ham spam-use-stat))
+		   (const :tag "Ham: Whitelist"      (ham spam-use-whitelist))
+		   (const :tag "Ham: BBDB"           (ham spam-use-BBDB))
+		   (const :tag "Ham: Copy"           (ham spam-use-ham-copy))
+		   (const :tag "Ham: Spam Oracle"    (ham spam-use-spamoracle)))))
+
    :parameter-document
-   "Which spam processors will be applied to the spam or ham GROUP articles at summary exit.")
+   "Which spam or ham processors will be applied when the summary is exited.")
+
+  (gnus-define-group-parameter
+   spam-autodetect
+   :type list
+   :parameter-type 
+   '(boolean :tag "Spam autodetection")
+   :function-document
+   "Should spam be autodetected (with spam-split) in this group?"
+   :variable gnus-spam-autodetect
+   :variable-default nil
+   :variable-document
+   "*Groups in which spam should be autodetected when they are entered.
+   Only unseen articles will be examined, unless
+   spam-autodetect-recheck-messages is set."
+   :variable-group spam
+   :variable-type 
+   '(repeat
+     :tag "Autodetection setting"
+     (list
+      (regexp :tag "Group Regexp")
+      boolean))
+   :parameter-document
+   "Spam autodetection.
+Only unseen articles will be examined, unless
+spam-autodetect-recheck-messages is set.")
+
+  (gnus-define-group-parameter
+   spam-autodetect-methods
+   :type list
+   :parameter-type 
+   '(choice :tag "Spam autodetection-specific methods"
+     (const none)
+     (const default)
+     (set :tag "Use specific methods"
+	  (variable-item spam-use-blacklist)
+	  (variable-item spam-use-regex-headers)
+	  (variable-item spam-use-regex-body)
+	  (variable-item spam-use-whitelist)
+	  (variable-item spam-use-BBDB)
+	  (variable-item spam-use-ifile)
+	  (variable-item spam-use-spamoracle)
+	  (variable-item spam-use-stat)
+	  (variable-item spam-use-blackholes)
+	  (variable-item spam-use-hashcash)
+	  (variable-item spam-use-bogofilter-headers)
+	  (variable-item spam-use-bogofilter)))
+   :function-document
+   "Methods to be used for autodetection in each group"
+   :variable gnus-spam-autodetect-methods
+   :variable-default nil
+   :variable-document
+   "*Methods for autodetecting spam per group.
+Requires the spam-autodetect parameter.  Only unseen articles
+will be examined, unless spam-autodetect-recheck-messages is
+set."
+   :variable-group spam
+   :variable-type 
+   '(repeat
+     :tag "Autodetection methods"
+     (list
+      (regexp :tag "Group Regexp")
+      (choice
+       (const none)
+       (const default)
+       (set :tag "Use specific methods"
+	(variable-item spam-use-blacklist)
+	(variable-item spam-use-regex-headers)
+	(variable-item spam-use-regex-body)
+	(variable-item spam-use-whitelist)
+	(variable-item spam-use-BBDB)
+	(variable-item spam-use-ifile)
+	(variable-item spam-use-spamoracle)
+	(variable-item spam-use-stat)
+	(variable-item spam-use-blackholes)
+	(variable-item spam-use-hashcash)
+	(variable-item spam-use-bogofilter-headers)
+	(variable-item spam-use-bogofilter)))))
+     :parameter-document
+   "Spam autodetection methods.  
+Requires the spam-autodetect parameter.  Only unseen articles
+will be examined, unless spam-autodetect-recheck-messages is
+set.")
 
   (gnus-define-group-parameter
    spam-process-destination
-   :parameter-type '(choice :tag "Destination for spam-processed articles at summary exit"
-			    (string :tag "Move to a group")
-			    (const :tag "Expire" nil))
+   :type list
+   :parameter-type 
+   '(choice :tag "Destination for spam-processed articles at summary exit"
+	    (string :tag "Move to a group")
+	    (repeat :tag "Move to multiple groups"
+		    (string :tag "Destination group"))
+	    (const :tag "Expire" nil))
    :function-document
    "Where spam-processed articles will go at summary exit."
    :variable gnus-spam-process-destinations
@@ -1968,23 +2100,31 @@ to do spam-processed article moving, associated with the destination
 group or nil for explicit expiration.  This only makes sense for
 mail groups."
    :variable-group spam
-   :variable-type '(repeat 
-		    :tag "Spam-processed articles destination" 
-		    (list
-		     (regexp :tag "Group Regexp") 
-		     (choice 
-		      :tag "Destination for spam-processed articles at summary exit"
-		      (string :tag "Move to a group")
-		      (const :tag "Expire" nil))))
+   :variable-type 
+   '(repeat
+     :tag "Spam-processed articles destination"
+     (list
+      (regexp :tag "Group Regexp")
+      (choice
+       :tag "Destination for spam-processed articles at summary exit"
+       (string :tag "Move to a group")
+       (repeat :tag "Move to multiple groups"
+	       (string :tag "Destination group"))
+       (const :tag "Expire" nil))))
    :parameter-document
    "Where spam-processed articles will go at summary exit.")
-
+  
   (gnus-define-group-parameter
    ham-process-destination
-   :parameter-type '(choice 
-		     :tag "Destination for ham articles at summary exit from a spam group"
-		     (string :tag "Move to a group")
-		     (const :tag "Do nothing" nil))
+   :type list
+   :parameter-type 
+   '(choice
+     :tag "Destination for ham articles at summary exit from a spam group"
+     (string :tag "Move to a group")
+     (repeat :tag "Move to multiple groups"
+	     (string :tag "Destination group"))
+     (const :tag "Respool" respool)
+     (const :tag "Do nothing" nil))
    :function-document
    "Where ham articles will go at summary exit from a spam group."
    :variable gnus-ham-process-destinations
@@ -1997,24 +2137,29 @@ to do ham article moving, associated with the destination
 group or nil for explicit ignoring.  This only makes sense for
 mail groups, and only works in spam groups."
    :variable-group spam
-   :variable-type '(repeat 
-		    :tag "Ham articles destination" 
-		    (list
-		     (regexp :tag "Group Regexp") 
-		     (choice 
-		      :tag "Destination for ham articles at summary exit from spam group"
-		      (string :tag "Move to a group")
-		      (const :tag "Expire" nil))))
+   :variable-type 
+   '(repeat
+     :tag "Ham articles destination"
+     (list
+      (regexp :tag "Group Regexp")
+      (choice
+       :tag "Destination for ham articles at summary exit from spam group"
+       (string :tag "Move to a group")
+       (repeat :tag "Move to multiple groups"
+		(string :tag "Destination group"))
+       (const :tag "Respool" respool)
+       (const :tag "Expire" nil))))
    :parameter-document
    "Where ham articles will go at summary exit from a spam group.")
 
-  (gnus-define-group-parameter 
+  (gnus-define-group-parameter
    ham-marks
    :type 'list
    :parameter-type '(list :tag "Ham mark choices"
-			  (set 
+			  (set
 			   (variable-item gnus-del-mark)
 			   (variable-item gnus-read-mark)
+			   (variable-item gnus-ticked-mark)
 			   (variable-item gnus-killed-mark)
 			   (variable-item gnus-kill-file-mark)
 			   (variable-item gnus-low-score-mark)))
@@ -2023,20 +2168,20 @@ mail groups, and only works in spam groups."
    "Marks considered ham (positively not spam).  Such articles will be
 processed as ham (non-spam) on group exit.  When nil, the global
 spam-ham-marks variable takes precedence."
-   :variable-default '((".*" ((gnus-del-mark 
+   :variable-default '((".*" ((gnus-del-mark
 			       gnus-read-mark
-			       gnus-killed-mark 
+			       gnus-killed-mark
 			       gnus-kill-file-mark
 			       gnus-low-score-mark))))
    :variable-group spam
    :variable-document
    "*Groups in which to explicitly set the ham marks to some value.")
 
-  (gnus-define-group-parameter 
+  (gnus-define-group-parameter
    spam-marks
    :type 'list
    :parameter-type '(list :tag "Spam mark choices"
-			  (set 
+			  (set
 			   (variable-item gnus-spam-mark)
 			   (variable-item gnus-killed-mark)
 			   (variable-item gnus-kill-file-mark)
@@ -2175,9 +2320,10 @@ face."
   "Whether Gnus is plugged or not.")
 
 (defcustom gnus-agent-cache t
-  "Controls use of the agent cache while plugged.  When set, Gnus will prefer
-using the locally stored content rather than re-fetching it from the server.
-You also need to enable `gnus-agent' for this to have any affect."
+  "Controls use of the agent cache while plugged.
+When set, Gnus will prefer using the locally stored content rather
+than re-fetching it from the server.  You also need to enable
+`gnus-agent' for this to have any affect."
   :version "21.3"
   :group 'gnus-agent
   :type 'boolean)
@@ -2190,9 +2336,13 @@ covered by that variable."
   :type 'symbol
   :group 'gnus-charset)
 
+;; Fixme: Doc reference to agent.
 (defcustom gnus-agent t
   "Whether we want to use the Gnus agent or not.
-Putting (gnus-agentize) in ~/.gnus is obsoleted by (setq gnus-agent t)."
+
+You may customize gnus-agent to disable its use.  However, some
+back ends have started to use the agent as a client-side cache.
+Disabling the agent may result in noticeable loss of performance."
   :version "21.3"
   :group 'gnus-agent
   :type 'boolean)
@@ -2222,6 +2372,10 @@ This should be an alist for Emacs, or a plist for XEmacs."
 
 (defvar gnus-agent-gcc-header "X-Gnus-Agent-Gcc")
 (defvar gnus-agent-meta-information-header "X-Gnus-Agent-Meta-Information")
+(defvar gnus-agent-method-p-cache nil
+  ; Reset each time gnus-agent-covered-methods is changed else
+  ; gnus-agent-method-p may mis-report a methods status.
+  )
 (defvar gnus-agent-target-move-group-header "X-Gnus-Agent-Move-To")
 (defvar gnus-draft-meta-information-header "X-Draft-From")
 (defvar gnus-group-get-parameter-function 'gnus-group-get-parameter)
@@ -2233,7 +2387,8 @@ This should be an alist for Emacs, or a plist for XEmacs."
 (defvar gnus-agent-fetching nil
   "Whether Gnus agent is in fetching mode.")
 
-(defvar gnus-agent-covered-methods nil)
+(defvar gnus-agent-covered-methods nil
+  "A list of servers, NOT methods, showing which servers are covered by the agent.")
 
 (defvar gnus-command-method nil
   "Dynamically bound variable that says what the current back end is.")
@@ -2354,8 +2509,7 @@ This variable can be nil, gnus or gnus-ja."
 			gnus-newsrc-last-checked-date
 			gnus-newsrc-alist gnus-server-alist
 			gnus-killed-list gnus-zombie-list
-			gnus-topic-topology gnus-topic-alist
-			gnus-agent-covered-methods)
+			gnus-topic-topology gnus-topic-alist)
   "Gnus variables saved in the quick startup file.")
 
 (defvar gnus-product-variable-file-list
@@ -2394,20 +2548,20 @@ It has an effect on the values of `gnus-*-line-format-spec'."
 
 (defvar gnus-newsrc-alist nil
   "Assoc list of read articles.
-gnus-newsrc-hashtb should be kept so that both hold the same information.")
+`gnus-newsrc-hashtb' should be kept so that both hold the same information.")
 
 (defvar gnus-registry-alist nil
   "Assoc list of registry data.
 gnus-registry.el will populate this if it's loaded.")
 
 (defvar gnus-newsrc-hashtb nil
-  "Hashtable of gnus-newsrc-alist.")
+  "Hashtable of `gnus-newsrc-alist'.")
 
 (defvar gnus-killed-list nil
   "List of killed newsgroups.")
 
 (defvar gnus-killed-hashtb nil
-  "Hash table equivalent of gnus-killed-list.")
+  "Hash table equivalent of `gnus-killed-list'.")
 
 (defvar gnus-zombie-list nil
   "List of almost dead newsgroups.")
@@ -3196,9 +3350,58 @@ that that variable is buffer-local to the summary buffers."
 			    (not (equal server (format "%s:%s" (caar servers)
 						       (cadar servers)))))
 		  (pop servers))
-		(car servers)))))
-	(push (cons server result) gnus-server-method-cache)
+		(car servers))
+              ;; This could be some sort of foreign server that I
+              ;; simply haven't opened (yet).  Do a brute-force scan
+              ;; of the entire gnus-newsrc-alist for the server name
+              ;; of every method.  As a side-effect, loads the
+              ;; gnus-server-method-cache so this only happens once,
+              ;; if at all.
+              (let (match)
+                (mapcar 
+                 (lambda (info)
+                   (let ((info-method (gnus-info-method info)))
+                     (unless (stringp info-method)
+                       (let ((info-server (gnus-method-to-server info-method)))
+                         (when (equal server info-server)
+                           (setq match info-method))))))
+                 (cdr gnus-newsrc-alist))
+                match))))
+        (when result
+          (push (cons server result) gnus-server-method-cache))
 	result)))
+
+(defsubst gnus-method-to-server (method)
+  (catch 'server-name
+    (setq method (or method gnus-select-method))
+
+    ;; Perhaps it is already in the cache.
+    (mapc (lambda (name-method)
+            (if (equal (cdr name-method) method)
+                (throw 'server-name (car name-method))))
+          gnus-server-method-cache)
+
+    (mapc
+     (lambda (server-alist)
+       (mapc (lambda (name-method)
+               (when (gnus-methods-equal-p (cdr name-method) method)
+                 (unless (member name-method gnus-server-method-cache)
+                   (push name-method gnus-server-method-cache))
+                 (throw 'server-name (car name-method))))
+             server-alist))
+     (let ((alists (list gnus-server-alist
+                         gnus-predefined-server-alist)))
+       (if gnus-select-method
+           (push (list (cons "native" gnus-select-method)) alists))
+       alists))
+
+    (let* ((name (if (member (cadr method) '(nil ""))
+                     (format "%s" (car method))
+                   (format "%s:%s" (car method) (cadr method))))
+           (name-method (cons name method)))
+      (unless (member name-method gnus-server-method-cache)
+        (push name-method gnus-server-method-cache))
+      name)))
 
 (defsubst gnus-server-get-method (group method)
   ;; Input either a server name, and extended server name, or a
@@ -3305,8 +3508,7 @@ server is native)."
 			       group)))
 
 (defun gnus-group-full-name (group method)
-  "Return the full name from GROUP and METHOD, even if the method is
-native."
+  "Return the full name from GROUP and METHOD, even if the method is native."
   (gnus-group-prefixed-name group method t))
 
 (defun gnus-group-guess-full-name (group)
@@ -3315,11 +3517,19 @@ native."
       group
     (gnus-group-full-name group (gnus-find-method-for-group group))))
 
+(defun gnus-group-guess-full-name-from-command-method (group)
+  "Guess the full name from GROUP, even if the method is native."
+  (if (gnus-group-prefixed-p group)
+      group
+    (gnus-group-full-name group gnus-command-method)))
+
 (defun gnus-group-real-prefix (group)
   "Return the prefix of the current group name."
-  (if (string-match "^[^:]+:" group)
-      (substring group 0 (match-end 0))
-    ""))
+  (if (stringp group)
+      (if (string-match "^[^:]+:" group)
+	  (substring group 0 (match-end 0))
+	"")
+    nil))
 
 (defun gnus-group-short-name (group)
   "Return the short group name."
@@ -3781,8 +3991,24 @@ Disallow invalid group names."
 	     (setq group (read-string (concat prefix prompt)
 				      (cons (or default "") 0)
 				      'gnus-group-history)))
-	(setq prefix (format "Invalid group name: \"%s\".  " group)
-	      group nil)))
+	(let ((match (match-string 0 group)))
+	  ;; `/' may be okay (e.g. for nnimap), so ask the user:
+	  (unless (and (string-match "/" match)
+		       (message-y-or-n-p
+			"Proceed and create group anyway? " t
+"The group name \"" group "\" contains a forbidden character: \"" match "\".
+
+Usually, it's dangerous to create a group with this name, because it's not
+supported by all back ends and servers.  On some IMAP servers, it's valid to
+use the character \"/\".
+
+If you are really sure, you can proceed anyway and create the group.
+
+You may customize the variable `gnus-invalid-group-regexp', which currently is
+set to \"" gnus-invalid-group-regexp
+"\", if you want to get rid of this query."))
+	    (setq prefix (format "Invalid group name: \"%s\".  " group)
+		  group nil)))))
     group))
 
 (defun gnus-read-method (prompt)
@@ -3826,7 +4052,13 @@ Allow completion over sensible values."
 
 (defun gnus-agent-method-p (method)
   "Say whether METHOD is covered by the agent."
-  (member method gnus-agent-covered-methods))
+  (or (eq (car gnus-agent-method-p-cache) method)
+      (setq gnus-agent-method-p-cache 
+            (cons method
+                  (member (if (stringp method) 
+                              method 
+                            (gnus-method-to-server method)) gnus-agent-covered-methods))))
+  (cdr gnus-agent-method-p-cache))
 
 (defun gnus-online (method)
   (not
@@ -3909,11 +4141,11 @@ current display is used."
 	  (switch-to-buffer gnus-group-buffer)
 	(funcall gnus-other-frame-function arg)
 	(add-hook 'gnus-exit-gnus-hook
-		  (lambda nil
-		    (when (and (frame-live-p gnus-other-frame-object)
-			       (cdr (frame-list)))
-		      (delete-frame gnus-other-frame-object))
-		    (setq gnus-other-frame-object nil)))))))
+		  '(lambda nil
+		     (when (and (frame-live-p gnus-other-frame-object)
+				(cdr (frame-list)))
+		       (delete-frame gnus-other-frame-object))
+		     (setq gnus-other-frame-object nil)))))))
 
 ;;;###autoload
 (defun gnus (&optional arg dont-connect slave)

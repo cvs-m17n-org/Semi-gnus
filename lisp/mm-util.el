@@ -148,6 +148,9 @@ In XEmacs, also return non-nil if CS is a coding system object."
     ;; ISO-8859-15 is very similar to ISO-8859-1.  But it's _different_!
     ,@(unless (mm-coding-system-p 'iso-8859-15)
        '((iso-8859-15 . iso-8859-1)))
+    ;; BIG-5HKSCS is similar to, but different than, BIG-5.
+    ,@(unless (mm-coding-system-p 'big5-hkscs)
+	'((big5-hkscs . big5)))
     ;; Windows-1252 is actually a superset of Latin-1.  See also
     ;; `gnus-article-dumbquotes-map'.
     ,@(unless (mm-coding-system-p 'windows-1252)
@@ -311,12 +314,12 @@ Valid elements include:
 	       ;; Japanese users may prefer iso-2022-jp to shift-jis.
 	       '(iso-2022-jp iso-2022-jp-2 japanese-shift-jis
 			     iso-latin-1 utf-8)))))
-  "Preferred coding systems for encoding outgoing mails.
+  "Preferred coding systems for encoding outgoing messages.
 
-More than one suitable coding system may be found for some text.  By
-default, the coding system with the highest priority is used to encode
-outgoing mails (see `sort-coding-systems').  If this variable is set,
-it overrides the default priority."
+More than one suitable coding system may be found for some text.
+By default, the coding system with the highest priority is used
+to encode outgoing messages (see `sort-coding-systems').  If this
+variable is set, it overrides the default priority."
   :type '(repeat (symbol :tag "Coding system"))
   :group 'mime)
 
@@ -413,7 +416,7 @@ used as the line break code type of the coding system."
 	"Set the multibyte flag of the current buffer.
 Only do this if the default value of `enable-multibyte-characters' is
 non-nil.  This is a no-op in XEmacs."
-	(set-buffer-multibyte t))
+	(set-buffer-multibyte 'to))
     (defalias 'mm-enable-multibyte 'ignore))
 
   (if mm-emacs-mule
@@ -703,10 +706,10 @@ Equivalent to `progn' in XEmacs"
 
 (defun mm-insert-file-contents (filename &optional visit beg end replace
 					 inhibit)
-  "Like `insert-file-contents', q.v., but only reads in the file.
+  "Like `insert-file-contents', but only reads in the file.
 A buffer may be modified in several ways after reading into the buffer due
 to advanced Emacs features, such as file-name-handlers, format decoding,
-find-file-hooks, etc.
+`find-file-hooks', etc.
 If INHIBIT is non-nil, inhibit `mm-inhibit-file-name-handlers'.
   This function ensures that none of these modifications will take place."
   (let ((format-alist nil)
@@ -745,7 +748,8 @@ If INHIBIT is non-nil, inhibit `mm-inhibit-file-name-handlers'."
 	     (append mm-inhibit-file-name-handlers
 		     inhibit-file-name-handlers)
 	   inhibit-file-name-handlers)))
-    (append-to-file start end filename)))
+    (write-region start end filename t 'no-message)
+    (message "Appended to %s" filename)))
 
 (defun mm-write-region (start end filename &optional append visit lockname
 			      coding-system inhibit)

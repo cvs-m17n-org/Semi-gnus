@@ -1,6 +1,392 @@
+2003-12-30  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Maildir): Filled.
+
+2003-12-29  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Group Parameters): Clarification.
+
+2003-12-29  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Agent Variables): Add.
+
+2003-12-23  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Oort Gnus): Mention change of `e' in draft groups.
+
+2003-12-15  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Group Parameters): Clarify.
+
+2003-12-11  Kevin Greiner <kgreiner@xpediantsolutions.com>
+
+	* gnus.texi (Agent Parameters): Added references in Topic and
+	Group Parameters.  Added gnus-agent-cat-disable-undownloaded-faces
+	to the list of documented agent parameters.
+
+2003-12-11  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.texi (Mailing Lists): Fix typo.
+
+2003-12-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Fancy Mail Splitting): Close paren of a Lisp function.
+	(SpamAssassin): Ditto.
+
+2003-12-04  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (SpamAssassin, Fancy Mail Splitting): add
+	save-restriction before (widen) in the example.  From Kevin Ryde
+	<user42@zip.com.au>.
+
+2003-12-03  Simon Josefsson  <jas@extundo.com>
+
+	* emacs-mime.texi (Flowed text): Fix.
+
+2003-12-02  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Agent Variables): Fix.
+
+2003-12-01  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi: Add missing mode to some @kindex'es.
+
+2003-11-30  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (RSS): Add nnrss-use-local.
+	(Foreign Groups): Add `G R'.
+
+2003-11-29  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnusref.tex (subsection*{Notes}): Add `G R'.
+
+2003-11-25  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Hiding Headers): Update.
+
+2003-11-20  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Debugging IMAP): minor corrections
+
+2003-11-20  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Finding the Parent): nnml does supports fetching by
+	MID.
+
+2003-11-20  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Debugging IMAP): Add.
+
+2003-11-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Score Decays): Update the gnus-decay-score function.
+
+2003-11-17  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Troubleshooting): Update.
+
+2003-11-03  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Filtering Spam Using The Spam ELisp Package): added
+	some clarifications
+
+2003-10-30  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Fancy Mail Splitting): added mention of
+	nnmail-split-fancy-match-partial-words
+
+2003-10-30  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Slashdot, SpamAssassin, Score File Format): Fix
+	overfull hbox.
+	(Topic Parameters): @group.
+	(Slashdot): Fix.
+
+2003-10-27  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Filtering Spam Using The Spam ELisp Package): added
+	example of using a string as a parameter to spam-split in order
+	to override the default spam-split-group value
+
+2003-10-27  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnusref.tex (subsection*{Notes}): do.
+
+	* gnus.texi (Exiting the Summary Buffer): Add keybinding.
+
+2003-10-23  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* emacs-mime.texi: Markup: Use @acronym for MML and MIME.
+
+	* message.texi: Ditto.
+
+	* gnus.texi: Ditto.
+
+2003-10-23  Simon Josefsson  <jas@extundo.com>
+
+	* emacs-mime.texi (MML Definition): Add format.
+
+2003-10-22  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Filtering Spam Using The Spam ELisp Package):
+	changed to use the new spam-initialize function
+
+2003-10-19  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* message.texi (Mailing Lists): Add Mail-Followup-To to index.
+
+	* gnus.texi (Group Parameters): Add Mail-Followup-To to index.
+	(Emacsen): Fixed typo.
+	(Oort Gnus): Mention message-forward-show-mml change (Sync with
+	GNUS-NEWS).
+
+2003-10-12  Adrian Aichner  <adrian@xemacs.org>
+
+	* gnus.texi (Mail Source Specifiers): uref fixes.
+
+2003-10-18  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Group Mail Splitting)
+	(Filtering Spam Using The Spam ELisp Package): Markup fixes.
+
+	* message.texi (Security): @url -> @uref.
+
+2003-10-18  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi: Define gnusasis and gnusurl.
+
+2003-10-12  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Group Mail Splitting): Markup fix.
+
+2003-10-03  Jesper Harder  <harder@ifa.au.dk>
+
+	* emacs-mime.texi (Files and Directories): Update.
+
+2003-10-02  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Filtering Spam Using The Spam ELisp Package): added
+	spam-process-ham-in-spam-groups and
+	spam-process-ham-in-nonham-groups variable descriptions
+
+2003-10-01  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.texi (Various Message Variables): Typo.
+
+	* gnus.texi (Oort Gnus): Typo.
+	(Filtering Spam Using The Spam ELisp Package): Just remember,
+	kids: There is no 'c' in 'supersede'.
+
+2003-09-27  Jesper Harder  <harder@ifa.au.dk>
+
+	* message.texi (Reply): Fix typo.
+
+2003-09-22  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Fancy Mail Splitting, SpamAssassin): corrected fancy
+	split example to use current buffer, mentioned
+	nnimap-split-download-body
+
+2003-09-22  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi, gnus-faq.texi, message.texi: gnus -> Gnus.
+
+	* message.texi: Fixes.
+
+2003-09-20  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Fancy Mail Splitting): Make split-on-body work for
+	respooling.  Suggested by Harald Maier <maierh@myself.com>.
+	(Fancy Mail Splitting): Reformat.
+
+2003-09-15  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Posting Styles): Fix typo.  @itemize attribute names.
+
+2003-09-14  Jesper Harder  <harder@ifa.au.dk>
+
+	* pgg.texi (Selecting an implementation, Caching passphrase)
+	(Initializing): Markup fix.
+
+2003-09-12  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Summary Buffer Lines): Formatting fix.
+
+2003-09-03  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Creating a Virtual Server): Use nnml for the example.
+	nnspool doesn't work on ms-windows due to file name restrictions.
+
+2003-08-29  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Gmane Spam Reporting): added explanation of
+	spam-report-gmane-use-article-number
+
+2003-08-25  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Customizing Articles): xface -> x-face.
+
+2003-08-20  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (GroupLens): Move text around.
+
+2003-08-16  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Searching for Articles): Fix example.
+
+2003-08-08  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Kibozed Groups): Fix.
+
+2003-08-04  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Group Parameters): Add expiry-target.
+	(Archived Messages): Layout fix.
+
+2003-07-22  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Top): Menu fixes and additions.
+
+2003-07-19  Jesper Harder  <harder@ifa.au.dk>
+
+	* emacs-mime.texi (Encoding Customization): Fix.
+	(MML Definition): Typo.
+
+2003-07-17  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Sorting the Summary Buffer): Index.
+
+2003-07-15  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-faq.texi ([3.8]): Fixed example.
+
+2003-07-14  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Filtering Spam Using The Spam ELisp Package):
+	mentioned the spam-install-hooks mess
+
+2003-07-11  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Splitting in IMAP): Typos, tiny patch from Matthias
+	Andree <ma@dt.e-technik.uni-dortmund.de>.
+	(Splitting in IMAP): Mention Sieve.
+
+2003-07-10  Simon Josefsson  <jas@extundo.com>
+
+	* message.texi (Security): Discuss the PGP 2.x compatibility
+	problem.
+
+2003-06-24  Jesper Harder  <harder@ifa.au.dk>
+
+	* sieve.texi (Sieve Mode): Formatting fix.
+
+	* gnus.texi (Agent Basics, Group Parameters, Quassia Gnus): do.
+
+2003-06-24  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus.texi (Summary Mail Commands): Make note of
+	Mail-Followup-To. 
+
+2003-06-23  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi: Formatting fixes.
+
+2003-06-22  Simon Josefsson  <jas@extundo.com>
+
+	* message.texi (Security): Mention S/MIME passphrases.
+
+2003-06-20  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi: Add @command.
+
+	* texi2latex.el (latexi-translate-file): Add @command and @:.
+
+	* gnus.texi (Face): Use @uref.
+
+2003-06-19  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Sieve Commands, Agent Basics, SpamOracle): @xref
+	fixes.
+
+2003-06-18  Didier Verna  <didier@xemacs.org>
+
+	* gnus.texi (Face): New node.
+	* gnus.texi (Article Display): Reference it.
+	* gnus.texi (Customizing Articles): Ditto.
+	* gnus.texi (Image Enhancements): Put the Face node into the menu.
+
+2003-06-17  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
+
+	* gnus.texi (Splitting Mail): Add "splitting" entry and concept
+	index entries.  Small patch from Karl Pfl,Ad(Bsterer
+	<sigurd@12move.de>.
+
+2003-06-15  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Daemons): Fixed typo.
+
+2003-06-15  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
+
+	* message.texi (Message Headers): Extend
+	`message-subject-re-regexp' example.  From Niklas Morberg
+	<niklas.morberg@axis.com>.
+
+2003-06-11  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Bogofilter): revise docs to mention threshold is now
+	user-controllable
+
+2003-06-10  Jesper Harder  <harder@ifa.au.dk>
+
+	* emacs-mime.texi: Use two spaces consistently to end sentences.
+
+	* message.texi: do.
+
+	* gnus.texi: do.
+
+2003-06-09  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Filtering Spam Using The Spam ELisp Package): new
+	SpamOracle node
+	(SpamOracle): document new SpamOracle code
+
+2003-06-07  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Article Buttons, Splitting in IMAP)
+	(Category Syntax, Picons): Preemptive strike by
+	alt.possesive.its.has.no.apostrophe.
+
+2003-06-03  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnus.texi (Fancy Mail Splitting): Explain some entries in
+	nnmail-split-abbrev-alist.
+
+2003-05-17  Adrian Aichner  <adrian@xemacs.org>
+
+	* emacs-mime.texi (Charset Translation): Ruthless typo fixing.
+	* gnus.texi (Top): Ditto.
+	* gnus.texi (Selecting a Group): Ditto.
+	* gnus.texi (Delayed Articles): Ditto.
+	* gnus.texi (Hiding Headers): Ditto.
+	* gnus.texi (Getting Mail): Ditto.
+	* gnus.texi (Comparing Mail Back Ends): Ditto.
+	* gnus.texi (IMAP): Ditto.
+	* gnus.texi (Required Back End Functions): Ditto.
+	* gnusref.tex (MIMESummary): Ditto.
+	* message.texi (Message Headers): Ditto.
+	* message.texi (Mail Variables): Ditto.
+	* pgg.texi (Prerequisites): Ditto.
+	* pgg.texi (Architecture): Ditto.
+	* pgg.texi (Backend methods): Ditto.
+	* sieve.texi (Managing Sieve): Ditto.
+
+2003-05-17  Jesper Harder  <harder@ifa.au.dk>
+
+	* gnusref.tex (subsection*{Notes}): Fix.
+
 2003-05-13  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
-	* gnus.texi (Anti-Spam Basics): Removed mention of gnus-junk. 
+	* gnus.texi (Anti-Spam Basics): Removed mention of gnus-junk.
 
 2003-05-13  Jesper Harder  <harder@ifa.au.dk>
 
@@ -61,11 +447,11 @@
 
 	* texi2latex.el (latexi-translate-file): Add @syncodeindex.
 
-	* gnus.texi: Markup and formatting improvements.  
+	* gnus.texi: Markup and formatting improvements.
 	Use @syncodeindex for merging indexes to get the same font for
 	@defvar and @vindex entries.  Be more consistent about the case
 	of index entries.
-	
+
 
 2003-04-30  Reiner Steib  <Reiner.Steib@gmx.de>
 
@@ -141,7 +527,7 @@
 	* gnus-faq.texi: Allow inclusion in `gnus.texi' again.
 
 2003-04-21  Reiner Steib  <Reiner.Steib@gmx.de>
-		
+
 	* gnus-faq.texi: New, the Gnus FAQ from http://my.gnus.org/FAQ.
 	From Frank Schmitt <ich@frank-schmitt.net>.
 

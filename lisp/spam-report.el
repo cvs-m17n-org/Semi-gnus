@@ -31,6 +31,9 @@
 (require 'gnus)
 (require 'gnus-sum)
 
+(eval-and-compile
+  (autoload 'mm-url-insert "mm-url"))
+
 (defgroup spam-report nil
   "Spam reporting configuration.")
 
@@ -39,7 +42,8 @@
 If you are using spam.el, consider setting gnus-spam-process-newsgroups 
 or the gnus-group-spam-exit-processor-report-gmane group/topic parameter 
 instead."
-  :type 'regexp
+  :type '(radio (const nil)
+		(regexp :format "%t: %v\n" :size 0 :value "^nntp\+.*:gmane\."))
   :group 'spam-report)
 
 (defcustom spam-report-gmane-spam-header 
@@ -53,18 +57,28 @@ instead."
   :type 'boolean
   :group 'spam-report)
 
-(defun spam-report-gmane (article)
+(defcustom spam-report-url-ping-function
+  'spam-report-url-ping-plain
+  "Function to use for url ping spam reporting."
+  :type '(choice
+	  (const :tag "Connect directly" 
+		 spam-report-url-ping-plain)
+	  (const :tag "Use the external program specified in `mm-url-program'" 
+		 spam-report-url-ping-mm-url))
+  :group 'spam-report)
+
+(defun spam-report-gmane (&rest articles)
   "Report an article as spam through Gmane"
-  (interactive "nEnter the article number: ")
-  (when (and gnus-newsgroup-name
-	     (or (null spam-report-gmane-regex)
-		 (string-match spam-report-gmane-regex gnus-newsgroup-name)))
-    (gnus-message 6 "Reporting spam article %d to spam.gmane.org..." article)
+  (dolist (article articles)
+    (when (and gnus-newsgroup-name
+	       (or (null spam-report-gmane-regex)
+		   (string-match spam-report-gmane-regex gnus-newsgroup-name)))
+      (gnus-message 6 "Reporting spam article %d to spam.gmane.org..." article)
       (if spam-report-gmane-use-article-number
 	  (spam-report-url-ping "spam.gmane.org" 
-		    (format "/%s:%d"
-			    (gnus-group-real-name gnus-newsgroup-name)
-			    article))
+				(format "/%s:%d"
+					(gnus-group-real-name gnus-newsgroup-name)
+					article))
 	(with-current-buffer nntp-server-buffer
 	  (gnus-request-head article gnus-newsgroup-name)
 	  (goto-char (point-min))
@@ -75,11 +89,15 @@ instead."
 		(gnus-message 10 "Reporting spam through URL %s..." url)
 		(spam-report-url-ping host report))
 	    (gnus-message 10 "Could not find X-Report-Spam in article %d..."
-			  article))))))
-
+			  article)))))))
 
 (defun spam-report-url-ping (host report)
-  "Ping a host through HTTP, addressing a specific GET resource"
+  "Ping a host through HTTP, addressing a specific GET resource using
+the function specified by `spam-report-url-ping-function'."
+  (funcall spam-report-url-ping-function host report))
+
+(defun spam-report-url-ping-plain (host report)
+  "Ping a host through HTTP, addressing a specific GET resource."
   (let ((tcp-connection))
     (with-temp-buffer
       (or (setq tcp-connection
@@ -90,9 +108,18 @@ instead."
 		 80))
 	  (error "Could not open connection to %s" host))
       (set-marker (process-mark tcp-connection) (point-min))
-      (process-send-string tcp-connection
-			   (format "GET %s HTTP/1.1\nHost: %s\n\n"
-				   report host)))))
+      (process-send-string
+       tcp-connection
+       (format "GET %s HTTP/1.1\nUser-Agent: %s (spam-report.el)\nHost: %s\n\n"
+	       report (gnus-emacs-version) host)))))
+
+(defun spam-report-url-ping-mm-url (host report)
+  "Ping a host through HTTP, addressing a specific GET resource. Use
+the external program specified in `mm-url-program' to connect to
+server."
+  (with-temp-buffer
+    (let ((url (concat "http://" host "/" report)))
+      (mm-url-insert url t))))
 
 (provide 'spam-report)
 

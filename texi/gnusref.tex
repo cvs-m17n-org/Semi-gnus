@@ -1,7 +1,7 @@
 %% include file for the Gnus refcard and booklet
 
 \def\progver{5.10}\def\refver{5.10-1} % program and refcard versions
-\def\date{May, 2003}
+\def\date{Oct, 2003}
 \def\author{Gnus Bugfixing Girls + Boys $<$bugs@gnus.org$>$}
 
 %%
@@ -299,6 +299,7 @@
         G V     & Make a new empty {\bf virtual} group. (nnvirtual)\\
         G w     & Create ephemeral group based on web-search. [Prefix: make solid group
         instead]\\
+        G R     & Make an {\bf RSS} group.\\
         G DEL   & {\bf Delete} group [Prefix: delete all articles as well].\\
         G x     & Expunge all deleted articles in an nnimap mailbox.\\
         G l     & Edit ACL (Access Control {\bf List}) for an nnimap mailbox.\\
@@ -426,7 +427,7 @@
         Y c     & Insert all cached articles into the summary-buffer.\\
                                 %
         M-C-e   & {\bf Edit} the group-parameters.\\
-        M-C-g   & Customize the group-parameters.\\
+        M-C-a   & Customize the group-parameters.\\
                                 %
                                 % article handling
                                 %
@@ -470,7 +471,7 @@
         K $\mid$ & Pipe the MIME part to an external command.\\
         K b      & Make all the MIME parts have buttons in front of them.\\
         K m      & Try to repair {\bf multipart-headers}.\\
-        K C      & View the MIME part using a differenct {\bf charset}.\\
+        K C      & View the MIME part using a different {\bf charset}.\\
         X m      & Save all parts matching a MIME type to a directory. [p/p]\\
         M-t      & Toggle the buttonized display of the article buffer.\\
         W M w    & Decode RFC2047-encoded words in the article headers.\\
@@ -943,7 +944,7 @@
     \end{keys}
     The four letters stand for:\\*
     \quad \B{A}ction: I)ncrease, L)ower;\\*
-    \quad \B{p}art: a)utor (from), s)ubject, x)refs (cross-posting), d)ate, l)ines,
+    \quad \B{p}art: a)uthor (from), s)ubject, x)refs (cross-posting), d)ate, l)ines,
     message-i)d, t)references (parent), f)ollowup, b)ody, h)ead (all headers);\\*
     \quad \B{m}atch type:\\*
     \qquad string: s)ubstring, e)xact, r)egexp, f)uzzy,\\*
@@ -1008,7 +1009,7 @@
       Z P     & Exit and go to the {\bf previous} group.\\
                                 %
       Z G     & (M-g) Check for new articles in this group ({\bf get}).\\
-      Z R     & Exit this group, and then enter it again ({\bf reenter}).
+      Z R     & (C-x C-s) Exit this group, and then enter it again ({\bf reenter}).
       [Prefix: select all articles, read and unread.]\\
       Z s     & Update and save the dribble buffer. [Prefix: save .newsrc* as well]\\
     \end{keys}
@@ -1062,7 +1063,7 @@
       C-c C-f C-d & Move to \textbf{Distribution:}.\\
       C-c C-f C-m & Move to \textbf{Mail-Followup-To:}.\\
       C-c C-f C-o & Move to \textbf{From:}.\\
-      C-c C-f C-a & Insert a resonable \textbf{Mail-Followup-To:} for
+      C-c C-f C-a & Insert a reasonable \textbf{Mail-Followup-To:} for
       an unsubscribed list. [Prefix: include addresses in \textbf{Cc:}]\\
       C-c C-f TAB & (C-c C-u) Move to \textbf{Importance:}.\\
       C-c M-n     & Insert \textbf{Disposition-Notification-To:}
@@ -1084,7 +1085,7 @@
       C-c C-m m   & Insert \textbf{multi}-part.\\
       C-c C-m q   & \textbf{Quote} region.\\
       C-c C-m c s & Encrypt message using \textbf{S/MIME}.\\
-      C-c C-m c o & Encrypt message usging PGP.\\
+      C-c C-m c o & Encrypt message using PGP.\\
       C-c C-m c p & Encrypt message using \textbf{PGP/MIME}.\\
       C-c C-m s s & Sign message using \textbf{S/MIME}.\\
       C-c C-m s o & Sign message using PGP.\\

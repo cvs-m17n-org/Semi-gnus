@@ -65,6 +65,10 @@ By the way, the latest CUSTOM package for Emacs v19 is available from:
 
 ftp://ftp.dina.kvl.dk/pub/Staff/Per.Abrahamsen/custom/custom-1.9962.tar.gz
 
+However, since the `custom-make-dependencies' function does not exist
+in this version of CUSTOM, we will use the contrib/cus-dep.el which is
+imported from Emacs 20.7 when building T-gnus.
+
 
 INSTALL regexp-opt.el
 =====================
@@ -162,7 +166,7 @@ There are three ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
 USING emacs-w3m (and Emacs/W3)
 ==============================
 The `nnshimbun' web based back end has been moved to the emacs-w3m
-package at 18 June 2003.  You need to download the latest version of
+package at 18 June 2003.  You need to install the latest version of
 emacs-w3m if you want to browse web newspapers using T-gnus as before.
 In that case, you *must* delete nnshimbun.el and nnshimbun.elc files
 originated by T-gnus.  Emacs-w3m is an Emacs interface to the external

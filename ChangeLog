@@ -1,3 +1,20 @@
+2003-12-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.16.3 revision 00.
+
+2003-12-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/pop3.el: Autoload `open-ssl-stream' when compiling.
+
+2003-12-23  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Mention change of `e' in draft groups.
+
+2003-12-17  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-group.el (gnus-group-edit-group): Let the `C-c C-i' command
+	choose the language specific info file.
+
 2003-12-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el: Require `mime-image' when Emacs is running on
@@ -5,10 +22,73 @@
 
 	* lisp/gnus-sum.el: Don't require `mime-view'.
 
+2003-12-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnmail.el (nnmail-lazy): Replace `widget-default-get' with
+	the expanded form for Mule 2.
+
+2003-12-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-make-cus-load): Use
+	contrib/cus-dep.el to build T-gnus with Mule 2.
+
+	* contrib/cus-dep.el: Imported from Emacs 20.7 for Mule 2.
+
+2003-11-03  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
+
+	* lisp/message.el (message-forward-subject-name-subject): Fixed.
+
 2003-10-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/infohack.el: Don't fiddle with the `features' variable;
 	fix directories relative to the ../lisp directory in `load-path'.
+
+2003-10-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* Makefile.in (install-package): Don't call `compose-package'.
+	(install-package-ja): Ditto.
+	(package): Ditto.
+	(package-ja): Ditto.
+	(compose-package): Abolish.
+
+	* lisp/Makefile.in (compose-package): Abolish.
+
+	* lisp/dgnushack.el (dgnushack-unexporting-files): Add
+	gnus-load.el when using XEmacs.
+	(dgnushack-dont-compile-files): Add gnus-load.el.
+	(dgnushack-auto-load-file): Abolish.
+	(dgnushack-make-auto-load): Don't delete the file specified by
+	`dgnushack-auto-load-file'.
+	(dgnushack-compose-package): Abolish.
+
+2003-08-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-treat-display-x-face): Use `set-default'
+	instead of `custom-set-default' for old Emacsen.
+
+	* lisp/gnus-sum.el
+	(gnus-summary-search-article-highlight-matched-text): Replace
+	`gnus-treat-display-xface' with `gnus-treat-display-x-face'.
+
+2003-08-01  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/search): Small modified to
+	reduce its spending time.
+
+2003-07-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* gnus-namazu.el (gnus-namazu/group-prefixed-name): Removed.
+	(gnus-namazu/real-group-name): Removed.
+	(gnus-namazu/decode-group-name): Removed.
+	(gnus-namazu/directory-table): New internal variable.
+	(gnus-namazu/make-directory-table): New function.
+	(gnus-namazu/search): Call the above function, and use
+	`gnus-namazu/directory-table' to get a real group name from a file
+	name.
+	(gnus-namazu-create-index): Call `gnus-namazu/make-directory-table'.
+	(gnus-namazu/update-sentinel): Ditto.
+	(gnus-namazu-update-all-indices): Simplified.
+	(gnus-namazu-update-indices): New function.
 
 2003-07-28  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
@@ -37,6 +117,11 @@
 	(ptexinfmt-broken-facility): Abolish NO-NOTICE argument.
 	Use `ptexinfmt-disable-broken-notice-flag' instead.
 
+2003-06-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/infohack.el (infohack-texi-format): Include other files
+	first.
+
 2003-06-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/lpath.el: Fbind `read-passwd' for Mule 2.
@@ -58,8 +143,12 @@
 
 2003-06-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
-	* lisp/gnus-sum.el (gnus-summary-refer-parent-article): Extract
-	Message-ID from In-Reply-To header.
+	* lisp/message.el (message-check-news-header-syntax): Replace
+	`mail-extract-address-components' with
+	`std11-extract-address-components'.
+	(message-sendmail-envelope-from): Ditto.
+	(message-buffer-name): Ditto.
+	(message-do-send-housekeeping): Ditto.
 
 2003-06-10  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
@@ -69,6 +158,11 @@
 
 	* .cvsignore, etc/.cvsignore, lisp/.cvsignore, texi/.cvsignore,
 	texi/ps/.cvsignore: Created.
+
+2003-06-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-fix-before-sending): Don't check for
+	`illegible text' messages (see the comment).
 
 2003-05-22  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -82,6 +176,27 @@
 
 	* lisp/nnfolder.el (nnfolder-read-folder): Force to use a
 	multibyte buffer.
+
+2003-05-21  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
+
+	* lisp/gnus-msg.el (gnus-message-make-user-agent): Don't use `@'
+	for rfc2616 compliance.
+
+2003-05-20  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-message-make-user-agent): Check whether
+	Mule 2 is running.
+
+2003-05-14  ARISAWA Akihiro  <ari@mbf.sphere.ne.jp>
+
+	* lisp/gnus-msg.el (gnus-user-agent): Added `gnus-mime-edit'.
+	(gnus-inews-add-send-actions): Use `gnus-message-make-user-agent'
+	instead of `gnus-extended-version'.
+	(xemacs-codename): Defvar while compiling.
+	(gnus-message-make-user-agent): Use `gnus-user-agent'.
+
+	* lisp/message.el (message-make-user-agent): If the "User-Agent" field
+	has alread exist, remove it.
 
 2003-05-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 

@@ -8,6 +8,9 @@ For older news, see Gnus info node "New Features".
 
 * Changes in Oort Gnus
 
+** In draft groups, `e' is now bound to `gnus-draft-edit-message'.
+Use `B w' for `gnus-summary-edit-article' instead.
+
 ** The revised Gnus FAQ is included in the manual.
 See the info node "Frequently Asked Questions".
 
@@ -452,6 +455,13 @@ This also obsoletes `gnus-article-hide-pgp-hook'.
 
 This change was made to avoid conflict with the standard binding of
 `back-to-indentation', which is also useful in message mode.
+
+** The default for message-forward-show-mml changed to symbol best.
+
+The behaviour for the `best' value is to show MML (i.e., convert MIME
+to MML) when appropriate.  MML will not be used when forwarding signed
+or encrypted messages, as the conversion invalidate the digital
+signature.
 
 ** Bug fixes.
 

@@ -48,7 +48,7 @@ license to the document, as described in section 6 of the license.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1996, 1997, 1998, 1999, 2000, 2001, 2002
+Copyright @copyright{} 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
      Free Software Foundation, Inc.
 
 Permission is granted to copy, distribute and/or modify this document
@@ -173,9 +173,9 @@ just return @code{nil}, and the normal methods for determining the To
 header will be used.
 
 This function can also return a list.  In that case, each list element
-should be a cons, where the car should be the name of an header
-(eg. @code{Cc}) and the cdr should be the header value
-(eg. @samp{larsi@@ifi.uio.no}).  All these headers will be inserted into
+should be a cons, where the @sc{car} should be the name of a header
+(e.g. @code{Cc}) and the @sc{cdr} should be the header value
+(e.g. @samp{larsi@@ifi.uio.no}).  All these headers will be inserted into
 the head of the outgoing mail.
 
 
@@ -312,7 +312,7 @@ constructed.  The default value is @code{nil}.
 If this variable is @code{t} (the default), forwarded messages are
 included as inline @acronym{MIME} RFC822 parts.  If it's @code{nil}, forwarded
 messages will just be copied inline to the new message, like previous,
-non @acronym{MIME}-savvy versions of gnus would do.
+non @acronym{MIME}-savvy versions of Gnus would do.
 
 @item message-forward-before-signature
 @vindex message-forward-before-signature
@@ -353,6 +353,7 @@ will be removed before popping up the buffer.  The default is
 @node Mailing Lists
 @section Mailing Lists
 
+@cindex Mail-Followup-To
 Sometimes while posting to mailing lists, the poster needs to direct
 followups to the post to specific places.  The Mail-Followup-To (MFT)
 was created to enable just this.  Two example scenarios where this is
@@ -399,7 +400,7 @@ way.  The following variables would come in handy.
 @vindex message-subscribed-addresses
 @item message-subscribed-addresses
 This should be a list of addresses the user is subscribed to.  Its
-default value is @code{nil}.   Example:
+default value is @code{nil}.  Example:
 @lisp
 (setq message-subscribed-addresses
       '("ding@@gnus.org" "bing@@noose.org"))
@@ -425,8 +426,8 @@ There is a pre-defined function in Gnus that is a good candidate for
 this variable.  @code{gnus-find-subscribed-addresses} is a function
 that returns a list of addresses corresponding to the groups that have
 the @code{subscribed} (@pxref{Group Parameters, ,Group Parameters,
-gnus, The Gnus Manual}) group parameter set to a non-nil value.  This
-is how you would do it.
+gnus, The Gnus Manual}) group parameter set to a non-@code{nil} value.
+This is how you would do it.
 
 @lisp
 (setq message-subscribed-address-functions
@@ -460,7 +461,7 @@ other headers and set to the value of all addresses in To: and Cc:
 @findex message-generate-unsubscribed-mail-followup-to
 @kindex C-c C-f C-m
 @findex message-goto-mail-followup-to
-Hm. ``So'', you ask, ``what if I send an email to a list I am not
+Hm.  ``So'', you ask, ``what if I send an email to a list I am not
 subscribed to?  I want my MFT to say that I want an extra copy.''  (This
 is supposed to be interpreted by others the same way as if there were no
 MFT, but you can use an explicit MFT to override someone else's
@@ -491,7 +492,7 @@ Gnus will prompt you for an action.
 
 @end table
 
-It is considered good nettiquette to honor MFT, as it is assumed the
+It is considered good netiquette to honor MFT, as it is assumed the
 fellow who posted a message knows where the followups need to go
 better than you do.
 
@@ -625,9 +626,9 @@ own address.  This function inserts such a header automatically.  It
 fetches the contents of the @samp{To:} header in the current mail
 buffer, and appends the current @code{user-mail-address}.
 
-If the optional argument @code{include-cc} is non-nil, the addresses in
-the @samp{Cc:} header are also put into the @samp{Mail-Followup-To:}
-header.
+If the optional argument @code{include-cc} is non-@code{nil}, the
+addresses in the @samp{Cc:} header are also put into the
+@samp{Mail-Followup-To:} header.
 
 @end table
 
@@ -666,7 +667,7 @@ address from @code{To:} and @code{Cc:} headers.
 @kindex C-c M-n
 @findex message-insert-disposition-notification-to
 Insert a request for a disposition
-notification. (@code{message-insert-disposition-notification-to}).
+notification.  (@code{message-insert-disposition-notification-to}).
 This means that if the recipient support RFC 2298 she might send you a
 notification that she received the message.
 
@@ -716,7 +717,7 @@ Replace contents of @samp{To} header with contents of @samp{Cc} or
 @kindex C-c C-f w
 @findex message-insert-wide-reply
 Insert @samp{To} and @samp{Cc} headers as if you were doing a wide
-reply. 
+reply.
 
 @item C-c C-f a
 @kindex C-c C-f a
@@ -831,7 +832,7 @@ The most typical thing users want to use the multipart things in
 be done with the @kbd{C-c C-a} command, which will prompt for a file
 name and a @acronym{MIME} type.
 
-You can also create arbitrarily complex multiparts using the MML
+You can also create arbitrarily complex multiparts using the @acronym{MML}
 language (@pxref{Composing, , Composing, emacs-mime, The Emacs MIME
 Manual}).
 
@@ -877,12 +878,13 @@ Libidn} installed in order to use this functionality.
 @cindex encrypt
 @cindex secure
 
-Using the MML language, Message is able to create digitally signed and
-digitally encrypted messages.  Message (or rather MML) currently
-support @acronym{PGP} (RFC 1991), @acronym{PGP/MIME} (RFC 2015/3156) and @acronym{S/MIME}.
-Instructing MML to perform security operations on a @acronym{MIME} part is
-done using the @kbd{C-c C-m s} key map for signing and the @kbd{C-c
-C-m c} key map for encryption, as follows.
+Using the @acronym{MML} language, Message is able to create digitally
+signed and digitally encrypted messages.  Message (or rather
+@acronym{MML}) currently support @acronym{PGP} (RFC 1991),
+@acronym{PGP/MIME} (RFC 2015/3156) and @acronym{S/MIME}.  Instructing
+@acronym{MML} to perform security operations on a @acronym{MIME} part is
+done using the @kbd{C-c C-m s} key map for signing and the @kbd{C-c C-m
+c} key map for encryption, as follows.
 
 @table @kbd
 
@@ -925,43 +927,22 @@ Digitally encrypt current message using @acronym{PGP/MIME}.
 @item C-c C-m C-n
 @kindex C-c C-m C-n
 @findex mml-unsecure-message
-Remove security related MML tags from message.
+Remove security related @acronym{MML} tags from message.
 
 @end table
 
 These commands do not immediately sign or encrypt the message, they
-merely insert the proper MML secure tag to instruct the MML engine to
-perform that operation when the message is actually sent. They may
-perform other operations too, such as locating and retrieving a
-@acronym{S/MIME} certificate of the person you wish to send encrypted mail
-to.  When the mml parsing engine converts your MML into a properly
-encoded @acronym{MIME} message, the secure tag will be replaced with either
-a part or a multipart tag.  If your message contains other mml parts,
-a multipart tag will be used; if no other parts are present in your
-message a single part tag will be used.  This way, message mode will
-do the Right Thing (TM) with signed/encrypted multipart messages.
-
-@vindex mml-signencrypt-style-alist
-By default, when encrypting a message, Gnus will use the ``signencrypt''
-mode.  If you would like to disable this for a particular message,
-give the @code{mml-secure-message-encrypt-*} command a prefix argument. (for
-example, @kbd{C-u C-c C-m c p}).  Additionally, by default Gnus will
-separately sign, then encrypt a message which has the mode
-signencrypt.  If you would like to change this behavior you can
-customize the @code{mml-signencrypt-style-alist} variable.  For
-example:
-
-
-@lisp
-(setq mml-signencrypt-style-alist '(("smime" combined)
-                                    ("pgp" combined)
-                                    ("pgpmime" combined)))
-@end lisp
-
-Will cause Gnus to sign and encrypt in one pass, thus generating a
-single signed and encrypted part.  Note that combined sign and encrypt
-does not work with all supported OpenPGP implementations (in
-particular, @acronym{PGP} version 2 do not support this).
+merely insert the proper @acronym{MML} secure tag to instruct the
+@acronym{MML} engine to perform that operation when the message is
+actually sent.  They may perform other operations too, such as locating
+and retrieving a @acronym{S/MIME} certificate of the person you wish to
+send encrypted mail to.  When the mml parsing engine converts your
+@acronym{MML} into a properly encoded @acronym{MIME} message, the secure
+tag will be replaced with either a part or a multipart tag.  If your
+message contains other mml parts, a multipart tag will be used; if no
+other parts are present in your message a single part tag will be used.
+This way, message mode will do the Right Thing (TM) with
+signed/encrypted multipart messages.
 
 Since signing and especially encryption often is used when sensitive
 information is sent, you may want to have some way to ensure that your
@@ -976,6 +957,12 @@ party the other night, actually will be sent encrypted.
 RFC822 headers.  They only operate on the @acronym{MIME} object.  Keep this
 in mind before sending mail with a sensitive Subject line.
 
+By default, when encrypting a message, Gnus will use the
+``signencrypt'' mode, which means the message is both signed and
+encrypted.  If you would like to disable this for a particular
+message, give the @code{mml-secure-message-encrypt-*} command a prefix
+argument, e.g., @kbd{C-u C-c C-m c p}.
+
 Actually using the security commands above is not very difficult.  At
 least not compared with making sure all involved programs talk with each
 other properly.  Thus, we now describe what external libraries or
@@ -987,24 +974,25 @@ programs are required to make things work, and some small general hints.
 modern cryptography, @acronym{S/MIME}, various PKCS standards, OpenSSL and
 so on.
 
-The @acronym{S/MIME} support in Message (and MML) require OpenSSL.  OpenSSL
-perform the actual @acronym{S/MIME} sign/encrypt operations.  OpenSSL can
-be found at @uref{http://www.openssl.org/}.  OpenSSL 0.9.6 and later
-should work.  Version 0.9.5a cannot extract mail addresses from
-certificates, and it insert a spurious CR character into @acronym{MIME}
-separators so you may wish to avoid it if you would like to avoid
-being regarded as someone who send strange mail. (Although by sending
-@acronym{S/MIME} messages you've probably already lost that contest.)
+The @acronym{S/MIME} support in Message (and @acronym{MML}) require
+OpenSSL.  OpenSSL performs the actual @acronym{S/MIME} sign/encrypt
+operations.  OpenSSL can be found at @uref{http://www.openssl.org/}.
+OpenSSL 0.9.6 and later should work.  Version 0.9.5a cannot extract mail
+addresses from certificates, and it insert a spurious CR character into
+@acronym{MIME} separators so you may wish to avoid it if you would like
+to avoid being regarded as someone who send strange mail.  (Although by
+sending @acronym{S/MIME} messages you've probably already lost that
+contest.)
 
 To be able to send encrypted mail, a personal certificate is not
-required.  Message (MML) need a certificate for the person to whom you
+required.  Message (@acronym{MML}) need a certificate for the person to whom you
 wish to communicate with though.  You're asked for this when you type
 @kbd{C-c C-m c s}.  Currently there are two ways to retrieve this
 certificate, from a local file or from DNS.  If you chose a local
 file, it need to contain a X.509 certificate in @acronym{PEM} format.
 If you chose DNS, you're asked for the domain name where the
 certificate is stored, the default is a good guess.  To my belief,
-Message (MML) is the first mail agent in the world to support
+Message (@acronym{MML}) is the first mail agent in the world to support
 retrieving @acronym{S/MIME} certificates from DNS, so you're not
 likely to find very many certificates out there.  At least there
 should be one, stored at the domain @code{simon.josefsson.org}.  LDAP
@@ -1014,8 +1002,8 @@ command line to retrieve a certificate into a file and use it.)
 
 As for signing messages, OpenSSL can't perform signing operations
 without some kind of configuration.  Especially, you need to tell it
-where your private key and your certificate is stored.  MML uses an
-Emacs interface to OpenSSL, aptly named @code{smime.el}, and it
+where your private key and your certificate is stored.  @acronym{MML}
+uses an Emacs interface to OpenSSL, aptly named @code{smime.el}, and it
 contain a @code{custom} group used for this configuration.  So, try
 @kbd{M-x customize-group RET smime RET} and look around.
 
@@ -1034,15 +1022,21 @@ $ openssl pkcs12 -in ns.p12 -clcerts -nodes > key+cert.pem
 The @file{key+cert.pem} file should be pointed to from the
 @code{smime-keys} variable.  You should now be able to send signed mail.
 
-@emph{Note!}  Your private key is stored unencrypted in the file, so take
-care in handling it.
+@emph{Note!}  Your private key is now stored unencrypted in the file,
+so take care in handling it.  Storing encrypted keys on the disk are
+supported, and Gnus will ask you for a passphrase before invoking
+OpenSSL.  Read the OpenSSL documentation for how to achieve this.  If
+you use unencrypted keys (e.g., if they are on a secure storage, or if
+you are on a secure single user machine) simply press @code{RET} at
+the passphrase prompt.
 
 @subsection Using PGP/MIME
 
 @acronym{PGP/MIME} requires an external OpenPGP implementation, such
-as @uref{http://www.gnupg.org/, GNU Privacy Guard}.  One Emacs
-interface to OpenPGP implementations, PGG (@pxref{Top, ,PGG, pgg, PGG
-Manual}), is included, but Mailcrypt and Florian Weimer's
+as @uref{http://www.gnupg.org/, GNU Privacy Guard}.  Pre-OpenPGP
+implementations such as PGP 2.x and PGP 5.x are also supported.  One
+Emacs interface to the PGP implementations, PGG (@pxref{Top, ,PGG,
+pgg, PGG Manual}), is included, but Mailcrypt and Florian Weimer's
 @code{gpg.el} are also supported.
 
 @vindex gpg-temp-directory
@@ -1050,8 +1044,36 @@ Note, if you are using the @code{gpg.el} you must make sure that the
 directory specified by @code{gpg-temp-directory} have permissions
 0700.
 
-Creating your own OpenPGP key is described in detail in the
-documentation of your OpenPGP implementation, so we refer to it.
+Creating your own key is described in detail in the documentation of
+your PGP implementation, so we refer to it.
+
+If you have imported your old PGP 2.x key into GnuPG, and want to send
+signed and encrypted messages to your fellow PGP 2.x users, you'll
+discover that the receiver cannot understand what you send. One
+solution is to use PGP 2.x instead (i.e., if you use @code{pgg}, set
+@code{pgg-default-scheme} to @code{pgp}).  If you do want to use
+GnuPG, you can use a compatibility script called @code{gpg-2comp}
+available from
+@uref{http://muppet.faveve.uni-stuttgart.de/~gero/gpg-2comp/}.  You
+could also convince your fellow PGP 2.x users to convert to GnuPG.
+@vindex mml-signencrypt-style-alist
+As a final workaround, you can make the sign and encryption work in
+two steps; separately sign, then encrypt a message.  If you would like
+to change this behavior you can customize the
+@code{mml-signencrypt-style-alist} variable.  For example:
+
+@lisp
+(setq mml-signencrypt-style-alist '(("smime" separate)
+                                    ("pgp" separate)
+                                    ("pgpauto" separate)
+                                    ("pgpmime" separate)))
+@end lisp
+
+This causes to sign and encrypt in two passes, thus generating a
+message that can be understood by PGP version 2.
+
+(Refer to @uref{http://www.gnupg.org/gph/en/pgp2x.html} for more
+information about the problem.)
 
 @node Various Commands
 @section Various Commands
@@ -1072,7 +1094,7 @@ many places to rotate the text.  The default is 13.
 @vindex message-elide-ellipsis
 Elide the text between point and mark (@code{message-elide-region}).
 The text is killed and replaced with the contents of the variable
-@code{message-elide-ellipsis}. The default value is to use an ellipsis
+@code{message-elide-ellipsis}.  The default value is to use an ellipsis
 (@samp{[...]}).
 
 @item C-c C-z
@@ -1344,7 +1366,7 @@ Responses to messages have subjects that start with @samp{Re: }.  This
 is @emph{not} an abbreviation of the English word ``response'', but is
 Latin, and means ``in response to''.  Some illiterate nincompoops have
 failed to grasp this fact, and have ``internationalized'' their software
-to use abonimations like @samp{Aw: } (``antwort'') or @samp{Sv: }
+to use abominations like @samp{Aw: } (``antwort'') or @samp{Sv: }
 (``svar'') instead, which is meaningless and evil.  However, you may
 have to deal with users that use these evil tools, in which case you may
 set this variable to a regexp that matches these prefixes.  Myself, I
@@ -1355,7 +1377,23 @@ responding to a message:
 
 @lisp
 (setq message-subject-re-regexp
-     "^\\(\\(\\([Rr][Ee]\\|[Ss][Vv]\\|[Aa][Ww]\\): *\\)+\\)")
+      (concat
+       "^[ \t]*"
+         "\\("
+           "\\("
+             "[Aa][Nn][Tt][Ww]\\.?\\|"     ; antw
+             "[Aa][Ww]\\|"                 ; aw
+             "[Ff][Ww][Dd]?\\|"            ; fwd
+             "[Oo][Dd][Pp]\\|"             ; odp
+             "[Rr][Ee]\\|"                 ; re
+             "[Rr][\311\351][Ff]\\.?\\|"   ; ref
+             "[Ss][Vv]"                    ; sv
+           "\\)"
+           "\\(\\[[0-9]*\\]\\)"
+           "*:[ \t]*"
+         "\\)"
+       "*[ \t]*"
+       ))
 @end lisp
 
 @item message-subject-trailing-was-query
@@ -1431,8 +1469,8 @@ buffers that are initialized as mail.
 @findex message-smtpmail-send-it
 @findex smtpmail-send-it
 @findex feedmail-send-it
-Function used to send the current buffer as mail. The default is
-@code{message-send-mail-with-sendmail}. Other valid values include
+Function used to send the current buffer as mail.  The default is
+@code{message-send-mail-with-sendmail}.  Other valid values include
 @code{message-send-mail-with-mh}, @code{message-send-mail-with-qmail},
 @code{message-smtpmail-send-it}, @code{smtpmail-send-it} and
 @code{feedmail-send-it}.
@@ -1476,7 +1514,7 @@ the address to use in the @acronym{SMTP} envelope.  If it is
 @item message-mailer-swallows-blank-line
 @vindex message-mailer-swallows-blank-line
 Set this to non-@code{nil} if the system's mailer runs the header and
-body together.  (This problem exists on Sunos 4 when sendmail is run
+body together.  (This problem exists on SunOS 4 when sendmail is run
 in remote mode.)  The value should be an expression to test whether
 the problem will actually occur.
 
@@ -1585,9 +1623,9 @@ unlikely that you should need to fiddle with this variable at all.
 
 @findex yow
 @cindex Mime-Version
-In addition, you can enter conses into this list.  The car of this cons
+In addition, you can enter conses into this list.  The @sc{car} of this cons
 should be a symbol.  This symbol's name is the name of the header, and
-the cdr can either be a string to be entered verbatim as the value of
+the @sc{cdr} can either be a string to be entered verbatim as the value of
 this header, or it can be a function to be called.  This function should
 return a string to be inserted.  For instance, if you want to insert
 @code{Mime-Version: 1.0}, you should enter @code{(Mime-Version . "1.0")}
@@ -1595,8 +1633,8 @@ into the list.  If you want to insert a funny quote, you could enter
 something like @code{(X-Yow . yow)} into the list.  The function
 @code{yow} will then be called without any arguments.
 
-If the list contains a cons where the car of the cons is
-@code{optional}, the cdr of this cons will only be inserted if it is
+If the list contains a cons where the @sc{car} of the cons is
+@code{optional}, the @sc{cdr} of this cons will only be inserted if it is
 non-@code{nil}.
 
 If you want to delete an entry from this list, the following Lisp
@@ -1739,7 +1777,7 @@ Note that Gnus provides a feature where clicking on `writes:' hides the
 cited text.  If you change the citation line too much, readers of your
 messages will have to adjust their Gnus, too.  See the variable
 @code{gnus-cite-attribution-suffix}.  @xref{Article Highlighting, ,
-Article Highlighting, gnus}, for details.
+Article Highlighting, gnus, The Gnus Manual}, for details.
 
 @item message-yank-prefix
 @vindex message-yank-prefix
@@ -1749,7 +1787,7 @@ When you are replying to or following up an article, you normally want
 to quote the person you are answering.  Inserting quoted text is done
 by @dfn{yanking}, and each line you yank will have
 @code{message-yank-prefix} prepended to it (except for quoted and
-empty lines which uses @code{message-yank-cited-prefix}). The default
+empty lines which uses @code{message-yank-cited-prefix}).  The default
 is @samp{> }.
 
 @item message-yank-cited-prefix
@@ -1947,7 +1985,7 @@ Hook run after sending messages.
 
 @item message-cancel-hook
 @vindex message-cancel-hook
-Hook run when cancelling news articles.
+Hook run when canceling news articles.
 
 @item message-mode-syntax-table
 @vindex message-mode-syntax-table
@@ -1968,7 +2006,7 @@ message composition doesn't break too bad.
 Alist of ways to send outgoing messages.  Each element has the form
 
 @lisp
-(TYPE PREDICATE FUNCTION)
+(@var{type} @var{predicate} @var{function})
 @end lisp
 
 @table @var
@@ -2137,7 +2175,7 @@ This restores the Gnus window configuration when the message buffer is
 killed, postponed or exited.
 
 An @dfn{action} can be either: a normal function, or a list where the
-@code{car} is a function and the @code{cdr} is the list of arguments, or
+@sc{car} is a function and the @sc{cdr} is the list of arguments, or
 a form to be @code{eval}ed.
 
 

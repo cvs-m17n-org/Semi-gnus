@@ -71,8 +71,8 @@ Value is what BODY returns."
   '(("Newsgroups" . nil)
     ("Followup-To" . nil)
     ("Message-ID" . nil)
-    ("\\(Resent-\\)?\\(From\\|Cc\\|To\\|Bcc\\|Reply-To\\|Sender\\)" .
-     address-mime)
+    ("\\(Resent-\\)?\\(From\\|Cc\\|To\\|Bcc\\|Reply-To\\|Sender\
+\\|Mail-Followup-To\\|Mail-Copies-To\\|Approved\\)" . address-mime)
     (t . mime))
   "*Header/encoding method alist.
 The list is traversed sequentially.  The keys can either be
@@ -110,7 +110,8 @@ The values can be:
     (cn-gb-2312 . B)
     (euc-kr . B)
     (iso-2022-jp-2 . B)
-    (iso-2022-int-1 . B))
+    (iso-2022-int-1 . B)
+    (viscii . Q))
   "Alist of MIME charsets to RFC2047 encodings.
 Valid encodings are nil, `Q' and `B'.  These indicate binary (no) encoding,
 quoted-printable and base64 respectively.")
@@ -120,15 +121,6 @@ quoted-printable and base64 respectively.")
     (B . rfc2047-b-encode-region)
     (nil . ignore))
   "Alist of RFC2047 encodings to encoding functions.")
-
-(defvar rfc2047-q-encoding-alist
-  '(("\\(Resent-\\)?\\(From\\|Cc\\|To\\|Bcc\\|Reply-To\\|Sender\\):"
-     . "-A-Za-z0-9!*+/" )
-    ;; = (\075), _ (\137), ? (\077) are used in the encoded word.
-    ;; Avoid using 8bit characters.
-    ;; Equivalent to "^\000-\007\011\013\015-\037\200-\377=_?"
-    ("." . "\010\012\014\040-\074\076\100-\136\140-\177"))
-  "Alist of header regexps and valid Q characters.")
 
 ;;;
 ;;; Functions for encoding RFC2047 messages
@@ -142,9 +134,7 @@ quoted-printable and base64 respectively.")
    (progn
      (forward-line 1)
      (if (re-search-forward "^[^ \n\t]" nil t)
-	 (progn
-	   (beginning-of-line)
-	   (point))
+	 (rfc2047-point-at-bol)
        (point-max))))
   (goto-char (point-min)))
 
@@ -207,7 +197,7 @@ Should be called narrowed to the head of the message."
 	     ((eq method 'address-mime)
 	      (rfc2047-encode-region (point) (point-max)))
 	     ((eq method 'mime)
-	      (let (rfc2047-encoding-type)
+	      (let ((rfc2047-encoding-type 'mime))
 		(rfc2047-encode-region (point) (point-max))))
 	     ((eq method 'default)
 	      (if (and (featurep 'mule)
@@ -299,13 +289,23 @@ Dynamically bind `rfc2047-encoding-type' to change that."
   (save-restriction
     (narrow-to-region b e)
     (if (eq 'mime rfc2047-encoding-type)
-	;; Simple case -- treat as single word.
+	;; Simple case.  Treat as single word after any initial ASCII
+	;; part and before any tailing ASCII part.  The leading ASCII
+	;; is relevant for instance in Subject headers with `Re:' for
+	;; interoperability with non-MIME clients, and we might as
+	;; well avoid the tail too.
 	(progn
 	  (goto-char (point-min))
 	  ;; Does it need encoding?
-	  (skip-chars-forward "\000-\177" e)
+	  (skip-chars-forward "\000-\177")
 	  (unless (eobp)
-	    (rfc2047-encode b e)))
+	    (skip-chars-backward "^ \n") ; beginning of space-delimited word
+	    (rfc2047-encode (point) (progn
+				      (goto-char e)
+				      (skip-chars-backward "\000-\177")
+				      (skip-chars-forward "^ \n")
+				      ;; end of space-delimited word
+				      (point)))))
       ;; `address-mime' case -- take care of quoted words, comments.
       (with-syntax-table rfc2047-syntax-table
 	(let ((start)			; start of current token
@@ -377,14 +377,15 @@ Dynamically bind `rfc2047-encoding-type' to change that."
 			    end (1+ end)))
 		    (rfc2047-encode start end)
 		    (setq last-encoded t)))))
-	    (error (error "Invalid data for rfc2047 encoding: %s"
-			  (buffer-substring b e)))))))
+	    (error
+	     (error "Invalid data for rfc2047 encoding: %s"
+		    (buffer-substring b e)))))))
     (rfc2047-fold-region b (point))))
 
 (defun rfc2047-encode-string (string)
   "Encode words in STRING.
 By default, the string is treated as containing addresses (see
-`rfc2047-special-chars')."
+`rfc2047-encoding-type')."
   (with-temp-buffer
     (insert string)
     (rfc2047-encode-region (point-min) (point-max))
@@ -393,7 +394,7 @@ By default, the string is treated as containing addresses (see
 (defun rfc2047-encode (b e)
   "Encode the word(s) in the region B to E.
 By default, the region is treated as containing addresses (see
-`rfc2047-special-chars')."
+`rfc2047-encoding-type')."
   (let* ((mime-charset (mm-find-mime-charset-region b e))
 	 (cs (if (> (length mime-charset) 1)
 		 ;; Fixme: Instead of this, try to break region into
@@ -404,14 +405,36 @@ By default, the region is treated as containing addresses (see
 	       (mm-charset-to-coding-system mime-charset)))
 	 ;; Fixme: Better, calculate the number of non-ASCII
 	 ;; characters, at least for 8-bit charsets.
-	 (encoding (if (assq mime-charset
-			     rfc2047-charset-encoding-alist)
-		       (cdr (assq mime-charset
+	 (encoding (or (cdr (assq mime-charset
 				  rfc2047-charset-encoding-alist))
-		     'B))
+		       ;; For the charsets that don't have a preferred
+		       ;; encoding, choose the one that's shorter.
+		       (save-restriction
+			 (narrow-to-region b e)
+			 (if (eq (mm-qp-or-base64) 'base64)
+			     'B
+			   'Q))))
 	 (start (concat
 		 "=?" (downcase (symbol-name mime-charset)) "?"
 		 (downcase (symbol-name encoding)) "?"))
+	 (factor (case mime-charset
+		   ((iso-8859-5 iso-8859-7 iso-8859-8 koi8-r) 1)
+		   ((big5 gb2312 euc-kr) 2)
+		   (utf-8 4)
+		   (t 8)))
+	 (pre (- b (save-restriction
+		     (widen)
+		     (rfc2047-point-at-bol))))
+	 ;; encoded-words must not be longer than 75 characters,
+	 ;; including charset, encoding etc.  This leaves us with
+	 ;; 75 - (length start) - 2 - 2 characters.  The last 2 is for
+	 ;; possible base64 padding.  In the worst case (iso-2022-*)
+	 ;; each character expands to 8 bytes which is expanded by a
+	 ;; factor of 4/3 by base64 encoding.
+	 (length (floor (- 75 (length start) 4) (* factor (/ 4.0 3.0))))
+	 ;; Limit line length to 76 characters.
+	 (length1 (max 1 (floor (- 76 (length start) 4 pre)
+				(* factor (/ 4.0 3.0)))))
 	 (first t))
     (if mime-charset
 	(save-restriction
@@ -420,9 +443,14 @@ By default, the region is treated as containing addresses (see
 	    ;; break into lines before encoding
 	    (goto-char (point-min))
 	    (while (not (eobp))
-	      (goto-char (min (point-max) (+ 15 (point))))
+	      (if first
+		  (progn
+		    (goto-char (min (point-max) (+ length1 (point))))
+		    (setq first nil))
+		(goto-char (min (point-max) (+ length (point)))))
 	      (unless (eobp)
-		(insert ?\n))))
+		(insert ?\n)))
+	    (setq first t))
 	  (if (and (mm-multibyte-p)
 		   (mm-coding-system-p cs))
 	      (mm-encode-coding-region (point-min) (point-max) cs))
@@ -492,7 +520,9 @@ By default, the region is treated as containing addresses (see
 	      (if (eq (char-after) ?=)
 		  (forward-char 1)
 		(skip-chars-forward "^ \t\n\r="))
-	    (setq qword-break (point))
+	    ;; Don't break at the start of the field.
+	    (unless (= (point) b)
+	      (setq qword-break (point)))
 	    (skip-chars-forward "^ \t\n\r")))
 	 (t
 	  (skip-chars-forward "^ \t\n\r"))))
@@ -553,16 +583,21 @@ By default, the region is treated as containing addresses (see
   (save-excursion
     (save-restriction
       (narrow-to-region (goto-char b) e)
-      (let ((alist rfc2047-q-encoding-alist)
-	    (bol (save-restriction
+      (let ((bol (save-restriction
 		   (widen)
 		   (rfc2047-point-at-bol))))
-	(while alist
-	  (when (looking-at (caar alist))
-	    (quoted-printable-encode-region b e nil (cdar alist))
-	    (subst-char-in-region (point-min) (point-max) ?  ?_)
-	    (setq alist nil))
-	  (pop alist))
+	(quoted-printable-encode-region
+	 b e nil
+	 ;; = (\075), _ (\137), ? (\077) are used in the encoded word.
+	 ;; Avoid using 8bit characters.
+	 ;; This list excludes `especials' (see the RFC2047 syntax),
+	 ;; meaning that some characters in non-structured fields will
+	 ;; get encoded when they con't need to be.  The following is
+	 ;; what it used to be.
+;;;  	 ;; Equivalent to "^\000-\007\011\013\015-\037\200-\377=_?"
+;;;  	 "\010\012\014\040-\074\076\100-\136\140-\177")
+	 "-\b\n\f !#-'*+0-9A-Z\\^`-~\d")
+	(subst-char-in-region (point-min) (point-max) ?  ?_)
 	;; The size of QP encapsulation is about 20, so set limit to
 	;; 56=76-20.
 	(unless (< (- (point-max) (point-min)) 56)
@@ -588,6 +623,12 @@ By default, the region is treated as containing addresses (see
 ;; Fixme: This should decode in place, not cons intermediate strings.
 ;; Also check whether it needs to worry about delimiting fields like
 ;; encoding.
+
+;; In fact it's reported that (invalid) encoding of mailboxes in
+;; addr-specs is in use, so delimiting fields might help.  Probably
+;; not decoding a word which isn't properly delimited is good enough
+;; and worthwhile (is it more correct or not?), e.g. something like
+;; `=?iso-8859-1?q?foo?=@'.
 
 (defun rfc2047-decode-region (start end)
   "Decode MIME-encoded words in region between START and END."
@@ -705,19 +746,16 @@ If your Emacs implementation can't decode CHARSET, return nil."
       (when (and (eq cs 'ascii)
 		 mail-parse-charset)
 	(setq cs mail-parse-charset))
-      ;; Fixme: What's this for?  The following comment makes no sense. -- fx
-      (mm-with-unibyte-current-buffer
-	;; In Emacs Mule 4, decoding UTF-8 should be in unibyte mode.
-	(mm-decode-coding-string
-	 (cond
-	  ((equal "B" encoding)
-	   (base64-decode-string
-	    (rfc2047-pad-base64 string)))
-	  ((equal "Q" encoding)
-	   (quoted-printable-decode-string
-	    (mm-replace-chars-in-string string ?_ ? )))
-	  (t (error "Invalid encoding: %s" encoding)))
-	 cs)))))
+      (mm-decode-coding-string
+       (cond
+	((equal "B" encoding)
+	 (base64-decode-string
+	  (rfc2047-pad-base64 string)))
+	((equal "Q" encoding)
+	 (quoted-printable-decode-string
+	  (mm-replace-chars-in-string string ?_ ? )))
+	(t (error "Invalid encoding: %s" encoding)))
+       cs))))
 
 (provide 'rfc2047)
 

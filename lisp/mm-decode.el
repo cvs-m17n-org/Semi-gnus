@@ -100,20 +100,23 @@
 (defcustom mm-text-html-renderer
   (cond ((locate-library "w3") 'w3)
 	((locate-library "w3m") 'w3m)
+	((executable-find "w3m") 'w3m-standalone)
 	((executable-find "links") 'links)
 	((executable-find "lynx") 'lynx)
 	(t 'html2text))
   "Render of HTML contents.
 It is one of defined renderer types, or a rendering function.
 The defined renderer types are:
-`w3'   : using Emacs/W3;
-`w3m'  : using emacs-w3m;
-`links': using links;
-`lynx' : using lynx;
-`html2text' : using html2text;
-nil    : using external viewer."
+`w3'   : use Emacs/W3;
+`w3m'  : use emacs-w3m;
+`w3m-standalone': use w3m;
+`links': use links;
+`lynx' : use lynx;
+`html2text' : use html2text;
+nil    : use external viewer."
   :type '(choice (const w3)
 		 (const w3m)
+		 (const w3m-standalone)
 		 (const links)
 		 (const lynx)
 		 (const html2text)
@@ -127,20 +130,24 @@ nil    : using external viewer."
 It is suggested to customize `mm-text-html-renderer' instead.")
 
 (defcustom mm-inline-text-html-with-images nil
-  "If non-nil, Gnus will allow retrieving images in the HTML contents
-with <img> tags.  It has no effect on Emacs/w3.  See also
-the documentation for the option `mm-w3m-safe-url-regexp'."
+  "If non-nil, Gnus will allow retrieving images in HTML contents with
+the <img> tags.  It has no effect on Emacs/w3.  See also the
+documentation for the `mm-w3m-safe-url-regexp' variable."
   :type 'boolean
   :group 'mime-display)
 
 (defcustom mm-w3m-safe-url-regexp "\\`cid:"
-  "Regexp that matches safe url names.  Some HTML mails might have a
-trick of spammers using <img> tags.  It is likely to be intended to
-verify whether you have read the mail.  You can prevent your personal
-informations from leaking by setting this to the regexp which matches
-the safe url names.  The value of the variable `w3m-safe-url-regexp'
-will be bound with this value.  You may set this value to nil if you
-consider all the urls to be safe."
+  "Regexp matching URLs which are considered to be safe.
+Some HTML mails might contain a nasty trick used by spammers, using
+the <img> tag which is far more evil than the [Click Here!] button.
+It is most likely intended to check whether the ominous spam mail has
+reached your eyes or not, in which case the spammer knows for sure
+that your email address is valid.  It is done by embedding an
+identifier string into a URL that you might automatically retrieve
+when displaying the image.  The default value is \"\\\\`cid:\" which only
+matches parts embedded to the Multipart/Related type MIME contents and
+Gnus will never connect to the spammer's site arbitrarily.  You may
+set this variable to nil if you consider all urls to be safe."
   :type '(choice (regexp :tag "Regexp")
 		 (const :tag "All URLs are safe" nil))
   :group 'mime-display)
@@ -151,7 +158,7 @@ consider all the urls to be safe."
   :group 'mime-display)
 
 (defcustom mm-inline-media-tests
-  '(("image/jpeg"
+  '(("image/p?jpeg"
      mm-inline-image
      (lambda (handle)
        (mm-valid-and-fit-image-p 'jpeg handle)))
@@ -237,7 +244,7 @@ consider all the urls to be safe."
     ;; Default to displaying as text
     (".*" mm-inline-text mm-readable-p))
   "Alist of media types/tests saying whether types can be displayed inline."
-  :type '(repeat (list (string :tag "MIME type")
+  :type '(repeat (list (regexp :tag "MIME type")
 		       (function :tag "Display function")
 		       (function :tag "Display test")))
   :group 'mime-display)
@@ -322,11 +329,14 @@ to:
   :type 'boolean
   :group 'mime-display)
 
-(defvar mm-file-name-rewrite-functions nil
+(defvar mm-file-name-rewrite-functions
+  '(mm-file-name-delete-control mm-file-name-delete-gotchas)
   "*List of functions used for rewriting file names of MIME parts.
 Each function takes a file name as input and returns a file name.
 
 Ready-made functions include
+`mm-file-name-delete-control'
+`mm-file-name-delete-gotchas'
 `mm-file-name-delete-whitespace',
 `mm-file-name-trim-whitespace',
 `mm-file-name-collapse-whitespace',
@@ -349,6 +359,11 @@ Each function takes a file name as input and returns a file name.")
   "The default directory where mm will save files.
 If not set, `default-directory' will be used."
   :type '(choice directory (const :tag "Default" nil))
+  :group 'mime-display)
+
+(defcustom mm-attachment-file-modes 384
+  "Set the mode bits of saved attachments to this integer."
+  :type 'integer
   :group 'mime-display)
 
 (defcustom mm-external-terminal-program "xterm"
@@ -384,7 +399,7 @@ If not set, `default-directory' will be used."
 (defcustom mm-verify-option 'never
   "Option of verifying signed parts.
 `never', not verify; `always', always verify;
-`known', only verify known protocols. Otherwise, ask user."
+`known', only verify known protocols.  Otherwise, ask user."
   :type '(choice (item always)
 		 (item never)
 		 (item :tag "only known protocols" known)
@@ -402,7 +417,7 @@ If not set, `default-directory' will be used."
 (defcustom mm-decrypt-option nil
   "Option of decrypting encrypted parts.
 `never', not decrypt; `always', always decrypt;
-`known', only decrypt known protocols. Otherwise, ask user."
+`known', only decrypt known protocols.  Otherwise, ask user."
   :type '(choice (item always)
 		 (item never)
 		 (item :tag "only known protocols" known)
@@ -458,8 +473,9 @@ The original alist is not modified.  See also `destructive-alist-to-plist'."
 	  (throw 'found t))))))
 
 (defun mm-handle-set-external-undisplayer (handle function)
-  "Set the undisplayer for this handle; postpone undisplaying of viewers
-for types in mm-keep-viewer-alive-types."
+  "Set the undisplayer for HANDLE to FUNCTION.
+Postpone undisplaying of viewers for types in
+`mm-keep-viewer-alive-types'."
   (if (mm-keep-viewer-alive-p handle)
       (let ((new-handle (copy-sequence handle)))
 	(mm-handle-set-undisplayer new-handle function)
@@ -515,7 +531,8 @@ for types in mm-keep-viewer-alive-types."
 	  ((equal type "multipart")
 	   (let ((mm-dissect-default-type (if (equal subtype "digest")
 					      "message/rfc822"
-					    "text/plain")))
+					    "text/plain"))
+		 (start (cdr (assq 'start (cdr ctl)))))
 	     (add-text-properties 0 (length (car ctl))
 				  (mm-alist-to-plist (cdr ctl)) (car ctl))
 
@@ -525,10 +542,9 @@ for types in mm-keep-viewer-alive-types."
 	     ;; the mm-handle API so we simply store the multipart buffert
 	     ;; name as a text property of the "multipart/whatever" string.
 	     (add-text-properties 0 (length (car ctl))
-				  (list 'buffer (mm-copy-to-buffer))
-				  (car ctl))
-	     (add-text-properties 0 (length (car ctl))
-				  (list 'from from)
+				  (list 'buffer (mm-copy-to-buffer)
+					'from from
+					'start start)
 				  (car ctl))
 	     (cons (car ctl) (mm-dissect-multipart ctl))))
 	  (t
@@ -846,9 +862,18 @@ external if displayed external."
 	  (funcall object))
 	 ;; Externally displayed part.
 	 ((consp object)
+	  (condition-case ()
+	      (while (get-buffer-process (cdr object))
+		(interrupt-process (get-buffer-process (cdr object)))
+		(message "Waiting for external displayer to die...")
+		(sit-for 1))
+	    (quit)
+	    (error))
+	  (ignore-errors (and (cdr object) (kill-buffer (cdr object))))
+	  (message "Waiting for external displayer to die...done")
 	  (ignore-errors (delete-file (car object)))
-	  (ignore-errors (delete-directory (file-name-directory (car object))))
-	  (ignore-errors (and (cdr object) (kill-buffer (cdr object)))))
+	  (ignore-errors (delete-directory (file-name-directory
+					    (car object)))))
 	 ((bufferp object)
 	  (when (buffer-live-p object)
 	    (kill-buffer object)))))
@@ -1005,12 +1030,21 @@ external if displayed external."
 
 (defun mm-file-name-replace-whitespace (file-name)
   "Replace whitespace characters in FILE-NAME with underscores.
-Set `mm-file-name-replace-whitespace' to any other string if you do not
-like underscores."
+Set the option `mm-file-name-replace-whitespace' to any other
+string if you do not like underscores."
   (let ((s (or mm-file-name-replace-whitespace "_")))
     (while (string-match "\\s-" file-name)
       (setq file-name (replace-match s t t file-name))))
   file-name)
+
+(defun mm-file-name-delete-control (filename)
+  "Delete control characters from FILENAME."
+  (gnus-replace-in-string filename "[\x00-\x1f\x7f]" ""))
+
+(defun mm-file-name-delete-gotchas (filename)
+  "Delete shell gotchas from FILENAME."
+  (setq filename (gnus-replace-in-string filename "[<>|]" ""))
+  (gnus-replace-in-string filename "^[.-]+" ""))
 
 (defun mm-save-part (handle)
   "Write HANDLE to a file."
@@ -1037,13 +1071,17 @@ like underscores."
   (mm-with-unibyte-buffer
     (mm-insert-part handle)
     (let ((coding-system-for-write 'binary)
+	  (current-file-modes (default-file-modes))
 	  ;; Don't re-compress .gz & al.  Arguably we should make
 	  ;; `file-name-handler-alist' nil, but that would chop
 	  ;; ange-ftp, which is reasonable to use here.
 	  (inhibit-file-name-operation 'write-region)
 	  (inhibit-file-name-handlers
 	   (cons 'jka-compr-handler inhibit-file-name-handlers)))
-      (write-region (point-min) (point-max) file))))
+      (set-default-file-modes mm-attachment-file-modes)
+      (unwind-protect
+	  (write-region (point-min) (point-max) file)
+	(set-default-file-modes current-file-modes)))))
 
 (defun mm-pipe-part (handle)
   "Pipe HANDLE to a process."

@@ -48,6 +48,7 @@
 
   (gnus-define-keys gnus-draft-mode-map
     "Dt" gnus-draft-toggle-sending
+    "e"  gnus-draft-edit-message ;; Use `B w' for `gnus-summary-edit-article'
     "De" gnus-draft-edit-message
     "Ds" gnus-draft-send-message
     "DS" gnus-draft-send-all-messages))
@@ -186,8 +187,12 @@
 (defun gnus-draft-send-all-messages ()
   "Send all the sendable drafts."
   (interactive)
-  (gnus-uu-mark-buffer)
-  (gnus-draft-send-message))
+  (when (or
+	 gnus-expert-user
+	 (gnus-y-or-n-p
+	  "Send all drafts? "))
+    (gnus-uu-mark-buffer)
+    (gnus-draft-send-message)))
 
 (defun gnus-group-send-queue ()
   "Send all sendable articles from the queue group."
@@ -219,7 +224,7 @@
 	  (dolist (group '("nndraft:drafts" "nndraft:queue"))
 	    (setq active (gnus-activate-group group))
 	    (if (and active (>= (cdr active) (car active)))
-		(if (y-or-n-p "There are unsent drafts. Confirm to exit?")
+		(if (y-or-n-p "There are unsent drafts.  Confirm to exit? ")
 		    (throw 'continue t)
 		  (error "Stop!"))))))))
 
