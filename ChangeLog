@@ -1,3 +1,23 @@
+1999-08-24  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 11.
+	(gnus-summary-incorporated-face): New face spec.
+
+	* lisp/gnus-group.el (gnus-group-line-format-alist): Add
+	entry about the format specifier `w'.
+	(gnus-group-line-format): Fix documentation.
+
+	* lisp/gnus-sum.el (gnus-summary-highlight): Highlight lines on
+	newly incorporated mails with `gnus-summary-incorporated-face'.
+	(gnus-newsgroup-incorporated): New variable.
+	(gnus-summary-local-variables): Add `gnus-newsgroup-incorporated'.
+	(gnus-summary-mode): Set `gnus-newsgroup-incorporated'.
+
+	* lisp/nnmail.el (nnmail-new-mail-numbers): New function.
+
+	* lisp/gnus-srvr.el (gnus-browse-foreign-server): Don't prepend
+	`K' if the group has already been subscribed.
+
 1999-08-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-isearch-article): Set
