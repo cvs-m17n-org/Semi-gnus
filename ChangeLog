@@ -1,3 +1,7 @@
+2000-09-05   Daiki Ueno  <ueno@unixuser.org>
+
+	* lisp/pop3.el (pop3-save-uidls): Clear `pop3-uidl-obarray'.
+
 2000-09-04   Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/mail-source.el (pop3-leave-mail-on-server): Declare.
