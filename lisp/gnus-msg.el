@@ -807,7 +807,9 @@ Here is an example of how to use this function:
 		    swidth (string-width element)
 		    agent (cdr agent))
 	      (if bol
-		  (setq user-agent (concat user-agent " " element)
+		  (setq user-agent (if (member user-agent '("" "\n"))
+				       (concat user-agent element)
+				     (concat user-agent " " element))
 			width (+ width 1 swidth)
 			bol nil)
 		(if (> (+ width 1 swidth) max-column)
