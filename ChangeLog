@@ -1,3 +1,18 @@
+1999-08-18  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 06.
+
+	* lisp/gnus-art.el (mime-preview-over-to-next-method-alist): Use
+	`gnus-article-next-page' when the last page is not displayed.
+	(mime-preview-over-to-previous-method-alist): Use
+	`gnus-article-prev-page' when the first page is not displayed.
+	(gnus-next-page-map): Use `make-sparse-keymap' instead of
+	`make-keymap'; don't use `suppress-keymap'.
+	(gnus-insert-next-page-button, gnus-insert-prev-page-button):
+	Succeed to the value of the text property `mime-view-situation' in
+	the Next/Prev buttons; make `gnus-{next|prev}-page-map' have the
+	current local map under FSF Emacsen.
+
 1999-08-18  Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/pop3.el (pop3-retr): Undo last change.
