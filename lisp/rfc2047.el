@@ -169,14 +169,15 @@ Should be called narrowed to the head of the message."
 		       (mm-charset-to-coding-system
 			(car message-posting-charset))))
 		;; No encoding necessary, but folding is nice
-		(rfc2047-fold-region
-		 (save-excursion
-		   (goto-char (point-min))
-		   (skip-chars-forward "^:")
-		   (when (looking-at ": ")
-		     (forward-char 2))
-		   (point))
-		 (point-max)))
+		(when nil
+		  (rfc2047-fold-region
+		   (save-excursion
+		     (goto-char (point-min))
+		     (skip-chars-forward "^:")
+		     (when (looking-at ": ")
+		       (forward-char 2))
+		     (point))
+		   (point-max))))
 	    ;; We found something that may perhaps be encoded.
 	    (setq method nil
 		  alist rfc2047-header-encoding-alist)
@@ -611,9 +612,9 @@ By default, the region is treated as containing addresses (see
 	(goto-char (or break qword-break))
 	(setq break nil
 	      qword-break nil)
-	(if (looking-at "[ \t]")
-	    (insert ?\n)
-	  (insert "\n "))
+	  (if (looking-at "[ \t]")
+	      (insert ?\n)
+	    (insert "\n "))
 	(setq bol (1- (point)))
 	;; Don't break before the first non-LWSP characters.
 	(skip-chars-forward " \t")
