@@ -1,5 +1,8 @@
 1999-01-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/pop3.el (pop3-munge-message-separator): Use
+	`parse-time-string'.
+
 	* lisp/gnus-vm.el (gnus-summary-save-in-vm): Save window config,
 	select the article before saving.
 
