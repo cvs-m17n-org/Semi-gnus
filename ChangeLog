@@ -1,5 +1,8 @@
 2001-07-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/nnheader.el (nnheader-header-value): Ignore leading
+	whitespaces.
+
 	* lisp/dgnushack.el (dgnushack-make-auto-load): Advise
 	`make-autoload' to handle `define-derived-mode'.
 

@@ -213,7 +213,7 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (let ((pt (point)))
     (prog2
 	(skip-chars-forward " \t")
-	(buffer-substring (match-end 0) (std11-field-end))
+	(buffer-substring (point) (std11-field-end))
       (goto-char pt))))
 
 (defun nnheader-parse-head (&optional naked)
