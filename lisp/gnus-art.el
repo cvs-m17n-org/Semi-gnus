@@ -1798,7 +1798,6 @@ should replace the \"Date:\" one, or should be added below it."
 	 (date (if (vectorp header) (mail-header-date header)
 		 header))
 	 (inhibit-point-motion-hooks t)
-	 (newline t)
 	 bface eface)
     (when (and date (not (string= date "")))
       (save-excursion
@@ -1811,18 +1810,12 @@ should replace the \"Date:\" one, or should be added below it."
 	    (forward-line 1))
 	  (goto-char (point-min))
 	  (let ((buffer-read-only nil))
- 	    ;; Delete any old Date headers.
- 	    (while (re-search-forward date-regexp nil t)
-	      (if newline
-		  (delete-region (progn (beginning-of-line) (point))
-				 (progn (end-of-line) (point)))
-		(delete-region (progn (beginning-of-line) (point))
-			       (progn (forward-line 1) (point))))
-	      (setq newline nil))
-	    (insert (article-make-date-line date type))
-	    (when newline
-	      (insert "\n")
-	      (forward-line -1))
+	    ;; Delete any old Date headers.
+	    (while (re-search-forward date-regexp nil t)
+	      (delete-region (progn (beginning-of-line) (point))
+			     (progn (forward-line 1) (point))))
+	    (insert (article-make-date-line date type) "\n")
+	    (forward-line -1)
 	    ;; Do highlighting.
 	    (beginning-of-line)
 	    (when (looking-at "\\([^:]+\\): *\\(.*\\)$")
@@ -2723,6 +2716,8 @@ If ALL-HEADERS is non-nil, no headers are hidden."
     (funcall method)
     ;; Associate this article with the current summary buffer.
     (setq gnus-article-current-summary gnus-summary-buffer)
+    ;; Call the treatment functions.
+    (gnus-treat-article nil)
     ;; Perform the article display hooks.
     (gnus-run-hooks 'gnus-article-display-hook)))
 
