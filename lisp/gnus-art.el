@@ -2145,7 +2145,9 @@ This format is defined by the `gnus-article-time-format' variable."
   (interactive (gnus-article-hidden-arg))
   (unless (gnus-article-check-hidden-text 'emphasis arg)
     (save-excursion
-      (let ((alist (or gnus-article-emphasis-alist gnus-emphasis-alist))
+      (let ((alist (or (with-current-buffer gnus-summary-buffer 
+			 gnus-article-emphasis-alist) 
+		       gnus-emphasis-alist))
 	    (buffer-read-only nil)
 	    (props (append '(article-type emphasis)
 			   gnus-hidden-properties))
@@ -3417,7 +3419,7 @@ value of the variable `gnus-show-mime' is non-nil."
 				  "inline")
 			   (mm-attachment-override-p type)))
 		 (mm-automatic-display-p type)
-		 (or (mm-inlinable-part-p type)
+		 (or (mm-inlined-p type)
 		     (mm-automatic-external-display-p type)))
 	    (setq display t)
 	  (when (equal (car (split-string type "/"))

@@ -8307,12 +8307,11 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
 $B$G$"$k;v$,$G$-$^$9!#(B
 
 $B$b$7!":n@.$7$h$&$H$7$F$$$k%a%C%;!<%8$,%K%e!<%95-;v$+%a!<%k%a%C%;!<%8$G$"(B
-$B$k$+$rD4$Y$?$$$H$-$O!"(B2$B$D$NF0E*$KB+G{$5$l$kJQ?t(B 
-@code{message-this-is-news} $B$H(B @code{message-thiss-is-mail} $B$rD4$Y$k;v$,(B
-$B$G$-$^$9!#(B
+$B$k$+$rD4$Y$?$$$H$-$O!"(B2$B$D$N4X?t(B @code{message-news-p} $B$H(B 
+@code{message-mail-p} $B$r;H$&$3$H$K$h$C$FCN$k;v$,$G$-$^$9!#(B
 
-@vindex message-this-is-mail
-@vindex message-this-is-news
+@findex message-mail-p
+@findex message-news-p
 
 $B$=$7$F!"$3$l$ONc$G$9(B:
 
@@ -8327,9 +8326,9 @@ Gnus $B$O30$X=P$F9T$/A4$F$N%a%C%;!<%8$K!"0l$D$+$=$l0J>e$N$=$N%5!<%P!<$N%0%k!<(
          (signature my-funny-signature-randomizer))
         ((equal (system-name) "gnarly")
          (signature my-quote-randomizer))
-        (message-this-is-news
+        ((message-news-p)
          (signature my-news-signature))
-        (posting-from-work-p
+        ((posting-from-work-p)
          (signature-file "~/.work-signature")
          (address "user@@bar.foo")
          (body "You are fired.\n\nSincerely, your boss.")
@@ -9226,6 +9225,7 @@ W3 $B$NG[I[$+$i(B) $B$,I,MW$K$J$j$^$9(B)$B!#$=$l$+$i%5!<%P!<$r<!$N$h$&$KDj5
 $B$+!)(B $B$$$d!"$b$A$m$s$G$-$^$9!#(B
 
 @menu
+* Mail in a Newsreader:: $B%K%e!<%9%j!<%@$G%a!<%k(B ($BBg;v$JA0CV$-(B)$B!#(B
 * Getting Started Reading Mail:: $B4JC1$JNAM}K\$N$h$&$JNc!#(B
 * Splitting Mail::               $B$I$N$h$&$K%a!<%k%0%k!<%W$r:n@.$9$k$+!#(B
 * Mail Backend Variables::       $B%a!<%k$N07$$$r%+%9%?%^%$%:$9$k$?$a$NJQ?t!#(B
@@ -9238,6 +9238,58 @@ W3 $B$NG[I[$+$i(B) $B$,I,MW$K$J$j$^$9(B)$B!#$=$l$+$i%5!<%P!<$r<!$N$h$&$KDj5
 * Not Reading Mail::             $BB>$N%U%!%$%k$rFI$`$?$a$K%a!<%k%P%C%/%(%s%I$r;H$&!#(B
 * Choosing a Mail Backend::      Gnus $B$O?'!9$J%a!<%kMM<0$rFI$`;v$,$G$-$k!#(B
 @end menu
+
+
+@node Mail in a Newsreader
+@subsection $B%K%e!<%9%j!<%@$G%a!<%k(B ($BBg;v$JA0CV$-(B)
+
+$B$"$J$?$,EAE}E*$J%a!<%k%j!<%@$+$i(B gnus $B$K>h$j49$($k$3$H$r7hCG$7$?$J$i$P!"(B
+$B$"$J$?$O$$$m$$$m$J%+%k%A%c!<%7%g%C%/$r<u$1$k$3$H$G$7$g$&!#(B
+
+gnus $B$OEAE}E*$J%a!<%k%j!<%@$N$h$&$J$U$k$^$$$r$7$^$;$s!#$"$J$?$,K>$`$J(B
+$B$i$=$N$h$&$K$b$G$-$^$9$,!"$=$l$O9|@^$jB;$N$/$?$S$lLY$1$G$9!#(B
+
+gnus $B$O$U$D$&F1$8<jK!$G$9$Y$F$N%0%k!<%W$r07$$$^$9!#$"$J$?$O$"$k%0%k!<(B
+$B%W$rA*$s$G?7$7$$(B/$BL$FI$N5-;v$rFI$`!"$=$7$FFI$s$@5-;v$O4{FI$H$7$F%^!<%/(B
+$B$5$l$k!#$"$J$?$,L\$K$9$k$N$O(B ($B$"$J$?$,0U?^E*$K?R$M$J$1$l$P(B) $B$=$l$@$1$G(B
+$B$9!#$3$l$C$F$H$F$b%K%e!<%9%j!<%@E*$G$7$g!#(B
+
+$B$"$J$?$O5-;v$r>C$9$?$a$KFCJL$JA`:n$O$7$^$;$s!#(B
+
+$B$3$N$3$H$O4{FI$N5-;v$O$9$Y$F>C$5$l$F$7$^$&$3$H$r0UL#$9$k$N$+$C$F(B? $B$=$j$c(B
+$B$"$s$^$j$G$9$h$M(B!
+
+$B$=$&$G$O$"$j$^$;$s!#8E$$5-;v$O$$$m$s$J;EAH$_$K$h$C$F(B @dfn{expire} $B$5$l(B
+$B$k$N$G$9!#%K%e!<%95-;v$O%K%e!<%9$N4IM}?M(B ($B$,4IM}$7$F$$$k%5!<%P(B) $B$K$h$C(B
+$B$F(B expire $B$N=hM}$,@)8f$5$l!"%a!<%k$N(B expire $B$N=hM}$O$"$J$?$,@)8f$7$^$9!#(B
+$B%a!<%k$N(B expire $B$K$D$$$F$O(B @pxref{Expiring Mail} $B$r;2>H$7$F2<$5$$!#(B
+
+$B$7$P$i$/%a!<%k$H%K%e!<%9$NN>J}$r;H$C$F$_$l$P!"G[Aw$N;EAH$_$N0c$$$,=EMW(B
+$B$G$O$J$$$3$H$K5$$,IU$-$^$9!#Bg;v$J$N$O5-;v$r<u$1<h$k4Q=0$N?t$J$N$G$9!#(B
+
+$BB?$/$N?M$?$A$OJ#?t$N%a!<%j%s%0%j%9%H$r9VFI$7$F$$$^$9!#$=$l$i$O(B SMTP $B$G(B
+$BG[Aw$5$l$k!"%a!<%k!"$G$9!#$"$k?M$?$A$O>.?M?t$KMxMQ$5$l$F$$$k%m!<%+%k(B
+$B%K%e!<%9%0%k!<%W$r9VFI$7$F$$$^$9!#$=$l$i$O(B NNTP $B$GG[Aw$5$l$k!"%K%e!<%9!"(B
+$B$G$9!#(B
+
+$BG[Aw$N;EAH$_$N0c$$$O$I$&$G$b$h$$$3$H$G!"Bg;v$J$N$O5-;v$,(B @dfn{personal}
+ $B$J$b$N$+(B @dfn{public} $B$J$b$N$+$H$$$&$3$H$G$9!#$3$l$iFs$D$N<oN`$K1~$8(B
+$B$F!"B?$/$N%f!<%6$O(B gnus $B$NF0:n$rHyL/$K@Z$jBX$($^$9!#(B
+
+$B$"$k?M$?$A$O(B gnus ($B$($C$X$s(B) $B$N$d$j$+$?$KK~B-$G$-$J$/$F!"(Bgnus $B$,%a!<%k(B
+$B%j!<%@$K$J$k$3$H$rM_$7$^$9!#(Bgnus $B$r$b$C$H%a!<%k%j!<%@E*$J$b$N$K$9$k$?(B
+$B$a$KJ\BG$D$3$H$O2DG=$G$O$"$k$N$G$9$,!"A0$K$b8@$C$?$h$&$K4JC1$G$O$"$j$^(B
+$B$;$s!#$$$o$f$k%a!<%k%j!<%@$,9%$_$J$i$P(B @sc{vm} $B$r;H$$$^$7$g$&!#$3$l$O(B
+$BM%=($J!"87L)$J0UL#$G$N%a!<%k%j!<%@$G$9!#(B
+
+$B6<$+$9$o$1$G$O$J$$$N$G$9$,!"$O$C$-$j$5$;$F$*$-$?$$$N$O!"$"$J$?$K5-;v$K(B
+$B$D$$$F$N?7$7$$$d$jJ}$r=$F@$7$FM_$7$$$H$$$&$3$H$G$9!#$"$J$?$,(B gnus $B$N$d(B
+$B$jJ}$r<u$1F~$l$F$/$l$?6G$K$O!"$-$C$H$"$J$?$O(B gnus $B$,9%$-$K$J$k$3$H@A$1(B
+$B9g$$$G$9!#(B
+
+(At least the guy who sold me the Emacs Subliminal Brain-Washing
+Functions that I've put into Gnus did guarantee it.  You Will Be
+Assimilated.  You Love Gnus.  You Love The Gnus Mail Way.  You Do.)
 
 
 @node Getting Started Reading Mail
@@ -16869,8 +16921,6 @@ to display help in the minibuffer on buttons under XEmacs.
 are in the cache.
 @item
  AUTHINFO GENERIC
-@item
- support qmail maildir spools
 @item
  `run-with-idle-timer' in gnus-demon.
 @item

@@ -79,7 +79,7 @@ it's not cached."
 (defvar gnus-cache-overview-coding-system 'raw-text
   "Coding system used on Gnus cache files.")
 
-(defvar gnus-cache-coding-system 'binary
+(defvar gnus-cache-coding-system 'raw-text
   "Coding system used on Gnus cache files.")
 
 
@@ -685,14 +685,9 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
   (when (or force
 	    (and gnus-cache-active-hashtb
 		 gnus-cache-active-altered))
-    (with-temp-file gnus-cache-active-file
-      (mapatoms
-       (lambda (sym)
-	 (when (and sym (boundp sym))
-	   (insert (format "%s %d %d y\n"
-			   (symbol-name sym) (cdr (symbol-value sym))
-			   (car (symbol-value sym))))))
-       gnus-cache-active-hashtb))
+    (gnus-write-active-file-as-coding-system
+     gnus-cache-write-file-coding-system
+     gnus-cache-active-file gnus-cache-active-hashtb)
     ;; Mark the active hashtb as unaltered.
     (setq gnus-cache-active-altered nil)))
 

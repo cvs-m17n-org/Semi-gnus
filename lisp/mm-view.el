@@ -33,9 +33,6 @@
   (autoload 'vcard-parse-string "vcard")
   (autoload 'vcard-format-string "vcard"))
 
-;; Avoid byte compile warnings for the use of old W3.
-(defvar w3-meta-content-type-charset-regexp)
-(defvar w3-meta-charset-content-type-regexp)
 ;; Avoid byte compile warning.
 (defvar gnus-article-mime-handles)
 
@@ -95,7 +92,8 @@
 			       (buffer-substring-no-properties 
 				(match-beginning 2) 
 				(match-end 2)))))
-	    (mm-decode-body charset)
+	    (delete-region (point-min) (point-max))
+	    (insert (mm-decode-string text charset))
 	    (save-window-excursion
 	      (save-restriction
 		(let ((w3-strict-width width)

@@ -93,7 +93,7 @@ If nil, only read articles will be expired."
 (defvar gnus-agent-spam-hashtb nil)
 (defvar gnus-agent-file-name nil)
 (defvar gnus-agent-send-mail-function nil)
-(defvar gnus-agent-file-coding-system 'binary)
+(defvar gnus-agent-file-coding-system 'raw-text)
 
 (defconst gnus-agent-scoreable-headers
   '("subject" "from" "date" "message-id" "references" "chars" "lines" "xref")
@@ -545,46 +545,56 @@ the actual number of articles toggled is returned."
 ;;;
 
 (defun gnus-agent-save-active (method)
+  (gnus-agent-save-active-1 method 'gnus-active-to-gnus-format))
+
+(defun gnus-agent-save-active-1 (method function)
   (when (gnus-agent-method-p method)
     (let* ((gnus-command-method method)
+	   (new (gnus-make-hashtable (count-lines (point-min) (point-max))))
 	   (file (gnus-agent-lib-file "active")))
-      (gnus-make-directory (file-name-directory file))
-      (write-region-as-coding-system
-       gnus-agent-file-coding-system (point-min) (point-max) file nil 'silent)
-      (when (file-exists-p (gnus-agent-lib-file "groups"))
-	(delete-file (gnus-agent-lib-file "groups"))))))
+      (funcall function nil new)
+      (gnus-agent-write-active file new)
+      (erase-buffer)
+      (insert-file-contents-as-coding-system gnus-agent-file-coding-system
+					     file))))
+
+(defun gnus-agent-write-active (file new)
+  (let ((orig (gnus-make-hashtable (count-lines (point-min) (point-max))))
+	(file (gnus-agent-lib-file "active"))
+	elem)
+    (when (file-exists-p file)
+      (with-temp-buffer
+	(insert-file-contents-as-coding-system gnus-agent-file-coding-system
+					       file)
+	(gnus-active-to-gnus-format nil orig))
+      (mapatoms
+       (lambda (sym)
+	 (when (and sym (boundp sym))
+	   (if (setq elem (symbol-value (intern (symbol-name sym) orig)))
+	       (setcdr elem (cdr (symbol-value sym)))
+	     (set (intern (symbol-name sym) orig) (symbol-value sym)))))
+       new))
+    (gnus-make-directory (file-name-directory file))
+    (gnus-write-active-file-as-coding-system gnus-agent-file-coding-system
+					     file orig)))
 
 (defun gnus-agent-save-groups (method)
-  (let* ((gnus-command-method method)
-	 (file (gnus-agent-lib-file "groups")))
-    (gnus-make-directory (file-name-directory file))
-    (write-region-as-coding-system
-     gnus-agent-file-coding-system (point-min) (point-max) file nil 'silent)
-    (when (file-exists-p (gnus-agent-lib-file "active"))
-      (delete-file (gnus-agent-lib-file "active")))))
+  (gnus-agent-save-active-1 method 'gnus-groups-to-gnus-format))
 
 (defun gnus-agent-save-group-info (method group active)
   (when (gnus-agent-method-p method)
     (let* ((gnus-command-method method)
-	   (file (if nntp-server-list-active-group
-		     (gnus-agent-lib-file "active")
-		   (gnus-agent-lib-file "groups"))))
+	   (file (gnus-agent-lib-file "active")))
       (gnus-make-directory (file-name-directory file))
       (with-temp-file file
 	(when (file-exists-p file)
 	  (nnheader-insert-file-contents file))
 	(goto-char (point-min))
-	(if nntp-server-list-active-group
-	    (progn
-	      (when (re-search-forward
-		     (concat "^" (regexp-quote group) " ") nil t)
-		(gnus-delete-line))
-	      (insert group " " (number-to-string (cdr active)) " "
- 		      (number-to-string (car active)) " y\n"))
- 	  (when (re-search-forward
- 		 (concat (regexp-quote group) "\\($\\| \\)") nil t)
-	    (gnus-delete-line))
-	  (insert-buffer-substring nntp-server-buffer))))))
+	(when (re-search-forward
+	       (concat "^" (regexp-quote group) " ") nil t)
+	  (gnus-delete-line))
+	(insert group " " (number-to-string (cdr active)) " "
+		(number-to-string (car active)) " y\n")))))
 
 (defun gnus-agent-group-path (group)
   "Translate GROUP into a path."
@@ -1351,8 +1361,14 @@ The following commands are available:
 	(day (- (time-to-days (current-time)) gnus-agent-expire-days))
 	gnus-command-method sym group articles
 	history overview file histories elem art nov-file low info
-	unreads marked article)
+	unreads marked article orig lowest highest)
     (save-excursion
+      (with-temp-buffer
+	(insert-file-contents-as-coding-system gnus-agent-file-coding-system
+					       file)
+	(gnus-active-to-gnus-format
+	 nil (setq orig (gnus-make-hashtable
+			 (count-lines (point-min) (point-max))))))
       (setq overview (gnus-get-buffer-create " *expire overview*"))
       (while (setq gnus-command-method (pop methods))
 	(let ((expiry-hashtb (gnus-make-hashtable 1023)))
@@ -1391,7 +1407,9 @@ The following commands are available:
 				 (gnus-uncompress-range
 				  (cdr (assq 'dormant
 					     (gnus-info-marks info)))))
-		   nov-file (gnus-agent-article-name ".overview" group))
+		   nov-file (gnus-agent-article-name ".overview" group)
+		   lowest nil
+		   highest nil)
 	     (gnus-agent-load-alist group)
 	     (gnus-message 5 "Expiring articles in %s" group)
 	     (set-buffer overview)
@@ -1415,7 +1433,11 @@ The following commands are available:
 		   (if (file-exists-p
 			(gnus-agent-article-name
 			 (number-to-string art) group))
-		       (forward-line 1)
+		       (progn
+			 (unless lowest
+			   (setq lowest art))
+			 (setq highest art)
+			 (forward-line 1))
 		     ;; Remove old NOV lines that have no articles.
 		     (gnus-delete-line)))
 		 (if (or (eobp)
@@ -1465,19 +1487,23 @@ The following commands are available:
 	       ;; Maybe everything has been expired from `gnus-article-alist'
 	       ;; and so the above marking as read could not be conducted,
 	       ;; or there are expired article within the range of the alist.
- 	       (when (and info
- 			  expired
- 			  (or (not (caar gnus-agent-article-alist))
- 			      (> (car expired)
- 				 (caar gnus-agent-article-alist))))
- 		 (setcar (nthcdr 2 info)
- 			 (gnus-add-to-range
- 			  (nth 2 info)
- 			  (nreverse expired))))
+	       (when (and info
+			  expired
+			  (or (not (caar gnus-agent-article-alist))
+			      (> (car expired)
+				 (caar gnus-agent-article-alist))))
+		 (setcar (nthcdr 2 info)
+			 (gnus-add-to-range
+			  (nth 2 info)
+			  (nreverse expired))))
 	       (gnus-dribble-enter
 		(concat "(gnus-group-set-info '"
 			(gnus-prin1-to-string info)
-			")"))))
+			")")))
+	     (when lowest
+	       (if (gnus-gethash group orig)
+		   (setcar (gnus-gethash group orig) lowest)
+		 (gnus-sethash group (cons lowest highest) orig))))
 	   expiry-hashtb)
 	  (set-buffer history)
 	  (setq histories (nreverse (sort histories '<)))
@@ -1485,7 +1511,10 @@ The following commands are available:
 	    (goto-char (pop histories))
 	    (gnus-delete-line))
 	  (gnus-agent-save-history)
-	  (gnus-agent-close-history))
+	  (gnus-agent-close-history)
+	  (gnus-write-active-file-as-coding-system
+	   gnus-agent-file-coding-system
+	   (gnus-agent-lib-file "active") orig))
 	(gnus-message 4 "Expiry...done"))))))
 
 ;;;###autoload
