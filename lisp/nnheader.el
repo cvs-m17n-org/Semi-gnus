@@ -1140,7 +1140,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
   "Initialize the Gnus-backend communication buffer."
   (save-excursion
     (unless (gnus-buffer-live-p nntp-server-buffer)
-      (setq nntp-server-buffer (gnus-get-buffer-create " *nntpd*")))
+      (setq nntp-server-buffer (get-buffer-create " *nntpd*")))
     (set-buffer nntp-server-buffer)
     (erase-buffer)
     (kill-all-local-variables)
