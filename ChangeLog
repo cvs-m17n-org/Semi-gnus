@@ -3,6 +3,8 @@
 	* lisp/gnus-bbdb.el (gnus-bbdb/update-record): Use
 	`mime-decode-field-body'.
 	(gnus-bbdb/extract-field-value): Ditto.
+	(gnus-bbdb-insinuate): Check existence of
+	`bbdb-extract-field-value-function-list' before setting.
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.10.1.
 
