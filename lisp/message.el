@@ -705,10 +705,10 @@ the prefix.")
 The default is `abbrev', which uses mailabbrev.  nil switches
 mail aliases off.")
 
-(defcustom message-autosave-directory
+(defcustom message-auto-save-directory
   (nnheader-concat message-directory "drafts/")
-  "*Directory where Message autosaves buffers if Gnus isn't running.
-If nil, Message won't autosave."
+  "*Directory where Message auto-saves buffers if Gnus isn't running.
+If nil, Message won't auto-save."
   :group 'message-buffers
   :type 'directory)
 
@@ -1322,7 +1322,7 @@ Return the number of headers removed."
 
   (define-key message-mode-map "\t" 'message-tab)
 
-  (define-key message-mode-map "\C-xk" 'message-kill-buffer))
+  (define-key message-mode-map "\C-xk" 'message-mimic-kill-buffer))
 
 (easy-menu-define
  message-mode-menu message-mode-map "Message Menu."
@@ -2005,6 +2005,21 @@ The text will also be indented the normal way."
       (message-delete-frame frame org-frame)))
   (message ""))
 
+(defun message-mimic-kill-buffer ()
+  "Kill the current buffer with query."
+  (interactive)
+  (unless (eq 'message-mode major-mode)
+    (error "%s must be invoked from a message buffer." this-command))
+  (let ((command this-command)
+	(bufname (read-buffer (format "Kill buffer: (default %s) "
+				      (buffer-name)))))
+    (if (or (not bufname)
+	    (string-equal bufname "")
+	    (string-equal bufname (buffer-name)))
+	(let ((message-delete-frame-on-exit nil))
+	  (message-kill-buffer))
+      (message "%s must be invoked only for the current buffer." command))))
+
 (defun message-delete-frame (frame org-frame)
   "Delete frame for editing message."
   (when (and (or (and (featurep 'xemacs)
@@ -2081,7 +2096,7 @@ the user from the mailer."
 	;; (mail-hist-put-headers-into-history))
 	(run-hooks 'message-sent-hook)
 	(message "Sending...done")
-	;; Mark the buffer as unmodified and delete autosave.
+	;; Mark the buffer as unmodified and delete auto-save.
 	(set-buffer-modified-p nil)
 	(delete-auto-save-file-if-necessary t)
 	(message-disassociate-draft)
@@ -3619,12 +3634,12 @@ Headers already prepared in the buffer are not modified."
 
 (defun message-set-auto-save-file-name ()
   "Associate the message buffer with a file in the drafts directory."
-  (when message-autosave-directory
+  (when message-auto-save-directory
     (if (gnus-alive-p)
 	(setq message-draft-article
 	      (nndraft-request-associate-buffer "drafts"))
       (setq buffer-file-name (expand-file-name "*message*"
-					       message-autosave-directory))
+					       message-auto-save-directory))
       (setq buffer-auto-save-file-name (make-auto-save-file-name)))
     (clear-visited-file-modtime)))
 
