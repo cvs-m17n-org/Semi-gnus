@@ -1,5 +1,10 @@
 2004-09-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* texi/gnus-ja.texi: Uncomment the @copying section.
+	* texi/message-ja.texi: Ditto.
+
+2004-09-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* texi/gnus-ja.texi: Comment the @copying section temporarily.
 	* texi/message-ja.texi: Ditto.
 
