@@ -1669,7 +1669,7 @@ newsgroup."
 
     (while newsrc
       (setq active (gnus-active (setq group (gnus-info-group
-						  (setq info (pop newsrc))))))
+					     (setq info (pop newsrc))))))
 
       ;; Check newsgroups.  If the user doesn't want to check them, or
       ;; they can't be checked (for instance, if the news server can't
@@ -1692,13 +1692,13 @@ newsgroup."
       (when (and method
 		 (not (setq method-type (cdr (assoc method type-cache)))))
 	(setq method-type
-		   (cond
-		    ((gnus-secondary-method-p method)
-		     'secondary)
-		    ((inline (gnus-server-equal gnus-select-method method))
-		     'primary)
-		    (t
-		     'foreign)))
+	      (cond
+	       ((gnus-secondary-method-p method)
+		'secondary)
+	       ((inline (gnus-server-equal gnus-select-method method))
+		'primary)
+	       (t
+		'foreign)))
 	(push (cons method method-type) type-cache))
 
       (setq ignore nil)
@@ -1779,8 +1779,8 @@ newsgroup."
 	  (when (gnus-check-backend-function 'request-scan (car method))
 	    (gnus-request-scan nil method))
 	  (gnus-read-active-file-2
-		(mapcar (lambda (group) (gnus-group-real-name group)) groups)
-		method)
+	   (mapcar (lambda (group) (gnus-group-real-name group)) groups)
+	   method)
 	  (dolist (group groups)
 	    (cond
 	     ((setq active (gnus-active (gnus-info-group
