@@ -376,6 +376,139 @@ the line could be found."
     (beginning-of-line)
     (eq num article)))
 
+(defun nnheader-retrieve-headers-from-directory (articles
+						 directory dependencies
+						 &optional
+						 fetch-old force-new large
+						 backend)
+  (with-temp-buffer
+    (let* ((file nil)
+	   (number (length articles))
+	   (count 0)
+	   (pathname-coding-system 'binary)
+	   (case-fold-search t)
+	   (cur (current-buffer))
+	   article
+	   headers header id end ref in-reply-to lines chars ctype)
+      ;; We don't support fetching by Message-ID.
+      (if (stringp (car articles))
+	  'headers
+	(while articles
+	  (when (and (file-exists-p
+		      (setq file (expand-file-name
+				  (int-to-string
+				   (setq article (pop articles)))
+				  directory)))
+		     (not (file-directory-p file)))
+	    ;;(erase-buffer)
+	    (nnheader-insert-head file)
+	    (save-restriction
+	      (std11-narrow-to-header)
+	      (setq
+	       header
+	       (make-full-mail-header
+		;; Number.
+		article
+		;; Subject.
+		(or (std11-fetch-field "Subject")
+		    "(none)")
+		;; From.
+		(or (std11-fetch-field "From")
+		    "(nobody)")
+		;; Date.
+		(or (std11-fetch-field "Date")
+		    "")
+		;; Message-ID.
+		(progn
+		  (goto-char (point-min))
+		  (setq id (if (re-search-forward
+				"^Message-ID: *\\(<[^\n\t> ]+>\\)" nil t)
+			       ;; We do it this way to make sure the Message-ID
+			       ;; is (somewhat) syntactically valid.
+			       (buffer-substring (match-beginning 1)
+						 (match-end 1))
+			     ;; If there was no message-id, we just fake one
+			     ;; to make subsequent routines simpler.
+			     (nnheader-generate-fake-message-id))))
+		;; References.
+		(progn
+		  (goto-char (point-min))
+		  (if (search-forward "\nReferences: " nil t)
+		      (progn
+			(setq end (point))
+			(prog1
+			    (buffer-substring (match-end 0) (std11-field-end))
+			  (setq ref
+				(buffer-substring
+				 (progn
+				   ;; (end-of-line)
+				   (search-backward ">" end t)
+				   (1+ (point)))
+				 (progn
+				   (search-backward "<" end t)
+				   (point))))))
+		    ;; Get the references from the in-reply-to header if there
+		    ;; were no references and the in-reply-to header looks
+		    ;; promising.
+		    (if (and (search-forward "\nIn-Reply-To: " nil t)
+			     (setq in-reply-to
+				   (buffer-substring (match-end 0)
+						     (std11-field-end)))
+			     (string-match "<[^>]+>" in-reply-to))
+			(let (ref2)
+			  (setq ref (substring in-reply-to (match-beginning 0)
+					       (match-end 0)))
+			  (while (string-match "<[^>]+>"
+					       in-reply-to (match-end 0))
+			    (setq ref2
+				  (substring in-reply-to (match-beginning 0)
+					     (match-end 0)))
+			    (when (> (length ref2) (length ref))
+			      (setq ref ref2)))
+			  ref)
+		      (setq ref nil))))
+		;; Chars.
+		(progn
+		  (goto-char (point-min))
+		  (if (search-forward "\nChars: " nil t)
+		      (if (numberp (setq chars (ignore-errors (read cur))))
+			  chars 0)
+		    0))
+		;; Lines.
+		(progn
+		  (goto-char (point-min))
+		  (if (search-forward "\nLines: " nil t)
+		      (if (numberp (setq lines (ignore-errors (read cur))))
+			  lines 0)
+		    0))
+		;; Xref.
+		(std11-fetch-field "Xref")
+		))
+	      (goto-char (point-min))
+	      (if (setq ctype (std11-fetch-field "Content-Type"))
+		  (mime-entity-set-content-type-internal
+		   header (mime-parse-Content-Type ctype)))
+	      )
+	    (when (setq header
+			(gnus-dependencies-add-header
+			 header dependencies force-new))
+	      (push header headers))
+	    )
+	  (setq count (1+ count))
+
+	  (and large
+	       (zerop (% count 20))
+	       (nnheader-message 5 "%s: Receiving headers... %d%%"
+				 backend
+				 (/ (* count 100) number))))
+
+	(when large
+	  (nnheader-message 5 "%s: Receiving headers...done" backend))
+
+        ;; (nnheader-fold-continuation-lines)
+	(cons 'header (nreverse headers))
+	))))
+
 ;; Various cruft the backends and Gnus need to communicate.
 
 (defvar nntp-server-buffer nil)
