@@ -370,35 +370,35 @@ If EXAMINE is non-nil the group is selected read-only."
   (with-current-buffer nntp-server-buffer
     (nnheader-insert-nov
      (with-current-buffer nnimap-server-buffer
-       (vector imap-current-message
-	       (nnimap-replace-whitespace
-		(imap-message-envelope-subject imap-current-message))
-	       (nnimap-replace-whitespace
-		(imap-envelope-from
-		 (car-safe (imap-message-envelope-from
-			    imap-current-message))))
-	       (nnimap-replace-whitespace
-		(imap-message-envelope-date imap-current-message))
-	       (nnimap-replace-whitespace
-		(imap-message-envelope-message-id imap-current-message))
-	       (nnimap-replace-whitespace
-		(let ((str (if (imap-capability 'IMAP4rev1)
-			       (nth 2 (assoc
-				       "HEADER.FIELDS REFERENCES"
-				       (imap-message-get
-					imap-current-message 'BODYDETAIL)))
-			     (imap-message-get imap-current-message
-					       'RFC822.HEADER))))
-		  (if (> (length str) (length "References: "))
-		      (substring str (length "References: "))
-		    (if (and (setq str (imap-message-envelope-in-reply-to
-					imap-current-message))
-			     (string-match "<[^>]+>" str))
-			(substring str (match-beginning 0) (match-end 0))))))
-	       (imap-message-get imap-current-message 'RFC822.SIZE)
-	       (imap-body-lines (imap-message-body imap-current-message))
-	       nil ;; xref
-	       nil))))) ;; extra-headers
+       (make-full-mail-header 
+	imap-current-message
+	(nnimap-replace-whitespace 
+	 (imap-message-envelope-subject imap-current-message))
+	(nnimap-replace-whitespace
+	 (imap-envelope-from (car-safe (imap-message-envelope-from
+					imap-current-message))))
+	(nnimap-replace-whitespace
+	 (imap-message-envelope-date imap-current-message))
+	(nnimap-replace-whitespace
+	 (imap-message-envelope-message-id imap-current-message))
+	(nnimap-replace-whitespace
+	 (let ((str (if (imap-capability 'IMAP4rev1)
+			(nth 2 (assoc
+				"HEADER.FIELDS REFERENCES"
+				(imap-message-get
+				 imap-current-message 'BODYDETAIL)))
+		      (imap-message-get imap-current-message
+					'RFC822.HEADER))))
+	   (if (> (length str) (length "References: "))
+	       (substring str (length "References: "))
+	     (if (and (setq str (imap-message-envelope-in-reply-to
+				 imap-current-message))
+		      (string-match "<[^>]+>" str))
+		 (substring str (match-beginning 0) (match-end 0))))))
+	(imap-message-get imap-current-message 'RFC822.SIZE)
+	(imap-body-lines (imap-message-body imap-current-message))
+	nil ;; xref
+	nil))))) ;; extra-headers
 
 (defun nnimap-retrieve-which-headers (articles fetch-old)
   "Get a range of articles to fetch based on ARTICLES and FETCH-OLD."
