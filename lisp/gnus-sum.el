@@ -6989,26 +6989,26 @@ If ARG is a negative number, hide the unwanted header lines."
     (set-buffer gnus-article-buffer)
     (save-restriction
       (let* ((buffer-read-only nil)
- 	     (inhibit-point-motion-hooks t)
- 	     (hidden (gnus-article-hidden-text-p 'headers))
- 	     e)
- 	(goto-char (point-min))
- 	(when (search-forward "\n\n" nil t)
- 	  (delete-region (point-min) (1- (point))))
+	     (inhibit-point-motion-hooks t)
+	     (hidden (gnus-article-hidden-text-p 'headers))
+	     e)
 	(goto-char (point-min))
- 	(save-excursion
- 	  (set-buffer gnus-original-article-buffer)
- 	  (goto-char (point-min))
- 	  (setq e (1- (or (search-forward "\n\n" nil t) (point-max)))))
- 	(insert-buffer-substring gnus-original-article-buffer 1 e)
- 	(save-restriction
- 	  (narrow-to-region (point-min) (point))
- 	  (if (or hidden
- 		  (and (numberp arg) (< arg 0)))
- 	      (let ((gnus-treat-hide-headers nil)
- 		    (gnus-treat-hide-boring-headers nil))
- 		(gnus-treat-article 'head))
- 	    (gnus-treat-article 'head)))))))
+	(when (search-forward "\n\n" nil t)
+	  (delete-region (point-min) (1- (point))))
+	(goto-char (point-min))
+	(save-excursion
+	  (set-buffer gnus-original-article-buffer)
+	  (goto-char (point-min))
+	  (setq e (1- (or (search-forward "\n\n" nil t) (point-max)))))
+	(insert-buffer-substring gnus-original-article-buffer 1 e)
+	(save-restriction
+	  (narrow-to-region (point-min) (point))
+	  (if (or hidden
+		  (and (numberp arg) (< arg 0)))
+	      (let ((gnus-treat-hide-headers nil)
+		    (gnus-treat-hide-boring-headers nil))
+		(gnus-treat-article 'head))
+	    (gnus-treat-article 'head)))))))
 
 (defun gnus-summary-show-all-headers ()
   "Make all header lines visible."

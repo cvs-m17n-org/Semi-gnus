@@ -53,6 +53,24 @@
 
 ;;; Mule functions.
 
+(defun gnus-mule-cite-add-face (number prefix face)
+  ;; At line NUMBER, ignore PREFIX and add FACE to the rest of the line.
+  (when face
+    (let ((inhibit-point-motion-hooks t)
+	  from to)
+      (goto-line number)
+      (unless (eobp)            ; Sometimes things become confused (broken).
+	(forward-char (chars-in-string prefix))
+        (skip-chars-forward " \t")
+        (setq from (point))
+        (end-of-line 1)
+        (skip-chars-backward " \t")
+        (setq to (point))
+        (when (< from to)
+          (push (setq overlay (gnus-make-overlay from to))
+                gnus-cite-overlay-list)
+          (gnus-overlay-put (gnus-make-overlay from to) 'face face))))))
+
 (defvar gnus-mule-bitmap-image-file nil)
 (defun gnus-mule-group-startup-message (&optional x y)
   "Insert startup message in current buffer."
@@ -102,12 +120,6 @@
   (setq mode-line-buffer-identification (concat " " gnus-version))
   (setq gnus-simple-splash t)
   (set-buffer-modified-p t))
-
-(defun gnus-encode-coding-string (string system)
-  string)
-
-(defun gnus-decode-coding-string (string system)
-  string)
 
 (eval-and-compile
   (if (string-match "XEmacs\\|Lucid" emacs-version)
@@ -194,8 +206,6 @@
     (defvar gnus-summary-display-table nil
       "Display table used in summary mode buffers.")
     (fset 'gnus-summary-set-display-table (lambda ()))
-    (fset 'gnus-encode-coding-string 'encode-coding-string)
-    (fset 'gnus-decode-coding-string 'decode-coding-string)
 
     (if (fboundp 'truncate-string-to-width)
 	(fset 'gnus-truncate-string 'truncate-string-to-width)
@@ -251,6 +261,10 @@
       (setq gnus-check-before-posting
 	    (delq 'long-lines
 		  (delq 'control-chars gnus-check-before-posting))))
+
+    (when (fboundp 'chars-in-string)
+      (fset 'gnus-cite-add-face 'gnus-mule-cite-add-face))
+
     )))
 
 (defun gnus-region-active-p ()
