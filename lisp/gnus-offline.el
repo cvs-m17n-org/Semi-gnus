@@ -636,7 +636,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
       (funcall gnus-offline-hangup-function))
   (setq gnus-offline-connected nil)
   (if (eq gnus-offline-news-fetch-method 'nnagent)
-      (funcall 'ad-Orig-gnus-agent-toggle-plugged nil))
+      (ad-Orig-gnus-agent-toggle-plugged nil))
 
   ;; Set send mail/news function to offline functions.
   (gnus-offline-set-offline-sendmail-function)
@@ -831,9 +831,9 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 		(if (eq gnus-offline-news-fetch-method 'nnagent)
 		    (local-set-key "\C-coe" 'gnus-agent-expire))
 		(static-unless (featurep 'xemacs)
-		 (local-set-key
-		  (static-if (eq system-type 'windows-nt) [S-mouse-2] [mouse-3])
-		  'gnus-offline-popup-menu)))))
+		  (local-set-key
+		   (if (eq system-type 'windows-nt) [S-mouse-2] [mouse-3])
+		   'gnus-offline-popup-menu)))))
 
 ;;
 ;;
