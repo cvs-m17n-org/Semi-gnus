@@ -1,5 +1,7 @@
 1999-02-08  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
+	* Nana-gnus: Version 6.12.1 released.
+
 	* lisp/mess-bbdb.el: New file.
 
 	* lisp/message.el (message-mail-follow-up-address-checker): New
