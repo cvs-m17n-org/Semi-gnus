@@ -8571,6 +8571,12 @@ gnus でメールを読むことの有利な点は、単純なバグを素晴らしい不条理に置き
 @code{X-Face} を @code{From} ヘッダーに表示しま
 す (@code{gnus-article-display-x-face})。
 
+@item W D d
+@kindex W D d (概略)
+@findex gnus-article-display-face
+@code{Face} を @code{From} ヘッダーに表示しま
+す (@code{gnus-article-display-face})。
+
 @item W D s
 @kindex W D s (概略)
 @findex gnus-treat-smiley
@@ -10361,9 +10367,18 @@ Superseding} を参照してください。
 
 @item gnus-confirm-mail-reply-to-news
 @vindex gnus-confirm-mail-reply-to-news
-非-@code{nil}だったら、ニュース記事に返信するときに gnus は確認を求めま
-す。メールで返信する気は無いのに時たまぞんざいに R を押してしまう癖があ
-るならば、この変数はそんなあなたのためにあります。
+これは、確認が必要である場合に非-@code{nil} を返す、唯一のパラメータとし
+てグループ名を受け取る関数であることもできます。あるいは、確認を求めるべ
+きグループ名に合致する正規表現です。
+
+メールで返信する気は無いのに時たまぞんざいに R を押してしまう癖があるな
+らば、この変数はそんなあなたのためにあります。
+
+@item gnus-confirm-treat-mail-like-news
+@vindex gnus-confirm-treat-mail-like-news
+非-@code{nil} だったら、gnus はメールへの返信時に
+も @code{gnus-confirm-mail-reply-to-news} に基づいた確認を求めます。これ
+はメーリングリストをニューズグループのように扱うのに便利です。
 @end table
 
 @node Posting Server
