@@ -1,3 +1,20 @@
+1999-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 13.
+	(TopLevel): Rearrange autoload settings.
+
+	* lisp/gnus-art.el (gnus-treatment-function-alist): Don't use
+	`smiley-buffer'.
+
+	* lisp/gnus-sum.el (gnus-summary-make-menu-bar): Add button
+	"Toggle smileys" in "Washing" menu.
+	(gnus-summary-wash-map): Add "s" key for `smiley-toggle-buffer'.
+
+	* lisp/smiley.el (gnus-smiley-display): Use `smiley-toggle-buffer'.
+	(smiley-toggle-buffer): New function.
+	(smiley-buffer): Don't quote the function.
+	(smiley-toggle-extents): Ditto.
+
 1999-10-24  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 12.
