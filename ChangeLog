@@ -1,3 +1,11 @@
+2000-09-06  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-header-xref): New function.
+	(nnshimbun-insert-header): Use `nnshimbun-header-xref', instead of
+	`mail-header-xref'.
+	(nnshimbun-make-mhonarc-contents): Took a measure against
+	unexpected TAB characters.
+
 2000-09-05  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
 
 	* lisp/nnshimbun.el: Add `netbsd' support.
