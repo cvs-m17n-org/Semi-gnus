@@ -1,3 +1,8 @@
+2003-12-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnmail.el (nnmail-lazy): Replace `widget-default-get' with
+	the expanded form for Mule 2.
+
 2003-12-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-make-cus-load): Use

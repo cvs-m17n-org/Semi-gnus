@@ -381,8 +381,12 @@ This is copy of the `lazy' widget in Emacs 21.4 provided for compatibility."
                   (widget-apply (car (widget-get widget :children))
                                 :value-inline))
   :default-get (lambda (widget)
-                 (widget-default-get
-                  (widget-convert (widget-get widget :type))))
+                 ;;(widget-default-get
+                 ;; (widget-convert (widget-get widget :type))))
+		 ;; `widget-default-get' isn't available in Mule 2.
+		 (let ((w (widget-convert (widget-get widget :type))))
+		   (or (widget-get w :value)
+		       (widget-apply w :default-get))))
   :match (lambda (widget value)
            (widget-apply (widget-convert (widget-get widget :type))
                          :match value))
@@ -402,12 +406,13 @@ This is copy of the `lazy' widget in Emacs 21.4 provided for compatibility."
                             (const :format "" &)
                             (editable-list :inline t nnmail-split-fancy))
                       (list :tag "Function with fixed arguments (:)"
-                            :value (:)
+                            :value (: nil)
                             (const :format "" :value :)
                             function 
                             (editable-list :inline t (sexp :tag "Arg"))
                             )
-                      (list :tag "Function with split arguments (!)" :value (!)
+                      (list :tag "Function with split arguments (!)"
+                            :value (! nil)
                             (const :format "" !)
                             function
                             (editable-list :inline t nnmail-split-fancy))
