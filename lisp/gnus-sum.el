@@ -2664,7 +2664,7 @@ The following commands are available:
   (make-local-variable 'gnus-summary-dummy-line-format)
   (make-local-variable 'gnus-summary-dummy-line-format-spec)
   (make-local-variable 'gnus-summary-mark-positions)
-  (make-local-hook 'pre-command-hook)
+  (gnus-make-local-hook 'pre-command-hook)
   (add-hook 'pre-command-hook 'gnus-set-global-variables nil t)
   (gnus-run-hooks 'gnus-summary-mode-hook)
   (turn-on-gnus-mailing-list-mode)
@@ -3621,7 +3621,7 @@ If SHOW-ALL is non-nil, already read articles are also listed."
    ((eq gnus-auto-select-subject 'first)
     ;; Do nothing.
     )
-   ((gnus-functionp gnus-auto-select-subject)
+   ((functionp gnus-auto-select-subject)
     (funcall gnus-auto-select-subject))))
 
 (defun gnus-summary-prepare ()
@@ -8657,8 +8657,8 @@ If ARG (the prefix) is a number, show the article with the charset
 defined in `gnus-summary-show-article-charset-alist', or the charset
 input.
 If ARG (the prefix) is non-nil and not a number, show the raw article
-without any article massaging functions being run.  Normally, the key strokes
-are `C-u g'."
+without any article massaging functions being run.  Normally, the key
+strokes are `C-u g'."
   (interactive "P")
   (cond
    ((numberp arg)
@@ -10263,7 +10263,7 @@ If ALL is non-nil, also mark ticked and dormant articles as read."
   (gnus-summary-position-point))
 
 (defun gnus-summary-catchup-from-here (&optional all)
-  "Mark all unticked articles after the current one as read.
+  "Mark all unticked articles after (and including) the current one as read.
 If ALL is non-nil, also mark ticked and dormant articles as read."
   (interactive "P")
   (save-excursion
@@ -10480,7 +10480,7 @@ Returns nil if no thread was there to be shown."
 	     gnus-thread-hide-subtree)
     (gnus-summary-hide-all-threads
      (if (or (consp gnus-thread-hide-subtree)
-	     (gnus-functionp gnus-thread-hide-subtree))
+	     (functionp gnus-thread-hide-subtree))
 	 (gnus-make-predicate gnus-thread-hide-subtree)
        nil))))
 
@@ -10896,7 +10896,7 @@ save those articles instead."
 		    ;; Regular expression.
 		    (ignore-errors
 		      (re-search-forward match nil t)))
-		   ((gnus-functionp match)
+		   ((functionp match)
 		    ;; Function.
 		    (save-restriction
 		      (widen)

@@ -117,14 +117,6 @@
       (substring str 0 width)
     str))
 
-;; Fixme: This is incomplete, but why not just use functionp?  In
-;; fact, that is used in various places.
-(defsubst gnus-functionp (form)
-  "Return non-nil if FORM is funcallable."
-  (or (and (symbolp form) (fboundp form))
-      (and (listp form) (eq (car form) 'lambda))
-      (byte-code-function-p form)))
-
 (defsubst gnus-goto-char (point)
   (and point (goto-char point)))
 
@@ -162,6 +154,16 @@
 	  (point)
 	(goto-char p))))
   ))
+
+;; The LOCAL arg to `add-hook' is interpreted differently in Emacs and
+;; XEmacs.  In Emacs we don't need to call `make-local-hook' first.
+;; It's harmless, though, so the main purpose of this alias is to shut
+;; up the byte compiler.
+(defalias 'gnus-make-local-hook
+  (if (eq (get 'make-local-hook 'byte-compile) 
+	  'byte-compile-obsolete)
+      'ignore				; Emacs
+    'make-local-hook))			; XEmacs
 
 (defun gnus-delete-first (elt list)
   "Delete by side effect the first occurrence of ELT as a member of LIST."
@@ -612,7 +614,7 @@ If N, return the Nth ancestor instead."
   "Return a composite sort condition based on the functions in FUNC."
   (cond
    ;; Just a simple function.
-   ((gnus-functionp funs) funs)
+   ((functionp funs) funs)
    ;; No functions at all.
    ((null funs) funs)
    ;; A list of functions.
@@ -637,7 +639,7 @@ If N, return the Nth ancestor instead."
 	(setq function (cadr function)
 	      first 't2
 	      last 't1))
-       ((gnus-functionp function)
+       ((functionp function)
 	;; Do nothing.
 	)
        (t

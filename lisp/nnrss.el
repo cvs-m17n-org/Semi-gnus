@@ -405,7 +405,8 @@ ARTICLE is the article number of the current headline.")
 ;;; Snarf functions
 
 (defun nnrss-check-group (group server)
-  (let (file xml subject url extra changed author date rss-ns rdf-ns content-ns dc-ns)
+  (let (file xml subject url extra changed author
+	     date rss-ns rdf-ns content-ns dc-ns)
     (if (and nnrss-use-local
 	     (file-exists-p (setq file (expand-file-name
 					(nnrss-translate-file-chars
@@ -416,7 +417,9 @@ ARTICLE is the article number of the current headline.")
 		    (second (assoc group nnrss-group-alist))))
       (unless url
 	(setq url
-	      (nnrss-discover-feed (read-string (format "URL to search for %s: " group) "http://")))
+	      (nnrss-discover-feed
+	       (read-string
+		(format "URL to search for %s: " group) "http://")))
 	(let ((pair (assoc group nnrss-server-data)))
 	  (if pair
 	      (setcdr (cdr pair) (list url))
@@ -514,16 +517,13 @@ It is useful when `(setq nnrss-use-local t)'."
   (gnus-replace-in-string (nnrss-string-as-multibyte string) " *\n *" " "))
 
 (defun nnrss-node-text (namespace local-name element)
-  (let* ((node (assq (intern (concat namespace (symbol-name local-name))) element))
+  (let* ((node (assq (intern (concat namespace (symbol-name local-name)))
+		     element))
 	 (text (if (and node (listp node))
 		   (nnrss-node-just-text node)
 		 node))
 	 (cleaned-text (if text (gnus-replace-in-string
-				 (gnus-replace-in-string
-				  (gnus-replace-in-string
-				   text "^[[:cntrl:]]+" "")
-				  "^ +" "")
-				 " +$" ""))))
+				 text "^[[:cntrl:]]+\\|^ +\\| +$" ""))))
     (if (string-equal "" cleaned-text)
 	nil
       cleaned-text)))
