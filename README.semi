@@ -8,7 +8,7 @@ all features of Gnus and gnus-mime, so there are no need to install
 Gnus to use it, and you must not use gnus-mime for SEMI.
 
   It requires APEL, FLIM and SEMI packages, so please get and install
-them before to install it. T-gnus 6.10 requires the latest APEL, the
+them before to install it. T-gnus 6.10 requires APEL 9.12 or later, the
 latest FLIM 1.12 and SEMI 1.12. You can get these packages from
 ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi/
 Required environment for SEMI is written in README.en of SEMI package.
