@@ -38,11 +38,10 @@
 (require 'nnmail)
 (require 'nnoo)
 (require 'gnus-bcklg)
-(eval-when-compile
-  (ignore-errors
-    (require 'nnweb)))
+(eval-when-compile (ignore-errors (require 'nnweb)))
 ;; Report failure to find w3 at load time if appropriate.
 (eval '(require 'nnweb))
+(require 'mcharset)
 
 
 (nnoo-declare nnshimbun)
@@ -213,6 +212,22 @@
 (defvoo nnshimbun-backlog-articles nil)
 (defvoo nnshimbun-backlog-hashtb nil)
 
+(defconst nnshimbun-meta-content-type-charset-regexp
+  (eval-when-compile
+    (concat "<meta[ \t]+http-equiv=\"?Content-type\"?[ \t]+content=\"\\([^;]+\\)"
+	    ";[ \t]*charset=\"?\\([^\"]+\\)\"?"
+	    ">"))
+  "Regexp used in parsing `<META HTTP-EQUIV=\"Content-Type\" content=\"...;charset=...\">
+for a charset indication")
+
+(defconst nnshimbun-meta-charset-content-type-regexp
+  (eval-when-compile
+    (concat "<meta[ \t]+content=\"\\([^;]+\\)"
+	    ";[ \t]*charset=\"?\\([^\"]+\\)\"?"
+	    "[ \t]+http-equiv=\"?Content-type\"?>"))
+  "Regexp used in parsing `<META content=\"...;charset=...\" HTTP-EQUIV=\"Content-Type\">
+for a charset indication")
+
 
 
 ;;; backlog
@@ -282,36 +297,67 @@
 
 (defun nnshimbun-retrieve-url (url &optional no-cache)
   "Rertrieve URL contents and insert to current buffer."
-  (let ((coding-system-for-read 'binary)
-	(coding-system-for-write 'binary))
-    (set-buffer-multibyte nil)
-    ;; Following code is imported from `url-insert-file-contents'.
-    (save-excursion
-      (let ((old-asynch (default-value 'url-be-asynchronous))
-	    (old-caching (default-value 'url-automatic-caching))
-	    (old-mode (default-value 'url-standalone-mode)))
-	(unwind-protect
-	    (progn
-	      (setq-default url-be-asynchronous nil)
-	      (when no-cache
-		(setq-default url-automatic-caching nil)
-		(setq-default url-standalone-mode nil))
-	      (let ((buf (current-buffer))
-		    (url-working-buffer (cdr (url-retrieve url no-cache))))
-		(set-buffer url-working-buffer)
-		(url-uncompress)
-		(set-buffer buf)
-		(insert-buffer url-working-buffer)
-		(save-excursion
-		  (set-buffer url-working-buffer)
-		  (set-buffer-modified-p nil))
-		(kill-buffer url-working-buffer)))
-	  (setq-default url-be-asynchronous old-asynch)
-	  (setq-default url-automatic-caching old-caching)
-	  (setq-default url-standalone-mode old-mode))))
-    ;; Modify buffer coding system.
-    (decode-coding-region (point-min) (point-max) nnshimbun-coding-system)
-    (set-buffer-multibyte t)))
+  (let ((buf (current-buffer))
+	(url-working-buffer url-working-buffer))
+    (let ((old-asynch (default-value 'url-be-asynchronous))
+	  (old-caching (default-value 'url-automatic-caching))
+	  (old-mode (default-value 'url-standalone-mode)))
+      (setq-default url-be-asynchronous nil)
+      (when no-cache
+	(setq-default url-automatic-caching nil)
+	(setq-default url-standalone-mode nil))
+      (unwind-protect
+	  (let ((coding-system-for-read 'binary)
+		(coding-system-for-write 'binary)
+		(input-coding-system 'binary)
+		(output-coding-system 'binary)
+		(default-enable-multibyte-characters nil))
+	    (set-buffer
+	     (setq url-working-buffer
+		   (cdr (url-retrieve url no-cache))))
+	    (url-uncompress))
+	(setq-default url-be-asynchronous old-asynch)
+	(setq-default url-automatic-caching old-caching)
+	(setq-default url-standalone-mode old-mode)))
+    (let ((charset
+	   (or url-current-mime-charset
+	       (let ((case-fold-search t))
+		 (goto-char (point-min))
+		 (if (or (re-search-forward nnshimbun-meta-content-type-charset-regexp nil t)
+			 (re-search-forward nnshimbun-meta-charset-content-type-regexp nil t))
+		     (buffer-substring-no-properties (match-beginning 2) (match-end 2)))))))
+      (decode-coding-region
+       (point-min) (point-max)
+       (if charset
+	   (let ((mime-charset-coding-system-alist
+		  (append '((euc-jp . euc-japan)
+			    (shift-jis . shift_jis)
+			    (shift_jis . shift_jis)
+			    (sjis . shift_jis)
+			    (x-euc-jp . euc-japan)
+			    (x-shift-jis . shift_jis)
+			    (x-shift_jis . shift_jis)
+			    (x-sjis . shift_jis))
+			  mime-charset-coding-system-alist)))
+	     (mime-charset-to-coding-system charset))
+	 (let ((default (condition-case nil
+			    (coding-system-category nnshimbun-coding-system)
+			  (error nil)))
+	       (candidate (detect-coding-region (point-min) (point-max))))
+	   (unless (listp candidate)
+	     (setq candidate (list candidate)))
+	   (catch 'coding
+	     (dolist (coding candidate)
+	       (if (eq default (coding-system-category coding))
+		   (throw 'coding coding)))
+	     (if (eq (coding-system-category 'binary)
+		     (coding-system-category (car candidate)))
+		 nnshimbun-coding-system
+	       (car candidate)))))))
+    (set-buffer-multibyte t)
+    (set-buffer buf)
+    (insert-buffer url-working-buffer)
+    (kill-buffer url-working-buffer)))
 
 (deffoo nnshimbun-request-article (article &optional group server to-buffer)
   (when (nnshimbun-possibly-change-group group server)

@@ -1,3 +1,10 @@
+2000-12-06  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el (nnshimbun-retrieve-url): coding detection is
+	improved.
+	(nnshimbun-meta-content-type-charset-regexp): New constant.
+	(nnshimbun-meta-charset-content-type-regexp): Ditto.
+
 2000-12-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/lpath.el: Attempt to add another FLIM path to `load-path' if
