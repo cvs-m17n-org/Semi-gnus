@@ -107,7 +107,7 @@ AC_DEFUN(AM_PATH_LISPDIR,
     fi
     case "$EMACS_BASENAME" in
     xemacs|xemacs-*)
-      lispdir="$lispdir/lookup"
+      lispdir="$lispdir/tgnus"
       ;;
     esac
   fi
