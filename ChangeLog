@@ -1,3 +1,7 @@
+2002-12-05  Kai Gro,A_(Bjohann  <kai.grossjohann@uni-duisburg.de>
+
+	* etc/smilies/*.pbm: Made them binary.
+
 2002-11-28  Daiki Ueno  <ueno@unixuser.org>
 
 	* lisp/gnus-agent.el (gnus-agent-fetch-headers): Don't refer to
