@@ -97,7 +97,8 @@
 ;;; backlog
 (defmacro nnshimbun-backlog (&rest form)
   `(let ((gnus-keep-backlog nnshimbun-keep-backlog)
-	 (gnus-backlog-buffer (format " *nnshimbun backlog %s*" (nnoo-current-server 'nnshimbun)))
+	 (gnus-backlog-buffer (format " *nnshimbun backlog %s*"
+				      (nnoo-current-server 'nnshimbun)))
 	 (gnus-backlog-articles nnshimbun-backlog-articles)
 	 (gnus-backlog-hashtb nnshimbun-backlog-hashtb))
      (unwind-protect
@@ -115,7 +116,8 @@
   (push (list 'nnshimbun-shimbun
 	      (condition-case err
 		  (shimbun-open server (luna-make-entity 'shimbun-gnus-mua))
-		(error (nnheader-report 'nnshimbun "%s" (error-message-string err)))))
+		(error (nnheader-report 'nnshimbun "%s" (error-message-string
+							 err)))))
 	defs)
   ;; Set directory for server working files.
   (push (list 'nnshimbun-server-directory
@@ -130,7 +132,8 @@
   (cond
    ((not (file-exists-p nnshimbun-directory))
     (nnshimbun-close-server)
-    (nnheader-report 'nnshimbun "Couldn't create directory: %s" nnshimbun-directory))
+    (nnheader-report 'nnshimbun "Couldn't create directory: %s"
+		     nnshimbun-directory))
    ((not (file-directory-p (file-truename nnshimbun-directory)))
     (nnshimbun-close-server)
     (nnheader-report 'nnshimbun "Not a directory: %s" nnshimbun-directory))
@@ -140,10 +143,12 @@
     (cond
      ((not (file-exists-p nnshimbun-server-directory))
       (nnshimbun-close-server)
-      (nnheader-report 'nnshimbun "Couldn't create directory: %s" nnshimbun-server-directory))
+      (nnheader-report 'nnshimbun "Couldn't create directory: %s"
+		       nnshimbun-server-directory))
      ((not (file-directory-p (file-truename nnshimbun-server-directory)))
       (nnshimbun-close-server)
-      (nnheader-report 'nnshimbun "Not a directory: %s" nnshimbun-server-directory))
+      (nnheader-report 'nnshimbun "Not a directory: %s"
+		       nnshimbun-server-directory))
      (t
       (nnheader-report 'nnshimbun "Opened server %s using directory %s"
 		       server nnshimbun-server-directory)
@@ -195,6 +200,9 @@
 	 (substring xref 6)
        xref))))
 
+(eval-when-compile
+  (require 'gnus-sum));; For the macro `gnus-summary-article-header'.
+
 (defun nnshimbun-request-article-1 (article &optional group server to-buffer)
   (if (nnshimbun-backlog
 	(gnus-backlog-request-article
@@ -209,6 +217,10 @@
 	(with-current-buffer (or to-buffer nntp-server-buffer)
 	  (delete-region (point-min) (point-max))
 	  (shimbun-article nnshimbun-shimbun header)
+	  ;; Kludge! replace a date string in `gnus-newsgroup-data'
+	  ;; based on the newly retrieved article.
+	  (mail-header-set-date (gnus-summary-article-header article)
+				(shimbun-header-date header))
 	  (when (> (buffer-size) 0)
 	    (nnshimbun-replace-nov-entry group article header original-id)
 	    (nnshimbun-backlog
@@ -304,7 +316,8 @@
 (defun nnshimbun-retrieve-headers-with-nov (articles &optional fetch-old)
   (if (or gnus-nov-is-evil nnshimbun-nov-is-evil)
       nil
-    (let ((nov (expand-file-name nnshimbun-nov-file-name nnshimbun-current-directory)))
+    (let ((nov (expand-file-name nnshimbun-nov-file-name
+				 nnshimbun-current-directory)))
       (when (file-exists-p nov)
 	(save-excursion
 	  (set-buffer nntp-server-buffer)
@@ -663,9 +676,11 @@ nil)."
 	(ignore-errors (make-directory nnshimbun-current-directory t)))
       (cond
        ((not (file-exists-p nnshimbun-current-directory))
-	(nnheader-report 'nnshimbun "Couldn't create directory: %s" nnshimbun-current-directory))
+	(nnheader-report 'nnshimbun "Couldn't create directory: %s"
+			 nnshimbun-current-directory))
        ((not (file-directory-p (file-truename nnshimbun-current-directory)))
-	(nnheader-report 'nnshimbun "Not a directory: %s" nnshimbun-current-directory))
+	(nnheader-report 'nnshimbun "Not a directory: %s"
+			 nnshimbun-current-directory))
        (t t)))))
 
 

@@ -1,5 +1,11 @@
 2001-06-07  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/nnshimbun.el (nnshimbun-request-article-1): Replace a date
+	string in `gnus-newsgroup-data' based on the newly retrieved
+	article.
+
+2001-06-07  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/nnshimbun.el (nnshimbun-request-expire-articles): Fix
 	inhibiting the expiring.
 
