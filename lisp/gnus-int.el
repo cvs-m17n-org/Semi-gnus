@@ -206,8 +206,8 @@ If it is down, start it up (again)."
 		 (funcall (gnus-get-function gnus-command-method 'open-server)
 			  (nth 1 gnus-command-method)
 			  (nthcdr 2 gnus-command-method))
-               (error 
-                (gnus-message 1 (format 
+               (error
+                (gnus-message 1 (format
                                  "Unable to open server due to: %s"
                                  (error-message-string err)))
                 nil)
@@ -288,8 +288,8 @@ If it is down, start it up (again)."
 
 (defun gnus-status-message (gnus-command-method)
   "Return the status message from GNUS-COMMAND-METHOD.
-If GNUS-COMMAND-METHOD is a string, it is interpreted as a group name.  The method
-this group uses will be queried."
+If GNUS-COMMAND-METHOD is a string, it is interpreted as a group
+name.  The method this group uses will be queried."
   (let ((gnus-command-method
 	 (if (stringp gnus-command-method)
 	     (gnus-find-method-for-group gnus-command-method)
@@ -384,7 +384,7 @@ If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
 	       (gnus-group-real-name group) article))))
 
 (defun gnus-request-set-mark (group action)
-  "Set marks on articles in the backend."
+  "Set marks on articles in the back end."
   (let ((gnus-command-method (gnus-find-method-for-group group)))
     (if (not (gnus-check-backend-function
 	      'request-set-mark (car gnus-command-method)))
@@ -394,7 +394,7 @@ If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
 	       (nth 1 gnus-command-method)))))
 
 (defun gnus-request-update-mark (group article mark)
-  "Allow the backend to change the mark the user tries to put on an article."
+  "Allow the back end to change the mark the user tries to put on an article."
   (let ((gnus-command-method (gnus-find-method-for-group group)))
     (if (not (gnus-check-backend-function
 	      'request-update-mark (car gnus-command-method)))

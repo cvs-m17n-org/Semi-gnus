@@ -181,8 +181,8 @@ with some simple extensions.
 %E    Icon as defined by `gnus-group-icon-list'.
 %u    User defined specifier.  The next character in the format string should
       be a letter.  Gnus will call the function gnus-user-format-function-X,
-      where X is the letter following %u.  The function will be passed a 
-      single dummy parameter as argument..  The function should return a
+      where X is the letter following %u.  The function will be passed a
+      single dummy parameter as argument.  The function should return a
       string, which will be inserted into the buffer just like information
       from any other group specifier.
 
@@ -742,7 +742,7 @@ simple manner.")
 
 (defun gnus-topic-mode-p ()
   "Return non-nil in `gnus-topic-mode'."
-  (and (boundp 'gnus-topic-mode) 
+  (and (boundp 'gnus-topic-mode)
        (symbol-value 'gnus-topic-mode)))
 
 (defun gnus-group-make-menu-bar ()
@@ -760,7 +760,7 @@ simple manner.")
        ["Select" gnus-group-select-group
 	:included (not (gnus-topic-mode-p))
 	:active (gnus-group-group-name)]
-       ["Select " gnus-topic-select-group 
+       ["Select " gnus-topic-select-group
 	:included (gnus-topic-mode-p)]
        ["See old articles" (gnus-group-select-group 'all)
 	:keys "C-u SPC" :active (gnus-group-group-name)]
@@ -769,7 +769,7 @@ simple manner.")
 	:active (gnus-group-group-name)
 	,@(if (featurep 'xemacs) nil
 	    '(:help "Mark unread articles in the current group as read"))]
-       ["Catch up " gnus-topic-catchup-articles 
+       ["Catch up " gnus-topic-catchup-articles
 	:included (gnus-topic-mode-p)
 	,@(if (featurep 'xemacs) nil
 	    '(:help "Mark unread articles in the current group or topic as read"))]
@@ -804,13 +804,13 @@ simple manner.")
 	    '(:help "Display the archived control message for the current group"))]
        ;; Actually one should check, if any of the marked groups gives t for
        ;; (gnus-check-backend-function 'request-expire-articles ...)
-       ["Expire articles" gnus-group-expire-articles 
+       ["Expire articles" gnus-group-expire-articles
 	:included (not (gnus-topic-mode-p))
 	:active (or (and (gnus-group-group-name)
 			 (gnus-check-backend-function
 			  'request-expire-articles
 			  (gnus-group-group-name))) gnus-group-marked)]
-       ["Expire articles " gnus-topic-expire-articles 
+       ["Expire articles " gnus-topic-expire-articles
 	:included (gnus-topic-mode-p)]
        ["Set group level..." gnus-group-set-current-level
 	(gnus-group-group-name)]
@@ -1427,7 +1427,7 @@ if it is a string, only list groups matching REGEXP."
 	 (gnus-tmp-qualified-group
 	  (gnus-group-name-decode (gnus-group-real-name gnus-tmp-group)
 				  group-name-charset))
-	 (gnus-tmp-comment 
+	 (gnus-tmp-comment
 	  (or (gnus-group-get-parameter gnus-tmp-group 'comment t)
 	      gnus-tmp-group))
 	 (gnus-tmp-newsgroup-description
@@ -2282,7 +2282,7 @@ ADDRESS."
     (forward-line -1)
     (gnus-group-position-point)
 
-    ;; Load the backend and try to make the backend create
+    ;; Load the back end and try to make the back end create
     ;; the group as well.
     (when (assoc (symbol-name (setq backend (car (gnus-server-get-method
 						  nil meth))))
@@ -2321,7 +2321,7 @@ doing the deletion."
   (unless group
     (error "No group to delete"))
   (unless (gnus-check-backend-function 'request-delete-group group)
-    (error "This backend does not support group deletion"))
+    (error "This back end does not support group deletion"))
   (prog1
       (if (and (not no-prompt)
 	       (not (gnus-yes-or-no-p
@@ -2353,12 +2353,12 @@ and NEW-NAME will be prompted for."
     (progn
       (unless (gnus-check-backend-function
 	       'request-rename-group (gnus-group-group-name))
-	(error "This backend does not support renaming groups"))
+	(error "This back end does not support renaming groups"))
       (gnus-read-group "Rename group to: "
 		       (gnus-group-real-name (gnus-group-group-name))))))
 
   (unless (gnus-check-backend-function 'request-rename-group group)
-    (error "This backend does not support renaming groups"))
+    (error "This back end does not support renaming groups"))
   (unless group
     (error "No group to rename"))
   (when (equal (gnus-group-real-name group) new-name)
@@ -2596,18 +2596,18 @@ If SOLID (the prefix), create a solid group."
 		   (defun nnrss-discover-feed (arg))
 		   (defun nnrss-save-server-data (arg)))
 (defun gnus-group-make-rss-group (&optional url)
-  "Given a URL, discover if there is an RSS feed.  If there is,
-use Gnus' to create an nnrss group"
+  "Given a URL, discover if there is an RSS feed.
+If there is, use Gnus to create an nnrss group"
   (interactive)
   (require 'nnrss)
   (if (not url)
       (setq url (read-from-minibuffer "URL to Search for RSS: ")))
   (let ((feedinfo (nnrss-discover-feed url)))
     (if feedinfo
-	(let ((title (read-from-minibuffer "Title: " 
-					   (cdr (assoc 'title 
+	(let ((title (read-from-minibuffer "Title: "
+					   (cdr (assoc 'title
 						       feedinfo))))
-	      (desc  (read-from-minibuffer "Description: " 
+	      (desc  (read-from-minibuffer "Description: "
 					   (cdr (assoc 'description
 						       feedinfo))))
 	      (href (cdr (assoc 'href feedinfo))))
@@ -2899,7 +2899,7 @@ If REVERSE, sort in reverse order."
   (gnus-group-sort-groups 'gnus-group-sort-by-rank reverse))
 
 (defun gnus-group-sort-groups-by-method (&optional reverse)
-  "Sort the group buffer alphabetically by backend name.
+  "Sort the group buffer alphabetically by back end name.
 If REVERSE, sort in reverse order."
   (interactive "P")
   (gnus-group-sort-groups 'gnus-group-sort-by-method reverse))
@@ -2988,7 +2988,7 @@ sort in reverse order."
   (gnus-group-sort-selected-groups n 'gnus-group-sort-by-rank reverse))
 
 (defun gnus-group-sort-selected-groups-by-method (&optional n reverse)
-  "Sort the group buffer alphabetically by backend name.
+  "Sort the group buffer alphabetically by back end name.
 Obeys the process/prefix convention.  If REVERSE (the symbolic prefix),
 sort in reverse order."
   (interactive (gnus-interactive "P\ny"))
@@ -3017,7 +3017,7 @@ sort in reverse order."
   (< (gnus-info-level info1) (gnus-info-level info2)))
 
 (defun gnus-group-sort-by-method (info1 info2)
-  "Sort alphabetically by backend name."
+  "Sort alphabetically by back end name."
   (string< (car (gnus-find-method-for-group
 		 (gnus-info-group info1) info1))
 	   (car (gnus-find-method-for-group
@@ -3492,7 +3492,7 @@ yanked) a list of yanked groups is returned."
 
 (defun gnus-group-list-all-groups (&optional arg)
   "List all newsgroups with level ARG or lower.
-Default is gnus-level-unsubscribed, which lists all subscribed and most
+Default is `gnus-level-unsubscribed', which lists all subscribed and most
 unsubscribed groups."
   (interactive "P")
   (gnus-group-list-groups (or arg gnus-level-unsubscribed) t))
@@ -3705,7 +3705,7 @@ If given a prefix argument, prompt for a group."
 	  (browse-url (eval url))
 	(setq url (concat "http://" hierarchy
 			  ".news-admin.org/charters/" name))
-	(if (and (fboundp 'url-http-file-exists-p) 
+	(if (and (fboundp 'url-http-file-exists-p)
 		 (url-http-file-exists-p url))
 	    (browse-url url)
 	  (gnus-group-fetch-control group))))))
@@ -3730,9 +3730,9 @@ If given a prefix argument, prompt for a group."
 	(let ((enable-local-variables nil))
 	  (gnus-group-read-ephemeral-group
 	   group
-	   `(nndoc ,group (nndoc-address 
+	   `(nndoc ,group (nndoc-address
 			   ,(find-file-noselect
-			     (concat "/ftp@ftp.isc.org:/usenet/control/" 
+			     (concat "/ftp@ftp.isc.org:/usenet/control/"
 				     hierarchy "/" name ".Z")))
 		   (nndoc-article-type mbox)) t nil nil))))))
 
@@ -3831,7 +3831,7 @@ If given a prefix argument, prompt for a group."
     (pop-to-buffer obuf)))
 
 (defun gnus-group-description-apropos (regexp)
-  "List all newsgroups that have names or descriptions that match a regexp."
+  "List all newsgroups that have names or descriptions that match REGEXP."
   (interactive "sGnus description apropos (regexp): ")
   (when (not (or gnus-description-hashtb
 		 (gnus-read-all-descriptions-files)))
@@ -3933,7 +3933,7 @@ If GROUP, edit that local kill file instead."
 (defun gnus-group-suspend ()
   "Suspend the current Gnus session.
 In fact, cleanup buffers except for group mode buffer.
-The hook gnus-suspend-gnus-hook is called before actually suspending."
+The hook `gnus-suspend-gnus-hook' is called before actually suspending."
   (interactive)
   (gnus-run-hooks 'gnus-suspend-gnus-hook)
   (gnus-offer-save-summaries)
@@ -4019,10 +4019,10 @@ If not, METHOD should be a list where the first element is the method
 and the second element is the address."
   (interactive
    (list (let ((how (completing-read
-		     "Which backend: "
+		     "Which back end: "
 		     (append gnus-valid-select-methods gnus-server-alist)
 		     nil t (cons "nntp" 0) 'gnus-method-history)))
-	   ;; We either got a backend name or a virtual server name.
+	   ;; We either got a back end name or a virtual server name.
 	   ;; If the first, we also need an address.
 	   (if (assoc how gnus-valid-select-methods)
 	       (list (intern how)
