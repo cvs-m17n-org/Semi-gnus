@@ -1,3 +1,8 @@
+1998-11-17  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/message.el (message-dont-send): Use `message-save-drafts'
+	instead of `save-buffer'.
+
 1998-11-17  Hiroaki Matsui  <matu@uxd.fc.nec.co.jp>
 
 	* lisp/message.el (message-clone-locals): Add
