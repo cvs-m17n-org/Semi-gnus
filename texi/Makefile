@@ -109,6 +109,62 @@ install:
 	cp gnus gnus-[0-9] gnus-[0-9][0-9] $(INFODIR)
 	cp message $(INFODIR)
 
+
+tmps:
+	if [ ! -e tmp ]; then mkdir tmp; fi
+	make screens
+	make herdss
+	make etcs
+	make piconss
+	make xfaces
+	make smiley
+	make miscs
+
+herdss:
+	cd herds ; for i in new-herd-[0-9]*.gif; do echo $$i; giftopnm $$i | pnmcrop -white | pnmmargin -white 9 | pnmscale 2 | pnmconvol convol5.pnm  | ppmtopgm | pnmdepth 255 | pnmtops -width 100 -height 100 -noturn > ../tmp/`basename $$i .gif`.ps; done
+	cd herds ; giftopnm new-herd-section.gif | pnmscale 4 | pnmconvol convol11.pnm | ppmtopgm | pnmdepth 255 | pnmtops -noturn -width 100 -height 100 > ../tmp/new-herd-section.ps
+
+
+screens:
+	cd screen ; for i in *.gif; do echo $$i; giftopnm $$i | pnmmargin -black 1 | ppmtopgm | pnmtops -width 100 -height 100 -noturn > ../tmp/`basename $$i .gif`.ps; done	
+
+miscs:
+	giftopnm misc/larsi.gif | ppmtopgm | pnmtops -noturn > tmp/larsi.ps
+	tifftopnm misc/eseptember.tif | pnmscale 4 | ppmtopgm | pnmtops -noturn  -width 100 -height 100 > tmp/september.ps
+	tifftopnm misc/fseptember.tif | pnmscale 2 | ppmtopgm | pnmtops -noturn  -width 100 -height 100 > tmp/fseptember.ps
+	tifftopnm misc/fred.tif | pnmscale 2 | ppmtopgm | pnmtops -noturn  -width 100 -height 100 > tmp/fred.ps
+	tifftopnm misc/ered.tif | pnmscale 2 | ppmtopgm | pnmtops -noturn  -width 100 -height 100 > tmp/red.ps
+
+etcs:
+	cd etc; for i in gnus-*.xpm; do echo $$i; xpmtoppm $$i | ppmtopgm | pnmdepth 255 | pnmtops -noturn > ../tmp/`basename $$i .xpm`.ps; done
+
+piconss:
+	cd picons; for i in *.xbm; do echo $$i; xbmtopbm $$i | pnmtops -noturn > ../tmp/picons-`basename $$i .xbm`.ps; done
+	cd picons; for i in *.gif; do echo $$i; giftopnm $$i | ppmtopgm | pnmtops -noturn > ../tmp/picons-`basename $$i .gif`.ps; done
+	for i in tmp/picons-*.ps; do echo "\\gnuspicon{$$i}"; done > picons.tex
+
+xfaces:
+	cd xface; for i in *.gif; do echo $$i; giftopnm $$i | ppmtopgm | pnmtops -noturn > ../tmp/xface-`basename $$i .gif`.ps; done
+	for i in tmp/xface-*.ps; do \
+		if [ -n "$$a" ]; then a=""; echo "{$$i}"; else \
+		a="h"; echo -n "\\gnusxface{$$i}"; fi done > xface.tex; \
+		if [ -n "$$a" ]; then echo "{$$i}" >> xface.tex; fi
+
+smiley:
+	cd smilies; tifftopnm BigFace.tif | ppmtopgm | pnmtops > ../tmp/BigFace.ps
+	cd smilies; for i in *.xpm; do echo $$i; sed "s/none/#FFFFFF/" $$i | xpmtoppm | ppmtopgm | pnmdepth 255 | pnmtops > ../tmp/smiley-`basename $$i .xpm`.ps; done
+	for i in tmp/smiley-*.ps; do \
+		if [ -n "$$a" ]; then a=""; echo "{$$i}"; else \
+		a="h"; echo -n "\\gnussmiley{$$i}"; fi done > smiley.tex; \
+		if [ -n "$$a" ]; then echo "{$$i}" >> smiley.tex; fi
+
+pspackage:
+	tar czvf pspackage.tar.gz gnus-faq.texi gnus.texi herds misc pagestyle.sty picons pixidx.sty postamble.tex ps screen smilies splitindex texi2latex.el xface Makefile README etc
+
+complete:
+	make texi2latex.elc
+	make tmps
+	make pss
 tmps:
 	if [ ! -d /local/tmp/larsi ]; then mkdir /local/tmp/larsi; fi
 	make screens
