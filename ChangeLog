@@ -1,3 +1,13 @@
+1999-05-21  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 11.
+
+	* lisp/gnus-art.el (gnus-article-prepare-mime-display): Don't treat
+	as a MIME message if the article is not so.
+	(gnus-article-display-traditional-message): Bind
+	`inhibit-read-only' to t.
+	(article-hide-headers): Ditto.
+
 1999-05-19  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 10.
