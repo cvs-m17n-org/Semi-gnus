@@ -33,9 +33,9 @@
 
 (defsubst mm-handle-p (handle)
   (memq (luna-class-name handle)
-	'(mime-gnus-handle-entity mime-gnus-entity)))
-(defalias 'mm-handle-buffer 'mime-buffer-entity-buffer-internal)
-(defalias 'mm-handle-set-buffer 'mime-buffer-entity-set-buffer-internal)
+	'(mmgnus-entity mime-gnus-entity)))
+(defalias 'mm-handle-body 'mmgnus-entity-body-internal)
+(defalias 'mm-handle-set-body 'mmgnus-entity-set-body-internal)
 (defsubst mm-handle-multipart/mixed-p (handle)
   (string= (mime-entity-content-type-internal handle) "multipart/mixed"))
 (defalias 'mm-handle-type 'mime-entity-content-type-internal)
@@ -56,26 +56,30 @@
        (intern (mime-entity-encoding-internal handle))))
 (defalias 'mm-handle-child 'mime-entity-children-internal)
 (defalias 'mm-handle-set-child 'mime-entity-set-children-internal)
-(defalias 'mm-handle-undisplayer 'mime-gnus-handle-entity-undisplayer-internal)
-(defalias 'mm-handle-set-undisplayer
-  'mime-gnus-handle-entity-set-undisplayer-internal)
+(defalias 'mm-handle-parent 'mime-entity-parent-internal)
+(defalias 'mm-handle-set-parent 'mime-entity-set-parent-internal)
+(defalias 'mm-handle-undisplayer 'mmgnus-entity-undisplayer-internal)
+(defalias 'mm-handle-set-undisplayer 'mmgnus-entity-set-undisplayer-internal)
 (defalias 'mm-handle-disposition 'mime-entity-content-disposition-internal)
 (defsubst mm-handle-disposition-type (handle)
   (mime-content-disposition-type (mm-handle-disposition handle)))
 (defsubst mm-handle-disposition-parameters (handle)
   (mime-content-disposition-parameters (mm-handle-disposition handle)))
-(defalias 'mm-handle-description
-  'mime-gnus-handle-entity-content-description-internal)
-(defalias 'mm-handle-cache 'mime-gnus-hendle-entity-cache-internal)
-(defalias 'mm-handle-set-cache 'mime-gnus-handle-entity-set-cache-internal)
-(defalias 'mm-handle-id 'mime-gnus-handle-entity-content-id-internal)
-(defsubst mm-make-handle (&optional buffer type encoding undisplayer
+(defalias 'mm-handle-description 'mmgnus-entity-content-description-internal)
+(defalias 'mm-handle-cache 'mmgnus-entity-cache-internal)
+(defalias 'mm-handle-set-cache 'mmgnus-entity-set-cache-internal)
+(defalias 'mm-handle-id 'mmgnus-entity-content-id-internal)
+(defalias 'mm-handle-header 'mmgnus-entity-header-internal)
+(defalias 'mm-handle-set-header 'mmgnus-entity-set-header-internal)
+(defsubst mm-make-handle (&optional parent body type encoding undisplayer
 				    disposition description cache
-				    id child)
-  (luna-make-entity (mm-expand-class-name 'gnus-handle)
-		    :buffer buffer
+				    id child header)
+  (luna-make-entity 'mmgnus-entity
+		    :parent parent
+		    :body body
 		    :content-type type
-		    :encoding (if (symbolp encoding)
+		    :encoding (if (and encoding
+				       (symbolp encoding))
 				  (symbol-name encoding)
 				encoding)
 		    :undisplayer undisplayer
@@ -83,7 +87,8 @@
 		    :content-description description
 		    :cache cache
 		    :content-id id
-		    :children child))
+		    :children child
+		    :header header))
 
 (defvar mm-inline-media-tests
   '(("image/jpeg"
@@ -206,9 +211,9 @@ to:
 
 ;;; The functions.
 
-(defun mm-dissect-buffer-header (parent &optional no-strict-mime)
+(defun mm-dissect-buffer-header (handle &optional no-strict-mime)
   (save-excursion
-    (let (ctl type cte cd description id result)
+    (let (ctl type cte cd description id result header-string header-end)
       (save-restriction
 	(mail-narrow-to-head)
 	(when (or no-strict-mime
@@ -218,7 +223,9 @@ to:
 		cte (mail-fetch-field "content-transfer-encoding")
 		cd (mail-fetch-field "content-disposition")
 		description (mail-fetch-field "content-description")
-		id (mail-fetch-field "content-id"))))
+		id (mail-fetch-field "content-id")))
+	(setq header-end (point-max)
+	      header-string (buffer-substring (point-min) header-end)))
       (unless ctl
 	(setq ctl (mail-header-parse-content-type "text/plain")))
       (setq cte (and cte (downcase (mail-header-remove-whitespace
@@ -226,36 +233,33 @@ to:
 				     cte))))
 	    cd (and cd (ignore-errors
 			 (mail-header-parse-content-disposition cd))))
-      (cond
-       ((null parent)
-	(setq result (mm-make-handle nil ctl cte nil cd
-				     description nil id nil)))
-       ((or (mm-handle-buffer parent)
-	    (mm-handle-child parent))
-	(setq result (mm-make-handle nil ctl cte nil cd
-				     description nil id nil))
-	(mm-handle-set-child parent (cons result (mm-handle-child parent))))
-       (t
-	(mime-entity-set-content-type-internal parent ctl)
-	(mime-entity-set-content-type-internal parent ctl)
-	(mime-entity-set-encoding-internal parent cte)
-	(mime-entity-set-content-disposition-internal parent cd)
-	(mime-gnus-handle-entity-set-content-description-internal parent
-								  description)
-	(setq result parent)))
+      (if handle
+	  (progn
+	    (mime-entity-set-content-type-internal handle ctl)
+	    (mime-entity-set-encoding-internal handle cte)
+	    (mime-entity-set-content-disposition-internal handle cd)
+	    (mmgnus-entity-set-content-description-internal handle description)
+	    (mmgnus-entity-set-header-internal handle header-string)
+	    (setq result handle))
+	(setq result (mm-make-handle nil nil ctl cte nil cd
+				     description nil id nil header-string)))
       (when id
 	(when (string-match " *<\\(.*\\)> *" id)
 	  (setq id (match-string 1 id)))
-	(mime-gnus-handle-entity-set-content-id-internal result id))
+	(mmgnus-entity-set-content-id-internal result id))
       result)))
 
-(defun mm-dissect-buffer (parent &optional no-strict-mime)
+(defun mm-dissect-buffer (handle &optional no-strict-mime)
   "Dissect the current buffer and return a list of MIME handles."
   (save-excursion
-    (let* ((result (mm-dissect-buffer-header parent no-strict-mime))
+    (let* ((result (mm-dissect-buffer-header handle no-strict-mime))
 	   (ctl (mime-entity-content-type-internal result))
 	   (type (mime-content-type-primary-type ctl)))
       (cond
+       ((and (eq gnus-mime-display-part-function
+		 'gnus-mime-display-part-with-mime-view)
+	     (eq type 'message))
+	(mm-dissect-message result ctl))
        ((eq type 'multipart)
 	(mm-dissect-multipart result ctl))
        (t
@@ -265,8 +269,8 @@ to:
       result)))
 
 (defun mm-dissect-singlepart (handle ctl &optional force)
-  (mime-buffer-entity-set-buffer-internal handle (mm-copy-to-buffer))
-  (push (mm-handle-buffer handle) mm-dissection-list)
+  (mm-handle-set-body handle (mm-copy-to-buffer))
+  (push (mm-handle-body handle) mm-dissection-list)
   handle)
 
 (defun mm-remove-all-parts ()
@@ -275,9 +279,22 @@ to:
   (mapcar 'mm-remove-part mm-dissection-list)
   (setq mm-dissection-list nil))
 
-(defun mm-dissect-multipart (parent ctl)
+(defun mm-dissect-message (handle ctl)
   (goto-char (point-min))
-  (let* ((boundary (concat "\n--" (mail-content-type-get ctl 'boundary)))
+  (save-excursion
+    (save-restriction
+      (when (re-search-forward "\n\n" nil t)
+	(narrow-to-region (point) (point-max))
+	(let ((part (mm-dissect-buffer nil t)))
+	  (mm-handle-set-parent part handle)
+	  (mm-handle-set-child handle
+			       (cons part (mm-handle-child handle))))))))
+
+(defun mm-dissect-multipart (handle ctl)
+  (goto-char (point-min))
+  (let* ((node-id (and handle (mime-entity-node-id-internal handle)))
+	 (this-node 0)
+	 (boundary (concat "\n--" (mail-content-type-get ctl 'boundary)))
 	 (close-delimiter (concat (regexp-quote boundary) "--[ \t]*$"))
 	start parts
 	(end (save-excursion
@@ -291,16 +308,25 @@ to:
 	(save-excursion
 	  (save-restriction
 	    (narrow-to-region start (point))
-	    (setq parts (cons (mm-dissect-buffer nil t) parts)))))
+	    (let ((part (mm-make-handle handle nil nil nil nil nil
+					nil nil nil nil nil)))
+	      (mime-entity-set-node-id-internal part (cons this-node node-id))
+	      (setq this-node (1+ this-node))
+	      (mm-dissect-buffer part t)
+	      (setq parts (cons part parts))))))
       (forward-line 2)
       (setq start (point)))
     (when start
       (save-excursion
 	(save-restriction
 	  (narrow-to-region start end)
-	  (setq parts (cons (mm-dissect-buffer nil t) parts)))))
-    (mime-entity-set-children-internal parent (nreverse parts))
-    parent))
+	  (let ((part (mm-make-handle handle nil nil nil nil nil
+				      nil nil nil nil nil)))
+	    (mime-entity-set-node-id-internal part (cons this-node node-id))
+	    (mm-dissect-buffer part t)
+	    (setq parts (cons part parts))))))
+    (mm-handle-set-child handle (nreverse parts))
+    handle))
 
 (defun mm-copy-to-buffer ()
   "Copy the contents of the current buffer to a fresh buffer."
@@ -574,9 +600,9 @@ external if displayed external."
   "Destroy the data structures connected to HANDLE."
   (when (mm-handle-p handle)
     (mm-remove-part handle)
-    (when (buffer-live-p (mm-handle-buffer handle))
-      (kill-buffer (mm-handle-buffer handle))
-      (mm-handle-set-buffer handle nil))))
+    (when (buffer-live-p (mm-handle-body handle))
+      (kill-buffer (mm-handle-body handle))
+      (mm-handle-set-body handle nil))))
 
 (defun mm-handle-displayed-p (handle)
   "Say whether HANDLE is displayed or not."
@@ -598,7 +624,7 @@ external if displayed external."
     (save-excursion
       (if (member (mm-handle-media-supertype handle) '("text" "message"))
 	  (with-temp-buffer
-	    (insert-buffer-substring (mm-handle-buffer handle))
+	    (insert-buffer-substring (mm-handle-body handle))
 	    (mm-decode-content-transfer-encoding
 	     (mm-handle-encoding handle)
 	     (mm-handle-media-type handle))
@@ -606,7 +632,7 @@ external if displayed external."
 	      (set-buffer cur)
 	      (insert-buffer-substring temp)))
 	(mm-with-unibyte-buffer
-	  (insert-buffer-substring (mm-handle-buffer handle))
+	  (insert-buffer-substring (mm-handle-body handle))
 	  (mm-decode-content-transfer-encoding
 	   (mm-handle-encoding handle)
 	   (mm-handle-media-type handle))
