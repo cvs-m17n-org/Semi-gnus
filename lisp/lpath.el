@@ -112,7 +112,6 @@
 		 make-symbolic-link map-extents smiley-encode-buffer
 		 toolbar-gnus)))
 
-(setq load-path (cons "." load-path))
 (require 'custom)
 
 (defun md5 (object &optional start end coding noerror)

@@ -1133,7 +1133,7 @@ find-file-hooks, etc.
       (message "%s(Y/n) Yes" prompt)
       t)))
 
-(when (string-match "XEmacs" emacs-version)
+(when (featurep 'xemacs)
   (require 'nnheaderxm))
 
 (run-hooks 'nnheader-load-hook)

@@ -683,6 +683,20 @@ used."
 		:value undisplayed-alternative)
 	  (function)))
 
+(defcustom gnus-mime-action-alist
+  '(("save to file" . gnus-mime-save-part)
+    ("display as text" . gnus-mime-inline-part)
+    ("view the part" . gnus-mime-view-part)
+    ("pipe to command" . gnus-mime-pipe-part)
+    ("toggle display" . gnus-article-press-button)
+    ("view as type" . gnus-mime-view-part-as-type)
+    ("internalize type" . gnus-mime-internalize-part)
+    ("externalize type" . gnus-mime-externalize-part))
+  "An alist of actions that run on the MIME attachment."
+  :group 'gnus-article-mime
+  :type '(repeat (cons (string :tag "name")
+		       (function))))
+
 ;;;
 ;;; The treatment variables
 ;;;
@@ -3255,7 +3269,8 @@ value of the variable `gnus-show-mime' is non-nil."
     (gnus-mime-inline-part "i" "View As Text, In This Buffer")
     (gnus-mime-internalize-part "E" "View Internally")
     (gnus-mime-externalize-part "e" "View Externally")
-    (gnus-mime-pipe-part "|" "Pipe To Command...")))
+    (gnus-mime-pipe-part "|" "Pipe To Command...")
+    (gnus-mime-action-on-part "." "Take action on the part")))
 
 (defun gnus-article-mime-part-status ()
   (with-current-buffer gnus-article-buffer
@@ -3380,14 +3395,26 @@ value of the variable `gnus-show-mime' is non-nil."
   (interactive)
   (gnus-article-check-buffer)
   (let* ((handle (or handle (get-text-property (point) 'gnus-data)))
-	 contents
+	 contents charset
 	 (b (point))
 	 buffer-read-only)
     (if (mm-handle-undisplayer handle)
 	(mm-remove-part handle)
       (setq contents (mm-get-part handle))
+      (cond
+       ((not current-prefix-arg)
+	(setq charset (or (mail-content-type-get
+			   (mm-handle-type handle) 'charset)
+			  gnus-newsgroup-charset)))
+       ((numberp current-prefix-arg)
+	(setq charset
+	      (or (cdr (assq current-prefix-arg 
+			     gnus-summary-show-article-charset-alist))
+		  (read-coding-system "Charset: ")))))
       (forward-line 2)
-      (mm-insert-inline handle contents)
+      (mm-insert-inline handle (if charset 
+				   (mm-decode-coding-string contents charset)
+				 contents))
       (goto-char b))))
 
 (defun gnus-mime-externalize-part (&optional handle)
@@ -3420,6 +3447,16 @@ In no internal viewer is available, use an external viewer."
     (if (mm-handle-undisplayer handle)
 	(mm-remove-part handle)
       (mm-display-part handle))))
+
+(defun gnus-mime-action-on-part (&optional action)
+  "Do something with the MIME attachment at \(point\)."
+  (interactive
+   (list (completing-read "Action: " gnus-mime-action-alist)))
+  (gnus-article-check-buffer)
+  (let ((action-pair (assoc action gnus-mime-action-alist)))
+    (if action-pair
+	(funcall (cdr action-pair)))))
+
 
 (defun gnus-article-part-wrapper (n function)
   (save-current-buffer
