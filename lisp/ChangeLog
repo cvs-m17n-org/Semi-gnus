@@ -377,8 +377,6 @@
 	(mm-w3m-cid-retrieve): New function.
 	(mm-inline-text-html-render-with-w3m): Handle cid: URLs.
 
-	* lpath.el: Bind `w3m-cid-retrieve-function-alist'.
-
 2002-01-27  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-agent.el (gnus-agent-fetch-articles): Don't save empty articles.
