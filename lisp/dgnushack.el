@@ -310,6 +310,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (autoload 'c-mode "cc-mode" nil t)
     (autoload 'customize-apropos "cus-edit" nil t)
     (autoload 'customize-save-variable "cus-edit" nil t)
+    (autoload 'customize-set-variable "cus-edit" nil t)
     (autoload 'customize-variable "cus-edit" nil t)
     (autoload 'delete-annotation "annotations")
     (autoload 'dolist "cl-macs" nil nil 'macro)
