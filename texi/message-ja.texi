@@ -985,6 +985,15 @@ documentation of your OpenPGP implementation, so we refer to it.
 @findex message-rename-buffer
 バッファの名前を変更します (@code{message-rename-buffer})。接頭引数を与
 えられれば、新しいバッファ名の入力を促進します。
+
+@item TAB
+@kindex TAB
+@findex message-tab
+@vindex message-tab-body-function
+@code{message-tab-body-function} に設定されている関数を実行します。さも
+なければ (それが @code{nil} だったら)、
+@code{text-mode-map} か @code{global-map} の @kbd{TAB} キーに割り当てら
+れているコマンドを使います。
 @end table
 
 @node Sending
@@ -1199,6 +1208,13 @@ Message はメッセージ作成部分に関しては非常に積極的です。それは次のようで
 (訳注: To か Cc にあるアドレスで、最初にこの正規表現に合致し、
 かつ @code{user-mail-address} とは違うものが、@code{From} フィールドのメー
 ルアドレスとして使われます。)
+
+@item message-allow-no-recipients
+@vindex message-allow-no-recipients
+@code{Gcc} と @code{Fcc} 以外に受取人がいなかった場合に、何をするかを設
+定します。@code{always} だったらとにかく送信し、@code{never} だったら送
+信しません。@code{ask} (それがディフォルト) だったら、どうするか尋ねられ
+ます。
 @end table
 
 @node Mail Headers
