@@ -2049,7 +2049,8 @@ This variable can be nil, gnus or gnus-ja."
 			gnus-newsrc-last-checked-date
 			gnus-newsrc-alist gnus-server-alist
 			gnus-killed-list gnus-zombie-list
-			gnus-topic-topology gnus-topic-alist)
+			gnus-topic-topology gnus-topic-alist
+			gnus-agent-covered-methods)
   "Gnus variables saved in the quick startup file.")
 
 (defvar gnus-product-variable-file-list
