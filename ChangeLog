@@ -1,5 +1,11 @@
 1998-02-28  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.8.
+
+	* lisp/gnus.el: Sync up with qgnus-0.34.
+
+1998-02-28  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/message.el: Sync up with qgnus-0.33.
 
 	* lisp/gnus-ems.el (gnus-bdf-image-file): New variable; moved from
