@@ -12778,8 +12778,13 @@ an_egroup RET egroups RET www.egroups.comRET your@@email.address RET}。
 じメーリングリストのアーカイブはすべて読める状態にしておく、ということで
 す。どうです、なかなか賢いでしょ?
 
-@code{nnshimbun} の期限切れ消去に関係する、以下の変数を覚えておいて下さ
-い。
+第三に、これはあなたが不審に思ったときに思い出してくれることを期待して書
+いておきますが、グループのすべての記事が期限切れ消去の対象になってしまっ
+たときに、@code{nnshimbun} は最後の一通だけは消さずに残しておきます。こ
+れはあなたの未練心を満足させるためではなく、サーバーから古い記事を再び取
+得してしまわないための窮余の策なのです。
+
+@code{nnshimbun} の期限切れ消去に関係する変数が一つあります。
 
 @table @code
 @item nnshimbun-keep-unparsable-dated-articles
