@@ -1321,7 +1321,19 @@ end position and text.")
   "Variables that are buffer-local to the summary buffers.")
 
 (defvar gnus-newsgroup-variables nil
-  "Variables that have separate values in the newsgroups.")
+  "A list of variables that have separate values in different newsgroups.
+A list of newsgroup (summary buffer) local variables, or cons of
+variables and their default values (when the default values are not
+nil), that should be made global while the summary buffer is active.
+These variables can be used to set variables in the group parameters
+while still allowing them to affect operations done in other
+buffers. For example:
+
+(setq gnus-newsgroup-variables 
+     '(message-use-followup-to
+       (gnus-visible-headers . 
+	 \"^From:\\\\|^Newsgroups:\\\\|^Subject:\\\\|^Date:\\\\|^To:\")))
+")
 
 ;; Byte-compiler warning.
 (eval-when-compile (defvar gnus-article-mode-map))

@@ -1,5 +1,41 @@
+2001-11-15  Simon Josefsson  <jas@extundo.com>
+
+	Support "Importance:" header in Message.
+
+	* message.el (message-mode-map): Bind C-c C-p to
+	`message-insert-or-toggle-importance'
+	(message-mode-menu): Add message-insert-importance-{high,low}.
+	(message-insert-importance-high, message-insert-importance-low) 
+	(message-insert-or-toggle-importance): New functions.
+	(message-tool-bar-map): Add {un,}important.
+	(message-mode): Doc fix.
+
+2001-11-15  Simon Josefsson  <jas@extundo.com>
+
+	* message.el (message-tool-bar-map): Fix attach toolbar tooltip.
+
+	* mml.el (mml-menu): Fix toolbar tooltip.
+
+2001-11-15 14:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnfolder.el (nnfolder-save-marks): gnus-prin1 takes one argument.
+	* nnml.el (nnml-save-marks): Ditto.
+	
+	* gnus-sum.el (gnus-newsgroup-variables): Fix doc.
+
+2001-11-15  Simon Josefsson  <jas@extundo.com>
+
+	* nnml.el (nnml-save-marks):
+	* nnfolder.el (nnfolder-save-marks): Use `gnus-prin1'.
+	Suggested by Istvan Marko <mi-gnus@imarko.dhs.org>.
+
 2001-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
 
+	* gnus-art.el (gnus-article-wash-status-strings): Use
+	`copy-sequence', not `copy-seq'.
+
+2001-11-15  Per Abrahamsen  <abraham@dina.kvl.dk>
+	
 	* gnus-art.el (gnus-article-wash-status-strings): New constant.
 	(gnus-gnus-article-wash-status-entry): New function.
 	(gnus-article-wash-status): Use it.

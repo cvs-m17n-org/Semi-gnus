@@ -1,3 +1,7 @@
+2001-11-15  Simon Josefsson  <jas@extundo.com>
+
+	* etc/gnus/unimportant.xpm, etc/gnus/important.xpm: New files.
+
 2001-11-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-wash-map): Remove

@@ -8790,6 +8790,22 @@ Gnus $B$,F1$8(B @code{Message-ID} $B$r;}$DFs$D$N5-;v$rH/8+$7$?$H$-$O!"2?$+;W$
       (append gnus-newsgroup-cached articles)
     articles))
 @end lisp
+
+@vindex gnus-newsgroup-variables
+@item gnus-newsgroup-variables
+$B%K%e!<%9%0%k!<%W(B ($B$=$N35N,%P%C%U%!$N(B) $B$N%m!<%+%kJQ?t!"$^$?$OJQ?t$H$=$l$i(B
+$B$N%G%#%U%)%k%HCM(B ($B%G%#%U%)%k%HCM$,(B nil $B$G$J$$>l9g(B) $B$N(B cons $B%;%k$N%j%9%H(B
+$B$G!"$=$N35N,%P%C%U%!$,3h$-$F$$$k4V$O%0%m!<%P%kJQ?t$K$J$j$^$9!#$3$l$i$NJQ(B
+$B?t$O!"JL$N%P%C%U%!$G$=$l$i(B ($B%0%k!<%W%Q%i%a!<%?(B) $B$N8z2L$,JQ99$5$l$F$$$F$b!"(B
+($B$=$N%0%k!<%W$N(B) $B%0%k!<%W%Q%i%a!<%?$NJQ?t$r@_Dj$9$k$?$a$K;H$&$3$H$,$G$-(B
+$B$^$9!#Nc$G$9(B:
+
+@lisp
+(setq gnus-newsgroup-variables
+      '(message-use-followup-to
+        (gnus-visible-headers
+         . "^From:\\|^Newsgroups:\\|^Subject:\\|^Date:\\|^To:")))
+@end lisp
 @end table
 
 @node Summary Group Information
