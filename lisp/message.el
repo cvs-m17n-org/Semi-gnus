@@ -2556,7 +2556,8 @@ be added to \"References\" field.
 			   (mapconcat 'identity (nreverse refs) " "))))
 	      (backward-delete-char 1)))))
 
-      (funcall message-cite-function)
+      (unless arg
+	(funcall message-cite-function))
       (message-exchange-point-and-mark)
       (unless (bolp)
 	(insert ?\n))

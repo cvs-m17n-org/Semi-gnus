@@ -8801,14 +8801,17 @@ Gnus $B$O%X%C%@!<$NJB$YBX$((B(sort)$B$b9T$$$^$9(B ($B$3$l$O%G%#%U%)%k%H$G9T
 @table @code
 @item empty
 $B6u$N%X%C%@!<$rA4$F>C5n$7$^$9!#(B
-@item newsgroups
-@code{Newsgroups} $BMs$,8=:_$N%0%k!<%WL>$7$+4^$s$G$$$J$$>l9g$K$O>C5n$7$^$9!#(B
 @item followup-to
 @code{Followup-To} $BMs$,(B @code{Newsgroups} $BMs$HF10l$G$"$k>l9g$K$O>C5n$7$^(B
 $B$9!#(B
 @item reply-to
 @code{Reply-To} $BMs$,(B @code{From} $BMs$HF1$8%"%I%l%9$r<($7$F$$$k>l9g$K$O>C(B
 $B5n$7$^$9!#(B
+@item newsgroups
+@code{Newsgroups} $BMs$,8=:_$N%0%k!<%WL>$7$+4^$s$G$$$J$$>l9g$K$O>C5n$7$^$9!#(B
+@item to-address
+@code{To} $BMs$,8=:_$N%0%k!<%W$N(B @code{to-address} $B%Q%i%a!<%?$HF1$8$b$N$7(B
+$B$+4^$s$G$$$J$$>l9g$K$O>C5n$7$^$9!#(B
 @item date
 $B$=$N5-;v$,2a5n;0F|0JFb$N$b$N$G$"$l$P!"(B@code{Date} $BMs$r>C5n$7$^$9!#(B
 @item long-to

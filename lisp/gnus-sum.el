@@ -2978,9 +2978,9 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 					kill-buffer no-display
 					&optional select-articles)
   ;; Killed foreign groups can't be entered.
-  (when (and (not (gnus-group-native-p group))
-	     (not (gnus-gethash group gnus-newsrc-hashtb)))
-    (error "Dead non-native groups can't be entered"))
+  ;;  (when (and (not (gnus-group-native-p group))
+  ;;	     (not (gnus-gethash group gnus-newsrc-hashtb)))
+  ;;    (error "Dead non-native groups can't be entered"))
   (gnus-message 5 "Retrieving newsgroup: %s..." group)
   (let* ((new-group (gnus-summary-setup-buffer group))
 	 (quit-config (gnus-group-quit-config group))
