@@ -1,3 +1,23 @@
+1998-02-17  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el: Check SEMI-0.118.2 (Otomaru) or later.
+	(gnus-structured-field-decoder): Use
+ 	`eword-decode-and-unfold-structured-field'.
+
+	* lisp/gnus-art.el (gnus-article-decode-rfc1522): Use charset
+ 	conversion option of `eword-decode-header'.
+	(gnus-article-decode-encoded-word): Use charset conversion option
+ 	of `eword-decode-header'; use `gnus-run-hooks'.
+	(gnus-content-header-filter): Use charset conversion option of
+ 	`eword-decode-header'.
+
+	* README.semi (How to get?): Should specify "-r semi-gnus".
+
+1998-02-16  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-decode-rfc1522): Decode header by
+ 	localized code.
+
 1998-02-16  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-msg.el: Delete commented-out function
