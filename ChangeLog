@@ -1,5 +1,10 @@
 1998-10-03  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/message.el (message-mode-map): Use `define-key' instead of
+	`substitute-key-definition' for `message-kill-buffer'.
+
+1998-10-03  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/message.el (message-make-user-agent): Replace with the
 	new code again. It is based on MORIOKA-san's code.
 
