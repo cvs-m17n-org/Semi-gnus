@@ -1227,7 +1227,7 @@ to actually put the message in the right group."
 
 (defun nnmail-split-fancy ()
   "Fancy splitting method.
-See the documentation for the variable `nnmail-split-fancy' for documentation."
+See the documentation for the variable `nnmail-split-fancy' for details."
   (let ((syntab (syntax-table)))
     (unwind-protect
 	(progn

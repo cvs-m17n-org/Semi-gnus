@@ -4768,13 +4768,13 @@ no more unread articles after the current one, gnus will offer to go to
 the next group.  If this variable is @code{t} and the next group is
 empty, gnus will exit summary mode and return to the group buffer.  If
 this variable is neither @code{t} nor @code{nil}, gnus will select the
-next group, no matter whether it has any unread articles or not.  As a
-special case, if this variable is @code{quietly}, gnus will select the
-next group without asking for confirmation.  If this variable is
-@code{almost-quietly}, the same will happen only if you are located on
-the last article in the group.  Finally, if this variable is
-@code{slightly-quietly}, the @kbd{Z n} command will go to the next group
-without confirmation.  Also @pxref{Group Levels}.
+next group with unread articles.  As a special case, if this variable
+is @code{quietly}, Gnus will select the next group without asking for
+confirmation.  If this variable is @code{almost-quietly}, the same
+will happen only if you are located on the last article in the group.
+Finally, if this variable is @code{slightly-quietly}, the @kbd{Z n}
+command will go to the next group without confirmation.  Also
+@pxref{Group Levels}.
 
 @item gnus-auto-select-same
 @vindex gnus-auto-select-same
@@ -23169,6 +23169,22 @@ the bug report.
 @cindex patches
 If you would like to contribute a patch to fix bugs or make
 improvements, please produce the patch using @samp{diff -u}.
+
+@cindex edebug
+If you want to debug your problem further before reporting, possibly
+in order to solve the problem yourself and send a patch, you can use
+edebug.  Debugging lisp code is documented in the Elisp manual
+(@pxref{Debugging, , Debugging Lisp Programs, elisp, The GNU Emacs
+Lisp Reference Manual}).  To get you started with edebug, consider if
+you discover some weird behaviour when pressing @kbd{c}, the first
+step is to do @kbd{C-h k c} and click on the hyperlink (Emacs only) in
+the documentation buffer that leads you to the function definition,
+then press @kbd{M-x edebug-defun RET} with point inside that function,
+return to Gnus and press @kbd{c} to invoke the code.  You will be
+placed in the lisp buffer and can single step using @kbd{SPC} and
+evaluate expressions using @kbd{M-:} or inspect variables using
+@kbd{C-h v}, abort execution with @kbd{q}, and resume execution with
+@kbd{c} or @kbd{g}.
 
 If you just need help, you are better off asking on
 @samp{gnu.emacs.gnus}.  I'm not very helpful.
