@@ -1136,6 +1136,22 @@ The cdr of ech entry is a function for applying the face to a region.")
 ;;;
 ;;; Utility functions.
 ;;;
+(defun message-eval-parameter (parameter)
+  (condition-case ()
+      (if (symbolp parameter)
+	  (if (functionp parameter)
+	      (funcall parameter)
+	    (eval parameter))
+	parameter)
+    (error nil)))
+
+(defsubst message-get-parameter (key &optional alist)
+  (unless alist
+    (setq alist message-parameter-alist))
+  (cdr (assq key alist)))
+
+(defmacro message-get-parameter-with-eval (key &optional alist)
+  `(message-eval-parameter (message-get-parameter ,alist ,key)))
 
 (defmacro message-y-or-n-p (question show &rest text)
   "Ask QUESTION, displaying the rest of the arguments in a temp. buffer if SHOW"
@@ -1228,7 +1244,7 @@ The cdr of ech entry is a function for applying the face to a region.")
 
 (defun message-fetch-reply-field (header)
   "Fetch FIELD from the message we're replying to."
-  (let ((buffer (message-get-reply-buffer)))
+  (let ((buffer (message-eval-parameter message-reply-buffer)))
     (when (and buffer
 	       (buffer-name buffer))
       (save-excursion
@@ -1388,22 +1404,6 @@ Point is left at the beginning of the narrowed-to region."
 	       (- max rank)
 	     (1+ max)))))
       (message-sort-headers-1))))
-
-(defun message-eval-parameter (parameter)
-  (condition-case ()
-      (if (symbolp parameter)
-	  (if (functionp parameter)
-	      (funcall parameter)
-	    (eval parameter))
-	parameter)
-    (error nil)))
-
-(defun message-get-reply-buffer ()
-  (message-eval-parameter message-reply-buffer))
-
-(defun message-get-original-reply-buffer ()
-  (message-eval-parameter
-   (cdr (assq 'original-buffer message-parameter-alist))))
 
 
 
@@ -1992,7 +1992,7 @@ Just \\[universal-argument] as argument means don't indent, insert no
 prefix, and don't delete any headers."
   (interactive "P")
   (let ((modified (buffer-modified-p))
-	(buffer (message-get-reply-buffer)))
+	(buffer (message-eval-parameter message-reply-buffer)))
     (when (and buffer
 	       message-cite-function)
       (delete-windows-on buffer t)
@@ -3720,7 +3720,7 @@ Headers already prepared in the buffer are not modified."
   (when actions
     (setq message-send-actions actions))
   (setq message-reply-buffer
-	(or (cdr (assq 'reply-buffer message-parameter-alist))
+	(or (message-get-parameter 'reply-buffer)
 	    replybuffer))
   (goto-char (point-min))
   ;; Insert all the headers.
@@ -4694,7 +4694,8 @@ regexp varstr."
 (defun message-mime-insert-article (&optional full-headers)
   (interactive "P")
   (let ((message-cite-function 'mime-edit-inserted-message-filter)
-	(message-reply-buffer (message-get-original-reply-buffer))
+	(message-reply-buffer
+	 (message-get-parameter-with-eval 'original-buffer))
 	(start (point)))
     (message-yank-original nil)
     (save-excursion
