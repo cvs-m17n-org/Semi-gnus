@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.13 1998-12-10 06:31:18 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.14 1998-12-10 09:38:36 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -275,7 +275,8 @@ If value is nil , dialup line is disconnected status.")
 	 (gnus-offline-set-offline-sendmail-function))
 	((eq gnus-offline-mail-treat-environ 'online)
 	 ;; send mail under offline environ.
-	 (gnus-offline-set-online-sendmail-function))))
+	 (gnus-offline-set-online-sendmail-function)))
+  (add-hook 'gnus-group-mode-hook 'gnus-offline-setup))
 
 ;;
 ;; Setting Error check.
@@ -744,7 +745,7 @@ If value is nil , dialup line is disconnected status.")
 (defun gnus-offline-define-menu-on-miee ()
   "*Set menu bar on MIEE menu."
   (easy-menu-define
-   global-map grobal-map "Gnus offline menu on Miee"
+   gnus-offline-menu-on-miee global-map "Gnus offline menu on Miee"
    '("Miee"
      ["Post news in spool" news-spool-post t]
      ["Send mails in spool" mail-spool-send t]
@@ -752,7 +753,7 @@ If value is nil , dialup line is disconnected status.")
      ["Message Offline" message-offline-state (not message-offline-state)]
      ["Message Online" message-online-state message-online-state]
      "----"
-     '("Gnus Offline"
+     ("Gnus Offline"
        ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
        ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
        ["Toggle online/offline send mail" gnus-offline-toggle-on/off-send-mail t]
@@ -769,7 +770,7 @@ If value is nil , dialup line is disconnected status.")
 (defun gnus-offline-define-menu-on-agent ()
   "*Set menu bar on OFFLINE menu."
   (easy-menu-define 
-   gnus-group-mode-map gnus-group-mode-map "Gnus offline Menu"
+   gnus-offline-menu-on-agent gnus-group-mode-map "Gnus offline Menu"
    '("Offline"
      ["Toggle movemail program" gnus-offline-toggle-movemail-program t]
      ["Toggle articles to fetch" gnus-offline-toggle-articles-to-fetch t]
@@ -779,7 +780,9 @@ If value is nil , dialup line is disconnected status.")
      ["Expire articles" gnus-offline-agent-expire (eq gnus-offline-news-fetch-method 'nnagent)]
      ["Set interval time" gnus-offline-set-interval-time t]
      "----"
-     ["Hang up Line." gnus-offline-set-unplugged-state (gnus-offline-connected)])))
+     ["Hang up Line." gnus-offline-set-unplugged-state (gnus-offline-connected)]))
+  (and (featurep 'xemacs)
+       (easy-menu-add gnus-offline-menu-on-agent)))
 
 ;;
 ;; Timer Function

@@ -1,3 +1,14 @@
+1998-12-10  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+	
+	* lisp/gnus-offline.el (gnus-offline-setup): Add
+	gnus-offline-setup to gnus-group-mode-hook.
+	
+1998-12-10  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
+
+	* lisp/gnus-offline.el (gnus-offline-define-menu-on-miee): Bug
+	fix.
+	(gnus-offline-define-menu-on-agent): Bug fix.
+
 1998-12-10  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/pop3.el (pop3-movemail): Use `write-region-as-binary'
