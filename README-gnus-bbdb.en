@@ -13,7 +13,7 @@ gnus-bbdb.el
  This is the BBDB API module for Semi-gnus. `mime-bbdb' should not be
 necessary for Semi-gnus, if that module were used.
 
- You need FLIM 1.11.3 or later.
+ You need FLIM 1.11.3 or later (T-gnus requires FLIM 1.14).
 
  If you are using bbdb-auto-notes-hook, the patch listed at the end
 of this file should be applied. If not, it might not.
@@ -28,7 +28,10 @@ of this file should be applied. If not, it might not.
 (require 'gnus-bbdb)
 (bbdb-initialize 'sc)  ;; 'Gnus or 'gnus should be deleted.
 (add-hook 'gnus-startup-hook 'gnus-bbdb-insinuate)
-(add-hook 'message-setup-hook 'gnus-bbdb-insinuate-message)
+
+;; No need to use the following lines under T-gnus 6.15.5 and later.
+;(eval-after-load "message"
+;  '(add-hook 'message-setup-hook 'gnus-bbdb-insinuate-message))
 
  If you would like to decode the quoted encoded words forcibly, even
 though FLIM does not decode them, put the following lines in your
@@ -40,12 +43,12 @@ though FLIM does not decode them, put the following lines in your
          (eword-decode-string field-body))))
 
 ---
- This is a patch for bbdb.el / bbdb-hooks.el.
+ This is a patch for bbdb-com.el, bbdb-hooks.el and bbdb.el.
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
---- bbdb-2.32/lisp/bbdb-com.el~	Sun Feb 18 08:00:39 2001
-+++ bbdb-2.32/lisp/bbdb-com.el	Sun Feb 18 08:00:39 2001
-@@ -1620,7 +1620,7 @@
+--- bbdb-2.34/lisp/bbdb-com.el~	Tue Jan 15 23:00:57 2002
++++ bbdb-2.34/lisp/bbdb-com.el	Thu Jan 31 03:55:01 2002
+@@ -1686,7 +1686,7 @@
            ;; to be enclosed in quotes.  Double-quotes and backslashes have
            ;; already been escaped.  This quotes a few extra characters as
            ;; well (!,%, and $) just for common sense.
@@ -54,29 +57,27 @@ though FLIM does not decode them, put the following lines in your
             (format "\"%s\" <%s>" name net))
            (t
             (format "%s <%s>" name net)))))
---- bbdb-2.32/lisp/bbdb-hooks.el~	Tue Jan 30 08:00:56 2001
-+++ bbdb-2.32/lisp/bbdb-hooks.el	Tue Jan 30 08:00:56 2001
-@@ -83,6 +83,8 @@
- ;;
+--- bbdb-2.34/lisp/bbdb-hooks.el~	Tue Jan 15 09:00:11 2002
++++ bbdb-2.34/lisp/bbdb-hooks.el	Thu Jan 31 03:55:01 2002
+@@ -36,4 +36,6 @@
  ;;
  
 +(eval-when-compile (require 'cl))
 +
  (require 'bbdb)
- 
- (defmacro the-v18-byte-compiler-sucks-wet-farts-from-dead-pigeons ()
-@@ -415,12 +417,23 @@
-          (marker (bbdb-header-start))
+ (require 'bbdb-com)
+@@ -405,13 +407,23 @@
+          ignore
           field pairs fieldval  ; do all bindings here for speed
           regexp string notes-field-name notes
--         replace-p replace-or-add-msg)
-+         replace-p replace-or-add-msg
-+	 extract-field-value-funtion)
+-         replace-p)
++         replace-p extract-field-value-funtion)
      (set-buffer (marker-buffer marker))
      (save-restriction
 -      (widen)
 -      (goto-char marker)
 -      (if (and (setq fieldval (bbdb-extract-field-value "From"))
+-               (string-match (bbdb-user-mail-names) fieldval))
 +      (let ((function-list bbdb-extract-field-value-function-list)
 +	    function)
 +	(or (progn
@@ -90,10 +91,11 @@ though FLIM does not decode them, put the following lines in your
 +	      (goto-char marker)
 +	      (setq extract-field-value-funtion 'bbdb-extract-field-value))))
 +      (if (and (setq fieldval (funcall extract-field-value-funtion "From"))
-                (string-match (bbdb-user-mail-names) fieldval))
++	       (string-match (bbdb-user-mail-names) fieldval))
            ;; Don't do anything if this message is from us.  Note that we have
            ;; to look at the message instead of the record, because the record
-@@ -431,7 +444,7 @@
+           ;; will be of the recipient of the message if it is from us.
+@@ -421,7 +433,7 @@
            (goto-char marker)
            (setq field (car (car ignore-all))
                  regexp (cdr (car ignore-all))
@@ -102,7 +104,7 @@ though FLIM does not decode them, put the following lines in your
            (if (and fieldval
                     (string-match regexp fieldval))
                (setq ignore t)
-@@ -444,7 +457,8 @@
+@@ -434,7 +446,8 @@
                  pairs (cdr (car rest))  ; (REGEXP . STRING) or
                                          ; (REGEXP FIELD-NAME STRING) or
                                          ; (REGEXP FIELD-NAME STRING REPLACE-P)
@@ -110,14 +112,14 @@ though FLIM does not decode them, put the following lines in your
 +                fieldval (funcall extract-field-value-funtion field))
 +                                        ; e.g., Subject line
            (when fieldval
-             (while pairs
-               (setq regexp (car (car pairs))
---- bbdb-2.32/lisp/bbdb.el~	Sun Mar  4 20:30:09 2001
-+++ bbdb-2.32/lisp/bbdb.el	Sun Mar  4 20:30:09 2001
-@@ -710,6 +710,7 @@
+             ;; we perform the auto notes stuff only for authors of a message
+             ;; or if explicitly requested
+--- bbdb-2.34/lisp/bbdb.el~	Tue Jan 15 23:00:58 2002
++++ bbdb-2.34/lisp/bbdb.el	Thu Jan 31 03:55:01 2002
+@@ -737,6 +737,7 @@
  (defvar bbdb-showing-changed-ones nil)
  (defvar bbdb-modified-p nil)
- (defvar bbdb-elided-display nil)
+ (defvar bbdb-address-print-formatting-alist) ; "bbdb-print"
 +(defvar bbdb-extract-field-value-function-list nil)
  
  (defvar bbdb-debug t)

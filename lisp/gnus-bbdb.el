@@ -46,38 +46,59 @@
 		     ,field-body ,field-name))
        ,field-body))
 
+(defvar gnus-bbdb/extract-message-sender-function
+  'gnus-bbdb/extract-message-sender)
+
+(defun gnus-bbdb/extract-message-sender ()
+  (let ((from (mime-entity-fetch-field gnus-current-headers "from"))
+	to)
+    (when from
+      (setq from (gnus-bbdb/extract-address-components
+		  (gnus-bbdb/decode-field-body from 'From)))
+      (if (and (car (cdr from))
+	       (string-match (bbdb-user-mail-names) (car (cdr from)))
+	       ;; if logged-in user sent this, use recipients.
+	       (setq to (mime-entity-fetch-field gnus-current-headers "to")))
+	  (gnus-bbdb/extract-address-components
+	   (gnus-bbdb/decode-field-body to 'To))
+	from))))
+
 ;;;###autoload
 (defun gnus-bbdb/update-record (&optional offer-to-create)
-  "returns the record corresponding to the current GNUS message, creating
+  "Return the record corresponding to the current GNUS message, creating
 or modifying it as necessary.  A record will be created if
 bbdb/news-auto-create-p is non-nil, or if OFFER-TO-CREATE is true and
 the user confirms the creation."
   (if bbdb-use-pop-up
       (gnus-bbdb/pop-up-bbdb-buffer offer-to-create)
-    (let ((from (mime-entity-fetch-field gnus-current-headers "from")))
-      (when from
-	(setq from (gnus-bbdb/extract-address-components
-		    (gnus-bbdb/decode-field-body from 'From))))
-      (when (and (car (cdr from))
-		 (string-match (bbdb-user-mail-names)
-			       (car (cdr from))))
-	;; if logged-in user sent this, use recipients.
-	(let ((to (mime-entity-fetch-field gnus-current-headers "to")))
-	  (when to
-	    (setq from
-		  (gnus-bbdb/extract-address-components
-		   (gnus-bbdb/decode-field-body to 'To))))))
-      (when from
-	(save-excursion
-	  (bbdb-annotate-message-sender from t
-					(or (bbdb-invoke-hook-for-value
-					     bbdb/news-auto-create-p)
-					    offer-to-create)
-					offer-to-create))))))
+    (let ((message-key
+	   (intern (mail-header-id gnus-current-headers)))
+	  record sender)
+      (or (and (setq record (bbdb-message-cache-lookup message-key))
+	       (if (listp record)
+		   (nth 1 record)
+		 record))
+	  (when (setq sender
+		      (funcall gnus-bbdb/extract-message-sender-function))
+	    (save-excursion
+	      (setq record (bbdb-annotate-message-sender
+			    sender t
+			    (or (bbdb-invoke-hook-for-value
+				 bbdb/news-auto-create-p)
+				offer-to-create)
+			    offer-to-create)))
+	    (when record
+	      ;; XXX: BBDB 2.3x not only redefines
+	      ;; `bbdb-encache-message' as a macro but also the inherent
+	      ;; semantics of message caching functions is changed, so
+	      ;; the following calls are much the same here.
+	      (if (functionp 'bbdb-encache-message)
+		  (car (bbdb-encache-message message-key (list record)))
+		(bbdb-encache-message message-key record))))))))
 
 ;;;###autoload
 (defun gnus-bbdb/annotate-sender (string &optional replace)
-  "Add a line to the end of the Notes field of the BBDB record 
+  "Add a line to the end of the Notes field of the BBDB record
 corresponding to the sender of this message.  If REPLACE is non-nil,
 replace the existing notes entry (if any)."
   (interactive (list (if bbdb-readonly-p
@@ -103,7 +124,7 @@ This buffer will be in bbdb-mode, with associated keybindings."
   (let ((record (gnus-bbdb/update-record t)))
     (if record
 	(bbdb-display-records (list record))
-	(error "unperson"))))
+      (error "unperson"))))
 
 
 (defun gnus-bbdb/pop-up-bbdb-buffer (&optional offer-to-create)
@@ -114,7 +135,12 @@ displaying the record corresponding to the sender of the current message."
 	 (record
 	  (let (bbdb-use-pop-up)
 	    (gnus-bbdb/update-record offer-to-create)))
-	 (bbdb-elided-display (bbdb-pop-up-elided-display)))
+	 (bbdb-display-layout
+	  (cond ((boundp 'bbdb-pop-up-display-layout)
+		 (symbol-value 'bbdb-pop-up-display-layout))
+		((boundp 'bbdb-pop-up-elided-display)
+		 (symbol-value 'bbdb-pop-up-elided-display))))
+	 (bbdb-elided-display bbdb-display-layout))
     (save-current-buffer
       ;; display the bbdb buffer iff there is a record for this article.
       (cond
@@ -191,10 +217,10 @@ BBDB-FIELD values is returned.  Otherwise, GROUP is returned."
 	 (unless (eq (point) (point-min))
 	   (insert "\\|"))
 	 (let ((addr (nth 1 address)))
-	   (insert (std11-addr-to-string
-		    (if (eq (car addr) 'phrase-route-addr)
-			(nth 2 addr)
-		      (cdr addr))))))))
+	   (insert (regexp-quote (std11-addr-to-string
+				  (if (eq (car addr) 'phrase-route-addr)
+				      (nth 2 addr)
+				    (cdr addr)))))))))
 
 (defun gnus-bbdb/split-mail-1 (address-regexp bbdb-field regexp group)
   (let ((records (bbdb-search (bbdb-records) nil nil address-regexp))
@@ -212,7 +238,7 @@ BBDB-FIELD values is returned.  Otherwise, GROUP is returned."
 	(throw 'done (when rest (cons '& rest))))
        (t
 	(while records
-	  (when (or (null bbdb-field) 
+	  (when (or (null bbdb-field)
 		    (and (setq prop (bbdb-record-getprop (car records)
 							 bbdb-field))
 			 (string-match regexp prop)))
@@ -335,8 +361,9 @@ strings.  In the future this should change."
 		      (error nil))))
 	 (name (car data))
 	 (net (car (cdr data)))
-	 (record (and data 
-		      (bbdb-search-simple name 
+	 (record (and data
+		      (bbdb-search-simple
+		       name
 		       (if (and net bbdb-canonicalize-net-hook)
 			   (bbdb-canonicalize-address net)
 			 net))))
@@ -346,7 +373,7 @@ strings.  In the future this should change."
 	;; bogon!
 	(setq record nil))
 
-    (setq name 
+    (setq name
 	  (or (and gnus-bbdb/summary-prefer-bbdb-data
 		   (or (and gnus-bbdb/summary-prefer-real-names
 			    (and record (bbdb-record-name record)))
@@ -357,22 +384,22 @@ strings.  In the future this should change."
 			    net)
 		       name))
 	      net from "**UNKNOWN**"))
-      ;; GNUS can't cope with extra square-brackets appearing in the summary.
-      (if (and name (string-match "[][]" name))
-	  (progn (setq name (copy-sequence name))
-		 (while (string-match "[][]" name)
-		   (aset name (match-beginning 0) ? ))))
-      (setq string (format "%s%3d:%s"
-			   (if (and record gnus-bbdb/summary-mark-known-posters)
-			       (or (bbdb-record-getprop
-				    record bbdb-message-marker-field)
-				   "*")
-			     " ")
-			   lines (or name from))
-	    L (length string))
-      (cond ((> L length) (substring string 0 length))
-	    ((< L length) (concat string (make-string (- length L) ? )))
-	    (t string))))
+    ;; GNUS can't cope with extra square-brackets appearing in the summary.
+    (if (and name (string-match "[][]" name))
+	(progn (setq name (copy-sequence name))
+	       (while (string-match "[][]" name)
+		 (aset name (match-beginning 0) ? ))))
+    (setq string (format "%s%3d:%s"
+			 (if (and record gnus-bbdb/summary-mark-known-posters)
+			     (or (bbdb-record-getprop
+				  record bbdb-message-marker-field)
+				 "*")
+			   " ")
+			 lines (or name from))
+	  L (length string))
+    (cond ((> L length) (substring string 0 length))
+	  ((< L length) (concat string (make-string (- length L) ? )))
+	  (t string))))
 
 (defun gnus-bbdb/summary-get-author (header)
   "Given a Gnus message header, returns the appropriate piece of
@@ -392,15 +419,16 @@ This function is meant to be used with the user function defined in
 		      (error nil))))
 	 (name (car data))
 	 (net (car (cdr data)))
-	 (record (and data 
-		      (bbdb-search-simple name 
+	 (record (and data
+		      (bbdb-search-simple
+		       name
 		       (if (and net bbdb-canonicalize-net-hook)
 			   (bbdb-canonicalize-address net)
 			 net)))))
     (if (and record name (member (downcase name) (bbdb-record-net record)))
 	;; bogon!
 	(setq record nil))
-    (setq name 
+    (setq name
 	  (or (and gnus-bbdb/summary-prefer-bbdb-data
 		   (or (and gnus-bbdb/summary-prefer-real-names
 			    (and record (bbdb-record-name record)))
@@ -486,12 +514,12 @@ field.  This allows the BBDB to serve as a supplemental global score
 file, with the advantage that it can keep up with multiple and changing
 addresses better than the traditionally static global scorefile."
   (list (list
-   (condition-case nil
-       (read (gnus-bbdb/score-as-text group))
-     (error (setq gnus-bbdb/score-rebuild-alist t)
-	    (message "Problem building BBDB score table.")
-	    (ding) (sit-for 2)
-	    nil)))))
+	 (condition-case nil
+	     (read (gnus-bbdb/score-as-text group))
+	   (error (setq gnus-bbdb/score-rebuild-alist t)
+		  (message "Problem building BBDB score table.")
+		  (ding) (sit-for 2)
+		  nil)))))
 
 (defun gnus-bbdb/score-as-text (group)
   "Returns a SCORE file format string built from the BBDB."
@@ -500,24 +528,25 @@ addresses better than the traditionally static global scorefile."
 		    (setq gnus-bbdb/score-default-internal
 			  gnus-bbdb/score-default)
 		    t))
-	    (not gnus-bbdb/score-alist)
-	    gnus-bbdb/score-rebuild-alist)
-    (setq gnus-bbdb/score-rebuild-alist nil)
-    (setq gnus-bbdb/score-alist
-	  (concat "((touched nil) (\"from\"\n"
-		  (mapconcat
-		   (lambda (rec)
-		     (let ((score (or (bbdb-record-getprop rec
-							   gnus-bbdb/score-field)
-				      gnus-bbdb/score-default))
-			   (net (bbdb-record-net rec)))
-		       (if (not (and score net)) nil
-			 (mapconcat
-			  (lambda (addr)
-			    (concat "(\"" addr "\" " score ")\n"))
-			  net ""))))
-		   (bbdb-records) "")
-		  "))"))))
+	     (not gnus-bbdb/score-alist)
+	     gnus-bbdb/score-rebuild-alist)
+	 (setq gnus-bbdb/score-rebuild-alist nil)
+	 (setq gnus-bbdb/score-alist
+	       (concat "((touched nil) (\"from\"\n"
+		       (mapconcat
+			(lambda (rec)
+			  (let ((score (or (bbdb-record-getprop
+					    rec
+					    gnus-bbdb/score-field)
+					   gnus-bbdb/score-default))
+				(net (bbdb-record-net rec)))
+			    (if (not (and score net)) nil
+			      (mapconcat
+			       (lambda (addr)
+				 (concat "(\"" addr "\" " score ")\n"))
+			       net ""))))
+			(bbdb-records) "")
+		       "))"))))
   gnus-bbdb/score-alist)
 
 (defun gnus-bbdb/extract-field-value-init ()
@@ -547,12 +576,12 @@ beginning of the message headers."
 
 (defun gnus-bbdb/extract-address-components (str)
   (let* ((ret     (std11-extract-address-components str))
-         (phrase  (car ret))
-         (address (car (cdr ret)))
-         (methods gnus-bbdb/canonicalize-full-name-methods))
+	 (phrase  (car ret))
+	 (address (car (cdr ret)))
+	 (methods gnus-bbdb/canonicalize-full-name-methods))
     (while (and phrase methods)
       (setq phrase  (funcall (car methods) phrase)
-            methods (cdr methods)))
+	    methods (cdr methods)))
     (if (string= address "") (setq address nil))
     (if (string= phrase "") (setq phrase nil))
     (when (or phrase address)
@@ -567,7 +596,7 @@ beginning of the message headers."
       (setq dest (cons (substring str 0 (match-beginning 0)) dest))
       (setq str (substring str (match-end 0))))
     (or (string= str "")
-        (setq dest (cons str dest)))
+	(setq dest (cons str dest)))
     (setq dest (nreverse dest))
     (mapconcat 'identity dest " ")))
 
@@ -577,7 +606,7 @@ beginning of the message headers."
       (setq dest (cons (substring str 0 (match-end 0)) dest))
       (setq str (substring str (match-end 0))))
     (or (string= str "")
-        (setq dest (cons str dest)))
+	(setq dest (cons str dest)))
     (setq dest (nreverse dest))
     (mapconcat 'identity dest " ")))
 
@@ -593,6 +622,7 @@ beginning of the message headers."
     (add-to-list 'bbdb-extract-field-value-function-list
 		 'gnus-bbdb/extract-field-value-init))
   (add-hook 'gnus-article-prepare-hook 'gnus-bbdb/update-record)
+  (add-hook 'gnus-summary-exit-hook 'bbdb-flush-all-caches)
   (add-hook 'gnus-save-newsrc-hook 'bbdb-offer-save)
   (define-key gnus-summary-mode-map ":" 'gnus-bbdb/show-sender)
   (define-key gnus-summary-mode-map ";" 'gnus-bbdb/edit-notes)
@@ -614,7 +644,7 @@ beginning of the message headers."
 Please redefine `gnus-bbdb/summary-user-format-letter' to a different letter."
 			gnus-bbdb/summary-user-format-letter))
 	     (fset get-author-user-fun 'gnus-bbdb/summary-get-author))))
-    
+
     ; One tick.  One tick only, please
     (cond (gnus-bbdb/summary-in-bbdb-format-letter
 	   (if (and (fboundp in-bbdb-user-fun)
@@ -625,7 +655,7 @@ Please redefine `gnus-bbdb/summary-user-format-letter' to a different letter."
 Redefine `gnus-bbdb/summary-in-bbdb-format-letter' to a different letter."
 			gnus-bbdb/summary-in-bbdb-format-letter))
 	     (fset in-bbdb-user-fun 'gnus-bbdb/summary-author-in-bbdb)))))
-  
+
   ;; Scoring
   (add-hook 'bbdb-after-change-hook 'gnus-bbdb/score-invalidate-alist)
 ;  (setq gnus-score-find-score-files-function

@@ -35,9 +35,12 @@
   "Translate."
   (interactive)
   (latexi-translate-file "gnus")
-  (latexi-translate-file "gnus-faq"))
+  (latexi-translate-file "gnus-faq")
+  (latexi-translate-file "message" t)
+  (latexi-translate-file "emacs-mime" t)
+  (latexi-translate-file "sieve" t))
 
-(defun latexi-translate-file (file)
+(defun latexi-translate-file (file &optional as-a-chapter)
   "Translate file a LaTeX file."
   (let ((item-string "")
 	(item-stack nil)
@@ -62,6 +65,13 @@
     (latexi-translate-string "%@{" "\\gnuspercent{}\\gnusbraceleft{}")
     (latexi-translate-string "%@}" "\\gnuspercent{}\\gnusbraceright{}")
     (latexi-translate-string "%1@{" "\\gnuspercent{}1\\gnusbraceright{}")
+    (latexi-translate-string "@*" "\\newline{}")
+    (latexi-translate-string "S@{" "S\\gnusbraceleft{}")
+    (latexi-translate-string "@code{\\222}" "@code{\\gnusbackslash{}222}")
+    (latexi-translate-string "@code{\\264}" "@code{\\gnusbackslash{}264}")
+    (latexi-translate-string "@samp{\\Deleted}" "@samp{\\gnusbackslash{}Deleted}")
+    (latexi-translate-string "@samp{\\Seen}" "@samp{\\gnusbackslash{}Seen}")
+    (latexi-translate-string "@file{c:\\myhome}" "@file{c:\\gnusbackslash{}myhome}")
 ;    (while (re-search-forward "{\"[^\"]*\\(\\\\\\)[^\"]*\"}\\\\" nil t)
 ;      (replace-match "\\verb+\\\\+ " t t))
     (while (not (zerop (decf times)))
@@ -85,26 +95,47 @@
 				 (progn (end-of-line) (point))))
 		(if (equal arg "@head")
 		    (insert "\\gnusinteresting")))
-	       ((member command '("setfilename" 
+	       ((member command '("setfilename" "set"
 				  "synindex" "setchapternewpage"
 				  "summarycontents" "bye"
 				  "top" "iftex" "cartouche" 
 				  "iflatex" "finalout" "vskip"
-				  "dircategory"))
+				  "dircategory" "group" "syncodeindex"))
 		(latexi-strip-line))
 	       ((member command '("menu" "tex" "ifinfo" "ignore" 
 				  "ifnottex" "direntry"))
 		(latexi-discard-until command))
 	       ((member command '("subsection" "subsubsection"))
-		(latexi-switch-line command arg))
+		(if as-a-chapter
+		    (latexi-switch-line (format "sub%s" command) arg)
+		  (latexi-switch-line command arg)))
+	       ((member command '("heading"))
+		(if as-a-chapter
+		    (latexi-switch-line "subsection*" arg)
+		  (latexi-switch-line "section*" arg)))
+	       ((member command '("subheading"))
+		(if as-a-chapter
+		    (latexi-switch-line "subsubsection*" arg)
+		  (latexi-switch-line "subsection*" arg)))
+	       ((member command '("subsubheading"))
+		(if as-a-chapter
+		    (latexi-switch-line "subsubsubsection*" arg)
+		  (latexi-switch-line "subsubsection*" arg)))
 	       ((member command '("chapter"))
-		(latexi-switch-line 
-		 (format 
-		  "gnus%s{\\epsfig{figure=tmp/new-herd-%d.ps,scale=.5}}"
-		   command (incf chapter))
-		 arg))
+		(if (string-match "Index" arg)
+		    (latexi-strip-line)
+		  (if as-a-chapter
+		      (latexi-switch-line "gnussection" arg)
+		    (latexi-switch-line 
+		     (format 
+		      "gnus%s{%s}" command
+		      (format "\\epsfig{figure=ps/new-herd-%d,scale=.5}"
+			      (if (> (incf chapter) 9) 9 chapter)))
+		     arg))))
 	       ((member command '("section"))
-		(latexi-switch-line (format "gnus%s" command) arg))
+		(if as-a-chapter
+		    (latexi-switch-line "subsection" arg)
+		  (latexi-switch-line (format "gnus%s" command) arg)))
 	       ((member command '("cindex" "findex" "kindex" "vindex"))
 		(latexi-index-command command arg))
 	       ((member command '("*"))
@@ -112,16 +143,19 @@
 		(insert "\\\\"))
 	       ((equal command "sp")
 		(replace-match "" t t))
+	       ((member command '("deffn" "defvar" "defun"))
+		(replace-match "" t t))
 	       ((equal command "node")
 		(latexi-strip-line)
-		(insert (format "\\label{%s}\n" arg)))
+		(unless (string-match "Index" arg)
+		  (insert (format "\\label{%s}\n" arg))))
 	       ((equal command "contents")
 		(latexi-strip-line)
 		;;(insert (format "\\tableofcontents\n" arg))
 		)
 	       ((member command '("titlepage"))
 		(latexi-begin-command command))
-	       ((member command '("lisp" "example"))
+	       ((member command '("lisp" "example" "smallexample" "display"))
 		(latexi-strip-line)
 		(insert (format "\\begin{verbatim}\n"))
 		(setq verbatim (point)))
@@ -137,7 +171,7 @@
 		 ((equal arg "quotation")
 		  (latexi-strip-line)
 		  (insert (format "\\end{verse}\n")))
-		 ((member arg '("lisp" "example"))
+		 ((member arg '("lisp" "example" "smallexample" "display"))
 		  (latexi-strip-line)
 		  (save-excursion
 		    (save-restriction
@@ -158,7 +192,9 @@
 		  (setq item-string (pop item-stack))
 		  (latexi-strip-line)
 		  (insert (format "\\end{%s}\n" arg)))
-		 ((member arg '("iflatex" "iftex" "cartouche"))
+		 ((member arg '("iflatex" "iftex" "cartouche" "group"))
+		  (latexi-strip-line))
+		 ((member arg '("deffn" "defvar" "defun"))
 		  (latexi-strip-line))
 		 (t
 		  (error "Unknown end arg: %s" arg))))
@@ -190,7 +226,9 @@
 		(insert "duppat{}"))
 	       ((equal command "settitle")
 		(latexi-strip-line)
-		(insert (format "\\newcommand{\\gnustitlename}{%s}\n" arg)))
+		(if (not as-a-chapter)
+		    (insert 
+		     (format "\\newcommand{\\gnustitlename}{%s}\n" arg))))
 	       ((equal command "title")
 		(latexi-strip-line)
 		(insert (format "\\gnustitlename{%s}\n" arg)))
@@ -207,7 +245,12 @@
 		(delete-char 1))
 	       ((equal command "include")
 		(latexi-strip-line)
-		(insert "\\input{gnus-faq.latexi}\n"))
+		(string-match "\\.texi" arg)
+		(insert (format "\\input{%s.latexi}\n" 
+				(substring arg 0 (match-beginning 0)))))
+	       ((equal command "noindent")
+		(latexi-strip-line)
+		(insert "\\noindent\n"))
 	       ((equal command "printindex")
 		(latexi-strip-line)
 		;;(insert 
@@ -215,19 +258,30 @@
 		;;  "\\begin{theindex}\\input{gnus.%s}\\end{theindex}\n" arg))
 		)
 	       (t
-		(error "Unknown command: %s" command))))
+		(error "Unknown command (file %s line %d): %s"
+		       file
+		       (save-excursion
+			 (widen)
+			 (1+ (count-lines (point-min) (progn
+							(beginning-of-line)
+							(point)))))
+		       command))))
 	  ;; These are commands with {}.
 	  (setq arg (match-string 5))
 	  (cond 
-	   ((member command '("xref" "pxref"))
+	   ((member command '("anchor"))
+	    (latexi-strip-line))
+	   ((member command '("ref" "xref" "pxref"))
 	    (latexi-exchange-command (concat "gnus" command) arg))
-	   ((member command '("sc" "file" "dfn" "emph" "kbd" 
+	   ((member command '("sc" "file" "dfn" "emph" "kbd" "key" "uref"
 			      "code" "samp" "var" "strong" "i"
-			      "result"))
+			      "result" "email" "env" "r"))
 	    (goto-char (match-beginning 0))
 	    (delete-char 1)
 	    (insert "\\gnus"))
-	   ((member command '("copyright" "footnote"))
+	   ((member command '("acronym"))
+	    (latexi-exchange-command (concat "gnus" command) (downcase arg)))
+	   ((member command '("copyright" "footnote" "TeX"))
 	    (goto-char (match-beginning 0))
 	    (delete-char 1)
 	    (insert "\\"))
@@ -240,7 +294,14 @@
 	    (delete-char 2)
 	    (insert "duppat{}"))
 	   (t
-	    (error "Unknown command: %s" command))))))
+	    (error "Unknown command (file %s line %d): %s"
+		   file
+		   (save-excursion
+		     (widen)
+		     (1+ (count-lines (point-min) (progn
+						    (beginning-of-line)
+						    (point)))))
+		   command))))))
     (latexi-translate-string "$" "\\gnusdollar{}")
     (latexi-translate-string "&" "\\gnusampersand{}")
     (latexi-translate-string "%" "\\gnuspercent{}")

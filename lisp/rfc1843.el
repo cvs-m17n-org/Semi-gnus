@@ -1,10 +1,10 @@
 ;;; rfc1843.el --- HZ (rfc1843) decoding
-;; Copyright (c) 1998, 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (c) 1998, 1999, 2000, 2003 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: news HZ HZ+ mail i18n
 
-;; This file is a part of GNU Emacs.
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published
@@ -43,18 +43,18 @@
 
 (defvar rfc1843-hzp-word-regexp
   "~\\({\\([\041-\167][\041-\176]\\| \\)+\\|\
-[<>]\\([\041-\175][\041-\176]\\| \\)+\\)\\(~}\\|$\\)")
+\[<>]\\([\041-\175][\041-\176]\\| \\)+\\)\\(~}\\|$\\)")
 
 (defvar rfc1843-hzp-word-regexp-strictly
   "~\\({\\([\041-\167][\041-\176]\\)+\\|\
-[<>]\\([\041-\175][\041-\176]\\)+\\)\\(~}\\|$\\)")
+\[<>]\\([\041-\175][\041-\176]\\)+\\)\\(~}\\|$\\)")
 
 (defcustom rfc1843-decode-loosely nil
   "Loosely check HZ encoding if non-nil.
 When it is set non-nil, only buffers or strings with strictly
 HZ-encoded are decoded."
   :type 'boolean
-  :group 'gnus)
+  :group 'mime)
 
 (defcustom rfc1843-decode-hzp t
   "HZ+ decoding support if non-nil.
@@ -64,12 +64,12 @@ e-mail transmission, news posting, etc.
 The document of HZ+ 0.78 specification can be found at
 ftp://ftp.math.psu.edu/pub/simpson/chinese/hzp/hzp.doc"
   :type 'boolean
-  :group 'gnus)
+  :group 'mime)
 
 (defcustom rfc1843-newsgroups-regexp "chinese\\|hz"
   "Regexp of newsgroups in which might be HZ encoded."
   :type 'string
-  :group 'gnus)
+  :group 'mime)
 
 (defun rfc1843-decode-region (from to)
   "Decode HZ in the region between FROM and TO."
@@ -88,7 +88,7 @@ ftp://ftp.math.psu.edu/pub/simpson/chinese/hzp/hzp.doc"
 					  rfc1843-hzp-word-regexp
 					rfc1843-word-regexp) (point-max) t)
 	      ;;; Text with extents may cause XEmacs crash
-	      (setq str (buffer-substring-no-properties 
+	      (setq str (buffer-substring-no-properties
 			 (match-beginning 1)
 			 (match-end 1)))
 	      (setq firstc (aref str 0))
@@ -145,7 +145,7 @@ ftp://ftp.math.psu.edu/pub/simpson/chinese/hzp/hzp.doc"
 		 (ct (message-fetch-field "Content-Type" t))
 		 (ctl (and ct (ignore-errors
 				(mail-header-parse-content-type ct)))))
-	    (if (and ctl (not (string-match "/" (car ctl)))) 
+	    (if (and ctl (not (string-match "/" (car ctl))))
 		(setq ctl nil))
 	    (goto-char (point-max))
 	    (widen)
@@ -158,6 +158,7 @@ ftp://ftp.math.psu.edu/pub/simpson/chinese/hzp/hzp.doc"
 (defvar rfc1843-old-gnus-decode-header-function  nil)
 (defvar gnus-decode-header-methods)
 (defvar gnus-decode-encoded-word-methods)
+(defvar gnus-decode-encoded-word-function)
 
 (defun rfc1843-gnus-setup ()
   "Setup HZ decoding for Gnus."

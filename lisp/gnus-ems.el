@@ -1,5 +1,5 @@
 ;;; gnus-ems.el --- functions for making Semi-gnus work under different Emacsen
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -27,7 +27,9 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'ring))
 
 ;;; Function aliases later to be redefined for XEmacs usage.
 
@@ -46,9 +48,10 @@
   (autoload 'gnus-xmas-redefine "gnus-xmas")
   (autoload 'appt-select-lowest-window "appt"))
 
-(if (featurep 'xemacs)
-    (autoload 'gnus-smiley-display "smiley")
-  (autoload 'gnus-smiley-display "smiley-ems")) ; override XEmacs version
+(if (or (featurep 'xemacs)
+	(>= emacs-major-version 21))
+    (autoload 'smiley-region "smiley")
+  (autoload 'smiley-region "smiley-mule"))
 
 (defun gnus-kill-all-overlays ()
   "Delete all overlays in the current buffer."
@@ -61,21 +64,16 @@
 ;;; Mule functions.
 
 (eval-and-compile
+  (defalias 'gnus-char-width
+    (if (fboundp 'char-width)
+	'char-width
+      (lambda (ch) 1)))) ;; A simple hack.
+
+(eval-and-compile
   (if (featurep 'xemacs)
       (gnus-xmas-define)
     (defvar gnus-mouse-face-prop 'mouse-face
       "Property used for highlighting mouse regions.")))
-
-(eval-and-compile
-  (let ((case-fold-search t))
-    (cond
-     ((string-match "windows-nt\\|os/2\\|emx\\|cygwin32"
-		    (symbol-name system-type))
-      (setq nnheader-file-name-translation-alist
-	    (append nnheader-file-name-translation-alist
-		    (mapcar (lambda (c) (cons c ?_))
-			    '(?: ?* ?\" ?< ?> ??))
-		    '((?+ . ?-))))))))
 
 (defvar gnus-tmp-unread)
 (defvar gnus-tmp-replied)
@@ -86,6 +84,7 @@
 (defvar gnus-tmp-name)
 (defvar gnus-tmp-closing-bracket)
 (defvar gnus-tmp-subject-or-nil)
+(defvar gnus-check-before-posting)
 
 (defun gnus-ems-redefine ()
   (cond
@@ -97,18 +96,18 @@
 
     ;; [Note] Now there are three kinds of mule implementations,
     ;; original MULE, XEmacs/mule and Emacs 20+ including
-    ;; MULE features.  Unfortunately these API are different.  In
-    ;; particular, Emacs (including original MULE) and XEmacs are
+    ;; MULE features.  Unfortunately these APIs are different.  In
+    ;; particular, Emacs (including original Mule) and XEmacs are
     ;; quite different.  However, this version of Gnus doesn't support
     ;; anything other than XEmacs 20+ and Emacs 20.3+.
 
     ;; Predicates to check are following:
-    ;; (boundp 'MULE) is t only if MULE (original; anything older than
+    ;; (boundp 'MULE) is t only if Mule (original; anything older than
     ;;                     Mule 2.3) is running.
-    ;; (featurep 'mule) is t when every mule variants are running.
+    ;; (featurep 'mule) is t when other mule variants are running.
 
     ;; It is possible to detect XEmacs/mule by (featurep 'mule) and
-    ;; checking `emacs-version'.  In this case, the implementation for
+    ;; (featurep 'xemacs).  In this case, the implementation for
     ;; XEmacs/mule may be shareable between XEmacs and XEmacs/mule.
 
     (defvar gnus-summary-display-table nil
@@ -162,6 +161,10 @@
        (boundp 'mark-active)
        mark-active))
 
+(defun gnus-mark-active-p ()
+  "Non-nil means the mark and region are currently active in this buffer."
+  mark-active) ; aliased to region-exists-p in XEmacs.
+
 (if (fboundp 'add-minor-mode)
     (defalias 'gnus-add-minor-mode 'add-minor-mode)
   (defun gnus-add-minor-mode (mode name map &rest rest)
@@ -184,11 +187,13 @@
 	(when (and dir
 		   (file-exists-p (setq file
 					(expand-file-name "x-splash" dir))))
-	  (with-temp-buffer
-	    (insert-file-contents-as-binary file)
-	    (goto-char (point-min))
-	    (ignore-errors
-	      (setq pixmap (read (current-buffer))))))
+	  (let ((coding-system-for-read 'raw-text)
+		default-enable-multibyte-characters)
+	    (with-temp-buffer
+	      (insert-file-contents-as-binary file)
+	      (goto-char (point-min))
+	      (ignore-errors
+		(setq pixmap (read (current-buffer)))))))
 	(when pixmap
 	  (make-face 'gnus-splash)
 	  (setq height (/ (car pixmap) (frame-char-height))
@@ -207,82 +212,32 @@
 	  (goto-char (point-min))
 	  (sit-for 0))))))
 
-(defvar gnus-article-xface-ring-internal nil
-  "Cache for face data.")
+;;; Image functions.
 
-;; Worth customizing?
-(defvar gnus-article-xface-ring-size 6
-  "Length of the ring used for `gnus-article-xface-ring-internal'.")
+(defun gnus-image-type-available-p (type)
+  (and (fboundp 'image-type-available-p)
+       (image-type-available-p type)))
 
-(defvar gnus-article-compface-xbm
-  (condition-case ()
-      (eq 0 (string-match "#define"
-			  (shell-command-to-string "uncompface -X")))
-    (error nil))
-  "Non-nil means the compface program supports the -X option.
-That produces XBM output.")
+(defun gnus-create-image (file &optional type data-p &rest props)
+  (let ((face (plist-get props :face)))
+    (when face
+      (setq props (plist-put props :foreground (face-foreground face)))
+      (setq props (plist-put props :background (face-background face))))
+    (apply 'create-image file type data-p props)))
 
-(defun gnus-article-display-xface (beg end)
-  "Display an XFace header from between BEG and END in the current article.
-Requires support for images in your Emacs and the external programs
-`uncompface', and `icontopbm'.  On a GNU/Linux system these
-might be in packages with names like `compface' or `faces-xface' and
-`netpbm' or `libgr-progs', for instance.  See also
-`gnus-article-compface-xbm'.
+(defun gnus-put-image (glyph &optional string)
+  (insert-image glyph (or string " "))
+  (unless string
+    (put-text-property (1- (point)) (point)
+		       'gnus-image-text-deletable t))
+  glyph)
 
-This function is for Emacs 21+.  See `gnus-xmas-article-display-xface'
-for XEmacs."
-  ;; It might be worth converting uncompface's output in Lisp.
-
-  (when (if (fboundp 'display-graphic-p)
-	    (display-graphic-p))
-    (unless gnus-article-xface-ring-internal ; Only load ring when needed.
-      (setq gnus-article-xface-ring-internal
-	    (make-ring gnus-article-xface-ring-size)))
-    (save-excursion
-      (let* ((cur (current-buffer))
-	     (data (buffer-substring beg end))
-	     (image (cdr-safe (assoc data (ring-elements
-					   gnus-article-xface-ring-internal))))
-	     default-enable-multibyte-characters)
-	(unless image
-	  (with-temp-buffer
-	    (insert data)
-	    (and (eq 0 (apply #'call-process-region (point-min) (point-max)
-			      "uncompface"
-			      'delete '(t nil) nil
-			      (if gnus-article-compface-xbm
-				  '("-X"))))
-		 (if gnus-article-compface-xbm
-		     t
-		   (goto-char (point-min))
-		   (progn (insert "/* Width=48, Height=48 */\n") t)
-		   (eq 0 (call-process-region (point-min) (point-max)
-					      "icontopbm"
-					      'delete '(t nil))))
-		 ;; Miles Bader says that faces don't look right as
-		 ;; light on dark.
-		 (if (eq 'dark (cdr-safe (assq 'background-mode
-					       (frame-parameters))))
-		     (setq image (create-image (buffer-string)
-					       (if gnus-article-compface-xbm
-						   'xbm
-						 'pbm)
-					       t
-					       :ascent 'center
-					       :foreground "black"
-					       :background "white"))
-		   (setq image (create-image (buffer-string)
-					     (if gnus-article-compface-xbm
-						 'xbm
-					       'pbm)
-					     t
-					     :ascent 'center)))))
-	  (ring-insert gnus-article-xface-ring-internal (cons data image)))
-	(when image
-	  (goto-char (point-min))
-	  (re-search-forward "^From:" nil 'move)
-	  (insert-image image))))))
+(defun gnus-remove-image (image)
+  (dolist (position (message-text-with-property 'display))
+    (when (equal (get-text-property position 'display) image)
+      (put-text-property position (1+ position) 'display nil)
+      (when (get-text-property position 'gnus-image-text-deletable)
+	(delete-region position (1+ position))))))
 
 (defun-maybe assoc-ignore-case (key alist)
   "Like `assoc', but assumes KEY is a string and ignores case when comparing."
@@ -328,9 +283,5 @@ for XEmacs."
     (setcdr key-slot info)))
 
 (provide 'gnus-ems)
-
-;; Local Variables:
-;; byte-compile-warnings: '(redefine callargs)
-;; End:
 
 ;;; gnus-ems.el ends here

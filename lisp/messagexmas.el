@@ -1,6 +1,6 @@
 ;;; messagexmas.el --- XEmacs extensions to message
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2003
 ;;      Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -118,12 +118,16 @@ If it is non-nil, it must be a toolbar.  The five valid values are
 
 (defun message-xmas-redefine ()
   "Redefine message functions for XEmacs."
-  (defalias 'message-exchange-point-and-mark 
+  (defalias 'message-exchange-point-and-mark
     'message-xmas-exchange-point-and-mark)
-
+  (defalias 'message-mark-active-p
+    'region-exists-p)
   (when (>= emacs-major-version 20)
     (defalias 'message-make-caesar-translation-table
-      'message-xmas-make-caesar-translation-table)))
+      'message-xmas-make-caesar-translation-table))
+  (defalias 'message-make-overlay 'make-extent)
+  (defalias 'message-delete-overlay 'delete-extent)
+  (defalias 'message-overlay-put 'set-extent-property))
 
 (message-xmas-redefine)
 

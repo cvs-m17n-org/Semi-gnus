@@ -35,13 +35,17 @@ beginning of .emacs file instead of rebuilding Mule.
     (makunbound (intern (format "message-%s" symbol)))))
 
 
-INSTALL CUSTOM, APEL, FLIM, SEMI/WEMI
-=====================================
+INSTALL CUSTOM, APEL, CLIME, SEMI
+=================================
 
-T-gnus requires the latest version of CUSTOM, APEL, FLIM and SEMI or
-WEMI; you should install these packages before installing T-gnus.
+T-gnus requires the latest version of CUSTOM, APEL, CLIME and SEMI;
+CLIME 1.14 provides the same features as FLIM 1.14 for old Emacsen,
+which is currently available from:
 
-As for CUSTOM, you should apply the following patch before building it.
+ftp://ftp.jpl.org/pub/m17n/clime-1_14-************.tar.gz
+
+You should install these packages before installing T-gnus.  As for
+CUSTOM, you should apply the following patch before building it.
 
 ------ cut here ------ cut here ------ cut here ------ cut here ------
 --- custom-1.9962/cus-face.el~	Wed Mar  4 19:52:39 1998
@@ -62,18 +66,47 @@ By the way, the latest CUSTOM package for Emacs v19 is available from:
 ftp://ftp.dina.kvl.dk/pub/Staff/Per.Abrahamsen/custom/custom-1.9962.tar.gz
 
 
+INSTALL regexp-opt.el
+=====================
+
+Some T-gnus modules use the functions `regexp-opt', etc.  That
+functions are defined in regexp-opt.el(c) in the recent Emacsen,
+however, Mule 2.3 does not contain it in the standard Lisp libraries.
+Copy the file contrib/regexp-opt.el to site-lisp directory (or any
+other directory), and byte-compile it as follows:
+
+   % cp -p contrib/regexp-opt.el /usr/local/share/mule/site-lisp
+   % cd /usr/local/share/mule/site-lisp/
+   % mule -batch -q -no-site-file -f batch-byte-compile regexp-opt.el
+
+
+INSTALL passwd.el
+=================
+
+This module provide the `read-passwd' function.  You have to install
+it if you don't have that function.  To do this:
+
+   % cp -p contrib/passwd.el /usr/local/share/mule/site-lisp
+   % cd /usr/local/share/mule/site-lisp/
+   % mule -batch -q -no-site-file -f batch-byte-compile passwd.el
+
+And add the following line in your .emacs file:
+
+   (autoload 'read-passwd "passwd")
+
+
 INSTALL T-gnus
 ==============
 
 There are three ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
 
-1. If you have installed EMU, APEL, FLIM and SEMI or WEMI packages
-   under the standard load-path, for instance:
+1. If you have installed EMU, APEL, CLIME and SEMI packages under the
+   standard load-path, for instance:
 
-   EMU:  /usr/local/share/mule/19.34/site-lisp/
-   APEL: /usr/local/share/mule/site-lisp/apel/
-   FLIM: /usr/local/share/mule/site-lisp/flim/
-   SEMI: /usr/local/share/mule/site-lisp/semi/
+   EMU:   /usr/local/share/mule/19.34/site-lisp/
+   APEL:  /usr/local/share/mule/site-lisp/apel/
+   CLIME: /usr/local/share/mule/site-lisp/flim/
+   SEMI:  /usr/local/share/mule/site-lisp/semi/
 
    What is more, if you have been replaced old CUSTOM with new CUSTOM
    or if you have installed new CUSTOM directly under the standard
@@ -103,45 +136,53 @@ There are three ways of making T-gnus with Mule 2.3 based on Emacs 19.34.
    % ./configure --with-emacs=mule
    % make install
 
-2. If you have installed EMU, APEL, FLIM and SEMI or WEMI packages in
-   the non-standard load-path, use the configure option
-   `--with-addpath=' with the colon separated directory names where
-   EMU, APEL or CUSTOM packages are installed.  For example:
+2. If you have installed EMU, APEL, CLIME and SEMI packages in the
+   non-standard load-path, use the configure option `--with-addpath='
+   with the colon separated directory names where EMU, APEL or CUSTOM
+   packages are installed.  For example:
 
    % ./configure --with-emacs=mule\
      --with-addpath=~/elisp/emu/:~/elisp/apel/:~/elisp/custom/
    % make install
 
-   In this case, you have no need to add paths of FLIM, SEMI or WEMI
-   if they are installed under the directory which is same as the
-   parent directory of APEL.
+   In this case, you have no need to add paths of CLIME, SEMI if they
+   are installed under the directory which is same as the parent
+   directory of APEL.
 
 3. This is another way to install T-gnus when you have installed EMU,
-   APEL, FLIM and SEMI or WEMI packages in the non-standard load-path.
-   Copy the file `sample.lpath.el' which is included in the
-   distribution to `~/.lpath.el' and modify it suitably for your
-   environment.  And then type the following command.
+   APEL, CLIME and SEMI packages in the non-standard load-path.  Copy
+   the file `sample.lpath.el' which is included in the distribution to
+   `~/.lpath.el' and modify it suitably for your environment.  And
+   then type the following command.
 
    % ./configure --with-emacs=mule
    % make install
 
 
-USING Emacs W3
-==============
+USING emacs-w3m (and Emacs/W3)
+==============================
+The web based backend `nnshimbun' uses the shimbun modules which are
+included in emacs-w3m package (and the other web based backends of T-
+gnus requires Emacs/W3).  emacs-w3m is an interface program to the
+external command w3m, visit the following pages for more information.
 
-;; By the way, it is the point, does anyone know where do we find
-;; Emacs W3 package fitting with Mule 2.3 based on Emacs 19.34? :-p
+   http://emacs-w3m.namazu.org/
+   http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
-Some modules of T-gnus (e.g. nnshimbun) requires Emacs W3.  You can
-build T-gnus to be abel to use them, if you already have Emacs W3
-installed.  For that, you should specify the path where Emacs W3 is
-installed using the configure option `--with-w3=' or editing the file
-`~/.lpath.el'.  Here is an example for using the configure option:
+If you wish to build T-gnus to be able to use emacs-w3m and nnshimbun,
+you have to specify the path where emacs-w3m is installed using the
+configure option `--with-addpath=' (for Emacs/W3, use the configure
+option `--with-w3=' or editing the file `~/.lpath.el').  Here is an
+example for that:
 
    % ./configure --with-emacs=mule\
+     --with-addpath=~/elisp/emu/:~/elisp/apel/: ... :~/elisp/w3m/\
      --with-w3=/usr/local/share/mule/site-lisp/w3/
    % make install
 
-Don't mind if configure says "W3... not found".  It is currently
-malfunction when the configure option `--with-w3=' is not used even if
-the path of Emacs W3 is specified in the file `~/.lpath.el'.
+;; Don't mind if configure says "W3... not found".  It is currently
+;; malfunction when the configure option `--with-w3=' is not used even
+;; if the path of Emacs/W3 is specified in the file `~/.lpath.el'.
+
+;; By the way, does anyone know where do we find Emacs/W3 package
+;; which is suitable to Mule 2.3 based on Emacs 19.34?

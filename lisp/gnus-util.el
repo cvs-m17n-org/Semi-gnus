@@ -1,5 +1,5 @@
 ;;; gnus-util.el --- utility functions for Semi-gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -32,17 +32,45 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  ;; Fixme: this should be a gnus variable, not nnmail-.
+  (defvar nnmail-pathname-coding-system))
 (eval-when-compile (require 'static))
 
 (require 'custom)
-(require 'nnheader)
 (require 'time-date)
+(require 'netrc)
 
 (eval-and-compile
+  (autoload 'message-fetch-field "message")
+  (autoload 'gnus-get-buffer-window "gnus-win")
   (autoload 'rmail-insert-rmail-file-header "rmail")
   (autoload 'rmail-count-new-messages "rmail")
-  (autoload 'rmail-show-message "rmail"))
+  (autoload 'rmail-show-message "rmail")
+  (autoload 'nnheader-narrow-to-headers "nnheader")
+  (autoload 'nnheader-replace-chars-in-string "nnheader"))
+
+(eval-and-compile
+  (cond
+   ((fboundp 'replace-in-string)
+    (defalias 'gnus-replace-in-string 'replace-in-string))
+   ((fboundp 'replace-regexp-in-string)
+    (defun gnus-replace-in-string  (string regexp newtext &optional literal)
+      (replace-regexp-in-string regexp newtext string nil literal)))
+   (t
+    (defun gnus-replace-in-string (string regexp newtext &optional literal)
+      (let ((start 0) tail)
+	(while (string-match regexp string start)
+	  (setq tail (- (length string) (match-end 0)))
+	  (setq string (replace-match newtext nil literal string))
+	  (setq start (- (length string) tail))))
+      string))))
+
+;;; bring in the netrc functions as aliases
+(defalias 'gnus-netrc-get 'netrc-get)
+(defalias 'gnus-netrc-machine 'netrc-machine)
+(defalias 'gnus-parse-netrc 'netrc-parse)
 
 (defun gnus-boundp (variable)
   "Return non-nil if VARIABLE is bound and non-nil."
@@ -52,23 +80,23 @@
 (defmacro gnus-eval-in-buffer-window (buffer &rest forms)
   "Pop to BUFFER, evaluate FORMS, and then return to the original window."
   (let ((tempvar (make-symbol "GnusStartBufferWindow"))
-        (w (make-symbol "w"))
-        (buf (make-symbol "buf"))
+	(w (make-symbol "w"))
+	(buf (make-symbol "buf"))
 	(frame (make-symbol "frame")))
     `(let* ((,tempvar (selected-window))
-            (,buf ,buffer)
-            (,w (get-buffer-window ,buf 'visible))
+	    (,buf ,buffer)
+	    (,w (gnus-get-buffer-window ,buf 'visible))
 	    ,frame)
        (unwind-protect
-           (progn
-             (if ,w
-                 (progn
-                   (select-window ,w)
-                   (set-buffer (window-buffer ,w)))
-               (pop-to-buffer ,buf))
-             ,@forms)
+	   (progn
+	     (if ,w
+		 (progn
+		   (select-window ,w)
+		   (set-buffer (window-buffer ,w)))
+	       (pop-to-buffer ,buf))
+	     ,@forms)
 	 (setq ,frame (selected-frame))
-         (select-window ,tempvar)
+	 (select-window ,tempvar)
 	 (select-frame ,frame)))))
 
 (put 'gnus-eval-in-buffer-window 'lisp-indent-function 1)
@@ -81,25 +109,14 @@
 	 (set symbol nil))
      symbol))
 
-;; Avoid byte-compile warning.
-;; In Mule, this function will be redefined to `truncate-string',
-;; which takes 3 or 4 args.
-(defun gnus-truncate-string (str width &rest ignore)
-  (substring str 0 width))
-
 ;; Added by Geoffrey T. Dairiki <dairiki@u.washington.edu>.  A safe way
 ;; to limit the length of a string.  This function is necessary since
 ;; `(substr "abc" 0 30)' pukes with "Args out of range".
+;; Fixme: Why not `truncate-string-to-width'?
 (defsubst gnus-limit-string (str width)
   (if (> (length str) width)
       (substring str 0 width)
     str))
-
-(defsubst gnus-functionp (form)
-  "Return non-nil if FORM is funcallable."
-  (or (and (symbolp form) (fboundp form))
-      (and (listp form) (eq (car form) 'lambda))
-      (byte-code-function-p form)))
 
 (defsubst gnus-goto-char (point)
   (and point (goto-char point)))
@@ -109,11 +126,6 @@
      (when buffer
        (funcall (if (stringp buffer) 'get-buffer 'buffer-name)
 		buffer))))
-
-(defmacro gnus-kill-buffer (buffer)
-  `(let ((buf ,buffer))
-     (when (gnus-buffer-exists-p buf)
-       (kill-buffer buf))))
 
 (static-cond
  ((fboundp 'point-at-bol)
@@ -144,6 +156,16 @@
 	(goto-char p))))
   ))
 
+;; The LOCAL arg to `add-hook' is interpreted differently in Emacs and
+;; XEmacs.  In Emacs we don't need to call `make-local-hook' first.
+;; It's harmless, though, so the main purpose of this alias is to shut
+;; up the byte compiler.
+(defalias 'gnus-make-local-hook
+  (if (eq (get 'make-local-hook 'byte-compile) 
+	  'byte-compile-obsolete)
+      'ignore				; Emacs
+    'make-local-hook))			; XEmacs
+
 (defun gnus-delete-first (elt list)
   "Delete by side effect the first occurrence of ELT as a member of LIST."
   (if (equal (car list) elt)
@@ -158,7 +180,7 @@
 
 ;; Delete the current line (and the next N lines).
 (defmacro gnus-delete-line (&optional n)
-  `(delete-region (progn (beginning-of-line) (point))
+  `(delete-region (gnus-point-at-bol)
 		  (progn (forward-line ,(or n 1)) (point))))
 
 (defun gnus-byte-code (func)
@@ -183,7 +205,7 @@
 	 (string-match (concat "[ \t]*<" (regexp-quote address) ">") from)
 	 (and (setq name (substring from 0 (match-beginning 0)))
 	      ;; Strip any quotes from the name.
-	      (string-match "\".*\"" name)
+	      (string-match "^\".*\"$" name)
 	      (setq name (substring name 1 (1- (match-end 0))))))
     ;; If not, then "address (name)" is used.
     (or name
@@ -208,9 +230,26 @@
 	(nnheader-narrow-to-headers)
 	(message-fetch-field field)))))
 
+(defun gnus-fetch-original-field (field)
+  "Fetch FIELD from the original version of the current article."
+  (with-current-buffer gnus-original-article-buffer
+    (gnus-fetch-field field)))
+
+
 (defun gnus-goto-colon ()
   (beginning-of-line)
-  (search-forward ":" (gnus-point-at-eol) t))
+  (let ((eol (gnus-point-at-eol)))
+    (goto-char (or (text-property-any (point) eol 'gnus-position t)
+		   (search-forward ":" eol t)
+		   (point)))))
+
+(defun gnus-decode-newsgroups (newsgroups group &optional method)
+  (let ((method (or method (gnus-find-method-for-group group))))
+    (mapconcat (lambda (group)
+		 (gnus-group-name-decode group (gnus-group-name-charset
+						method group)))
+	       (message-tokenize-header newsgroups)
+	       ",")))
 
 (defun gnus-remove-text-with-property (prop)
   "Delete all text in the current buffer with text property PROP."
@@ -223,20 +262,14 @@
 
 (defun gnus-newsgroup-directory-form (newsgroup)
   "Make hierarchical directory name from NEWSGROUP name."
-  (let ((newsgroup (gnus-newsgroup-savable-name newsgroup))
-	(len (length newsgroup))
-	idx)
-    ;; If this is a foreign group, we don't want to translate the
-    ;; entire name.
-    (if (setq idx (string-match ":" newsgroup))
-	(aset newsgroup idx ?/)
-      (setq idx 0))
-    ;; Replace all occurrences of `.' with `/'.
-    (while (< idx len)
-      (when (= (aref newsgroup idx) ?.)
-	(aset newsgroup idx ?/))
-      (setq idx (1+ idx)))
-    newsgroup))
+  (let* ((newsgroup (gnus-newsgroup-savable-name newsgroup))
+	 (idx (string-match ":" newsgroup)))
+    (concat
+     (if idx (substring newsgroup 0 idx))
+     (if idx "/")
+     (nnheader-replace-chars-in-string
+      (if idx (substring newsgroup (1+ idx)) newsgroup)
+      ?. ?/))))
 
 (defun gnus-newsgroup-savable-name (group)
   ;; Replace any slashes in a group name (eg. an ange-ftp nndoc group)
@@ -299,7 +332,7 @@
 	  (define-key keymap key (pop plist))
 	(pop plist)))))
 
-(defun gnus-completing-read (default prompt &rest args)
+(defun gnus-completing-read-with-default (default prompt &rest args)
   ;; Like `completing-read', except that DEFAULT is the default argument.
   (let* ((prompt (if default
 		     (concat prompt " (default " default ") ")
@@ -320,6 +353,78 @@
   (prog1
       (yes-or-no-p prompt)
     (message "")))
+
+;; By Frank Schmitt <ich@Frank-Schmitt.net>. Allows to have
+;; age-depending date representations. (e.g. just the time if it's
+;; from today, the day of the week if it's within the last 7 days and
+;; the full date if it's older)
+(defun gnus-seconds-today ()
+  "Returns the number of seconds passed today"
+  (let ((now (decode-time (current-time))))
+    (+ (car now) (* (car (cdr now)) 60) (* (car (nthcdr 2 now)) 3600))))
+
+(defun gnus-seconds-month ()
+  "Returns the number of seconds passed this month"
+  (let ((now (decode-time (current-time))))
+    (+ (car now) (* (car (cdr now)) 60) (* (car (nthcdr 2 now)) 3600)
+       (* (- (car (nthcdr 3 now)) 1) 3600 24))))
+
+(defun gnus-seconds-year ()
+  "Returns the number of seconds passed this year"
+  (let ((now (decode-time (current-time)))
+	(days (format-time-string "%j" (current-time))))
+    (+ (car now) (* (car (cdr now)) 60) (* (car (nthcdr 2 now)) 3600)
+       (* (- (string-to-number days) 1) 3600 24))))
+
+(defvar gnus-user-date-format-alist
+  '(((gnus-seconds-today) . "%k:%M")
+    (604800 . "%a %k:%M")                   ;;that's one week
+    ((gnus-seconds-month) . "%a %d")
+    ((gnus-seconds-year) . "%b %d")
+    (t . "%b %d '%y"))                      ;;this one is used when no
+					    ;;other does match
+  "Specifies date format depending on age of article.
+This is an alist of items (AGE . FORMAT).  AGE can be a number (of
+seconds) or a Lisp expression evaluating to a number.  When the age of
+the article is less than this number, then use `format-time-string'
+with the corresponding FORMAT for displaying the date of the article.
+If AGE is not a number or a Lisp expression evaluating to a
+non-number, then the corresponding FORMAT is used as a default value.
+
+Note that the list is processed from the beginning, so it should be
+sorted by ascending AGE.  Also note that items following the first
+non-number AGE will be ignored.
+
+You can use the functions `gnus-seconds-today', `gnus-seconds-month'
+and `gnus-seconds-year' in the AGE spec.  They return the number of
+seconds passed since the start of today, of this month, of this year,
+respectively.")
+
+(defun gnus-user-date (messy-date)
+  "Format the messy-date acording to gnus-user-date-format-alist.
+Returns \"  ?  \" if there's bad input or if an other error occurs.
+Input should look like this: \"Sun, 14 Oct 2001 13:34:39 +0200\"."
+  (condition-case ()
+      (let* ((messy-date (safe-date-to-time messy-date))
+	     (now (current-time))
+	     ;;If we don't find something suitable we'll use this one
+	     (my-format "%b %m '%y")
+	     (high (lsh (- (car now) (car messy-date)) 16)))
+	(if (and (> high -1) (= (logand high 65535) 0))
+	    ;;overflow and bad input
+	    (let* ((difference (+ high (- (car (cdr now))
+					  (car (cdr messy-date)))))
+		   (templist gnus-user-date-format-alist)
+		   (top (eval (caar templist))))
+	      (while (if (numberp top) (< top difference) (not top))
+		(progn
+		  (setq templist (cdr templist))
+		  (setq top (eval (caar templist)))))
+	      (if (stringp (cdr (car templist)))
+		  (setq my-format (cdr (car templist))))))
+	(format-time-string (eval my-format) messy-date))
+    (error "  ?   ")))
+;;end of Frank's code
 
 (defun gnus-dd-mmm (messy-date)
   "Return a string like DD-MMM from a big messy string."
@@ -353,13 +458,7 @@ Cache the result as a text property stored in DATE."
 
 (defun gnus-mode-string-quote (string)
   "Quote all \"%\"'s in STRING."
-  (save-excursion
-    (gnus-set-work-buffer)
-    (insert string)
-    (goto-char (point-min))
-    (while (search-forward "%" nil t)
-      (insert "%"))
-    (buffer-string)))
+  (gnus-replace-in-string string "%" "%%"))
 
 ;; Make a hash table (default and minimum size is 256).
 ;; Optional argument HASHSIZE specifies the table size.
@@ -387,12 +486,13 @@ jabbering all the time."
   :group 'gnus-start
   :type 'integer)
 
-;; Show message if message has a lower level than `gnus-verbose'.
-;; Guideline for numbers:
-;; 1 - error messages, 3 - non-serious error messages, 5 - messages
-;; for things that take a long time, 7 - not very important messages
-;; on stuff, 9 - messages inside loops.
 (defun gnus-message (level &rest args)
+  "If LEVEL is lower than `gnus-verbose' print ARGS using `message'.
+
+Guideline for numbers:
+1 - error messages, 3 - non-serious error messages, 5 - messages for things
+that take a long time, 7 - not very important messages on stuff, 9 - messages
+inside loops."
   (if (<= level gnus-verbose)
       (apply 'message args)
     ;; We have to do this format thingy here even if the result isn't
@@ -415,7 +515,7 @@ jabbering all the time."
   "Return a list of Message-IDs in REFERENCES."
   (let ((beg 0)
 	ids)
-    (while (string-match "<[^>]+>" references beg)
+    (while (string-match "<[^<]+[^< \t]" references beg)
       (push (substring references (match-beginning 0) (setq beg (match-end 0)))
 	    ids))
     (nreverse ids)))
@@ -423,13 +523,17 @@ jabbering all the time."
 (defsubst gnus-parent-id (references &optional n)
   "Return the last Message-ID in REFERENCES.
 If N, return the Nth ancestor instead."
-  (when references
-    (let ((ids (inline (gnus-split-references references))))
-      (while (nthcdr (or n 1) ids)
-	(setq ids (cdr ids)))
-      (car ids))))
+  (when (and references
+	     (not (zerop (length references))))
+    (if n
+	(let ((ids (inline (gnus-split-references references))))
+	  (while (nthcdr n ids)
+	    (setq ids (cdr ids)))
+	  (car ids))
+      (when (string-match "\\(<[^<]+>\\)[ \t]*\\'" references)
+	(match-string 1 references)))))
 
-(defsubst gnus-buffer-live-p (buffer)
+(defun gnus-buffer-live-p (buffer)
   "Say whether BUFFER is alive or not."
   (and buffer
        (get-buffer buffer)
@@ -438,9 +542,9 @@ If N, return the Nth ancestor instead."
 (defun gnus-horizontal-recenter ()
   "Recenter the current buffer horizontally."
   (if (< (current-column) (/ (window-width) 2))
-      (set-window-hscroll (get-buffer-window (current-buffer) t) 0)
+      (set-window-hscroll (gnus-get-buffer-window (current-buffer) t) 0)
     (let* ((orig (point))
-	   (end (window-end (get-buffer-window (current-buffer) t)))
+	   (end (window-end (gnus-get-buffer-window (current-buffer) t)))
 	   (max 0))
       (when end
 	;; Find the longest line currently displayed in the window.
@@ -454,15 +558,21 @@ If N, return the Nth ancestor instead."
 	;; Scroll horizontally to center (sort of) the point.
 	(if (> max (window-width))
 	    (set-window-hscroll
-	     (get-buffer-window (current-buffer) t)
+	     (gnus-get-buffer-window (current-buffer) t)
 	     (min (- (current-column) (/ (window-width) 3))
 		  (+ 2 (- max (window-width)))))
-	  (set-window-hscroll (get-buffer-window (current-buffer) t) 0))
+	  (set-window-hscroll (gnus-get-buffer-window (current-buffer) t) 0))
 	max))))
 
-(defun gnus-read-event-char ()
+(defun gnus-read-event-char (&optional prompt)
   "Get the next event."
-  (let ((event (read-event)))
+  (let ((event (condition-case nil
+		   (read-event prompt)
+		 ;; `read-event' doesn't allow arguments in Mule 2.3
+		 (wrong-number-of-arguments
+		  (when prompt
+		    (message "%s" prompt))
+		  (read-event)))))
     ;; should be gnus-characterp, but this can't be called in XEmacs anyway
     (cons (and (numberp event) event) event)))
 
@@ -504,14 +614,15 @@ If N, return the Nth ancestor instead."
   "Return a composite sort condition based on the functions in FUNC."
   (cond
    ;; Just a simple function.
-   ((gnus-functionp funs) funs)
+   ((functionp funs) funs)
    ;; No functions at all.
    ((null funs) funs)
    ;; A list of functions.
    ((or (cdr funs)
 	(listp (car funs)))
-    `(lambda (t1 t2)
-       ,(gnus-make-sort-function-1 (reverse funs))))
+    (gnus-byte-compile
+     `(lambda (t1 t2)
+	,(gnus-make-sort-function-1 (reverse funs)))))
    ;; A list containing just one function.
    (t
     (car funs))))
@@ -528,7 +639,7 @@ If N, return the Nth ancestor instead."
 	(setq function (cadr function)
 	      first 't2
 	      last 't1))
-       ((gnus-functionp function)
+       ((functionp function)
 	;; Do nothing.
 	)
        (t
@@ -554,13 +665,18 @@ Bind `print-quoted' and `print-readably' to t while printing."
     (prin1 form (current-buffer))))
 
 (defun gnus-prin1-to-string (form)
-  "The same as `prin1', but bind `print-quoted' and `print-readably' to t."
+  "The same as `prin1'.
+Bind `print-quoted' and `print-readably' to t, and `print-length'
+and `print-level' to nil."
   (let ((print-quoted t)
-	(print-readably t))
+	(print-readably t)
+	(print-length nil)
+	(print-level nil))
     (prin1-to-string form)))
 
 (defun gnus-make-directory (directory)
   "Make DIRECTORY (and all its parents) if it doesn't exist."
+  (require 'nnmail)
   (let ((file-name-coding-system nnmail-pathname-coding-system)
 	(pathname-coding-system nnmail-pathname-coding-system))
     (when (and directory
@@ -614,6 +730,19 @@ Bind `print-quoted' and `print-readably' to t while printing."
 	  (setq beg (point)))
 	(gnus-put-text-property beg (point) prop val)))))
 
+(defsubst gnus-put-overlay-excluding-newlines (beg end prop val)
+  "The same as `put-text-property', but don't put this prop on any newlines in the region."
+  (save-match-data
+    (save-excursion
+      (save-restriction
+	(goto-char beg)
+	(while (re-search-forward gnus-emphasize-whitespace-regexp end 'move)
+	  (gnus-overlay-put
+	   (gnus-make-overlay beg (match-beginning 0))
+	   prop val)
+	  (setq beg (point)))
+	(gnus-overlay-put (gnus-make-overlay beg (point)) prop val)))))
+
 (defun gnus-put-text-property-excluding-characters-with-faces (beg end
 								   prop val)
   "The same as `put-text-property', but don't put props on characters with the `gnus-face' property."
@@ -622,9 +751,23 @@ Bind `print-quoted' and `print-readably' to t while printing."
       (when (get-text-property b 'gnus-face)
 	(setq b (next-single-property-change b 'gnus-face nil end)))
       (when (/= b end)
-	(gnus-put-text-property
-	 b (setq b (next-single-property-change b 'gnus-face nil end))
-	 prop val)))))
+	(inline
+	  (gnus-put-text-property
+	   b (setq b (next-single-property-change b 'gnus-face nil end))
+	   prop val))))))
+
+(defmacro gnus-faces-at (position)
+  "Return a list of faces at POSITION."
+  (if (featurep 'xemacs)
+      `(let ((pos ,position))
+	 (mapcar-extents 'extent-face
+			 nil (current-buffer) pos pos nil 'face))
+    `(let ((pos ,position))
+       (delq nil (cons (get-text-property pos 'face)
+		       (mapcar
+			(lambda (overlay)
+			  (overlay-get overlay 'face))
+			(overlays-at pos)))))))
 
 ;;; Protected and atomic operations.  dmoore@ucsd.edu 21.11.1996
 ;;; The primary idea here is to try to protect internal datastructures
@@ -655,7 +798,7 @@ non-locally exits.  The variables listed in PROTECT are updated atomically.
 It is safe to use gnus-atomic-progn-assign with long computations.
 
 Note that if any of the symbols in PROTECT were unbound, they will be
-set to nil on a sucessful assignment.  In case of an error or other
+set to nil on a successful assignment.  In case of an error or other
 non-local exit, it will still be unbound."
   (let* ((temp-sym-map (mapcar (lambda (x) (list (make-symbol
 						  (concat (symbol-name x)
@@ -734,7 +877,10 @@ with potentially long computations."
       ;; Decide whether to append to a file or to an Emacs buffer.
       (let ((outbuf (get-file-buffer filename)))
 	(if (not outbuf)
-	    (write-region-as-binary (point-min) (point-max) filename 'append)
+	    (let ((file-name-coding-system nnmail-pathname-coding-system)
+		  (pathname-coding-system nnmail-pathname-coding-system))
+	      (write-region-as-binary (point-min) (point-max)
+				      filename 'append))
 	  ;; File has been visited, in buffer OUTBUF.
 	  (set-buffer outbuf)
 	  (let ((buffer-read-only nil)
@@ -748,10 +894,10 @@ with potentially long computations."
 	    (when msg
 	      (goto-char (point-min))
 	      (widen)
- 	      (search-backward "\n\^_")
- 	      (narrow-to-region (point) (point-max))
- 	      (rmail-count-new-messages t)
- 	      (when (rmail-summary-exists)
+	      (search-backward "\n\^_")
+	      (narrow-to-region (point) (point-max))
+	      (rmail-count-new-messages t)
+	      (when (rmail-summary-exists)
 		(rmail-select-summary
 		 (rmail-update-summary)))
 	      (rmail-count-new-messages t)
@@ -803,8 +949,10 @@ with potentially long computations."
 		    (insert "\n"))
 		  (insert "\n"))
 		(goto-char (point-max))
-		(write-region-as-binary (point-min) (point-max)
-					filename 'append)))
+		(let ((file-name-coding-system nnmail-pathname-coding-system)
+		      (pathname-coding-system nnmail-pathname-coding-system))
+		  (write-region-as-binary (point-min) (point-max)
+					  filename 'append))))
 	  ;; File has been visited, in buffer OUTBUF.
 	  (set-buffer outbuf)
 	  (let ((buffer-read-only nil))
@@ -829,104 +977,14 @@ with potentially long computations."
 (defun gnus-map-function (funs arg)
   "Applies the result of the first function in FUNS to the second, and so on.
 ARG is passed to the first function."
-  (let ((myfuns funs))
-    (while myfuns
-      (setq arg (funcall (pop myfuns) arg)))
-    arg))
+  (while funs
+    (setq arg (funcall (pop funs) arg)))
+  arg)
 
 (defun gnus-run-hooks (&rest funcs)
-  "Does the same as `run-hooks', but saves excursion."
-  (let ((buf (current-buffer)))
-    (unwind-protect
-	(apply 'run-hooks funcs)
-      (set-buffer buf))))
-
-;;;
-;;; .netrc and .authinforc parsing
-;;;
-
-(defun gnus-parse-netrc (file)
-  "Parse FILE and return an list of all entries in the file."
-  (when (file-exists-p file)
-    (with-temp-buffer
-      (let ((tokens '("machine" "default" "login"
-		      "password" "account" "macdef" "force"
-		      "port"))
-	    alist elem result pair)
-	(insert-file-contents file)
-	(goto-char (point-min))
-	;; Go through the file, line by line.
-	(while (not (eobp))
-	  (narrow-to-region (point) (gnus-point-at-eol))
-	  ;; For each line, get the tokens and values.
-	  (while (not (eobp))
-	    (skip-chars-forward "\t ")
-	    ;; Skip lines that begin with a "#".
-	    (if (eq (char-after) ?#)
-		(goto-char (point-max))
-	      (unless (eobp)
-		(setq elem
-		      (if (= (following-char) ?\")
-			  (read (current-buffer))
-			(buffer-substring
-			 (point) (progn (skip-chars-forward "^\t ")
-					(point)))))
-		(cond
-		 ((equal elem "macdef")
-		  ;; We skip past the macro definition.
-		  (widen)
-		  (while (and (zerop (forward-line 1))
-			      (looking-at "$")))
-		  (narrow-to-region (point) (point)))
-		 ((member elem tokens)
-		  ;; Tokens that don't have a following value are ignored,
-		  ;; except "default".
-		  (when (and pair (or (cdr pair)
-				      (equal (car pair) "default")))
-		    (push pair alist))
-		  (setq pair (list elem)))
-		 (t
-		  ;; Values that haven't got a preceding token are ignored.
-		  (when pair
-		    (setcdr pair elem)
-		    (push pair alist)
-		    (setq pair nil)))))))
-	  (when alist
-	    (push (nreverse alist) result))
-	  (setq alist nil
-		pair nil)
-	  (widen)
-	  (forward-line 1))
-	(nreverse result)))))
-
-(defun gnus-netrc-machine (list machine &optional port defaultport)
-  "Return the netrc values from LIST for MACHINE or for the default entry.
-If PORT specified, only return entries with matching port tokens.
-Entries without port tokens default to DEFAULTPORT."
-  (let ((rest list)
-	result)
-    (while list
-      (when (equal (cdr (assoc "machine" (car list))) machine)
-	(push (car list) result))
-      (pop list))
-    (unless result
-      ;; No machine name matches, so we look for default entries.
-      (while rest
-	(when (assoc "default" (car rest))
-	  (push (car rest) result))
-	(pop rest)))
-    (when result
-      (setq result (nreverse result))
-      (while (and result
-		  (not (equal (or port defaultport "nntp")
-			      (or (gnus-netrc-get (car result) "port")
-				  defaultport "nntp"))))
-	(pop result))
-      (car result))))
-
-(defun gnus-netrc-get (alist type)
-  "Return the value of token TYPE from ALIST."
-  (cdr (assoc type alist)))
+  "Does the same as `run-hooks', but saves the current buffer."
+  (save-current-buffer
+    (apply 'run-hooks funcs)))
 
 ;;; Various
 
@@ -940,28 +998,31 @@ Entries without port tokens default to DEFAULTPORT."
 	 (eq major-mode 'gnus-group-mode))))
 
 (defun gnus-remove-duplicates (list)
-  (let (new (tail list))
-    (while tail
-      (or (member (car tail) new)
-	  (setq new (cons (car tail) new)))
-      (setq tail (cdr tail)))
+  (let (new)
+    (while list
+      (or (member (car list) new)
+	  (setq new (cons (car list) new)))
+      (setq list (cdr list)))
     (nreverse new)))
 
-(defun gnus-delete-if (predicate list)
-  "Delete elements from LIST that satisfy PREDICATE."
+(defun gnus-remove-if (predicate list)
+  "Return a copy of LIST with all items satisfying PREDICATE removed."
   (let (out)
     (while list
       (unless (funcall predicate (car list))
 	(push (car list) out))
-      (pop list))
+      (setq list (cdr list)))
     (nreverse out)))
 
-(defun gnus-delete-alist (key alist)
-  "Delete all entries in ALIST that have a key eq to KEY."
-  (let (entry)
-    (while (setq entry (assq key alist))
-      (setq alist (delq entry alist)))
-    alist))
+(if (fboundp 'assq-delete-all)
+    (defalias 'gnus-delete-alist 'assq-delete-all)
+  (defun gnus-delete-alist (key alist)
+    "Delete from ALIST all elements whose car is KEY.
+Return the modified alist."
+    (let (entry)
+      (while (setq entry (assq key alist))
+	(setq alist (delq entry alist)))
+      alist)))
 
 (defmacro gnus-pull (key alist &optional assoc-p)
   "Modify ALIST to be without KEY."
@@ -978,7 +1039,7 @@ Entries without port tokens default to DEFAULTPORT."
 
 (defun gnus-set-window-start (&optional point)
   "Set the window start to POINT, or (point) if nil."
-  (let ((win (get-buffer-window (current-buffer) t)))
+  (let ((win (gnus-get-buffer-window (current-buffer) t)))
     (when win
       (set-window-start win (or point (point))))))
 
@@ -1023,6 +1084,33 @@ Entries without port tokens default to DEFAULTPORT."
       (while (search-backward "\\." nil t)
 	(delete-char 1)))))
 
+;; Fixme: Why not use `with-output-to-temp-buffer'?
+(defmacro gnus-with-output-to-file (file &rest body)
+  (let ((buffer (make-symbol "output-buffer"))
+        (size (make-symbol "output-buffer-size"))
+        (leng (make-symbol "output-buffer-length"))
+        (append (make-symbol "output-buffer-append")))
+    `(let* ((,size 131072)
+            (,buffer (make-string ,size 0))
+            (,leng 0)
+            (,append nil)
+            (standard-output
+	     (lambda (c)
+               (aset ,buffer ,leng c)
+                   
+	       (if (= ,size (setq ,leng (1+ ,leng)))
+		   (progn (write-region ,buffer nil ,file ,append 'no-msg)
+			  (setq ,leng 0
+				,append t))))))
+       ,@body
+       (when (> ,leng 0)
+         (let ((coding-system-for-write 'no-conversion))
+	 (write-region (substring ,buffer 0 ,leng) nil ,file
+		       ,append 'no-msg))))))
+
+(put 'gnus-with-output-to-file 'lisp-indent-function 1)
+(put 'gnus-with-output-to-file 'edebug-form-spec '(form body))
+
 (if (fboundp 'union)
     (defalias 'gnus-union 'union)
   (defun gnus-union (l1 l2)
@@ -1063,6 +1151,339 @@ Entries without port tokens default to DEFAULTPORT."
     (if start
 	(remove-text-properties start end properties object))
     t))
+
+;; This might use `compare-strings' to reduce consing in the
+;; case-insensitive case, but it has to cope with null args.
+;; (`string-equal' uses symbol print names.)
+(defun gnus-string-equal (x y)
+  "Like `string-equal', except it compares case-insensitively."
+  (and (= (length x) (length y))
+       (or (string-equal x y)
+	   (string-equal (downcase x) (downcase y)))))
+
+(defcustom gnus-use-byte-compile t
+  "If non-nil, byte-compile crucial run-time code.
+Setting it to nil has no effect after the first time `gnus-byte-compile'
+is run."
+  :type 'boolean
+  :version "21.1"
+  :group 'gnus-various)
+
+(defun gnus-byte-compile (form)
+  "Byte-compile FORM if `gnus-use-byte-compile' is non-nil."
+  (if gnus-use-byte-compile
+      (progn
+	(condition-case nil
+	    ;; Work around a bug in XEmacs 21.4
+	    (require 'byte-optimize)
+	  (error))
+	(require 'bytecomp)
+	(defalias 'gnus-byte-compile
+	  (lambda (form)
+	    (let ((byte-compile-warnings '(unresolved callargs redefine)))
+	      (byte-compile form))))
+	(gnus-byte-compile form))
+    form))
+
+(defun gnus-remassoc (key alist)
+  "Delete by side effect any elements of LIST whose car is `equal' to KEY.
+The modified LIST is returned.  If the first member
+of LIST has a car that is `equal' to KEY, there is no way to remove it
+by side effect; therefore, write `(setq foo (remassoc key foo))' to be
+sure of changing the value of `foo'."
+  (when alist
+    (if (equal key (caar alist))
+	(cdr alist)
+      (setcdr alist (gnus-remassoc key (cdr alist)))
+      alist)))
+
+(defun gnus-update-alist-soft (key value alist)
+  (if value
+      (cons (cons key value) (gnus-remassoc key alist))
+    (gnus-remassoc key alist)))
+
+(defun gnus-create-info-command (node)
+  "Create a command that will go to info NODE."
+  `(lambda ()
+     (interactive)
+     ,(concat "Enter the info system at node " node)
+     (Info-goto-node ,node)
+     (setq gnus-info-buffer (current-buffer))
+     (gnus-configure-windows 'info)))
+
+(defun gnus-not-ignore (&rest args)
+  t)
+
+(defvar gnus-directory-sep-char-regexp "/"
+  "The regexp of directory separator character.
+If you find some problem with the directory separator character, try
+\"[/\\\\\]\" for some systems.")
+
+(defun gnus-url-unhex (x)
+  (if (> x ?9)
+      (if (>= x ?a)
+	  (+ 10 (- x ?a))
+	(+ 10 (- x ?A)))
+    (- x ?0)))
+
+;; Fixme: Do it like QP.
+(defun gnus-url-unhex-string (str &optional allow-newlines)
+  "Remove %XX, embedded spaces, etc in a url.
+If optional second argument ALLOW-NEWLINES is non-nil, then allow the
+decoding of carriage returns and line feeds in the string, which is normally
+forbidden in URL encoding."
+  (setq str (or (mm-subst-char-in-string ?+ ?  str) "")) ; why `or'?
+  (let ((tmp "")
+	(case-fold-search t))
+    (while (string-match "%[0-9a-f][0-9a-f]" str)
+      (let* ((start (match-beginning 0))
+	     (ch1 (gnus-url-unhex (elt str (+ start 1))))
+	     (code (+ (* 16 ch1)
+		      (gnus-url-unhex (elt str (+ start 2))))))
+	(setq tmp (concat
+		   tmp (substring str 0 start)
+		   (cond
+		    (allow-newlines
+		     (char-to-string code))
+		    ((or (= code ?\n) (= code ?\r))
+		     " ")
+		    (t (char-to-string code))))
+	      str (substring str (match-end 0)))))
+    (setq tmp (concat tmp str))
+    tmp))
+
+(defun gnus-make-predicate (spec)
+  "Transform SPEC into a function that can be called.
+SPEC is a predicate specifier that contains stuff like `or', `and',
+`not', lists and functions.  The functions all take one parameter."
+  `(lambda (elem) ,(gnus-make-predicate-1 spec)))
+
+(defun gnus-make-predicate-1 (spec)
+  (cond
+   ((symbolp spec)
+    `(,spec elem))
+   ((listp spec)
+    (if (memq (car spec) '(or and not))
+	`(,(car spec) ,@(mapcar 'gnus-make-predicate-1 (cdr spec)))
+      (error "Invalid predicate specifier: %s" spec)))))
+
+(defun gnus-local-map-property (map)
+  "Return a list suitable for a text property list specifying keymap MAP."
+  (cond
+   ((featurep 'xemacs)
+    (list 'keymap map))
+   ((>= emacs-major-version 21)
+    (list 'keymap map))
+   (t
+    (list 'local-map map))))
+
+(defmacro gnus-completing-read-maybe-default (prompt table &optional predicate 
+					      require-match initial-contents 
+					      history default)
+  "Like `completing-read', allowing for non-existent 7th arg in older XEmacsen."
+  `(completing-read ,prompt ,table ,predicate ,require-match
+                    ,initial-contents ,history
+                    ,@(if (and (featurep 'xemacs) (< emacs-minor-version 2))
+                          ()
+                        (list default))))
+
+(defun gnus-completing-read (prompt table &optional predicate require-match
+				    history)
+  (when (and history
+	     (not (boundp history)))
+    (set history nil))
+  (gnus-completing-read-maybe-default
+   (if (symbol-value history)
+       (concat prompt " (" (car (symbol-value history)) "): ")
+     (concat prompt ": "))
+   table
+   predicate
+   require-match
+   nil
+   history
+   (car (symbol-value history))))
+
+(defun gnus-graphic-display-p ()
+  (or (and (fboundp 'display-graphic-p)
+	   (display-graphic-p))
+      ;;;!!!This is bogus.  Fixme!
+      (and (featurep 'xemacs)
+	   t)))
+
+(put 'gnus-parse-without-error 'lisp-indent-function 0)
+(put 'gnus-parse-without-error 'edebug-form-spec '(body))
+
+(defmacro gnus-parse-without-error (&rest body)
+  "Allow continuing onto the next line even if an error occurs."
+  `(while (not (eobp))
+     (condition-case ()
+	 (progn
+	   ,@body
+	   (goto-char (point-max)))
+       (error
+	(gnus-error 4 "Invalid data on line %d"
+		    (count-lines (point-min) (point)))
+	(forward-line 1)))))
+
+(defun gnus-cache-file-contents (file variable function)
+  "Cache the contents of FILE in VARIABLE.  The contents come from FUNCTION."
+  (let ((time (nth 5 (file-attributes file)))
+	contents value)
+    (if (or (null (setq value (symbol-value variable)))
+	    (not (equal (car value) file))
+	    (not (equal (nth 1 value) time)))
+	(progn
+	  (setq contents (funcall function file))
+	  (set variable (list file time contents))
+	  contents)
+      (nth 2 value))))
+
+(defun gnus-multiple-choice (prompt choice &optional idx)
+  "Ask user a multiple choice question.
+CHOICE is a list of the choice char and help message at IDX."
+  (let (tchar buf)
+    (save-window-excursion
+      (save-excursion
+	(while (not tchar)
+	  (message "%s (%s): "
+		   prompt
+		   (mapconcat (lambda (s) (char-to-string (car s)))
+			      choice ", "))
+	  (setq tchar (read-char))
+	  (when (not (assq tchar choice))
+	    (setq tchar nil)
+	    (setq buf (get-buffer-create "*Gnus Help*"))
+	    (pop-to-buffer buf)
+	    (fundamental-mode)		; for Emacs 20.4+
+	    (buffer-disable-undo)
+	    (erase-buffer)
+	    (insert prompt ":\n\n")
+	    (let ((max -1)
+		  (list choice)
+		  (alist choice)
+		  (idx (or idx 1))
+		  (i 0)
+		  n width pad format)
+	      ;; find the longest string to display
+	      (while list
+		(setq n (length (nth idx (car list))))
+		(unless (> max n)
+		  (setq max n))
+		(setq list (cdr list)))
+	      (setq max (+ max 4))	; %c, `:', SPACE, a SPACE at end
+	      (setq n (/ (1- (window-width)) max)) ; items per line
+	      (setq width (/ (1- (window-width)) n)) ; width of each item
+	      ;; insert `n' items, each in a field of width `width'
+	      (while alist
+		(if (< i n)
+		    ()
+		  (setq i 0)
+		  (delete-char -1)		; the `\n' takes a char
+		  (insert "\n"))
+		(setq pad (- width 3))
+		(setq format (concat "%c: %-" (int-to-string pad) "s"))
+		(insert (format format (caar alist) (nth idx (car alist))))
+		(setq alist (cdr alist))
+		(setq i (1+ i))))))))
+    (if (buffer-live-p buf)
+	(kill-buffer buf))
+    tchar))
+
+(defun gnus-select-frame-set-input-focus (frame)
+  "Select FRAME, raise it, and set input focus, if possible."
+  (cond ((featurep 'xemacs)
+	 (raise-frame frame)
+	 (select-frame frame)
+	 (focus-frame frame))
+	;; The function `select-frame-set-input-focus' won't set
+	;; the input focus under Emacs 21.2 and X window system.
+	;;((fboundp 'select-frame-set-input-focus)
+	;; (defalias 'gnus-select-frame-set-input-focus
+	;;   'select-frame-set-input-focus)
+	;; (select-frame-set-input-focus frame))
+	(t
+	 (raise-frame frame)
+	 (select-frame frame)
+	 (cond ((and (eq window-system 'x)
+		     (fboundp 'x-focus-frame))
+		(x-focus-frame frame))
+	       ((eq window-system 'w32)
+		(w32-focus-frame frame)))
+	 (when (or (not (boundp 'focus-follows-mouse))
+		   (symbol-value 'focus-follows-mouse))
+	   (set-mouse-position frame (1- (frame-width frame)) 0)))))
+
+(unless (fboundp 'frame-parameter)
+  (defalias 'frame-parameter
+    (lambda (frame parameter)
+      "Return FRAME's value for parameter PARAMETER.
+If FRAME is nil, describe the currently selected frame."
+      (cdr (assq parameter (frame-parameters frame))))))
+
+(defun gnus-frame-or-window-display-name (object)
+  "Given a frame or window, return the associated display name.
+Return nil otherwise."
+  (if (featurep 'xemacs)
+      (device-connection (dfw-device object))
+    (if (or (framep object)
+	    (and (windowp object)
+		 (setq object (window-frame object))))
+	(let ((display (frame-parameter object 'display)))
+	  (if (and (stringp display)
+		   ;; Exclude invalid display names.
+		   (string-match "\\`[^:]*:[0-9]+\\(\\.[0-9]+\\)?\\'"
+				 display))
+	      display)))))
+
+;; Fixme: This has only one use (in gnus-agent), which isn't worthwhile.
+(defmacro gnus-mapcar (function seq1 &rest seqs2_n)
+  "Apply FUNCTION to each element of the sequences, and make a list of the results.
+If there are several sequences, FUNCTION is called with that many arguments,
+and mapping stops as soon as the shortest sequence runs out.  With just one
+sequence, this is like `mapcar'.  With several, it is like the Common Lisp
+`mapcar' function extended to arbitrary sequence types."
+
+  (if seqs2_n
+      (let* ((seqs (cons seq1 seqs2_n))
+	     (cnt 0)
+	     (heads (mapcar (lambda (seq)
+			      (make-symbol (concat "head"
+						   (int-to-string
+						    (setq cnt (1+ cnt))))))
+			    seqs))
+	     (result (make-symbol "result"))
+	     (result-tail (make-symbol "result-tail")))
+	`(let* ,(let* ((bindings (cons nil nil))
+		       (heads heads))
+		  (nconc bindings (list (list result '(cons nil nil))))
+		  (nconc bindings (list (list result-tail result)))
+		  (while heads
+		    (nconc bindings (list (list (pop heads) (pop seqs)))))
+		  (cdr bindings))
+	   (while (and ,@heads)
+	     (setcdr ,result-tail (cons (funcall ,function
+						 ,@(mapcar (lambda (h) (list 'car h))
+							   heads))
+					nil))
+	     (setq ,result-tail (cdr ,result-tail)
+		   ,@(apply 'nconc (mapcar (lambda (h) (list h (list 'cdr h))) heads))))
+	   (cdr ,result)))
+    `(mapcar ,function ,seq1)))
+
+(if (fboundp 'merge)
+    (defalias 'gnus-merge 'merge)
+  ;; Adapted from cl-seq.el
+  (defun gnus-merge (type list1 list2 pred)
+    "Destructively merge lists LIST1 and LIST2 to produce a new list.
+Argument TYPE is for compatibility and ignored.
+Ordering of the elements is preserved according to PRED, a `less-than'
+predicate on the elements."
+    (let ((res nil))
+      (while (and list1 list2)
+	(if (funcall pred (car list2) (car list1))
+	    (push (pop list2) res)
+	  (push (pop list1) res)))
+      (nconc (nreverse res) list1 list2))))
 
 (provide 'gnus-util)
 

@@ -1,5 +1,5 @@
 ;;; mail-source.el --- functions for fetching mail
-;; Copyright (C) 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
@@ -28,17 +28,18 @@
 (eval-when-compile
   (require 'cl)
   (require 'imap)
-  (eval-when-compile (defvar display-time-mail-function)))
-(eval-and-compile
-  (defvar pop3-leave-mail-on-server)
+  (defvar display-time-mail-function)
   (autoload 'pop3-movemail "pop3")
-  (autoload 'pop3-get-message-count "pop3")
+  (autoload 'pop3-get-message-count "pop3"))
+(eval-and-compile
   (autoload 'nnheader-cancel-timer "nnheader")
   (autoload 'nnheader-run-at-time "nnheader"))
 (require 'format-spec)
+(require 'message) ;; for `message-directory'
 
 (defgroup mail-source nil
   "The mail-fetching library."
+  :version "21.1"
   :group 'gnus)
 
 ;; Define these at compile time to avoid dragging in imap always.
@@ -46,18 +47,19 @@
   (eval-when-compile
     (mapcar (lambda (a)
 	      (list 'const (car a)))
-     imap-authenticator-alist)))
+	    imap-authenticator-alist)))
 (defconst mail-source-imap-streams
   (eval-when-compile
     (mapcar (lambda (a)
 	      (list 'const (car a)))
-     imap-stream-alist)))
+	    imap-stream-alist)))
 
 (defcustom mail-sources nil
   "*Where the mail backends will look for incoming mail.
 This variable is a list of mail source specifiers.
 See Info node `(gnus)Mail Source Specifiers'."
   :group 'mail-source
+  :link '(custom-manual "(gnus)Mail Source Specifiers")
   :type `(repeat
 	  (choice :format "%[Value Menu%] %v"
 		  :value (file)
@@ -81,10 +83,16 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (function :tag "Predicate"))
 				   (group :inline t
 					  (const :format "" :value :prescript)
-					  (string :tag "Prescript"))
+					  (choice :tag "Prescript"
+						  :value nil
+						  (string :format "%v")
+						  (function :format "%v")))
 				   (group :inline t
 					  (const :format "" :value :postscript)
-					  (string :tag "Postscript"))
+					  (choice :tag "Postscript"
+						  :value nil
+						  (string :format "%v")
+						  (function :format "%v")))
 				   (group :inline t
 					  (const :format "" :value :plugged)
 					  (boolean :tag "Plugged"))))
@@ -92,12 +100,12 @@ See Info node `(gnus)Mail Source Specifiers'."
 			(const :format "" pop)
 			(checklist :tag "Options" :greedy t
 				   (group :inline t
-					  (const :format "" :value :server) 
+					  (const :format "" :value :server)
 					  (string :tag "Server"))
 				   (group :inline t
-					  (const :format "" :value :port) 
+					  (const :format "" :value :port)
 					  (choice :tag "Port"
-						  :value "pop3" 
+						  :value "pop3"
 						  (number :format "%v")
 						  (string :format "%v")))
 				   (group :inline t
@@ -111,15 +119,21 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (string :tag "Program"))
 				   (group :inline t
 					  (const :format "" :value :prescript)
-					  (string :tag "Prescript"))
+					  (choice :tag "Prescript"
+						  :value nil
+						  (string :format "%v")
+						  (function :format "%v")))
 				   (group :inline t
 					  (const :format "" :value :postscript)
-					  (string :tag "Postscript"))
+					  (choice :tag "Postscript"
+						  :value nil
+						  (string :format "%v")
+						  (function :format "%v")))
 				   (group :inline t
 					  (const :format "" :value :function)
 					  (function :tag "Function"))
 				   (group :inline t
-					  (const :format "" 
+					  (const :format ""
 						 :value :authentication)
 					  (choice :tag "Authentication"
 						  :value apop
@@ -145,8 +159,8 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (string :tag "Server"))
 				   (group :inline t
 					  (const :format "" :value :port)
-					  (choice :tag "Port" 
-						  :value 143 
+					  (choice :tag "Port"
+						  :value 143
 						  number string))
 				   (group :inline t
 					  (const :format "" :value :user)
@@ -160,6 +174,9 @@ See Info node `(gnus)Mail Source Specifiers'."
 						  :value network
 						  ,@mail-source-imap-streams))
 				   (group :inline t
+					  (const :format "" :value :program)
+					  (string :tag "Program"))
+				   (group :inline t
 					  (const :format ""
 						 :value :authenticator)
 					  (choice :tag "Authenticator"
@@ -171,7 +188,7 @@ See Info node `(gnus)Mail Source Specifiers'."
 						  :value "INBOX"))
 				   (group :inline t
 					  (const :format "" :value :predicate)
-					  (string :tag "Predicate" 
+					  (string :tag "Predicate"
 						  :value "UNSEEN UNDELETED"))
 				   (group :inline t
 					  (const :format "" :value :fetchflag)
@@ -187,18 +204,18 @@ See Info node `(gnus)Mail Source Specifiers'."
 		  (cons :tag "Webmail server"
 			(const :format "" webmail)
 			(checklist :tag "Options" :greedy t
-				   (group :inline t 
-					 (const :format "" :value :subtype)
-					 ;; Should be generated from
-					 ;; `webmail-type-definition', but we
-					 ;; can't require webmail without W3.
-					 (choice :tag "Subtype"
-						 :value hotmail
-						 (const hotmail)
-						 (const yahoo)
-						 (const netaddress)
-						 (const netscape)
-						 (const my-deja)))
+				   (group :inline t
+					  (const :format "" :value :subtype)
+					  ;; Should be generated from
+					  ;; `webmail-type-definition', but we
+					  ;; can't require webmail without W3.
+					  (choice :tag "Subtype"
+						  :value hotmail
+						  (const hotmail)
+						  (const yahoo)
+						  (const netaddress)
+						  (const netscape)
+						  (const my-deja)))
 				   (group :inline t
 					  (const :format "" :value :user)
 					  (string :tag "User"))
@@ -213,18 +230,28 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (const :format "" :value :plugged)
 					  (boolean :tag "Plugged")))))))
 
+(defcustom mail-source-ignore-errors nil
+  "*Ignore errors when querying mail sources.
+If nil, the user will be prompted when an error occurs.  If non-nil,
+the error will be ignored.")
+
 (defcustom mail-source-primary-source nil
   "*Primary source for incoming mail.
 If non-nil, this maildrop will be checked periodically for new mail."
   :group 'mail-source
   :type 'sexp)
 
+(defcustom mail-source-flash t
+  "*If non-nil, flash periodically when mail is available."
+  :group 'mail-source
+  :type 'boolean)
+
 (defcustom mail-source-crash-box "~/.emacs-mail-crash-box"
   "File where mail will be stored while processing it."
   :group 'mail-source
   :type 'file)
 
-(defcustom mail-source-directory "~/Mail/"
+(defcustom mail-source-directory message-directory
   "Directory where files (if any) will be stored."
   :group 'mail-source
   :type 'directory)
@@ -234,8 +261,24 @@ If non-nil, this maildrop will be checked periodically for new mail."
   :group 'mail-source
   :type 'integer)
 
-(defcustom mail-source-delete-incoming t
-  "*If non-nil, delete incoming files after handling."
+(defcustom mail-source-delete-incoming nil
+  "*If non-nil, delete incoming files after handling.
+If t, delete immediately, if nil, never delete.  If a positive number, delete
+files older than number of days."
+  ;; Note: The removing happens in `mail-source-callback', i.e. no old
+  ;; incoming files will be deleted, unless you receive new mail.
+  ;;
+  ;; You may also set this to `nil' and call `mail-source-delete-old-incoming'
+  ;; from a hook or interactively.
+  :group 'mail-source
+  :type '(choice (const :tag "immediately" t)
+		 (const :tag "never" nil)
+		 (integer :tag "days")))
+
+(defcustom mail-source-delete-old-incoming-confirm t
+  "*If non-nil, ask for for confirmation before deleting old incoming files.
+This variable only applies when `mail-source-delete-incoming' is a positive
+number."
   :group 'mail-source
   :type 'boolean)
 
@@ -253,6 +296,11 @@ If non-nil, this maildrop will be checked periodically for new mail."
   "Number of idle seconds to wait before checking for new mail."
   :group 'mail-source
   :type 'number)
+
+(defcustom mail-source-movemail-program nil
+  "If non-nil, name of program for fetching new mail."
+  :group 'mail-source
+  :type '(choice (const nil) string))
 
 ;;; Internal variables.
 
@@ -276,6 +324,9 @@ Common keywords should be listed here.")
        (:path (or (getenv "MAIL")
 		  (expand-file-name (user-login-name) rmail-spool-directory))))
       (directory
+       (:prescript)
+       (:prescript-delay)
+       (:postscript)
        (:path)
        (:suffix ".spool")
        (:predicate identity))
@@ -300,6 +351,7 @@ Common keywords should be listed here.")
        (:server (getenv "MAILHOST"))
        (:port)
        (:stream)
+       (:program)
        (:authentication)
        (:user (or (user-login-name) (getenv "LOGNAME") (getenv "USER")))
        (:password)
@@ -364,7 +416,7 @@ the `mail-source-keyword-map' variable."
      ,@body))
 
 (put 'mail-source-bind 'lisp-indent-function 1)
-(put 'mail-source-bind 'edebug-form-spec '(form body))
+(put 'mail-source-bind 'edebug-form-spec '(sexp body))
 
 (defun mail-source-set-1 (source)
   (let* ((type (pop source))
@@ -407,7 +459,7 @@ See `mail-source-bind'."
      ,@body))
 
 (put 'mail-source-bind-common 'lisp-indent-function 1)
-(put 'mail-source-bind-common 'edebug-form-spec '(form body))
+(put 'mail-source-bind-common 'edebug-form-spec '(sexp body))
 
 (defun mail-source-value (value)
   "Return the value of VALUE."
@@ -441,21 +493,63 @@ Return the number of files that were found."
 	      (setq found (mail-source-callback
 			   callback mail-source-crash-box)))
 	    (+ found
-	       (condition-case err
+	       (if (or debug-on-quit debug-on-error)
 		   (funcall function source callback)
-		 (error
-		  (unless (yes-or-no-p
-			   (format "Mail source error (%s).  Continue? " err))
-		    (error "Cannot get new mail."))
-		  0))))))))
+		 (condition-case err
+		     (funcall function source callback)
+		   (error
+		    (if (and (not mail-source-ignore-errors)
+			     (not
+			      (yes-or-no-p
+			       (format "Mail source %s error (%s).  Continue? "
+				       (if (memq ':password source)
+					   (let ((s (copy-sequence source)))
+					     (setcar (cdr (memq ':password s)) 
+						     "********")
+					     s)
+					 source)
+				       (cadr err)))))
+		      (error "Cannot get new mail"))
+		    0)))))))))
 
-(defun mail-source-make-complex-temp-name (prefix)
-  (let ((newname (make-temp-name prefix))
-	(newprefix prefix))
-    (while (file-exists-p newname)
-      (setq newprefix (concat newprefix "x"))
-      (setq newname (make-temp-name newprefix)))
-    newname))
+(eval-and-compile
+  (if (fboundp 'make-temp-file)
+      (defalias 'mail-source-make-complex-temp-name 'make-temp-file)
+    (defun mail-source-make-complex-temp-name (prefix)
+      (let ((newname (make-temp-name prefix))
+	    (newprefix prefix))
+	(while (file-exists-p newname)
+	  (setq newprefix (concat newprefix "x"))
+	  (setq newname (make-temp-name newprefix)))
+	newname))))
+
+(defun mail-source-delete-old-incoming (&optional age confirm)
+  "Remove incoming files older than AGE days.
+If CONFIRM is non-nil, ask for confirmation before removing a file."
+  (interactive "P")
+  (let* ((high2days (/ 65536.0 60 60 24));; convert high bits to days
+	 (low2days  (/ 1.0 65536.0))     ;; convert low bits to days
+	 (diff (if (natnump age) age 30));; fallback, if no valid AGE given
+	 currday files)
+    (setq files (directory-files
+		 mail-source-directory t
+		 (concat mail-source-incoming-file-prefix "*"))
+	  currday (* (car (current-time)) high2days)
+	  currday (+ currday (* low2days (nth 1 (current-time)))))
+    (while files
+      (let* ((ffile (car files))
+	     (bfile (gnus-replace-in-string
+		     ffile "\\`.*/\\([^/]+\\)\\'" "\\1"))
+	     (filetime (nth 5 (file-attributes ffile)))
+	     (fileday (* (car filetime) high2days))
+	     (fileday (+ fileday (* low2days (nth 1 filetime)))))
+	(setq files (cdr files))
+	(when (and (> (- currday fileday) diff)
+		   (gnus-message 8 "File `%s' is older than %s day(s)"
+				 bfile diff)
+		   (or (not confirm)
+		       (y-or-n-p (concat "Remove file `" bfile "'? "))))
+	  (delete-file ffile))))))
 
 (defun mail-source-callback (callback info)
   "Call CALLBACK on the mail file, and then remove the mail file.
@@ -470,7 +564,7 @@ Pass INFO on to CALLBACK."
 	(funcall callback mail-source-crash-box info)
       (when (file-exists-p mail-source-crash-box)
 	;; Delete or move the incoming mail out of the way.
-	(if mail-source-delete-incoming
+	(if (eq mail-source-delete-incoming t)
 	    (delete-file mail-source-crash-box)
 	  (let ((incoming
 		 (mail-source-make-complex-temp-name
@@ -479,7 +573,12 @@ Pass INFO on to CALLBACK."
 		   mail-source-directory))))
 	    (unless (file-exists-p (file-name-directory incoming))
 	      (make-directory (file-name-directory incoming) t))
-	    (rename-file mail-source-crash-box incoming t)))))))
+	    (rename-file mail-source-crash-box incoming t)
+	    ;; remove old incoming files?
+	    (when (natnump mail-source-delete-incoming)
+	      (mail-source-delete-old-incoming
+	       mail-source-delete-incoming
+	       mail-source-delete-old-incoming-confirm))))))))
 
 (defun mail-source-movemail (from to)
   "Move FROM to TO using movemail."
@@ -514,11 +613,13 @@ Pass INFO on to CALLBACK."
 		       'call-process
 		       (append
 			(list
-			 (expand-file-name "movemail" exec-directory)
+			 (or mail-source-movemail-program
+			     (expand-file-name "movemail" exec-directory))
 			 nil errors nil from to)))))
 	      (when (file-exists-p to)
 		(set-file-modes to mail-source-default-file-modes))
-	      (if (and (not (buffer-modified-p errors))
+	      (if (and (or (not (buffer-modified-p errors))
+			   (zerop (buffer-size errors)))
 		       (zerop result))
 		  ;; No output => movemail won.
 		  t
@@ -536,8 +637,9 @@ Pass INFO on to CALLBACK."
 		  (goto-char (point-min))
 		  (when (looking-at "movemail: ")
 		    (delete-region (point-min) (match-end 0)))
+		  ;; Result may be a signal description string.
 		  (unless (yes-or-no-p
-			   (format "movemail: %s (%d return).  Continue? "
+			   (format "movemail: %s (%s return).  Continue? "
 				   (buffer-string) result))
 		    (error "%s" (buffer-string)))
 		  (setq to nil)))))))
@@ -553,29 +655,13 @@ Pass INFO on to CALLBACK."
       (not (zerop (nth 7 (file-attributes from))))
       (delete-file from)))
 
-(defvar mail-source-read-passwd nil)
-(defun mail-source-read-passwd (prompt &rest args)
-  "Read a password using PROMPT.
-If ARGS, PROMPT is used as an argument to `format'."
-  (let ((prompt
-	 (if args
-	     (apply 'format prompt args)
-	   prompt)))
-    (unless mail-source-read-passwd
-      (if (or (fboundp 'read-passwd) (load "passwd" t))
-	  (setq mail-source-read-passwd 'read-passwd)
-	(unless (fboundp 'ange-ftp-read-passwd)
-	  (autoload 'ange-ftp-read-passwd "ange-ftp"))
-	(setq mail-source-read-passwd 'ange-ftp-read-passwd)))
-    (funcall mail-source-read-passwd prompt)))
-
 (defun mail-source-fetch-with-program (program)
   (zerop (call-process shell-file-name nil nil nil
 		       shell-command-switch program)))
 
 (defun mail-source-run-script (script spec &optional delay)
   (when script
-    (if (and (symbolp script) (fboundp script))
+    (if (functionp script)
 	(funcall script)
       (mail-source-call-script
        (format-spec script spec))))
@@ -611,6 +697,8 @@ If ARGS, PROMPT is used as an argument to `format'."
 (defun mail-source-fetch-directory (source callback)
   "Fetcher for directory sources."
   (mail-source-bind (directory source)
+    (mail-source-run-script
+     prescript (format-spec-make ?t path) prescript-delay)
     (let ((found 0)
 	  (mail-source-string (format "directory:%s" path)))
       (dolist (file (directory-files
@@ -619,6 +707,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 		   (funcall predicate file)
 		   (mail-source-movemail file mail-source-crash-box))
 	  (incf found (mail-source-callback callback file))))
+      (mail-source-run-script postscript (format-spec-make ?t path))
       found)))
 
 (defun mail-source-fetch-pop (source callback)
@@ -636,7 +725,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(setq password
 	      (or password
 		  (cdr (assoc from mail-source-password-cache))
-		  (mail-source-read-passwd
+		  (read-passwd
 		   (format "Password for %s at %s: " user server)))))
       (when server
 	(setenv "MAILHOST" server))
@@ -652,6 +741,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	      (funcall function mail-source-crash-box))
 	     ;; The default is to use pop3.el.
 	     (t
+	      (require 'pop3)
 	      (let ((pop3-password password)
 		    (pop3-maildrop user)
 		    (pop3-mailhost server)
@@ -662,16 +752,18 @@ If ARGS, PROMPT is used as an argument to `format'."
 		    (pop3-leave-mail-on-server
 		     (or leave
 			 (and (boundp 'pop3-leave-mail-on-server)
-			      pop3-leave-mail-on-server))))
-		(condition-case err
+			      (symbol-value 'pop3-leave-mail-on-server)))))
+		(if (or debug-on-quit debug-on-error)
 		    (save-excursion (pop3-movemail mail-source-crash-box))
-		  (error
-		   ;; We nix out the password in case the error
-		   ;; was because of a wrong password being given.
-		   (setq mail-source-password-cache
-			 (delq (assoc from mail-source-password-cache)
-			       mail-source-password-cache))
-		   (signal (car err) (cdr err))))))))
+		  (condition-case err
+		      (save-excursion (pop3-movemail mail-source-crash-box))
+		    (error
+		     ;; We nix out the password in case the error
+		     ;; was because of a wrong password being given.
+		     (setq mail-source-password-cache
+			   (delq (assoc from mail-source-password-cache)
+				 mail-source-password-cache))
+		     (signal (car err) (cdr err)))))))))
       (if result
 	  (progn
 	    (when (eq authentication 'password)
@@ -703,7 +795,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 	(setq password
 	      (or password
 		  (cdr (assoc from mail-source-password-cache))
-		  (mail-source-read-passwd
+		  (read-passwd
 		   (format "Password for %s at %s: " user server))))
 	(unless (assoc from mail-source-password-cache)
 	  (push (cons from password) mail-source-password-cache)))
@@ -716,21 +808,24 @@ If ARGS, PROMPT is used as an argument to `format'."
 	     (function)
 	     ;; The default is to use pop3.el.
 	     (t
+	      (require 'pop3)
 	      (let ((pop3-password password)
 		    (pop3-maildrop user)
 		    (pop3-mailhost server)
 		    (pop3-port port)
 		    (pop3-authentication-scheme
 		     (if (eq authentication 'apop) 'apop 'pass)))
-		(condition-case err
+		(if (or debug-on-quit debug-on-error)
 		    (save-excursion (pop3-get-message-count))
-		  (error
-		   ;; We nix out the password in case the error
-		   ;; was because of a wrong password being given.
-		   (setq mail-source-password-cache
-			 (delq (assoc from mail-source-password-cache)
-			       mail-source-password-cache))
-		   (signal (car err) (cdr err))))))))
+		  (condition-case err
+		      (save-excursion (pop3-get-message-count))
+		    (error
+		     ;; We nix out the password in case the error
+		     ;; was because of a wrong password being given.
+		     (setq mail-source-password-cache
+			   (delq (assoc from mail-source-password-cache)
+				 mail-source-password-cache))
+		     (signal (car err) (cdr err)))))))))
       (if result
 	  ;; Inform display-time that we have new mail.
 	  (setq mail-source-new-mail-available (> result 0))
@@ -741,8 +836,30 @@ If ARGS, PROMPT is used as an argument to `format'."
 		    mail-source-password-cache)))
       result)))
 
+(defun mail-source-touch-pop ()
+  "Open and close a POP connection shortly.
+POP server should be defined in `mail-source-primary-source' (which is
+preferred) or `mail-sources'.  You may use it for the POP-before-SMTP
+authentication.  To do that, you need to set the option
+`message-send-mail-function' to `message-send-mail-with-smtp' or
+`message-smtpmail-send-it' and put the following line in .gnus file:
+
+\(add-hook 'message-send-mail-hook 'mail-source-touch-pop)
+"
+  (let ((sources (if mail-source-primary-source
+		     (list mail-source-primary-source)
+		   mail-sources)))
+    (while sources
+      (if (eq 'pop (car (car sources)))
+	  (mail-source-check-pop (car sources)))
+      (setq sources (cdr sources)))))
+
 (defun mail-source-new-mail-p ()
   "Handler for `display-time' to indicate when new mail is available."
+  ;; Flash (ie. ring the visible bell) if mail is available.
+  (if (and mail-source-flash mail-source-new-mail-available)
+      (let ((visible-bell t))
+	(ding)))
   ;; Only report flag setting; flag is updated on a different schedule.
   mail-source-new-mail-available)
 
@@ -751,7 +868,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 (defvar mail-source-report-new-mail-timer nil)
 (defvar mail-source-report-new-mail-idle-timer nil)
 
-(eval-when-compile 
+(eval-when-compile
   (if (featurep 'xemacs)
       (require 'itimer)
     (require 'timer)))
@@ -765,8 +882,9 @@ If ARGS, PROMPT is used as an argument to `format'."
 	   mail-source-idle-time-delay
 	   nil
 	   (lambda ()
-	     (mail-source-check-pop mail-source-primary-source)
-	     (setq mail-source-report-new-mail-idle-timer nil))))
+	     (unwind-protect
+		 (mail-source-check-pop mail-source-primary-source)
+	       (setq mail-source-report-new-mail-idle-timer nil)))))
     ;; Since idle timers created when Emacs is already in the idle
     ;; state don't get activated until Emacs _next_ becomes idle, we
     ;; need to force our timer to be considered active now.  We do
@@ -779,7 +897,7 @@ If ARGS, PROMPT is used as an argument to `format'."
 This only works when `display-time' is enabled."
   (interactive "P")
   (if (not mail-source-primary-source)
-      (error "Need to set `mail-source-primary-source' to check for new mail."))
+      (error "Need to set `mail-source-primary-source' to check for new mail"))
   (let ((on (if (null arg)
 		(not mail-source-report-new-mail)
 	      (> (prefix-numeric-value arg) 0))))
@@ -835,13 +953,13 @@ This only works when `display-time' is enabled."
 				(with-temp-file mail-source-crash-box
 				  (insert-file-contents file)
 				  (goto-char (point-min))
-;;;                               ;; Unix mail format
-;;; 				  (unless (looking-at "\n*From ")
-;;; 				    (insert "From maildir " 
-;;; 					    (current-time-string) "\n"))
-;;; 				  (while (re-search-forward "^From " nil t)
-;;; 				    (replace-match ">From "))
-;;;                               (goto-char (point-max))
+;;;				  ;; Unix mail format
+;;;				  (unless (looking-at "\n*From ")
+;;;				    (insert "From maildir "
+;;;					    (current-time-string) "\n"))
+;;;				  (while (re-search-forward "^From " nil t)
+;;;				    (replace-match ">From "))
+;;;				  (goto-char (point-max))
 ;;;				  (insert "\n\n")
 				  ;; MMDF mail format
 				  (insert "\001\001\001\001\n"))
@@ -861,8 +979,7 @@ This only works when `display-time' is enabled."
   (autoload 'imap-error-text "imap")
   (autoload 'imap-message-flags-add "imap")
   (autoload 'imap-list-to-message-set "imap")
-  (autoload 'imap-range-to-message-set "imap")
-  (autoload 'nnheader-ms-strip-cr "nnheader"))
+  (autoload 'imap-range-to-message-set "imap"))
 
 (defvar mail-source-imap-file-coding-system 'binary
   "Coding system for the crashbox made by `mail-source-fetch-imap'.")
@@ -870,13 +987,14 @@ This only works when `display-time' is enabled."
 (defun mail-source-fetch-imap (source callback)
   "Fetcher for imap sources."
   (mail-source-bind (imap source)
-    (let ((from (format "%s:%s:%s" server user port))
-	  (found 0)
-	  (buf (get-buffer-create
-		(format " *imap source %s:%s:%s *" server user mailbox)))
-	  (mail-source-string (format "imap:%s:%s" server mailbox))
-	  remove)
-      (if (and (imap-open server port stream authentication buf)
+    (let* ((from (format "%s:%s:%s" server user port))
+	   (found 0)
+	   (buffer-name " *imap source*")
+	   (buf (get-buffer-create (generate-new-buffer-name buffer-name)))
+	   (mail-source-string (format "imap:%s:%s" server mailbox))
+	   (imap-shell-program (or (list program) imap-shell-program))
+	   remove)
+      (if (and (imap-open server port stream authentication buffer-name)
 	       (imap-authenticate
 		user (or (cdr (assoc from mail-source-password-cache))
 			 password) buf)
@@ -895,7 +1013,11 @@ This only works when `display-time' is enabled."
 		  (push (cons from imap-password) mail-source-password-cache)))
 	      ;; if predicate is nil, use all uids
 	      (dolist (uid (imap-search (or predicate "1:*") buf))
-		(when (setq str (imap-fetch uid "RFC822.PEEK" 'RFC822 nil buf))
+		(when (setq str
+			    (if (imap-capability 'IMAP4rev1 buf)
+				(caddar (imap-fetch uid "BODY.PEEK[]"
+						    'BODYDETAIL nil buf))
+			      (imap-fetch uid "RFC822.PEEK" 'RFC822 nil buf)))
 		  (push uid remove)
 		  (insert "From imap " (current-time-string) "\n")
 		  (save-excursion
@@ -911,7 +1033,7 @@ This only works when `display-time' is enabled."
 	       fetchflag nil buf))
 	    (if dontexpunge
 		(imap-mailbox-unselect buf)
-	      (imap-mailbox-close buf))
+	      (imap-mailbox-close nil buf))
 	    (imap-close buf))
 	(imap-close buf)
 	;; We nix out the password in case the error
@@ -935,14 +1057,14 @@ This only works when `display-time' is enabled."
       (when (eq authentication 'password)
 	(setq password
 	      (or password
-		  (cdr (assoc (format "webmail:%s:%s" subtype user) 
+		  (cdr (assoc (format "webmail:%s:%s" subtype user)
 			      mail-source-password-cache))
-		  (mail-source-read-passwd
+		  (read-passwd
 		   (format "Password for %s at %s: " user subtype))))
 	(when (and password
-		   (not (assoc (format "webmail:%s:%s" subtype user) 
+		   (not (assoc (format "webmail:%s:%s" subtype user)
 			       mail-source-password-cache)))
-	  (push (cons (format "webmail:%s:%s" subtype user) password) 
+	  (push (cons (format "webmail:%s:%s" subtype user) password)
 		mail-source-password-cache)))
       (webmail-fetch mail-source-crash-box subtype user password)
       (mail-source-callback callback (symbol-name subtype)))))

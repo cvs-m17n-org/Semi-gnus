@@ -1,5 +1,6 @@
-;;; mm-encode.el --- Functions for encoding MIME things 
-;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+;;; mm-encode.el --- Functions for encoding MIME things
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -30,16 +31,25 @@
 (eval-and-compile
   (autoload 'mm-body-7-or-8 "mm-bodies"))
 
-(defvar mm-content-transfer-encoding-defaults
+(defcustom mm-content-transfer-encoding-defaults
   '(("text/x-patch" 8bit)
     ("text/.*" qp-or-base64)
     ("message/rfc822" 8bit)
     ("application/emacs-lisp" 8bit)
+    ("application/x-emacs-lisp" 8bit)
     ("application/x-patch" 8bit)
-    (".*" qp-or-base64))
+    (".*" base64))
   "Alist of regexps that match MIME types and their encodings.
 If the encoding is `qp-or-base64', then either quoted-printable
-or base64 will be used, depending on what is more efficient.")
+or base64 will be used, depending on what is more efficient."
+  :type '(repeat (list (regexp :tag "MIME type")
+		       (choice :tag "encoding"
+			       (const 7bit)
+			       (const 8bit)
+			       (const qp-or-base64)
+			       (const quoted-printable)
+			       (const base64))))
+  :group 'mime)
 
 (defvar mm-use-ultra-safe-encoding nil
   "If non-nil, use encodings aimed at Procrustean bed survival.
@@ -78,14 +88,15 @@ This variable should never be set directly, but bound before a call to
   "Return a safer but similar encoding."
   (cond
    ((memq encoding '(7bit 8bit quoted-printable)) 'quoted-printable)
-   ;; The remaing encodings are binary and base64 (and perhaps some
+   ;; The remaining encodings are binary and base64 (and perhaps some
    ;; non-standard ones), which are both turned into base64.
    (t 'base64)))
 
 (defun mm-encode-content-transfer-encoding (encoding &optional type)
   (cond
    ((eq encoding 'quoted-printable)
-    (quoted-printable-encode-region (point-min) (point-max) t))
+    (mm-with-unibyte-current-buffer-mule4
+      (quoted-printable-encode-region (point-min) (point-max) t)))
    ((eq encoding 'base64)
     (when (equal type "text/plain")
       (goto-char (point-min))
@@ -105,7 +116,7 @@ This variable should never be set directly, but bound before a call to
    ((functionp encoding)
     (ignore-errors (funcall encoding (point-min) (point-max))))
    (t
-    (message "Unknown encoding %s; defaulting to 8bit" encoding))))
+    (message "Unknown encoding %s; treating it as 8bit" encoding))))
 
 (defun mm-encode-buffer (type)
   "Encode the buffer which contains data of TYPE.
@@ -118,7 +129,8 @@ The encoding used is returned."
 	 (bits (mm-body-7-or-8)))
     ;; We force buffers that are 7bit to be unencoded, no matter
     ;; what the preferred encoding is.
-    (when (eq bits '7bit)
+    ;; Only if the buffers don't contain lone lines.
+    (when (and (eq bits '7bit) (not (mm-long-lines-p 76)))
       (setq encoding bits))
     (mm-encode-content-transfer-encoding encoding mime-type)
     encoding))
@@ -143,7 +155,7 @@ The encoding used is returned."
       (while rules
 	(when (string-match (caar rules) type)
 	  (throw 'found
-		 (let ((encoding 
+		 (let ((encoding
 			(if (eq (cadr (car rules)) 'qp-or-base64)
 			    (mm-qp-or-base64)
 			  (cadr (car rules)))))
@@ -153,18 +165,24 @@ The encoding used is returned."
 	(pop rules)))))
 
 (defun mm-qp-or-base64 ()
-  (save-excursion
-    (let ((limit (min (point-max) (+ 2000 (point-min))))
-	  (n8bit 0))
-      (goto-char (point-min))
-      (skip-chars-forward "\x20-\x7f\r\n\t" limit)
-      (while (< (point) limit)
-	(incf n8bit)
-	(forward-char 1)
-	(skip-chars-forward "\x20-\x7f\r\n\t" limit))
-      (if (< (* 6 n8bit) (- limit (point-min)))
-	  'quoted-printable
-	'base64))))
+  (if (equal mm-use-ultra-safe-encoding '(sign . "pgp"))
+      ;; perhaps not always accurate?
+      'quoted-printable
+    (save-excursion
+      (let ((limit (min (point-max) (+ 2000 (point-min))))
+	    (n8bit 0))
+	(goto-char (point-min))
+	(skip-chars-forward "\x20-\x7f\r\n\t" limit)
+	(while (< (point) limit)
+	  (incf n8bit)
+	  (forward-char 1)
+	  (skip-chars-forward "\x20-\x7f\r\n\t" limit))
+	(if (or (< (* 6 n8bit) (- limit (point-min)))
+		;; Don't base64, say, a short line with a single
+		;; non-ASCII char when splitting parts by charset.
+		(= n8bit 1))
+	    'quoted-printable
+	  'base64)))))
 
 (provide 'mm-encode)
 

@@ -1,6 +1,6 @@
 ;;; nnmh.el --- mhspool access for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2003
 ;;	Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -44,16 +44,16 @@
 (nnoo-declare nnmh)
 
 (defvoo nnmh-directory message-directory
-  "*Mail spool directory.")
+  "Mail spool directory.")
 
 (defvoo nnmh-get-new-mail t
-  "*If non-nil, nnmh will check the incoming mail file and split the mail.")
+  "If non-nil, nnmh will check the incoming mail file and split the mail.")
 
 (defvoo nnmh-prepare-save-mail-hook nil
-  "*Hook run narrowed to an article before saving.")
+  "Hook run narrowed to an article before saving.")
 
 (defvoo nnmh-be-safe nil
-  "*If non-nil, nnmh will check all articles to make sure whether they are new or not.
+  "If non-nil, nnmh will check all articles to make sure whether they are new or not.
 Go through the .nnmh-articles file and compare with the actual
 articles in this folder.  The articles that are \"new\" will be marked
 as unread by Gnus.")
@@ -122,33 +122,8 @@ as unread by Gnus.")
 	(when large
 	  (nnheader-message 5 "nnmh: Receiving headers...done"))
 
-        ;; (nnheader-fold-continuation-lines)
+	;; (nnheader-fold-continuation-lines)
 	'headers))))
-
-(deffoo nnmh-retrieve-parsed-headers (articles
-				      dependencies
-				      &optional newsgroup server fetch-old
-				      force-new)
-  (save-excursion
-    (set-buffer nntp-server-buffer)
-    (let* ((file nil)
-	   (number (length articles))
-	   (large (and (numberp nnmail-large-newsgroup)
-		       (> number nnmail-large-newsgroup)))
-	   (count 0)
-	   (file-name-coding-system 'binary)
-	   (pathname-coding-system 'binary)
-	   (case-fold-search t)
-	   ;;beg
-	   article
-	   headers header id end ref lines chars ctype in-reply-to
-	   (cur (current-buffer)))
-      (nnmh-possibly-change-directory newsgroup server)
-      ;; We don't support fetching by Message-ID.
-      (nnheader-retrieve-headers-from-directory
-       articles nnmh-current-directory dependencies
-       fetch-old force-new large "nnmh")
-      )))
 
 (deffoo nnmh-open-server (server &optional defs)
   (nnoo-change-server 'nnmh server defs)
@@ -264,17 +239,19 @@ as unread by Gnus.")
 	  (goto-char (point-max))
 	  (insert
 	   (format
-	    "%s %d %d y\n"
+	    "%s %.0f %.0f y\n"
 	    (progn
 	      (string-match
 	       (regexp-quote
 		(file-truename (file-name-as-directory
 				(expand-file-name nnmh-toplev))))
 	       dir)
-	      (nnheader-replace-chars-in-string
-	       (decode-coding-string (substring dir (match-end 0))
-				     nnmail-pathname-coding-system)
-	       ?/ ?.))
+	      (string-as-multibyte
+	       (encode-coding-string
+		(nnheader-replace-chars-in-string
+		 (substring dir (match-end 0))
+		 ?/ ?.)
+		nnmail-pathname-coding-system)))
 	    (apply 'max files)
 	    (apply 'min files)))))))
   t)
@@ -297,6 +274,13 @@ as unread by Gnus.")
 		 (setq is-old
 		       (nnmail-expired-article-p newsgroup mod-time force)))
 	    (progn
+	      ;; Allow a special target group. -- jcn
+	      (unless (eq nnmail-expiry-target 'delete)
+		(with-temp-buffer
+		  (nnmh-request-article (car articles)
+					newsgroup server (current-buffer))
+		  (nnmail-expiry-target-group
+		   nnmail-expiry-target newsgroup)))
 	      (nnheader-message 5 "Deleting article %s in %s..."
 				article newsgroup)
 	      (condition-case ()
@@ -313,8 +297,8 @@ as unread by Gnus.")
 (deffoo nnmh-close-group (group &optional server)
   t)
 
-(deffoo nnmh-request-move-article
-    (article group server accept-form &optional last)
+(deffoo nnmh-request-move-article (article group server
+					   accept-form &optional last)
   (let ((buf (get-buffer-create " *nnmh move*"))
 	result)
     (and
@@ -341,7 +325,7 @@ as unread by Gnus.")
 	   (not (equal group "draft")))
       (nnmail-check-syntax))
   (when nnmail-cache-accepted-message-ids
-    (nnmail-cache-insert (nnmail-fetch-field "message-id")))
+    (nnmail-cache-insert (nnmail-fetch-field "message-id") group))
   (nnheader-init-server-buffer)
   (prog1
       (if (stringp group)
@@ -450,7 +434,7 @@ as unread by Gnus.")
 	  (pathname-coding-system nnmail-pathname-coding-system))
       (if (file-directory-p pathname)
 	  (setq nnmh-current-directory pathname)
-	(error "No such newsgroup: %s" newsgroup)))))
+	(nnheader-report 'nnmh "Not a directory: %s" nnmh-directory)))))
 
 (defun nnmh-possibly-create-directory (group)
   (let (dir dirs)

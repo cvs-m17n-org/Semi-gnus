@@ -6,38 +6,44 @@ subdir = lisp
 top_srcdir = @top_srcdir@
 
 EMACS = @EMACS@
-FLAGS = -batch -q -no-site-file -l $(srcdir)/dgnushack.el
+FLAGS = @FLAGS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 VPATH = @srcdir@
 PACKAGEDIR = @PACKAGEDIR@
 W3DIR = @W3@
+URLDIR = @URL@
+EMACS_COMP = URLDIR=$(URLDIR) W3DIR=$(W3DIR) lispdir=$(lispdir) srcdir=$(srcdir) $(EMACS) $(FLAGS)
 GNUS_PRODUCT_NAME = @GNUS_PRODUCT_NAME@
-EXPORTING_FILES = $(EMACS) $(FLAGS) -f dgnushack-exporting-files 2>/dev/null
+EXPORTING_FILES = $(EMACS_COMP) -f dgnushack-exporting-files 2>/dev/null
 
-all total:
-	rm -f *.elc auto-autoloads.el custom-load.el
-	W3DIR=$(W3DIR) lispdir=$(lispdir) \
-		srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
+# We should never use `COMMAND && ...' form, use `if COMMAND then ...'
+# form instead.  Because, as far as we know, FreeBSD's native make will
+# be discontinued if COMMAND returns a non-zero exit status.
 
-warn:
-	rm -f *.elc
-	W3DIR=$(W3DIR) lispdir=$(lispdir) srcdir=$(srcdir) $(EMACS) $(FLAGS) --eval '(dgnushack-compile t)' 2>&1 | egrep -v "variable G|inhibit-point-motion-hooks|coding-system|temp-results|variable gnus|variable nn|scroll-in-place|deactivate-mark|filladapt-mode|byte-code-function-p|print-quoted|ps-right-header|ps-left-header|article-inhibit|print-escape|ssl-program-arguments|message-log-max"
+all total: clean-some gnus-load.el
+	$(EMACS_COMP) -f dgnushack-compile
+
+clean-some:
+	rm -f *.elc gnus-load.el
+
+warn: clean-some gnus-load.el
+	$(EMACS_COMP) --eval '(dgnushack-compile t)' 2>&1 | egrep -v "variable G|inhibit-point-motion-hooks|coding-system|temp-results|variable gnus|variable nn|scroll-in-place|deactivate-mark|filladapt-mode|byte-code-function-p|print-quoted|ps-right-header|ps-left-header|article-inhibit|print-escape|ssl-program-arguments|message-log-max"
 
 # The "clever" rule is unsafe, since redefined macros are loaded from
 # .elc files, and not the .el file.
-clever some:
+clever some l: gnus-load.el
 	@if test -f $(srcdir)/gnus.elc; then \
 	  echo \
-	    "checking for whether the all elc files should be recompiled..."; \
+	    "checking whether the all elc files should be recompiled..."; \
 	  RM_ELC=nil; \
 	  if test `$(EMACS) -batch -q -no-site-file \
-		-eval "(princ (format \"%s\" (featurep (quote xemacs))))" \
+		-eval '(prin1 (featurep (quote xemacs)))' \
 		2>/dev/null` = t; then \
-	    test ! -f $(srcdir)/gnus-xmas.elc && RM_ELC=t; \
+	    if test ! -f $(srcdir)/gnus-xmas.elc; then RM_ELC=t; fi; \
 	  else \
-	    test -f $(srcdir)/gnus-xmas.elc && RM_ELC=t; \
+	    if test -f $(srcdir)/gnus-xmas.elc; then RM_ELC=t; fi; \
 	  fi; \
 	  if test $$RM_ELC = t; then \
 	    echo " => maybe yes;" \
@@ -47,8 +53,7 @@ clever some:
 	    echo " => maybe unnecessary"; \
 	  fi; \
 	fi
-	W3DIR=$(W3DIR) lispdir=$(lispdir) \
-		srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-compile
+	$(EMACS_COMP) -f dgnushack-compile
 
 install: clever install-without-compiling
 
@@ -65,18 +70,24 @@ install-without-compiling:
 
 # Rule for XEmacs package.
 install-package-manifest:
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
-		-f dgnushack-install-package-manifest \
+	$(EMACS_COMP) -f dgnushack-install-package-manifest \
 		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
 
-compose-package:
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) -f dgnushack-make-autoloads
+compose-package: gnus-load.el
+	$(EMACS_COMP) -f dgnushack-compose-package
 
 remove-extra-files-in-package:
-	srcdir=$(srcdir) $(EMACS) $(FLAGS) \
-		-f dgnushack-remove-extra-files-in-package \
+	$(EMACS_COMP) -f dgnushack-remove-extra-files-in-package \
 		$(PACKAGEDIR) $(GNUS_PRODUCT_NAME)
 #
+
+install-el:
+	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
+	cd $(srcdir) \
+	&& for p in *.el; do \
+	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
+	done
 
 tags:
 	etags *.el
@@ -88,20 +99,13 @@ pot:
 	xpot -drgnus -r`cat ./version` *.el > rgnus.pot
 
 gnus-load.el:
-	echo ";;; gnus-load.el --- automatically extracted custom dependencies" > gnus-load.el
-	echo ";;" >> gnus-load.el
-	echo ";;; Code:" >> gnus-load.el
-	echo >> gnus-load.el
-	$(EMACS)  $(FLAGS) -l ./dgnushack.el -l cus-edit.el *.el \
-		-f custom-make-dependencies >> gnus-load.el
-	echo >> gnus-load.el
-	echo "(provide 'gnus-load)" >> gnus-load.el
-	echo >> gnus-load.el
-	echo ";;; gnus-load.el ends here" >> gnus-load.el
+	$(EMACS_COMP) -f dgnushack-make-cus-load $(srcdir)
+	$(EMACS_COMP) -f dgnushack-make-auto-load $(srcdir)
+	$(EMACS_COMP) -f dgnushack-make-load
 
 clean:
-	rm -f *.orig *.rej *.elc *~
-	rm -f auto-autoloads.el custom-load.el
+	rm -f *.orig *.rej *.elc *~ \
+		auto-autoloads.el custom-load.el gnus-load.el dgnuskwds.el
 
 distclean: clean
 	rm -f Makefile dgnuspath.el

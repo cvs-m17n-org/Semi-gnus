@@ -1,6 +1,6 @@
 ;;; nndb.el --- nndb access for Gnus
 
-;; Copyright (C) 1997, 1998, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1997, 1998, 2000, 2003 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;         Kai Grossjohann <grossjohann@ls6.informatik.uni-dortmund.de>
@@ -8,7 +8,7 @@
 ;;         David Blacka <davidb@rwhois.net>
 ;; Keywords: news
 
-;; This file is NOT part of GNU Emacs.
+;; This file is part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -169,7 +169,7 @@ article was posted to nndb")
       (nntp-send-command "^\\([23]\\|^423\\).*\n" "X-DATE" art)
       (setq msg (nndb-status-message))
       (if (string-match "^423" msg)
-          ()
+	  ()
 	(or (string-match "'\\(.+\\)'" msg)
 	    (error "Not a valid response for X-DATE command: %s"
 		   msg))
@@ -286,7 +286,7 @@ Optional LAST is ignored."
       (nntp-send-buffer "^[23].*\n"))
 
     (set-buffer nntp-server-buffer)
-    (setq msg (buffer-substring (point-min) (point-max)))
+    (setq msg (buffer-string))
     (or (string-match "^\\([0-9]+\\)" msg)
 	(error "nndb: %s" msg))
     (setq art (substring msg (match-beginning 1) (match-end 1)))
@@ -312,7 +312,7 @@ Optional LAST is ignored."
 (deffoo nndb-status-message (&optional server)
   "Return server status as a string."
   (set-buffer nntp-server-buffer)
-  (buffer-substring (point-min) (point-max)))
+  (buffer-string))
 
 ;; Import stuff from nntp
 
@@ -320,3 +320,5 @@ Optional LAST is ignored."
   (nntp))
 
 (provide 'nndb)
+
+;;; nndb.el ends here

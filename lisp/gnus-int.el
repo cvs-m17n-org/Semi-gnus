@@ -1,5 +1,5 @@
 ;;; gnus-int.el --- backend interface functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -30,11 +30,30 @@
 (eval-when-compile (require 'cl))
 
 (require 'gnus)
+(require 'message)
+(require 'gnus-range)
+
+(eval-when-compile
+  (defun gnus-agent-expire (&optional a b c)))
 
 (defcustom gnus-open-server-hook nil
   "Hook called just before opening connection to the news server."
   :group 'gnus-start
   :type 'hook)
+
+(defcustom gnus-server-unopen-status nil
+  "The default status if the server is not able to open.
+If the server is covered by Gnus agent, the possible values are
+`denied', set the server denied; `offline', set the server offline;
+nil, ask user.  If the server is not covered by Gnus agent, set the
+server denied."
+  :group 'gnus-start
+  :type '(choice (const :tag "Ask" nil)
+		 (const :tag "Deny server" denied)
+		 (const :tag "Unplug Agent" offline)))
+
+(defvar gnus-internal-registry-spool-current-method nil
+  "The current method, for the registry.")
 
 ;;;
 ;;; Server Communication
@@ -111,7 +130,8 @@ If CONFIRM is non-nil, the user will be asked for an NNTP server."
   "Check whether the connection to METHOD is down.
 If METHOD is nil, use `gnus-select-method'.
 If it is down, start it up (again)."
-  (let ((method (or method gnus-select-method)))
+  (let ((method (or method gnus-select-method))
+	result)
     ;; Transform virtual server names into select methods.
     (when (stringp method)
       (setq method (gnus-server-to-method method)))
@@ -125,9 +145,15 @@ If it is down, start it up (again)."
 			(format " on %s" (nth 1 method)))))
       (gnus-run-hooks 'gnus-open-server-hook)
       (prog1
-	  (gnus-open-server method)
+	  (condition-case ()
+	      (setq result (gnus-open-server method))
+	    (quit (message "Quit gnus-check-server")
+		  nil))
 	(unless silent
-	  (message ""))))))
+	  (gnus-message 5 "Opening %s server%s...%s" (car method)
+			(if (equal (nth 1 method) "") ""
+			  (format " on %s" (nth 1 method)))
+			(if result "done" "failed")))))))
 
 (defun gnus-get-function (method function &optional noerror)
   "Return a function symbol based on METHOD and FUNCTION."
@@ -177,17 +203,51 @@ If it is down, start it up (again)."
 	  nil)
       ;; Open the server.
       (let ((result
-	     (funcall (gnus-get-function gnus-command-method 'open-server)
-		      (nth 1 gnus-command-method)
-		      (nthcdr 2 gnus-command-method))))
+	     (condition-case err
+		 (funcall (gnus-get-function gnus-command-method 'open-server)
+			  (nth 1 gnus-command-method)
+			  (nthcdr 2 gnus-command-method))
+               (error 
+                (gnus-message 1 (format 
+                                 "Unable to open server due to: %s"
+                                 (error-message-string err)))
+                nil)
+	       (quit
+		(gnus-message 1 "Quit trying to open server")
+		nil))))
 	;; If this hasn't been opened before, we add it to the list.
 	(unless elem
 	  (setq elem (list gnus-command-method nil)
 		gnus-opened-servers (cons elem gnus-opened-servers)))
 	;; Set the status of this server.
-	(setcar (cdr elem) (if result 'ok 'denied))
+	(setcar (cdr elem)
+		(if result
+		    (if (eq (cadr elem) 'offline)
+			'offline
+		      'ok)
+		  (if (and gnus-agent
+			   (not (eq (cadr elem) 'offline))
+			   (gnus-agent-method-p gnus-command-method))
+		      (or gnus-server-unopen-status
+			  (if (gnus-y-or-n-p
+			       (format "Unable to open %s:%s, go offline? "
+				       (car gnus-command-method)
+				       (cadr gnus-command-method)))
+                              'offline
+			    'denied))
+		    'denied)))
 	;; Return the result from the "open" call.
-	result))))
+        (cond ((eq (cadr elem) 'offline)
+               ;; I'm avoiding infinite recursion by binding unopen
+               ;; status to denied (The logic of this routine
+               ;; guarantees that I can't get to this point with
+               ;; unopen status already bound to denied).
+               (unless (eq gnus-server-unopen-status 'denied)
+                 (let ((gnus-server-unopen-status 'denied))
+                   (gnus-open-server gnus-command-method)))
+               t)
+              (t
+               result))))))
 
 (defun gnus-close-server (gnus-command-method)
   "Close the connection to GNUS-COMMAND-METHOD."
@@ -229,7 +289,7 @@ If it is down, start it up (again)."
 
 (defun gnus-status-message (gnus-command-method)
   "Return the status message from GNUS-COMMAND-METHOD.
-If GNUS-COMMAND-METHOD is a string, it is interpreted as a group name.   The method
+If GNUS-COMMAND-METHOD is a string, it is interpreted as a group name.  The method
 this group uses will be queried."
   (let ((gnus-command-method
 	 (if (stringp gnus-command-method)
@@ -290,48 +350,16 @@ this group uses will be queried."
   "Request headers for ARTICLES in GROUP.
 If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
   (let ((gnus-command-method (gnus-find-method-for-group group)))
-    (if (and gnus-use-cache (numberp (car articles)))
-	(gnus-cache-retrieve-headers articles group fetch-old)
+    (cond
+     ((and gnus-use-cache (numberp (car articles)))
+      (gnus-cache-retrieve-headers articles group fetch-old))
+     ((and gnus-agent (gnus-online gnus-command-method)
+	   (gnus-agent-method-p gnus-command-method))
+      (gnus-agent-retrieve-headers articles group fetch-old))
+     (t
       (funcall (gnus-get-function gnus-command-method 'retrieve-headers)
 	       articles (gnus-group-real-name group)
-	       (nth 1 gnus-command-method) fetch-old))))
-
-(defun gnus-retrieve-parsed-headers (articles group &optional fetch-old
-					      dependencies force-new)
-  "Request parsed-headers for ARTICLES in GROUP.
-If FETCH-OLD, retrieve all headers (or some subset thereof) in the group."
-  (unless dependencies
-    (setq dependencies
-	  (save-excursion
-	    (set-buffer gnus-summary-buffer)
-	    gnus-newsgroup-dependencies)))
-  (let ((gnus-command-method (gnus-find-method-for-group group))
-	headers)
-    (if (and gnus-use-cache (numberp (car articles)))
-	(setq headers
-	      (gnus-cache-retrieve-parsed-headers articles group fetch-old
-						  dependencies force-new))
-      (let ((func (gnus-get-function gnus-command-method
-				     'retrieve-parsed-headers 'no-error)))
-	(if func
-	    (setq headers (funcall func articles dependencies
-				   (gnus-group-real-name group)
-				   (nth 1 gnus-command-method) fetch-old
-				   force-new)
-		  gnus-headers-retrieved-by (car headers)
-		  headers (cdr headers))
-	  (setq gnus-headers-retrieved-by
-		(funcall
-		 (gnus-get-function gnus-command-method 'retrieve-headers)
-		 articles (gnus-group-real-name group)
-		 (nth 1 gnus-command-method) fetch-old))
-	  )))
-    (or headers
-	(if (eq gnus-headers-retrieved-by 'nov)
-	    (gnus-get-newsgroup-headers-xover
-	     articles nil dependencies gnus-newsgroup-name t)
-	  (gnus-get-newsgroup-headers dependencies)))
-    ))
+	       (nth 1 gnus-command-method) fetch-old)))))
 
 (defun gnus-retrieve-articles (articles group)
   "Request ARTICLES in GROUP."
@@ -396,6 +424,10 @@ If BUFFER, insert the article in that group."
 	   (gnus-cache-request-article article group))
       (setq res (cons group article)
 	    clean-up t))
+     ;; Check the agent cache.
+     ((gnus-agent-request-article article group)
+      (setq res (cons group article)
+	    clean-up t))
      ;; Use `head' function.
      ((fboundp head)
       (setq res (funcall head article (gnus-group-real-name group)
@@ -423,6 +455,10 @@ If BUFFER, insert the article in that group."
      ((and gnus-use-cache
 	   (numberp article)
 	   (gnus-cache-request-article article group))
+      (setq res (cons group article)
+	    clean-up t))
+     ;; Check the agent cache.
+     ((gnus-agent-request-article article group)
       (setq res (cons group article)
 	    clean-up t))
      ;; Use `head' function.
@@ -456,9 +492,11 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
 	(gnus-inhibit-demon t)
 	(mail-source-plugged gnus-plugged))
     (if (or gnus-plugged (not (gnus-agent-method-p gnus-command-method)))
-	(funcall (gnus-get-function gnus-command-method 'request-scan)
-		 (and group (gnus-group-real-name group))
-		 (nth 1 gnus-command-method)))))
+	(progn
+	  (setq gnus-internal-registry-spool-current-method gnus-command-method)
+	  (funcall (gnus-get-function gnus-command-method 'request-scan)
+		   (and group (gnus-group-real-name group))
+		   (nth 1 gnus-command-method))))))
 
 (defsubst gnus-request-update-info (info gnus-command-method)
   "Request that GNUS-COMMAND-METHOD update INFO."
@@ -466,22 +504,48 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
     (setq gnus-command-method (gnus-server-to-method gnus-command-method)))
   (when (gnus-check-backend-function
 	 'request-update-info (car gnus-command-method))
-    (funcall (gnus-get-function gnus-command-method 'request-update-info)
-	     (gnus-group-real-name (gnus-info-group info))
-	     info (nth 1 gnus-command-method))))
+    (let ((group (gnus-info-group info)))
+      (and (funcall (gnus-get-function gnus-command-method
+				       'request-update-info)
+		    (gnus-group-real-name group)
+		    info (nth 1 gnus-command-method))
+	   ;; If the minimum article number is greater than 1, then all
+	   ;; smaller article numbers are known not to exist; we'll
+	   ;; artificially add those to the 'read range.
+	   (let* ((active (gnus-active group))
+		  (min (car active)))
+	     (when (> min 1)
+	       (let* ((range (if (= min 2) 1 (cons 1 (1- min))))
+		      (read (gnus-info-read info))
+		      (new-read (gnus-range-add read (list range))))
+		 (gnus-info-set-read info new-read)))
+	     info)))))
 
 (defun gnus-request-expire-articles (articles group &optional force)
-  (let ((gnus-command-method (gnus-find-method-for-group group)))
-    (funcall (gnus-get-function gnus-command-method 'request-expire-articles)
-	     articles (gnus-group-real-name group) (nth 1 gnus-command-method)
-	     force)))
+  (let* ((gnus-command-method (gnus-find-method-for-group group))
+	 (not-deleted
+	  (funcall
+	   (gnus-get-function gnus-command-method 'request-expire-articles)
+	   articles (gnus-group-real-name group) (nth 1 gnus-command-method)
+	   force)))
+    (when (and gnus-agent
+	       (gnus-agent-method-p gnus-command-method))
+      (let ((expired-articles (gnus-sorted-difference articles not-deleted)))
+        (when expired-articles
+          (gnus-agent-expire expired-articles group 'force))))
+    not-deleted))
 
-(defun gnus-request-move-article
-  (article group server accept-function &optional last)
-  (let ((gnus-command-method (gnus-find-method-for-group group)))
-    (funcall (gnus-get-function gnus-command-method 'request-move-article)
-	     article (gnus-group-real-name group)
-	     (nth 1 gnus-command-method) accept-function last)))
+(defun gnus-request-move-article (article group server accept-function
+					  &optional last)
+  (let* ((gnus-command-method (gnus-find-method-for-group group))
+	 (result (funcall (gnus-get-function gnus-command-method
+					     'request-move-article)
+			  article (gnus-group-real-name group)
+			  (nth 1 gnus-command-method) accept-function last)))
+    (when (and result gnus-agent
+	       (gnus-agent-method-p gnus-command-method))
+      (gnus-agent-expire (list article) group 'force))
+    result))
 
 (defun gnus-request-accept-article (group &optional gnus-command-method last
 					  no-encode)
@@ -494,9 +558,9 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
   (goto-char (point-max))
   (unless (bolp)
     (insert "\n"))
-  (let ((func (car (or gnus-command-method
-		       (gnus-find-method-for-group group)))))
-    (funcall (intern (format "%s-request-accept-article" func))
+  (let ((gnus-command-method (or gnus-command-method
+				 (gnus-find-method-for-group group))))
+    (funcall (gnus-get-function gnus-command-method 'request-accept-article)
 	     (if (stringp group) (gnus-group-real-name group) group)
 	     (cadr gnus-command-method)
 	     last)))

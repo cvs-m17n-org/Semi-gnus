@@ -27,6 +27,8 @@
 
 ;; This module defines some utility functions for STARTTLS profiles.
 
+;; Get "starttls" from ftp://ftp.opaopa.org/pub/elisp/.
+
 ;; [RFC 2595] "Using TLS with IMAP, POP3 and ACAP"
 ;;	by Chris Newman <chris.newman@innosoft.com> (1999/06)
 
@@ -71,6 +73,11 @@ specifying a port number to connect to."
 			 starttls-extra-args)))
     (process-kill-without-query process)
     process))
+
+(defun starttls-open-ssl-stream (name buffer host service)
+  (let* ((starttls-extra-args
+	  (cons "--force" starttls-extra-args)))
+    (starttls-open-stream name buffer host service)))
 
 (provide 'starttls)
 

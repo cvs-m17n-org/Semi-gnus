@@ -1,10 +1,11 @@
 ;;; nnspool.el --- spool access for GNU Emacs
 
 ;; Copyright (C) 1988, 1989, 1990, 1993, 1994, 1995, 1996, 1997, 1998,
-;;	2000 Free Software Foundation, Inc.
+;;               2000, 2002, 2003
+;;               Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
 
 ;; This file is part of GNU Emacs.
@@ -51,7 +52,10 @@ If you are using Cnews, you probably should set this variable to nil.")
 (defvoo nnspool-nov-directory (concat nnspool-spool-directory "over.view/")
   "Local news nov directory.")
 
-(defvoo nnspool-lib-dir "/usr/lib/news/"
+(defvoo nnspool-lib-dir
+    (if (file-exists-p "/usr/lib/news/active")
+	"/usr/lib/news/"
+      "/var/lib/news/")
   "Where the local news library files are stored.")
 
 (defvoo nnspool-active-file (concat nnspool-lib-dir "active")
@@ -141,9 +145,8 @@ there.")
 	      (inline (nnheader-insert-head file))
 	      (goto-char beg)
 	      (if (search-forward "\n\n" nil t)
-		  (progn
-		    (forward-char -1)
-		    (insert ".\n"))
+		  (progn (forward-char -1)
+			 (insert ".\n"))
 		(goto-char (point-max))
 		(if (bolp)
 		    (insert ".\n")
@@ -329,7 +332,8 @@ there.")
 	  ()
 	(nnheader-report 'nnspool "")
 	(set-process-sentinel proc 'nnspool-inews-sentinel)
-	(process-send-region proc (point-min) (point-max))
+	(mm-with-unibyte-current-buffer
+	  (process-send-region proc (point-min) (point-max)))
 	;; We slap a condition-case around this, because the process may
 	;; have exited already...
 	(ignore-errors
@@ -361,7 +365,7 @@ there.")
     (let ((nov (nnheader-group-pathname
 		nnspool-current-group nnspool-nov-directory ".overview"))
 	  (arts articles)
-      	  (nnheader-file-coding-system nnspool-file-coding-system)
+	  (nnheader-file-coding-system nnspool-file-coding-system)
 	  last)
       (if (not (file-exists-p nov))
 	  ()
@@ -457,7 +461,7 @@ there.")
 	(nnheader-report 'nnspool "No such newsgroup: %s" group)))))
 
 (defun nnspool-article-pathname (group &optional article)
-  "Find the path for GROUP."
+  "Find the file name for GROUP."
   (nnheader-group-pathname group nnspool-spool-directory article))
 
 (provide 'nnspool)

@@ -1,7 +1,7 @@
 ;;; gnus-xmas.el --- Gnus functions for XEmacs
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
-;;      Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Katsumi Yamaoka <yamaoka@jpl.org>
@@ -45,54 +45,15 @@ automatically."
 		 directory)
   :group 'gnus-xmas)
 
-;;(format "%02x%02x%02x" 114 66 20) "724214"
-
-(defvar gnus-xmas-logo-color-alist
-  '((flame "#cc3300" "#ff2200")
-    (pine "#c0cc93" "#f8ffb8")
-    (moss "#a1cc93" "#d2ffb8")
-    (irish "#04cc90" "#05ff97")
-    (sky "#049acc" "#05deff")
-    (tin "#6886cc" "#82b6ff")
-    (velvet "#7c68cc" "#8c82ff")
-    (grape "#b264cc" "#cf7df")
-    (labia "#cc64c2" "#fd7dff")
-    (berry "#cc6485" "#ff7db5")
-    (dino "#724214" "#1e3f03")
-    (neutral "#b4b4b4" "#878787")
-    (september "#bf9900" "#ffcc00"))
-  "Color alist used for the Gnus logo.")
-
-(defcustom gnus-xmas-logo-color-style 'dino
-  "*Color styles used for the Gnus logo."
-  :type '(choice (const flame) (const pine) (const moss)
-		 (const irish) (const sky) (const tin)
-		 (const velvet) (const grape) (const labia)
-		 (const berry) (const neutral) (const september)
-		 (const dino))
-  :group 'gnus-xmas)
-
-(defvar gnus-xmas-logo-colors
-  (cdr (assq gnus-xmas-logo-color-style gnus-xmas-logo-color-alist))
-  "Colors used for the Gnus logo.")
-
-(defcustom gnus-article-x-face-command
-  (if (or (featurep 'xface)
-	  (featurep 'xpm))
-      'gnus-xmas-article-display-xface
-    "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | ee -")
-  "*String or function to be executed to display an X-Face header.
-If it is a string, the command will be executed in a sub-shell
-asynchronously.	 The compressed face will be piped to this command."
-  :type '(choice string function))
+(unless gnus-xmas-glyph-directory
+  (unless (setq gnus-xmas-glyph-directory
+		(message-xmas-find-glyph-directory "gnus"))
+    (error "Can't find glyph directory. \
+Possibly the `etc' directory has not been installed.")))
 
 ;;; Internal variables.
 
 ;; Don't warn about these undefined variables.
-
-(defvar gnus-group-mode-hook)
-(defvar gnus-summary-mode-hook)
-(defvar gnus-article-mode-hook)
 
 ;;defined in gnus.el
 (defvar gnus-active-hashtb)
@@ -141,12 +102,12 @@ It is provided only to ease porting of broken FSF Emacs programs."
   (if (stringp buffer)
       nil
     (map-extents (lambda (extent ignored)
-                   (remove-text-properties
-                    start end
-                    (list (extent-property extent 'text-prop) nil)
-                    buffer)
+		   (remove-text-properties
+		    start end
+		    (list (extent-property extent 'text-prop) nil)
+		    buffer)
 		   nil)
-                 buffer start end nil nil 'text-prop)
+		 buffer start end nil nil 'text-prop)
     (gnus-add-text-properties start end props buffer)))
 
 (defun gnus-xmas-highlight-selected-summary ()
@@ -198,7 +159,7 @@ displayed, no centering will be performed."
 	;; whichever is the least.
 	;; NOFORCE parameter suggested by Daniel Pittman <daniel@danann.net>.
 	(set-window-start
-	 window (min bottom (save-excursion (forward-line (- top)) (point))) 
+	 window (min bottom (save-excursion (forward-line (- top)) (point)))
 	 t))
       ;; Do horizontal recentering while we're at it.
       (when (and (get-buffer-window (current-buffer) t)
@@ -291,19 +252,19 @@ call it with the value of the `gnus-data' text property."
 (defun gnus-xmas-appt-select-lowest-window ()
   (let* ((lowest-window (selected-window))
 	 (bottom-edge (car (cdr (cdr (cdr (window-pixel-edges))))))
-         (last-window (previous-window))
-         (window-search t))
+	 (last-window (previous-window))
+	 (window-search t))
     (while window-search
       (let* ((this-window (next-window))
-             (next-bottom-edge (car (cdr (cdr (cdr
-                                               (window-pixel-edges
+	     (next-bottom-edge (car (cdr (cdr (cdr
+					       (window-pixel-edges
 						this-window)))))))
-        (when (< bottom-edge next-bottom-edge)
+	(when (< bottom-edge next-bottom-edge)
 	  (setq bottom-edge next-bottom-edge)
 	  (setq lowest-window this-window))
 
-        (select-window this-window)
-        (when (eq last-window this-window)
+	(select-window this-window)
+	(when (eq last-window this-window)
 	  (select-window lowest-window)
 	  (setq window-search nil))))))
 
@@ -329,7 +290,8 @@ call it with the value of the `gnus-data' text property."
 
 (defun gnus-xmas-article-menu-add ()
   (gnus-xmas-menu-add article
-    gnus-article-article-menu gnus-article-treatment-menu))
+    gnus-article-article-menu gnus-article-treatment-menu
+    gnus-article-post-menu gnus-article-commands-menu))
 
 (defun gnus-xmas-score-menu-add ()
   (gnus-xmas-menu-add score
@@ -379,8 +341,10 @@ call it with the value of the `gnus-data' text property."
   (gnus-xmas-menu-add grouplens
     gnus-grouplens-menu))
 
-(defun gnus-xmas-read-event-char ()
+(defun gnus-xmas-read-event-char (&optional prompt)
   "Get the next event."
+  (when prompt
+    (message "%s" prompt))
   (let ((event (next-command-event)))
     (sit-for 0)
     ;; We junk all non-key events.  Is this naughty?
@@ -429,11 +393,8 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-window-edges 'window-pixel-edges)
 
   (if (and (<= emacs-major-version 19)
- 	   (< emacs-minor-version 14))
+	   (< emacs-minor-version 14))
       (defalias 'gnus-set-text-properties 'gnus-xmas-set-text-properties))
-
-  (when (fboundp 'turn-off-scroll-in-place)
-    (add-hook 'gnus-article-mode-hook 'turn-off-scroll-in-place))
 
   (unless (boundp 'standard-display-table)
     (setq standard-display-table nil))
@@ -466,40 +427,37 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-group-startup-message 'gnus-xmas-group-startup-message)
   (defalias 'gnus-tree-minimize 'gnus-xmas-tree-minimize)
   (defalias 'gnus-appt-select-lowest-window
-	'gnus-xmas-appt-select-lowest-window)
+    'gnus-xmas-appt-select-lowest-window)
   (defalias 'gnus-mail-strip-quoted-names 'gnus-xmas-mail-strip-quoted-names)
   (defalias 'gnus-character-to-event 'character-to-event)
   (defalias 'gnus-mode-line-buffer-identification
-	'gnus-xmas-mode-line-buffer-identification)
+    'gnus-xmas-mode-line-buffer-identification)
   (defalias 'gnus-key-press-event-p 'key-press-event-p)
   (defalias 'gnus-region-active-p 'region-active-p)
+  (defalias 'gnus-mark-active-p 'region-exists-p)
   (defalias 'gnus-annotation-in-region-p 'gnus-xmas-annotation-in-region-p)
   (defalias 'gnus-mime-button-menu 'gnus-xmas-mime-button-menu)
+  (defalias 'gnus-image-type-available-p 'gnus-xmas-image-type-available-p)
+  (defalias 'gnus-put-image 'gnus-xmas-put-image)
+  (defalias 'gnus-create-image 'gnus-xmas-create-image)
+  (defalias 'gnus-remove-image 'gnus-xmas-remove-image)
 
-  (add-hook 'gnus-group-mode-hook 'gnus-xmas-group-menu-add)
-  (add-hook 'gnus-summary-mode-hook 'gnus-xmas-summary-menu-add)
-  (add-hook 'gnus-article-mode-hook 'gnus-xmas-article-menu-add)
+  (when (or (< emacs-major-version 21)
+	    (and (= emacs-major-version 21)
+		 (< emacs-minor-version 3)))
+    (defalias 'gnus-completing-read 'gnus-xmas-completing-read))
+
+  ;; These ones are not defcutom'ed, sometimes not even defvar'ed. They
+  ;; probably should. If that is done, the code below should then be moved
+  ;; where each variable is defined, in order not to mess with user settings.
+  ;; -- didier
   (add-hook 'gnus-score-mode-hook 'gnus-xmas-score-menu-add)
-
-  (add-hook 'gnus-pick-mode-hook 'gnus-xmas-pick-menu-add)
-  (add-hook 'gnus-topic-mode-hook 'gnus-xmas-topic-menu-add)
-  (add-hook 'gnus-tree-mode-hook 'gnus-xmas-tree-menu-add)
   (add-hook 'gnus-binary-mode-hook 'gnus-xmas-binary-menu-add)
   (add-hook 'gnus-grouplens-mode-hook 'gnus-xmas-grouplens-menu-add)
   (add-hook 'gnus-server-mode-hook 'gnus-xmas-server-menu-add)
   (add-hook 'gnus-browse-mode-hook 'gnus-xmas-browse-menu-add)
-
-  (add-hook 'gnus-group-mode-hook 'gnus-xmas-setup-group-toolbar)
-  (add-hook 'gnus-summary-mode-hook 'gnus-xmas-setup-summary-toolbar)
-
-  (add-hook 'gnus-agent-summary-mode-hook 'gnus-xmas-agent-summary-menu-add)
-  (add-hook 'gnus-agent-group-mode-hook 'gnus-xmas-agent-group-menu-add)
-  (add-hook 'gnus-agent-server-mode-hook 'gnus-xmas-agent-server-menu-add)
-
   (add-hook 'gnus-draft-mode-hook 'gnus-xmas-draft-menu-add)
-  (add-hook 'gnus-summary-mode-hook
-	    'gnus-xmas-switch-horizontal-scrollbar-off)
-  (add-hook 'gnus-tree-mode-hook 'gnus-xmas-switch-horizontal-scrollbar-off)
+  (add-hook 'gnus-mailing-list-mode-hook 'gnus-xmas-mailing-list-menu-add)
 
   (when (featurep 'mule)
     (defun gnus-truncate-string (str end-column &optional start-column padding)
@@ -554,36 +512,13 @@ the resulting string may be narrower than END-COLUMN.
 	  (setq str (substring str from-idx idx))
 	  (if padding
 	      (concat head-padding str tail-padding)
-	    str))))
-
-    (defun gnus-tilde-pad-form (el pad-width)
-      "Return a form that pads EL to PAD-WIDTH."
-      (let ((pad (abs pad-width)))
-	(if (symbolp el)
-	    (if (< pad-width 0)
-		`(let ((val (format "%s" ,el)))
-		   (concat val (make-string
-				(max 0 (- ,pad (string-width val))) ?\ )))
-	      `(let ((val (format "%s" ,el)))
-		 (concat (make-string
-			  (max 0 (- ,pad (string-width val))) ?\ )
-			 val)))
-	  (if (< pad-width 0)
-	      `(let ((val (eval ,el)))
-		 (concat val (make-string
-			      (max 0 (- ,pad (string-width val))) ?\ )))
-	    `(let ((val (eval ,el)))
-	       (concat (make-string
-			(max 0 (- ,pad (string-width val))) ?\ )
-		       val))))))
-    ))
+	    str))))))
 
 ;;; XEmacs logo and toolbar.
 
 (defun gnus-xmas-group-startup-message (&optional x y)
   "Insert startup message in current buffer."
   ;; Insert the message.
-  (setq gnus-xmas-glyph-directory (message-xmas-find-glyph-directory "gnus"))
   (erase-buffer)
   (cond
    ((and (console-on-window-system-p)
@@ -596,8 +531,9 @@ the resulting string may be narrower than END-COLUMN.
 			  `[xpm
 			    :file ,logo-xpm
 			    :color-symbols
-			    (("thing" . ,(car gnus-xmas-logo-colors))
-			     ("shadow" . ,(cadr gnus-xmas-logo-colors))
+			    (("thing" . ,(car gnus-logo-colors))
+			     ("shadow" . ,(cadr gnus-logo-colors))
+			     ("oort" . "#eeeeee")
 			     ("background" . ,(face-background 'default)))])
 			 ((featurep 'xbm)
 			  `[xbm :file ,logo-xbm])
@@ -631,23 +567,23 @@ the resulting string may be narrower than END-COLUMN.
       (set-window-start (selected-window) (point-min))))
    (t
     (insert "
-          _    ___ _             _
-          _ ___ __ ___  __    _ ___
-          __   _     ___    __  ___
-              _           ___     _
-             _  _ __             _
-             ___   __            _
-                   __           _
-                    _      _   _
-                   _      _    _
-                      _  _    _
-                  __  ___
-                 _   _ _     _
-                _   _
-              _    _
-             _    _
-            _
-          __
+	  _    ___ _             _
+	  _ ___ __ ___  __    _ ___
+	  __   _     ___    __  ___
+	      _           ___     _
+	     _  _ __             _
+	     ___   __            _
+		   __           _
+		    _      _   _
+		   _      _    _
+		      _  _    _
+		  __  ___
+		 _   _ _     _
+		_   _
+	      _    _
+	     _    _
+	    _
+	  __
 
 "
 	    )
@@ -673,6 +609,7 @@ the resulting string may be narrower than END-COLUMN.
       (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
     ;; Paint it.
     (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)))
+  (goto-char (point-min))
   (setq modeline-buffer-identification
 	(list (concat gnus-version ": *Group*")))
   (set-buffer-modified-p t))
@@ -704,6 +641,8 @@ If it is non-nil, it must be a toolbar.  The five valid values are
     [gnus-group-unsubscribe gnus-group-unsubscribe t "Unsubscribe group"]
     [gnus-group-subscribe gnus-group-subscribe t "Subscribe group"]
     [gnus-group-kill-group gnus-group-kill-group t "Kill group"]
+    [gnus-summary-mail-save
+     gnus-group-save-newsrc t "Save .newsrc files"] ; borrowed icon.
     [gnus-group-exit gnus-group-exit t "Exit Gnus"])
   "The group buffer toolbar.")
 
@@ -761,6 +700,8 @@ If it is non-nil, it must be a toolbar.  The five valid values are
      gnus-summary-save-article-file t "Save article in file"]
     [gnus-summary-save-article
      gnus-summary-save-article t "Save article"]
+    [gnus-summary-cancel-article ; usenet : cancellation :: mail : deletion.
+     gnus-summary-delete-article t "Delete message"]
     [gnus-summary-catchup
      gnus-summary-catchup t "Catchup"]
     [gnus-summary-catchup-and-exit
@@ -783,7 +724,7 @@ If it is non-nil, it must be a toolbar.  The five valid values are
 			(cons (current-buffer) bar)))))
 
 (defun gnus-xmas-mail-strip-quoted-names (address)
-  "Protect mail-strip-quoted-names from NIL input.
+  "Protect mail-strip-quoted-names from nil input.
 XEmacs compatibility workaround."
   (if (null address)
       nil
@@ -793,42 +734,6 @@ XEmacs compatibility workaround."
   (apply
    'call-process-region (point-min) (point-max) command t '(t nil) nil
    args))
-
-(defface gnus-x-face '((t (:foreground "black" :background "white")))
-  "Face to show X face"
-  :group 'gnus-xmas)
-
-(defun gnus-xmas-article-display-xface (beg end)
-  "Display any XFace headers in the current article."
-  (save-excursion
-    (let ((xface-glyph
-	   (cond
-	    ((featurep 'xface)
-	     (make-glyph (vector 'xface :data
-				 (concat "X-Face: "
-					 (buffer-substring beg end)))))
-	    ((featurep 'xpm)
-	     (let ((cur (current-buffer)))
-	       (save-excursion
-		 (gnus-set-work-buffer)
-		 (insert-buffer-substring cur beg end)
-		 (gnus-xmas-call-region "uncompface")
-		 (goto-char (point-min))
-		 (insert "/* Width=48, Height=48 */\n")
-		 (gnus-xmas-call-region "icontopbm")
-		 (gnus-xmas-call-region "ppmtoxpm")
-		 (make-glyph
-		  (vector 'xpm :data (buffer-string))))))
-	    (t
-	     (make-glyph [nothing]))))
-	  (ext (make-extent (progn
-			      (goto-char (point-min))
-			      (re-search-forward "^From:" nil t)
-			      (point))
-			    (1+ (point)))))
-      (set-glyph-face xface-glyph 'gnus-x-face)
-      (set-extent-begin-glyph ext xface-glyph)
-      (set-extent-property ext 'duplicable t))))
 
 (defvar gnus-xmas-modeline-left-extent
   (let ((ext (copy-extent modeline-buffer-id-left-extent)))
@@ -840,7 +745,6 @@ XEmacs compatibility workaround."
 
 (defvar gnus-xmas-modeline-glyph
   (progn
-    (setq gnus-xmas-glyph-directory (message-xmas-find-glyph-directory "gnus"))
     (let* ((file-xpm (expand-file-name "gnus-pointer.xpm"
 				       gnus-xmas-glyph-directory))
 	   (file-xbm (expand-file-name "gnus-pointer.xbm"
@@ -887,9 +791,9 @@ XEmacs compatibility workaround."
 	  (eq (cadr (memq 'gnus-undeletable (text-properties-at b))) t)
 	(text-property-any b e 'gnus-undeletable t))))
 
-(defun gnus-xmas-mime-button-menu (event)
+(defun gnus-xmas-mime-button-menu (event prefix)
   "Construct a context-sensitive menu of MIME commands."
-  (interactive "e")
+  (interactive "e\nP")
   (let ((response (get-popup-menu-response
 		   `("MIME Part"
 		     ,@(mapcar (lambda (c) `[,(caddr c) ,(car c) t])
@@ -901,7 +805,7 @@ XEmacs compatibility workaround."
 (defun gnus-group-add-icon ()
   "Add an icon to the current line according to `gnus-group-icon-list'."
   (let* ((p (point))
-	 (end (progn (end-of-line) (point)))
+	 (end (gnus-point-at-eol))
 	 ;; now find out where the line starts and leave point there.
 	 (beg (progn (beginning-of-line) (point))))
     (save-restriction
@@ -968,9 +872,95 @@ XEmacs compatibility workaround."
 
 (defun gnus-xmas-mailing-list-menu-add ()
   (gnus-xmas-menu-add mailing-list
-		      gnus-mailing-list-menu))
+    gnus-mailing-list-menu))
 
-(add-hook 'gnus-mailing-list-mode-hook 'gnus-xmas-mailing-list-menu-add)
+(defun gnus-xmas-image-type-available-p (type)
+  (and window-system
+       (featurep (if (eq type 'pbm) 'xbm type))))
+
+(defun gnus-xmas-create-image (file &optional type data-p &rest props)
+  (let ((type (if type
+		  (symbol-name type)
+		(car (last (split-string file "[.]")))))
+	(face (plist-get props :face))
+	glyph)
+    (when (equal type "pbm")
+      (with-temp-buffer
+	(if data-p
+	    (insert file)
+	  (insert-file-contents file))
+	(shell-command-on-region (point-min) (point-max)
+				 "ppmtoxpm 2>/dev/null" t)
+	(setq file (buffer-string)
+	      type "xpm"
+	      data-p t)))
+    (setq glyph
+	  (if (equal type "xbm")
+	      (make-glyph (list (cons 'x file)))
+	    (with-temp-buffer
+	      (if data-p
+		  (insert file)
+		(insert-file-contents file))
+	      (make-glyph
+	       (vector
+		(or (intern type)
+		    (mm-image-type-from-buffer))
+		:data (buffer-string))))))
+    (when face
+      (set-glyph-face glyph face))
+    glyph))
+
+(defun gnus-xmas-put-image (glyph &optional string)
+  "Insert STRING, but display GLYPH.
+Warning: Don't insert text immediately after the image."
+  (let ((begin (point))
+	extent)
+    (if (and (bobp) (not string))
+	(setq string " "))
+    (if string
+	(insert string)
+      (setq begin (1- begin)))
+    (setq extent (make-extent begin (point)))
+    (set-extent-property extent 'gnus-image t)
+    (set-extent-property extent 'duplicable t)
+    (if string
+	(set-extent-property extent 'invisible t))
+    (set-extent-property extent 'end-glyph glyph))
+  glyph)
+
+(defun gnus-xmas-remove-image (image)
+  (map-extents
+   (lambda (ext unused)
+     (when (equal (extent-end-glyph ext) image)
+       (set-extent-property ext 'invisible nil)
+       (set-extent-property ext 'end-glyph nil))
+     nil)
+   nil nil nil nil nil 'gnus-image))
+
+(defun gnus-xmas-completing-read (prompt table &optional
+					 predicate require-match history)
+  (when (and history
+	     (not (boundp history)))
+    (set history nil))
+  (completing-read
+   (if (symbol-value history)
+       (concat prompt " (" (car (symbol-value history)) "): ")
+     (concat prompt ": "))
+   table
+   predicate
+   require-match
+   nil
+   history))
+
+;; This macro is because XEmacs versions prior to 21.2 do not have the
+;; PROTOCOL argument to `open-network-stream'.
+(defmacro gnus-xmas-open-network-stream (name buffer host service &optional protocol)
+  "Like `open-network-stream' but take into account older XEmacs versions."
+  (if (and (featurep 'xemacs)
+	   (fboundp 'open-network-stream)
+	   (emacs-version>= 21 2))
+      `(open-network-stream ,name ,buffer ,host ,service ,protocol)
+    `(open-network-stream ,name ,buffer ,host ,service)))
 
 (provide 'gnus-xmas)
 

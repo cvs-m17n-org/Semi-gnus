@@ -1,6 +1,7 @@
 ;;; gnus-salt.el --- alternate summary mode interfaces for Gnus
 
-;; Copyright (C) 1996, 1997, 1998, 1999 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2001
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -30,13 +31,15 @@
 
 (require 'gnus)
 (require 'gnus-sum)
+(require 'gnus-win)
 
 ;;;
 ;;; gnus-pick-mode
 ;;;
 
 (defvar gnus-pick-mode nil
-  "Minor mode for providing a pick-and-read interface in Gnus summary buffers.")
+  "Minor mode for providing a pick-and-read interface in Gnus
+summary buffers.")
 
 (defcustom gnus-pick-display-summary nil
   "*Display summary while reading."
@@ -48,18 +51,22 @@
   :type 'hook
   :group 'gnus-summary-pick)
 
+(when (featurep 'xemacs)
+  (add-hook 'gnus-pick-mode-hook 'gnus-xmas-pick-menu-add))
+
 (defcustom gnus-mark-unpicked-articles-as-read nil
   "*If non-nil, mark all unpicked articles as read."
   :type 'boolean
   :group 'gnus-summary-pick)
 
 (defcustom gnus-pick-elegant-flow t
-  "If non-nil, `gnus-pick-start-reading' runs `gnus-summary-next-group' when no articles have been picked."
+  "If non-nil, `gnus-pick-start-reading' runs
+ `gnus-summary-next-group' when no articles have been picked."
   :type 'boolean
   :group 'gnus-summary-pick)
 
 (defcustom gnus-summary-pick-line-format
-  "%-5P %U\%R\%z\%I\%(%[%4L: %-20,20n%]%) %s\n"
+  "%-5P %U\%R\%z\%I\%(%[%4L: %-23,23n%]%) %s\n"
   "*The format specification of the lines in pick buffers.
 It accepts the same format specs that `gnus-summary-line-format' does."
   :type 'string
@@ -148,11 +155,11 @@ If given a prefix, mark all unpicked articles as read."
   (interactive "P")
   (if gnus-newsgroup-processable
       (progn
-        (gnus-summary-limit-to-articles nil)
-        (when (or catch-up gnus-mark-unpicked-articles-as-read)
+	(gnus-summary-limit-to-articles nil)
+	(when (or catch-up gnus-mark-unpicked-articles-as-read)
 	  (gnus-summary-limit-mark-excluded-as-read))
-        (gnus-summary-first-article)
-        (gnus-configure-windows
+	(gnus-summary-first-article)
+	(gnus-configure-windows
 	 (if gnus-pick-display-summary 'article 'pick) t))
     (if gnus-pick-elegant-flow
 	(progn
@@ -223,7 +230,7 @@ This must be bound to a button-down mouse event."
   (let* ((echo-keystrokes 0)
 	 (start-posn (event-start start-event))
 	 (start-point (posn-point start-posn))
-         (start-line (1+ (count-lines 1 start-point)))
+	 (start-line (1+ (count-lines 1 start-point)))
 	 (start-window (posn-window start-posn))
 	 (bounds (gnus-window-edges start-window))
 	 (top (nth 1 bounds))
@@ -361,7 +368,7 @@ This must be bound to a button-down mouse event."
 (defun gnus-binary-display-article (article &optional all-header)
   "Run ARTICLE through the binary decode functions."
   (when (gnus-summary-goto-subject article)
-    (let ((gnus-view-pseudos 'automatic))
+    (let ((gnus-view-pseudos (or gnus-view-pseudos 'automatic)))
       (gnus-uu-decode-uu))))
 
 (defun gnus-binary-show-article (&optional arg)
@@ -417,6 +424,11 @@ Two predefined functions are available:
   "*Hook run in tree mode buffers."
   :type 'hook
   :group 'gnus-summary-tree)
+
+(when (featurep 'xemacs)
+  (add-hook 'gnus-tree-mode-hook 'gnus-xmas-tree-menu-add)
+  (add-hook 'gnus-tree-mode-hook 'gnus-xmas-switch-horizontal-scrollbar-off))
+
 
 ;;; Internal variables.
 
@@ -543,7 +555,7 @@ Two predefined functions are available:
 (defun gnus-tree-recenter ()
   "Center point in the tree window."
   (let ((selected (selected-window))
-	(tree-window (get-buffer-window gnus-tree-buffer t)))
+	(tree-window (gnus-get-buffer-window gnus-tree-buffer t)))
     (when tree-window
       (select-window tree-window)
       (when gnus-selected-tree-overlay
@@ -656,6 +668,10 @@ Two predefined functions are available:
       (let* ((score (or (cdr (assq article gnus-newsgroup-scored))
 			gnus-summary-default-score 0))
 	     (default gnus-summary-default-score)
+	     (default-high gnus-summary-default-high-score)
+	     (default-low gnus-summary-default-low-score)
+             (uncached (memq article gnus-newsgroup-undownloaded))
+             (downloaded (not uncached))
 	     (mark (or (gnus-summary-article-mark article) gnus-unread-mark)))
 	;; Eval the cars of the lists until we find a match.
 	(while (and list
@@ -686,8 +702,8 @@ Two predefined functions are available:
       (gnus-tree-minimize)
       (gnus-tree-recenter)
       (let ((selected (selected-window)))
-	(when (get-buffer-window (set-buffer gnus-tree-buffer) t)
-	  (select-window (get-buffer-window (set-buffer gnus-tree-buffer) t))
+	(when (gnus-get-buffer-window (set-buffer gnus-tree-buffer) t)
+	  (select-window (gnus-get-buffer-window (set-buffer gnus-tree-buffer) t))
 	  (gnus-horizontal-recenter)
 	  (select-window selected))))))
 
@@ -825,6 +841,13 @@ Two predefined functions are available:
 (defun gnus-tree-close (group)
   (gnus-kill-buffer gnus-tree-buffer))
 
+(defun gnus-tree-perhaps-minimize ()
+  (when (and gnus-tree-minimize-window
+	     (get-buffer gnus-tree-buffer))
+    (save-excursion
+      (set-buffer gnus-tree-buffer)
+      (gnus-tree-minimize))))
+
 (defun gnus-highlight-selected-tree (article)
   "Highlight the selected article in the tree."
   (let ((buf (current-buffer))
@@ -843,8 +866,8 @@ Two predefined functions are available:
       (gnus-tree-minimize)
       (gnus-tree-recenter)
       (let ((selected (selected-window)))
-	(when (get-buffer-window (set-buffer gnus-tree-buffer) t)
-	  (select-window (get-buffer-window (set-buffer gnus-tree-buffer) t))
+	(when (gnus-get-buffer-window (set-buffer gnus-tree-buffer) t)
+	  (select-window (gnus-get-buffer-window (set-buffer gnus-tree-buffer) t))
 	  (gnus-horizontal-recenter)
 	  (select-window selected))))
     ;; If we remove this save-excursion, it updates the wrong mode lines?!?
@@ -860,7 +883,7 @@ Two predefined functions are available:
       (when (setq region (gnus-tree-article-region article))
 	(gnus-put-text-property (car region) (cdr region) 'face face)
 	(set-window-point
-	 (get-buffer-window (current-buffer) t) (cdr region))))))
+	 (gnus-get-buffer-window (current-buffer) t) (cdr region))))))
 
 ;;;
 ;;; gnus-carpal
@@ -886,6 +909,7 @@ Two predefined functions are available:
     ("matching" . gnus-group-list-matching)
     ("post" . gnus-group-post-news)
     ("mail" . gnus-group-mail)
+    ("local" . (lambda () (interactive) (gnus-group-news 0)))
     ("rescan" . gnus-group-get-new-news)
     ("browse-foreign" . gnus-group-browse-foreign)
     ("exit" . gnus-group-exit)))
@@ -916,7 +940,8 @@ Two predefined functions are available:
     ("kill" . gnus-summary-kill-thread)
     "post"
     ("post" . gnus-summary-post-news)
-    ("mail" . gnus-summary-mail)
+    ("local" . gnus-summary-news-other-window)
+    ("mail" . gnus-summary-mail-other-window)
     ("followup" . gnus-summary-followup-with-original)
     ("reply" . gnus-summary-reply-with-original)
     ("cancel" . gnus-summary-cancel-article)

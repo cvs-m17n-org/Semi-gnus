@@ -1,5 +1,6 @@
-;;; nnultimate.el --- interfacing with the Ultimate Bulletin Board system -*- coding: iso-latin-1 -*-
-;; Copyright (C) 1999, 2000 Free Software Foundation, Inc.
+;;; nnultimate.el --- interfacing with the Ultimate Bulletin Board system
+
+;; Copyright (C) 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -37,11 +38,9 @@
 (require 'gnus)
 (require 'nnmail)
 (require 'mm-util)
-(eval-when-compile
-  (ignore-errors
-    (require 'nnweb)))
-;; Report failure to find w3 at load time if appropriate.
-(eval '(require 'nnweb))
+(require 'mm-url)
+(require 'nnweb)
+(autoload 'w3-parse-buffer "w3-parse")
 
 (nnoo-declare nnultimate)
 
@@ -57,7 +56,7 @@
 (defvoo nnultimate-groups nil)
 (defvoo nnultimate-headers nil)
 (defvoo nnultimate-articles nil)
-(defvar nnultimate-table-regexp 
+(defvar nnultimate-table-regexp
   "postings.*editpost\\|forumdisplay\\|Forum[0-9]+/HTML\\|getbio")
 
 ;;; Interface functions
@@ -81,11 +80,13 @@
 	    "postings.*editpost\\|forumdisplay\\|getbio")
 	   headers article subject score from date lines parent point
 	   contents tinfo fetchers map elem a href garticles topic old-max
-	   inc datel table string current-page total-contents pages
+	   inc datel table current-page total-contents pages
 	   farticles forum-contents parse furl-fetched mmap farticle)
       (setq map mapping)
       (while (and (setq article (car articles))
 		  map)
+	;; Skip past the articles in the map until we reach the
+	;; article we're looking for.
 	(while (and map
 		    (or (> article (caar map))
 			(< (cadar map) (caar map))))
@@ -124,31 +125,36 @@
 	      (setq subject (nth 2 (assq (car elem) topics)))
 	      (setq href (nth 3 (assq (car elem) topics)))
 	      (if (= current-page 1)
-		  (nnweb-insert href)
+		  (mm-url-insert href)
 		(string-match "\\.html$" href)
-		(nnweb-insert (concat (substring href 0 (match-beginning 0))
+		(mm-url-insert (concat (substring href 0 (match-beginning 0))
 				      "-" (number-to-string current-page)
 				      (match-string 0 href))))
 	      (goto-char (point-min))
 	      (setq contents
 		    (ignore-errors (w3-parse-buffer (current-buffer))))
 	      (setq table (nnultimate-find-forum-table contents))
-	      (setq string (mapconcat 'identity (nnweb-text table) ""))
-	      (when (string-match "topic is \\([0-9]\\) pages" string)
-		(setq pages (string-to-number (match-string 1 string)))
-		(setcdr table nil)
-		(setq table (nnultimate-find-forum-table contents)))
+	      (goto-char (point-min))
+	      (when (re-search-forward "topic is \\([0-9]+\\) pages" nil t)
+		(setq pages (string-to-number (match-string 1))))
 	      (setq contents (cdr (nth 2 (car (nth 2 table)))))
 	      (setq total-contents (nconc total-contents contents))
 	      (incf current-page))
-	    ;;(setq total-contents (nreverse total-contents))
-	    (dolist (art (cdr elem))
-	      (if (not (nth (1- (cdr art)) total-contents))
-		  ()			;(debug)
-		(push (list (car art)
-			    (nth (1- (cdr art)) total-contents)
-			    subject)
-		      nnultimate-articles)))))
+	    (when t
+	      (let ((i 0))
+		(dolist (co total-contents)
+		  (push (list (or (nnultimate-topic-article-to-article
+				   group (car elem) (incf i))
+				  1)
+			      co subject)
+			nnultimate-articles))))
+	    (when nil
+	      (dolist (art (cdr elem))
+		(when (nth (1- (cdr art)) total-contents)
+		  (push (list (car art)
+			      (nth (1- (cdr art)) total-contents)
+			      subject)
+			nnultimate-articles))))))
 	(setq nnultimate-articles
 	      (sort nnultimate-articles 'car-less-than-car))
 	;; Now we have all the articles, conveniently in an alist
@@ -166,17 +172,26 @@
 	      (setq date (substring (car datel) (match-end 0))
 		    datel nil))
 	    (pop datel))
-	  (setq date (delete "" (split-string date "[- \n\t\r    ]")))
-	  (if (or (member "AM" date)
-		  (member "PM" date))
-	      (setq date (format "%s %s %s %s"
-				 (car (rassq (string-to-number (nth 0 date))
-					     parse-time-months))
-				 (nth 1 date) (nth 2 date) (nth 3 date)))
-	    (setq date (format "%s %s %s %s"
-			       (car (rassq (string-to-number (nth 1 date))
-					   parse-time-months))
-			       (nth 0 date) (nth 2 date) (nth 3 date))))
+	  (when date
+	    (setq date (delete "" (split-string date "[-, \n\t\r    ]")))
+	    (setq date
+		  (if (or (member "AM" date)
+			  (member "PM" date))
+		      (format
+		       "%s %s %s %s"
+		       (nth 1 date)
+		       (if (and (>= (length (nth 0 date)) 3)
+				(assoc (downcase
+					(substring (nth 0 date) 0 3))
+				       parse-time-months))
+			   (substring (nth 0 date) 0 3)
+			 (car (rassq (string-to-number (nth 0 date))
+				     parse-time-months)))
+		       (nth 2 date) (nth 3 date))
+		    (format "%s %s %s %s"
+			    (car (rassq (string-to-number (nth 1 date))
+					parse-time-months))
+			    (nth 0 date) (nth 2 date) (nth 3 date)))))
 	  (push
 	   (cons
 	    article
@@ -185,7 +200,7 @@
 	     from (or date "")
 	     (concat "<" (number-to-string sid) "%"
 		     (number-to-string article)
-		     "@ultimate>")
+		     "@ultimate." server ">")
 	     "" 0
 	     (/ (length (mapconcat
 			 'identity
@@ -203,6 +218,16 @@
 	    (dolist (header nnultimate-headers)
 	      (nnheader-insert-nov (cdr header))))))
       'nov)))
+
+(defun nnultimate-topic-article-to-article (group topic article)
+  (catch 'found
+    (dolist (elem (nth 5 (assoc group nnultimate-groups)))
+      (when (and (= topic (nth 2 elem))
+		 (>= article (nth 3 elem))
+		 (< article (+ (- (nth 1 elem) (nth 0 elem)) 1
+			       (nth 3 elem))))
+	(throw 'found
+	       (+ (nth 0 elem) (- article (nth 3 elem))))))))
 
 (deffoo nnultimate-request-group (group &optional server dont-check)
   (nnultimate-possibly-change-server nil server)
@@ -244,7 +269,7 @@
 (deffoo nnultimate-request-list (&optional server)
   (nnultimate-possibly-change-server nil server)
   (mm-with-unibyte-buffer
-    (nnweb-insert
+    (mm-url-insert
      (if (string-match "/$" nnultimate-address)
 	 (concat nnultimate-address "Ultimate.cgi")
        nnultimate-address))
@@ -309,7 +334,7 @@
     (mm-with-unibyte-buffer
       (while furls
 	(erase-buffer)
-	(nnweb-insert (pop furls))
+	(mm-url-insert (pop furls))
 	(goto-char (point-min))
 	(setq parse (w3-parse-buffer (current-buffer)))
 	(setq contents
@@ -408,7 +433,7 @@
 	nnultimate-groups-alist)
   (with-temp-file (expand-file-name "groups" nnultimate-directory)
     (prin1 nnultimate-groups-alist (current-buffer))))
-    
+
 (defun nnultimate-init (server)
   "Initialize buffers and such."
   (unless (file-exists-p nnultimate-directory)

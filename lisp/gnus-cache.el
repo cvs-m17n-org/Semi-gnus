@@ -1,5 +1,5 @@
 ;;; gnus-cache.el --- cache interface for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -36,10 +36,12 @@
 (require 'gnus-range)
 (require 'gnus-start)
 (eval-when-compile
+  (if (not (fboundp 'gnus-agent-load-alist))
+      (defun gnus-agent-load-alist (group)))
   (require 'gnus-sum))
 
 (defcustom gnus-cache-active-file
-  (concat (file-name-as-directory gnus-cache-directory) "active")
+  (expand-file-name "active" gnus-cache-directory)
   "*The cache active file."
   :group 'gnus-cache
   :type 'file)
@@ -152,8 +154,8 @@ it's not cached."
   (group article headers ticked dormant unread &optional force)
   (when (and (or force (not (eq gnus-use-cache 'passive)))
 	     (numberp article)
-	     (> article 0)
-	     (vectorp headers))		; This might be a dummy article.
+	     (> article 0)		; This might be a dummy article.
+	     (vectorp headers))
     (let ((number article) file)
       ;; If this is a virtual group, we find the real group.
       (when (gnus-virtual-group-p group)
@@ -164,11 +166,7 @@ it's not cached."
       (when (and number
 		 (> number 0)		; Reffed article.
 		 (or force
-                     (and (or (not gnus-cacheable-groups)
-                              (string-match gnus-cacheable-groups group))
-                          (or (not gnus-uncacheable-groups)
-			      (not (string-match
-				    gnus-uncacheable-groups group)))
+		     (and (gnus-cache-fully-p group)
 			  (gnus-cache-member-of-class
 			   gnus-cache-enter-articles ticked dormant unread)))
 		 (not (file-exists-p (setq file (gnus-cache-file-name
@@ -187,7 +185,8 @@ it's not cached."
 	    (when (> (buffer-size) 0)
 	      (gnus-write-buffer-as-coding-system
 	       gnus-cache-write-file-coding-system file)
-	      (setq headers (nnheader-parse-head t))
+	      (nnheader-remove-body)
+	      (setq headers (nnheader-parse-naked-head))
 	      (mail-header-set-number headers number)
 	      (gnus-cache-change-buffer group)
 	      (set-buffer (cdr gnus-cache-buffer))
@@ -213,8 +212,9 @@ it's not cached."
 	      (nnheader-insert-nov headers)
 	      ;; Update the active info.
 	      (set-buffer gnus-summary-buffer)
-	      (gnus-cache-update-active group number)
-	      (push article gnus-newsgroup-cached)
+	      (gnus-cache-possibly-update-active group (cons number number))
+	      (setq gnus-newsgroup-cached
+		    (gnus-add-to-sorted-list gnus-newsgroup-cached article))
 	      (gnus-summary-update-secondary-mark article))
 	    t))))))
 
@@ -239,7 +239,7 @@ it's not cached."
 
 (defun gnus-cache-possibly-remove-articles-1 ()
   "Possibly remove some of the removable articles."
-  (unless (eq gnus-use-cache 'passive)
+  (when (gnus-cache-fully-p gnus-newsgroup-name)
     (let ((articles gnus-cache-removable-articles)
 	  (cache-articles gnus-newsgroup-cached)
 	  article)
@@ -287,9 +287,7 @@ it's not cached."
 	;; the normal way.
 	(let ((gnus-use-cache nil))
 	  (gnus-retrieve-headers articles group fetch-old))
-      (let ((uncached-articles (gnus-sorted-intersection
-				(gnus-sorted-complement articles cached)
-				articles))
+      (let ((uncached-articles (gnus-sorted-difference articles cached))
 	    (cache-file (gnus-cache-file-name group ".overview"))
 	    type)
 	;; We first retrieve all the headers that we don't have in
@@ -326,65 +324,6 @@ it's not cached."
 					   cached articles))
 	    type)))))))
 
-(defun gnus-cache-retrieve-parsed-headers (articles group &optional fetch-old
-						    dependencies force-new)
-  "Retrieve the parsed-headers for ARTICLES in GROUP."
-  (let ((cached
-	 (setq gnus-newsgroup-cached (gnus-cache-articles-in-group group))))
-    (if (not cached)
-	;; No cached articles here, so we just retrieve them
-	;; the normal way.
-	(let ((gnus-use-cache nil))
-	  (gnus-retrieve-parsed-headers articles group fetch-old
-					dependencies force-new))
-      (let ((uncached-articles (gnus-sorted-intersection
-				(gnus-sorted-complement articles cached)
-				articles))
-	    (cache-file (gnus-cache-file-name group ".overview")))
-	(gnus-cache-braid-headers
-	 ;; We first retrieve all the headers that we don't have in
-	 ;; the cache.
-	 (prog1
-	     (let ((gnus-use-cache nil))
-	       (when uncached-articles
-		 (and articles
-		      (gnus-retrieve-parsed-headers
-		       uncached-articles group fetch-old
-		       dependencies))
-		 ))
-	   (gnus-cache-save-buffers))
-	 ;; Then we insert the cached headers.
-	 (cond ((not (file-exists-p cache-file))
-		;; There are no cached headers.
-		)
-	       ((eq gnus-headers-retrieved-by 'nov)
-		(with-current-buffer nntp-server-buffer
-		  (erase-buffer)
-		  (nnheader-insert-file-contents cache-file)
-		  (nnheader-get-newsgroup-headers-xover*
-		   articles nil dependencies group)
-		  ))
-	       (t
-		;; We braid HEADs.
-		(nnheader-retrieve-headers-from-directory*
-		 cached
-		 (expand-file-name
-		  (file-name-as-directory
-		   (nnheader-translate-file-chars
-		    (if (gnus-use-long-file-name 'not-cache)
-			group
-		      (let ((group
-			     (nnheader-replace-chars-in-string group ?/ ?_)))
-			;; Translate the first colon into a slash.
-			(when (string-match ":" group)
-			  (aset group (match-beginning 0) ?/))
-			(nnheader-replace-chars-in-string group ?. ?/)))
-		    t))
-		  gnus-cache-directory)
-		 dependencies)
-		)))
-	))))
-
 (defun gnus-cache-enter-article (&optional n)
   "Enter the next N articles into the cache.
 If not given a prefix, use the process marked articles instead.
@@ -399,14 +338,16 @@ Returns the list of articles entered."
 		 gnus-newsgroup-name article
 		 (gnus-summary-article-header article)
 		 nil nil nil t)
+            (setq gnus-newsgroup-undownloaded (delq article gnus-newsgroup-undownloaded))
 	    (push article out))
 	(gnus-message 2 "Can't cache article %d" article))
+      (gnus-summary-update-download-mark article)
       (gnus-summary-update-secondary-mark article))
     (gnus-summary-next-subject 1)
     (gnus-summary-position-point)
     (nreverse out)))
 
-(defun gnus-cache-remove-article (n)
+(defun gnus-cache-remove-article (&optional n)
   "Remove the next N articles from the cache.
 If not given a prefix, use the process marked articles instead.
 Returns the list of articles removed."
@@ -418,7 +359,14 @@ Returns the list of articles removed."
       (setq article (pop articles))
       (gnus-summary-remove-process-mark article)
       (when (gnus-cache-possibly-remove-article article nil nil nil t)
+        (when gnus-newsgroup-agentized
+          (let ((alist (gnus-agent-load-alist gnus-newsgroup-name)))
+            (unless (cdr (assoc article alist))
+              (setq gnus-newsgroup-undownloaded
+                    (gnus-add-to-sorted-list 
+                     gnus-newsgroup-undownloaded article)))))
 	(push article out))
+      (gnus-summary-update-download-mark article)
       (gnus-summary-update-secondary-mark article))
     (gnus-summary-next-subject 1)
     (gnus-summary-position-point)
@@ -431,15 +379,20 @@ Returns the list of articles removed."
 (defun gnus-summary-insert-cached-articles ()
   "Insert all the articles cached for this group into the current buffer."
   (interactive)
-  (let ((cached (sort (copy-sequence gnus-newsgroup-cached) '>))
-	(gnus-verbose (max 6 gnus-verbose)))
-    (unless cached
-      (gnus-message 3 "No cached articles for this group"))
-    (while cached
-      (gnus-summary-goto-subject (pop cached) t))))
+  (let ((gnus-verbose (max 6 gnus-verbose)))
+    (if (not gnus-newsgroup-cached)
+	(gnus-message 3 "No cached articles for this group")
+      (gnus-summary-goto-subjects gnus-newsgroup-cached))))
 
-(defalias 'gnus-summary-limit-include-cached
-  'gnus-summary-insert-cached-articles)
+(defun gnus-summary-limit-include-cached ()
+  "Limit the summary buffer to articles that are cached."
+  (interactive)
+  (let ((gnus-verbose (max 6 gnus-verbose)))
+    (if gnus-newsgroup-cached
+	(progn
+	  (gnus-summary-limit gnus-newsgroup-cached)
+	  (gnus-summary-position-point))
+      (gnus-message 3 "No cached articles for this group"))))
 
 ;;; Internal functions.
 
@@ -474,20 +427,23 @@ Returns the list of articles removed."
       (and (not unread) (not ticked) (not dormant) (memq 'read class))))
 
 (defun gnus-cache-file-name (group article)
-  (concat (file-name-as-directory gnus-cache-directory)
-	  (file-name-as-directory
-	   (nnheader-translate-file-chars
-	    (if (gnus-use-long-file-name 'not-cache)
-		group
-	      (let ((group (nnheader-replace-duplicate-chars-in-string
-			    (nnheader-replace-chars-in-string group ?/ ?_)
-			    ?. ?_)))
-		;; Translate the first colon into a slash.
-		(when (string-match ":" group)
-		  (aset group (match-beginning 0) ?/))
-		(nnheader-replace-chars-in-string group ?. ?/)))
-	    t))
-	  (if (stringp article) article (int-to-string article))))
+  (expand-file-name
+   (if (stringp article) article (int-to-string article))
+   (file-name-as-directory
+    (expand-file-name
+     (nnheader-translate-file-chars
+      (if (gnus-use-long-file-name 'not-cache)
+	  group
+	(let ((group (nnheader-replace-duplicate-chars-in-string
+		      (nnheader-replace-chars-in-string group ?/ ?_)
+		      ?. ?_)))
+	  ;; Translate the first colon into a slash.
+	  (when (string-match ":" group)
+	    (setq group (concat (substring group 0 (match-beginning 0))
+				"/" (substring group (match-end 0)))))
+	  (nnheader-replace-chars-in-string group ?. ?/)))
+      t)
+     gnus-cache-directory))))
 
 (defun gnus-cache-update-article (group article)
   "If ARTICLE is in the cache, remove it and re-enter it."
@@ -522,10 +478,11 @@ Returns the list of articles removed."
 	(when (or (looking-at (concat (int-to-string number) "\t"))
 		  (search-forward (concat "\n" (int-to-string number) "\t")
 				  (point-max) t))
-	  (delete-region (progn (beginning-of-line) (point))
-			 (progn (forward-line 1) (point)))))
-      (setq gnus-newsgroup-cached
-	    (delq article gnus-newsgroup-cached))
+	  (gnus-delete-line)))
+      (unless (setq gnus-newsgroup-cached
+		    (delq article gnus-newsgroup-cached))
+	(gnus-sethash gnus-newsgroup-name nil gnus-cache-active-hashtb)
+	(setq gnus-cache-active-altered t))
       (gnus-summary-update-secondary-mark article)
       t)))
 
@@ -539,9 +496,13 @@ Returns the list of articles removed."
 			  (directory-files dir nil "^[0-9]+$" t))
 		  '<))
       ;; Update the cache active file, just to synch more.
-      (when articles
-	(gnus-cache-update-active group (car articles) t)
-	(gnus-cache-update-active group (car (last articles))))
+      (if articles
+	  (progn
+	    (gnus-cache-update-active group (car articles) t)
+	    (gnus-cache-update-active group (car (last articles))))
+	(when (gnus-gethash group gnus-cache-active-hashtb)
+	  (gnus-sethash group nil gnus-cache-active-hashtb)
+	  (setq gnus-cache-active-altered t)))
       articles)))
 
 (defun gnus-cache-braid-nov (group cached &optional file)
@@ -564,13 +525,13 @@ Returns the list of articles removed."
 		  (< (read (current-buffer)) (car cached)))
 	(forward-line 1))
       (beginning-of-line)
-      (save-excursion
-	(set-buffer cache-buf)
-	(if (search-forward (concat "\n" (int-to-string (car cached)) "\t")
-			    nil t)
-	    (setq beg (progn (beginning-of-line) (point))
-		  end (progn (end-of-line) (point)))
-	  (setq beg nil)))
+      (set-buffer cache-buf)
+      (if (search-forward (concat "\n" (int-to-string (car cached)) "\t")
+			  nil t)
+	  (setq beg (gnus-point-at-bol)
+		end (progn (end-of-line) (point)))
+	(setq beg nil))
+      (set-buffer nntp-server-buffer)
       (when beg
 	(insert-buffer-substring cache-buf beg end)
 	(insert "\n"))
@@ -609,36 +570,6 @@ Returns the list of articles removed."
       (insert-buffer-substring cache-buf)
       (setq cached (cdr cached)))
     (kill-buffer cache-buf)))
-
-(defun gnus-cache-braid-headers (headers cached-headers)
-  (if cached-headers
-      (if headers
-	  (let (cached-header hrest nhrest)
-	    (nconc (catch 'tag
-		     (while cached-headers
-		       (setq cached-header (car cached-headers))
-		       (if (< (mail-header-number cached-header)
-			      (mail-header-number (car headers)))
-			   (throw 'tag (nreverse cached-headers))
-			 (setq hrest headers
-			       nhrest (cdr hrest))
-			 (while (and nhrest
-				     (> (mail-header-number cached-header)
-					(mail-header-number (car nhrest))))
-			   (setq hrest nhrest
-				 nhrest (cdr nhrest))
-			   )
-			 ;;(if nhrest
-			 (setcdr hrest (cons cached-header nhrest))
-                         ;; (setq headers
-                         ;;         (nconc headers (list cached-header)))
-			 ;; (throw 'tag nil)
-			 ;;)
-			 )
-		       (setq cached-headers (cdr cached-headers))))
-		   headers))
-	(nreverse cached-headers))
-    headers))
 
 ;;;###autoload
 (defun gnus-jog-cache ()
@@ -694,6 +625,24 @@ $ emacs -batch -l ~/.emacs -l gnus -f gnus-jog-cache"
     (gnus-write-active-file gnus-cache-active-file gnus-cache-active-hashtb t)
     ;; Mark the active hashtb as unaltered.
     (setq gnus-cache-active-altered nil)))
+
+(defun gnus-cache-possibly-update-active (group active)
+  "Update active info bounds of GROUP with ACTIVE if necessary.
+The update is performed if ACTIVE contains a higher or lower bound
+than the current."
+  (let ((lower t) (higher t))
+    (if gnus-cache-active-hashtb
+	(let ((cache-active (gnus-gethash group gnus-cache-active-hashtb)))
+	  (when cache-active
+	    (unless (< (car active) (car cache-active))
+	      (setq lower nil))
+	    (unless (> (cdr active) (cdr cache-active))
+	      (setq higher nil))))
+      (gnus-cache-read-active))
+    (when lower
+      (gnus-cache-update-active group (car active) t))
+    (when higher
+      (gnus-cache-update-active group (cdr active)))))
 
 (defun gnus-cache-update-active (group number &optional low)
   "Update the upper bound of the active info of GROUP to NUMBER.
@@ -768,6 +717,19 @@ If LOW, update the lower bound instead."
   "Move the cache tree to somewhere else."
   (interactive "FMove the cache tree to: ")
   (rename-file gnus-cache-directory dir))
+
+(defun gnus-cache-fully-p (&optional group)
+  "Returns non-nil if the cache should be fully used.
+If GROUP is non-nil, also cater to `gnus-cacheable-groups' and
+`gnus-uncacheable-groups'."
+  (and gnus-use-cache
+       (not (eq gnus-use-cache 'passive))
+       (if (null group)
+	   t
+	 (and (or (not gnus-cacheable-groups)
+		  (string-match gnus-cacheable-groups group))
+	      (or (not gnus-uncacheable-groups)
+		  (not (string-match gnus-uncacheable-groups group)))))))
 
 (provide 'gnus-cache)
 

@@ -1,5 +1,5 @@
 ;;; mm-partial.el --- showing message/partial
-;; Copyright (C) 2000 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001, 2002 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: message partial
@@ -25,8 +25,7 @@
 
 ;;; Code:
 
-(eval-when-compile 
-  (require 'cl))
+(eval-when-compile (require 'cl))
 
 (require 'gnus-sum)
 (require 'mm-util)
@@ -40,13 +39,14 @@
     (while (setq header (pop headers))
       (unless (eq (aref header 0) art)
 	(mm-with-unibyte-buffer
-	  (gnus-request-article-this-buffer (aref header 0) 
+	  (gnus-request-article-this-buffer (aref header 0)
 					    gnus-newsgroup-name)
 	  (when (search-forward id nil t)
-	    (let ((nhandles (mm-dissect-buffer)) nid)
+	    (let ((nhandles (mm-dissect-buffer
+			     nil gnus-article-loose-mime)) nid)
 	      (if (consp (car nhandles))
 		  (mm-destroy-parts nhandles)
-		(setq nid (cdr (assq 'id 
+		(setq nid (cdr (assq 'id
 				     (cdr (mm-handle-type nhandles)))))
 		(if (not (equal id nid))
 		    (mm-destroy-parts nhandles)
@@ -56,50 +56,47 @@
 ;;;###autoload
 (defun mm-inline-partial (handle &optional no-display)
   "Show the partial part of HANDLE.
-This function replaces the buffer of HANDLE with a buffer contains 
+This function replaces the buffer of HANDLE with a buffer contains
 the entire message.
 If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
-  (let ((id (cdr (assq 'id (cdr (mm-handle-type handle))))) 
+  (let ((id (cdr (assq 'id (cdr (mm-handle-type handle)))))
 	phandles
 	(b (point)) (n 1) total
 	phandle nn ntotal
 	gnus-displaying-mime handles buffer)
     (unless (mm-handle-cache handle)
       (unless id
-	(error "Can not find message/partial id."))
+	(error "Can not find message/partial id"))
       (setq phandles
-	    (sort (cons handle 
+	    (sort (cons handle
 			(mm-partial-find-parts
-			 id 
+			 id
 			 (save-excursion
 			   (set-buffer gnus-summary-buffer)
 			   (gnus-summary-article-number))))
 		  #'(lambda (a b)
-		      (let ((anumber (string-to-number 
-				      (cdr (assq 'number 
+		      (let ((anumber (string-to-number
+				      (cdr (assq 'number
 						 (cdr (mm-handle-type a))))))
-			    (bnumber (string-to-number 
-				      (cdr (assq 'number 
+			    (bnumber (string-to-number
+				      (cdr (assq 'number
 						 (cdr (mm-handle-type b)))))))
 			(< anumber bnumber)))))
       (setq gnus-article-mime-handles
-	    (append (if (listp (car gnus-article-mime-handles))
-			gnus-article-mime-handles
-		      (list gnus-article-mime-handles))
-		    phandles))
+	    (mm-merge-handles gnus-article-mime-handles phandles))
       (save-excursion
 	(set-buffer (generate-new-buffer " *mm*"))
 	(while (setq phandle (pop phandles))
-	  (setq nn (string-to-number 
-		    (cdr (assq 'number 
+	  (setq nn (string-to-number
+		    (cdr (assq 'number
 			       (cdr (mm-handle-type phandle))))))
-	  (setq ntotal (string-to-number 
-			(cdr (assq 'total 
+	  (setq ntotal (string-to-number
+			(cdr (assq 'total
 				   (cdr (mm-handle-type phandle))))))
 	  (if ntotal
 	      (if total
-		  (unless (eq total ntotal) 
-		  (error "The numbers of total are different."))
+		  (unless (eq total ntotal)
+		    (error "The numbers of total are different"))
 		(setq total ntotal)))
 	  (unless (< nn n)
 	    (unless (eq nn n)
@@ -118,7 +115,7 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 	    (error "Missing part %d" n))
 	(kill-buffer (mm-handle-buffer handle))
 	(goto-char (point-min))
-	(let ((point (if (search-forward "\n\n" nil t) 
+	(let ((point (if (search-forward "\n\n" nil t)
 			 (1- (point))
 		       (point-max))))
 	  (goto-char (point-min))
@@ -138,11 +135,7 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 	  (when handles
 	    ;; It is in article buffer.
 	    (setq gnus-article-mime-handles
-		  (nconc (if (listp (car gnus-article-mime-handles))
-			   gnus-article-mime-handles
-			   (list gnus-article-mime-handles))
-			 (if (listp (car handles)) 
-			     handles (list handles)))))
+		  (mm-merge-handles gnus-article-mime-handles handles)))
 	  (mm-handle-set-undisplayer
 	   handle
 	   `(lambda ()
@@ -150,10 +143,12 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 		(condition-case nil
 		    ;; This is only valid on XEmacs.
 		    (mapcar (lambda (prop)
-			    (remove-specifier
-			     (face-property 'default prop) (current-buffer)))
+			      (remove-specifier
+			       (face-property 'default prop) (current-buffer)))
 			    '(background background-pixmap foreground))
 		  (error nil))
 		(delete-region ,(point-min-marker) ,(point-max-marker))))))))))
 
-;; mm-partial.el ends here
+(provide 'mm-partial)
+
+;;; mm-partial.el ends here

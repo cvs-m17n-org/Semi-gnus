@@ -305,4 +305,4 @@ presentation buffer."
 
 (provide 'vcard)
 
-;;; vcard.el ends here.
+;;; vcard.el ends here

@@ -1,6 +1,6 @@
 ;;; rfc2231.el --- Functions for decoding rfc2231 headers
 
-;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2002, 2003 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -27,6 +27,7 @@
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'gnus-clfns))
 
+(eval-when-compile (require 'cl))
 (require 'ietf-drums)
 (require 'rfc2047)
 
@@ -114,10 +115,11 @@ The list will be on the form
 	      (setq value
 		    (buffer-substring (1+ (point))
 				      (progn (forward-sexp 1) (1- (point))))))
-	     ((and (memq c ttoken)
+	     ((and (or (memq c ttoken)
+		       (> c ?\177)) ;; EXTENSION: Support non-ascii chars.
 		   (not (memq c stoken)))
 	      (setq value (buffer-substring
-			   (point) (progn (forward-sexp 1) (point)))))
+			   (point) (progn (forward-sexp) (point)))))
 	     (t
 	      (error "Invalid header: %s" string)))
 	    (when encoded
@@ -152,9 +154,9 @@ These look like \"us-ascii'en-us'This%20is%20%2A%2A%2Afun%2A%2A%2A\"."
       ;; Encode using the charset, if any.
       (when (and (mm-multibyte-p)
 		 (> (length elems) 1)
-		 (not (equal (intern (car elems)) 'us-ascii)))
+		 (not (equal (intern (downcase (car elems))) 'us-ascii)))
 	(mm-decode-coding-region (point-min) (point-max)
-				 (intern (car elems))))
+				 (intern (downcase (car elems)))))
       (buffer-string))))
 
 (defun rfc2231-encode-string (param value)

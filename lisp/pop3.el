@@ -1,14 +1,15 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;;      Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
-;; Maintainer: FSF
+;;      Katsumi Yamaoka <yamaoka@jpl.org>
+;; Maintainer: Volunteers
 ;; Keywords: mail
 
-;; This file is part of GNU Emacs.
+;; This file is part of T-gnus.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
@@ -34,10 +35,25 @@
 
 ;; This program was inspired by Kyle E. Jones's vm-pop program.
 
+;; You have to set the variable `pop3-connection-type' to `ssl' or
+;; `tls' expressly, if you would like to use this module with Gnus
+;; (not T-gnus) for those connection types.  For examples:
+;;
+;;(setq mail-sources '((pop :server "POPSERVER" :port 995 :connection ssl
+;;                          :authentication apop)))
+;;(setq pop3-connection-type 'ssl)
+
 ;;; Code:
 
-(eval-when-compile (require 'cl))
-(eval-when-compile (require 'static))
+(eval-when-compile
+  (require 'cl)
+  ;; For compiling this module in Gnus with XEmacs -no-autoloads.
+  (require 'advice))
+
+;; as-binary-process, open-network-stream-as-binary, write-region-as-binary
+(require 'pces)
+;; exec-installed-p
+(require 'path-util)
 
 (require 'mail-utils)
 
@@ -76,9 +92,9 @@ Used for APOP authentication.")
 (defvar pop3-uidl-file-name "~/.uidls"
   "File in which to store the UIDL of processed messages.")
 
-(defvar pop3-uidl-support 'dont-know
-  "Whether the server supports UIDL.
-Nil means no, t means yes, not-nil-or-t means yet to be determined.")
+(defvar pop3-uidl-support nil
+  "Alist of servers and flags of whether they support UIDLs.
+Users don't have to set this value.")
 
 (defvar pop3-uidl-obarray (make-vector 31 0)
   "Uidl hash table.")
@@ -87,7 +103,6 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
 (defvar pop3-debug nil)
 
 (eval-and-compile
-  (autoload 'open-ssl-stream "ssl")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls"))
 
@@ -121,7 +136,7 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     ;; query for password
     (if (and pop3-password-required (not pop3-password))
 	(setq pop3-password
-	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
+	      (read-passwd (format "Password for %s: " pop3-maildrop))))
     (cond ((equal 'apop pop3-authentication-scheme)
 	   (pop3-apop process pop3-maildrop))
 	  ((equal 'pass pop3-authentication-scheme)
@@ -162,6 +177,28 @@ Nil means no, t means yes, not-nil-or-t means yet to be determined.")
     (kill-buffer crashbuf)
     message-count))
 
+(defun pop3-get-message-count ()
+  "Return the number of messages in the maildrop."
+  (let* ((process (pop3-open-server pop3-mailhost pop3-port))
+	 message-count
+	 (pop3-password pop3-password)
+	 )
+    ;; for debugging only
+    (if pop3-debug (switch-to-buffer (process-buffer process)))
+    ;; query for password
+    (if (and pop3-password-required (not pop3-password))
+	(setq pop3-password
+	      (read-passwd (format "Password for %s: " pop3-maildrop))))
+    (cond ((equal 'apop pop3-authentication-scheme)
+	   (pop3-apop process pop3-maildrop))
+	  ((equal 'pass pop3-authentication-scheme)
+	   (pop3-user process pop3-maildrop)
+	   (pop3-pass process))
+	  (t (error "Invalid POP3 authentication scheme")))
+    (setq message-count (car (pop3-stat process)))
+    (pop3-quit process)
+    message-count))
+
 (defun pop3-open-server (mailhost port)
   "Open TCP connection to MAILHOST on PORT.
 Returns the process associated with the connection.
@@ -189,22 +226,23 @@ Argument PORT specifies connecting port."
       process)))
 
 (defun pop3-open-ssl-stream-1 (name buffer host service extra-arg)
-  (require 'path-util)
+  (require 'ssl)
   (let* ((ssl-program-name
 	  pop3-ssl-program-name)
 	 (ssl-program-arguments
-	  `(,@pop3-ssl-program-arguments ,extra-arg
+	  `(,@pop3-ssl-program-arguments
+	    ,extra-arg
 	    "-connect" ,(format "%s:%d" host service)))
-         (process (open-ssl-stream name buffer host service)))
+	 (process (open-ssl-stream name buffer host service)))
     (when process
       (with-current-buffer buffer
 	(goto-char (point-min))
 	(while (and (memq (process-status process) '(open run))
-                    (goto-char (point-max))
-                    (forward-line -1)
-                    (not (looking-at "+OK")))
-          (accept-process-output process 1)
-          (sit-for 1))
+		    (goto-char (point-max))
+		    (forward-line -1)
+		    (not (looking-at "+OK")))
+	  (nnheader-accept-process-output process)
+	  (sit-for 1))
 	(delete-region (point-min) (point)))
       (and process (memq (process-status process) '(open run))
 	   process))))
@@ -213,16 +251,9 @@ Argument PORT specifies connecting port."
   "Open a SSL connection for a service to a host.
 Returns a subprocess-object to represent the connection.
 Args are NAME BUFFER HOST SERVICE."
-  (cond ((eq system-type 'windows-nt)
-	 (let (selective-display
-	       (coding-system-for-write 'binary)
-	       (coding-system-for-read 'raw-text-dos))
-	   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
-	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
-	(t
-	 (as-binary-process
-	   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
-	       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))))
+  (as-binary-process
+   (or (pop3-open-ssl-stream-1 name buffer host service "-ssl3")
+       (pop3-open-ssl-stream-1 name buffer host service "-ssl2"))))
 
 (defun pop3-open-tls-stream (name buffer host service)
   "Open a TLSv1 connection for a service to a host.
@@ -244,26 +275,26 @@ Args are NAME BUFFER HOST SERVICE."
     (insert output)))
 
 (defun pop3-send-command (process command)
-    (set-buffer (process-buffer process))
-    (goto-char (point-max))
-;;    (if (= (aref command 0) ?P)
-;;	(insert "PASS <omitted>\r\n")
-;;      (insert command "\r\n"))
-    (setq pop3-read-point (point))
-    (goto-char (point-max))
-    (process-send-string process (concat command "\r\n"))
-    )
+  (set-buffer (process-buffer process))
+  (goto-char (point-max))
+;;  (if (= (aref command 0) ?P)
+;;      (insert "PASS <omitted>\r\n")
+;;    (insert command "\r\n"))
+  (setq pop3-read-point (point))
+  (goto-char (point-max))
+  (process-send-string process (concat command "\r\n"))
+  )
 
 (defun pop3-read-response (process &optional return)
-  "Read the response from the server.
-Return the response string if optional second argument is non-nil."
+  "Read the response from the server PROCESS.
+Return the response string if optional second argument RETURN is non-nil."
   (let ((case-fold-search nil)
 	match-end)
     (save-excursion
       (set-buffer (process-buffer process))
       (goto-char pop3-read-point)
       (while (not (search-forward "\r\n" nil t))
-	(accept-process-output process 3)
+	(nnheader-accept-process-output process)
 	(goto-char pop3-read-point))
       (setq match-end (point))
       (goto-char pop3-read-point)
@@ -276,17 +307,6 @@ Return the response string if optional second argument is non-nil."
 	      (buffer-substring (point) match-end)
 	    t)
 	  )))))
-
-(defvar pop3-read-passwd nil)
-(defun pop3-read-passwd (prompt)
-  (if (not pop3-read-passwd)
-      (if (fboundp 'read-passwd)
-	  (setq pop3-read-passwd 'read-passwd)
-	(if (load "passwd" t)
-	    (setq pop3-read-passwd 'read-passwd)
-	  (autoload 'ange-ftp-read-passwd "ange-ftp")
-	  (setq pop3-read-passwd 'ange-ftp-read-passwd))))
-  (funcall pop3-read-passwd prompt))
 
 (defun pop3-clean-region (start end)
   (setq end (set-marker (make-marker) end))
@@ -303,10 +323,31 @@ Return the response string if optional second argument is non-nil."
       (forward-char)))
   (set-marker end nil))
 
+(eval-when-compile (defvar parse-time-months))
+
+;; Copied from message-make-date.
+(defun pop3-make-date (&optional now)
+  "Make a valid date header.
+If NOW, use that time instead."
+  (require 'parse-time)
+  (let* ((now (or now (current-time)))
+	 (zone (nth 8 (decode-time now)))
+	 (sign "+"))
+    (when (< zone 0)
+      (setq sign "-")
+      (setq zone (- zone)))
+    (concat
+     (format-time-string "%d" now)
+     ;; The month name of the %b spec is locale-specific.  Pfff.
+     (format " %s "
+	     (capitalize (car (rassoc (nth 4 (decode-time now))
+				      parse-time-months))))
+     (format-time-string "%Y %H:%M:%S " now)
+     ;; We do all of this because XEmacs doesn't have the %z spec.
+     (format "%s%02d%02d" sign (/ zone 3600) (/ (% zone 3600) 60)))))
+
 (defun pop3-munge-message-separator (start end)
   "Check to see if a message separator exists.  If not, generate one."
-  (if (not (fboundp 'parse-time-string))
-      (autoload 'parse-time-string "parse-time"))
   (save-excursion
     (save-restriction
       (narrow-to-region start end)
@@ -315,27 +356,50 @@ Return the response string if optional second argument is non-nil."
 		   (looking-at "\001\001\001\001\n") ; MMDF
 		   (looking-at "BABYL OPTIONS:") ; Babyl
 		   ))
-	  (let ((from (mail-strip-quoted-names (mail-fetch-field "From")))
-		(date (mail-fetch-field "Date"))
-		(From_))
+	  (let* ((from (mail-strip-quoted-names (mail-fetch-field "From")))
+		 (tdate (mail-fetch-field "Date"))
+		 (date (split-string (or (and tdate
+					      (not (string= "" tdate))
+					      tdate)
+					 (pop3-make-date))
+				     " "))
+		 (From_))
 	    ;; sample date formats I have seen
 	    ;; Date: Tue, 9 Jul 1996 09:04:21 -0400 (EDT)
 	    ;; Date: 08 Jul 1996 23:22:24 -0400
 	    ;; should be
 	    ;; Tue Jul 9 09:04:21 1996
-	    (setq date (format-time-string
-			"%a %b %e %T %Y"
-			(if date
-			    (condition-case nil
-				(apply 'encode-time (parse-time-string date))
-			      (error (current-time)))
-			  (current-time))))
+	    (setq date
+		  (cond ((not date)
+			 "Tue Jan 1 00:00:0 1900")
+			((string-match "[A-Z]" (nth 0 date))
+			 (format "%s %s %s %s %s"
+				 (nth 0 date) (nth 2 date) (nth 1 date)
+				 (nth 4 date) (nth 3 date)))
+			(t
+			 ;; this really needs to be better but I don't feel
+			 ;; like writing a date to day converter.
+			 (format "Sun %s %s %s %s"
+				 (nth 1 date) (nth 0 date)
+				 (nth 3 date) (nth 2 date)))
+			))
 	    (setq From_ (format "\nFrom %s  %s\n" from date))
 	    (while (string-match "," From_)
 	      (setq From_ (concat (substring From_ 0 (match-beginning 0))
 				  (substring From_ (match-end 0)))))
 	    (goto-char (point-min))
-	    (insert From_))))))
+	    (insert From_)
+	    (if (search-forward "\n\n" nil t)
+		nil
+	      (goto-char (point-max))
+	      (insert "\n"))
+	    (narrow-to-region (point) (point-max))
+	    (let ((size (- (point-max) (point-min))))
+	      (goto-char (point-min))
+	      (widen)
+	      (forward-line -1)
+	      (insert (format "Content-Length: %s\n" size)))
+	    )))))
 
 ;; UIDL support
 
@@ -353,7 +417,8 @@ Return the response string if optional second argument is non-nil."
       ;; only retrieve messages matching our regexp or in the uidl list
       (when (and
 	     ;; remove elements not in the uidl, this assumes the uidl is short
-	     (or (not (eq pop3-uidl-support t))
+	     (or (not (and pop3-leave-mail-on-server
+			   (cdr (assoc pop3-mailhost pop3-uidl-support))))
 		 (memq (caar messages) uidl))
 	     (caar messages)
 	     ;; don't download messages that are too large
@@ -364,14 +429,18 @@ Return the response string if optional second argument is non-nil."
 				     (pop3-top process (caar messages) 0)))))
 	(push (car messages) out))
       (setq messages (cdr messages)))
-    (cons total (reverse out))))
+    (cons total (nreverse out))))
 
 (defun pop3-get-uidl (process)
   "Use PROCESS to get a list of unread message numbers."
-  (let ((messages (pop3-uidl process)) uidl)
-    (if (or (null messages) (null pop3-uidl-support))
-	(setq pop3-uidl-support nil)
-      (setq pop3-uidl-support t)
+  (let ((messages (pop3-uidl process))
+	(support (assoc pop3-mailhost pop3-uidl-support))
+	uidl)
+    (if support
+	(setcdr support (and messages t))
+      (push (cons pop3-mailhost (and messages t))
+	    pop3-uidl-support))
+    (when messages
       (save-excursion
 	(with-temp-buffer
 	  (when (file-readable-p pop3-uidl-file-name)
@@ -380,15 +449,13 @@ Return the response string if optional second argument is non-nil."
 	  (while (looking-at "\\([^ \n\t]+\\)")
 	    (set (intern (match-string 1) pop3-uidl-obarray)
 		 (cons nil t))
-	    (forward-line 1))
-	  ))
+	    (forward-line 1))))
       (dolist (message (cdr messages))
 	(if (setq uidl (intern-soft (cdr message) pop3-uidl-obarray))
 	    (setcar (symbol-value uidl) (car message))
 	  (set (intern (cdr message) pop3-uidl-obarray)
 	       (cons (car message) nil))))
-      (pop3-get-unread-message-numbers))
-    ))
+      (pop3-get-unread-message-numbers))))
 
 (defun pop3-get-unread-message-numbers ()
   "Return a sorted list of unread msg numbers to retrieve."
@@ -431,7 +498,7 @@ Return the response string if optional second argument is non-nil."
   (pop3-send-command process (format "USER %s" user))
   (let ((response (pop3-read-response process t)))
     (if (not (and response (string-match "+OK" response)))
-	(error (format "USER %s not valid." user)))))
+	(error (format "USER %s not valid" user)))))
 
 (defun pop3-pass (process)
   "Send authentication information to the server."
@@ -440,40 +507,55 @@ Return the response string if optional second argument is non-nil."
     (if (not (and response (string-match "+OK" response)))
 	(pop3-quit process))))
 
-(static-unless (and (fboundp 'md5) (subrp (symbol-function 'md5)))
-  (eval-and-compile
-    (require 'path-util)
-    (if (module-installed-p 'md5)
-	(progn
-	  (autoload 'md5 "md5")
-	  (fset 'pop3-md5 'md5))
+;; When this file is being compiled in the Gnus (not T-gnus) source
+;; tree, `md5' might have been defined in w3/md5.el, ./lpath.el or one
+;; of some other libraries and `md5' will accept only 3 arguments.  We
+;; will deceive the byte-compiler not to say warnings.
+(eval-and-compile
+  (if (fboundp 'eval-when)
+      ;; `eval-when' might not be provided when loading .el file.
+      (eval-when 'compile
+	(let ((def (assq 'md5 byte-compile-function-environment)))
+	  (if def
+	      (setcdr def '(lambda (object &optional start end
+					   coding-system noerror)))
+	    (setq byte-compile-function-environment
+		  (cons '(md5 . (lambda (object &optional start end
+						coding-system noerror)))
+			byte-compile-function-environment)))))))
 
-      (defvar pop3-md5-program "md5"
-	"*Program to encode its input in MD5.")
-
-      (defun pop3-md5 (string)
-	(with-temp-buffer
-	  (insert string)
-	  (call-process-region (point-min) (point-max)
-			       (or shell-file-name "/bin/sh")
-			       t (current-buffer) nil
-			       "-c" pop3-md5-program)
-	  ;; The meaningful output is the first 32 characters.
-	  ;; Don't return the newline that follows them!
-	  (buffer-substring (point-min) (+ (point-min) 32))))
-      )))
+;; Note that `pop3-md5' should never encode a given string to use for
+;; the apop authentication.
+(eval-and-compile
+  (if (fboundp 'md5)
+      (if (condition-case nil
+	      (md5 "\
+Check whether the 4th argument CODING-SYSTEM is allowed"
+		   nil nil 'binary)
+	    (error nil))
+	  ;; Emacs 21 or XEmacs 21
+	  ;; (md5 OBJECT &optional START END CODING-SYSTEM NOERROR)
+	  (defun pop3-md5 (string)
+	    (md5 string nil nil 'binary))
+	;; The reason why the program reaches here:
+	;; 1. XEmacs 20 is running and the built-in `md5' doesn't
+	;;    allow the 4th argument.
+	;; 2. `md5' has been defined by one of some lisp libraries.
+	;; 3. This file is being compiled in the Gnus source tree,
+	;;    and `md5' has been defined in lpath.el.
+	(defalias 'pop3-md5 'md5))
+    ;; The lisp function will be provided by FLIM or other libraries.
+    (autoload 'md5 "md5")
+    (defalias 'pop3-md5 'md5)))
 
 (defun pop3-apop (process user)
   "Send alternate authentication information to the server."
   (let ((pass pop3-password))
     (if (and pop3-password-required (not pass))
 	(setq pass
-	      (pop3-read-passwd (format "Password for %s: " pop3-maildrop))))
+	      (read-passwd (format "Password for %s: " pop3-maildrop))))
     (if pass
-	(let ((hash (static-if (and (fboundp 'md5)
-				    (subrp (symbol-function 'md5)))
-			(md5 (concat pop3-timestamp pass))
-		      (pop3-md5 (concat pop3-timestamp pass)))))
+	(let ((hash (pop3-md5 (concat pop3-timestamp pass))))
 	  (pop3-send-command process (format "APOP %s %s" user hash))
 	  (let ((response (pop3-read-response process t)))
 	    (if (not (and response (string-match "+OK" response)))
@@ -559,7 +641,7 @@ where
   (if msgno
       (pop3-send-command process (format "UIDL %d" msgno))
     (pop3-send-command process "UIDL"))
-  
+
   (if (null (pop3-read-response process t))
       nil ;; UIDL is not supported on this server
     (let (pairs uidl)
@@ -623,7 +705,7 @@ If msgno is invalid, return nil.  Otherwise, return a string."
     (set-buffer (process-buffer process))
     (goto-char start)
     (while (not (re-search-forward "^\\.\r\n" nil t))
-      (accept-process-output process 3)
+      (nnheader-accept-process-output process)
       (goto-char start))
     (setq pop3-read-point (point-marker))
     (goto-char (match-beginning 0))

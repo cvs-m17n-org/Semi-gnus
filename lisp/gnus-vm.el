@@ -1,5 +1,7 @@
 ;;; gnus-vm.el --- vm interface for Gnus
-;; Copyright (C) 1994,95,96,97,98,99 Free Software Foundation, Inc.
+
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
+;;	Free Software Foundation, Inc.
 
 ;; Author: Per Persson <pp@gnu.ai.mit.edu>
 ;;         Katsumi Yamaoka <yamaoka@jpl.org>
@@ -47,7 +49,7 @@
 (defvar vm-folder-history)
 (defvar vm-primary-inbox)
 (defvar vm-use-toolbar)
-  
+
 (defun gnus-vm-make-folder (&optional buffer)
   (let ((article (or buffer (current-buffer)))
 	(tmp-folder (generate-new-buffer " *tmp-folder*"))
@@ -162,4 +164,4 @@ save those articles instead."
 
 (provide 'gnus-vm)
 
-;;; gnus-vm.el ends here.
+;;; gnus-vm.el ends here

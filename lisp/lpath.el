@@ -1,7 +1,5 @@
 ;; Shut up.
 
-(defvar byte-compile-default-warnings)
-
 (defun maybe-fbind (args)
   (while args
     (or (fboundp (car args))
@@ -11,103 +9,114 @@
 (defun maybe-bind (args)
   (mapcar (lambda (var) (unless (boundp var) (set var nil))) args))
 
-(maybe-fbind '(babel-fetch
-	       babel-wash create-image decode-coding-string display-graphic-p
-	       find-image font-create-object gnus-mule-get-coding-system
-	       font-lock-set-defaults
+(maybe-fbind '(Info-directory
+	       Info-menu bbdb-create-internal bbdb-records create-image
+	       display-graphic-p display-time-event-handler find-image
 	       image-size image-type-available-p insert-image
-	       make-temp-file message-xmas-redefine
-	       mail-aliases-setup mm-copy-tree
-	       mule-write-region-no-coding-system put-image
-	       rmail-select-summary rmail-summary-exists rmail-update-summary
-	       sc-cite-regexp set-font-family set-font-size temp-directory
-	       url-view-url vcard-pretty-print
-	       url-insert-file-contents
-	       w3-coding-system-for-mime-charset w3-prepare-buffer w3-region
-	       widget-make-intangible x-defined-colors))
-
-(maybe-bind '(adaptive-fill-first-line-regexp
-	      adaptive-fill-regexp babel-history babel-translations
-	      default-enable-multibyte-characters
-	      display-time-mail-function imap-password mail-mode-hook
-	      mc-pgp-always-sign
-	      nnoo-definition-alist
-	      url-current-callback-func url-be-asynchronous
-	      url-current-callback-data url-working-buffer
-	      url-current-mime-headers w3-meta-charset-content-type-regexp
-	      w3-meta-content-type-charset-regexp))
+	       make-mode-line-mouse-map make-temp-file open-ssl-stream
+	       propertize put-image replace-regexp-in-string
+	       rmail-msg-is-pruned rmail-msg-restore-non-pruned-header
+	       sort-coding-systems spam-BBDB-register-routine
+	       spam-enter-ham-BBDB string-to-multibyte tool-bar-add-item
+	       tool-bar-add-item-from-menu tool-bar-local-item-from-menu
+	       url-http-file-exists-p vcard-pretty-print w32-focus-frame
+	       w3m-charset-to-coding-system x-focus-frame))
+(maybe-bind '(filladapt-mode
+	      mc-pgp-always-sign mm-w3m-mode-map rmail-enable-mime-composing
+	      rmail-insert-mime-forwarded-message-function
+	      w3m-cid-retrieve-function-alist w3m-current-buffer
+	      w3m-display-inline-images w3m-meta-content-type-charset-regexp
+	      w3m-minor-mode-map))
 
 (if (featurep 'xemacs)
     (progn
-      (defvar track-mouse nil)
-      (maybe-fbind '(char-charset
-		     coding-system-get compute-motion coordinates-in-window-p
-		     delete-overlay easy-menu-create-keymaps
-		     error-message-string event-click-count event-end
-		     event-start facemenu-add-new-face facemenu-get-face
+      (maybe-fbind '(Info-directory
+		     Info-menu ccl-execute-on-string char-charset charsetp
+		     coding-system-get coding-system-list coding-system-p
+		     decode-coding-region decode-coding-string
+		     define-ccl-program delete-overlay detect-coding-region
+		     encode-coding-region encode-coding-string
+		     event-click-count event-end event-start
 		     find-charset-region find-coding-systems-for-charsets
-		     find-coding-systems-region find-non-ascii-charset-region
-		     frame-face-alist get-charset-property internal-find-face
-		     internal-next-face-id mail-abbrevs-setup make-char-table
-		     make-face-internal make-face-x-resource-internal
-		     make-overlay mouse-minibuffer-check mouse-movement-p
-		     mouse-scroll-subr overlay-buffer overlay-end
-		     overlay-get overlay-lists overlay-put
-		     overlay-start posn-point posn-window
-		     read-event read-event run-with-idle-timer
-		     set-buffer-multibyte set-char-table-range
-		     set-face-stipple set-frame-face-alist track-mouse
-		     url-retrieve w3-form-encode-xwfu window-at
-		     window-edges x-color-values x-popup-menu))
-      (maybe-bind '(buffer-display-table
-		    buffer-file-coding-system font-lock-defaults
-		    global-face-data gnus-article-x-face-too-ugly
-		    gnus-newsgroup-charset gnus-newsgroup-emphasis-alist
-		    gnus-newsgroup-name mark-active
-		    mouse-selection-click-count
-		    mouse-selection-click-count-buffer
+		     find-coding-systems-region find-coding-systems-string
+		     get-charset-property mail-abbrevs-setup
+		     mouse-minibuffer-check mouse-movement-p mouse-scroll-subr
+		     overlay-lists pgg-parse-crc24-string posn-point
+		     posn-window read-event set-buffer-multibyte track-mouse
+		     window-edges w3m-region))
+      (maybe-bind '(adaptive-fill-first-line-regexp
+		    buffer-display-table buffer-file-coding-system
+		    current-language-environment
+		    default-enable-multibyte-characters
+		    enable-multibyte-characters gnus-agent-expire-current-dirs
+		    language-info-alist mark-active mouse-selection-click-count
+		    mouse-selection-click-count-buffer pgg-parse-crc24
 		    temporary-file-directory transient-mark-mode
-		    url-current-mime-type
-		    user-full-name user-login-name
-		    w3-image-mappings)))
-  (maybe-bind '(browse-url-browser-function
-		enable-multibyte-characters help-echo-owns-message))
-  (maybe-fbind '(Info-goto-node
-		 add-submenu annotation-glyph annotationp babel-as-string
-		 button-press-event-p char-int characterp color-instance-name
-		 color-instance-rgb-components color-name delete-annotation
-		 device-class device-on-window-system-p device-type
-		 display-error event-glyph event-object event-point
-		 events-to-keys face-doc-string find-face frame-device
-		 frame-property get-popup-menu-response glyph-height
-		 glyph-property glyph-width glyphp make-annotation
-		 make-event
-		 make-color-instance make-extent make-glyph make-gui-button
-		 make-image-specifier map-extents next-command-event
-		 pp-to-string read-color set-extent-property
-		 set-face-doc-string set-glyph-image set-glyph-property
-		 specifier-instance url-generic-parse-url
-		 valid-image-instantiator-format-p w3-do-setup
-		 window-pixel-height window-pixel-width)))
+		    w3-meta-content-type-charset-regexp
+		    w3-meta-charset-content-type-regexp)))
+  (maybe-fbind '(bbdb-complete-name
+		 delete-annotation device-connection dfw-device
+		 events-to-keys font-lock-set-defaults frame-device
+		 glyph-height glyph-width mail-aliases-setup make-annotation
+		 make-event make-glyph make-network-process map-extents
+		 message-xmas-redefine set-extent-property temp-directory
+		 url-generic-parse-url url-insert-file-contents
+		 valid-image-instantiator-format-p
+		 w3-coding-system-for-mime-charset w3-do-setup
+		 w3-prepare-buffer w3-region w3m-region window-pixel-height
+		 window-pixel-width))
+  (maybe-bind '(help-echo-owns-message
+		mail-mode-hook
+		url-current-object url-package-name url-package-version
+		w3-meta-charset-content-type-regexp
+		w3-meta-content-type-charset-regexp)))
 
 ;; T-gnus.
-(if (featurep 'xemacs)
-    (progn
-      (maybe-fbind '(propertize))
-      (maybe-bind '(mh-lib-progs)))
-  ;; FSFmacs
-  (maybe-fbind '(charsetp
-		 function-max-args propertize smiley-encode-buffer))
-  (if (boundp 'MULE)
-      (progn
-	(maybe-fbind '(coding-system-get
-		       file-name-extension find-coding-systems-region
-		       get-charset-property))
-	(maybe-bind '(mh-lib-progs)))))
+(let ((functions
+       (cond
+	((featurep 'xemacs)
+	 '(frame-char-height frame-char-width))
+	((>= emacs-major-version 21)
+	 '(function-max-args smiley-encode-buffer))
+	((boundp 'MULE)
+	 '(charsetp
+	   coding-system-base coding-system-get coding-system-list
+	   coding-system-to-mime-charset compose-mail
+	   file-name-extension find-coding-systems-for-charsets
+	   find-coding-systems-region function-max-args get-charset-property
+	   smiley-encode-buffer smtpmail-send-it))
+	(t
+	 '(function-max-args smiley-encode-buffer))))
+      (common-fns
+       nil)
+      (variables
+       (cond
+	((featurep 'xemacs)
+	 '(font-lock-defaults))
+	((>= emacs-major-version 21)
+	 nil)
+	((boundp 'MULE)
+	 '(adaptive-fill-first-line-regexp
+	   default-enable-multibyte-characters enable-multibyte-characters))
+	(t
+	 nil)))
+      (common-vars
+       '(default-mime-charset-unlimited navi2ch-mona-font)))
+  (maybe-fbind functions)
+  (maybe-fbind common-fns)
+  (maybe-bind variables)
+  (maybe-bind common-vars))
 
-(require 'custom)
+(when (and (featurep 'xemacs)
+	   (not (featurep 'mule)))
+  (progn
+    (maybe-fbind '(coding-system-base find-charset-string))))
+
 
 (defun nnkiboze-score-file (a)
+  )
+
+(defun split-line (&optional arg)
   )
 
 (provide 'lpath)

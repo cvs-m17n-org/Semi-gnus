@@ -1,5 +1,5 @@
 ;;; gnus-audio.el --- Sound effects for Gnus
-;; Copyright (C) 1996, 2000 Free Software Foundation
+;; Copyright (C) 1996, 2000, 2003 Free Software Foundation
 
 ;; Author: Steven L. Baur <steve@miranova.com>
 ;; Keywords: news, mail, multimedia
@@ -30,8 +30,11 @@
 
 (require 'nnheader)
 
+(require 'path-util)
+
 (defgroup gnus-audio nil
   "Playing sound in Gnus."
+  :version "21.1"
   :group 'gnus-visual
   :group 'multimedia)
 
@@ -46,15 +49,15 @@
   :type '(choice directory (const nil))
   :group 'gnus-audio)
 
-(defcustom gnus-audio-au-player "/usr/bin/showaudio"
+(defcustom gnus-audio-au-player (exec-installed-p "play")
   "Executable program for playing sun AU format sound files."
   :group 'gnus-audio
-  :type 'string)
+  :type '(choice file (const nil)))
 
-(defcustom gnus-audio-wav-player "/usr/local/bin/play"
+(defcustom gnus-audio-wav-player (exec-installed-p "play")
   "Executable program for playing WAV files."
   :group 'gnus-audio
-  :type 'string)
+  :type '(choice file (const nil)))
 
 ;;; The following isn't implemented yet.  Wait for Millennium Gnus.
 ;;(defvar gnus-audio-effects-enabled t
@@ -92,18 +95,18 @@
 ;;;###autoload
 (defun gnus-audio-play (file)
   "Play a sound FILE through the speaker."
-  (interactive)
+  (interactive "fSound file name: ")
   (let ((sound-file (if (file-exists-p file)
 			file
 		      (expand-file-name file gnus-audio-directory))))
     (when (file-exists-p sound-file)
       (cond ((and gnus-audio-inline-sound
-		 (condition-case nil
-		     ;; Even if we have audio, we may fail with the
-		     ;; wrong sort of sound file.
-		     (progn (play-sound-file sound-file)
-			    t)
-		   (error nil))))
+		  (condition-case nil
+		      ;; Even if we have audio, we may fail with the
+		      ;; wrong sort of sound file.
+		      (progn (play-sound-file sound-file)
+			     t)
+		    (error nil))))
 	    ;; If we don't have built-in sound, or playing it failed,
 	    ;; try with external program.
 	    ((equal "wav" (file-name-extension sound-file))

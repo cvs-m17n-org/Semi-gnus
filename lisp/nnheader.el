@@ -1,11 +1,11 @@
 ;;; nnheader.el --- header access macros for Semi-gnus and its backends
 
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000
+;;        1997, 1998, 2000, 2001, 2002, 2003
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;; 	Lars Magne Ingebrigtsen <larsi@gnus.org>
+;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;	Katsumi Yamaoka <yamaoka@jpl.org>
 ;; Keywords: mail, news, MIME
@@ -34,6 +34,10 @@
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
 
+;; Requiring `gnus-util' at compile time creates a circular
+;; dependency between nnheader.el and gnus-util.el.
+;;(eval-when-compile (require 'gnus-util))
+
 (require 'mail-utils)
 
 ;; Reduce the required value of `recursive-load-depth-limit' for Emacs 21.
@@ -42,14 +46,59 @@
 (require 'std11)
 
 (require 'mime)
+(eval-and-compile
+  (autoload 'gnus-sorted-intersection "gnus-range")
+  (autoload 'gnus-intersection "gnus-range")
+  (autoload 'gnus-sorted-complement "gnus-range")
+  (autoload 'gnus-sorted-difference "gnus-range"))
+
+(defcustom gnus-verbose-backends 7
+  "Integer that says how verbose the Gnus backends should be.
+The higher the number, the more messages the Gnus backends will flash
+to say what it's doing.  At zero, the Gnus backends will be totally
+mute; at five, they will display most important messages; and at ten,
+they will keep on jabbering all the time."
+  :group 'gnus-start
+  :type 'integer)
+
+(defcustom gnus-nov-is-evil nil
+  "If non-nil, Gnus backends will never output headers in the NOV format."
+  :group 'gnus-server
+  :type 'boolean)
 
 (defvar nnheader-max-head-length 4096
-  "*Max length of the head of articles.")
+  "*Max length of the head of articles.
+
+Value is an integer, nil, or t.  nil means read in chunks of a file
+indefinitely until a complete head is found\; t means always read the
+entire file immediately, disregarding `nnheader-head-chop-length'.
+
+Integer values will in effect be rounded up to the nearest multiple of
+`nnheader-head-chop-length'.")
 
 (defvar nnheader-head-chop-length 2048
   "*Length of each read operation when trying to fetch HEAD headers.")
 
-(defvar nnheader-file-name-translation-alist nil
+(defvar nnheader-read-timeout
+  (if (string-match "windows-nt\\|os/2\\|emx\\|cygwin"
+		    (symbol-name system-type))
+      1.0
+    0.1)
+  "How long nntp should wait between checking for the end of output.
+Shorter values mean quicker response, but is more CPU intensive.")
+
+(defvar nnheader-file-name-translation-alist
+  (let ((case-fold-search t))
+    (cond
+     ((string-match "windows-nt\\|os/2\\|emx\\|cygwin"
+		    (symbol-name system-type))
+      (append (mapcar (lambda (c) (cons c ?_))
+		      '(?: ?* ?\" ?< ?> ??))
+	      (if (string-match "windows-nt\\|cygwin"
+				(symbol-name system-type))
+		  nil
+		'((?+ . ?-)))))
+     (t nil)))
   "*Alist that says how to translate characters in file names.
 For instance, if \":\" is invalid as a file character in file names
 on your system, you could say something like:
@@ -67,13 +116,389 @@ This variable is a substitute for `mm-text-coding-system'.")
   "Text coding system for write.
 This variable is a substitute for `mm-text-coding-system-for-write'.")
 
+(defvar nnheader-auto-save-coding-system
+  (cond
+   ((boundp 'MULE) '*junet*)
+   ((not (fboundp 'find-coding-system)) nil)
+   ((find-coding-system 'emacs-mule)
+    (if (memq system-type '(windows-nt ms-dos ms-windows))
+	'emacs-mule-dos 'emacs-mule))
+   ((find-coding-system 'escape-quoted) 'escape-quoted)
+   ((find-coding-system 'no-conversion) 'no-conversion)
+   (t nil))
+  "Coding system of auto save file.")
+
+(defvar nnheader-directory-separator-character
+  (string-to-char (substring (file-name-as-directory ".") -1))
+  "*A character used to a directory separator.")
+
 (eval-and-compile
   (autoload 'nnmail-message-id "nnmail")
   (autoload 'mail-position-on-field "sendmail")
   (autoload 'message-remove-header "message")
   (autoload 'gnus-point-at-eol "gnus-util")
-  (autoload 'gnus-delete-line "gnus-util")
   (autoload 'gnus-buffer-live-p "gnus-util"))
+
+;; mm-util stuff.
+(unless (featurep 'mm-util)
+  ;; Should keep track of `mm-image-load-path' in mm-util.el.
+  (defun nnheader-image-load-path (&optional package)
+    (let (dir result)
+      (dolist (path load-path (nreverse result))
+	(if (file-directory-p
+	     (setq dir (concat (file-name-directory
+				(directory-file-name path))
+			       "etc/" (or package "gnus/"))))
+	    (push dir result))
+	(push path result))))
+  (defalias 'mm-image-load-path 'nnheader-image-load-path)
+
+  ;; Should keep track of `mm-read-coding-system' in mm-util.el.
+  (defalias 'mm-read-coding-system
+    (if (or (and (featurep 'xemacs)
+		 (<= (string-to-number emacs-version) 21.1))
+	    (boundp 'MULE))
+	(lambda (prompt &optional default-coding-system)
+	  (read-coding-system prompt))
+      'read-coding-system))
+
+  ;; Should keep track of `mm-%s' in mm-util.el.
+  (defalias 'mm-multibyte-string-p
+    (if (fboundp 'multibyte-string-p)
+	'multibyte-string-p
+      'ignore))
+  (defalias 'mm-encode-coding-string 'encode-coding-string)
+  (defalias 'mm-decode-coding-string 'decode-coding-string)
+
+  ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
+  (defun nnheader-detect-coding-region (start end)
+    "Like 'detect-coding-region' except returning the best one."
+    (let ((coding-systems
+	   (static-if (boundp 'MULE)
+	       (code-detect-region (point) (point-max))
+	     (detect-coding-region (point) (point-max)))))
+      (or (car-safe coding-systems)
+	  coding-systems)))
+  (defalias 'mm-detect-coding-region 'nnheader-detect-coding-region)
+
+  ;; Should keep track of `mm-detect-mime-charset-region' in mm-util.el.
+  (defun nnheader-detect-mime-charset-region (start end)
+    "Detect MIME charset of the text in the region between START and END."
+    (coding-system-to-mime-charset
+     (nnheader-detect-coding-region start end)))
+  (defalias 'mm-detect-mime-charset-region
+    'nnheader-detect-mime-charset-region)
+
+  ;; Should keep track of `mm-with-unibyte-buffer' in mm-util.el.
+  (defmacro nnheader-with-unibyte-buffer (&rest forms)
+  "Create a temporary buffer, and evaluate FORMS there like `progn'.
+Use unibyte mode for this."
+  `(let (default-enable-multibyte-characters default-mc-flag)
+     (with-temp-buffer ,@forms)))
+  (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
+  (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
+  (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
+  (put 'mm-with-unibyte-buffer 'edebug-form-spec '(body))
+  (defalias 'mm-with-unibyte-buffer 'nnheader-with-unibyte-buffer)
+
+  ;; Should keep track of `mm-with-unibyte-current-buffer' in mm-util.el.
+  (defmacro nnheader-with-unibyte-current-buffer (&rest forms)
+    "Evaluate FORMS with current current buffer temporarily made unibyte.
+Also bind `default-enable-multibyte-characters' to nil.
+Equivalent to `progn' in XEmacs"
+    (let ((multibyte (make-symbol "multibyte"))
+	  (buffer (make-symbol "buffer")))
+      (cond ((featurep 'xemacs)
+	     `(let (default-enable-multibyte-characters)
+		,@forms))
+	    ((boundp 'MULE)
+	     `(let ((,multibyte mc-flag)
+		    (,buffer (current-buffer)))
+		(unwind-protect
+		    (let (default-enable-multibyte-characters default-mc-flag)
+		      (setq mc-flag nil)
+		      ,@forms)
+		  (set-buffer ,buffer)
+		  (setq mc-flag ,multibyte))))
+	    (t
+	     `(let ((,multibyte enable-multibyte-characters)
+		    (,buffer (current-buffer)))
+		(unwind-protect
+		    (let (default-enable-multibyte-characters)
+		      (set-buffer-multibyte nil)
+		      ,@forms)
+		  (set-buffer ,buffer)
+		  (set-buffer-multibyte ,multibyte)))))))
+  (put 'nnheader-with-unibyte-current-buffer 'lisp-indent-function 0)
+  (put 'nnheader-with-unibyte-current-buffer 'edebug-form-spec '(body))
+  (put 'mm-with-unibyte-current-buffer 'lisp-indent-function 0)
+  (put 'mm-with-unibyte-current-buffer 'edebug-form-spec '(body))
+  (defalias 'mm-with-unibyte-current-buffer
+    'nnheader-with-unibyte-current-buffer)
+
+  ;; Should keep track of `mm-with-unibyte' in mm-util.el.
+  (defmacro nnheader-with-unibyte (&rest forms)
+    "Eval the FORMS with the default value of `enable-multibyte-characters'
+nil, ."
+    `(let (default-enable-multibyte-characters)
+       ,@forms))
+  (put 'nnheader-with-unibyte 'lisp-indent-function 0)
+  (put 'nnheader-with-unibyte 'edebug-form-spec '(body))
+  (put 'mm-with-unibyte 'lisp-indent-function 0)
+  (put 'mm-with-unibyte 'edebug-form-spec '(body))
+  (defalias 'mm-with-unibyte 'nnheader-with-unibyte)
+
+  ;; Should keep track of `mm-guess-mime-charset' in mm-util.el.
+  (defun nnheader-guess-mime-charset ()
+  "Guess the default MIME charset from the language environment."
+  (let ((language-info
+	 (and (boundp 'current-language-environment)
+	      (assoc current-language-environment
+		     language-info-alist)))
+	item)
+    (cond
+     ((null language-info)
+      'iso-8859-1)
+     ((setq item
+	    (cadr
+	     (or (assq 'coding-priority language-info)
+		 (assq 'coding-system language-info))))
+      (if (fboundp 'coding-system-get)
+	  (or (coding-system-get item 'mime-charset)
+	      item)
+	item))
+     ((setq item (car (last (assq 'charset language-info))))
+      (if (eq item 'ascii)
+	  'iso-8859-1
+	 (charsets-to-mime-charset (list item))))
+     (t
+      'iso-8859-1))))
+  (defalias 'mm-guess-mime-charset 'nnheader-guess-mime-charset)
+
+  (defalias 'mm-char-int 'char-int)
+
+  ;; Should keep track of the same alias in mm-util.el.
+  (defalias 'mm-multibyte-p
+    (static-cond ((and (featurep 'xemacs) (featurep 'mule))
+		  (lambda nil t))
+		 ((featurep 'xemacs)
+		  (lambda nil nil))
+		 ((boundp 'MULE)
+		  (lambda nil mc-flag))
+		 (t
+		  (lambda nil enable-multibyte-characters))))
+
+  ;; Should keep track of the same alias in mm-util.el.
+  (defalias 'mm-make-temp-file
+    (if (fboundp 'make-temp-file)
+	'make-temp-file
+      (lambda (prefix &optional dir-flag)
+	(let ((file (expand-file-name
+		     (make-temp-name prefix)
+		     (if (fboundp 'temp-directory)
+			 (temp-directory)
+		       temporary-file-directory))))
+	  (if dir-flag
+	      (make-directory file))
+	  file))))
+
+  ;; Should keep track of `mm-coding-system-p' in mm-util.el.
+  (defun nnheader-coding-system-p (sym)
+    "Return non-nil if SYM is a coding system."
+    (or (and (fboundp 'find-coding-system) (find-coding-system sym))
+	(and (fboundp 'coding-system-p) (coding-system-p sym))))
+  (defalias 'mm-coding-system-p 'nnheader-coding-system-p))
+
+;; mail-parse stuff.
+(unless (featurep 'mail-parse)
+  ;; Should keep track of `rfc2047-narrow-to-field' in rfc2047.el.
+  (defun-maybe std11-narrow-to-field ()
+    "Narrow the buffer to the header on the current line."
+    (forward-line 0)
+    (narrow-to-region (point)
+		      (progn
+			(std11-field-end)
+			(when (eolp) (forward-line 1))
+			(point)))
+    (goto-char (point-min)))
+  (defalias 'mail-header-narrow-to-field 'std11-narrow-to-field)
+
+  ;; Should keep track of `ietf-drums-narrow-to-header' in ietf-drums.el.
+  (defun mail-narrow-to-head ()
+    "Narrow to the header section in the current buffer."
+    (narrow-to-region
+     (goto-char (point-min))
+     (if (re-search-forward "^\r?$" nil 1)
+	 (match-beginning 0)
+       (point-max)))
+    (goto-char (point-min)))
+
+  ;; Should keep track of `rfc2047-fold-region' in rfc2047.el.
+  (defun-maybe std11-fold-region (b e)
+    "Fold long lines in region B to E."
+    (save-restriction
+      (narrow-to-region b e)
+      (goto-char (point-min))
+      (let ((break nil)
+	    (qword-break nil)
+	    (first t)
+	    (bol (save-restriction
+		   (widen)
+		   (gnus-point-at-bol))))
+	(while (not (eobp))
+	  (when (and (or break qword-break)
+		     (> (- (point) bol) 76))
+	    (goto-char (or break qword-break))
+	    (setq break nil
+		  qword-break nil)
+	    (if (looking-at "[ \t]")
+		(insert "\n")
+	      (insert "\n "))
+	    (setq bol (1- (point)))
+	    ;; Don't break before the first non-LWSP characters.
+	    (skip-chars-forward " \t")
+	    (unless (eobp)
+	      (forward-char 1)))
+	  (cond
+	   ((eq (char-after) ?\n)
+	    (forward-char 1)
+	    (setq bol (point)
+		  break nil
+		  qword-break nil)
+	    (skip-chars-forward " \t")
+	    (unless (or (eobp) (eq (char-after) ?\n))
+	      (forward-char 1)))
+	   ((eq (char-after) ?\r)
+	    (forward-char 1))
+	   ((memq (char-after) '(?  ?\t))
+	    (skip-chars-forward " \t")
+	    (if first
+		;; Don't break just after the header name.
+		(setq first nil)
+	      (setq break (1- (point)))))
+	   ((not break)
+	    (if (not (looking-at "=\\?[^=]"))
+		(if (eq (char-after) ?=)
+		    (forward-char 1)
+		  (skip-chars-forward "^ \t\n\r="))
+	      (setq qword-break (point))
+	      (skip-chars-forward "^ \t\n\r")))
+	   (t
+	    (skip-chars-forward "^ \t\n\r"))))
+	(when (and (or break qword-break)
+		   (> (- (point) bol) 76))
+	  (goto-char (or break qword-break))
+	  (setq break nil
+		qword-break nil)
+	  (if (looking-at "[ \t]")
+	      (insert "\n")
+	    (insert "\n "))
+	  (setq bol (1- (point)))
+	  ;; Don't break before the first non-LWSP characters.
+	  (skip-chars-forward " \t")
+	  (unless (eobp)
+	    (forward-char 1))))))
+
+  ;; Should keep track of `rfc2047-fold-field' in rfc2047.el.
+  (defun-maybe std11-fold-field ()
+    "Fold the current line."
+    (save-excursion
+      (save-restriction
+	(std11-narrow-to-field)
+	(std11-fold-region (point-min) (point-max)))))
+
+  (defalias 'mail-header-fold-field 'std11-fold-field)
+
+  ;; Should keep track of `rfc2047-unfold-region' in rfc2047.el.
+  (defun-maybe std11-unfold-region (b e)
+    "Unfold lines in region B to E."
+    (save-restriction
+      (narrow-to-region b e)
+      (goto-char (point-min))
+      (let ((bol (save-restriction
+		   (widen)
+		   (gnus-point-at-bol)))
+	    (eol (gnus-point-at-eol)))
+	(forward-line 1)
+	(while (not (eobp))
+	  (if (and (looking-at "[ \t]")
+		   (< (- (gnus-point-at-eol) bol) 76))
+	      (delete-region eol (progn
+				   (goto-char eol)
+				   (skip-chars-forward "\r\n")
+				   (point)))
+	    (setq bol (gnus-point-at-bol)))
+	  (setq eol (gnus-point-at-eol))
+	  (forward-line 1)))))
+
+  ;; Should keep track of `rfc2047-unfold-field' in rfc2047.el.
+  (defun-maybe std11-unfold-field ()
+    "Fold the current line."
+    (save-excursion
+      (save-restriction
+	(std11-narrow-to-field)
+	(std11-unfold-region (point-min) (point-max)))))
+
+  (defalias 'mail-header-unfold-field 'std11-unfold-field)
+
+  ;; This is the original function in T-gnus.
+  (defun-maybe std11-extract-addresses-components (string)
+    "Extract a list of full name and canonical address from STRING.  Each
+element looks like a list of the form (FULL-NAME CANONICAL-ADDRESS).
+If no name can be extracted, FULL-NAME will be nil."
+    (when string
+      (let (addresses)
+	(dolist (structure (std11-parse-addresses-string
+			    (std11-unfold-string string))
+			   addresses)
+	  (push (list (std11-full-name-string structure)
+		      (std11-address-string structure))
+		addresses))
+	(nreverse addresses))))
+
+  ;; Should keep track of `ietf-drums-parse-addresses' in ietf-drums.el.
+  (defun mail-header-parse-addresses (string)
+    "Parse STRING and return a list of MAILBOX / DISPLAY-NAME pairs."
+    (mapcar (function
+	     (lambda (components)
+	       (cons (nth 1 components) (car components))))
+	    (std11-extract-addresses-components string)))
+
+  ;; Should keep track of `rfc2047-field-value' in rfc2047.el.
+  (defun std11-field-value (&optional dont-include-last-newline)
+    "Return the value of the field at point.  If the optional argument is
+given, the return value will not contain the last newline."
+    (let ((begin (point))
+	  (inhibit-point-motion-hooks t)
+	  start value)
+      (beginning-of-line)
+      (unless (eobp)
+	(while (and (memq (char-after) '(?\t ?\ ))
+		    (zerop (forward-line -1))))
+	(when (looking-at "[^\t\n ]+:[\t\n ]+")
+	  (goto-char (setq start (match-end 0)))
+	  (forward-line 1)
+	  (while (and (memq (char-after) '(?\t ?\ ))
+		      (zerop (forward-line 1))))
+	  (when dont-include-last-newline
+	    (skip-chars-backward "\t\n " start))
+	  (setq value (buffer-substring start (point)))))
+      (goto-char begin)
+      value))
+
+  (defalias 'mail-header-field-value 'std11-field-value))
+
+;; ietf-drums stuff.
+(unless (featurep 'ietf-drums)
+  ;; Should keep track of `ietf-drums-unfold-fws' in ietf-drums.el.
+  (defun nnheader-unfold-fws ()
+    "Unfold folding white space in the current buffer."
+    (goto-char (point-min))
+    (while (re-search-forward "[ \t]*\n[ \t]+" nil t)
+      (replace-match " " t t))
+    (goto-char (point-min)))
+
+  (defalias 'ietf-drums-unfold-fws 'nnheader-unfold-fws))
 
 ;;; Header access macros.
 
@@ -194,123 +619,138 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 
 ;; Parsing headers and NOV lines.
 
+(defsubst nnheader-remove-cr-followed-by-lf ()
+  (goto-char (point-max))
+  (while (search-backward "\r\n" nil t)
+    (delete-char 1)))
+
 (defsubst nnheader-header-value ()
   (let ((pt (point)))
-    (prog1
-	(buffer-substring (match-end 0) (std11-field-end))
+    (prog2
+	(skip-chars-forward " \t")
+	(buffer-substring (point) (std11-field-end))
       (goto-char pt))))
 
-(defun nnheader-parse-head (&optional naked)
+(defun nnheader-parse-naked-head (&optional number)
+  ;; This function unfolds continuation lines in this buffer
+  ;; destructively.  When this side effect is unwanted, use
+  ;; `nnheader-parse-head' instead of this function.
   (let ((case-fold-search t)
-	(cur (current-buffer))
 	(buffer-read-only nil)
-	in-reply-to lines p ref)
-    (goto-char (point-min))
-    (when naked
-      (insert "\n"))
-    ;; Search to the beginning of the next header.  Error messages
-    ;; do not begin with 2 or 3.
+	(cur (current-buffer))
+	(p (point-min))
+	in-reply-to lines ref)
+    (nnheader-remove-cr-followed-by-lf)
+    (ietf-drums-unfold-fws)
+    (subst-char-in-region (point-min) (point-max) ?\t ? )
+    (goto-char p)
+    (insert "\n")
     (prog1
-	(when (or naked (re-search-forward "^[23][0-9]+ " nil t))
-	  ;; This implementation of this function, with nine
-	  ;; search-forwards instead of the one re-search-forward and
-	  ;; a case (which basically was the old function) is actually
-	  ;; about twice as fast, even though it looks messier.	 You
-	  ;; can't have everything, I guess.  Speed and elegance
-	  ;; don't always go hand in hand.
-	  (make-full-mail-header
-	   ;; Number.
-	   (if naked
-	       (progn
-		 (setq p (point-min))
-		 0)
-	     (prog1
-		 (read cur)
-	       (end-of-line)
-	       (setq p (point))
-	       (narrow-to-region (point)
-				 (or (and (search-forward "\n.\n" nil t)
-					  (- (point) 2))
-				     (point)))))
-	   ;; Subject.
-	   (progn
-	     (goto-char p)
-	     (if (search-forward "\nsubject: " nil t)
-		 (nnheader-header-value) "(none)"))
-	   ;; From.
-	   (progn
-	     (goto-char p)
-	     (if (or (search-forward "\nfrom: " nil t)
-		     (search-forward "\nfrom:" nil t))
-		 (nnheader-header-value) "(nobody)"))
-	   ;; Date.
-	   (progn
-	     (goto-char p)
-	     (if (search-forward "\ndate: " nil t)
-		 (nnheader-header-value) ""))
-	   ;; Message-ID.
-	   (progn
-	     (goto-char p)
-	     (if (search-forward "\nmessage-id:" nil t)
-		 (buffer-substring
-		  (1- (or (search-forward "<" (gnus-point-at-eol) t)
-			  (point)))
-		  (or (search-forward ">" (gnus-point-at-eol) t) (point)))
-	       ;; If there was no message-id, we just fake one to make
-	       ;; subsequent routines simpler.
-	       (nnheader-generate-fake-message-id)))
-	   ;; References.
-	   (progn
-	     (goto-char p)
-	     (if (search-forward "\nreferences: " nil t)
-		 (nnheader-header-value)
-	       ;; Get the references from the in-reply-to header if there
-	       ;; were no references and the in-reply-to header looks
-	       ;; promising.
-	       (if (and (search-forward "\nin-reply-to: " nil t)
-			(setq in-reply-to (nnheader-header-value))
-			(string-match "<[^\n>]+>" in-reply-to))
-		   (let (ref2)
-		     (setq ref (substring in-reply-to (match-beginning 0)
-					  (match-end 0)))
-		     (while (string-match "<[^\n>]+>"
-					  in-reply-to (match-end 0))
-		       (setq ref2 (substring in-reply-to (match-beginning 0)
-					     (match-end 0)))
-		       (when (> (length ref2) (length ref))
-			 (setq ref ref2)))
-                     ref)
-		 nil)))
-	   ;; Chars.
-	   0
-	   ;; Lines.
-	   (progn
-	     (goto-char p)
-	     (if (search-forward "\nlines: " nil t)
-		 (if (numberp (setq lines (read cur)))
-		     lines 0)
-	       0))
-	   ;; Xref.
-	   (progn
-	     (goto-char p)
-	     (and (search-forward "\nxref: " nil t)
-		  (nnheader-header-value)))
+	;; This implementation of this function, with nine
+	;; search-forwards instead of the one re-search-forward and a
+	;; case (which basically was the old function) is actually
+	;; about twice as fast, even though it looks messier.  You
+	;; can't have everything, I guess.  Speed and elegance don't
+	;; always go hand in hand.
+	(make-full-mail-header
+	 ;; Number.
+	 (or number 0)
+	 ;; Subject.
+	 (progn
+	   (goto-char p)
+	   (if (search-forward "\nsubject:" nil t)
+	       (nnheader-header-value) "(none)"))
+	 ;; From.
+	 (progn
+	   (goto-char p)
+	   (if (search-forward "\nfrom:" nil t)
+	       (nnheader-header-value) "(nobody)"))
+	 ;; Date.
+	 (progn
+	   (goto-char p)
+	   (if (search-forward "\ndate:" nil t)
+	       (nnheader-header-value) ""))
+	 ;; Message-ID.
+	 (progn
+	   (goto-char p)
+	   (if (search-forward "\nmessage-id:" nil t)
+	       (buffer-substring
+		(1- (or (search-forward "<" (gnus-point-at-eol) t)
+			(point)))
+		(or (search-forward ">" (gnus-point-at-eol) t) (point)))
+	     ;; If there was no message-id, we just fake one to make
+	     ;; subsequent routines simpler.
+	     (nnheader-generate-fake-message-id)))
+	 ;; References.
+	 (progn
+	   (goto-char p)
+	   (if (search-forward "\nreferences:" nil t)
+	       (nnheader-header-value)
+	     ;; Get the references from the in-reply-to header if
+	     ;; there were no references and the in-reply-to header
+	     ;; looks promising.
+	     (if (and (search-forward "\nin-reply-to:" nil t)
+		      (setq in-reply-to (nnheader-header-value))
+		      (string-match "<[^\n>]+>" in-reply-to))
+		 (let (ref2)
+		   (setq ref (substring in-reply-to (match-beginning 0)
+					(match-end 0)))
+		   (while (string-match "<[^\n>]+>"
+					in-reply-to (match-end 0))
+		     (setq ref2 (substring in-reply-to (match-beginning 0)
+					   (match-end 0)))
+		     (when (> (length ref2) (length ref))
+		       (setq ref ref2)))
+		   ref)
+	       nil)))
+	 ;; Chars.
+	 0
+	 ;; Lines.
+	 (progn
+	   (goto-char p)
+	   (if (search-forward "\nlines: " nil t)
+	       (if (numberp (setq lines (read cur)))
+		   lines 0)
+	     0))
+	 ;; Xref.
+	 (progn
+	   (goto-char p)
+	   (and (search-forward "\nxref:" nil t)
+		(nnheader-header-value)))
+	 ;; Extra.
+	 (when nnmail-extra-headers
+	   (let ((extra nnmail-extra-headers)
+		 out)
+	     (while extra
+	       (goto-char p)
+	       (when (search-forward
+		      (concat "\n" (symbol-name (car extra)) ":") nil t)
+		 (push (cons (car extra) (nnheader-header-value))
+		       out))
+	       (pop extra))
+	     out)))
+      (goto-char p)
+      (delete-char 1))))
 
-	   ;; Extra.
-	   (when nnmail-extra-headers
-	     (let ((extra nnmail-extra-headers)
-		   out)
-	       (while extra
-		 (goto-char p)
-		 (when (search-forward
-			(concat "\n" (symbol-name (car extra)) ": ") nil t)
-		   (push (cons (car extra) (nnheader-header-value))
-			 out))
-		 (pop extra))
-	       out))))
-      (when naked
-	(goto-char (point-min))
-	(delete-char 1)))))
+(defun nnheader-parse-head (&optional naked)
+  (let ((cur (current-buffer)) num beg end)
+    (when (if naked
+	      (setq num 0
+		    beg (point-min)
+		    end (point-max))
+	    (goto-char (point-min))
+	    ;; Search to the beginning of the next header.  Error
+	    ;; messages do not begin with 2 or 3.
+	    (when (re-search-forward "^[23][0-9]+ " nil t)
+	      (end-of-line)
+	      (setq num (read cur)
+		    beg (point)
+		    end (if (search-forward "\n.\n" nil t)
+			    (- (point) 2)
+			  (point)))))
+      (with-temp-buffer
+	(insert-buffer-substring cur beg end)
+	(nnheader-parse-naked-head num)))))
 
 (defmacro nnheader-nov-skip-field ()
   '(search-forward "\t" eol 'move))
@@ -396,6 +836,22 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
       (delete-char 1))
     (forward-line 1)))
 
+(defun nnheader-parse-overview-file (file)
+  "Parse FILE and return a list of headers."
+  (mm-with-unibyte-buffer
+    (nnheader-insert-file-contents file)
+    (goto-char (point-min))
+    (let (headers)
+      (while (not (eobp))
+	(push (nnheader-parse-nov) headers)
+	(forward-line 1))
+      (nreverse headers))))
+
+(defun nnheader-write-overview-file (file headers)
+  "Write HEADERS to FILE."
+  (with-temp-file file
+    (mapcar 'nnheader-insert-nov headers)))
+
 (defun nnheader-insert-header (header)
   (insert
    "Subject: " (or (mail-header-subject header) "(none)") "\n"
@@ -439,7 +895,7 @@ the line could be found."
 	(prev (point-min))
 	num found)
     (while (not found)
-      (goto-char (/ (+ max min) 2))
+      (goto-char (+ min (/ (- max min) 2)))
       (beginning-of-line)
       (if (or (= (point) prev)
 	      (eobp))
@@ -665,10 +1121,6 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
 
 (defvar nntp-server-buffer nil)
 (defvar nntp-process-response nil)
-(defvar gnus-verbose-backends 7
-  "*A number that says how talkative the Gnus backends should be.")
-(defvar gnus-nov-is-evil nil
-  "If non-nil, Gnus backends will never output headers in the NOV format.")
 (defvar news-reply-yank-from nil)
 (defvar news-reply-yank-message-id nil)
 
@@ -738,7 +1190,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
       ;; This is invalid, but not all articles have Message-IDs.
       ()
     (mail-position-on-field "References")
-    (let ((begin (save-excursion (beginning-of-line) (point)))
+    (let ((begin (gnus-point-at-bol))
 	  (fill-column 78)
 	  (fill-prefix "\t"))
       (when references
@@ -772,6 +1224,12 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
      (point-max)))
   (goto-char (point-min)))
 
+(defun nnheader-remove-body ()
+  "Remove the body from an article in this current buffer."
+  (goto-char (point-min))
+  (when (re-search-forward "\n\r?\n" nil t)
+    (delete-region (point) (point-max))))
+
 (defun nnheader-set-temp-buffer (name &optional noerase)
   "Set-buffer to an empty (possibly new) buffer called NAME with undo disabled."
   (set-buffer (get-buffer-create name))
@@ -794,7 +1252,7 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
   "Regexp that matches numerical file names.")
 
 (defvar nnheader-numerical-full-files (concat "/" nnheader-numerical-files)
-  "Regexp that matches numerical full file paths.")
+  "Regexp that matches numerical full file names.")
 
 (defsubst nnheader-file-to-number (file)
   "Take a FILE name and return the article number."
@@ -803,7 +1261,10 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
     (string-match nnheader-numerical-short-files file)
     (string-to-int (match-string 0 file))))
 
-(defvar nnheader-directory-files-is-safe nil
+(defvar nnheader-directory-files-is-safe
+  (or (eq system-type 'windows-nt)
+      (and (not (featurep 'xemacs))
+	   (> emacs-major-version 20)))
   "If non-nil, Gnus believes `directory-files' is safe.
 It has been reported numerous times that `directory-files' fails with
 an alarming frequency on NFS mounted file systems. If it is nil,
@@ -820,7 +1281,7 @@ an alarming frequency on NFS mounted file systems. If it is nil,
 (defun nnheader-directory-articles (dir)
   "Return a list of all article files in directory DIR."
   (mapcar 'nnheader-file-to-number
-	  (if nnheader-directory-files-is-safe 
+	  (if nnheader-directory-files-is-safe
 	      (directory-files
 	       dir nil nnheader-numerical-short-files t)
 	    (nnheader-directory-files-safe
@@ -829,7 +1290,7 @@ an alarming frequency on NFS mounted file systems. If it is nil,
 (defun nnheader-article-to-file-alist (dir)
   "Return an alist of article/file pairs in DIR."
   (mapcar (lambda (file) (cons (nnheader-file-to-number file) file))
-	  (if nnheader-directory-files-is-safe 
+	  (if nnheader-directory-files-is-safe
 	      (directory-files
 	       dir nil nnheader-numerical-short-files t)
 	    (nnheader-directory-files-safe
@@ -856,12 +1317,13 @@ If FULL, translate everything."
 	;; We translate -- but only the file name.  We leave the directory
 	;; alone.
 	(if (and (featurep 'xemacs)
-		 (memq system-type '(win32 w32 mswindows windows-nt)))
+		 (memq system-type '(cygwin32 win32 w32 mswindows windows-nt
+					      cygwin)))
 	    ;; This is needed on NT and stuff, because
 	    ;; file-name-nondirectory is not enough to split
 	    ;; file names, containing ':', e.g.
 	    ;; "d:\\Work\\News\\nntp+news.fido7.ru:fido7.ru.gnu.SCORE"
-	    ;; 
+	    ;;
 	    ;; we are trying to correctly split such names:
 	    ;; "d:file.name" -> "a:" "file.name"
 	    ;; "aaa:bbb.ccc" -> "" "aaa:bbb.ccc"
@@ -954,7 +1416,7 @@ without formatting."
 		     (expand-file-name
 		      (file-name-as-directory top))))
        (error "")))
-   ?/ ?.))
+   nnheader-directory-separator-character ?.))
 
 (defun nnheader-message (level &rest args)
   "Message if the Gnus backends are talkative."
@@ -969,10 +1431,10 @@ without formatting."
       (<= level gnus-verbose-backends)))
 
 (defvar nnheader-pathname-coding-system 'binary
-  "*Coding system for pathname.")
+  "*Coding system for file name.")
 
 (defun nnheader-group-pathname (group dir &optional file)
-  "Make pathname for GROUP."
+  "Make file name for GROUP."
   (concat
    (let ((dir (file-name-as-directory (expand-file-name dir))))
      ;; If this directory exists, we use it directly.
@@ -1000,16 +1462,16 @@ without formatting."
 (defun nnheader-ms-strip-cr ()
   "Strip ^M from the end of all lines."
   (save-excursion
-    (goto-char (point-min))
-    (while (re-search-forward "\r$" nil t)
-      (delete-backward-char 1))))
+    (nnheader-remove-cr-followed-by-lf)))
 
 (defun nnheader-file-size (file)
   "Return the file size of FILE or 0."
   (or (nth 7 (file-attributes file)) 0))
 
 (defun nnheader-find-etc-directory (package &optional file)
-  "Go through the path and find the \".../etc/PACKAGE\" directory.
+  "Go through `load-path' and find the \"../etc/PACKAGE\" directory.
+This function will look in the parent directory of each `load-path'
+entry, and look for the \"etc\" directory there.
 If FILE, find the \".../etc/PACKAGE\" file instead."
   (let ((path load-path)
 	dir result)
@@ -1054,11 +1516,31 @@ find-file-hooks, etc.
 	(auto-mode-alist (nnheader-auto-mode-alist))
 	(default-major-mode 'fundamental-mode)
 	(enable-local-variables nil)
-        (after-insert-file-functions nil)
+	(after-insert-file-functions nil)
 	(enable-local-eval nil)
 	(find-file-hooks nil))
     (insert-file-contents-as-coding-system
      nnheader-file-coding-system filename visit beg end replace)))
+
+(defun nnheader-insert-nov-file (file first)
+  (let ((size (nth 7 (file-attributes file)))
+	(cutoff (* 32 1024)))
+    (when size
+      (if (< size cutoff)
+          ;; If the file is small, we just load it.
+          (nnheader-insert-file-contents file)
+        ;; We start on the assumption that FIRST is pretty recent.  If
+        ;; not, we just insert the rest of the file as well.
+        (let (current)
+          (nnheader-insert-file-contents file nil (- size cutoff) size)
+          (goto-char (point-min))
+          (delete-region (point) (or (search-forward "\n" nil 'move) (point)))
+          (setq current (ignore-errors (read (current-buffer))))
+          (if (and (numberp current)
+                   (< current first))
+              t
+            (delete-region (point-min) (point-max))
+            (nnheader-insert-file-contents file)))))))
 
 (defun nnheader-find-file-noselect (&rest args)
   (let ((format-alist nil)
@@ -1136,6 +1618,7 @@ find-file-hooks, etc.
 (defalias 'nnheader-run-at-time 'run-at-time)
 (defalias 'nnheader-cancel-timer 'cancel-timer)
 (defalias 'nnheader-cancel-function-timers 'cancel-function-timers)
+(defalias 'nnheader-string-as-multibyte 'string-as-multibyte)
 
 (defun nnheader-Y-or-n-p (prompt)
   "Ask user a \"Y/n\" question. Return t if answer is neither \"n\", \"N\" nor \"C-g\"."
@@ -1153,6 +1636,21 @@ find-file-hooks, etc.
 	  nil)
       (message "%s(Y/n) Yes" prompt)
       t)))
+
+(defun-maybe shell-command-to-string (command)
+  "Execute shell command COMMAND and return its output as a string."
+  (with-output-to-string
+    (with-current-buffer
+	standard-output
+      (call-process shell-file-name nil t nil shell-command-switch command))))
+
+(defun nnheader-accept-process-output (process)
+  (accept-process-output
+   process
+   (truncate nnheader-read-timeout)
+   (truncate (* (- nnheader-read-timeout
+		   (truncate nnheader-read-timeout))
+		1000))))
 
 (when (featurep 'xemacs)
   (require 'nnheaderxm))

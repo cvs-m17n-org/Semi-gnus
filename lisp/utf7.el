@@ -43,8 +43,8 @@
 
 ;;; Code:
 
-(eval-when-compile (require 'cl))
 (require 'base64)
+(eval-when-compile (require 'cl))
 
 (defvar utf7-direct-encoding-chars " -%'-*,-[]-}"
   "Character ranges which do not need escaping in UTF-7.")
@@ -156,7 +156,7 @@ Characters are in raw byte pairs in narrowed buffer."
   (while (not (eobp))
     (if (= 0 (following-char))
 	(delete-char 1)
-	(error "Unable to convert from Unicode"))
+      (error "Unable to convert from Unicode"))
     (forward-char)))
 
 (defun utf7-encode (string &optional for-imap)

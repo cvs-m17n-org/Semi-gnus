@@ -40,6 +40,7 @@ all-ja: lick info info-ja
 lick:
 	cd lisp && $(MAKE) EMACS="$(EMACS)" lispdir="$(lispdir)" all
 
+#install: install-lisp install-info install-etc
 install: install-lisp install-info
 
 install-ja: install install-info-ja
@@ -50,22 +51,31 @@ install-lisp:
 install-info:
 	cd texi && $(MAKE) EMACS="$(EMACS)" infodir="$(infodir)" install
 
+install-etc:
+	cd etc && $(MAKE) EMACS="$(EMACS)" install
+
 install-info-ja:
 	cd texi && $(MAKE) EMACS="$(EMACS)" infodir="$(infodir)" install-ja
 
 ## Rule for XEmacs package.
-install-package: xclever compose-package remove-extra-files-in-package \
+install-package: \
+	xclever-package \
+	compose-package \
+	remove-extra-files-in-package \
 	install-package-lisp \
 	install-package-info install-package-manifest
 
-install-package-ja: xclever compose-package remove-extra-files-in-package \
+install-package-ja: \
+	xclever-package \
+	compose-package \
+	remove-extra-files-in-package \
 	install-package-lisp \
 	install-package-info install-package-info-ja \
 	install-package-manifest
 
-package: xlick xinfo compose-package
+package: xlick-package xinfo compose-package
 
-package-ja: xlick xinfo xinfo-ja compose-package
+package-ja: xlick-package xinfo xinfo-ja compose-package
 
 # Sub-rule for XEmacs package.
 install-package-lisp:
@@ -110,8 +120,10 @@ install-package-manifest:
 	  package_dir="$(PACKAGEDIR)"; \
 	fi; \
 	echo "cd lisp && $(MAKE) EMACS=$(XEMACS) PACKAGEDIR=$$package_dir" \
+		"lispdir=$(PACKAGEDIR)/lisp/$(GNUS_PRODUCT_NAME)" \
 		"install-package-manifest"; \
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR=$$package_dir \
+		lispdir="$(PACKAGEDIR)/lisp/$(GNUS_PRODUCT_NAME)" \
 		install-package-manifest
 
 remove-extra-files-in-package:
@@ -121,25 +133,41 @@ remove-extra-files-in-package:
 	  package_dir="$(PACKAGEDIR)"; \
 	fi; \
 	echo "cd lisp && $(MAKE) EMACS=$(XEMACS) PACKAGEDIR=$$package_dir" \
+		"lispdir=$(PACKAGEDIR)/lisp/$(GNUS_PRODUCT_NAME)" \
 		"remove-extra-files-in-package"; \
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" PACKAGEDIR=$$package_dir \
+		lispdir="$(PACKAGEDIR)/lisp/$(GNUS_PRODUCT_NAME)" \
 		remove-extra-files-in-package
 
 compose-package:
-	cd lisp && $(MAKE) EMACS="$(XEMACS)" compose-package
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" \
+	lispdir="$(PACKAGEDIR)/lisp/$(GNUS_PRODUCT_NAME)" compose-package
 ##
 
 xclever:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" lispdir="$(lispdir)" clever
 
+xclever-package:
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" \
+	lispdir="$(PACKAGEDIR)/lisp/$(GNUS_PRODUCT_NAME)" clever
+
 xlick:
 	cd lisp && $(MAKE) EMACS="$(XEMACS)" lispdir="$(lispdir)" all
+
+xlick-package:
+	cd lisp && $(MAKE) EMACS="$(XEMACS)" \
+	lispdir="$(PACKAGEDIR)/lisp/$(GNUS_PRODUCT_NAME)" all
 
 xinfo:
 	cd texi && $(MAKE) EMACS="$(XEMACS)" all-info
 
 xinfo-ja:
 	cd texi && $(MAKE) EMACS="$(XEMACS)" ja-info
+
+uninstall:
+	cd lisp && $(MAKE) lispdir="$(lispdir)" uninstall
+	cd texi && $(MAKE) uninstall
+	cd etc && $(MAKE) uninstall
 
 # Rule for Lars and nobody else.
 some:
@@ -159,7 +187,7 @@ clean:
 	for i in lisp texi; do (cd $$i; $(MAKE) clean); done
 
 elclean:
-	cd lisp && rm -f *.elc auto-autoloads.el custom-load.el
+	cd lisp && rm -f *.elc auto-autoloads.el custom-load.el gnus-load.el
 
 x:
 	$(MAKE) EMACS="$(XEMACS)"
@@ -169,7 +197,7 @@ xsome:
 
 distclean: clean
 	rm -rf *~
-	for i in lisp texi; do (cd $$i; $(MAKE) distclean); done
+	for i in lisp texi etc texi/ps; do (cd $$i; $(MAKE) distclean); done
 	rm -f config.log config.status config.cache Makefile
 
 config.status: $(srcdir)/configure
