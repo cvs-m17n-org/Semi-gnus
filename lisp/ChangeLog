@@ -1,3 +1,45 @@
+2001-02-04 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-mark-as-processable): Understand
+	active region.
+
+	* gnus-start.el (gnus-group-change-level): Remove from both
+	gnus-zombie-list and gnus-killed-list.
+
+2001-02-04 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-start.el (gnus-subscribe-options-newsgroup-method): Add
+	gnus-subscribe-topics.
+
+	* gnus-cus.el (gnus-extra-topic-parameters): Fix doc.
+
+2001-02-04 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-art.el (gnus-article-make-menu-bar): Make
+	gnus-article-post-menu.
+
+	* gnus-xmas.el (gnus-xmas-article-menu-add): Add post menu.
+
+	* gnus-sum.el (gnus-summary-make-menu-bar): Use t if XEmacs.
+
+	* gnus-group.el (gnus-group-make-menu-bar): Ditto.
+	
+	* message.el (message-mode-menu): Ditto.
+	
+	* gnus-art.el (defvar): eval-when-compile.
+
+2001-02-02 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-agent.el (gnus-agentize): Fix doc.
+
+2001-02-02  Karl Kleinpaste <karl@charcoal.com>
+
+	* mml.el (mml-preview): Bind `q'.
+
+2001-02-02 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-mime-mule-charset-alist): non-Mule case.
+
 2001-01-31  Dave Love  <fx@gnu.org>
 
 	* mm-util.el (mm-mime-mule-charset-alist)

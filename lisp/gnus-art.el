@@ -2660,8 +2660,9 @@ This format is defined by the `gnus-article-time-format' variable."
 				 gnus-newsgroup-name 'highlight-words t)))
 	     gnus-emphasis-alist)))))
 
-(defvar gnus-summary-article-menu)
-(defvar gnus-summary-post-menu)
+(eval-when-compile
+  (defvar gnus-summary-article-menu)
+  (defvar gnus-summary-post-menu))
 
 ;;; Saving functions.
 
@@ -3133,6 +3134,8 @@ If variable `gnus-use-long-file-name' is non-nil, it is
 (eval-when-compile
   (defvar gnus-article-commands-menu))
 
+(defvar gnus-article-post-menu nil)
+
 (defun gnus-article-make-menu-bar ()
   (gnus-turn-off-edit-menu 'article)
   (unless (boundp 'gnus-article-article-menu)
@@ -3158,17 +3161,22 @@ If variable `gnus-use-long-file-name' is non-nil, it is
        ["Decode HZ" gnus-article-decode-HZ t]))
 
     ;; Note "Commands" menu is defined in gnus-sum.el for consistency
-
+    
     (when (boundp 'gnus-summary-post-menu)
+      (cond 
+       ((not (keymapp gnus-summary-post-menu))
+	(setq gnus-article-post-menu gnus-summary-post-menu))
+       ((not gnus-article-post-menu)
+	;; Don't share post menu.
+	(setq gnus-article-post-menu
+	      (copy-keymap gnus-summary-post-menu))))
       (define-key gnus-article-mode-map [menu-bar post]
-	(cons "Post" gnus-summary-post-menu)))
+	(cons "Post" gnus-article-post-menu)))
 
     (gnus-run-hooks 'gnus-article-menu-hook))
   ;; Add the menu.
   (when (boundp 'gnus-article-commands-menu)
-    (easy-menu-add gnus-article-commands-menu gnus-article-mode-map))
-  (when (boundp 'gnus-summary-post-menu)
-    (easy-menu-add gnus-summary-post-menu gnus-article-mode-map)))
+    (easy-menu-add gnus-article-commands-menu gnus-article-mode-map)))
 
 ;; Fixme: do something for the Emacs tool bar in Article mode a la
 ;; Summary.
@@ -3189,8 +3197,6 @@ commands:
 \\[gnus-article-describe-briefly]\t Describe the current mode briefly
 \\[gnus-info-find-node]\t Go to the Gnus info node"
   (interactive)
-  (when (gnus-visual-p 'article-menu 'menu)
-    (gnus-article-make-menu-bar))
   (gnus-simplify-mode-line)
   (setq mode-name "Article")
   (setq major-mode 'gnus-article-mode)
@@ -3198,6 +3204,8 @@ commands:
   (unless (assq 'gnus-show-mime minor-mode-alist)
     (push (list 'gnus-show-mime " MIME") minor-mode-alist))
   (use-local-map gnus-article-mode-map)
+  (when (gnus-visual-p 'article-menu 'menu)
+    (gnus-article-make-menu-bar))
   (gnus-update-format-specifications nil 'article-mode)
   (set (make-local-variable 'page-delimiter) gnus-page-delimiter)
   (make-local-variable 'gnus-page-broken)

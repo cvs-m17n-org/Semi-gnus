@@ -1791,7 +1791,7 @@ increase the score of each group you read."
               ["CR" gnus-article-remove-cr t]
               ["Show X-Face" gnus-article-display-x-face t]
 	      ["Rot 13" gnus-summary-caesar-message
-	       ,@(if (featurep 'xemacs) nil
+	       ,@(if (featurep 'xemacs) '(t)
 		   '(:help "\"Caesar rotate\" article by 13"))]
               ["Unix pipe" gnus-summary-pipe-message t]
               ["Add buttons" gnus-article-add-buttons t]
@@ -1805,10 +1805,10 @@ increase the score of each group you read."
 	      ["HZ" gnus-article-decode-HZ t])
              ("Output"
               ["Save in default format" gnus-summary-save-article
-	       ,@(if (featurep 'xemacs) nil
+	       ,@(if (featurep 'xemacs) '(t)
 		   '(:help "Save article using default method"))]
               ["Save in file" gnus-summary-save-article-file
-	       ,@(if (featurep 'xemacs) nil
+	       ,@(if (featurep 'xemacs) '(t)
 		   '(:help "Save article in file"))]
               ["Save in Unix mail format" gnus-summary-save-article-mail t]
               ["Save in MH folder" gnus-summary-save-article-folder t]
@@ -1841,7 +1841,7 @@ increase the score of each group you read."
                 'request-expire-articles gnus-newsgroup-name)])
              ("Extract"
               ["Uudecode" gnus-uu-decode-uu
-	       ,@(if (featurep 'xemacs) nil
+	       ,@(if (featurep 'xemacs) '(t)
 		   '(:help "Decode uuencoded article(s)"))]
               ["Uudecode and save" gnus-uu-decode-uu-and-save t]
               ["Unshar" gnus-uu-decode-unshar t]
@@ -1894,23 +1894,23 @@ increase the score of each group you read."
      gnus-summary-post-menu gnus-summary-mode-map ""
      `("Post"
        ["Post an article" gnus-summary-post-news
-	,@(if (featurep 'xemacs) nil
+	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Post an article"))]
        ["Followup" gnus-summary-followup
-	,@(if (featurep 'xemacs) nil
+	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Post followup to this article"))]
        ["Followup and yank" gnus-summary-followup-with-original
-	,@(if (featurep 'xemacs) nil
+	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Post followup to this article, quoting its contents"))]
        ["Supersede article" gnus-summary-supersede-article t]
        ["Cancel article" gnus-summary-cancel-article
-	,@(if (featurep 'xemacs) nil
+	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Cancel an article you posted"))]
        ["Reply" gnus-summary-reply t]
        ["Reply and yank" gnus-summary-reply-with-original t]
        ["Wide reply" gnus-summary-wide-reply t]
        ["Wide reply and yank" gnus-summary-wide-reply-with-original
-	,@(if (featurep 'xemacs) nil
+	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Mail a reply, quoting this article"))]
        ["Mail forward" gnus-summary-mail-forward t]
        ["Post forward" gnus-summary-post-forward t]
@@ -1920,7 +1920,7 @@ increase the score of each group you read."
        ["Send bounced mail" gnus-summary-resend-bounced-mail t]
        ["Send a mail" gnus-summary-mail-other-window t]
        ["Uuencode and post" gnus-uu-post-news
-	,@(if (featurep 'xemacs) nil
+	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Post a uuencoded article"))]
        ["Followup via news" gnus-summary-followup-to-mail t]
        ["Followup via news and yank"
@@ -1939,7 +1939,7 @@ increase the score of each group you read."
 	 gnus-summary-kill-same-subject-and-select t]
 	["Mark same subject" gnus-summary-kill-same-subject t]
 	["Catchup" gnus-summary-catchup
-	 ,@(if (featurep 'xemacs) nil
+	 ,@(if (featurep 'xemacs) '(t)
 	     '(:help "Mark unread articles in this group as read"))]
 	["Catchup all" gnus-summary-catchup-all t]
 	["Catchup to here" gnus-summary-catchup-to-here t]
@@ -1991,10 +1991,10 @@ increase the score of each group you read."
 	 ["Save" gnus-summary-save-process-mark t]))
        ("Scroll article"
 	["Page forward" gnus-summary-next-page
-	 ,@(if (featurep 'xemacs) nil
+	 ,@(if (featurep 'xemacs) '(t)
 	     '(:help "Show next page of article"))]
 	["Page backward" gnus-summary-prev-page
-	 ,@(if (featurep 'xemacs) nil
+	 ,@(if (featurep 'xemacs) '(t)
 	     '(:help "Show previous page of article"))]
 	["Line forward" gnus-summary-scroll-up t])
        ("Move"
@@ -2047,12 +2047,12 @@ increase the score of each group you read."
        ["Send a bug report" gnus-bug t]
        ("Exit"
 	["Catchup and exit" gnus-summary-catchup-and-exit
-	 ,@(if (featurep 'xemacs) nil
+	 ,@(if (featurep 'xemacs) '(t)
 	     '(:help "Mark unread articles in this group as read, then exit"))]
 	["Catchup all and exit" gnus-summary-catchup-all-and-exit t]
 	["Catchup and goto next" gnus-summary-catchup-and-goto-next-group t]
 	["Exit group" gnus-summary-exit
-	 ,@(if (featurep 'xemacs) nil
+	 ,@(if (featurep 'xemacs) '(t)
 	     '(:help "Exit current group, return to group selection mode"))]
 	["Exit group without updating" gnus-summary-exit-no-update t]
 	["Exit and goto next group" gnus-summary-next-group t]
@@ -8398,28 +8398,31 @@ If optional argument UNMARK is negative, mark articles as unread instead."
 If N is negative, mark backward instead.  If UNMARK is non-nil, remove
 the process mark instead.  The difference between N and the actual
 number of articles marked is returned."
-  (interactive "p")
-  (let ((backward (< n 0))
-	(n (abs n)))
-    (while (and
-	    (> n 0)
-	    (if unmark
+  (interactive "P")
+  (if (and (null n) (gnus-region-active-p))
+      (gnus-uu-mark-region (region-beginning) (region-end) unmark)
+    (setq n (prefix-numeric-value n))
+    (let ((backward (< n 0))
+	  (n (abs n)))
+      (while (and
+	      (> n 0)
+	      (if unmark
 		(gnus-summary-remove-process-mark
 		 (gnus-summary-article-number))
-	      (gnus-summary-set-process-mark (gnus-summary-article-number)))
-	    (zerop (gnus-summary-next-subject (if backward -1 1) nil t)))
-      (setq n (1- n)))
-    (when (/= 0 n)
-      (gnus-message 7 "No more articles"))
-    (gnus-summary-recenter)
-    (gnus-summary-position-point)
-    n))
+		(gnus-summary-set-process-mark (gnus-summary-article-number)))
+	      (zerop (gnus-summary-next-subject (if backward -1 1) nil t)))
+	(setq n (1- n)))
+      (when (/= 0 n)
+	(gnus-message 7 "No more articles"))
+      (gnus-summary-recenter)
+      (gnus-summary-position-point)
+      n)))
 
 (defun gnus-summary-unmark-as-processable (n)
   "Remove the process mark from the next N articles.
 If N is negative, unmark backward instead.  The difference between N and
 the actual number of articles unmarked is returned."
-  (interactive "p")
+  (interactive "P")
   (gnus-summary-mark-as-processable n t))
 
 (defun gnus-summary-unmark-all-processable ()

@@ -863,7 +863,7 @@ in the minibuffer prompt."
        ["Send a mail" gnus-group-mail t]
        ["Post an article..." gnus-group-post-news t]
        ["Check for new news" gnus-group-get-new-news
-	,@(if (featurep 'xemacs) nil
+	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Get newly arrived articles"))
 	]
        ["Activate all groups" gnus-activate-all-groups t]
@@ -882,7 +882,7 @@ in the minibuffer prompt."
        ["Toggle topics" gnus-topic-mode t]
        ["Send a bug report" gnus-bug t]
        ["Exit from Gnus" gnus-group-exit
-	,@(if (featurep 'xemacs) nil
+	,@(if (featurep 'xemacs) '(t)
 	    '(:help "Quit reading news"))]
        ["Exit without saving" gnus-group-quit t]))
 
