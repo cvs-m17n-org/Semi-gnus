@@ -1,7 +1,7 @@
 \input texinfo
 
 @setfilename gnus-ja
-@settitle T-gnus 6.16 Manual
+@settitle T-gnus 6.17 Manual
 @syncodeindex fn cp
 @syncodeindex vr cp
 @syncodeindex pg cp
@@ -33,7 +33,7 @@
 \makeindex
 \begin{document}
 
-\newcommand{\gnusversionname}{T-gnus v6.16}
+\newcommand{\gnusversionname}{T-gnus v6.17}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
 
@@ -390,7 +390,7 @@ license to the document, as described in section 6 of the license.
 @tex
 
 @titlepage
-@title T-gnus 6.16 Manual
+@title T-gnus 6.17 Manual
 
 @author by Lars Magne Ingebrigtsen
 @author by members of Semi-gnus mailing-list
@@ -458,7 +458,7 @@ T-gnus $B$O(B @acronym{SEMI} API $B$K4p$E$/(B @acronym{MIME} $B5!G=$rDs6!$7
 $B$5$^$6$^$J8@8l7w$r:9JL$7$^$;$s!#$"$"!"%/%j%s%4%s$NJ}$O(B Unicode Next
 Generation $B$r$*BT$A$/$@$5$$!#(B
 
-$B$3$N@bL@=q$O(B T-gnus 6.16 $B$KBP1~$7$^$9!#(B
+$B$3$N@bL@=q$O(B T-gnus 6.17 $B$KBP1~$7$^$9!#(B
 
 @end ifinfo
 
@@ -25796,7 +25796,7 @@ Gnus $B$OH"$+$i=P$7$F$9$0$K(B @emph{$BHs>o$K(B} $B$h$/F0:n$7$^$9(B---$B2?
 
 @item
 @kbd{M-x gnus-version} $B$r;n$7$F2<$5$$!#$b$7!"(B
-@samp{T-gnus 6.16.* (based on Gnus v5.10.*; for SEMI 1.1*, FLIM
+@samp{T-gnus 6.17.* (based on Gnus v5.10.*; for SEMI 1.1*, FLIM
 1.1*)} $B$N$h$&$J$b$N$,=P$F$-$?$J$i!"@5$7$$%U%!%$%k$,FI$_9~$^$l$F$$$^$9!#(B
 $B$=$&$J$i$J$$>l9g$O!"8E$$(B @file{.el} $B%U%!%$%k$,;6$i$+$C$F$$$^$9!#$=$l$i$r(B
 $B>C$7$F2<$5$$!#(B

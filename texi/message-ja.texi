@@ -1,7 +1,7 @@
 \input texinfo
 
 @setfilename message-ja
-@settitle T-gnus 6.16 Message Manual
+@settitle T-gnus 6.17 Message Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -63,7 +63,7 @@ license to the document, as described in section 6 of the license.
 @tex
 
 @titlepage
-@title T-gnus 6.16 Message Manual
+@title T-gnus 6.17 Message Manual
 
 @author by Lars Magne Ingebrigtsen
 @translated by members of Semi-gnus mailing-list
@@ -126,7 +126,7 @@ Gnus $B$NA4$F$N%a%C%;!<%8$N:n@.(B ($B%a!<%k$H%K%e!<%9$NN>J}(B) $B$O%a%C%;!<
 * Key Index::         $B%a%C%;!<%8%b!<%I%-!<$N0lMw(B
 @end menu
 
-$B$3$N%^%K%e%"%k$O(B T-gnus 6.16 Message $B$KBP1~$7$^$9!#(BMessage $B$O$3$N%^%K%e(B
+$B$3$N%^%K%e%"%k$O(B T-gnus 6.17 Message $B$KBP1~$7$^$9!#(BMessage $B$O$3$N%^%K%e(B
 $B%"%k$HF1$8HGHV9f$N(B Gnus $B$NG[I[$H6&$KG[I[$5$l$^$9!#(B
 
 @node Interface
