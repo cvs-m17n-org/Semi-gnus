@@ -1,3 +1,11 @@
+1998-06-30  Keisuke Mori   <ksk@ntts.com>
+
+	* texi/gnus-ja.texi: Add "Scroing".
+
+1998-06-30  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: Add "Scoring".
+
 1998-06-30  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* Sync up with Gnus 5.6.22
