@@ -2132,7 +2132,7 @@ Place point on the subject line of the highest-scored unread article.
 @end table
 
 This variable can also be a function.  In that case, that function
-will be called to place point on a subject line.  
+will be called to place point on a subject line.
 
 If you want to prevent automatic selection in some group (say, in a
 binary group with Huge articles) you can set the
@@ -2750,7 +2750,7 @@ precedence over any default @code{Gcc} rules as described later
 (@pxref{Archived Messages}).  CAVEAT:: It yields an error putting
 @code{(gcc-self . t)} in groups of a @code{nntp} server or so, because
 a @code{nntp} server doesn't accept artciles.
- 
+
 @item auto-expire
 @cindex auto-expire
 If the group parameter has an element that looks like @code{(auto-expire
@@ -3860,7 +3860,7 @@ topic.
 
 @item subscribe-level
 When subscribing new groups by topic (see the @code{subscribe} parameter),
-the group will be subscribed with the level specified in the 
+the group will be subscribed with the level specified in the
 @code{subscribe-level} instead of @code{gnus-level-default-subscribed}.
 
 @end table
@@ -4167,7 +4167,7 @@ something like:
 
 If you would like greater control of the time format, you can use a
 user-defined format spec.  Something like the following should do the
-trick: 
+trick:
 
 @lisp
 (setq gnus-group-line-format
@@ -4178,7 +4178,7 @@ trick:
         (format-time-string "%b %d  %H:%M" time)
       "")))
 @end lisp
-            
+
 
 @node File Commands
 @subsection File Commands
@@ -8228,7 +8228,7 @@ If a prefix is given, a charset will be asked for.
 
 @vindex gnus-article-wash-function
 The default is to use the function specified by
-@code{mm-inline-text-html-renderer} (@pxref{Customization, , , emacs-mime}) 
+@code{mm-inline-text-html-renderer} (@pxref{Customization, , , emacs-mime})
 to convert the @sc{html}, but this is controlled by the
 @code{gnus-article-wash-function} variable.  Pre-defined functions you
 can use include:
@@ -10715,7 +10715,7 @@ When you press those magical @kbd{C-c C-c} keys to ship off your latest
 
 Thank you for asking.  I hate you.
 
-It can be quite complicated.  
+It can be quite complicated.
 
 @vindex gnus-post-method
 When posting news, Message usually invokes @code{message-send-news}
@@ -10760,6 +10760,10 @@ package correctly.  An example:
 (setq message-send-mail-function 'smtpmail-send-it
       smtpmail-default-smtp-server "YOUR SMTP HOST")
 @end lisp
+
+To the thing similar to this, there is @code{message-smtpmail-send-it}.
+It is useful if your ISP requires the POP-before-SMTP authentication.
+See the documentation for the function @code{mail-source-touch-pop}.
 
 Other possible choises for @code{message-send-mail-function} includes
 @code{message-send-mail-with-mh}, @code{message-send-mail-with-qmail},
@@ -16075,7 +16079,7 @@ line from the article you respond to in these cases.
 
 @code{nnvirtual} groups do not inherit anything but articles and marks
 from component groups---group parameters, for instance, are not
-inherited. 
+inherited.
 
 
 @node Kibozed Groups
@@ -16397,7 +16401,7 @@ with the predicate then defined as:
 
 or you could append your predicate to the predefined
 @code{gnus-category-predicate-alist} in your @file{~/.gnus.el} or
-wherever. 
+wherever.
 
 @lisp
 (require 'gnus-agent)
@@ -20128,7 +20132,7 @@ functions all take one parameter.
 Internally, Gnus calls @code{gnus-make-predicate} on these specifiers
 to create a function that can be called.  This input parameter to this
 function will be passed along to all the functions in the predicate
-specifier. 
+specifier.
 
 
 @node Moderation
@@ -20833,7 +20837,7 @@ Specifiers}) follows.
 (setq mail-sources
       '((file :prescript "formail -bs spamassassin < /var/mail/%u")
         (pop :user "jrl"
-             :server "pophost" 
+             :server "pophost"
              :postscript "mv %t /tmp/foo; formail -bs spamc < /tmp/foo > %t")))
 @end lisp
 

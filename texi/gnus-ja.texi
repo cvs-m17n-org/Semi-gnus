@@ -10258,6 +10258,10 @@ gnus は常に投稿にどの方法を使うかをあなたに尋ねます。
       smtpmail-default-smtp-server "YOUR SMTP HOST")
 @end lisp
 
+これと似たものに @code{message-smtpmail-send-it} があります。
+ISP が POP-before-SMTP の認証を要求している場合に有用です。関
+数 @code{mail-source-touch-pop} の説明文を見てください。
+
 他の可能な @code{message-send-mail-function} の選択肢
 は @code{message-send-mail-with-mh},
 @code{message-send-mail-with-qmail} および @code{feedmail-send-it} を含
