@@ -117,6 +117,26 @@
      (contents-end   . "<!--BODYEND-->"))
     ))
 
+(defvar nnshimbun-x-face-alist
+  '(("default" .
+     (("default" .
+       "X-Face: Ygq$6P.,%Xt$U)DS)cRY@k$VkW!7(X'X'?U{{osjjFG\"E]hND;SPJ-J?O?R|a?L
+	g2$0rVng=O3Lt}?~IId8Jj&vP^3*o=LKUyk(`t%0c!;t6REk=JbpsEn9MrN7gZ%"))))
+  "Alist of server vs. alist of group vs. X-Face field.  It looks like:
+
+\((\"asahi\" . ((\"national\" . \"X-face: ***\")
+	     (\"business\" . \"X-Face: ***\")
+		;;
+		;;
+	     (\"default\" . \"X-face: ***\")))
+ (\"sponichi\" . ((\"baseball\" . \"X-face: ***\")
+		(\"soccer\" . \"X-Face: ***\")
+		;;
+		;;
+		(\"default\" . \"X-face: ***\")))
+		;;
+ (\"default\" . ((\"default\" . \"X-face: ***\")))")
+
 (defvoo nnshimbun-directory (nnheader-concat gnus-directory "shimbun/")
   "Where nnshimbun will save its files.")
 
@@ -274,14 +294,18 @@
 			   (set-buffer (nnshimbun-open-nov group))
 			   (and (nnheader-find-nov-line article)
 				(nnheader-parse-nov))))
-	(let ((xref (substring (mail-header-xref header) 6)))
+	(let* ((xref (substring (mail-header-xref header) 6))
+	       (x-faces (cdr (or (assoc server nnshimbun-x-face-alist)
+				 (assoc "default" nnshimbun-x-face-alist))))
+	       (x-face (cdr (or (assoc group x-faces)
+				(assoc "default" x-faces)))))
 	  (save-excursion
 	    (set-buffer nnshimbun-buffer)
 	    (erase-buffer)
 	    (nnshimbun-retrieve-url xref)
 	    (nnheader-message 6 "nnshimbun: Make contents...")
 	    (goto-char (point-min))
-	    (setq contents (funcall nnshimbun-make-contents header))
+	    (setq contents (funcall nnshimbun-make-contents header x-face))
 	    (nnheader-message 6 "nnshimbun: Make contents...done"))))
       (when contents
 	(save-excursion
@@ -654,7 +678,7 @@ is enclosed by at least one regexp grouping construct."
     (delete-region (point) (point-max)))
   (insert "\n"))
 
-(defun nnshimbun-make-text-or-html-contents (header)
+(defun nnshimbun-make-text-or-html-contents (header &optional x-face)
   (let ((case-fold-search t) (html t) (start))
     (when (and (search-forward nnshimbun-contents-start nil t)
 	       (setq start (point))
@@ -666,11 +690,16 @@ is enclosed by at least one regexp grouping construct."
     (goto-char (point-min))
     (nnshimbun-insert-header header)
     (insert "Content-Type: " (if html "text/html" "text/plain")
-	    "; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
+	    "; charset=ISO-2022-JP\nMIME-Version: 1.0\n")
+    (when x-face
+      (insert x-face)
+      (unless (bolp)
+	(insert "\n")))
+    (insert "\n")
     (encode-coding-string (buffer-string)
 			  (mime-charset-to-coding-system "ISO-2022-JP"))))
 
-(defun nnshimbun-make-html-contents (header)
+(defun nnshimbun-make-html-contents (header &optional x-face)
   (let (start)
     (when (and (search-forward nnshimbun-contents-start nil t)
 	       (setq start (point))
@@ -679,7 +708,13 @@ is enclosed by at least one regexp grouping construct."
       (delete-region (- (point) (length nnshimbun-contents-end)) (point-max)))
     (goto-char (point-min))
     (nnshimbun-insert-header header)
-    (insert "Content-Type: text/html; charset=ISO-2022-JP\nMIME-Version: 1.0\n\n")
+    (insert "Content-Type: text/html; charset=ISO-2022-JP\n"
+	    "MIME-Version: 1.0\n")
+    (when x-face
+      (insert x-face)
+      (unless (bolp)
+	(insert "\n")))
+    (insert "\n")
     (encode-coding-string (buffer-string)
 			  (mime-charset-to-coding-system "ISO-2022-JP"))))
 
