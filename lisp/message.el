@@ -3504,7 +3504,7 @@ This sub function is for exclusive use of `message-send-mail'."
 			    (if resend-to-addresses
 				(list resend-to-addresses)
 			      '("-t")))))))
-      (unless (zerop cpr)
+      (unless (or (null cpr) (zerop cpr))
 	(error "Sending...failed: %s" cpr)))
     (when message-interactive
       (save-excursion
