@@ -230,7 +230,7 @@ Return the response string if optional second argument is non-nil."
 	    (let ((size (- (point-max) (point-min))))
 	      (goto-char (point-min))
 	      (widen)
-	      (forward-line -2)
+	      (forward-line -1)
 	      (insert (format "Content-Length: %s\n" size)))
 	    )))))
 
