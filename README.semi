@@ -53,10 +53,8 @@ Major tags are following:
 
     himi		himi branch
 
-    ichikawa		ichikawa branch
+    pgnus-ichikawa	ichikawa branch
 			Based on pGnus.
-
-    pgnus-ichikawa	ichikawa branch. Based on pGnus
 
     akr			akr branch
 
@@ -74,7 +72,7 @@ How to get? (via ftp)
 
   Semi-daily snapshots are also available from
 
-    ftp://ftp.jaist.ac.jp/pub/GNU/elisp/semi-gnus/
+    ftp://ftp.jaist.ac.jp/pub/GNU/elisp/chamonix/gnus/
 
   NOTE: These snapshots are automatically created from our repository
 if something was changed within a day, and will usually not be tested.
