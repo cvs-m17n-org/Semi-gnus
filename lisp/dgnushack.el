@@ -87,6 +87,9 @@ Modify to suit your needs."))
 	(xemacs (string-match "XEmacs" emacs-version))
 	;;(byte-compile-generate-call-tree t)
 	file elc)
+    ;; !!!!! Temporarily !!!!!
+    (setq files (delete "webmail.el" files))
+    ;; !!!!! Temporarily !!!!!
     (condition-case ()
  	(require 'w3-forms)
       (error
