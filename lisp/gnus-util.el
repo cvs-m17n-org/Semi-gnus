@@ -75,10 +75,10 @@
 	 (set symbol nil))
      symbol))
 
-(defun gnus-string-width (str)
-  (length str))
-
-(defun gnus-truncate-string (str width)
+;; Avoid byte-compile warning.
+;; In Mule, this function will be redefined to `truncate-string',
+;; which takes 3 or 4 args.
+(defun gnus-truncate-string (str width &rest ignore)
   (substring str 0 width))
 
 ;; Added by Geoffrey T. Dairiki <dairiki@u.washington.edu>.  A safe way
