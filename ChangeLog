@@ -1,3 +1,19 @@
+1998-06-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.5.0.
+	(gnus-version): Modify for SEMI 1.7.
+
+	* lisp/gnus-sum.el: Rename
+	`mime-method-to-combine-message/partial-pieces' to
+	`mime-combine-message/partial-pieces-automatically'.
+
+	* lisp/gnus-art.el (gnus-article-preview-mime-message): Use
+	`mime-view-buffer'.
+	(gnus-article-decode-encoded-word): Fix DOC-string.
+	(gnus-article-header-presentation-method): New function; abolish
+	`gnus-content-header-filter'.
+	Modify for SEMI 1.7.
+
 1998-06-18  Keisuke Mori   <ksk@ntts.com>
 
 	* texi/gnus-ja.texi: Add "Select Methods".
