@@ -1,5 +1,5 @@
 ;;; mm-decode.el --- Functions for decoding MIME things
-;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -81,6 +81,8 @@
   `(nth 7 ,handle))
 (defmacro mm-handle-multipart-original-buffer (handle)
   `(get-text-property 0 'buffer (car ,handle)))
+(defmacro mm-handle-multipart-from (handle)
+  `(get-text-property 0 'from (car ,handle)))
 (defmacro mm-handle-multipart-ctl-parameter (handle parameter)
   `(get-text-property 0 ,parameter (car ,handle)))
 
@@ -181,7 +183,7 @@
   "List of media types that are to be displayed inline."
   :type '(repeat string)
   :group 'mime-display)
-  
+ 
 (defcustom mm-automatic-display
   '("text/plain" "text/enriched" "text/richtext" "text/html"
     "text/x-vcard" "image/.*" "message/delivery-status" "multipart/.*"
@@ -249,16 +251,16 @@ to:
 
 (defvar mm-verify-function-alist
   '(("application/pgp-signature" mml2015-verify "PGP" mml2015-verify-test)
-    ("application/x-gnus-pgp-signature" mm-uu-pgp-signed-extract-1 "PGP" 
+    ("application/x-gnus-pgp-signature" mm-uu-pgp-signed-extract-1 "PGP"
      mm-uu-pgp-signed-test)
-    ("application/pkcs7-signature" mml-smime-verify "S/MIME" 
+    ("application/pkcs7-signature" mml-smime-verify "S/MIME"
      mml-smime-verify-test)
-    ("application/x-pkcs7-signature" mml-smime-verify "S/MIME" 
+    ("application/x-pkcs7-signature" mml-smime-verify "S/MIME"
      mml-smime-verify-test)))
 
 (defcustom mm-verify-option 'never
   "Option of verifying signed parts.
-`never', not verify; `always', always verify; 
+`never', not verify; `always', always verify;
 `known', only verify known protocols. Otherwise, ask user."
   :type '(choice (item always)
 		 (item never)
@@ -271,12 +273,12 @@ to:
 
 (defvar mm-decrypt-function-alist
   '(("application/pgp-encrypted" mml2015-decrypt "PGP" mml2015-decrypt-test)
-    ("application/x-gnus-pgp-encrypted" mm-uu-pgp-encrypted-extract-1 "PGP" 
+    ("application/x-gnus-pgp-encrypted" mm-uu-pgp-encrypted-extract-1 "PGP"
      mm-uu-pgp-encrypted-test)))
 
 (defcustom mm-decrypt-option nil
   "Option of decrypting encrypted parts.
-`never', not decrypt; `always', always decrypt; 
+`never', not decrypt; `always', always decrypt;
 `known', only decrypt known protocols. Otherwise, ask user."
   :type '(choice (item always)
 		 (item never)
@@ -291,7 +293,7 @@ to:
   "Keymap for input viewer with completion.")
 
 ;; Should we bind other key to minibuffer-complete-word?
-(define-key mm-viewer-completion-map " " 'self-insert-command) 
+(define-key mm-viewer-completion-map " " 'self-insert-command)
 
 (defvar mm-viewer-completion-map
   (let ((map (make-sparse-keymap 'mm-viewer-completion-map)))
@@ -325,7 +327,7 @@ The original alist is not modified.  See also `destructive-alist-to-plist'."
 (defun mm-dissect-buffer (&optional no-strict-mime)
   "Dissect the current buffer and return a list of MIME handles."
   (save-excursion
-    (let (ct ctl type subtype cte cd description id result)
+    (let (ct ctl type subtype cte cd description id result from)
       (save-restriction
 	(mail-narrow-to-head)
 	(when (or no-strict-mime
@@ -335,6 +337,8 @@ The original alist is not modified.  See also `destructive-alist-to-plist'."
 		cte (mail-fetch-field "content-transfer-encoding")
 		cd (mail-fetch-field "content-disposition")
 		description (mail-fetch-field "content-description")
+		from (cadr (mail-extract-address-components
+			    (or (mail-fetch-field "from") "")))
 		id (mail-fetch-field "content-id"))))
       (when cte
 	(setq cte (mail-header-strip cte)))
@@ -368,6 +372,9 @@ The original alist is not modified.  See also `destructive-alist-to-plist'."
 	     ;; name as a text property of the "multipart/whatever" string.
              (add-text-properties 0 (length (car ctl))
 				  (list 'buffer (mm-copy-to-buffer))
+                                  (car ctl))
+             (add-text-properties 0 (length (car ctl))
+				  (list 'from from)
                                   (car ctl))
 	     (cons (car ctl) (mm-dissect-multipart ctl))))
 	  (t
@@ -575,7 +582,7 @@ external if displayed external."
 		   (mm-handle-set-undisplayer handle (cons file buffer)))
 		 (message "Displaying %s..." (format method file))
 		 'external)))))))
-  
+
 (defun mm-mailcap-command (method file type-list)
   (let ((ctl (cdr type-list))
 	(beg 0)
@@ -964,7 +971,7 @@ external if displayed external."
   (and (mm-valid-image-format-p format)
        (mm-image-fit-p handle)))
 
-(defun mm-find-part-by-type (handles type &optional notp recursive) 
+(defun mm-find-part-by-type (handles type &optional notp recursive)
   "Search in HANDLES for part with TYPE.
 If NOTP, returns first non-matching part.
 If RECURSIVE, search recursively."
@@ -982,9 +989,9 @@ If RECURSIVE, search recursively."
       (setq handles (cdr handles)))
     handle))
 
-(defun mm-find-raw-part-by-type (ctl type &optional notp) 
+(defun mm-find-raw-part-by-type (ctl type &optional notp)
   (goto-char (point-min))
-  (let* ((boundary (concat "--" (mm-handle-multipart-ctl-parameter ctl 
+  (let* ((boundary (concat "--" (mm-handle-multipart-ctl-parameter ctl
 								   'boundary)))
 	 (close-delimiter (concat "^" (regexp-quote boundary) "--[ \t]*$"))
 	 start
@@ -1002,8 +1009,8 @@ If RECURSIVE, search recursively."
 	(save-excursion
 	  (save-restriction
 	    (narrow-to-region start (1- (point)))
-	    (when (let ((ctl (ignore-errors 
-			       (mail-header-parse-content-type 
+	    (when (let ((ctl (ignore-errors
+			       (mail-header-parse-content-type
 				(mail-fetch-field "content-type")))))
 		    (if notp
 			(not (equal (car ctl) type))
@@ -1015,8 +1022,8 @@ If RECURSIVE, search recursively."
       (save-excursion
 	(save-restriction
 	  (narrow-to-region start end)
-	  (when (let ((ctl (ignore-errors 
-			     (mail-header-parse-content-type 
+	  (when (let ((ctl (ignore-errors
+			     (mail-header-parse-content-type
 			      (mail-fetch-field "content-type")))))
 		  (if notp
 		      (not (equal (car ctl) type))
@@ -1025,26 +1032,20 @@ If RECURSIVE, search recursively."
     result))
 
 (defvar mm-security-handle nil)
-(defvar mm-security-from nil)
 
 (defsubst mm-set-handle-multipart-parameter (handle parameter value)
   ;; HANDLE could be a CTL.
   (if handle
-      (put-text-property 0 (length (car handle)) parameter value 
+      (put-text-property 0 (length (car handle)) parameter value
 			 (car handle))))
 
 (defun mm-possibly-verify-or-decrypt (parts ctl)
   (let ((subtype (cadr (split-string (car ctl) "/")))
 	(mm-security-handle ctl) ;; (car CTL) is the type.
-	(mm-security-from
-	 (save-restriction
-	   (mail-narrow-to-head)
-	   (cadr (mail-extract-address-components 
-		  (or (mail-fetch-field "from") "")))))
 	protocol func functest)
-    (cond 
+    (cond
      ((equal subtype "signed")
-      (unless (and (setq protocol 
+      (unless (and (setq protocol
 			 (mm-handle-multipart-ctl-parameter ctl 'protocol))
 		   (not (equal protocol "multipart/mixed")))
 	;; The message is broken or draft-ietf-openpgp-multsig-01.
@@ -1060,10 +1061,10 @@ If RECURSIVE, search recursively."
       (if (cond
 	   ((eq mm-verify-option 'never) nil)
 	   ((eq mm-verify-option 'always) t)
-	   ((eq mm-verify-option 'known) 
-	    (and func 
-		 (or (not (setq functest 
-				(nth 3 (assoc protocol 
+	   ((eq mm-verify-option 'known)
+	    (and func
+		 (or (not (setq functest
+				(nth 3 (assoc protocol
 					      mm-verify-function-alist))))
 		     (funcall functest parts ctl))))
 	   (t (y-or-n-p
@@ -1073,16 +1074,16 @@ If RECURSIVE, search recursively."
 	  (save-excursion
 	    (if func
 		(funcall func parts ctl)
-	      (mm-set-handle-multipart-parameter 
-	       mm-security-handle 'gnus-details 
+	      (mm-set-handle-multipart-parameter
+	       mm-security-handle 'gnus-details
 	       (format "Unknown sign protocol (%s)" protocol))))))
      ((equal subtype "encrypted")
-      (unless (setq protocol 
+      (unless (setq protocol
 		    (mm-handle-multipart-ctl-parameter ctl 'protocol))
 	;; The message is broken.
 	(let ((parts parts))
 	  (while parts
-	    (if (assoc (mm-handle-media-type (car parts)) 
+	    (if (assoc (mm-handle-media-type (car parts))
 		       mm-decrypt-function-alist)
 		(setq protocol (mm-handle-media-type (car parts))
 		      parts nil)
@@ -1092,20 +1093,20 @@ If RECURSIVE, search recursively."
 	   ((eq mm-decrypt-option 'never) nil)
 	   ((eq mm-decrypt-option 'always) t)
 	   ((eq mm-decrypt-option 'known)
-	    (and func 
-		 (or (not (setq functest 
-				(nth 3 (assoc protocol 
+	    (and func
+		 (or (not (setq functest
+				(nth 3 (assoc protocol
 					      mm-decrypt-function-alist))))
 		     (funcall functest parts ctl))))
-	   (t (y-or-n-p 
+	   (t (y-or-n-p
 	       (format "Decrypt (%s) part? "
 		       (or (nth 2 (assoc protocol mm-decrypt-function-alist))
 			   (format "protocol=%s" protocol))))))
 	  (save-excursion
 	    (if func
 		(setq parts (funcall func parts ctl))
-	      (mm-set-handle-multipart-parameter 
-	       mm-security-handle 'gnus-details 
+	      (mm-set-handle-multipart-parameter
+	       mm-security-handle 'gnus-details
 	       (format "Unknown encrypt protocol (%s)" protocol))))))
      (t nil))
     parts))

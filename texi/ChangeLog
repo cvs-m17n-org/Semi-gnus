@@ -1,3 +1,13 @@
+2001-01-21  Raymond Scholz <ray-2001@zonix.de>
+
+	* message.texi: Rename X-Mailer and X-Newsreader to User-Agent.
+
+2001-01-19 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* infohack.el: New file.
+
+	* Makefile.in: Use it.
+
 2001-01-18 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus.texi (Hiding Headers): Add.

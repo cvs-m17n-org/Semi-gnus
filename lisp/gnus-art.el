@@ -1,5 +1,6 @@
 ;;; gnus-art.el --- article mode commands for Semi-gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -1391,7 +1392,7 @@ always hide."
 	     ((eq elem 'to-address)
 	      (let ((to (message-fetch-field "to"))
 		    (to-address
-		     (gnus-group-find-parameter 
+		     (gnus-group-find-parameter
 		      (if (boundp 'gnus-newsgroup-name)
 			  gnus-newsgroup-name "") 'to-address)))
 		(when (and to to-address
@@ -1726,7 +1727,7 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
       (save-restriction
 	(article-narrow-to-head)
 	(when (and buffer-read-only ;; When type `W f'
-		   (progn 
+		   (progn
 		     (goto-char (point-min))
 		     (not (re-search-forward "^X-Face:[\t ]*" nil t)))
 		   (gnus-buffer-live-p gnus-original-article-buffer))
@@ -1737,7 +1738,7 @@ MAP is an alist where the elements are on the form (\"from\" \"to\")."
 		(setq x-faces
 		      (concat
 		       (or x-faces "")
-		       (buffer-substring 
+		       (buffer-substring
 			(match-beginning 0)
 			(1- (re-search-forward
 			     "^\\($\\|[^ \t]\\)" nil t))))))))
@@ -5092,7 +5093,7 @@ after replacing with the original article."
     ("\\bin\\( +article\\| +message\\)? +\\(<\\([^\n @<>]+@[^\n @<>]+\\)>\\)" 2
      t gnus-button-message-id 3)
     ("\\(<URL: *\\)mailto: *\\([^> \n\t]+\\)>" 0 t gnus-url-mailto 2)
-    ("mailto:\\([-a-zA-Z.@_+0-9%]+\\)" 0 t gnus-url-mailto 1)
+    ("mailto:\\([-a-zA-Z.@_+0-9%=?]+\\)" 0 t gnus-url-mailto 1)
     ("\\bmailto:\\([^ \n\t]+\\)" 0 t gnus-url-mailto 1)
     ;; This is how URLs _should_ be embedded in text...
     ("<URL: *\\([^<>]*\\)>" 0 t gnus-button-embedded-url 1)

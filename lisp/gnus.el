@@ -1,6 +1,6 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000 Free Software Foundation, Inc.
+;;        1997, 1998, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -916,7 +916,7 @@ REST is a plist of following:
 			    `(quote (repeat (list (regexp :tag "Group")
 						  ,parameter-type)))))
 	 (variable-default (plist-get rest :variable-default)))
-    (list 
+    (list
      'progn
      `(defcustom ,variable ,variable-default
 	,variable-document
@@ -1474,7 +1474,7 @@ to be desirable; see the manual for further details."
   :type '(choice (const nil)
 		 integer))
 
-(gnus-define-group-parameter 
+(gnus-define-group-parameter
  auto-expire
  :type bool
  :function gnus-group-auto-expirable-p
@@ -1489,17 +1489,17 @@ which to perform auto-expiry.  This only makes sense for mail groups."
   :variable-group nnmail-expire
   :variable-type '(choice (const nil)
 			  regexp)
-  :parameter-type '(const :tag "Automatic Expire" t) 
-  :parameter-document 
+  :parameter-type '(const :tag "Automatic Expire" t)
+  :parameter-document
   "All articles that are read will be marked as expirable.")
 
-(gnus-define-group-parameter 
+(gnus-define-group-parameter
  total-expire
  :type bool
  :function gnus-group-total-expirable-p
  :function-document
  "Check whether GROUP is total-expirable or not."
- :variable gnus-total-expirable-newsgroups 
+ :variable gnus-total-expirable-newsgroups
  :variable-default nil
  :variable-document
  "*Groups in which to perform expiry of all read articles.
@@ -1510,8 +1510,8 @@ course.)"
   :variable-group nnmail-expire
   :variable-type '(choice (const nil)
 			  regexp)
-  :parameter-type '(const :tag "Total Expire" t) 
-  :parameter-document 
+  :parameter-type '(const :tag "Total Expire" t)
+  :parameter-document
   "All read articles will be put through the expiry process
 
 This happens even if they are not marked as expirable.
@@ -2985,7 +2985,7 @@ Disallow invalid group names."
   (let ((prefix "")
 	group)
     (while (not group)
-      (when (string-match 
+      (when (string-match
 	     gnus-invalid-group-regexp
 	     (setq group (read-string (concat prefix prompt)
 				      (cons (or default "") 0)

@@ -1,5 +1,5 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -247,7 +247,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (unless (featurep 'xemacs)
   (defalias 'Custom-make-dependencies 'ignore)
   (defalias 'update-autoloads-from-directory 'ignore))
-(autoload 'texinfo-parse-line-arg "texinfmt")
 
 (unless (fboundp 'with-temp-buffer)
   ;; Pickup some macros.
@@ -261,7 +260,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (defalias 'define-mail-user-agent 'ignore)
 
 (defconst dgnushack-unexporting-files
-  (append '("dgnushack.el" "dgnuspath.el" "lpath.el" "ptexinfmt.el")
+  (append '("dgnushack.el" "dgnuspath.el" "lpath.el")
 	  (unless (or (condition-case code
 			  (require 'w3-forms)
 			(error
@@ -357,116 +356,6 @@ Modify to suit your needs."))
 (defun dgnushack-recompile ()
   (require 'gnus)
   (byte-recompile-directory "." 0))
-
-
-(defun dgnushack-texi-add-suffix-and-format ()
-  (dgnushack-texi-format t))
-
-(defun dgnushack-texi-format (&optional addsuffix)
-  (if (not noninteractive)
-      (error "batch-texinfo-format may only be used -batch."))
-  (require 'ptexinfmt)
-  (let ((auto-save-default nil)
-	(find-file-run-dired nil)
-	coding-system-for-write
-	output-coding-system)
-    (let ((error 0)
-	  file
-	  (files ()))
-      (while command-line-args-left
-	(setq file (expand-file-name (car command-line-args-left)))
-	(cond ((not (file-exists-p file))
-	       (message ">> %s does not exist!" file)
-	       (setq error 1
-		     command-line-args-left (cdr command-line-args-left)))
-	      ((file-directory-p file)
-	       (setq command-line-args-left
-		     (nconc (directory-files file nil nil t)
-			    (cdr command-line-args-left))))
-	      (t
-	       (setq files (cons file files)
-		     command-line-args-left (cdr command-line-args-left)))))
-      (while (setq file (pop files))
-	(condition-case err
-	    (progn
-	      (if buffer-file-name (kill-buffer (current-buffer)))
-	      (find-file file)
-	      (buffer-disable-undo (current-buffer))
-	      (if (boundp 'MULE)
-		  (setq output-coding-system (symbol-value
-					      'file-coding-system))
-		(setq coding-system-for-write buffer-file-coding-system))
-	      ;; Remove ignored areas first.
-	      (while (re-search-forward "^@ignore[\t\r ]*$" nil t)
-		(delete-region (match-beginning 0)
-			       (if (re-search-forward
-				    "^@end[\t ]+ignore[\t\r ]*$" nil t)
-				   (1+ (match-end 0))
-				 (point-max))))
-	      (goto-char (point-min))
-	      ;; Add suffix if it is needed.
-	      (when (and addsuffix
-			 (re-search-forward
-			  "^@setfilename[\t ]+\\([^\t\n ]+\\)" nil t)
-			 (not (string-match "\\.info$" (match-string 1))))
-		(insert ".info")
-		(goto-char (point-min)))
-	      ;; process @include before updating node
-	      ;; This might produce some problem if we use @lowersection or
-	      ;; such.
-	      (let ((input-directory default-directory)
-		    (texinfo-command-end))
-		(while (re-search-forward "^@include" nil t)
-		  (setq texinfo-command-end (point))
-		  (let ((filename (concat input-directory
-					  (texinfo-parse-line-arg))))
-		    (re-search-backward "^@include")
-		    (delete-region (point) (save-excursion
-					     (forward-line 1)
-					     (point)))
-		    (message "Reading included file: %s" filename)
-		    (save-excursion
-		      (save-restriction
-			(narrow-to-region
-			 (point)
-			 (+ (point)
-			    (car (cdr (insert-file-contents filename)))))
-			(goto-char (point-min))
-			;; Remove `@setfilename' line from included file,
-			;; if any, so @setfilename command not duplicated.
-			(if (re-search-forward "^@setfilename"
-					       (save-excursion
-						 (forward-line 100)
-						 (point))
-					       t)
-			    (progn
-			      (beginning-of-line)
-			      (delete-region (point) (save-excursion
-						       (forward-line 1)
-						       (point))))))))))
-	      (texinfo-mode)
-	      (texinfo-every-node-update)
-	      (set-buffer-modified-p nil)
-	      (message "texinfo formatting %s..." file)
-	      (texinfo-format-buffer nil)
-	      (if (buffer-modified-p)
-		  (progn (message "Saving modified %s" (buffer-file-name))
-			 (save-buffer))))
-	  (error
-	   (message ">> Error: %s" (prin1-to-string err))
-	   (message ">>  point at")
-	   (let ((s (buffer-substring (point)
-				      (min (+ (point) 100)
-					   (point-max))))
-		 (tem 0))
-	     (while (setq tem (string-match "\n+" s tem))
-	       (setq s (concat (substring s 0 (match-beginning 0))
-			       "\n>>  "
-			       (substring s (match-end 0)))
-		     tem (1+ tem)))
-	     (message ">>  %s" s))
-	   (setq error 1))))
-      (kill-emacs error))))
 
 
 (defconst dgnushack-info-file-regexp-en

@@ -1,3 +1,16 @@
+2001-01-22  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* texi/Makefile.in (.texi, %.info, %-ja.info, %-ja): Use
+	`infohack-texi-format'.
+
+	* texi/infohack: (infohack-texi-format): New function.
+	* lisp/dgnushack.el (dgnushack-texi-format): Move to
+	texi/infohack.el and rename.
+	(dgnushack-texi-add-suffix-and-format): Remove.
+
+	* texi/ptexinfmt.el: New file.
+	* lisp/ptexinfmt.el: Move to texi/.
+
 2001-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.

@@ -1,5 +1,5 @@
 ;;; mailcap.el --- MIME media types configuration
-;; Copyright (C) 1998, 1999, 2000 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001 Free Software Foundation, Inc.
 
 ;; Author: William M. Perry <wmperry@aventail.com>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -54,6 +54,10 @@
 ;; files for the rest?  -- fx
 (defvar mailcap-mime-data
   '(("application"
+     ("vnd.ms-excel"
+      (viewer . "gnumeric %s")
+      (test   . (getenv "DISPLAY"))
+      (type . "application/vnd.ms-excel"))
      ("x-x509-ca-cert"
       (viewer . ssl-view-site-cert)
       (test . (fboundp 'ssl-view-site-cert))
@@ -306,7 +310,7 @@ If you are unsure what to do, please answer \"no\"."
   "Text of warning message displayed by `mailcap-maybe-eval'.
 Make sure that this text consists only of few text lines.  Otherwise,
 Gnus might fail to display all of it.")
-  
+ 
 (defun mailcap-maybe-eval ()
   "Maybe evaluate a buffer of Emacs Lisp code."
   (let ((lisp-buffer (current-buffer)))

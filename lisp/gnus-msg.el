@@ -1,5 +1,5 @@
 ;;; gnus-msg.el --- mail and post interface for Semi-gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -439,7 +439,7 @@ If prefix argument YANK is non-nil, original article is yanked automatically."
 
       (gnus-copy-article-buffer)
       (let ((message-reply-buffer gnus-article-copy)
-	    (message-reply-headers 
+	    (message-reply-headers
 	     (with-current-buffer gnus-article-copy
 	       ;; The headers are decoded.
 	       (nnheader-parse-head t))))
@@ -847,8 +847,8 @@ If FULL-HEADERS (the prefix), include full headers when forwarding."
 
 (defun gnus-summary-resend-message (address n)
   "Resend the current article to ADDRESS."
-  (interactive 
-   (list (message-read-from-minibuffer "Resend message(s) to: ") 
+  (interactive
+   (list (message-read-from-minibuffer "Resend message(s) to: ")
 	 current-prefix-arg))
   (let ((articles (gnus-summary-work-articles n))
 	article)
@@ -1224,7 +1224,7 @@ this is a reply."
 		       (concat "^" (regexp-quote mail-header-separator) "$")
 		       nil t)
 		  (replace-match "" t t ))
-		(unless (setq group-art 
+		(unless (setq group-art
 			      (gnus-request-accept-article group method t t))
 		  (gnus-message 1 "Couldn't store article in group %s: %s"
 				group (gnus-status-message method))
@@ -1233,26 +1233,26 @@ this is a reply."
 		  (let ((active (gnus-active group)))
 		    (if active
 			(if (< (cdr active) (cdr group-art))
-			    (gnus-set-active group (cons (car active) 
+			    (gnus-set-active group (cons (car active)
 							 (cdr group-art))))
 		      (gnus-activate-group group)))
 		  (let ((buffer (gnus-summary-buffer-name group))
 			(mark gnus-read-mark)
 			(article (cdr group-art)))
-		    (unless 
-			(and 
+		    (unless
+			(and
 			 (get-buffer buffer)
 			 (with-current-buffer buffer
 			   (when gnus-newsgroup-prepared
 			     (when (and gnus-newsgroup-auto-expire
 					(memq mark gnus-auto-expirable-marks))
 			       (setq mark gnus-expirable-mark))
-			     (setq mark (gnus-request-update-mark 
+			     (setq mark (gnus-request-update-mark
 					 group article mark))
 			     (gnus-mark-article-as-read article mark)
 			     (setq gnus-newsgroup-active (gnus-active group))
 			     t)))
-		      (gnus-group-make-articles-read group 
+		      (gnus-group-make-articles-read group
 						     (list article))
 		      (when (gnus-group-auto-expirable-p group)
 			(gnus-add-marked-articles

@@ -1,5 +1,5 @@
 ;;; message.el --- composing mail and news messages  -*- coding: iso-latin-1 -*-
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -233,14 +233,14 @@ included.  Organization, Lines and User-Agent are optional."
   :type 'sexp)
 
 (defcustom message-ignored-news-headers
-  "^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:\\|X-Draft-From:"
+  "^NNTP-Posting-Host:\\|^Xref:\\|^[BGF]cc:\\|^Resent-Fcc:\\|^X-Draft-From:"
   "*Regexp of headers to be removed unconditionally before posting."
   :group 'message-news
   :group 'message-headers
   :type 'regexp)
 
 (defcustom message-ignored-mail-headers
-  "^[GF]cc:\\|^Resent-Fcc:\\|^Xref:\\|X-Draft-From:"
+  "^[GF]cc:\\|^Resent-Fcc:\\|^Xref:\\|^X-Draft-From:"
   "*Regexp of headers to be removed unconditionally before mailing."
   :group 'message-mail
   :group 'message-headers
@@ -2600,7 +2600,10 @@ be added to \"References\" field.
       (while (looking-at "^[ \t]*$")
 	(forward-line -1))
       (forward-line 1)
-      (delete-region (point) end))
+      (delete-region (point) end)
+      (unless (search-backward "\n\n" start t)
+	;; Insert a blank line if it is peeled off.
+	(insert "\n")))
     (goto-char start)
     (while functions
       (funcall (pop functions)))
@@ -3105,8 +3108,9 @@ This sub function is for exclusive use of `message-send-mail'."
 		       (or (message-fetch-field "cc")
 			   (message-fetch-field "to"))
 		       (let ((ct (mime-read-Content-Type)))
-			 (and (eq 'text (cdr (assq 'type ct)))
-			      (eq 'plain (cdr (assq 'subtype ct)))))))
+			 (or (not ct)
+			     (and (eq 'text (cdr (assq 'type ct)))
+				  (eq 'plain (cdr (assq 'subtype ct))))))))
 	      (message-insert-courtesy-copy))
 	    (setq failure (message-maybe-split-and-send-mail)))
 	(kill-buffer tembuf))
@@ -4744,7 +4748,8 @@ that further discussion should take place only in "
 	(progn
 	  (setq follow-to (list (cons 'To
 				      (or to-address mrt reply-to mft from))))
-	  (when (and wide mct)
+	  (when (and wide (or mft mct)
+		     (not (member (cons 'To (or mft mct)) follow-to)))
 	    (push (cons 'Cc mct) follow-to)))
       (let (ccalist)
 	(save-excursion

@@ -985,7 +985,7 @@ Message $B$O%a%C%;!<%8:n@.ItJ,$K4X$7$F$OHs>o$K@Q6KE*$G$9!#$=$l$O<!$N$h$&$G(B
 @vindex message-required-mail-headers
 $B$3$NJQ?t$N9=J8$rCN$j$?$1$l$P!"(B@xref{News Headers} $B$r;2>H$7$F2<$5$$!#$=$l(B
 $B$N=i4|CM$O(B @code{(From Date Subject (optional . In-Reply-To) Message-ID
-Lines (optional . X-Mailer))} $B$G$9!#(B
+Lines (optional . User-Agent))} $B$G$9!#(B
 
 @item message-ignored-mail-headers
 @vindex message-ignored-mail-headers
@@ -1077,14 +1077,10 @@ Message $B$O(B @code{system-name} $B$r%7%9%F%`L>$r7h$a$k$?$a$K;H$$$^$9!#$b$7$
 $BL>(B) $B$G$J$$$J$i(B $B$P!"(BMessage $B$O(B @code{mail-host-address} $B$r(B FQDN $B$H$7$F;H(B
 $B$$$^$9!#(B
 
-@item X-Newsreader
-@cindex X-Nesreader
+@item User-Agent
+@cindex User-Agent
 $B$3$NA*Br<+M3$J%X%C%@!<$O%m!<%+%kJQ?t(B @code{message-newsreader} $B$K$7$?$,$C(B
 $B$F:n$i$l$^$9!#(B
-
-@item X-Mailer
-$B$3$NA*Br<+M3$J%X%C%@!<$O!"4{$K(B @code{X-Nesreader} $B%X%C%@!<$,B8:_$7$F$$$k(B
-$B>l9g0J30$O!"%m!<%+%kJQ?t(B @code{message-mailer} $B$K$7$?$,$C$F:n$i$l$^$9!#(B
 
 @item In-Reply-To
 $B$3$NA*Br<+M3$J%X%C%@!<$OJVEz$7$F$$$k5-;v$N(B @code{Date} $B$H(B @code{From} $B%X%C(B

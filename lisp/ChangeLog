@@ -1,3 +1,57 @@
+2001-01-21 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* webmail.el (webmail-type-definition): netaddress changes.
+
+2001-01-21 00:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.el: Fix copyright. Remove trailing spaces.
+
+	* message.el (message-forward): Use mule4.
+	
+2001-01-20 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-string-as-unibyte): New.
+
+	* message.el (message-forward): Use it.
+
+2001-01-19 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-cite-original-without-signature): Don't peel
+	off the blank line.
+	(message-get-reply-headers): Add Cc if it is not in follow-to.
+
+2001-01-20  Simon Josefsson  <sj@extundo.com>
+
+	* mm-decode.el (mm-handle-multipart-from): Add.
+	(mm-dissect-buffer): Save From: header value.
+	(mm-security-from): Remove.
+	(mm-possibly-verify-or-decrypt): Don't set mm-security-from.
+
+	* mml-smime.el (mml-smime-verify): Use `mm-handle-multipart-from'
+	instead of `mml-security-from'.  Protect null from value.
+
+2001-01-20  Simon Josefsson  <sj@extundo.com>
+
+	* mailcap.el (mailcap-mime-data): Run `gnumeric' on
+	application/vnd.ms-excel attachments.
+
+2001-01-19  Simon Josefsson  <sj@extundo.com>
+
+        * gnus-art.el (gnus-button-alist): Add `?=' to mailto URL regexp.
+
+2001-01-19 13:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* message.el (message-ignored-mail-headers): Ditto.
+
+2001-01-19  Simon Josefsson  <sj@extundo.com>
+
+	* message.el (message-ignored-news-headers): Only search beginning
+	of line.
+
+2001-01-19  Alberto Lusiani <a.lusiani@noemail.org>
+
+	* message.el (message-send-mail): Content-Type may not be there.
+
 2001-01-18 23:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-ems.el (gnus-article-display-xface): Add BUFFER.
@@ -255,7 +309,7 @@
 	* nnfolder.el (nnfolder-existing-articles): Reversed, i.e. sorted.
 	(nnfolder-request-expire-articles): Use gnus-sorted-intersection.
 	(nnfolder-retrieve-headers): Use intersection. Suggested by Jonas
-	KvarnstrÅ,Av(Bm <jonkv@ida.liu.se>.
+	Kvarnstr,Av(Bm <jonkv@ida.liu.se>.
 
 2000-12-30 00:17:38  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
@@ -461,7 +515,7 @@
 
 	* message.el (message-forward): Save-restriction.
 
-2000-12-21  Kai GroÅ,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2000-12-21  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus-art.el (article-treat-dumbquotes): More doc, provided by
 	Paul Stevenson <p.stevenson@surrey.ac.uk>
@@ -1554,10 +1608,10 @@
 	* message.el (message-font-lock-keywords): use
 	message-cite-prefix-regexp.
 
-2000-11-15  Kai GroÅ,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2000-11-15  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus-group.el (gnus-group-jump-to-group-prompt): New variable by
-	Stein Arild StrÅ,Ax(Bmme.
+	Stein Arild Str,Ax(Bmme.
 	(gnus-group-jump-to-group): Use it.
 	(gnus-group-jump-to-group-prompt): Customize.
 
@@ -1689,7 +1743,7 @@
 	* gnus-art.el (gnus-mime-display-alternative): Show button if no
 	preferred part.
 
-2000-11-07  Kai GroÅ,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+2000-11-07  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 
 	* gnus-sum.el (gnus-move-split-methods): Say that
 	`gnus-split-methods' uses file names, whereas this uses group
