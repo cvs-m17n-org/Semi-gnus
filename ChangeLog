@@ -1,5 +1,16 @@
 1999-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 14.
+	(TopLevel): Autoload "gnus-bitmap" instead of "smiley-mule" for the
+	function `gnus-smiley-display'.
+
+	* lisp/gnus-art.el (gnus-treat-display-smileys): Default to nil if
+	`window-system' is nil.
+	(gnus-article-x-face-command): Default to external command if
+	`window-system' is nil.
+
+1999-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 13.
 	(TopLevel): Rearrange autoload settings.
 
