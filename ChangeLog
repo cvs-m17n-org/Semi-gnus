@@ -1,5 +1,11 @@
 1998-07-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus-art.el (gnus-article-header-presentation-method):
+	Delete nil optional arguments.
+	- Delete setting for `mime-raw-representation-type-alist'.
+
+1998-07-01  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* lisp/gnus.el (gnus-version-number): Update to 6.8.0.
 	(gnus-version): Modify for FLIM 1.8.
 
