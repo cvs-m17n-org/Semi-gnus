@@ -1854,7 +1854,7 @@ Point is left at the beginning of the narrowed-to region."
 ;;
 ;; We use `after-change-functions' to keep special text properties
 ;; that interfer with the normal function of message mode out of the
-;; buffer. 
+;; buffer.
 
 (defcustom message-strip-special-text-properties nil
   "Strip special properties from the message buffer.
@@ -1868,13 +1868,13 @@ hope the message composition doesn't break too bad."
   :group 'message-various
   :type 'boolean)
 
-(defconst message-forbidden-properties 
+(defconst message-forbidden-properties
   ;; No reason this should be clutter up customize.  We make it a
   ;; property list (rather than a list of property symbols), to be
   ;; directly useful for `remove-text-properties'.
-  '(field nil read-only nil intangible nil invisible nil 
+  '(field nil read-only nil intangible nil invisible nil
 	  mouse-face nil modification-hooks nil insert-in-front-hooks nil
-	  insert-behind-hooks nil point-entered nil point-left nil) 
+	  insert-behind-hooks nil point-entered nil point-left nil)
   ;; Other special properties:
   ;; category, face, display: probably doesn't do any harm.
   ;; fontified: is used by font-lock.
@@ -4858,13 +4858,7 @@ than 988 characters long, and if they are not, trim them until they are."
 			      headers)
 		      nil switch-function yank-action actions)))))
 
-;;;(defvar mc-modes-alist)
 (defun message-setup-1 (headers &optional replybuffer actions)
-;;;   (when (and (boundp 'mc-modes-alist)
-;;;	     (not (assq 'message-mode mc-modes-alist)))
-;;;     (push '(message-mode (encrypt . mc-encrypt-message)
-;;;			 (sign . mc-sign-message))
-;;;	  mc-modes-alist))
   (dolist (action actions)
     (condition-case nil
 	(add-to-list 'message-send-actions
@@ -5519,7 +5513,7 @@ header line with the old Message-ID."
   "Remove junk like \"Re:\", \"(fwd)\", etc. added to subject string SUBJECT.
 Previous forwarders, replyers, etc. may add it."
   (with-temp-buffer
-    (insert-string subject)
+    (insert subject)
     (goto-char (point-min))
     ;; strip Re/Fwd stuff off the beginning
     (while (re-search-forward

@@ -5786,19 +5786,22 @@ gnus $B<+BN$O2D;k5-;v$r4|8B@Z$l>C5n$7$^$;$s(B) $B$N$G!"1J1s$K5-;v$rJ]B8$7$F$*
 @kindex / / ($B35N,(B)
 @findex gnus-summary-limit-to-subject
 $B35N,%P%C%U%!$r$$$/$D$+$NI=Bj$H9gCW$9$k$b$N$@$1$K@)8B$7$^(B
-$B$9(B (@code{gnus-summary-limit-to-subject})$B!#(B
+$B$9(B (@code{gnus-summary-limit-to-subject})$B!#$b$7@\F,<-$,M?$($i$l$l$P!"9g(B
+$BCW$9$k5-;v$r=|30$7$^$9!#(B
 
 @item / a
 @kindex / a ($B35N,(B)
 @findex gnus-summary-limit-to-author
 $B35N,%P%C%U%!$r2??M$+$NCx<T$K9gCW$9$k$b$N$@$1$K@)8B$7$^(B
-$B$9(B (@code{gnus-summary-limit-to-author})$B!#(B
+$B$9(B (@code{gnus-summary-limit-to-author})$B!#$b$7@\F,<-$,M?$($i$l$l$P!"9gCW(B
+$B$9$k5-;v$r=|30$7$^$9!#(B
 
 @item / x
 @kindex / x ($B35N,(B)
 @findex gnus-summary-limit-to-extra
 ``$BDI2C(B'' $B$N%X%C%@!<$N0l$D$K9gCW$9$k5-;v$K35N,%P%C%U%!$r@)8B$7$^(B
-$B$9(B (@pxref{To From Newsgroups}) (@code{gnus-summary-limit-to-extra}).
+$B$9(B (@pxref{To From Newsgroups}) (@code{gnus-summary-limit-to-extra})$B!#$b(B
+$B$7@\F,<-$,M?$($i$l$l$P!"9gCW$9$k5-;v$r=|30$7$^$9!#(B
 
 @item / u
 @itemx x

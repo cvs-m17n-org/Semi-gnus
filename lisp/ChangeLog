@@ -1,3 +1,40 @@
+2001-11-25 15:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* mm-util.el (mm-coding-system-priorities): Add backslash in the doc.
+
+	* message.el (message-setup-1): Clean up mc-*.
+
+2001-11-25 09:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-util.el (gnus-directory-sep-char-regexp): New.
+	* gnus-score.el (gnus-score-find-bnews): Use it.
+
+	* gnus-sum.el (gnus-summary-limit-to-subject): An exclusion version.
+	(gnus-summary-limit-to-author): Ditto.
+	(gnus-summary-limit-to-extra): Ditto.
+	(gnus-summary-find-matching): Support not-matching argument.
+
+2001-11-25  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
+
+	* message.el (message-wash-subject): Use `insert' rather than
+	`insert-string', which is deprecated.
+
+2001-11-24  Simon Josefsson  <jas@extundo.com>
+
+	* mm-encode.el (mm-encode-content-transfer-encoding): Fix error
+	message. (Gnus does not "default" to using 8bit for the message,
+	it default to use 8bit encoding and the user-supplied CTE
+	value. Calling this behaviour "treating it as 8bit" is perhaps
+	better.)
+
+	* mm-bodies.el (mm-body-encoding): Intern encoding if needed
+	(compare mm-charset-to-coding-system).
+
+2001-11-23 02:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* canlock.el (canlock-sha1-with-openssl): Use unibyte
+	buffer. Correctly decode hex.
+
 2001-11-21 01:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
 
 	* gnus-agent.el (gnus-category-insert-line): Convert category
