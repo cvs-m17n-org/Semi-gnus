@@ -1,3 +1,29 @@
+2002-01-10  Keiichi Suzuki  <keiichi@nanap.org>
+
+	* Nana-gnus: Version 7.1.0.28 (This is alpha status.)
+	Sync. up `gnus-namazu.el' with T-gnus.
+	Sync. up `nnshimbun.el' with T-gnus.  Require `Emacs-W3M' and the
+	external command W3M, see the commentary in `nnshimbun.el' for
+	these packages.
+
+	* lisp/nnshimbun.el: Sync up with T-gnus.
+
+	* lisp/gnus.el (gnus-define-group-parameter): Import from Oort
+	gnus.
+	(TopLevel): Add autoload of `gnus-group-make-shimbun-group'.
+
+	* lisp/gnus-vers.el (gnus-vers): Update to 7.1.0.28.
+
+	* lisp/gnus-namazu.el: Sync up with T-gnus.
+
+	* lisp/gnus-group.el (gnus-group-gourp-map): Bind
+	`gnus-group-make-shimbun-group' to `G n'.
+	(gnus-group-group-menu): Add `gnus-group-make-shimbun-group' to
+	``Foreign groups'' in ``Groups' menu.
+
+	* lisp/dgnushack.el (dgnushack-compile): Don't compile
+	`nnshimbun.el' when `shimbun' package is not installed.
+
 2001-12-25  Keiichi Suzuki  <keiichi@nanap.org>
 
 	* Nana-gnus: Version 7.1.0.27 (This is alpha status.)
