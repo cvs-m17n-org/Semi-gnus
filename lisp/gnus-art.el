@@ -3628,9 +3628,14 @@ value of the variable `gnus-show-mime' is non-nil."
 
 (defun gnus-article-mime-part-status ()
   (with-current-buffer gnus-article-buffer
-    (let ((entity (get-text-property (point-min) 'mime-view-entity)))
-      (if (and entity (mime-entity-children entity))
-	  (format " (%d parts)" (length (mime-entity-children entity)))
+    (let ((entity (get-text-property (point-min) 'mime-view-entity))
+	  children)
+      (if (and entity
+	       (setq children (mime-entity-children entity))
+	       (setq children (length children)))
+	  (if (eq 1 children)
+	      " (1 part)"
+	    (format " (%d parts)" children))
 	""))))
 
 (defvar gnus-mime-button-map
