@@ -1,3 +1,8 @@
+2000-11-05  Tetsuo Tsukamoto  <czkmt@remus.dti.ne.jp>
+
+	* lisp/smiley.el (smiley-deformed-regexp-alist): Modify regexp for
+	the winking face.
+
 2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 06.
