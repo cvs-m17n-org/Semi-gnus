@@ -1,10 +1,9 @@
-;;; gnus-msg.el --- mail and post interface for Open gnus
+;;; gnus-msg.el --- mail and post interface for Gnus
 ;; Copyright (C) 1995,96,97 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
-;;         Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
-;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
-;; Keywords: mail, news, MIME
+;;	Lars Magne Ingebrigtsen <larsi@ifi.uio.no>
+;; Keywords: news
 
 ;; This file is part of GNU Emacs.
 
