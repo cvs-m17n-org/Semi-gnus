@@ -48,6 +48,10 @@ Major tags are following:
     t-gnus-6_15-quimby	Assigned to the latest version of T-gnus for
 			developing and synchronizing with Oort Gnus.
 
+    t-gnus-6_15		Assigned to the latest version of T-gnus for
+			developing and synchronizing with the released
+			version of Oort Gnus.
+
     pgnus-ichikawa	The main trunk of T-gnus.
 
     semi-gnus		Assigned to the latest stable version.	It is

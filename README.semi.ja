@@ -50,6 +50,9 @@ ftp://ftp.m17n.org/pub/mule/semi/semi-1.13-for-flim-1.13/
     t-gnus-6_15-quimby	最新の T-gnus に割り当てられ、開発と Oort Gnus
 			との同期を行ないます。
 
+    t-gnus-6_15		最新の T-gnus に割り当てられ、開発とリリースさ
+			れた Oort Gnus との同期を行ないます。
+
     pgnus-ichikawa	T-gnus の幹です。
 
     semi-gnus		最新の安定版に割り当てられます。非常に保守的で

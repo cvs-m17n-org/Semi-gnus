@@ -644,12 +644,12 @@ If ARGS, PROMPT is used as an argument to `format'."
 		      (not (imap-parse-greeting)))
 	    (accept-process-output process 1)
 	    (sit-for 1))
-	  (erase-buffer)
 	  (and imap-log
 	       (with-current-buffer (get-buffer-create imap-log)
 		 (buffer-disable-undo)
 		 (goto-char (point-max))
 		 (insert-buffer-substring buffer)))
+	  (erase-buffer)
 	  (when (memq (process-status process) '(open run))
 	    (setq done process)))))
     (if done
