@@ -10564,8 +10564,8 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 @vindex gnus-article-mode-line-format
 @item gnus-article-mode-line-format
 $B$3$NJQ?t$O(B @code{gnus-summary-mode-line-format} $B$HF1$89T$K=>$C$?MM<0J8;z(B
-$BNs$G$9(B (@pxref{Mode Line Formatting})$B!#$3$l$O0J2<$NFs$D$N3HD%$r=|$$$F!"(B
-$B$=$NJQ?t$HF1$8MM<0;XDj$r<uIU$1$^$9!#(B
+$BNs$G$9(B (@pxref{Summary Buffer Mode Line})$B!#$3$l$O0J2<$NFs$D$N3HD%$r=|$$(B
+$B$F!"$=$NJQ?t$HF1$8MM<0;XDj$r<uIU$1$^$9!#(B
 
 @table @samp
 @item w
