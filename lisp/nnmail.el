@@ -1384,10 +1384,13 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
 	;; correct match positions.
 	(goto-char (match-end 0))
 	(let ((value (nth 1 split)))
-	  (re-search-backward (if (symbolp value)
-				  (cdr (assq value nnmail-split-abbrev-alist))
-				value)
-			      (match-end 1)))
+	  (re-search-backward
+	   (concat "\\<"
+		   (if (symbolp value)
+		       (cdr (assq value nnmail-split-abbrev-alist))
+		     value)
+		   "\\>")
+	   (match-end 1)))
 	(nnmail-split-it (nth 2 split))))
 
      ;; Not in cache, compute a regexp for the field/value pair.
