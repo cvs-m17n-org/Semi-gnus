@@ -1,3 +1,17 @@
+1998-10-08  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/message.el (message-kill-buffer): Refer to
+	`message-kill-buffer-query-function'.
+
+	* lisp/message.el (message-kill-buffer-query-function): New user
+	option.
+
+	* lisp/nnheader.el (nnheader-Y-or-n-p): New function.
+
+1998-10-07  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* lisp/nnagent.el (nnagent-open-server): Small bug fix.
+
 1998-10-07  Keiichi Suzuki  <kei-suzu@mail.wbs.ne.jp>
 
 	* TODO.ja: New file.
