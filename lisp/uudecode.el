@@ -2,7 +2,7 @@
 ;; Copyright (c) 1998 by Shenghuo Zhu <zsh@cs.rochester.edu>
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
-;; $Revision: 1.3 $
+;; $Revision: 5.2 $
 ;; Keywords: uudecode
 
 ;; This file is not part of GNU Emacs, but the same permissions

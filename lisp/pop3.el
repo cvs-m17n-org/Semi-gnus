@@ -116,12 +116,14 @@ Returns the process associated with the connection."
   (let ((process-buffer
 	 (get-buffer-create (format "trace of POP session to %s" mailhost)))
 	(process)
-	(coding-system-for-read 'binary))
+	(coding-system-for-read 'binary)
+	(coding-system-for-write 'binary))
     (save-excursion
       (set-buffer process-buffer)
       (erase-buffer)
-      (setq process (open-network-stream "POP" process-buffer mailhost port))
       (setq pop3-read-point (point-min)))
+    (setq process
+	  (open-network-stream "POP" process-buffer mailhost port))
     (let ((response (pop3-read-response process t)))
       (setq pop3-timestamp
 	    (substring response (or (string-match "<" response) 0)
