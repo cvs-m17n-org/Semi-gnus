@@ -294,7 +294,9 @@ so I simply dropped them."
 
 (defcustom gnus-uu-digest-headers
   '("^Date:" "^From:" "^To:" "^Cc:" "^Subject:" "^Message-ID:" "^Keywords:"
-    "^Summary:" "^References:" "^Content-Type:" "^Content-Transfer-Encoding:")
+    "^Summary:" "^References:" "^Content-Type:" "^Content-Transfer-Encoding:"
+    "^MIME-Version:" "^Content-Disposition:" "^Content-Description:"
+    "^Content-ID:")
   "*List of regexps to match headers included in digested messages.
 The headers will be included in the sequence they are matched."
   :group 'gnus-extract
@@ -348,6 +350,7 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 
 (defvar gnus-uu-default-dir gnus-article-save-directory)
 (defvar gnus-uu-digest-from-subject nil)
+(defvar gnus-uu-digest-buffer nil)
 
 ;; Keymaps
 
@@ -518,15 +521,13 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
   (interactive "P")
   (let ((gnus-uu-save-in-digest t)
 	(file (make-temp-name (nnheader-concat gnus-uu-tmp-dir "forward")))
-	buf subject from)
+	gnus-uu-digest-buffer subject from)
     (gnus-setup-message 'forward
       (setq gnus-uu-digest-from-subject nil)
+      (setq gnus-uu-digest-buffer
+	    (gnus-get-buffer-create " *gnus-uu-forward*"))
       (gnus-uu-decode-save n file)
-      (setq buf (switch-to-buffer
-		 (gnus-get-buffer-create " *gnus-uu-forward*")))
-      (erase-buffer)
-      (insert-file file)
-      (delete-file file)
+      (set-buffer gnus-uu-digest-buffer)
       (let ((fs gnus-uu-digest-from-subject))
 	(when fs
 	  (setq from (caar fs)
@@ -556,7 +557,13 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
       (when (re-search-forward "^From: ")
 	(delete-region (point) (gnus-point-at-eol))
 	(insert from))
-      (message-forward post))
+      (message-forward post)
+      (save-excursion
+	(message-goto-body)
+	(delete-region (point)
+		       (progn
+			 (search-forward "\nTopics:\n")
+			 (1+ (match-beginning 0))))))
     (setq gnus-uu-digest-from-subject nil)))
 
 (defun gnus-uu-digest-post-forward (&optional n)
@@ -848,9 +855,13 @@ When called interactively, prompt for REGEXP."
 	    (save-excursion
 	      (set-buffer (gnus-get-buffer-create "*gnus-uu-pre*"))
 	      (erase-buffer)
-	      (insert (format
-		       "Date: %s\nFrom: %s\nSubject: %s Digest\n\nTopics:\n"
-		       (current-time-string) name name))))
+	      (insert (format "From: %s\nSubject: %s Digest\n\n" name name))
+	      (when gnus-uu-digest-buffer
+		;; The default part in multipart/digest is message/rfc822.
+		;; Subject is a fake head.
+		(let (mime-content-types)
+		  (mime-edit-insert-tag "text" "plain")))
+	      (insert "Topics:\n")))
 	(when (not (eq in-state 'end))
 	  (setq state (list 'middle))))
       (save-excursion
@@ -866,12 +877,13 @@ When called interactively, prompt for REGEXP."
 	      (put-text-property (point-min) (point-max) 'intangible nil))
 	    (goto-char (point-min))
 	    (re-search-forward "\n\n")
-	    ;; Quote all 30-dash lines.
-	    (save-excursion
-	      (while (re-search-forward "^-" nil t)
-		(beginning-of-line)
-		(delete-char 1)
-		(insert "- ")))
+	    (unless gnus-uu-digest-buffer
+	      ;; Quote all 30-dash lines.
+	      (save-excursion
+		(while (re-search-forward "^-" nil t)
+		  (beginning-of-line)
+		  (delete-char 1)
+		  (insert "- "))))
 	    (setq body (buffer-substring (1- (point)) (point-max)))
 	    (narrow-to-region (point-min) (point))
 	    (if (not (setq headers gnus-uu-digest-headers))
@@ -889,30 +901,45 @@ When called interactively, prompt for REGEXP."
 					  (1- (point)))
 				     (progn (forward-line 1) (point)))))))))
 	    (widen)))
+	(insert message-forward-start-separator)
 	(insert sorthead) (goto-char (point-max))
 	(insert body) (goto-char (point-max))
-	(insert (concat "\n" (make-string 30 ?-) "\n\n"))
 	(goto-char beg)
-	(when (re-search-forward "^Subject: \\(.*\\)$" nil t)
-	  (setq subj (buffer-substring (match-beginning 1) (match-end 1)))
+	(when (re-search-forward "^Subject:" nil t)
+	  (setq subj (nnheader-decode-subject
+		      (buffer-substring (match-end 0) (std11-field-end))))
 	  (save-excursion
 	    (set-buffer "*gnus-uu-pre*")
 	    (insert (format "   %s\n" subj)))))
       (when (or (eq in-state 'last)
 		(eq in-state 'first-and-last))
-	(save-excursion
-	  (set-buffer "*gnus-uu-pre*")
-	  (insert (format "\n\n%s\n\n" (make-string 70 ?-)))
-	  (gnus-write-buffer gnus-uu-saved-article-name))
-	(save-excursion
-	  (set-buffer "*gnus-uu-body*")
-	  (goto-char (point-max))
-	  (insert
-	   (concat (setq end-string (format "End of %s Digest" name))
-		   "\n"))
-	  (insert (concat (make-string (length end-string) ?*) "\n"))
-	  (write-region
-	   (point-min) (point-max) gnus-uu-saved-article-name t))
+	(if gnus-uu-digest-buffer
+	    (with-current-buffer gnus-uu-digest-buffer
+	      (erase-buffer)
+	      (insert-buffer "*gnus-uu-pre*")
+	      (goto-char (point-max))
+	      (insert-buffer "*gnus-uu-body*"))
+	  (save-excursion
+	    (set-buffer "*gnus-uu-pre*")
+	    (insert (format "\n\n%s\n\n" (make-string 70 ?-)))
+	    (if gnus-uu-digest-buffer
+		(with-current-buffer gnus-uu-digest-buffer
+		  (erase-buffer)
+		  (insert-buffer "*gnus-uu-pre*"))
+	      (gnus-write-buffer gnus-uu-saved-article-name)))
+	  (save-excursion
+	    (set-buffer "*gnus-uu-body*")
+	    (goto-char (point-max))
+	    (insert
+	     (concat (setq end-string (format "End of %s Digest" name))
+		     "\n"))
+	    (insert (concat (make-string (length end-string) ?*) "\n"))
+	    (if gnus-uu-digest-buffer
+		(with-current-buffer gnus-uu-digest-buffer
+		  (goto-char (point-max))
+		  (insert-buffer "*gnus-uu-body*"))
+	      (write-region
+	       (point-min) (point-max) gnus-uu-saved-article-name t))))
 	(gnus-kill-buffer "*gnus-uu-pre*")
 	(gnus-kill-buffer "*gnus-uu-body*")
 	(push 'end state))

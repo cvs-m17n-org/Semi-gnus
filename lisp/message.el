@@ -4906,10 +4906,9 @@ the message."
 	subject))))
 
 ;;;###autoload
-(defun message-forward (&optional news digest)
+(defun message-forward (&optional news)
   "Forward the current message via mail.
-Optional NEWS will use news to forward instead of mail.
-Optional DIGEST will use digest to forward."
+Optional NEWS will use news to forward instead of mail."
   (interactive "P")
   (let ((cur (current-buffer))
 	(subject (message-make-forward-subject))
