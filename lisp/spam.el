@@ -62,20 +62,20 @@
 (defvar spam-use-blacklist t
   "True if the blacklist should be used.")
 
-(defvar spam-use-whitelist t
+(defvar spam-use-whitelist nil
   "True if the whitelist should be used.")
 
 (defvar spam-use-blackholes nil
   ;; FIXME!  Turned off for now.  The DNS routines are said to be flaky.
   "True if blackholes should be used.")
 
-(defvar spam-use-bogofilter t
+(defvar spam-use-bogofilter nil
   "True if bogofilter should be used.")
 
-(defvar spam-use-bbdb t
+(defvar spam-use-bbdb nil
   "True if BBDB should be used.")
 
-(defvar spam-use-bbdb t
+(defvar spam-use-ifile nil
   "True if ifile should be used.")
 
 (defvar spam-split-group "spam"
