@@ -1,3 +1,11 @@
+1998-04-18  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* texi/gnus-ja.texi: Check and modify for Semi-gnus.
+
+1998-04-18  Yoshiki Hayashi   <g740685@komaba.ecc.u-tokyo.ac.jp>
+
+	* texi/gnus-ja.texi: New file.
+
 1998-04-19  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.1.3.
