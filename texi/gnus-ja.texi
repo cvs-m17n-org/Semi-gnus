@@ -18935,6 +18935,11 @@ gnus にはこれらを全て自動的に --- まるで魔法でも使ったように作成
 適応性スコア登録項目は、グループ名に @code{gnus-adaptive-file-suffix} を
 付加した名前のファイルに入れられます。初期設定値は @file{ADAPT} です。
 
+@vindex gnus-adaptive-pretty-print
+適応性スコアファイルは巨大になり得るし、人の手で編集されることは想定され
+ていません。@code{gnus-adaptive-pretty-print} が @code{nil} (ディフォル
+ト) であると、それらのファイルは人に読めるような形式では書かれません。
+
 @vindex gnus-score-exact-adapt-limit
 適応性スコアを行うときは、部分文字列一致やファジーな一致を行った方が、お
 そらくほとんどの場合において良い結果が得られるでしょう。しかし、ヘッダー
