@@ -1663,7 +1663,7 @@ See the documentation for the variable `nnmail-split-fancy' for documentation."
       (while spools
 	(if (listp (setq spool (pop spools)))
 	    (setq spool-options (cdr spool)
-		  setq spool (car spool))
+		  spool (car spool))
 	  (setq spool-options nil))
 	;; We read each spool file if either the spool is a POP-mail
 	;; spool, or the file exists.  We can't check for the
