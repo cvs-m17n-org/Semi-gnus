@@ -7411,6 +7411,10 @@ and `request-accept' functions."
 	     (symbol-value (intern (format "gnus-current-%s-group" action)))
 	     articles prefix))
       (set (intern (format "gnus-current-%s-group" action)) to-newsgroup))
+    (if (null to-newsgroup)
+	(message "Nothing to be done")
+      ;; We don't dare to indent below to make future sync'ing easier.
+
     (setq to-method (or select-method
 			(gnus-group-name-to-method to-newsgroup)))
     ;; Check the method we are to move this article to...
@@ -7586,6 +7590,7 @@ and `request-accept' functions."
     (gnus-kill-buffer copy-buf)
     (gnus-summary-position-point)
     (gnus-set-mode-line 'summary)))
+  )
 
 (defun gnus-summary-copy-article (&optional n to-newsgroup select-method)
   "Move the current article to a different newsgroup.
@@ -9132,7 +9137,7 @@ save those articles instead."
 					    (gnus-group-name-to-method
 					     to-newsgroup)))
 		  (error "Couldn't create group %s" to-newsgroup)))
-	  (error "No such group: %s" to-newsgroup)))
+	  (setq to-newsgroup nil)))
     to-newsgroup))
 
 (defun gnus-summary-save-parts (type dir n reverse)
