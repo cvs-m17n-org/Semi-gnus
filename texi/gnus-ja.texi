@@ -5752,8 +5752,8 @@ gnus $B$OA4$F$N5-;v$N40A4$J(B @code{References} $BMs$r8+$F!"F1$8%9%l%C%I$KB0$
 @item gnus-thread-ignore-subject
 @vindex gnus-thread-ignore-subject
 $B;~!9!"C/$+$,%9%l%C%I$N??Cf$GI=Bj$rJQ99$9$k$3$H$,$"$j$^$9!#$b$7$3$NJQ?t(B
-$B$,(B @code{nil} $B$G$J$$$H!"I=Bj$NJQ99$OL5;k$5$l$^$9!#$b$7(B @code{nil} $B$@$H!"(B
-$B$3$l$,%G%#%U%)%k%H$G$9$,!"I=Bj$NJQ99$r$9$k$HJL$N%9%l%C%I$K$J$j$^$9!#(B
+$B$,(B @code{nil} $B$G$J$$$H!"$3$l$,%G%#%U%)%k%H$G$9$,!"I=Bj$NJQ99$OL5;k$5$l$^(B
+$B$9!#$b$7(B @code{nil} $B$@$H!"I=Bj$NJQ99$r$9$k$HJL$N%9%l%C%I$K$J$j$^$9!#(B
 
 @item gnus-thread-indent-level
 @vindex gnus-thread-indent-level
@@ -11387,6 +11387,7 @@ www.my-deja.com $B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
 $B%H$G!":G=i$NMWAG$,(B @code{:} $B$G$"$k$H!"FsHVL\$NMWAG$,(B @var{args} $B$r0z?t$H(B
 $B$7$F4X?t$H$7$F8F$P$l$^$9!#4X?t$O(B @var{split} $B$rJV$9$Y$-$G$9!#(B
 
+@cindex body split
 $BNc$($P0J2<$N4X?t$O!"5-;v$N%\%G%#$K4p$E$$$?J,3d$K;H$($k$G$7$g$&(B:
 
 @lisp
@@ -11397,6 +11398,9 @@ www.my-deja.com $B$J$I$N%&%'%V%a!<%k%5!<%P!<$+$i%a!<%k$r<hF@$7$^$9!#(B
     (when (re-search-forward "Some.*string" nil t)
       "string.group")))
 @end lisp
+
+@code{:} $B$,;H$o$l$k$H$-!"%P%C%U%!(B @samp{" *nnmail incoming*"} $B$O%a%C%;!<(B
+$B%8$NItJ,$K69$a$i$l$^$9!#(B
 
 @item
 @code{(! @var{func} @var{split})}: $BJ,3d$,%j%9%H$G!":G=i$NMWAG(B
@@ -13658,7 +13662,7 @@ Nnmail $B$KBP1~$9$k$b$N$O$"$j$^$;$s!#(B
 
 $B$3$l$O(B nnimap $B%a!<%j%s%0%j%9%H$+$i$NA4$F$N5-;v$r%a!<%k%\%C%/(B
 $B%9(B INBOX.nnimap $B$KF~$l!"(BSubject: $B9T$K(B MAKE MONEY $B$N$"$kA4$F$N5-;v(B
-$B$r(B INBOX.spam $B$KF~$l!"$=$NB>A4$F$N$b$N$r(B INBOX.private $B$KF~$l$^$9!#(B
+$B$r(B INBOX.junk $B$KF~$l!"$=$NB>A4$F$N$b$N$r(B INBOX.private $B$KF~$l$^$9!#(B
 
 $B:G=i$NJ8;zNs$O!"(Breplace-match $B$G9gCW$7$?%F%-%9%H$+$iI{I=8=$rA^F~$9$k$H$-(B
 $B$K;HMQ$5$l$k$N$HF1$8$h$&$J!"(B`\\1' $B7A<0$r4^$`$3$H$,$G$-$^$9!#Nc$($P(B:

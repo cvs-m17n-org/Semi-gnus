@@ -5822,9 +5822,9 @@ will be hidden.
 @item gnus-thread-ignore-subject
 @vindex gnus-thread-ignore-subject
 Sometimes somebody changes the subject in the middle of a thread.  If
-this variable is non-@code{nil}, the subject change is ignored.  If it
-is @code{nil}, which is the default, a change in the subject will result
-in a new thread.
+this variable is non-@code{nil}, which is the default, the subject
+change is ignored.  If it is @code{nil}, a change in the subject will
+result in a new thread.
 
 @item gnus-thread-indent-level
 @vindex gnus-thread-indent-level
@@ -11887,6 +11887,7 @@ a list, and the first element is @code{:}, then the second element will
 be called as a function with @var{args} given as arguments.  The
 function should return a @var{split}.
 
+@cindex body split
 For instance, the following function could be used to split based on the
 body of the messages:
 
@@ -11898,6 +11899,9 @@ body of the messages:
     (when (re-search-forward "Some.*string" nil t)
       "string.group")))
 @end lisp
+
+The @samp{" *nnmail incoming*"} is narrowed to the message in question
+when the @code{:} function is run.
 
 @item
 @code{(! @var{func} @var{split})}: If the split is a list, and the first
@@ -14180,7 +14184,7 @@ Neither did I, we need examples.
 
 This will put all articles from the nnimap mailing list into mailbox
 INBOX.nnimap, all articles containing MAKE MONEY in the Subject: line
-into INBOX.spam and everything else in INBOX.private.
+into INBOX.junk and everything else in INBOX.private.
 
 The first string may contain `\\1' forms, like the ones used by
 replace-match to insert sub-expressions from the matched text.  For

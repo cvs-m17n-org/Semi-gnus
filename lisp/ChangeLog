@@ -1,4 +1,27 @@
+2001-04-09 03:55:09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-start.el (gnus-read-newsrc-el-file): Work with Semi-gnus. 
+
+2001-04-05 21:43:25  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-sum.el (gnus-update-summary-mark-positions): Use a valid
+	date. 
+
+2001-04-04 16:13:17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-group.el (gnus-group-quit): Check that the dribble buffer
+	lives. 
+
 2001-04-02 00:40:12  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-art.el (gnus-parse-news-url): New function.
+	(gnus-button-handle-news): New function.
+	(gnus-button-alist): Point to new functions.
+
+	* gnus-group.el (gnus-group-quit): Only mark buffer in non-empty.
+
+	* gnus-start.el (gnus-read-newsrc-el-file): Nix out
+	gnus-format-specs. 
 
 	* message.el (message-check-news-header-syntax): Question even
 	when Gnus doesn't know the group names.
