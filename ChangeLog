@@ -1,3 +1,8 @@
+2001-01-11  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-msg.el (gnus-copy-article-buffer): Revome smiley
+	extents for XEmacs 21.1 using `format'.
+
 2001-01-10  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 09.
