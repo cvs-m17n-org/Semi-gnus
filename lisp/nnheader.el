@@ -121,6 +121,18 @@ on your system, you could say something like:
 	 (cons 'From from))
    ))
 
+(defsubst make-full-mail-header-from-decoded-header
+  (&optional number subject from date id references chars lines xref)
+  "Create a new mail header structure initialized with the parameters given."
+  (make-mime-entity-internal
+   'gnus number
+   nil
+   nil nil nil
+   subject
+   from
+   date id references
+   chars lines xref))
+
 (defun make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
   (make-full-mail-header init init init init init
