@@ -796,13 +796,11 @@ and the NOV is open.  The optional fourth argument FORCE is ignored."
 		  'nnshimbun-server-history))
 	 (groups)
 	 (nnshimbun-pre-fetch-article))
-    (require (intern (concat "sb-" server)))
-    (when (setq groups (intern-soft (concat "shimbun-" server "-groups")))
-      (gnus-group-make-group
-       (completing-read "Group name: "
-			(mapcar 'list (symbol-value groups))
-			nil t nil)
-       (list 'nnshimbun server)))))
+    (if (setq groups (shimbun-groups (shimbun-open server)))
+	(gnus-group-make-group
+	 (completing-read "Group name: " (mapcar 'list groups) nil t nil)
+	 (list 'nnshimbun server))
+      (error "%s" "Can't find group"))))
 
 
 (provide 'nnshimbun)
