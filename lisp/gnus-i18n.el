@@ -25,6 +25,9 @@
 
 ;;; Code:
 
+(require 'gnus-sum)
+(require 'gnus-util)
+
 ;;; @ newsgroup default charset
 ;;;
 
@@ -44,14 +47,12 @@ newsgroup name.  SYMBOL is MIME charset or coding-system.")
 (defun gnus-set-newsgroup-default-charset (newsgroup charset)
   "Set CHARSET for the NEWSGROUP as default MIME charset."
   (let* ((ng-regexp (concat "^" (regexp-quote newsgroup) "\\($\\|\\.\\)"))
-	 (pair (assoc ng-regexp gnus-newsgroup-default-charset-alist))
-	 )
+	 (pair (assoc ng-regexp gnus-newsgroup-default-charset-alist)))
     (if pair
 	(setcdr pair charset)
       (setq gnus-newsgroup-default-charset-alist
 	    (cons (cons ng-regexp charset)
-		  gnus-newsgroup-default-charset-alist))
-      )))
+		  gnus-newsgroup-default-charset-alist)))))
 
 
 ;;; @ localization
@@ -62,28 +63,24 @@ newsgroup name.  SYMBOL is MIME charset or coding-system.")
 It is specified by variable `gnus-newsgroup-default-charset-alist'
 \(cf. function `gnus-set-newsgroup-default-charset')."
   (if (buffer-live-p gnus-summary-buffer)
-      (let ((charset
-	     (catch 'found
-	       (let ((group
-		      (save-excursion
-			(set-buffer gnus-summary-buffer)
-			gnus-newsgroup-name))
-		     (alist gnus-newsgroup-default-charset-alist))
-		 (while alist
-		   (let ((pair (car alist)))
-		     (if (string-match (car pair) group)
-			 (throw 'found (cdr pair))
-		       ))
-		   (setq alist (cdr alist)))
-		 ))))
+      (let* ((group (save-excursion
+		      (set-buffer gnus-summary-buffer)
+		      (gnus-group-real-name gnus-newsgroup-name)))
+	     (alist gnus-newsgroup-default-charset-alist)
+	     (charset (catch 'found
+			(let (pair)
+			  (while (setq pair (car alist))
+			    (if (string-match (car pair) group)
+				(throw 'found (cdr pair)))
+			    (setq alist (cdr alist)))))))
 	(if charset
-            (progn
-              (save-excursion
-                (set-buffer gnus-summary-buffer)
-                (make-local-variable 'default-mime-charset)
-                (setq default-mime-charset charset))
-              (make-local-variable 'default-mime-charset)
-              (setq default-mime-charset charset))
+	    (progn
+	      (save-excursion
+		(set-buffer gnus-summary-buffer)
+		(make-local-variable 'default-mime-charset)
+		(setq default-mime-charset charset))
+	      (make-local-variable 'default-mime-charset)
+	      (setq default-mime-charset charset))
 	  (kill-local-variable 'default-mime-charset)))))
 
 
