@@ -268,7 +268,7 @@ is restarted, and sometimes reloaded."
 (defconst gnus-version-number "6.14.0"
   "Version number for this version of gnus.")
 
-(defconst gnus-revision-number "03"
+(defconst gnus-revision-number "04"
   "Revision number for this version of gnus.")
 
 (defconst gnus-original-version-number "5.8.2"
@@ -1776,6 +1776,7 @@ use the article treating faculties instead.  Is is described in Info node
      ("gnus-gl" bbb-login bbb-logout bbb-grouplens-group-p
       gnus-grouplens-mode)
      ("smiley" :interactive t gnus-smiley-display)
+     ("smiley" smiley-toggle-buffer)
      ("gnus-win" gnus-configure-windows gnus-add-configuration)
      ("gnus-sum" gnus-summary-insert-line gnus-summary-read-group
       gnus-list-of-unread-articles gnus-list-of-read-articles
@@ -1854,7 +1855,8 @@ use the article treating faculties instead.  Is is described in Info node
 
 (eval-and-compile
   (unless (featurep 'xemacs)
-    (autoload 'gnus-smiley-display "gnus-bitmap")
+    (autoload 'gnus-smiley-display "gnus-bitmap" nil t)
+    (autoload 'smiley-toggle-buffer "gnus-bitmap")
     (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule")))
 
 ;;; gnus-sum.el thingies
