@@ -1,8 +1,13 @@
 1998-10-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
-	* lisp/gnus.el (gnus-version-number): Update to 6.12.1.
+	* lisp/gnus-draft.el (gnus-draft-decoding-function): Use
+	`mime-edit-decode-buffer' simply as initial value.
 
-1998-10-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+	* lisp/gnus-art.el (gnus-article-decode-rfc1522): Use
+	`mime-decode-header-in-buffer' instead of `eword-decode-header'.
+	(gnus-article-display-message-with-encoded-word): Likewise.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.12.1.
 
 	* lisp/message.el (message-make-forward-subject): Use
 	`nnheader-decode-subject' instead of
