@@ -1232,7 +1232,7 @@ this is a reply."
 		  filep nil)
 	    (setq value
 		  (cond
-		   ((eq (car attribute) :file)
+		   ((eq (car attribute) ':file)
 		    (setq filep t)
 		    (cadr attribute))
 		   ((eq (car attribute) :value)
