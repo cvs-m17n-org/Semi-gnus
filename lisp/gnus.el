@@ -1996,9 +1996,8 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-summary-resend-message gnus-summary-resend-bounced-mail
       gnus-summary-wide-reply gnus-summary-followup-to-mail
       gnus-summary-followup-to-mail-with-original gnus-bug
-      gnus-summary-wide-reply-with-original
-      gnus-summary-post-forward gnus-summary-wide-reply-with-original
-      gnus-summary-post-forward)
+      gnus-summary-wide-reply-with-original gnus-summary-post-forward
+      gnus-summary-digest-mail-forward gnus-summary-digest-post-forward)
      ("gnus-picon" :interactive t gnus-article-display-picons
       gnus-group-display-picons)
      ("gnus-picon" gnus-picons-buffer-name)
