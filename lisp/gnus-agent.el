@@ -1858,13 +1858,13 @@ The following commands are available:
 	  (erase-buffer)
 	  (let ((nnheader-file-coding-system
 		 gnus-agent-file-coding-system))
-	    (nnheader-insert-file-contents file))
-	  (goto-char (point-min))
+	    (nnheader-insert-nov-file file (car articles)))
+	  (nnheader-find-nov-line (car articles))
 	  (while (not (eobp))
 	    (when (looking-at "[0-9]")
 	      (push (read (current-buffer)) cached-articles))
 	    (forward-line 1))
-	  (setq cached-articles (sort cached-articles '<))))
+	  (setq cached-articles (nreverse cached-articles))))
       (if (setq uncached-articles
 		(gnus-set-difference articles cached-articles))
 	  (progn

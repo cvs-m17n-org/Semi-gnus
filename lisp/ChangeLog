@@ -1,3 +1,13 @@
+2002-01-28  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-score.el (gnus-score-insert-help): Move
+	to (point-min). Don't split when the window is small, e.g. a small
+	*BBDB* window is the lowest one.
+
+	* gnus-agent.el (gnus-agent-retrieve-headers): Use
+	nnheader-find-nov-line to speed up. Use nreverse, because it is
+	sorted. Use nnheader-insert-nov-file.
+
 2002-01-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* mm-decode.el (mm-inline-text-html-with-images): New user option.
