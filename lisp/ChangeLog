@@ -1,3 +1,63 @@
+2001-09-09  Simon Josefsson  <jas@extundo.com>
+
+	* mm-decode.el (mm-inline-media-tests): Add
+	application/x-emacs-lisp.
+	(mm-attachment-override-types): Add
+	application/{x-,}pkcs7-signature.
+
+	* gnus-srvr.el (gnus-server-mode-hook, gnus-server-exit-hook) 
+	(gnus-server-line-format, gnus-server-mode-line-format) 
+	(gnus-server-browse-in-group-buffer): Customize.
+
+2001-09-08 16:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnml.el (nnml-marks-changed-p): Typo.
+	(nnml-save-marks, nnml-open-marks): Use gnus-sethash.
+	(nnml-marks-changed-p): Use gnus-gethash.
+	(nnml-marks-modtime): Use gnus-make-hashtable.
+
+	* nnfolder.el (nnfolder-marks-changed-p): Typo.
+	(nnfolder-request-expire-articles, nnfolder-save-marks) 
+	(nnfolder-open-marks): Typo.
+	(nnfolder-save-marks, nnfolder-open-marks): Use gnus-sethash.
+	(nnfolder-marks-changed-p): Use gnus-gethash.
+	(nnfolder-marks-modtime): Use gnus-make-hashtable.
+
+2001-09-08  Simon Josefsson  <jas@extundo.com>
+
+	* nnfolder.el (nnfolder-marks-modtime): New variable.
+	(nnfolder-marks-changed-p): New function.
+	(nnfolder-save-marks, nnfolder-open-marks): Save modtime.
+	(nnfolder-request-update-info): Don't update if marks didn't change.
+
+	* nnml.el (nnml-marks-modtime): New variable.
+	(nnml-marks-changed-p): New function.
+	(nnml-save-marks, nnml-open-marks): Save modtime.
+	(nnml-request-update-info): Don't update if marks didn't change.
+
+	* gnus-agent.el (gnus-agent-any-covered-gcc)
+	(gnus-agent-add-server, gnus-agent-remove-server): Use
+	gnus-agent-method-p.
+
+	* gnus-art.el (gnus-buttonized-mime-types): New variable.
+	(gnus-unbuttonized-mime-type-p): Use it.
+
+	* gnus-agent.el (gnus-agent-fetch-group): If online, actually
+	fetch group.
+
+2001-09-08  Simon Josefsson  <jas@extundo.com>
+	From Daniel Pittman <daniel@rimspace.net>
+
+	* gnus-spec.el (gnus-correct-pad-form): New function.
+	(gnus-parse-simple-format): Use it.
+
+2001-09-07  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-group.el (gnus-group-sort-groups): Unmark all groups.
+	(gnus-group-sort-selected-groups): Ditto.  Suggested by Harry
+	Putnam <reader@newsguy.com>.
+	(gnus-group-sort-selected-groups): Touch dribble file.
+
 2001-09-07 Raja R Harinath  <harinath@cs.umn.edu>
 
 	* nnml.el (nnml-filenames-are-evil): New variable.

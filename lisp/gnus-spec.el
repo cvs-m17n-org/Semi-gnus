@@ -280,13 +280,6 @@
     (point) (progn ,@form (point))
     '(gnus-face t face ,(symbol-value (intern (format "gnus-face-%d" type))))))
 
-;;; Avoid byte-compile warning.
-(defun gnus-tilde-pad-form (el pad-width)
-  "Dummy function except for XEmacs-mule. It will be redefined
-by `gnus-xmas-redefine'."
-  (let ((val (if (symbolp el) (eval el) el)))
-    (` (, val))))
-
 (defun gnus-balloon-face-function (form type)
   `(gnus-put-text-property
     (point) (progn ,@form (point))
@@ -411,6 +404,22 @@ by `gnus-xmas-redefine'."
        (if (equal val ,ignore-value)
 	   "" val))))
 
+(defun gnus-correct-pad-form (el pad-width)
+  "Return a form that pads EL to PAD-WIDTH accounting for multi-column
+characters correctly. This is because `format' may pad to columns or to
+characters when given a pad value."
+  (let ((pad (abs pad-width)))
+    (if (symbolp el)
+	`(let ((need (- ,pad (gnus-correct-length ,el))))
+	   (if (> need 0)
+	       (concat ,el (make-string need ?\ ))
+	     ,el))
+      `(let* ((val (eval ,el))
+	      (need (- ,pad (gnus-correct-length ,el))))
+	 (if (> need 0)
+	     (concat ,el (make-string need ?\ ))
+	   ,el)))))
+
 (defun gnus-parse-format (format spec-alist &optional insert)
   ;; This function parses the FORMAT string with the help of the
   ;; SPEC-ALIST and returns a list that can be eval'ed to return the
@@ -488,8 +497,7 @@ by `gnus-xmas-redefine'."
   ;; This function parses the FORMAT string with the help of the
   ;; SPEC-ALIST and returns a list that can be eval'ed to return a
   ;; string.
-  (let ((xemacs-mule-p (and (featurep 'xemacs) (featurep 'mule)))
-	max-width
+  (let (max-width
 	spec flist fstring elem result dontinsert user-defined
 	type value pad-width spec-beg cut-width ignore-value
 	tilde-form tilde elem-type)
@@ -576,11 +584,14 @@ by `gnus-xmas-redefine'."
 	    (setq elem '("*" ?s))))
 	  (setq elem-type (cadr elem))
 	  ;; Insert the new format elements.
-	  (and pad-width (not xemacs-mule-p)
-	       (insert (number-to-string pad-width)))
+	  (when (and pad-width
+		     (not (and (featurep 'xemacs)
+			       gnus-use-correct-string-widths)))
+	    (insert (number-to-string pad-width)))
 	  ;; Create the form to be evaled.
 	  (if (or max-width cut-width ignore-value
-		  (and pad-width xemacs-mule-p))
+		  (and (featurep 'xemacs)
+		       gnus-use-correct-string-widths))
 	      (progn
 		(insert ?s)
 		(let ((el (car elem)))
@@ -594,8 +605,8 @@ by `gnus-xmas-redefine'."
 		    (setq el (gnus-tilde-cut-form el cut-width)))
 		  (when max-width
 		    (setq el (gnus-tilde-max-form el max-width)))
-		  (and pad-width xemacs-mule-p
-		       (setq el (gnus-tilde-pad-form el pad-width)))
+		  (when pad-width
+		    (setq el (gnus-correct-pad-form el pad-width)))
 		  (push el flist)))
 	    (insert elem-type)
 	    (push (car elem) flist))))

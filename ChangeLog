@@ -1,3 +1,9 @@
+2001-09-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-xmas.el (gnus-tilde-pad-form): Abolished.  Use the
+	new function `gnus-correct-pad-form' instead.
+	* lisp/gnus-spec.el (gnus-tilde-pad-form): Ditto.
+
 2001-09-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/nnir.el (nnir-run-namazu): Fix a side effect when handling

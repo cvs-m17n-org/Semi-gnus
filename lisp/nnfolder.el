@@ -163,6 +163,8 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
 
 (defvoo nnfolder-marks-file-suffix ".mrk")
 
+(defvar nnfolder-marks-modtime (gnus-make-hashtable))
+
 
 
 ;;; Interface functions
@@ -426,7 +428,7 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
 	      (with-temp-buffer
 		(nnfolder-request-article (car maybe-expirable)
 					  newsgroup server (current-buffer))
-		(let ((nnml-current-directory nil))
+		(let ((nnfolder-current-directory nil))
 		  (nnmail-expiry-target-group
 		   nnmail-expiry-target newsgroup))))
 	    (nnheader-message 5 "Deleting article %d in %s..."
@@ -1170,7 +1172,7 @@ This command does not work if you use short group names."
   (when (and server
 	     (not (nnfolder-server-opened server)))
     (nnfolder-open-server server))
-  (unless nnfolder-marks-is-evil
+  (when (and (not nnfolder-marks-is-evil) (nnfolder-marks-changed-p group))
     (nnheader-message 8 "Updating marks for %s..." group)
     (nnfolder-open-marks group server)
     ;; Update info using `nnfolder-marks'.
@@ -1197,14 +1199,25 @@ This command does not work if you use short group names."
   (let ((nnfolder-directory (or nnfolder-marks-directory nnfolder-directory)))
     (concat (nnfolder-group-pathname group) nnfolder-marks-file-suffix)))
 
+(defun nnfolder-marks-changed-p (group)
+  (let ((file (nnfolder-group-marks-pathname group)))
+    (if (null (gnus-gethash file nnfolder-marks-modtime))
+	t ;; never looked at marks file, assume it has changed
+      (not (eq (gnus-gethash file nnfolder-marks-modtime)
+	       (nth 5 (file-attributes file)))))))
+
 (defun nnfolder-save-marks (group server)
   (let ((file-name-coding-system nnmail-pathname-coding-system)
 	(file (nnfolder-group-marks-pathname group)))
     (condition-case err
-	(with-temp-file file
-	  (erase-buffer)
-	  (princ nnfolder-marks (current-buffer))
-	  (insert "\n"))
+	(progn
+	  (with-temp-file file
+	    (erase-buffer)
+	    (princ nnfolder-marks (current-buffer))
+	    (insert "\n"))
+	  (gnus-sethash file
+			(nth 5 (file-attributes file))
+			nnfolder-marks-modtime))
       (error (or (gnus-yes-or-no-p
 		  (format "Could not write to %s (%s).  Continue? " file err))
 		 (error "Cannot write to %s (%s)" err))))))
@@ -1214,6 +1227,9 @@ This command does not work if you use short group names."
     (if (file-exists-p file)
 	(setq nnfolder-marks (condition-case err
 				 (with-temp-buffer
+				   (gnus-sethash file
+						 (nth 5 (file-attributes file))
+						 nnfolder-marks-modtime)
 				   (nnheader-insert-file-contents file)
 				   (read (current-buffer)))
 			       (error (or (gnus-yes-or-no-p

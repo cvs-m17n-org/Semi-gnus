@@ -541,29 +541,7 @@ the resulting string may be narrower than END-COLUMN.
 	  (setq str (substring str from-idx idx))
 	  (if padding
 	      (concat head-padding str tail-padding)
-	    str))))
-
-    (defun gnus-tilde-pad-form (el pad-width)
-      "Return a form that pads EL to PAD-WIDTH."
-      (let ((pad (abs pad-width)))
-	(if (symbolp el)
-	    (if (< pad-width 0)
-		`(let ((val (format "%s" ,el)))
-		   (concat val (make-string
-				(max 0 (- ,pad (string-width val))) ?\ )))
-	      `(let ((val (format "%s" ,el)))
-		 (concat (make-string
-			  (max 0 (- ,pad (string-width val))) ?\ )
-			 val)))
-	  (if (< pad-width 0)
-	      `(let ((val (eval ,el)))
-		 (concat val (make-string
-			      (max 0 (- ,pad (string-width val))) ?\ )))
-	    `(let ((val (eval ,el)))
-	       (concat (make-string
-			(max 0 (- ,pad (string-width val))) ?\ )
-		       val))))))
-    ))
+	    str))))))
 
 ;;; XEmacs logo and toolbar.
 
