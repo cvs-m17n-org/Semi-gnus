@@ -1,3 +1,16 @@
+2001-10-17 21:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+	
+	* gnus.texi (Archived Messages): Add new line after @item.
+	From: Jesper Harder <harder@ifa.au.dk>
+	
+2001-10-17 21:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus.texi (Formatting Basics): Extended format specs.
+
+2001-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* gnus.texi (Summary Buffer Lines): Documment %( and %).
+
 2001-09-04 21:43:05  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Topic Sorting): Addition.

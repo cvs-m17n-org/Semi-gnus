@@ -308,7 +308,7 @@
 	(wseek 0)
 	(seek 0)
 	(length (length string))
-	(string (concat string "\0"))) 
+	(string (concat string "\0")))
     ;; Find the start position.
     (while (and (< seek length)
 		(< wseek start))
@@ -480,7 +480,7 @@ characters when given a pad value."
   (let (max-width
 	spec flist fstring elem result dontinsert user-defined
 	type value pad-width spec-beg cut-width ignore-value
-	tilde-form tilde elem-type)
+	tilde-form tilde elem-type extended-spec)
     (save-excursion
       (gnus-set-work-buffer)
       (insert format)
@@ -492,7 +492,8 @@ characters when given a pad value."
 	      max-width nil
 	      cut-width nil
 	      ignore-value nil
-	      tilde-form nil)
+	      tilde-form nil
+	      extended-spec nil)
 	(setq spec-beg (1- (point)))
 
 	;; Parse this spec fully.
@@ -533,10 +534,18 @@ characters when given a pad value."
 	      t)
 	     (t
 	      nil)))
-	;; User-defined spec -- find the spec name.
-	(when (eq (setq spec (char-after)) ?u)
+	(cond
+	 ;; User-defined spec -- find the spec name.
+	 ((eq (setq spec (char-after)) ?u)
 	  (forward-char 1)
-	  (setq user-defined (char-after)))
+	  (when (and (eq (setq user-defined (char-after)) ?&)
+		     (looking-at "&\\([^;]+\\);"))
+	    (setq user-defined (match-string 1))
+	    (goto-char (match-end 1))))
+	 ;; extended spec
+	 ((and (eq spec ?&) (looking-at "&\\([^;]+\\);"))
+	  (setq extended-spec (intern (match-string 1)))
+	  (goto-char (match-end 1))))
 	(forward-char 1)
 	(delete-region spec-beg (point))
 
@@ -554,12 +563,15 @@ characters when given a pad value."
 	   (user-defined
 	    (setq elem
 		  (list
-		   (list (intern (format "gnus-user-format-function-%c"
-					 user-defined))
+		   (list (intern (format
+				  (if (stringp user-defined)
+				      "gnus-user-format-function-%s"
+				    "gnus-user-format-function-%c")
+				  user-defined))
 			 'gnus-tmp-header)
 		   ?s)))
 	   ;; Find the specification from `spec-alist'.
-	   ((setq elem (cdr (assq spec spec-alist))))
+	   ((setq elem (cdr (assq (or extended-spec spec) spec-alist))))
 	   (t
 	    (setq elem '("*" ?s))))
 	  (setq elem-type (cadr elem))
@@ -596,7 +608,7 @@ characters when given a pad value."
     (setq
      result
      (cond
-      ;; Emptyness.
+      ;; Emptiness.
       ((string= fstring "")
        nil)
       ;; Not a format string.

@@ -90,8 +90,8 @@ marks file will be regenerated properly by Gnus.
 This variable is a virtual server slot.  See the Gnus manual for details.")
 
 (defvoo nnml-filenames-are-evil t
-  "If non-nil, Gnus will not assume that the articles file name 
-is the same as the article number listed in the nov database.  This 
+  "If non-nil, Gnus will not assume that the articles file name
+is the same as the article number listed in the nov database.  This
 variable should be set if any of the files are compressed.
 
 This variable is a virtual server slot.  See the Gnus manual for details.")
@@ -339,7 +339,9 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
 		(let (nnml-current-directory
 		      nnml-current-group
 		      nnml-article-file-alist)
-		  (nnmail-expiry-target-group nnmail-expiry-target group))))
+		  (nnmail-expiry-target-group nnmail-expiry-target group)))
+	      ;; Maybe directory is changed during nnmail-expiry-target-group.
+	      (nnml-possibly-change-directory group server))
 	    (nnheader-message 5 "Deleting article %s in %s"
 			      number group)
 	    (condition-case ()
@@ -914,7 +916,7 @@ Use the nov database for that directory if available."
 (defun nnml-current-group-article-to-file-alist ()
   "Return an alist of article/file pairs in the current group.
 Use the nov database for the current group if available."
-  (if (or gnus-nov-is-evil 
+  (if (or gnus-nov-is-evil
 	  nnml-nov-is-evil
 	  nnml-filenames-are-evil
 	  (not (file-exists-p

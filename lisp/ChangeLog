@@ -1,7 +1,55 @@
+2001-10-18  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-sum.el (gnus-group-make-articles-read): Call g-r-set-mark
+	when undoing.
+
+2001-10-18  Simon Josefsson  <jas@extundo.com>
+	From Frank Schmitt <usereplyto@Frank-Schmitt.net>
+
+	* gnus-sum.el (gnus-summary-limit-to-display-predicate): Fix typo.
+	(gnus-summary-make-menu-bar): Ditto.
+
+2001-10-17  Simon Josefsson  <jas@extundo.com>
+
+	* nnimap.el (nnimap-expiry-target): Make sure it is back to the
+	server. Suggested by ShengHuo ZHU <zsh@cs.rochester.edu>.
+
+2001-10-17 17:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-sum.el (gnus-summary-line-format-alist): user-date entry.
+	* gnus-util.el (gnus-user-date): New function. 
+	From Frank Schmitt <usenet@Frank-Schmitt.net>.
+	
+2001-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
+
+	* message.el (message-check-news-header-syntax): Special case
+	nnvirtual groups.
+
+	* gnus-sum.el (gnus-summary-respool-default-method): Changed
+	customize type to `symbol'.
+
+2001-10-17 12:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* gnus-spec.el (gnus-parse-simple-format): Support extended spec
+	%&foo;.
+	(gnus-parse-simple-format): Support user extended spec too. 
+	%u&foo; invokes gnus-user-format-function-foo.
+
+2001-10-17 11:00:00  ShengHuo ZHU  <zsh@cs.rochester.edu>
+
+	* nnml.el (nnml-request-expire-articles): Make sure it is back to
+	the server.
+	* nnmbox.el (nnmbox-request-expire-articles): Ditto.
+	* nnfolder.el (nnfolder-request-expire-articles): Ditto.
+	* nnbabyl.el (nnbabyl-request-expire-articles): Ditto.
+	* nndiary.el (nndiary-request-expire-articles): Ditto.
+	(nndiary-schedule): Defsubst it before use it.
+	(nndiary-error): eval-and-compile.
+
 2001-10-17  Per Abrahamsen  <abraham@dina.kvl.dk>
 
 	* gnus-msg.el (gnus-post-method): Changed two instances of
-	'active' to 'current' and one 'null' to 'not'.
+	`active' to `current' and one `null' to `not'.
 
 2001-10-16  Kai Gro,A_(Bjohann  <Kai.Grossjohann@CS.Uni-Dortmund.DE>
 	From Katsumi Yamaoka  <yamaoka@jpl.org>.

@@ -4178,7 +4178,8 @@ possible to change this.  Just write a new function
 
 The default string is @samp{%U%R%z%I%(%[%4L: %-23,23n%]%) %s\n}.
 
-The following format specification characters are understood:
+The following format specification characters and extended format
+specification(s) are understood:
 
 @table @samp
 @item N
@@ -4268,6 +4269,9 @@ article has any children.
 The line number.
 @item O
 Download mark.
+@item &user-date;
+Age sensitive date format.  Various date format is defined in
+@code{gnus-user-date-format-alist}.
 @item u
 User defined specifier.  The next character in the format string should
 be a letter.  Gnus will call the function
@@ -4276,6 +4280,10 @@ following @samp{%u}.  The function will be passed the current header as
 argument.  The function should return a string, which will be inserted
 into the summary just like information from any other summary specifier.
 @end table
+
+Text between @samp{%(} and @samp{%)} will be highlighted with
+@code{gnus-mouse-face} when the mouse point is placed inside the area.
+There can only be one such area.
 
 The @samp{%U} (status), @samp{%R} (replied) and @samp{%z} (zcore) specs
 have to be handled with care.  For reasons of efficiency, gnus will
@@ -10295,7 +10303,8 @@ determined by the @code{gnus-message-archive-group} variable.
 This variable can be used to do the following:
 
 @itemize @bullet
-@item a string
+@item
+a string
 Messages will be saved in that group.
 
 Note that you can include a select method in the group name, then the
@@ -10307,11 +10316,14 @@ has the default value shown above.  Then setting
 messages are stored in @samp{nnfolder+archive:foo}, but if you use the
 value @code{"nnml:foo"}, then outgoing messages will be stored in
 @samp{nnml:foo}.
-@item a list of strings
+@item
+a list of strings
 Messages will be saved in all those groups.
-@item an alist of regexps, functions and forms
+@item
+an alist of regexps, functions and forms
 When a key ``matches'', the result is used.
-@item @code{nil}
+@item
+@code{nil}
 No message archiving will take place.  This is the default.
 @end itemize
 
@@ -18173,6 +18185,8 @@ particularly wide values.  For that you can say @samp{%4,6y}, which
 means that the field will never be more than 6 characters wide and never
 less than 4 characters wide.
 
+Also Gnus supports some extended format specifications, such as
+@samp{%&user-date;}.
 
 @node Mode Line Formatting
 @subsection Mode Line Formatting
@@ -18274,6 +18288,9 @@ it's being called from.  The function should return a string, which will
 be inserted into the buffer just like information from any other
 specifier.  This function may also be called with dummy values, so it
 should protect against that.
+
+Also Gnus supports extended user-defined specs, such as @samp{%u&foo;}.
+Gnus will call the function @code{gnus-user-format-function-}@samp{foo}.
 
 You can also use tilde modifiers (@pxref{Advanced Formatting} to achieve
 much the same without defining new functions.  Here's an example:

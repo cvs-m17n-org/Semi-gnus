@@ -431,7 +431,8 @@ This variable is a virtual server slot.  See the Gnus manual for details.")
 					  newsgroup server (current-buffer))
 		(let ((nnfolder-current-directory nil))
 		  (nnmail-expiry-target-group
-		   nnmail-expiry-target newsgroup))))
+		   nnmail-expiry-target newsgroup)))
+	      (nnfolder-possibly-change-group newsgroup server))
 	    (nnheader-message 5 "Deleting article %d in %s..."
 			      (car maybe-expirable) newsgroup)
 	    (nnfolder-delete-mail)
@@ -1229,7 +1230,7 @@ This command does not work if you use short group names."
     (if (file-exists-p file)
 	(condition-case err
 	    (with-temp-buffer
-	      (gnus-sethash file (nth 5 (file-attributes file)) 
+	      (gnus-sethash file (nth 5 (file-attributes file))
 			    nnfolder-marks-modtime)
 	      (nnheader-insert-file-contents file)
 	      (setq nnfolder-marks (read (current-buffer)))

@@ -866,7 +866,7 @@ function is generally only called when Gnus is shutting down."
 	(or (member "\\NoSelect"
 		    (imap-mailbox-get 'list-flags group nnimap-server-buffer))
 	    (let ((info (nnimap-find-minmax-uid group 'examine)))
-	      (when (> (or (imap-mailbox-get 'recent group 
+	      (when (> (or (imap-mailbox-get 'recent group
 					     nnimap-server-buffer) 0)
 		       0)
 		(push (list (cons group 0)) nnmail-split-history))
@@ -1154,7 +1154,10 @@ function is generally only called when Gnus is shutting down."
 	(let ((nnimap-current-move-article art)
 	      (nnimap-current-move-group group)
 	      (nnimap-current-move-server server))
-	  (nnmail-expiry-target-group nnmail-expiry-target group))))))
+	  (nnmail-expiry-target-group nnmail-expiry-target group))))
+    ;; It is not clear if `nnmail-expiry-target' somehow cause the
+    ;; current group to be changed or not, so we make sure here.
+    (nnimap-possibly-change-group group server)))
 
 ;; Notice that we don't actually delete anything, we just mark them deleted.
 (deffoo nnimap-request-expire-articles (articles group &optional server force)

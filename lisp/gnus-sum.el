@@ -1130,7 +1130,9 @@ that were fetched.  Say, for nnultimate groups."
 	?c)
     (?u gnus-tmp-user-defined ?s)
     (?P (gnus-pick-line-number) ?d)
-    (?B gnus-tmp-thread-tree-header-string ?s))
+    (?B gnus-tmp-thread-tree-header-string ?s)
+    (user-date (gnus-user-date
+		,(macroexpand '(mail-header-date gnus-tmp-header))) ?s))
   "An alist of format specifications that can appear in summary lines.
 These are paired with what variables they correspond with, along with
 the type of the variable (string, integer, character, etc).")
@@ -2078,7 +2080,7 @@ increase the score of each group you read."
 	["Age..." gnus-summary-limit-to-age t]
 	["Extra..." gnus-summary-limit-to-extra t]
 	["Score" gnus-summary-limit-to-score t]
-	["Score" gnus-summary-limit-to-display-predicate t]
+	["Display Predicate" gnus-summary-limit-to-display-predicate t]
 	["Unread" gnus-summary-limit-to-unread t]
 	["Non-dormant" gnus-summary-limit-exclude-dormant t]
 	["Articles" gnus-summary-limit-to-articles t]
@@ -5156,6 +5158,7 @@ The resulting hash table is returned, or nil if no Xrefs were found."
 	     (gnus-info-set-marks ',info ',(gnus-info-marks info) t)
 	     (gnus-info-set-read ',info ',(gnus-info-read info))
 	     (gnus-get-unread-articles-in-group ',info (gnus-active ,group))
+	     (gnus-request-set-mark group (list (list ',range 'del '(read))))
 	     (gnus-group-update-group ,group t))))
       ;; Add the read articles to the range.
       (gnus-info-set-read info range)
@@ -6926,7 +6929,7 @@ articles that are younger than AGE days."
   "Limit the summary buffer to the predicated in the `display' group parameter."
   (interactive)
   (unless gnus-newsgroup-display
-    (error "There is no `diplay' group parameter"))
+    (error "There is no `display' group parameter"))
   (let (articles)
     (dolist (number gnus-newsgroup-articles)
       (when (funcall gnus-newsgroup-display)
@@ -8357,10 +8360,9 @@ re-spool using this method."
   (gnus-summary-move-article n nil nil 'crosspost))
 
 (defcustom gnus-summary-respool-default-method nil
-  "Default method for respooling an article.
+  "Default method type for respooling an article.
 If nil, use to the current newsgroup method."
-  :type '(choice (gnus-select-method :value (nnml ""))
-		 (const nil))
+  :type 'symbol
   :group 'gnus-summary-mail)
 
 (defun gnus-summary-respool-article (&optional n method)
