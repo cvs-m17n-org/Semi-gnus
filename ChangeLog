@@ -1,3 +1,16 @@
+2000-03-02  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 11.
+
+2000-03-01  MORIOKA Tomohiko  <tomo@m17n.org>
+
+	* lisp/nnheader.el (nnheader-insert-nov): Use
+	`mime-entity-fetch-field' instead of `mime-fetch-field'.
+
+	* lisp/gnus-sum.el (gnus-summary-line-format-alist): Use
+	`mime-entity-read-field' instead of `mime-read-field'.
+	(gnus-article-sort-by-author): Likewise.
+
 2000-03-02   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
 
 	* lisp/nnimap.el (nnimap-request-article-part): Don't use
