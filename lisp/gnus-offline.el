@@ -395,43 +395,44 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	(setq gnus-agent-handle-level gnus-level-subscribed)
 	(gnus-agent-toggle-plugged t))))
 
-;; Advice to Gnus functions.
-(defadvice gnus-group-get-new-news (before gnus-offline-advice
-					   activate preactivate)
-  "When called interactively, dial up and get online automatically."
-  (when (interactive-p)
-    (run-hooks 'gnus-offline-before-online-hook)
-    (if (and (memq 'connect gnus-offline-auto-ppp)
-	     (functionp gnus-offline-dialup-function))
-	(funcall gnus-offline-dialup-function))
-    (gnus-offline-get-new-news-function)))
-
-(defadvice gnus-agent-toggle-plugged (around gnus-offline-advice
+(when (featurep 'gnus-ofsetup)
+  ;; Advice to Gnus functions.
+  (defadvice gnus-group-get-new-news (before gnus-offline-advice
 					     activate preactivate)
-  "Also toggle gnus-offline `connected--disconnected' status."
-  (interactive (list (not gnus-offline-connected)))
-  (cond ((ad-get-arg 0)
-	 (setq gnus-offline-connected (ad-get-arg 0))
-	 ad-do-it
-	 ;; Set send mail/news function to offline functions.
-	 (gnus-offline-set-online-sendmail-function)
-	 (gnus-offline-set-online-post-news-function))
-	(t
-	 ;; Set to offline status
-	 (gnus-offline-set-unplugged-state))))
+    "When called interactively, dial up and get online automatically."
+    (when (interactive-p)
+      (run-hooks 'gnus-offline-before-online-hook)
+      (if (and (memq 'connect gnus-offline-auto-ppp)
+	       (functionp gnus-offline-dialup-function))
+	  (funcall gnus-offline-dialup-function))
+      (gnus-offline-get-new-news-function)))
 
-(defadvice gnus-agent-expire (around gnus-offline-advice activate preactivate)
-  "Advice not to delete new articles."
-  (cond ((eq 0 gnus-agent-expire-days)
-	 (let (gnus-agent-expire-all)
-	   ad-do-it))
-	(t
-	 ad-do-it)))
+  (defadvice gnus-agent-toggle-plugged (around gnus-offline-advice
+					       activate preactivate)
+    "Also toggle gnus-offline `connected--disconnected' status."
+    (interactive (list (not gnus-offline-connected)))
+    (cond ((ad-get-arg 0)
+	   (setq gnus-offline-connected (ad-get-arg 0))
+	   ad-do-it
+	   ;; Set send mail/news function to offline functions.
+	   (gnus-offline-set-online-sendmail-function)
+	   (gnus-offline-set-online-post-news-function))
+	  (t
+	   ;; Set to offline status
+	   (gnus-offline-set-unplugged-state))))
 
-(defadvice gnus-agent-mode (around gnus-offline-advice activate preactivate)
-  "Advice not to close PPP connection."
-  (let (gnus-offline-hangup-function)
-    ad-do-it))
+  (defadvice gnus-agent-expire (around gnus-offline-advice activate preactivate)
+    "Advice not to delete new articles."
+    (cond ((eq 0 gnus-agent-expire-days)
+	   (let (gnus-agent-expire-all)
+	     ad-do-it))
+	  (t
+	   ad-do-it)))
+
+  (defadvice gnus-agent-mode (around gnus-offline-advice activate preactivate)
+    "Advice not to close PPP connection."
+    (let (gnus-offline-hangup-function)
+      ad-do-it)))
 
 ;;
 ;; Setting up...
