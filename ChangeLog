@@ -1,3 +1,10 @@
+1999-11-19  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 03.
+
+	* lisp/gnus-sum.el (gnus-update-summary-mark-positions): Specify
+	the 3rd arg of `make-full-mail-header' to "nobody" instead of "".
+
 1999-08-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* README.semi: Update for the recent a-ftp sites and directories.
