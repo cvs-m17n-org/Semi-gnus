@@ -1953,7 +1953,7 @@ this is a reply."
 		  ;; This is a form to be evaled.
 		  (eval match)))))
 	  ;; We have a match, so we set the variables.
-	  (setq style (gnus-configure-posting-style style))
+	  (setq style (gnus-configure-posting-style style nil))
 	  (dolist (attribute style)
 	    (setq results (delq (assoc (car attribute) results) results))
 	    (push attribute results))))
@@ -2011,7 +2011,7 @@ this is a reply."
 		  nil 'local)))))
 
 ;; splitted from gnus-configure-posting-styles to allow recursive traversal.
-(defun gnus-configure-posting-style (style)
+(defun gnus-configure-posting-style (style stack)
   "Parse one posting style STYLE and returns the value as an alist."
   (let (results element variable filep value v)
     (dolist (attribute style)
@@ -2057,10 +2057,14 @@ this is a reply."
 		    (delete-char -1))
 		  (buffer-string))))
       (if (eq element 'import)
-	  (setq results
-		(nconc (nreverse (gnus-configure-posting-style
-				  (cdr (assoc v gnus-named-posting-styles))))
-		       results))
+	  (progn
+	    (if (member v stack)
+		(error "Circular import of \"%s\"" v))
+	    (setq results
+		  (nconc (nreverse (gnus-configure-posting-style
+				    (cdr (assoc v gnus-named-posting-styles))
+				    (cons v stack)))
+			 results)))
 	(push (cons element v) results)))
     (nreverse results)))
 
