@@ -1,3 +1,7 @@
+1999-05-15  Tsukamoto Tetsuo   <czkmt@remus.dti.ne.jp>
+
+	* texi/gnusref-ja.tex: Fix typo.
+
 1999-05-14  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/*.el: Undo all of the last changes.
