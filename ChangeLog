@@ -1,3 +1,8 @@
+1999-02-01  Akihiro Arisawa   <ari@mei9.advantest.co.jp>
+
+	* lisp/nndoc.el (nndoc-mime-digest-type-p): Add the element of
+	`header-begin' to type-alist for mime-digest.
+
 1999-02-01  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
 
 	* README-offline.ja: Add description written by YOSHIZAWA Masahiro
@@ -11,7 +16,7 @@
 
 	* lisp/gnus-offline.el: Use (running-pterodactyl-gnus-0_73-or-later)
         to check pGnus 0.73 or later instead of (locate-library "mail-source")
-	
+
 1999-02-01  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/nndoc.el (nndoc-mime-parts-type-p): Strip leading white
