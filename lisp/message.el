@@ -3036,10 +3036,10 @@ If NOW, use that time instead."
 		  (let ((pair (std11-extract-address-components from)))
 		    (concat "\n ("
 			    (or (car pair) (cadr pair))
-			    "'s message of " 
+			    "'s message of \""
 			    (if (or (not date) (string= date ""))
 				"(unknown date)" date)
-			    ")"))))))))
+			    "\")"))))))))
 
 (defun message-make-distribution ()
   "Make a Distribution header."
