@@ -33,10 +33,11 @@
 ;; autoload password
 (eval-and-compile
   (autoload 'password-read "password")
-  ;; Those two autoloads are needed since T-gnus won't load password.el
+  ;; The following section is needed since T-gnus won't load password.el
   ;; by way of pgg.el at the compile time.
   (autoload 'password-read-and-add "password")
-  (autoload 'password-cache-remove "password"))
+  (autoload 'password-cache-remove "password")
+  (defvar password-cache-expiry))
 
 (defgroup encrypt nil
   "File encryption configuration.")
