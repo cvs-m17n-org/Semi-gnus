@@ -931,21 +931,30 @@ REST is a plist of following:
 			 ,parameter-type
 			 ,parameter-document))
      (if (eq type 'bool)
-	 `(defun ,function (group)
+	 `(defun ,function (name)
 	    ,function-document
-	    (let ((params (gnus-group-find-parameter group))
+	    (let ((params (gnus-group-find-parameter name))
 		  val)
 	      (cond
 	       ((memq ',param params)
 		t)
 	       ((setq val (assq ',param params))
 		(cdr val))
+	       ((stringp ,variable)
+		(string-match ,variable name))
 	       (,variable
-		(string-match ,variable group)))))
+		(let ((alist ,variable)
+		      elem value)
+		  (while (setq elem (pop alist))
+		    (when (and name
+			       (string-match (car elem) name))
+		      (setq alist nil
+			    value (cdr elem))))
+		  (if (consp value) (car value) value))))))
        `(defun ,function (name)
 	  ,function-document
 	  (and name
-	       (or (gnus-group-find-parameter name ',param)
+	       (or (gnus-group-find-parameter name ',param ,(and type t))
 		   (let ((alist ,variable)
 			 elem value)
 		     (while (setq elem (pop alist))

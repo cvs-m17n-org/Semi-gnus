@@ -2585,6 +2585,9 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$m$KCM$,$"$k$b$N!"$G9=@.$5$l$^$9!#A4$F$N%Q%i%a!<%?$O$3$N7A<0$r<h$j$^$9$,!"(B
 @emph{$BNc30(B}$B$H$7$F6I=jJQ?t$N;XDj$OE@BP$G$O$J$/DL>o$N%j%9%H$K$J$j$^$9!#(B
 
+$B$$$/$D$+$N%Q%i%a!<%?$OBP1~$9$k%+%9%?%^%$%:2DG=$JJQ?t$r;}$C$F$$$^$9!#$=$l(B
+$B$i$O@55,I=8=$HCM$NO"A[%j%9%H$G$9!#(B
+
 $B0J2<$OMxMQ2DG=$J%0%k!<%W%Q%i%a!<%?$G$9(B:
 
 @table @code
@@ -2609,6 +2612,8 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$7$FD>@\Ej9F$9$k$3$H$OIT2DG=$G!"Be$o$j$K$=$N%a!<%j%s%0%j%9%H$K%a!<%k$rAw(B
 $B?.$7$J$1$l$P$J$j$^$;$s!#(B
 
+@code{gnus-parameter-to-address-alist} $B$b;2>H$7$F2<$5$$!#(B
+
 @item to-list
 @cindex to-list
 $B$=$N%0%k!<%W$G(B @kbd{a} $B$r2!$7$?$H$-$K;HMQ$5$l$k%"%I%l%9!#(B
@@ -2630,6 +2635,8 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 
 $B$b$7(B @kbd{a} $B%3%^%s%I$r%a!<%k%0%k!<%W$G<B9T$7$?$H$-!"(B@code{to-list} $B%0%k!<(B
 $B%W%Q%i%a!<%?$,$J$1$l$P!"Aw?.;~$K<+F0E*$KIU2C$5$l$^$9!#(B
+
+@code{gnus-parameter-to-list-alist} $B$b;2>H$7$F2<$5$$!#(B
 
 @item visible
 @cindex visible
@@ -2671,12 +2678,16 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$N4{FI5-;v$O;~8B>C5n$5$l$k$h$&$K0u$rIU$1$i$l$^$9!#B>$NJ}K!$O!"(B
 @pxref{Expiring Mail}$B!#(B
 
+@code{gnus-auto-expirable-newsgroups} $B$b;2>H$7$F2<$5$$!#(B
+
 @item total-expire
 @cindex total-expire
 $B%0%k!<%W%Q%i%a!<%?$K(B @code{(total-expire . t)} $B$N$h$&$JMWAG$,$"$l$P!"4{(B
 $BFI5-;v$O!";~8B>C5n$N0u$,$D$$$F$$$J$/$H$bA4$F;~8B>C5n=hM}$r;\$5$l$^$9!#Cm(B
 $B0U$7$F;HMQ$7$F$/$@$5$$!#L$FI5-;v!"0uIU$-5-;v!"J]N15-;v$O;~8B>C5n$5$l$^$;(B
 $B$s!#(B
+
+@code{gnus-total-expirable-newsgroups} $B$b;2>H$7$F2<$5$$!#(B
 
 @item expiry-wait
 @cindex expiry-wait
@@ -2721,26 +2732,21 @@ kiboze $B%0%k!<%W$r:n@.$7$^$9!#%W%m%s%W%H$GL>A0$H!"(Bkiboze $B%0%k!<%W$K!V4^$
 $B$9$kG$0U$N%3%a%s%H$G$9!#$3$l$O8=:_$N(B gnus $B$G$OL5;k$5$l$^$9$,!"FCDj$N%0%k!<(B
 $B%W$KBP$9$k>pJs$r3JG<$9$k>l=j$rDs6!$7$^$9!#(B
 
-@c FIXTGNUS Is this true?
-@c  @item charset
-@c  Elements that look like @code{(charset . iso-8859-1)} will make
-@c  @code{iso-8859-1} the default charset; that is, the charset that will be
-@c  used for all articles that do not specify a charset.
+@ignore
+@item charset
+Elements that look like @code{(charset . iso-8859-1)} will make
+@code{iso-8859-1} the default charset; that is, the charset that will be
+used for all articles that do not specify a charset.
 
-@item (@var{variable} @var{form})
-$B%0%k!<%W$KF~$k$H$-$K!"$=$N%0%k!<%W%m!<%+%k$NJQ?t$r@_Dj$9$k%0%k!<%W%Q%i%a!<(B
-$B%?$r;HMQ$9$k$3$H$,$G$-$^$9!#(B@samp{news.answers} $B$K$*$$$F%9%l%C%II=<($r9T(B
-$B$$$?$/$J$$$H$-$O!"$=$N%0%k!<%W$K%0%k!<%W%Q%i%a!<%?(B
-$B$K(B @code{(gnus-show-threads nil)} $B$H=q$1$^$9!#(B
-@code{gnus-show-threads} $B$O!"$=$N35N,%P%C%U%!$NCf$N%m!<%+%kJQ?t$K$J$j!"(B
-form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
+See also @code{gnus-group-charset-alist}.
 
-$B$3$l$O$b$7I,MW$G$"$l$P!"%0%k!<%WKh$N%U%C%/4X?t$H$7$F$b;HMQ$G$-$^$9!#$b$7(B
-$B$"$k%0%k!<%W$KF~$C$?$H$-$K%S!<%W2;$rLD$i$7$?$1$l$P!"$=$N%0%k!<%W$N%Q%i%a!<(B
-$B%?$K(B @code{(dummy-variable (ding))} $B$_$?$$$J$b$N$r=q$$$F$*$/$3$H$b$G$-$^(B
-$B$9!#(B@code{dummy-variable} $B$H$$$&JQ?t$K(B @code{(ding)} $B$NI>2A7k2L$,@_Dj$5(B
-$B$l$^$9$,!"$^$"!"C/$b5$$K$7$J$$$G$7$g(B?
+@item ignored-charsets
+Elements that look like @code{(ignored-charsets x-known iso-8859-1)}
+will make @code{iso-8859-1} and @code{x-unknown} ignored; that is, the
+default charset will be used for decoding articles.
 
+See also @code{gnus-group-ignored-charsets-alist}.
+@end ignore
 @item posting-style
 $B$3$N%0%k!<%W$NDI2C$NEj9FMM<0$r$3$3$N$_$KJ]B8$9$k$3$H$,$G$-$^(B
 $B$9(B (@pxref{Posting Styles})$B!#=q<0$O(B @code{gnus-posting-style} $BO"A[%j%9%H(B
@@ -2764,6 +2770,20 @@ form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
 $B%k(B @code{signature} ($B:G8e$N=pL>$r:o(B
 $B=|(B) $B$dO"A[%j%9%H(B @code{gnus-article-banner-alist} $B$N3FMWAG$r;H$&$3$H$b$G(B
 $B$-$^$9!#(B
+
+@item (@var{variable} @var{form})
+$B%0%k!<%W$KF~$k$H$-$K!"$=$N%0%k!<%W%m!<%+%k$NJQ?t$r@_Dj$9$k%0%k!<%W%Q%i%a!<(B
+$B%?$r;HMQ$9$k$3$H$,$G$-$^$9!#(B@samp{news.answers} $B$K$*$$$F%9%l%C%II=<($r9T(B
+$B$$$?$/$J$$$H$-$O!"$=$N%0%k!<%W$K%0%k!<%W%Q%i%a!<%?(B
+$B$K(B @code{(gnus-show-threads nil)} $B$H=q$1$^$9!#(B
+@code{gnus-show-threads} $B$O!"$=$N35N,%P%C%U%!$NCf$N%m!<%+%kJQ?t$K$J$j!"(B
+form $B$N(B @code{nil} $B$O$=$3$GI>2A$5$l$^$9!#(B
+
+$B$3$l$O$b$7I,MW$G$"$l$P!"%0%k!<%WKh$N%U%C%/4X?t$H$7$F$b;HMQ$G$-$^$9!#$b$7(B
+$B$"$k%0%k!<%W$KF~$C$?$H$-$K%S!<%W2;$rLD$i$7$?$1$l$P!"$=$N%0%k!<%W$N%Q%i%a!<(B
+$B%?$K(B @code{(dummy-variable (ding))} $B$_$?$$$J$b$N$r=q$$$F$*$/$3$H$b$G$-$^(B
+$B$9!#(B@code{dummy-variable} $B$H$$$&JQ?t$K(B @code{(ding)} $B$NI>2A7k2L$,@_Dj$5(B
+$B$l$^$9$,!"$^$"!"C/$b5$$K$7$J$$$G$7$g(B?
 
 @end table
 
@@ -6383,6 +6403,10 @@ MH $B%i%$%V%i%j!<$N(B @code{rcvstore} $B$rMQ$$$k;v$K$h$C$F5-;v$r(B MH $B%U%
 @item gnus-plain-save-name
 @findex gnus-plain-save-name
 @file{~/News/alt.andera-dworkin} $B$N$h$&$J%U%!%$%kL>!#(B
+
+@item gnus-sender-save-name
+@findex gnus-sender-save-name
+@file{~/News/larsi} $B$N$h$&$J%U%!%$%kL>!#(B
 @end table
 
 @vindex gnus-split-methods
@@ -11008,12 +11032,12 @@ UNDELETED} $B$O$*$=$i$/$?$$$F$$$N?M$K$O:GNI$NA*Br$G$7$g$&$,!"$H$-$I(B
 $B$-(B @sc{imap} $B%/%i%$%"%s%H$G%a!<%k%\%C%/%9$r=|$-!"$$$/$D$+$N5-;v$K4{(B
 $BFI(B ($B$b$7$/$O!"(BSEEN) $B$N0u$rIU$1$k$J$i!"(B@samp{nil} $B$K@_Dj$7$?$$$+$b$7$l$^(B
 $B$;$s!#$=$&$9$l$P!"%a!<%k%\%C%/%9$NA4$F$N5-;v$O0u$NG!2?$K4X$o$i$:<hF@$5$l(B
-$B$^$9!#=R8l$N40A4$J0lMw$O!"(BRFC2060 .AN'6.4.4 $B$rFI$s$G$/$@$5$$!#(B
+$B$^$9!#=R8l$N40A4$J0lMw$O!"(BRFC2060 N'6.4.4 $B$rFI$s$G$/$@$5$$!#(B
 
 @item :fetchflag
 $B%5!<%P!<$G!"<hF@$7$?5-;v$K0u$rIU$1$kJ}K!!#=i4|CM$N(B @samp{\Deleted} $B$O$=(B
 $B$l$i$K>C5n$N0u$rIU$1$^$9$,!"B>$K(B @samp{\Seen} $B$G$OC1$K4{FI$N0u$rIU$1$^$9!#(B
-$B$3$l$i$O:G$b$"$j$=$&$JFs$D$NA*Br$G$9$,!"B>$N0u$b(B RFC2060 .AN'2.3.2 $B$GDj5A$5(B
+$B$3$l$i$O:G$b$"$j$=$&$JFs$D$NA*Br$G$9$,!"B>$N0u$b(B RFC2060 N'2.3.2 $B$GDj5A$5(B
 $B$l$F$$$^$9!#(B
 
 @item :dontexpunge
@@ -16336,7 +16360,7 @@ bbbd $B%5!<%P!<$,<B9T$5$l$F$$$k%[%9%H$N%]!<%H$G$9!#=i4|CM$O(B 9000 $B$G$9!#(
 
 @item !
 @itemx not
-@itemx .AN,
+@itemx N,
 $B$3$NO@M}:nMQ;R$OC10l$N0z?t$N$_$r$H$j$^$9!#$=$l$O$=$N0z?t$NCM$NO@M}H]Dj$r(B
 $BJV$7$^$9!#(B
 
@@ -18716,7 +18740,7 @@ Kevin Davidson---@dfn{ding} $B$NL>A0$r;W$$IU$-$^$7$?!#$G$9$+$i!"H`$r@U$a$F(B
 $B2<$5$$!#(B
 
 @item
-Fran.ANgois Pinard---$BB?$/$N!"B?$/$N6=L#?<$/40A4$J%P%0%l%]!<%H$H(B autoconf $B$N(B
+FranNgois Pinard---$BB?$/$N!"B?$/$N6=L#?<$/40A4$J%P%0%l%]!<%H$H(B autoconf $B$N(B
 $B%5%]!<%H!#(B
 
 @end itemize
@@ -18729,7 +18753,7 @@ Borges $B$K$h$C$F9;@5$5$l!"(BJost Krieger $B$K$h$C$F0lItJ,$r9;@5$5$l$^$7$?!#
 Christopher Davis,
 Andrew Eskilsson,
 Kai Grossjohann,
-David K.ANegedal,
+David KNegedal,
 Richard Pieri,
 Fabrice Popineau,
 Daniel Quinlan,
@@ -18815,7 +18839,7 @@ Gunnar Horrigmo,
 Richard Hoskins,
 Brad Howes,
 Miguel de Icaza,
-Fran.ANgois Felix Ingrand,
+FranNgois Felix Ingrand,
 Tatsuya Ichikawa, @c ?
 Ishikawa Ichiro, @c Ishikawa
 Lee Iverson,
