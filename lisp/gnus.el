@@ -250,7 +250,7 @@ is restarted, and sometimes reloaded."
   "Version number for this version of gnus.")
 
 (defconst gnus-version
-  (format "Semi-gnus %s (based on Quassia Gnus v0.18)" gnus-version-number)
+  (format "Semi-gnus %s (based on Quassia Gnus v0.22)" gnus-version-number)
   "Version string for this version of gnus.")
 
 (defcustom gnus-inhibit-startup-message nil
@@ -1656,7 +1656,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-start-date-timer gnus-stop-date-timer)
      ("gnus-int" gnus-request-type)
      ("gnus-start" gnus-newsrc-parse-options gnus-1 gnus-no-server-1
-      gnus-dribble-enter)
+      gnus-dribble-enter gnus-read-init-file)
      ("gnus-dup" gnus-dup-suppress-articles gnus-dup-unsuppress-article
       gnus-dup-enter-articles)
      ("gnus-range" gnus-copy-sequence)
@@ -1670,9 +1670,9 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-async-halt-prefetch)
      ("gnus-agent" gnus-open-agent gnus-agent-get-function
       gnus-agent-save-groups gnus-agent-save-active gnus-agent-method-p
-      gnus-agent-get-undownloaded-list)
+      gnus-agent-get-undownloaded-list gnus-agent-fetch-session)
      ("gnus-agent" :interactive t
-      gnus-unplugged gnus-agentize)
+      gnus-unplugged gnus-agentize gnus-agent-batch)
      ("gnus-vm" :interactive t gnus-summary-save-in-vm
       gnus-summary-save-article-vm)
      ("gnus-draft" :interactive t gnus-draft-mode gnus-group-send-drafts))))
