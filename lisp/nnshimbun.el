@@ -1,12 +1,12 @@
 ;;; nnshimbun.el --- interfacing with web newspapers
 
+;; Copyright (C) 2000,2001,2002 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
+
 ;; Authors: TSUCHIYA Masatoshi <tsuchiya@namazu.org>,
 ;;          Akihiro Arisawa    <ari@atesoft.advantest.co.jp>,
 ;;          Katsumi Yamaoka    <yamaoka@jpl.org>,
 ;;          Yuuichi Teranishi  <teranisi@gohome.org>
 ;; Keywords: news
-
-;;; Copyright:
 
 ;; This file is a part of Semi-Gnus.
 

@@ -1,8 +1,8 @@
 ;;; gnus-namazu.el --- Search mail with Namazu.
 
-;; Copyright (C) 2000,2001,2002 Tsuchiya Masatoshi <tsuchiya@namazu.org>
+;; Copyright (C) 2000,2001,2002 TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 
-;; Author: Tsuchiya Masatoshi <tsuchiya@namazu.org>
+;; Author: TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;; Keywords: mail searching namazu
 
 ;; This file is a part of Semi-Gnus.
