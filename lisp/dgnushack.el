@@ -31,8 +31,78 @@
 
 (require 'cl)
 (require 'bytecomp)
+(condition-case err
+    ;; Attempt to pickup the additional load-path(s).
+    (load "~/.lpath.el" t)
+  (error (message "Error in \"~/.lpath.el\" file: %s" err)))
 (push "." load-path)
 (load "./lpath.el" nil t)
+
+(condition-case nil
+    (char-after)
+  (wrong-number-of-arguments
+   ;; Optimize byte code for `char-after',
+   (put 'char-after 'byte-optimizer 'byte-optimize-char-after)
+   (defun byte-optimize-char-after (form)
+     (if (null (cdr form))
+	 '(char-after (point))
+       form))))
+
+(condition-case nil
+    (char-before)
+  (wrong-number-of-arguments
+   ;; Optimize byte code for `char-before',
+   (put 'char-before 'byte-optimizer 'byte-optimize-char-before)
+   (defun byte-optimize-char-before (form)
+     (if (null (cdr form))
+	 '(char-before (point))
+       form))))
+
+(unless (fboundp 'byte-compile-file-form-custom-declare-variable)
+  ;; Bind defcustom'ed variables.
+  (put 'custom-declare-variable 'byte-hunk-handler
+       'byte-compile-file-form-custom-declare-variable)
+  (defun byte-compile-file-form-custom-declare-variable (form)
+    (if (memq 'free-vars byte-compile-warnings)
+	(setq byte-compile-bound-variables
+	      (cons (nth 1 (nth 1 form)) byte-compile-bound-variables)))
+    form))
+
+(when (< emacs-major-version 20)
+  ;; Bind functions defined by `defun-maybe'.
+  (put 'defun-maybe 'byte-hunk-handler 'byte-compile-file-form-defun-maybe)
+  (defun byte-compile-file-form-defun-maybe (form)
+    (if (memq 'unresolved byte-compile-warnings)
+	(setq byte-compile-function-environment
+	      (cons (cons (nth 1 form)
+			  (cons 'lambda (cdr (cdr form))))
+		    byte-compile-function-environment)))
+    form))
+
+(condition-case nil
+    :symbol-for-testing-whether-colon-keyword-is-available-or-not
+  (void-variable
+   ;; Bind keywords.
+   (mapcar (lambda (keyword) (set keyword keyword))
+	   '(:button-keymap :data :mime-handle :path :predicate :user))))
+
+;; Unknown variables and functions.
+(unless (boundp 'buffer-file-coding-system)
+  (defvar buffer-file-coding-system (symbol-value 'file-coding-system)))
+(autoload 'font-lock-set-defaults "font-lock")
+(unless (featurep 'xemacs)
+  (defalias 'Custom-make-dependencies 'ignore))
+(defalias 'coding-system-get 'ignore)
+(when (boundp 'MULE)
+  (defalias 'find-coding-system 'ignore))
+(defalias 'get-charset-property 'ignore)
+(defalias 'toolbar-gnus 'ignore)
+(unless (featurep 'xemacs)
+  (defalias 'update-autoloads-from-directory 'ignore))
+
+(unless (fboundp 'with-temp-buffer)
+  ;; Pickup some macros.
+  (require 'emu))
 
 (defalias 'device-sound-enabled-p 'ignore)
 (defalias 'play-sound-file 'ignore)
