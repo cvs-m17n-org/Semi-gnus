@@ -58,7 +58,7 @@
     (if rest
 	`(let* ((fn ,fn)
 		(seq ,seq)
-		(args (cons seq (list ,@rest)))
+		(args (list seq ,@rest))
 		(m (apply (function min) (mapcar (function length) args)))
 		(n 0))
 	   (while (< n m)
@@ -97,7 +97,7 @@
       form
     (if rest
 	`(let (res
-	       (args (cons ,seq (list ,@rest)))
+	       (args (list ,seq ,@rest))
 	       p)
 	   (while (not (memq nil args))
 	     (push (apply ,fn args) res)
