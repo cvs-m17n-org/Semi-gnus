@@ -1,3 +1,8 @@
+2002-01-08  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (article-toggle-headers): Expose headers even
+	if there is a boundary line.
+
 2002-01-08  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/highlight-words): Reimplemented.
