@@ -789,10 +789,10 @@ given, the return value will not contain the last newline."
      out))
 
 (defmacro nnheader-nov-read-message-id (&optional number)
-  '(let ((id (nnheader-nov-field)))
+  `(let ((id (nnheader-nov-field)))
      (if (string-match "^<[^>]+>$" id)
 	 id
-       (nnheader-generate-fake-message-id number))))
+       (nnheader-generate-fake-message-id ,number))))
 
 (defun nnheader-parse-nov ()
   (let ((eol (point-at-eol))
