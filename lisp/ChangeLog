@@ -1,3 +1,22 @@
+2003-06-15  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-sum.el (gnus-summary-force-verify-and-decrypt): Bind
+	`gnus-article-emulate-mime'.
+
+2003-06-15  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
+	From Tommi Vainikainen <thv+gnus@iki.fi>.
+
+	* message.el (message-is-yours-p): New function.  Separated common
+	code from message-cancel-news and message-supersede.  Added
+	matching code which uses message-alternative-emails regexp as last
+	resort.
+	(message-cancel-news, message-supersede): Use message-is-yours-p.
+
+2003-06-13  Kai Gro,A_(Bjohann  <kai.grossjohann@gmx.net>
+
+	* nnimap.el (nnimap-split-articles): Narrow the right buffer to
+	the headers.  From Niklas Morberg <niklas.morberg@axis.com>.
+
 2003-06-12  Dave Love  <fx@gnu.org>
 
 	* nnheader.el (nnheader-functionp): Deleted.
