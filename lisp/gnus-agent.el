@@ -1110,46 +1110,41 @@ the actual number of articles toggled is returned."
       (insert-buffer-substring gnus-agent-overview-buffer b e))))
 
 (defun gnus-agent-braid-nov (group articles file)
-  (set-buffer gnus-agent-overview-buffer)
-  (goto-char (point-min))
-  (set-buffer nntp-server-buffer)
-  (erase-buffer)
-  (nnheader-insert-file-contents file)
-  (goto-char (point-max))
-  (if (or (= (point-min) (point-max))
-	  (progn
-	    (forward-line -1)
-	    (< (read (current-buffer)) (car articles))))
-      ;; We have only headers that are after the older headers,
-      ;; so we just append them.
-      (progn
-	(goto-char (point-max))
-	(insert-buffer-substring gnus-agent-overview-buffer))
-    ;; We do it the hard way.
-    (nnheader-find-nov-line (car articles))
-    (gnus-agent-copy-nov-line (car articles))
-    (pop articles)
-    (while (and articles
-		(not (eobp)))
-      (while (and (not (eobp))
-		  (< (read (current-buffer)) (car articles)))
-	(forward-line 1))
-      (beginning-of-line)
-      (unless (eobp)
-	(gnus-agent-copy-nov-line (car articles))
-	(setq articles (cdr articles))))
+  (let (start last)
+    (set-buffer gnus-agent-overview-buffer)
+    (goto-char (point-min))
     (set-buffer nntp-server-buffer)
-    (when articles
-      (let (b e)
-	(set-buffer gnus-agent-overview-buffer)
-	(setq b (point)
-	      e (point-max))
+    (erase-buffer)
+    (nnheader-insert-file-contents file)
+    (goto-char (point-max))
+    (unless (or (= (point-min) (point-max))
+		(progn
+		  (forward-line -1)
+		  (< (setq last (read (current-buffer))) (car articles))))
+      ;; We do it the hard way.
+      (nnheader-find-nov-line (car articles))
+      (gnus-agent-copy-nov-line (pop articles))
+      (while (and articles
+		  (not (eobp)))
 	(while (and (not (eobp))
-		    (<= (read (current-buffer)) (car articles)))
-	  (forward-line 1)
-	  (setq b (point)))
-	(set-buffer nntp-server-buffer)
-	(insert-buffer-substring gnus-agent-overview-buffer b e)))))
+		    (< (read (current-buffer)) (car articles)))
+	  (forward-line 1))
+	(beginning-of-line)
+	(unless (eobp)
+	  (gnus-agent-copy-nov-line (pop articles)))))
+    ;; Copy the rest lines
+    (set-buffer nntp-server-buffer)
+    (goto-char (point-max))
+    (when articles
+      (when last
+	(set-buffer gnus-agent-overview-buffer)
+	(while (and (not (eobp))
+		    (<= (read (current-buffer)) last))
+	  (forward-line 1))
+	(beginning-of-line)
+	(setq start (point))
+	(set-buffer nntp-server-buffer))
+      (insert-buffer-substring gnus-agent-overview-buffer start))))
 
 (defun gnus-agent-load-alist (group &optional dir)
   "Load the article-state alist for GROUP."
