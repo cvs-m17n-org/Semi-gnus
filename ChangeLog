@@ -1,3 +1,15 @@
+1999-05-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 07.
+
+	* lisp/gnus-art.el (gnus-article-prepare-display): Call
+	`gnus-treat-article'.
+
+1999-05-17   Daiki Ueno  <daiki@kiss.kake.info.waseda.ac.jp>
+
+	* lisp/gnus-art.el (article-date-ut): Always detete the last
+	newline of any old Date fields.
+
 1999-05-17   Daiki Ueno  <daiki@kiss.kake.info.waseda.ac.jp>
 	     Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
