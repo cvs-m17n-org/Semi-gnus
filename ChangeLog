@@ -1,3 +1,8 @@
+1999-01-18  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-move-article): Don't copy
+	expirable marks if the destination group is not expirable.
+
 1999-01-16  Kiyokazu SUTO  <suto@merry.xmath.ous.ac.jp>
 
 	* lisp/message.el (message-reply): Accept references as a new
