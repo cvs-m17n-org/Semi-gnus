@@ -1,5 +1,38 @@
 1999-01-11  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/pop3.el (pop3-munge-message-separator): Use
+	`parse-time-string'.
+
+1998-10-03 15:04:27  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* lisp/parse-time.el (parse-time-rules): Accept dates far into the
+	past and the future, and parse single-digit numbers as years.
+
+1998-09-11 08:19:22  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/parse-time.el (parse-time-string): One too many nils.
+
+1998-09-10 06:20:52  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* lisp/parse-time.el (parse-time-rules): Parse
+	"Wed, 29 Apr 98 0:26:01 EDT" times.
+
+1998-09-10 01:58:24  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* lisp/parse-time.el (parse-time-rules): Accept times that look
+	like "h:mm".
+
+1998-09-08 00:38:39  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* lisp/parse-time.el (parse-time-string): Downcase before handling.
+	(parse-time-rules): Times without seconds have 0 seconds.
+
+1998-09-06 23:23:06  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* lisp/parse-time.el (parse-time-syntax): Use vectors.
+
+1999-01-11  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus-vm.el (gnus-summary-save-in-vm): Save window config,
 	select the article before saving.
 
