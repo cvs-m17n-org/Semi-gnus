@@ -22198,7 +22198,7 @@ Gnus $B$G(B SpamOracle $B$r;H$&$K$O!"$$$/$D$+$N$d$jJ}$,$"$j$^$9!#$9$Y$F$N>l9g
 $B$9(B @samp{X-Spam} $B%X%C%@!<$r5-F~$7$^$9!#(B
 
 $B<B8=2DG=$J0l$D$O!"(BSpamOracle $B$r(B @code{:prescript} $B$H$7$F(B @xref{Mail
-Source Specifiers} $B$+$i(B $BAv$i$;$k$3$H$G$9!#$3$NJ}K!$K$O!"%f!<%6(B
+Source Specifiers} $B$+$iAv$i$;$k$3$H$G$9!#$3$NJ}K!$K$O!"%f!<%6(B
 $B$,(B @emph{X-Spam} $B%X%C%@!<$r8+$k$3$H$,$G$-$k$H$$$&MxE@$,$"$j$^$9!#(B
 
 $B$b$C$H$b<j7Z$JJ}K!$O!"(B@file{spam.el} (@pxref{Filtering Spam Using The
