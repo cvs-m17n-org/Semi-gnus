@@ -171,9 +171,9 @@
      ((eq type 'at)
       (equal date match))
      ((eq type 'before)
-      (gnus-time-less match date))
+      (time-less-p match date))
      ((eq type 'after)
-      (gnus-time-less date match))
+      (time-less-p date match))
      (t
       (error "No such date score type: %s" type)))))
 
