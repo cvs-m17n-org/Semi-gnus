@@ -968,7 +968,7 @@ this is a reply."
 		       (concat "^" (regexp-quote mail-header-separator) "$")
 		       nil t)
 		  (replace-match "" t t ))
-		(unless (gnus-request-accept-article group method t)
+		(unless (gnus-request-accept-article group method t t)
 		  (gnus-message 1 "Couldn't store article in group %s: %s"
 				group (gnus-status-message method))
 		  (sit-for 2))

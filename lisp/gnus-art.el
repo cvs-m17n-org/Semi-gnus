@@ -1783,6 +1783,7 @@ If variable `gnus-use-long-file-name' is non-nil, it is
      article-date-iso8601
      article-date-original
      article-date-ut
+     article-decode-mime-words
      article-date-user
      article-date-lapsed
      article-emphasize

@@ -1,3 +1,4 @@
+
 ;;; message.el --- composing mail and news messages
 ;; Copyright (C) 1996,97,98 Free Software Foundation, Inc.
 
@@ -2838,9 +2839,6 @@ If NOW, use that time instead."
 	 (zone (nth 8 (decode-time now)))
 	 (sign "+"))
     ;; We do all of this because XEmacs doesn't have the %z spec.
-    (when (> (/ zone 3600) 12)
-      (setq sign "-"
-	    zone (- zone (* 3600 12))))
     (concat (format-time-string "%d %b %Y %H:%M:%S " (or now (current-time)))
 	    (format "%s%02d%02d"
 		    sign (/ zone 3600)
