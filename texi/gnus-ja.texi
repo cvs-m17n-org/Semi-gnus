@@ -4982,102 +4982,100 @@ Gnus は、取り消すときに『現在』の選択方法を使います。標準の投稿方法を使
 ちょっと覚えておいてください: 'supersede' (代替) という語の中に 'c' は無
 いということを。
 
-@c TRANSLATEME
 @node Delayed Articles
-@section Delayed Articles
+@section 遅延記事
 @cindex delayed sending
 @cindex send delayed
 
-Sometimes, you might wish to delay the sending of a message.  For
-example, you might wish to arrange for a message to turn up just in time
-to remind your about the birthday of your Significant Other.  For this,
-there is the @code{gnus-delay} package.  Setup is simple:
+ときとして、あなたはメッセージの送信を先延ばしにしたいと思うことはありま
+せんか。例えば、あなたが大切なだれかの誕生日を思い出すために、ちょうどそ
+の日に届くメッセージを用意したいと思ったとしましょう。
+@code{gnus-delay} パッケージはこれにうってつけです。設定は簡単です:
 
 @lisp
 (gnus-delay-initialize)
 @end lisp
 
 @findex gnus-delay-article
-Normally, to send a message you use the @kbd{C-c C-c} command from
-Message mode.  To delay a message, use @kbd{C-c C-j}
-(@code{gnus-delay-article}) instead.  This will ask you for how long the
-message should be delayed.  Possible answers are:
+普段はメッセージを送信するのに Message モードで @kbd{C-c C-c} コマンドを
+使いますよね。先延ばしにするには、代わりに @kbd{C-c C-j}
+(@code{gnus-delay-article}) を使って下さい。そうすると、どのくらい遅らせ
+るかを尋ねてきます。可能な返事は次の通りです:
 
 @itemize
 @item
-A time span.  Consists of an integer and a letter.  For example,
-@code{42d} means to delay for 42 days.  Available letters are @code{m}
-(minutes), @code{h} (hours), @code{d} (days), @code{w} (weeks), @code{M}
-(months) and @code{Y} (years).
+整数と一つの文字で指定する期間。例えば @code{42d} は 42 日遅らせることを
+意味します。使うことができる文字は @code{m} (分)、@code{h} (時)、
+@code{d} (日), @code{w} (週), @code{M} (月) および @code{Y} (年) です。
 
 @item
-A specific date.  Looks like @code{YYYYY-MM-DD}.  The message will be
-delayed until that day, at a specific time (eight o'clock by default).
-See also @code{gnus-delay-default-hour}.
+@code{YYYYY-MM-DD} のような形式で指定する日付。メッセージの送信はその日
+の特定の時刻 (ディフォルトは 8 時) まで遅らせられます。
+@code{gnus-delay-default-hour} も参照して下さい。
 
 @item
-A specific time of day.  Given in @code{hh:mm} format, 24h, no am/pm
-stuff.  The deadline will be at that time today, except if that time has
-already passed, then it's at the given time tomorrow.  So if it's ten
-o'clock in the morning and you specify @code{11:15}, then the deadline
-is one hour and fifteen minutes hence.  But if you specify @code{9:20},
-that means a time tomorrow.
+@code{hh:mm} の形式で与えられる am/pm を含まない 24 時間制の時刻。送信さ
+れるのは今日のその時刻ですが、すでにその時刻を過ぎてしまっていた場合は翌
+日のその時刻になります。ですから、朝の 10 時に @code{11:15} を指定した場
+合は 1時間15分後に送信されることになります。しかし @code{9:20} を指定し
+た場合は翌日の時刻を意味します。
 @end itemize
 
-The action of the @code{gnus-delay-article} command is influenced by a
-couple of variables:
+@code{gnus-delay-article} の動作は、以下の数個の変数に影響されます:
 
 @table @code
 @item gnus-delay-default-hour
 @vindex gnus-delay-default-hour
-When you specify a specific date, the message will be due on that hour
-on the given date.  Possible values are integers 0 through 23.
+特定の日付を指定した場合に、メッセージがその日の何時に送信されるかを与え
+ます。可能な値は 0 から 23 までの整数です。
 
 @item gnus-delay-default-delay
 @vindex gnus-delay-default-delay
-This is a string and gives the default delay.  It can be of any of the
-formats described above.
+ディフォルトの遅延を与える文字列です。前述のどんな形式でも可能です。
 
 @item gnus-delay-group
 @vindex gnus-delay-group
-Delayed articles will be kept in this group on the drafts server until
-they are due.  You probably don't need to change this.  The default
-value is @code{"delayed"}.
+遅延記事はドラフトサーバーのこのグループに期限が来るまで保管されます。た
+ぶんあなたはこれを変更する必要は無いでしょう。ディフォルトの値
+は @code{"delayed"} です。
 
 @item gnus-delay-header
 @vindex gnus-delay-header
-The deadline for each article will be stored in a header.  This variable
-is a string and gives the header name.  You probably don't need to
-change this.  The default value is @code{"X-Gnus-Delayed"}.
+それぞれの記事が送信される日時はヘッダーに記録されます。この変数はヘッダー
+名の文字列です。たぶんあなたはこれを変更する必要は無いでしょう。ディフォ
+ルトの値は @code{"X-Gnus-Delayed"} です。
 @end table
 
-The way delaying works is like this: when you use the
-@code{gnus-delay-article} command, you give a certain delay.  Gnus
-calculates the deadline of the message and stores it in the
-@code{X-Gnus-Delayed} header and puts the message in the
-@code{nndraft:delayed} group.
+送信の先延ばしはこんなふうに行なわれます:
 
-And whenever you get new news, Gnus looks through the group for articles
-which are due and sends them.  It uses the @code{gnus-delay-send-drafts}
-function for this.  By default, this function is added to the hook
-@code{gnus-get-new-news-hook}.  But of course, you can change this.
-Maybe you want to use the demon to send drafts?  Just tell the demon to
-execute the @code{gnus-delay-send-drafts} function.
+@code{gnus-delay-article} コマンドで、あなたはどのくらい遅らせるかを指定
+します。gnus はメッセージを送信する日時を計算し
+て @code{X-Gnus-Delayed} ヘッダーに記録し、そのメッセージ
+を @code{nndraft:delayed} グループに納めます。
+
+あなたが新着ニュースを取得しようとするときはいつも、gnus は送信する期限
+に達した記事をそのグループで探して、それらを送信します。これには関
+数 @code{gnus-delay-send-drafts} が使われます。ディフォルトではこの関数
+は @code{gnus-get-new-news-hook} に追加されますが、もちろんあなたはこれ
+を変更することができます。おそらくあなたは、ドラフトの送信にデーモンを使
+いたいと思うのではないでしょうか? それには、デーモンに関
+数 @code{gnus-delay-send-drafts} を実行せよ、と言うだけで良いのです。
 
 @table @code
 @item gnus-delay-initialize
 @findex gnus-delay-initialize
-By default, this function installs the @kbd{C-c C-j} key binding in
-Message mode and @code{gnus-delay-send-drafts} in
-@code{gnus-get-new-news-hook}.  But it accepts two optional arguments,
-@code{no-keymap} and @code{no-check}.  If @code{no-keymap} is non-nil,
-the @kbd{C-c C-j} binding is not intalled.  If @code{no-check} is
-non-nil, @code{gnus-get-new-news-hook} is not changed.
+ディフォルトでは、この関数は Message モードにおける @kbd{C-c C-j} キーの
+バインドと、
+@code{gnus-delay-send-drafts} の @code{gnus-get-new-news-hook} への追加
+を行ないます。ですが、これは @code{no-keymap} と @code{no-check} の二つ
+のオプション引数を受け付けます。もし @code{no-keymap} が非nil だった
+ら @kbd{C-c C-j} キーのバインドを行ないません。もし @code{no-check} が非
+nill だったら @code{gnus-get-new-news-hook} は変更されません。
 
-For example, @code{(gnus-delay-initialize nil t)} means to change the
-keymap but not to change @code{gnus-get-new-news-hook}.  Presumably, you
-want to use the demon for sending due delayed articles.  Just don't
-forget to set that up :-)
+例えば @code{(gnus-delay-initialize nil t)} は、キーマップは変更する
+が @code{gnus-get-new-news-hook} は変更しないことを意味します。あなたは
+遅延記事の送信にデーモンを使いたいのでしょうね。でも、それを設定すること
+を忘れないで下さいね。:-)
 @end table
 
 @node Marking Articles
