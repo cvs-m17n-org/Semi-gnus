@@ -1,5 +1,11 @@
 2002-01-15  Katsumi Yamaoka  <yamaoka@jpl.org>
 
+	* lisp/gnus-sum.el (gnus-adjust-marked-articles): Fix the record
+	for `seen' if it looks like (seen NUM1 . NUM2).  It should be
+	(seen (NUM1 . NUM2)).
+
+2002-01-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
 	* lisp/nntp.el (nntp-send-buffer): Bind `mc-flag' to nil.
 
 	* lisp/nnheader.el (mm-with-unibyte-buffer): Alias to
