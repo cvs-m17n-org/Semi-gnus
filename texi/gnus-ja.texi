@@ -8203,7 +8203,7 @@ GNUS $B$d(B Gnus $B$G$O!"$3$N$?$A$N0-$$LdBj$G6C$+$5$l$J$$$h$&$K$9$k$K$O!"35N,
 $B:G=i$NMWAG$,J8;zNs$G$J$$%j%9%H$G$9(B:
 
 $B%j%9%H$O:F5"E*$KI>2A$5$l$^$9!#%j%9%H$N:G=i$NMWAG$O=R8l$G$9!#0J2<$N=R8l$,(B
-$BG'<1$5$l$^$9(B: @code{or}, @code{and}, @code{not},m @code{typep}. $B$3$l$,Nc(B
+$BG'<1$5$l$^$9(B: @code{or}, @code{and}, @code{not}, @code{typep}. $B$3$l$,Nc(B
 $B$G$9(B:
 
 @lisp
