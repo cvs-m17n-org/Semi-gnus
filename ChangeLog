@@ -1,3 +1,14 @@
+1999-06-17  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 02.
+
+	* lisp/gnus-sum.el (gnus-summary-jump-to-other-group): Rewrite as
+	an independent function.
+	(gnus-summary-read-group): Revert to the previous form.
+
+	* lisp/gnus-msg.el (gnus-extended-version): Include
+	`gnus-revision-number' if it is non-zero.
+
 1999-06-16  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
