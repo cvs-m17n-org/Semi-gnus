@@ -11,6 +11,7 @@ INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 VPATH = @srcdir@
+PACKAGEDIR =
 
 all total:
 	rm -f *.elc ; $(EMACS) $(FLAGS) -f dgnushack-compile
@@ -28,6 +29,14 @@ install: clever
 	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
 	done
+
+package:
+	$(EMACS) $(FLAGS) -f dgnushack-make-package
+
+install-package: clever
+	rm -f dgnushack.elc
+	$(EMACS) $(FLAGS) -f dgnushack-make-package \
+		-f dgnushack-install-package $(PACKAGEDIR)
 
 tags:
 	etags *.el
