@@ -2623,11 +2623,10 @@ See also `message-forbidden-properties'."
 	     (message-tamago-not-in-use-p begin)
 	     ;; Check whether the invisible MIME part is not inserted.
 	     (not (text-property-any begin end 'mime-edit-invisible t)))
-    (while (not (= begin end))
-      (when (not (get-text-property begin 'message-hidden))
-	(remove-text-properties begin (1+ begin)
-				message-forbidden-properties))
-      (incf begin))))
+    (dolist (from-to (message-text-with-property 'message-hidden
+						 begin end t))
+      (remove-text-properties (car from-to) (cdr from-to)
+			      message-forbidden-properties))))
 
 ;;;###autoload
 (define-derived-mode message-mode text-mode "Message"
@@ -3908,16 +3907,32 @@ used to distinguish whether the invisible text is a MIME part or not."
 				     '(invisible t mime-edit-invisible t))
 	      (put-text-property start end 'invisible t))))))
 
-(defun message-text-with-property (prop)
-  "Return a list of all points where the text has PROP."
-  (let ((points nil)
-	(point (point-min)))
-    (save-excursion
-      (while (< point (point-max))
-	(when (get-text-property point prop)
-	  (push point points))
-	(incf point)))
-    (nreverse points)))
+(defun message-text-with-property (prop &optional start end reverse)
+  "Return a list of start and end positions where the text has PROP.
+START and END bound the search, they default to `point-min' and
+`point-max' respectively.  If REVERSE is non-nil, find text which does
+not have PROP."
+  (unless start
+    (setq start (point-min)))
+  (unless end
+    (setq end (point-max)))
+  (let (next regions)
+    (if reverse
+	(progn
+	  (while (and start
+		      (setq start (text-property-any start end prop nil)))
+	    (setq next (next-single-property-change start prop nil end))
+	    (push (cons start (or next end)) regions)
+	    (setq start next)))
+      (while (and start
+		  (or (get-text-property start prop)
+		      (and (setq start (next-single-property-change
+					start prop nil end))
+			   (get-text-property start prop))))
+	(setq next (text-property-any start end prop nil))
+	(push (cons start (or next end)) regions)
+	(setq start next)))
+    (nreverse regions)))
 
 (defun message-fix-before-sending ()
   "Do various things to make the message nice before sending it."
@@ -3927,12 +3942,9 @@ used to distinguish whether the invisible text is a MIME part or not."
   (unless (bolp)
     (insert "\n"))
   ;; Make the hidden headers visible.
-  (let ((points (message-text-with-property 'message-hidden)))
-    (when points
-      (goto-char (car points))
-      (dolist (point points)
-	(add-text-properties point (1+ point)
-			     '(invisible nil intangible nil)))))
+  (dolist (from-to (message-text-with-property 'message-hidden))
+    (add-text-properties (car from-to) (cdr from-to)
+			 '(invisible nil intangible nil)))
   ;; Make invisible text visible except for mime parts which may be
   ;; inserted by the MIME-Edit.
   ;; It doesn't seem as if this is useful, since the invisible property
