@@ -154,7 +154,7 @@ Useful functions to put in this list include:
   :type '(repeat function))
 
 (defcustom gnus-simplify-ignored-prefixes nil
-  "*Regexp, matches for which are removed from subject lines when simplifying fuzzily."
+  "*Remove matches for this regexp from subject lines when simplifying fuzzily."
   :group 'gnus-thread
   :type '(choice (const :tag "off" nil)
 		 regexp))
@@ -2766,7 +2766,7 @@ The following commands are available:
 
 (defmacro gnus-summary-article-number ()
   "The article number of the article on the current line.
-If there isn's an article number here, then we return the current
+If there isn't an article number here, then we return the current
 article number."
   '(progn
      (gnus-summary-skip-intangible)
@@ -3434,7 +3434,7 @@ If SHOW-ALL is non-nil, already read articles are also listed."
 	      (let ((gnus-newsgroup-dormant nil))
 		(gnus-summary-initial-limit show-all))
 	    (gnus-summary-initial-limit show-all))
-	;; When untreaded, all articles are always shown.
+	;; When unthreaded, all articles are always shown.
 	(setq gnus-newsgroup-limit
 	      (mapcar
 	       (lambda (header) (mail-header-number header))
@@ -6168,7 +6168,7 @@ displayed, no centering will be performed."
 
 (defun gnus-summary-toggle-truncation (&optional arg)
   "Toggle truncation of summary lines.
-With arg, turn line truncation on iff arg is positive."
+With arg, turn line truncation on if arg is positive."
   (interactive "P")
   (setq truncate-lines
 	(if (null arg) (not truncate-lines)
@@ -6547,7 +6547,7 @@ in."
    (list
     (when current-prefix-arg
       (completing-read
-       "Faq dir: " (and (listp gnus-group-faq-directory)
+       "FAQ dir: " (and (listp gnus-group-faq-directory)
 			(mapcar (lambda (file) (list file))
 				gnus-group-faq-directory))))))
   (let (gnus-faq-buffer)
@@ -7888,7 +7888,7 @@ of what's specified by the `gnus-refer-thread-limit' variable."
 	  (gnus-message 3 "Couldn't fetch article %s" message-id)))))))
 
 (defun gnus-refer-article-methods ()
-  "Return a list of referrable methods."
+  "Return a list of referable methods."
   (cond
    ;; No method, so we default to current and native.
    ((null gnus-refer-article-method)
@@ -9499,7 +9499,7 @@ the actual number of articles marked is returned."
 If N is negative, mark backwards instead.  Mark with MARK, ?r by default.
 The difference between N and the actual number of articles marked is
 returned.
-Iff NO-EXPIRE, auto-expiry will be inhibited."
+If NO-EXPIRE, auto-expiry will be inhibited."
   (interactive "p")
   (gnus-summary-show-thread)
   (let ((backward (< n 0))
@@ -9562,7 +9562,8 @@ Iff NO-EXPIRE, auto-expiry will be inhibited."
 	    (gnus-error 1 "Can't mark negative article numbers")
 	    nil)
 	(setq gnus-newsgroup-marked (delq article gnus-newsgroup-marked))
-	(setq gnus-newsgroup-spam-marked (delq article gnus-newsgroup-spam-marked))
+	(setq gnus-newsgroup-spam-marked
+	      (delq article gnus-newsgroup-spam-marked))
 	(setq gnus-newsgroup-dormant (delq article gnus-newsgroup-dormant))
 	(setq gnus-newsgroup-expirable (delq article gnus-newsgroup-expirable))
 	(setq gnus-newsgroup-reads (delq article gnus-newsgroup-reads))
@@ -9605,7 +9606,7 @@ Four MARK strings are reserved: `? ' (unread), `?!' (ticked),
 If MARK is nil, then the default character `?r' is used.
 If ARTICLE is nil, then the article on the current line will be
 marked.
-Iff NO-EXPIRE, auto-expiry will be inhibited."
+If NO-EXPIRE, auto-expiry will be inhibited."
   ;; The mark might be a string.
   (when (stringp mark)
     (setq mark (aref mark 0)))
@@ -9731,7 +9732,8 @@ Iff NO-EXPIRE, auto-expiry will be inhibited."
 		   (gnus-add-to-sorted-list gnus-newsgroup-marked article)))
 	    ((= mark gnus-spam-mark)
 	     (setq gnus-newsgroup-spam-marked
-		   (gnus-add-to-sorted-list gnus-newsgroup-spam-marked article)))
+		   (gnus-add-to-sorted-list gnus-newsgroup-spam-marked
+					    article)))
 	    ((= mark gnus-dormant-mark)
 	     (setq gnus-newsgroup-dormant
 		   (gnus-add-to-sorted-list gnus-newsgroup-dormant article)))
@@ -10981,32 +10983,42 @@ If REVERSE, save parts that do not match TYPE."
 ;; New implementation by Christian Limpach <Christian.Limpach@nice.ch>.
 (defun gnus-summary-highlight-line ()
   "Highlight current line according to `gnus-summary-highlight'."
-  (let* ((list gnus-summary-highlight)
-	 (beg (gnus-point-at-bol))
-	 (article (gnus-summary-article-number))
-	 (score (or (cdr (assq (or article gnus-current-article)
-			       gnus-newsgroup-scored))
-		    gnus-summary-default-score 0))
-	 (mark (or (gnus-summary-article-mark) gnus-unread-mark))
-	 (inhibit-read-only t)
-	 (default gnus-summary-default-score)
-	 (default-high gnus-summary-default-high-score)
-	 (default-low gnus-summary-default-low-score)
-         (downloaded (and (boundp 'gnus-agent-article-alist)
-                          gnus-agent-article-alist
-                          ;; Optimized for when gnus-summary-highlight-line is called multiple times for articles in ascending order (i.e. initial generation of summary buffer).
-                          (progn 
-                            (if (and (eq gnus-summary-highlight-line-downloaded-alist gnus-agent-article-alist)
-                                     (<= (caar gnus-summary-highlight-line-downloaded-cached) article))
-                                nil
-                              (setq gnus-summary-highlight-line-downloaded-alist  gnus-agent-article-alist
-                                    gnus-summary-highlight-line-downloaded-cached gnus-agent-article-alist))
-                            (let (n)
-                              (while (and (< (caar gnus-summary-highlight-line-downloaded-cached) article)
-                                          (setq n (cdr gnus-summary-highlight-line-downloaded-cached)))
-                                (setq gnus-summary-highlight-line-downloaded-cached n)))
-                            (and (eq (caar gnus-summary-highlight-line-downloaded-cached) article)
-                                 (cdar gnus-summary-highlight-line-downloaded-cached))))))
+  (let*
+      ((list gnus-summary-highlight)
+       (beg (gnus-point-at-bol))
+       (article (gnus-summary-article-number))
+       (score (or (cdr (assq (or article gnus-current-article)
+			     gnus-newsgroup-scored))
+		  gnus-summary-default-score 0))
+       (mark (or (gnus-summary-article-mark) gnus-unread-mark))
+       (inhibit-read-only t)
+       (default gnus-summary-default-score)
+       (default-high gnus-summary-default-high-score)
+       (default-low gnus-summary-default-low-score)
+       (downloaded
+	(and
+	 (boundp 'gnus-agent-article-alist)
+	 gnus-agent-article-alist
+	 ;; Optimized for when gnus-summary-highlight-line is
+	 ;; called multiple times for articles in ascending
+	 ;; order (i.e. initial generation of summary buffer).
+	 (progn 
+	   (unless (and
+		    (eq gnus-summary-highlight-line-downloaded-alist
+			gnus-agent-article-alist)
+		    (<= (caar gnus-summary-highlight-line-downloaded-cached)
+			article))
+	     (setq gnus-summary-highlight-line-downloaded-alist
+		   gnus-agent-article-alist)
+	     (setq gnus-summary-highlight-line-downloaded-cached
+		   gnus-agent-article-alist))
+	   (let (n)
+	     (while (and (< (caar gnus-summary-highlight-line-downloaded-cached)
+			    article)
+			 (setq n (cdr gnus-summary-highlight-line-downloaded-cached)))
+	       (setq gnus-summary-highlight-line-downloaded-cached n)))
+	   (and (eq (caar gnus-summary-highlight-line-downloaded-cached) article)
+		(cdar gnus-summary-highlight-line-downloaded-cached))))))
     (let ((face (funcall (gnus-summary-highlight-line-0))))
       (unless (eq face (get-text-property beg 'face))
 	(gnus-put-text-property-excluding-characters-with-faces
