@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.4 1999-08-27 16:56:16 czkmt Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.36.4.5 1999-09-03 15:42:54 czkmt Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -86,6 +86,7 @@
 (defgroup gnus-offline nil
   "Offline backend utility for Gnus."
   :prefix "gnus-offline-"
+  :group 'gnus
   :group 'mail
   :group 'news)
 
@@ -246,7 +247,81 @@ If value is nil , dialup line is disconnected status.")
 (defvar gnus-offline-mail-source nil
   "*mail-sources save variable.")
 
+(defvar gnus-offline-lang)
+
+(defvar gnus-offline-resource-en
+  '((error-check-1
+     . "WARNING!!: gnus-agent.el or nnagent.el is not loaded.
+Please check your .emacs or .gnus.el to work gnus-agent fine.")
+    (error-check-2 ."WARNING!!: nnspool.el is not loaded.
+Please check your .emacs or .gnus.el to work nnspool fine.")
+    (connect-server-1 . "Dialing ...")
+    (connect-server-2 . "Dialing ... done.")
+    (get-new-news-function-1 . "Set to online status.")
+    (hangup-line-1 . "Hang up line ... ")
+    (hangup-line-2 . "Hang up line ... done.")
+    (after-jobs-done-1 . "All online jobs has done.")
+    (toggle-auto-hangup-1 . "Auto hang up logic")
+    (toggle-auto-hangup-2 . "disabled.")
+    (toggle-auto-hangup-3 . "enabled.")
+    (toggle-on/off-send-mail-1 . "Sending mail immidiately.")
+    (toggle-on/off-send-mail-2 . "Sending mail temporary to spool directory.")
+    (toggle-articles-to-fetch-1 . "Articles fetch from server.")
+    (toggle-articles-to-fetch-2 . "Only Mail")
+    (toggle-articles-to-fetch-3 . "Only News")
+    (toggle-articles-to-fetch-4 . "Mail/News both")
+    (empting-spool-1 . "Sending mails in spool ...")
+    (empting-spool-2 . "Sending mails in spool ... done.")
+    (empting-spool-3 . "Posting news in spool ...")
+    (empting-spool-4 . "Posting news in spool ... done.")
+    (empting-spool-5 . "Sending messages in spool ...")
+    (empting-spool-6 . "Sending messages in spool ... done.")
+    (interval-time-1 . "Interval time (now %d minutes) : ")
+    (interval-time-2 . "Retrieving message logic by timer is disabled.")
+    (interval-time-3 . "Interval time set to %d minutes")))
+
+(defvar gnus-offline-resource-ja
+  '((error-check-1
+     . "警告!!: gnus-agent.el または nnagent.el がロードされていません。
+.emacs または .gnus.el の gnus-agent の設定を正しくしてください。")
+    (error-check-2 ."警告!!: nnspool.el がロードされていません。
+.emacs または .gnus.el の nnspool の設定を正しくしてください。")
+    (connect-server-1 . "ダイヤルしています...")
+    (connect-server-2 . "ダイヤルしています...完了。")
+    (get-new-news-function-1 . "オンライン状態です。")
+    (hangup-line-1 . "切断しています...")
+    (hangup-line-2 . "切断しています...完了。")
+    (after-jobs-done-1 . "全てのオンライン処理を完了しました。")
+    (toggle-auto-hangup-1 . "自動切断機能を ")
+    (toggle-auto-hangup-2 . "オフ にしました。")
+    (toggle-auto-hangup-3 . "オン にしました。")
+    (toggle-on/off-send-mail-1 . "メールを直接送信します。")
+    (toggle-on/off-send-mail-2 . "メールはキューに送られます。")
+    (toggle-articles-to-fetch-1 . "受信するメッセージは... ")
+    (toggle-articles-to-fetch-2 . "メールのみです。")
+    (toggle-articles-to-fetch-3 . "ニュースのみです。")
+    (toggle-articles-to-fetch-4 . "メールとニュースの両方です。")
+    (empting-spool-1 . "キューのメールを送信中...")
+    (empting-spool-2 . "キューのメールを送信中... 完了。")
+    (empting-spool-3 . "キューのニュース記事を送信中...")
+    (empting-spool-4 . "キューのニュース記事を送信中... 完了。")
+    (empting-spool-5 . "キューのメッセージを送信中...")
+    (empting-spool-6 . "キューのメッセージを送信中... 完了。")
+    (interval-time-1 . "送受信ジョブの間隔 (現在の設定は %d 分です) : ")
+    (interval-time-2 . "自動送受信機能を オフ にしました。")
+    (interval-time-3 . "自動送受信の間隔を %d 分に設定しました。")))
+
+(defvar gnus-offline-resource-ja_complete gnus-offline-resource-ja)
+
 ;;; Functions
+
+(defun gnus-offline-get-message (symbol &optional lang)
+  (setq lang (or lang gnus-offline-lang))
+  (or
+   (cdr (assq symbol (symbol-value
+		      (intern (format "gnus-offline-resource-%s" lang)))))
+   (cdr (assq symbol gnus-offline-resource-en))))
+
 ;;
 ;; Setting up...
 ;;
@@ -275,16 +350,14 @@ If value is nil , dialup line is disconnected status.")
 			(featurep 'nnagent))
 	     (set-buffer (gnus-get-buffer-create buffer))
 	     (erase-buffer)
-	     (insert "WARNING!!: gnus-agent.el or nnagent.el is not loaded.
-Please check your .emacs or .gnus.el to work gnus-agent fine.")
+	     (insert (gnus-offline-get-message 'error-check-1))
 	     (pop-to-buffer buffer)))
 	
 	  ((eq gnus-offline-news-fetch-method 'nnspool)
 	   (unless (featurep 'nnspool)
 	     (set-buffer (gnus-get-buffer-create buffer))
 	     (erase-buffer)
-	     (insert "WARNING!!: nnspool.el is not loaded.
-Please check your .emacs or .gnus.el to work nnspool fine.")
+	     (insert (gnus-offline-get-message 'error-check-2))
 	     (pop-to-buffer buffer)))
 	  (t
 	   nil))))
@@ -336,11 +409,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   ;; Dialup if gnus-offline-dialup-program is specified
   (if (stringp gnus-offline-dialup-program)
       (progn
-	(message "Dialing ...")
+	(message (gnus-offline-get-message 'connect-server-1))
 	(apply 'call-process gnus-offline-dialup-program nil nil nil
 	       gnus-offline-dialup-program-arguments)
 	(sleep-for 1)
-	(message "Dialing ... done."))))
+	(message (gnus-offline-get-message 'connect-server-2)))))
 
 ;;
 ;; Jobs before get new news , send mail and post news.
@@ -357,7 +430,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   ;; Set send mail/news functions to online functions.
   (gnus-offline-set-online-sendmail-function)
   (gnus-offline-set-online-post-news-function)
-  (message "Set to online status.")
+  (message (gnus-offline-get-message 'get-new-news-function-1))
 
   ;; fetch only news
   (if (eq gnus-offline-articles-to-fetch 'news)
@@ -547,11 +620,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 ;;
 (defun gnus-offline-hangup-line ()
   "*Hangup line function."
-  (message "Hang up line ... ")
+  (message (gnus-offline-get-message 'hangup-line-1))
   (if (stringp gnus-offline-hangup-program)
       (apply 'start-process "hup" nil gnus-offline-hangup-program
 	     gnus-offline-hangup-program-arguments))
-  (message "Hang up line ... done."))
+  (message (gnus-offline-get-message 'hangup-line-2)))
 ;;
 ;; Hang Up line routine whe using nnspool
 ;;
@@ -575,7 +648,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
       (ding nil 'drum)
     (ding))
   (gnus-group-save-newsrc)
-  (message "All online jobs has done."))
+  (message (gnus-offline-get-message 'after-jobs-done-1)))
 
 
 ;;
@@ -584,13 +657,13 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 (defun gnus-offline-toggle-auto-hangup ()
   "*Toggle auto hangup flag."
   (interactive)
-  (let ((string "Auto hang up logic") str)
+  (let ((string (gnus-offline-get-message 'toggle-auto-hangup-1)) str)
     (if gnus-offline-auto-hangup
 	(progn
 	  (setq gnus-offline-auto-hangup nil
-		str "disabled."))
+		str (gnus-offline-get-message 'toggle-auto-hangup-2)))
       (setq gnus-offline-auto-hangup t
-	    str "enabled."))
+	    str (gnus-offline-get-message 'toggle-auto-hangup-3)))
     (message (format "%s %s" string str))))
 ;;
 ;; Toggle offline/online to send mail.
@@ -603,27 +676,28 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	;; Sending mail under online environ.
 	(gnus-offline-set-online-sendmail-function)
 	(setq gnus-offline-mail-treat-environ 'online)
-	(message "Sending mail immidiately."))
+	(message (gnus-offline-get-message 'toggle-on/off-send-mail-1)))
     ;; Sending mail under offline environ.
     (gnus-offline-set-offline-sendmail-function)
     (setq gnus-offline-mail-treat-environ 'offline)
-    (message "Sending mail temporary to spool directory.")))
+    (message (gnus-offline-get-message 'toggle-on/off-send-mail-2))))
 ;;
 ;; Toggle articles to fetch ... both -> mail -> news -> both
 ;;
 (defun gnus-offline-toggle-articles-to-fetch ()
   "*Set articles to fetch... both(Mail/News) -> mail only -> News only -> both"
   (interactive)
-  (let ((string "Articles fetch from server.") str)
+  (let ((string (gnus-offline-get-message 'toggle-articles-to-fetch-1))
+	str)
     (cond ((eq gnus-offline-articles-to-fetch 'both)
 	   (setq gnus-offline-articles-to-fetch 'mail
-		 str "Only Mail"))
+		 str (gnus-offline-get-message 'toggle-articles-to-fetch-2)))
 	  ((eq gnus-offline-articles-to-fetch 'mail)
 	   (setq gnus-offline-articles-to-fetch 'news
-		 str "Only News"))
+		 str (gnus-offline-get-message 'toggle-articles-to-fetch-3)))
 	  (t
 	   (setq gnus-offline-articles-to-fetch 'both
-		 str "Mail/News both")))
+		 str (gnus-offline-get-message 'toggle-articles-to-fetch-4))))
     (message (format "%s %s" string str))))
 ;;
 ;; Send mail and Post news using Miee or gnus-agent.
@@ -636,11 +710,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
       (progn
 	(if (eq gnus-offline-mail-treat-environ 'offline)
 	    (progn
-	      (message "Sending mails in spool ...")
+	      (message (gnus-offline-get-message 'empting-spool-1))
 	      ;; Using miee to send mail.
 	      (mail-spool-send)
-	      (message "Sending mails in spool ... done.")))
-	(message "Posting news in spool ...")
+	      (message (gnus-offline-get-message 'empting-spool-2))))
+	(message (gnus-offline-get-message 'empting-spool-3))
 	;; Using miee to post news.
 	(if (and (not (stringp msspool-news-server))
 		 (not msspool-news-service))
@@ -648,11 +722,11 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 	      (setq msspool-news-server (nth 1 gnus-select-method))
 	      (setq msspool-news-service 119)))
 	(news-spool-post)
-	(message "Posting news in spool ... done."))
+	(message (gnus-offline-get-message 'empting-spool-4)))
     ;; Send queued message by gnus-agent
-    (message "Sending messages in spool ...")
+    (message (gnus-offline-get-message 'empting-spool-5))
     (gnus-group-send-drafts)
-    (message "Sending messages in spool ... done."))
+    (message (gnus-offline-get-message 'empting-spool-6)))
   ;;
   (run-hooks 'gnus-offline-after-empting-spool-hook))
 ;;
@@ -663,15 +737,16 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   (interactive)
   (setq gnus-offline-interval-time
 	(string-to-int (read-from-minibuffer
-			(format "Interval time (now %s minutes) : "
+			(format (gnus-offline-get-message 'interval-time-1)
 				gnus-offline-interval-time)
 			nil)))
   (if (< gnus-offline-interval-time 2)
       (progn
-	(message "Retrieving message logic by timer is disabled.")
+	(message (gnus-offline-get-message 'interval-time-2))
 	(setq gnus-offline-interval-time 0))
     (message
-     (format "Interval time set to %d minutes" gnus-offline-interval-time)))
+     (format (gnus-offline-get-message 'interval-time-3)
+	     gnus-offline-interval-time)))
   (gnus-offline-processed-by-timer))
 ;;
 ;; Expire articles using gnus-agent.
@@ -734,60 +809,61 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
 ;;
 (defun gnus-offline-define-menu-on-miee ()
   "*Set and change menu bar on MIEE menu."
-  (let (menu)
-    (if (featurep 'meadow)
-	(easy-menu-change
-	 nil
-	 "Miee"
-	 '(
-	   ["Spool にある記事の送信" news-spool-post t]
-	   ["Spool にある Mail の送信" mail-spool-send t]
-	   "----"
-	   ["Offline 状態へ" message-offline-state (not message-offline-state)]
-	   ["Online 状態へ" message-online-state message-offline-state]
-	   "----"
-	   ("Gnus Offline"
-	    ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
-	    ["Mail 送信方法(On/Off)の切替え"
-	     gnus-offline-toggle-on/off-send-mail t]
-	  ["自動切断の切替え" gnus-offline-toggle-auto-hangup t]
-	  "----"
-	  ["取得済記事を消す" gnus-offline-agent-expire
-	   (eq gnus-offline-news-fetch-method 'nnagent)]
-	  ["記事取得間隔時間の設定" gnus-offline-set-interval-time t]
-	  "----"
-	  ["回線の切断" gnus-offline-set-unplugged-state gnus-offline-connected]
-	  "----"
-	  ["プロパティ..." gnus-ofsetup-customize t])
-	 ))
-      (setq menu
-	    (easy-menu-change
-	     nil
-	     "Miee"
-	     '(
-	       ["Post news in spool" news-spool-post t]
-	       ["Send mails in spool" mail-spool-send t]
+  (let ((menu
+	 (if (string= gnus-offline-lang "ja_complete")
+	     (easy-menu-change
+	      nil
+	      "Miee"
+	      '(
+		["Spool にある記事の送信" news-spool-post t]
+		["Spool にある Mail の送信" mail-spool-send t]
+		"----"
+		["Offline 状態へ" message-offline-state
+		 (not message-offline-state)]
+		["Online 状態へ" message-online-state message-offline-state]
+		"----"
+		("Gnus Offline"
+		 ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
+		 ["Mail 送信方法(On/Off)の切替え"
+		  gnus-offline-toggle-on/off-send-mail t]
+		 ["自動切断の切替え" gnus-offline-toggle-auto-hangup t]
+		 "----"
+		 ["取得済記事を消す" gnus-offline-agent-expire
+		  (eq gnus-offline-news-fetch-method 'nnagent)]
+		 ["記事取得間隔時間の設定" gnus-offline-set-interval-time t]
+		 "----"
+		 ["回線の切断" gnus-offline-set-unplugged-state
+		  gnus-offline-connected]
+		 "----"
+		 ["プロパティ..." gnus-ofsetup-customize t])
+		))
+	   (easy-menu-change
+	    nil
+	    "Miee"
+	    '(
+	      ["Post news in spool" news-spool-post t]
+	      ["Send mails in spool" mail-spool-send t]
+	      "----"
+	      ["Message Offline" message-offline-state
+	       (not message-offline-state)]
+	      ["Message Online" message-online-state message-offline-state]
+	      "----"
+	      ("Gnus Offline"
+	       ["Toggle articles to fetch"
+		gnus-offline-toggle-articles-to-fetch t]
+	       ["Toggle online/offline send mail"
+		gnus-offline-toggle-on/off-send-mail t]
+	       ["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
 	       "----"
-	       ["Message Offline" message-offline-state
-		(not message-offline-state)]
-	       ["Message Online" message-online-state message-offline-state]
+	       ["Expire articles" gnus-offline-agent-expire
+		(eq gnus-offline-news-fetch-method 'nnagent)]
+	       ["Set interval time" gnus-offline-set-interval-time t]
 	       "----"
-	       ("Gnus Offline"
-		["Toggle articles to fetch"
-		 gnus-offline-toggle-articles-to-fetch t]
-		["Toggle online/offline send mail"
-		 gnus-offline-toggle-on/off-send-mail t]
-		["Toggle auto hangup" gnus-offline-toggle-auto-hangup t]
-		"----"
-		["Expire articles" gnus-offline-agent-expire
-		 (eq gnus-offline-news-fetch-method 'nnagent)]
-		["Set interval time" gnus-offline-set-interval-time t]
-		"----"
-		["Hang up Line." gnus-offline-set-unplugged-state
-		 gnus-offline-connected]
-		"----"
-		["Customize options..." gnus-ofsetup-customize t]
-		)))))
+	       ["Hang up Line." gnus-offline-set-unplugged-state
+		gnus-offline-connected]
+	       "----"
+	       ["Customize options..." gnus-ofsetup-customize t]
+	       ))))))
     (and (featurep 'xemacs)
 	 (easy-menu-add menu))))
 ;;
@@ -799,7 +875,7 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
    gnus-offline-menu-on-agent
    gnus-group-mode-map
    "Gnus offline Menu"
-   (if (featurep 'meadow)
+   (if (string= gnus-offline-lang "ja_complete")
        '("Offline"
 	 ["取得記事種類の変更" gnus-offline-toggle-articles-to-fetch t]
 	 ["Mail 送信方法(On/Off)の切替え" gnus-offline-toggle-on/off-send-mail
