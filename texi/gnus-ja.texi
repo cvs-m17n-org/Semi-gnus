@@ -21066,34 +21066,33 @@ Bogofilter $B$K;w$?E}7WJ,@O4o$G$"$k(B Ifile $B$r;H$$$?$$>l9g$O!"$3$NJQ?t$rM-8
 @end defvar
 
 @node Extending spam.el
-@subsubsection spam.el $B$N3HD%!#(B
+@subsubsection spam.el $B$N3HD%(B
 @cindex spam filtering
 @cindex spam.el, extending
 @cindex extending spam.el
 
-$B?7$7$$%P%C%/%(%s%I(B blackbox $B$rDI2C$7$?$$$"$J$?$N$?$a$K!"0J2<$rDs6!$7$^$7$g(B
-$B$&(B:
+$B?7$7$$%P%C%/%(%s%I(B blackbox $B$rDI2C$7$?$$$"$J$?$O!"0J2<$rMQ0U$7$F2<$5$$(B:
 
 @enumerate
 @item
-documentation
+$B@bL@J8(B
 
 @item
-code
+$B%3!<%I(B
 
 @example
 (defvar spam-use-blackbox nil
   "Blackbox $B$r;H$&$H$-$O(B t $B$K$9$k!#(B")
 @end example
 
-@code{spam-list-of-checks} $B$K(B
+@code{spam-list-of-checks} $B$K(B 
 @example
     (spam-use-blackbox	 . spam-check-blackbox)
 @end example
 $B$rDI2C!#(B
 
 @item
-functionality
+$B4X?t(B
 
 @code{spam-check-blackbox} $B4X?t$r=q$$$F2<$5$$!#$=$l(B
 $B$O(B @samp{nil} $B$+(B @code{spam-split-group} $B$rJV$5$J$1$l$P$J$j$^$;$s!#$"$J(B
@@ -21142,8 +21141,8 @@ gnus $B$O$3$N<o$N_I2a$r%5%]!<%H$7$^$9!#$7$+$7$=$l$K$O$$$/$D$+$N@_Dj$,I,MW(B
 @node Creating a spam-stat dictionary
 @subsubsection spam-stat $B<-=q$r:n$k(B
 
-$BE}7W$K4p$E$$$?(B spam $B_I2a$r;O$a$k$K!"$"$J$?$OFs$D$N%a!<%k$N%3%l%/%7%g%s$K(B
-$B4p$E$$$?E}7W$r:n$i$J$1$l$P$J$j$^$;$s!#0l$D$O(B spam$B!"$b$&0l$D$OHs(B-spam $B$G!#(B
+$BE}7W$K4p$E$$$?(B spam $B_I2a$r;O$a$k$K$O!"$"$J$?$OFs$D$N%a!<%k$N%3%l%/%7%g%s(B
+$B$K4p$E$$$?E}7W$r:n$i$J$1$l$P$J$j$^$;$s!#0l$D$O(B spam $B$b$&0l$D$OHs(B-spam $B$G!#(B
 $B$=$7$F$=$l$i$NE}7W$O!"8e$GMxMQ$9$k$?$a$K<-=q$K3JG<$5$l$^$9!#$=$l$i$NE}7W(B
 $B$r0UL#$N$"$k$b$N$K$9$k$?$a$K!"N>J}$N%3%l%/%7%g%s$K$D$-?tI4DL$N%a!<%k$,I,(B
 $BMW$G$9!#(B
