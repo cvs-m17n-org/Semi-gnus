@@ -26,7 +26,9 @@
 ;;; Code:
 
 (require 'easymenu)
-(eval-when-compile (require 'cl))
+(eval-when-compile
+  (require 'cl)
+  (require 'static))
 
 (defvar gnus-score-mode-hook nil
   "*Hook run in score mode buffers.")
@@ -51,7 +53,7 @@
     table)
   "Syntax table used in score-mode buffers.")
 
-(defvar score-mode-coding-system (if (boundp 'MULE)
+(defvar score-mode-coding-system (static-if (boundp 'MULE)
 				     '*ctext*
 				   'ctext))
 
