@@ -4,9 +4,10 @@
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
 ;;	Shuhei KOBAYASHI <shuhei-k@jaist.ac.jp>
-;;	Keiichi Suzuki <kei-suzu@mail.wbs.ne.jp>
+;;	Keiichi Suzuki   <kei-suzu@mail.wbs.ne.jp>
 ;;	Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
-;;	Katsumi Yamaoka <yamaoka@jpl.org>
+;;	Katsumi Yamaoka  <yamaoka@jpl.org>
+;;	Kiyokazu SUTO    <suto@merry.xmath.ous.ac.jp>
 ;; Keywords: mail, news, MIME
 
 ;; This file is part of GNU Emacs.
@@ -3864,12 +3865,12 @@ OTHER-HEADERS is an alist of header/value pairs."
 		     (Subject . ,(or subject ""))))))
 
 ;;;###autoload
-(defun message-reply (&optional to-address wide)
+(defun message-reply (&optional to-address wide references)
   "Start editing a reply to the article in the current buffer."
   (interactive)
   (let ((cur (current-buffer))
 	from subject date to cc
-	references message-id follow-to
+	message-id follow-to
 	(inhibit-point-motion-hooks t)
 	mct never-mct mft mrt gnus-warning)
     (save-restriction
@@ -3888,7 +3889,7 @@ OTHER-HEADERS is an alist of header/value pairs."
       (setq from (message-fetch-field "from")
 	    date (message-fetch-field "date" t)
 	    subject (or (message-fetch-field "subject") "none")
-	    references (message-fetch-field "references")
+	    references (or references (message-fetch-field "references"))
 	    message-id (message-fetch-field "message-id" t)
 	    to (message-fetch-field "to")
 	    cc (message-fetch-field "cc")
@@ -4020,19 +4021,19 @@ that further discussion should take place only in "
      cur)))
 
 ;;;###autoload
-(defun message-wide-reply (&optional to-address)
+(defun message-wide-reply (&optional to-address references)
   "Make a \"wide\" reply to the message in the current buffer."
   (interactive)
-  (message-reply to-address t))
+  (message-reply to-address t references))
 
 ;;;###autoload
-(defun message-followup (&optional to-newsgroups)
+(defun message-followup (&optional to-newsgroups references)
   "Follow up to the message in the current buffer.
 If TO-NEWSGROUPS, use that as the new Newsgroups line."
   (interactive)
   (let ((cur (current-buffer))
 	from subject date mct
-	references message-id follow-to
+	message-id follow-to
 	(inhibit-point-motion-hooks t)
 	(message-this-is-news t)
 	followup-to distribution newsgroups gnus-warning posted-to mft mrt)
