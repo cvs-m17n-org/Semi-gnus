@@ -3,9 +3,11 @@ This package contains T-gnus 6.15.
 What is T-gnus?
 ===============
 
-  T-gnus is a replacement of Gnus with gnus-mime for SEMI.  It has all
-features of Gnus and gnus-mime, so there are no need to install Gnus
-to use it, and you must not use gnus-mime for SEMI.
+  T-gnus is an improvement of Gnus with SEMI's MIME feature. T-gnus
+6.15 is based on Oort Gnus v0.10. SEMI may stand for "SEMI is Emacs
+MIME Interface" and is developped to provide an easy interfaces for
+users to handle MIME message structures. For further information,
+refer to REASME.en of SEMI.
 
   It requires APEL, FLIM and SEMI packages, so please get and install
 them before to install it.  T-gnus 6.15 requires APEL 10.0 or later,
