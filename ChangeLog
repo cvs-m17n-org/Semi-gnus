@@ -1,5 +1,22 @@
 1999-02-24  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus.el (gnus-revision-number): Increment to 04.
+
+	* Makefile.in (xinfo, xinfo-ja): Make add-info-suffix, formatting,
+	and make remove-info-suffix.
+
+	* texi/Makefile.in (.texi): Don't specify the output filename when
+	makeinfo command is used.
+	(add-info-suffix, remove-info-suffix): New targets.
+
+	* lisp/dgnushack.el (dgnushack-add-info-suffix-maybe): New
+	function. It will be used for adding ".info" suffix to @setfilename
+	line in each .texi files.
+	(dgnushack-texi-file-regexp): New constant.
+	(dgnushack-info-file-regexp): Add ".info" suffix.
+
+1999-02-24  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
 
 	* lisp/Makefile.in (all, total): Remove "auto-autoloads.el" and
