@@ -1,3 +1,22 @@
+1998-03-15  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/gnus-agent.el (gnus-agent-crosspost): Use
+	`nnheader-insert-file-contents'.
+	(gnus-agent-braid-nov): Ditto.
+	(gnus-agent-expire): Ditto.
+	
+	* lisp/gnus-cache.el (gnus-cache-request-article): Ditto.
+	(gnus-cache-retrieve-headers): Ditto.
+	(gnus-cache-change-buffer): Ditto.
+	(gnus-cache-braid-nov): Ditto.
+	
+	* lisp/gnus-sum.el (gnus-summary-import-article): Ditto.
+	
+	* lisp/nnkiboze.el (nnkiboze-retrieve-headers): Ditto.
+
+	* lisp/message.el (message-generate-headers): Fix regexp.
+	(cf. [semi-gnus-ja:107])
+
 1998-03-13  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-art.el: Rename `mime-view-quitting-method-for-gnus' ->
