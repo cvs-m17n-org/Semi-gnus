@@ -1,5 +1,18 @@
 1998-06-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
+	* lisp/gnus-art.el (gnus-mime-preview-quitting-method): Renamed
+	from `mime-preview-quitting-method-for-gnus'.
+
+1998-06-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-sum.el (gnus-summary-preview-mime-message): New
+	implementation.
+
+	* lisp/gnus-art.el (mime-preview-quitting-method-for-gnus): Use
+	`gnus-article-show-summary' is `gnus-show-mime' is not nil.
+
+1998-06-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
 	* texi/ChangeLog, texi/gnus.texi, texi/message.texi,
 	lisp/ChangeLog, lisp/gnus.el, lisp/nngateway.el, lisp/nnfolder.el,
 	lisp/message.el, lisp/gnus-sum.el, lisp/gnus-soup.el: Sync up with
