@@ -1,3 +1,9 @@
+1999-08-25  NAKAJI Hiroyuki  <nakaji@tutrp.tut.ac.jp>
+
+	* texi/Makefile.in (EMACS): Use @EMACS@, not emacs directly.
+	(clean): Remove formatted info files.
+	(distclean): Just remove Makefile.
+
 1999-08-25  Tsukamoto Tetsuo  <czkmt@remus.dti.ne.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 13.
