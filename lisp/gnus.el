@@ -1436,7 +1436,8 @@ slower, and `std11-extract-address-components'."
     ("nnwarchive" none)
     ("nnlistserv" none)
     ("nnagent" post-mail)
-    ("nnimap" post-mail address prompt-address physical-address))
+    ("nnimap" post-mail address prompt-address physical-address)
+    ("nnmaildir" mail respool address))
   "*An alist of valid select methods.
 The first element of each list lists should be a string with the name
 of the select method.  The other elements may be the category of
@@ -2797,7 +2798,8 @@ that that variable is buffer-local to the summary buffers."
   "Return the whole name from GROUP and METHOD."
   (and (stringp method) (setq method (gnus-server-to-method method)))
   (if (or (not method)
-	  (gnus-server-equal method "native"))
+	  (gnus-server-equal method "native")
+	  (string-match ":" group))
       group
     (concat (gnus-method-to-server-name method) ":" group)))
 

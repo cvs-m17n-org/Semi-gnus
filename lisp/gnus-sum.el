@@ -1867,8 +1867,9 @@ increase the score of each group you read."
 	 ["Increase score..." gnus-summary-increase-score t]
 	 ["Lower score..." gnus-summary-lower-score t]))))
 
-    ;; Define both the Article menu in the summary buffer and the equivalent
-    ;; Commands menu in the article buffer here for consistency.
+    ;; Define both the Article menu in the summary buffer and the
+    ;; equivalent Commands menu in the article buffer here for
+    ;; consistency.
     (let ((innards
 	   `(("Hide"
 	      ["All" gnus-article-hide t]
