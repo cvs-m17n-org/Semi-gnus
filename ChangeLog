@@ -1,3 +1,14 @@
+2000-03-03   Daiki Ueno  <ueno@ueda.info.waseda.ac.jp>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 12.
+
+	* lisp/gnus-sum.el: Add autoload setting for `pgg-decrypt-region'
+	and `pgg-verify-region'.
+	(gnus-summary-decrypt-article): New command.
+	(gnus-summary-verify-article): New command.
+	(gnus-summary-article-map): Bind them.
+	(gnus-wheel-summary-scroll): Fix paren style.
+
 2000-03-02  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 11.
