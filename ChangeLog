@@ -1,5 +1,12 @@
 1999-06-01  Keiichi Suzuki  <keiichi@nanap.org>
 
+	* lisp/gnus.el (gnus-version-number): Update to 6.13.0.
+	(gnus-version): Change required version of SEMI/FLIM.
+
+	* Sync up with Chaos-1_13.
+
+1999-06-01  Keiichi Suzuki  <keiichi@nanap.org>
+
 	* Nana-gnus: Version 6.12.17 released.
 
 1999-05-28  Keiichi Suzuki  <keiichi@nanap.org>
