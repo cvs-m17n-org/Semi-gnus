@@ -1,3 +1,17 @@
+1998-06-18  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
+
+	* lisp/message.el (message-send-mail-with-smtp): New
+	implementation.
+
+	* lisp/smtp.el (smtp-use-8bitmime): New variable.
+	(smtp-debug-info): Internal variable, now.
+	(smtp-make-fqdn): Renamed from `smtp-fqdn'.
+	(smtp-via-smtp): New implementation.
+	(smtp-send-command): Treat "PASS" as usual.
+	(smtp-do-bcc): Removed.
+
+	* lisp/smtpmail.el: Removed; Semi-gnus no longer use it.
+
 1998-06-13  Shuhei KOBAYASHI  <shuhei-k@jaist.ac.jp>
 
 	* lisp/message.el (message-subject-encoded-re-regexp): Add
