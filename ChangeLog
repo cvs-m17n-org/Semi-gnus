@@ -1,0 +1,277 @@
+1998-01-08  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/smtpmail.el (smtpmail-via-smtp): Bind
+	`coding-system-for-read' by `smtpmail-coding-system' to avoid
+	dead-locking in Emacs 20.
+
+	* lisp/gnus.el: gnus.el (gnus-version-number): Update to version
+	6.0.2.
+
+1998-01-07  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnmail.el, lisp/message.el: Sync with Quassia Gnus v0.22.
+
+	* lisp/gnus.el: Delete autoload setting for `metamail-buffer'.
+
+	* lisp/gnus.el, lisp/gnus-sum.el: Sync with Quassia Gnus v0.22.
+
+	* lisp/gnus-msg.el: Abolish function
+	`gnus-inews-insert-mime-headers'.
+
+	* lisp/gnus-msg.el, lisp/gnus-draft.el, lisp/gnus-art.el: Sync
+	with Quassia Gnus v0.22.
+
+	* lisp/smtpmail.el (smtpmail-coding-system): New variable; abolish
+	`smtpmail-code-conv-from'.
+	(smtpmail-via-smtp): Guard `coding-system-for-write' by
+	`smtpmail-coding-system'.
+
+	* lisp/smtpmail.el: Imported from Emacs 20.2.
+
+	* lisp/pop3.el (pop3-movemail-file-coding-system): Change default
+	value to `binary'.
+	(pop3-open-server): Guard `coding-system-for-read' by `binary'.
+
+1998-01-06  Shuhei Kobayashi  <shuhei-k@jaist.ac.jp>
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog, lisp/nnoo.el,
+	lisp/nnml.el, lisp/message.el, lisp/gnus.el, lisp/gnus-sum.el,
+	lisp/gnus-start.el, lisp/gnus-ems.el, lisp/gnus-draft.el,
+	lisp/gnus-agent.el, lisp/ChangeLog: Importing qgnus-0.22
+
+	* texi/message.texi, texi/gnus.texi, lisp/gnus.el, lisp/ChangeLog:
+	Importing qgnus-0.21
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog,
+	lisp/nnvirtual.el, lisp/nnsoup.el, lisp/nnoo.el, lisp/nnmh.el,
+	lisp/nnmail.el, lisp/nndraft.el, lisp/gnus.el, lisp/gnus-xmas.el,
+	lisp/gnus-sum.el, lisp/gnus-start.el, lisp/gnus-score.el,
+	lisp/gnus-msg.el, lisp/gnus-group.el, lisp/gnus-draft.el,
+	lisp/gnus-art.el, lisp/ChangeLog: Importing qgnus-0.20
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog, lisp/pop3.el,
+	lisp/nntp.el, lisp/nnml.el, lisp/nnmail.el, lisp/nndoc.el,
+	lisp/message.el, lisp/gnus.el, lisp/gnus-uu.el,
+	lisp/gnus-topic.el, lisp/gnus-sum.el, lisp/gnus-start.el,
+	lisp/gnus-score.el, lisp/gnus-group.el, lisp/gnus-cache.el,
+	lisp/gnus-agent.el, lisp/ChangeLog: Importing qgnus-0.19
+
+1997-12-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus.el (gnus-version-number): Update to version 6.0.1.
+
+	* lisp/message.el (message-resend): Enclose `message-setup' with
+	`(let (message-setup-hook) ...)' to avoid to `turn-on-mime-edit';
+	must setup `message-encoding-buffer' and `message-edit-buffer' for
+	`message-send-mail'.
+
+1997-12-08  Shuhei Kobayashi  <shuhei-k@jaist.ac.jp>
+
+	* lisp/pop3.el, lisp/message.el, lisp/gnus.el, lisp/gnus-sum.el,
+	lisp/gnus-art.el, lisp/ChangeLog: Synch'ed up to qgnus-0.18.
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog,
+	lisp/smiley.el, lisp/pop3.el, lisp/nnweb.el, lisp/nntp.el,
+	lisp/nnml.el, lisp/nnmail.el, lisp/nnheader.el, lisp/nndraft.el,
+	lisp/message.el, lisp/lpath.el, lisp/gnus.el, lisp/gnus-util.el,
+	lisp/gnus-sum.el, lisp/gnus-start.el, lisp/gnus-picon.el,
+	lisp/gnus-nocem.el, lisp/gnus-mh.el, lisp/gnus-group.el,
+	lisp/gnus-ems.el, lisp/gnus-cite.el, lisp/gnus-art.el,
+	lisp/gnus-agent.el, lisp/dgnushack.el, lisp/ChangeLog: Importing
+	qgnus-0.18
+
+1997-11-29  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* README.semi: New file.
+
+	* lisp/gnus.el (gnus-version): Rename to "Semi-gnus".
+
+1997-11-28  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-draft.el (gnus-draft-decoding-function): New variable.
+	(gnus-draft-setup): Use `gnus-draft-decoding-function'.
+
+1997-11-27  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnmail.el, lisp/nnheader.el, lisp/message.el, lisp/gnus.el,
+	lisp/gnus-sum.el, lisp/gnus-msg.el, lisp/gnus-art.el: sync with
+	qgnus-0.17.
+
+	* texi/message.texi, texi/gnus.texi, lisp/smiley.el, lisp/nnoo.el,
+	lisp/nnml.el, lisp/nnmail.el, lisp/nnheader.el,
+	lisp/messagexmas.el, lisp/message.el, lisp/gnus.el,
+	lisp/gnus-xmas.el, lisp/gnus-util.el, lisp/gnus-sum.el,
+	lisp/gnus-start.el, lisp/gnus-spec.el, lisp/gnus-score.el,
+	lisp/gnus-picon.el, lisp/gnus-move.el, lisp/gnus-msg.el,
+	lisp/gnus-kill.el, lisp/gnus-group.el, lisp/gnus-draft.el,
+	lisp/gnus-demon.el, lisp/gnus-cite.el, lisp/gnus-art.el,
+	lisp/ChangeLog: Quassia Gnus v0.17.
+
+	* lisp/gnus-i18n.el: New file.
+
+	* lisp/nnmail.el (nnmail-file-coding-system): Use `raw-text' in
+	default.
+
+	* lisp/nnheader.el (nnheader-file-coding-system): Use `raw-text'
+	in default.
+
+	* lisp/message.el (message-encode-function): New variable.
+	(message-forward-start-separator): Modify for mime-edit.
+	(message-forward-end-separator): Modify for mime-edit.
+	(message-setup-hook): Use `(message-maybe-setup-default-charset
+	turn-on-mime-edit)' in default.
+	(message-header-hook): Use `(eword-encode-header)' in default.
+
+	(message-send): Use local variable `message-encoding-buffer',
+	`message-edit-buffer' and `message-mime-mode' as public variables;
+	use `message-encode-function'.
+	(message-send-mail): Use `message-encoding-buffer' to get contents
+	of body; abolish `message-encode-mail-hook'; use
+	`mime-edit-maybe-split-and-send'; use `message-edit-buffer' to
+	refer original editing buffer.
+	(message-send-news): Use `message-encoding-buffer' to get contents
+	of body; abolish `message-encode-news-hook'; use
+	`mime-edit-maybe-split-and-send'; use `message-edit-buffer' to
+	refer original editing buffer.
+	(message-check-news-syntax): Call `message-check-news-body-syntax'
+	in `mime-edit-buffer'.
+	(message-do-fcc): Use `message-encoding-buffer' to get contents;
+	run `message-header-hook'.
+	(message-cancel-news): Use `std11-extract-address-components'
+	instead of `mail-extract-address-components'; bind
+	`message-encoding-buffer' and `message-edit-buffer'.
+
+	(message-maybe-setup-default-charset): New function.
+	(message-maybe-encode): New function.
+	(message-mime-insert-article): New function.
+	Add setting for mime-view.
+
+	* lisp/gnus.el (gnus-version-number): for version number for Open
+	gnus.
+	(gnus-version): Modify for Open gnus.
+
+	* lisp/gnus-sum.el: Autoload gnus-i18n.
+
+	(gnus-show-mime): `t' in default.
+	(gnus-structured-field-decoder): Use
+	`eword-decode-structured-field-body' in default.
+	(gnus-unstructured-field-decoder): Use
+	`eword-decode-unstructured-field-body' in default.
+
+	(gnus-parse-headers-hook): Use
+	`(gnus-set-summary-default-charset)' in default.
+
+	(gnus-summary-mode-map): Add binding for
+	`gnus-summary-scroll-down' and
+	`gnus-summary-preview-mime-message'.
+
+	(gnus-summary-preview-mime-message): New function.
+	(gnus-mime-partial-preview-function): New function.
+	Add setting for mime-view.
+
+	* lisp/gnus-msg.el (gnus-summary-cancel-article): Display
+	`gnus-article-buffer' instead ofb `gnus-original-article-buffer'.
+	(gnus-extended-version): Don't return version of emacsen.
+	(gnus-inews-do-gcc): Refer `message-encoding-buffer'.
+
+	* lisp/gnus-art.el (gnus-show-mime-method): Use
+	`gnus-article-preview-mime-message' instead of `metamail-buffer'
+	in default.
+	(gnus-decode-encoded-word-method): Use
+	`gnus-article-decode-encoded-word' instead of
+	`gnus-article-de-quoted-unreadable' in default.
+
+	Abolish `gnus-hack-decode-rfc1522', `gnus-decode-rfc1522',
+	`article-decode-rfc1522', `article-de-quoted-unreadable',
+	`article-mime-decode-quoted-printable-buffer' and
+	`article-mime-decode-quoted-printable'.
+	(gnus-article-decode-rfc1522): New implementation (use
+	`eword-decode-header').
+
+	(gnus-article-preview-mime-message): New function.
+	(gnus-article-decode-encoded-word): New function.
+	(gnus-content-header-filter): New function.
+	(mime-view-quitting-method-for-gnus): New function.
+	Add setting for mime-view.
+
+	* lisp/message.el: Abolish `message-max-size' because it is not
+	used.
+
+	* lisp/message.el: sync with qgnus-0.16.
+
+	* texi/Makefile, texi/message.texi, texi/gnus.texi, lisp/nnweb.el,
+	lisp/nnmh.el, lisp/nnheader.el, lisp/nnfolder.el, lisp/message.el,
+	lisp/gnus.el, lisp/gnus-xmas.el, lisp/gnus-uu.el,
+	lisp/gnus-sum.el, lisp/gnus-srvr.el, lisp/gnus-picon.el,
+	lisp/gnus-group.el, lisp/gnus-cite.el, lisp/gnus-art.el: Quassia
+	Gnus v0.16.
+
+	* lisp/nnmh.el (nnmh-request-list-1): fix maybe.
+
+	* lisp/message.el (message-do-fcc): Guard
+	`coding-system-for-write' by `raw-text'; run
+	`message-before-do-fcc-hook'.
+
+	* lisp/gnus-msg.el (gnus-inews-do-gcc): Guard
+	`coding-system-for-write' by `raw-text'; run
+	`gnus-before-do-gcc-hook'.
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog, lisp/nntp.el,
+	lisp/nnoo.el, lisp/nnml.el, lisp/nndraft.el, lisp/nnbabyl.el,
+	lisp/message.el, lisp/gnus.el, lisp/gnus-xmas.el, lisp/gnus-uu.el,
+	lisp/gnus-util.el, lisp/gnus-sum.el, lisp/gnus-start.el,
+	lisp/gnus-spec.el, lisp/gnus-soup.el, lisp/gnus-score.el,
+	lisp/gnus-msg.el, lisp/gnus-gl.el, lisp/gnus-ems.el,
+	lisp/gnus-draft.el, lisp/gnus-cache.el, lisp/gnus-audio.el,
+	lisp/gnus-art.el, lisp/gnus-agent.el, lisp/ChangeLog: Quassia Gnus
+	v0.15.
+
+	* lisp/message.el, lisp/ChangeLog: sync with qgnus-0.14.
+
+	* texi/Makefile, texi/gnus.texi: Quassia Gnus v0.14.
+
+	* texi/dir: New file.
+
+	* texi/dir, lisp/pop3.el, lisp/nntp.el, lisp/nnml.el,
+	lisp/nnmail.el, lisp/nnfolder.el, lisp/message.el, lisp/lpath.el,
+	lisp/gnus.el, lisp/gnus-win.el, lisp/gnus-util.el,
+	lisp/gnus-topic.el, lisp/gnus-sum.el, lisp/gnus-start.el,
+	lisp/gnus-score.el, lisp/gnus-msg.el, lisp/gnus-mh.el,
+	lisp/gnus-cus.el, lisp/gnus-art.el, lisp/gnus-agent.el,
+	lisp/ChangeLog: Quassia Gnus v0.14.
+
+	* lisp/message.el, lisp/ChangeLog: sync with qgnus-0.13.
+
+	* texi/gnus.texi, texi/ChangeLog, lisp/pop3.el, lisp/nnweb.el,
+	lisp/nnmail.el: Quassia Gnus v0.13.
+
+	* lisp/nnlistserv.el: New file.
+
+	* lisp/nnlistserv.el, lisp/message.el, lisp/md5.el, lisp/lpath.el,
+	lisp/gnus.el, lisp/gnus-topic.el, lisp/gnus-sum.el,
+	lisp/gnus-score.el, lisp/gnus-picon.el, lisp/gnus-msg.el,
+	lisp/gnus-group.el, lisp/gnus-art.el, lisp/gnus-agent.el,
+	lisp/dgnushack.el, lisp/ChangeLog, GNUS-NEWS: Quassia Gnus v0.13.
+
+	* lisp/message.el: sync with qgnus-0.12.
+
+	* texi/message.texi, texi/gnus.texi, texi/gnus-faq.texi,
+	texi/ChangeLog, lisp/nntp.el, lisp/nnmh.el, lisp/nnmail.el,
+	lisp/nndraft.el, lisp/messcompat.el, lisp/message.el,
+	lisp/gnus.el, lisp/gnus-xmas.el, lisp/gnus-uu.el,
+	lisp/gnus-sum.el, lisp/gnus-score.el, lisp/gnus-salt.el,
+	lisp/gnus-msg.el, lisp/gnus-int.el, lisp/gnus-group.el,
+	lisp/gnus-demon.el, lisp/gnus-cache.el, lisp/gnus-art.el,
+	lisp/gnus-agent.el, lisp/ChangeLog, GNUS-NEWS: Quassia Gnus v0.12.
+
+	* lisp/message.el (message-send-news-function): Use
+	`message-send-news-with-gnus' in default.
+	(message-send-via-news): Use `message-send-news' instead of
+	`message-send-news-function'.
+	(message-send-mail): Don't avoid text properties; run
+	`message-encode-mail-hook'.
+	(message-send-news): Don't avoid text properties; run
+	`message-encode-news-hook'; use `message-send-news-function'.
+	(message-send-news-with-gnus): New function.
+	(message-cancel-news): Use `message-send-news' instead of
+	`message-send-news-function'.
