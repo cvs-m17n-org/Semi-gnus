@@ -2848,10 +2848,12 @@ Manual} $B$r8+$F2<$5$$!#(B
 @item broken-reply-to
 @cindex broken-reply-to
 @code{(broken-reply-to . t)} $B$H$$$&MWAG$,$"$l$P!"$=$N%0%k!<%W$G(B
-$B$O(B @code{Reply-To} $B$OL5;k$5$l$k!"$H$$$&0UL#$G$9!#$3$l$O$"$k(B listserv $B$K(B
-$B$h$k%a!<%j%s%0%j%9%H$r9XFI$7$F$$$F!"$=$l$,(B @code{Reply-To} $BMs(B
-$B$r(B listserv $B<+?H$KJV$9$h$&$K$D$1$i$l$F$$$k>l9g$KM-8z$G$7$g$&!#$3$l$O$*$+(B
-$B$7$J?6$kIq$$$G$9!#$@$+$i$3$l$,MW$k$s$G$9(B!
+$B$O(B @code{Reply-To} $B$OL5;k$5$l!"(B
+@code{reply-to} $B$,(B @code{gnus-boring-article-headers} $B$NItJ,$G$"$l$P!"%X%C(B
+$B%@!<$,1#$5$l$k$H$$$&0UL#$G$9!#$3$l$O$"$k(B listserv $B$K$h$k%a!<%j%s%0%j%9%H(B
+$B$r9XFI$7$F$$$F!"$=$l$,(B @code{Reply-To} $BMs$r(B listserv $B<+?H$KJV$9$h$&$K$D(B
+$B$1$i$l$F$$$k>l9g$KM-8z$G$7$g$&!#$3$l$O$*$+$7$J?6$kIq$$$G$9!#$@$+$i$3$l$,(B
+$BMW$k$s$G$9(B!
 
 @item to-group
 @cindex to-group
@@ -5222,7 +5224,10 @@ Summary Buffer} $B$r;2>H$7$F2<$5$$!#(B
 @kindex S B r ($B35N,(B)
 @findex gnus-summary-reply-broken-reply-to
 $B8=:_$N5-;v$r=q$$$??M$KBP$7$FJVEz$r$7$^$9$,(B @code{Reply-To} $B%U%#!<%k%I$O(B
-$BL5;k$7$^$9(B (@code{gnus-summary-reply-broken-reply-to})$B!#(B
+$BL5;k$7$^$9(B (@code{gnus-summary-reply-broken-reply-to})$B!#%a!<%j%s%0%j%9%H(B
+$B$,$=$N%j%9%H$r;X$9(B @code{Reply-To} $B$r2a$C$F@_Dj$9$k$?$a$K$3$l$,I,MW$J$N(B
+$B$G$"$l$P!"$"$J$?$O$?$V$sBe$o$j$K(B @code{broken-reply-to} $B%0%k!<%W%Q%i%a!<(B
+$B%?$r@_Dj$7$?$$$H;W$$!"$=$l$OF0:n$9$k$G$7$g$&!#(B
 
 @item S B R
 @kindex S B R ($B35N,(B)
@@ -10139,8 +10144,9 @@ Gnus $B$O%X%C%@!<$NJB$YBX$((B (sort) $B$b9T$$$^$9(B ($B$3$l$O%G%#%U%)%k%H$G
 @code{Followup-To} $BMs$,(B @code{Newsgroups} $BMs$HF10l$G$"$k>l9g$K$O>C5n$7$^(B
 $B$9!#(B
 @item reply-to
-@code{Reply-To} $BMs$,(B @code{From} $BMs$HF1$8%"%I%l%9$r<($7$F$$$k>l9g$K$O>C(B
-$B5n$7$^$9!#(B
+@code{Reply-To} $BMs$,(B @code{From} $BMs$HF1$8%"%I%l%9$r<($7$F$$$k$+!"(B
+@code{broken-reply-to} $B%0%k!<%W%Q%i%a!<%?$,@_Dj$5$l$F$$$k>l9g$K$O>C5n$7(B
+$B$^$9!#(B
 @item newsgroups
 @code{Newsgroups} $BMs$,8=:_$N%0%k!<%WL>$7$+4^$s$G$$$J$$>l9g$K$O>C5n$7$^$9!#(B
 @item to-address

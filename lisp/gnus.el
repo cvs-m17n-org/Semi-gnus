@@ -1844,20 +1844,20 @@ This only makes sense for mail groups."
 When a spam group is entered, all unread articles are marked as spam.")
 
   (defvar gnus-group-spam-exit-processor-ifile "ifile"
-    "The ifile summary exit spam processor.
-Only applicable to spam groups.")
+    "The ifile summary exit spam processor.")
 
   (defvar gnus-group-spam-exit-processor-stat "stat"
-    "The spam-stat summary exit spam processor.
-Only applicable to spam groups.")
+    "The spam-stat summary exit spam processor.")
 
   (defvar gnus-group-spam-exit-processor-bogofilter "bogofilter"
-    "The Bogofilter summary exit spam processor.
-Only applicable to spam groups.")
+    "The Bogofilter summary exit spam processor.")
 
   (defvar gnus-group-spam-exit-processor-blacklist "blacklist"
-    "The Blacklist summary exit spam processor.
-Only applicable to spam groups.")
+    "The Blacklist summary exit spam processor.")
+
+  (defvar gnus-group-spam-exit-processor-report-gmane "report-gmane"
+    "The Gmane reporting summary exit spam processor.
+Only applicable to NNTP groups with articles from Gmane.  See spam-report.el")
 
   (defvar gnus-group-ham-exit-processor-ifile "ifile-ham"
     "The ifile summary exit ham processor.
@@ -1894,6 +1894,7 @@ Only applicable to non-spam (unclassified and ham) groups.")
 				   (variable-item gnus-group-spam-exit-processor-stat)
 				   (variable-item gnus-group-spam-exit-processor-bogofilter)
 				   (variable-item gnus-group-spam-exit-processor-blacklist)
+				   (variable-item gnus-group-spam-exit-processor-report-gmane)
 				   (variable-item gnus-group-ham-exit-processor-bogofilter)
 				   (variable-item gnus-group-ham-exit-processor-ifile)
 				   (variable-item gnus-group-ham-exit-processor-stat)
@@ -1919,6 +1920,7 @@ for mail groups."
 				      (variable-item gnus-group-spam-exit-processor-stat)
 				      (variable-item gnus-group-spam-exit-processor-bogofilter)
 				      (variable-item gnus-group-spam-exit-processor-blacklist)
+				      (variable-item gnus-group-spam-exit-processor-report-gmane)
 				      (variable-item gnus-group-ham-exit-processor-bogofilter)
 				      (variable-item gnus-group-ham-exit-processor-ifile)
 				      (variable-item gnus-group-ham-exit-processor-stat)
@@ -2331,6 +2333,7 @@ This variable can be nil, gnus or gnus-ja."
 			gnus-newsrc-last-checked-date
 			gnus-newsrc-alist gnus-server-alist
 			gnus-registry-alist
+			gnus-registry-headers-alist
 			gnus-killed-list gnus-zombie-list
 			gnus-topic-topology gnus-topic-alist
 			gnus-agent-covered-methods)
@@ -2376,6 +2379,10 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
 
 (defvar gnus-registry-alist nil
   "Assoc list of registry data.
+gnus-registry.el will populate this if it's loaded.")
+
+(defvar gnus-registry-headers-alist nil
+  "Assoc list of registry header data.
 gnus-registry.el will populate this if it's loaded.")
 
 (defvar gnus-newsrc-hashtb nil

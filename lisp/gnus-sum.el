@@ -2118,9 +2118,9 @@ increase the score of each group you read."
 	       ,@(gnus-summary-menu-split
 		  (mapcar
 		   (lambda (cs)
-		     ;; Since easymenu under FSF Emacs doesn't allow lambda
-		     ;; forms for menu commands, we should provide intern'ed
-		     ;; function symbols.
+		     ;; Since easymenu under Emacs doesn't allow
+		     ;; lambda forms for menu commands, we should
+		     ;; provide intern'ed function symbols.
 		     (let ((command (intern (format "\
 gnus-summary-show-article-from-menu-as-charset-%s" cs))))
 		       (fset command
@@ -4568,6 +4568,11 @@ Unscored articles will be counted as having a score of zero."
 If nil, use subject instead."
   :type 'string
   :group 'gnus-thread)
+(defcustom gnus-sum-thread-tree-false-root "> "
+  "With %B spec, used for a false root of a thread.
+If nil, use subject instead."
+  :type 'string
+  :group 'gnus-thread)
 (defcustom gnus-sum-thread-tree-single-indent ""
   "With %B spec, used for a thread with just one message.
 If nil, use subject instead."
@@ -4838,9 +4843,12 @@ or a straight list of headers."
 	     (cond
 	      ((not gnus-show-threads) "")
 	      ((zerop gnus-tmp-level)
-	       (if (cdar thread)
-		   (or gnus-sum-thread-tree-root subject)
-		 (or gnus-sum-thread-tree-single-indent subject)))
+	       (cond ((cdar thread)
+		      (or gnus-sum-thread-tree-root subject))
+		     (gnus-tmp-new-adopts
+		      (or gnus-sum-thread-tree-false-root subject))
+		     (t
+		      (or gnus-sum-thread-tree-single-indent subject))))
 	      (t
 	       (concat (apply 'concat
 			      (mapcar (lambda (item)
@@ -4871,7 +4879,7 @@ or a straight list of headers."
 
 	(when (nth 1 thread)
 	  (push (list (max 0 gnus-tmp-level)
-		      (copy-list tree-stack)
+		      (copy-sequence tree-stack)
 		      (nthcdr 1 thread))
 		stack))
 	(push (if (nth 1 thread) 1 0) tree-stack)
@@ -11740,10 +11748,10 @@ returned."
 						(mail-header-number h))
 					      gnus-newsgroup-headers)))
     (setq gnus-newsgroup-headers
-	  (merge 'list
-		 gnus-newsgroup-headers
-		 (gnus-fetch-headers articles)
-		 'gnus-article-sort-by-number))
+	  (gnus-merge 'list
+		      gnus-newsgroup-headers
+		      (gnus-fetch-headers articles)
+		      'gnus-article-sort-by-number))
     ;; Suppress duplicates?
     (when gnus-suppress-duplicates
       (gnus-dup-suppress-articles))

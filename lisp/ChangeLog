@@ -1,10 +1,102 @@
+2003-04-17  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lpath.el: Fbind compare-strings for XEmacs.
+
+2003-04-17  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* gnus-srvr.el (gnus-browse-make-menu-bar): Fix typo.
+
+2003-04-17  Mike Woolley  <mike@ariel.co.uk>
+
+	* gnus-sum.el (gnus-sum-thread-tree-false-root): New variable. 
+
+2003-04-15  Michael Shields  <shields@msrl.com>
+
+	* gnus-art.el (article-hide-boring-headers): Hide Reply-To: if
+	the broken-reply-to group parameter is set.  Idea from Vasily
+	Korytov <deskpot@myrealbox.com>.
+
+2003-04-17  Steve Youngs  <youngs@xemacs.org>
+
+	* dgnushack.el: Add a whole swag of autoloads and defaliases to
+	satisfy the byte-compiler when building with XEmacs.
+
+	* lpath.el (maybe-bind): Add 'w3-meta-content-type-charset-regexp'
+	and 'w3-meta-charset-content-type-regexp' in XEmacs.  The upstream
+	W3 doesn't have these.
+
+	* mailcap.el: Maybe require 'lpr in XEmacs.
+
+2003-04-16  Simon Josefsson  <jas@extundo.com>
+
+	* mml2015.el (mml2015-pgg-sign): Bind pgg-default-user-id to MML
+	sender tag, if available.
+
+2003-04-16  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus-registry.el (gnus-register-action) 
+	(gnus-register-spool-action, hashtable-to-alist) 
+	(gnus-registry-translate-from-alist, alist-to-hashtable) 
+	(gnus-registry-translate-to-alist, gnus-registry-headers-hashtb):
+	new variables and function fixes
+
+	* gnus.el (gnus-registry-headers-alist): new variable to hold
+	article header data
+	(gnus-variable-list): save gnus-registry-headers-alist
+
+	* spam-report.el (Module): new module for spam reporting
+
+	* gnus.el (spam-process): added
+	gnus-group-spam-exit-processor-report-gmane to the list of choices
+	(gnus-install-group-spam-parameters): defined new spam exit processor
+
+	* spam.el (autoload): autoload spam-report-gmane when needed
+	(spam-report-gmane-register-routine): glue for spam-report.el
+	(spam-group-spam-processor-report-gmane-p): glue for the
+	gnus-group-spam-exit-processor-report-gmane spam processor
+	(spam-summary-prepare-exit): check the report-gmane spam processor
+	and run spam-report-gmane-register-routine if it's active
+
+	From John Wiegley <johnw@gnu.org>
+
+	* spam.el (spam-bogofilter-score): check bogofilter headers before
+	checking bogofilter itself
+
+2003-04-16  Dave Love  <fx@gnu.org>
+
+	* gnus-agent.el: Wrap defsetf in eval-when-compile.
+	(gnus-agent-cat-defaccessor): Don't use gensym.
+
+	* mml1991.el: Require cl, mm-util when compiling.
+	(quoted-printable-decode-region, quoted-printable-encode-region):
+	Autoload.
+
+	* pgg.el: Require cl when compiling.
+
+	* nnmail.el (gnus): Require.
+
+	* gnus-util.el: Move provide to end.
+	(gnus-string-equal): Maybe use compare-strings.
+	(gnus-merge): New.
+
+	* gnus-sum.el (gnus-summary-prepare-threads): Don't use copy-list.
+	(gnus-summary-insert-articles): Use gnus-merge.
+
+	* gnus-fun.el: Require cl and mm-util when compiling.
+
+	* gnus-diary.el (gnus-diary-delay-format-french)
+	(gnus-diary-delay-format-english): Don't use setf with nthcdr.
+
+	* nndiary.el (nndiary-compute-reminders): Don't use setf with
+	nthcdr.
+
 2003-04-16  Kevin Greiner <kgreiner@xpediantsolutions.com>
 
 	* gnus-agent.el (gnus-agent-make-cat): Added optional parameter to
 	specify a predicate other than false.
 	(gnus-category-read): Use the new feature to create a 'default'
 	category with a 'short' predicate.
-	
+
 2003-04-16  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* message.el (message-unique-id): Comment change.
@@ -452,13 +544,14 @@
 
 2003-03-28  Paul Jarc  <prj@po.cwru.edu>
 
-	* nnmaildir.el (nnmaildir-request-set-mark,
-	nnmaildir-close-group): Allow each mark directory in a group to
+	* nnmaildir.el (nnmaildir-request-set-mark)
+	(nnmaildir-close-group): Allow each mark directory in a group to
 	have its own inode for mark files, to accommodate AFS.
 
 2003-03-28  Teodor Zlatanov  <tzz@lifelogs.com>
 
-	* gnus-start.el (gnus-read-newsrc-el-hook): new hook called by gnus-read-newsrc-el-file
+	* gnus-start.el (gnus-read-newsrc-el-hook): new hook called by
+	gnus-read-newsrc-el-file
 	(gnus-read-newsrc-el-file): call the gnus-read-newsrc-el-hook
 
 	* gnus-registry.el (gnus-registry-translate-to-alist)
@@ -477,7 +570,7 @@
 
 2003-03-27  Katsumi Yamaoka <yamaoka@jpl.org>
 
-	* lpath.el: Bind url-current-object for FSF Emacs; bind
+	* lpath.el: Bind url-current-object for Emacs; bind
 	gnus-agent-expire-current-dirs for XEmacs; fbind open-ssl-stream
 	for both Emacsen.
 
@@ -712,11 +805,9 @@
 
 2003-03-18  Paul Jarc  <prj@po.cwru.edu>
 
-	* nnmaildir.el (nnmaildir-open-server,
-	nnmaildir-request-scan,
-	nnmaildir-request-create-group,
-	nnmaildir-request-delete-group): Replace create-directory with
-	target-prefix.
+	* nnmaildir.el (nnmaildir-open-server, nnmaildir-request-scan)
+	(nnmaildir-request-create-group, nnmaildir-request-delete-group):
+	Replace create-directory with target-prefix.
 
 2003-03-18  Jesper Harder  <harder@ifa.au.dk>
 
