@@ -7285,7 +7285,7 @@ DOS $(B$N9TKv$N@$OC$r$7$^$9(B)$(B!"$=$7$F$=$l$+$i;D$j$N(B CR $(B$r(B LF $
 @kindex W Z (Summary)
 @findex gnus-article-decode-HZ
 HZ $(B$^$?$O(B HZP $(B$r=hM}$7$^$9!#(BHZ ($(B$^$?$O(B HZP) $(B$OCf9q8l$N5-;v$rEAAw$9$k$H$-(B
-$(B$K;H$o$l$k0lHLE*$JId9g$G$9!#$3$l$O(B @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}} $(B$N(B
+$(B$K;H$o$l$k0lHLE*$JId9f$G$9!#$3$l$O(B @samp{~@{<:Ky2;S@{#,NpJ)l6HK!#~@}} $(B$N(B
 $(B$h$&$JE57?E*$JJ8;zNs$r:n$j$^$9!#(B
 
 @c @item W h
