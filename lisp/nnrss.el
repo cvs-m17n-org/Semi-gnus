@@ -518,12 +518,12 @@ It is useful when `(setq nnrss-use-local t)'."
 	 (text (if (and node (listp node))
 		   (nnrss-node-just-text node)
 		 node))
-	 (cleaned-text (if text (gnus-replace-regexp-in-string
-				 (gnus-replace-regexp-in-string
-				  (gnus-replace-regexp-in-string
+	 (cleaned-text (if text (gnus-replace-in-string
+				 (gnus-replace-in-string
+				  (gnus-replace-in-string
 				   text "^[[:cntrl:]]+" "")
-				  "^ *" "")
-				 " *$" ""))))
+				  "^ +" "")
+				 " +$" ""))))
     (if (string-equal "" cleaned-text)
 	nil
       cleaned-text)))
