@@ -1,3 +1,5 @@
+Emacs 19.34 をベースにした Mule 2.3 で T-gnus を作る方法。
+
 FIX loaddefs.el
 ===============
 
