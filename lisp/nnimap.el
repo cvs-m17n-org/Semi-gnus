@@ -71,6 +71,7 @@
 (require 'gnus-int)
 
 (nnoo-declare nnimap)
+(put 'nnimap 'gnus-agent-covered-method t)
 
 (defconst nnimap-version "nnimap 0.131")
 

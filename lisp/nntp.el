@@ -31,6 +31,7 @@
 (require 'gnus-util)
 
 (nnoo-declare nntp)
+(put 'nntp 'gnus-agent-covered-method t)
 
 (eval-when-compile (require 'cl))
 
