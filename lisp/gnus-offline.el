@@ -1,5 +1,5 @@
 ;;; gnus-offline.el --- To process mail & news at offline environment.
-;;; $Id: gnus-offline.el,v 1.1.2.5.2.4 1998-10-17 03:27:06 ichikawa Exp $
+;;; $Id: gnus-offline.el,v 1.1.2.5.2.5 1998-11-09 14:44:06 ichikawa Exp $
 
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;;                    Yukihiro Ito
@@ -7,7 +7,7 @@
 ;;;         Yukihiro Ito <ito@rs.civil.tohoku.ac.jp>
 ;;;         Hidekazu Nakamura <u90121@uis-inf.co.jp>
 
-;;; Version: 1.54
+;;; Version: 2.00b1
 ;;; Keywords: news , mail , offline , gnus
 ;;;
 ;;; SPECIAL THANKS
@@ -41,24 +41,22 @@
 ;;;   You must use Semi-gnus 6.X.X.
 ;;;
 ;;; How to use.
-;;; put following code in you .emacs , after the setting of Gnus.
 ;;;
-;;;  (setq gnus-offline-connect-program "/dir/program.exe")
-;;;  (setq gnus-offline-connect-program-arguments '("-a" "-b"))
-;;;  (setq gnus-offline-hangup-program "/dir/program")
+;;; Add following code at the end in your .emacs
+;;;
+;;;    (load "gnus-ofsetup")
+;;;    (gnus-setup-for-offline)
+;;;    (load gnus-offline-setting-file)
+;;;
+;;; put following code in you .gnus-offline.el.
+;;;
+;;;  (setq gnus-offline-dialup-program-arguments '("-a" "-b"))
 ;;;  (setq gnus-offline-hangup-program-arguments '("-c" "-d"))
-;;;  (setq gnus-offline-mail-spool-directory "your-send-mail-spool-directory")
-;;;  (setq gnus-offline-news-spool-directory "your-send-news-spool-directory")
-;;;  (autoload 'gnus-offline-setup "gnus-offline")
-;;;  (add-hook 'gnus-load-hook 'gnus-offline-setup)
 ;;;
 ;;; If you use gnus-agent as souper , put gnus-agent setup code in you .gnus.el
 ;;;
 ;;; If you use nnspool as souper , put following code in your .emacs before
 ;;; gnus-offline setting.
-;;;
-;;;  (load "miee")
-;;;  (message-offline-state)
 ;;;
 ;;; Then , put hang.exe in exec-path directory.
 ;;;
@@ -66,14 +64,10 @@
 ;;; Then send mail and news in spool directory.
 ;;;
 ;;; Variables.
-;;;  gnus-offline-connect-program     ... Dialup program name.
-;;;  gnus-offline-connect-program-arguments
+;;;  gnus-offline-dialup-program-arguments
 ;;;                                   ... List of dialup program arguments.
-;;;  gnus-offline-hangup-program      ... Program name that used hanup line.
 ;;;  gnus-offline-hangup-program-arguments
 ;;;                                   ... List of hangup program arguments.
-;;;  gnus-offline-mail-spool-directory... spool directory sending mail.
-;;;  gnus-offline-news-spool-directory... spool directory sending news.
 ;;;  gnus-offline-mail-treat-environ  ... toggle sending mail online/offline.
 ;;;  gnus-offline-articles-to-fetch   ... toggle fetch articles.
 ;;;                                        both->mail->news->both...
@@ -82,14 +76,8 @@
 ;;;  gnus-offline-after-online-hook   ... hook after all online jobs.
 ;;;  gnus-offline-interval-time       ... Interval time to do all online jobs.
 ;;;                                        (minutes)
-;;;  gnus-offline-MTA-type            ... Type of MTA.
-;;;                                        'smtp     ... Use smtp.el.
-;;;                                        'sendmail ... Use sendmail.el.
-;;;  gnus-offline-drafts-queue-type   ... Method type queuing message to spool.
-;;;                                        'miee means queue message to spool
-;;;                                         using miee.el.
-;;;                                        'agent means queue message to spool
-;;;                                         using gnus-agent.el.
+;;;  gnus-offline-dialup-function     ... Function to diualup.
+;;;  gnus-offline-hangup-function     ... Function to hangup.
 
 ;;; Code:
 
@@ -115,19 +103,10 @@
   :group 'mail
   :group 'news)
 
-(defconst gnus-offline-version-number "1.54")
+(defconst gnus-offline-version-number "2.00b1")
 (defconst gnus-offline-codename
-;;  "You may be right"		; 1.40
-;;  "Chilstie Lee"		; 1.45
-;;  "Uptown Girl"		; 1.46
-;;  "Easy money"		; 1.47
-;;  "An Innocent man"		; 1.48
-;;  "Tell her about it"		; 1.50
-;;  "This night"		; 1.51
-;;  "Movin'out"			; 1.52
-;;  "Longest night"		; 1.53
-  "Running on ice"		; 1.54
-;;  "This is the time"
+  "Beta1"
+;;  "This is the time"		; 2.00
 ;;  "A matter of trust"
 ;;  "Modern Woman"
 ;;  "Code of silence"
@@ -136,21 +115,10 @@
 (defconst gnus-offline-version (format "Gnus offline backend utiliy v%s"
 				       gnus-offline-version-number))
 
-(defcustom gnus-offline-connect-program nil
-  "*Program name to dial-up dialup network.
-If nil , use auto-dialup if required to connect the Internet."
-  :group 'gnus-offline
-  :type 'string)
-
-(defcustom gnus-offline-connect-program-arguments nil
-  "*Program arguments of gnus-offline-connect-program."
+(defcustom gnus-offline-dialup-program-arguments nil
+  "*Program arguments of gnus-offline-dialup-program."
   :group 'gnus-offline
   :type '(repeat (string :tag "Argument")))
-
-(defcustom gnus-offline-hangup-program nil
-  "*Program name to hang-up dialup network."
-  :group 'gnus-offline
-  :type 'string)
 
 (defcustom gnus-offline-hangup-program-arguments nil
   "*Program arguments of gnus-offline-hangup-program."
@@ -161,16 +129,6 @@ If nil , use auto-dialup if required to connect the Internet."
   "*Whether dialup-network automatically hang up when all online jobs has done."
   :group 'gnus-offline
   :type 'boolean)
-
-(defcustom gnus-offline-mail-spool-directory "~/News/mail.out"
-  "*Spool directory sending mail."
-  :group 'gnus-offline
-  :type 'directory)
-
-(defcustom gnus-offline-news-spool-directory "~/News/news.out"
-  "*Spool directory sending news."
-  :group 'gnus-offline
-  :type 'directory)
 
 (defcustom gnus-offline-load-hook nil
   "*Hook to be run after the gnus-offline package has been loaded."
@@ -214,22 +172,6 @@ If set to 0 , timer call is disabled."
   :group 'gnus-offline
   :type 'integer)
 
-(defcustom gnus-offline-MTA-type 'smtp
-  "*Type of MTA program.
-smtp means use smtp.el.
- sendmail means use sendmail.el."
-  :group 'gnus-offline
-  :type '(choice (const smtp)
-		 (const sendmail)))
-
-(defcustom gnus-offline-drafts-queue-type 'agent
-  "*Type of to queue drafts method.
-'miee means drafts are queued and sent by miee.el.
-'agent means drafts are queued and sent by gnus-agent.el"
-  :group 'gnus-offline
-  :type '(choice (const miee)
-		 (const agent)))
-
 (defcustom gnus-offline-after-empting-spool-hook nil
   "*Hook to be run before empting spool."
   :group 'gnus-offline
@@ -266,9 +208,6 @@ If value is nil , dialup line is disconnected status.")
 	  gnus-offline-version
 	  gnus-offline-codename)
   "*Header string for gnus-offline.")
-
-(defvar gnus-offline-auto-hangup-indicator "Hup"
-  "*Indicator whether auto hang up is enabled.")
 
 (defvar gnus-offline-stored-group-level nil
   "*Mail Group level before changing.")
@@ -315,34 +254,19 @@ If value is nil , dialup line is disconnected status.")
      (make-local-variable 'byte-compile-warnings)
      (setq byte-compile-warnings nil))))
        
-(autoload 'message-offline-state "miee"
-  "Set current status to offline state" t)
-;;
-;; mode-line control
-(if (not (member 'gnus-offline-auto-hangup-indicator mode-line-format))
-    (progn
-      (delete "-%-" mode-line-format)
-      (setq-default mode-line-format
-		    (append mode-line-format
-			    (list "--" 'gnus-offline-auto-hangup-indicator
-				  "-%-")))))
 (put 'gnus-offline-set-unplugged-state 'menu-enable 'gnus-offline-connected)
-(add-hook 'gnus-startup-hook 'gnus-offline-setup)
 ;;; Functions
 ;;
 ;; Setting up...
 ;;
 (defun gnus-offline-setup ()
   "*Initialize gnus-offline function"
-  (if (eq system-type 'windows-nt)
-      (define-process-argument-editing "/hang\\.exe\\'"
-	(lambda (x) (general-process-argument-editing-function
-		     x nil t t nil t t))))
-  ;; Initialize Internal Variable
-  (gnus-offline-initialize-variables)
-  
-  ;; Disable fetch mail when startup.
-  (gnus-offline-disable-fetch-mail)
+
+  ;; Load setting file - required.
+  (load gnus-offline-setting-file)
+
+  ;; Menus.
+  (gnus-offline-define-menu-and-key)
   
   ;; To transfer Mail/News function.
   (cond ((eq gnus-offline-mail-treat-environ 'offline)
@@ -350,40 +274,7 @@ If value is nil , dialup line is disconnected status.")
 	 (gnus-offline-set-offline-sendmail-function))
 	((eq gnus-offline-mail-treat-environ 'online)
 	 ;; send mail under offline environ.
-	 (gnus-offline-set-online-sendmail-function)))
-
-  ;; always treat news under offline environ.
-  (gnus-offline-set-offline-post-news-function)
-  
-  ;; Spool directory setting - Miee
-  (if (eq gnus-offline-drafts-queue-type 'miee)
-      (progn
-	(if (not (file-exists-p gnus-offline-mail-spool-directory))
-	    (make-directory gnus-offline-mail-spool-directory t))
-	(setq sendmail-to-spool-directory gnus-offline-mail-spool-directory)
-	(if (not (file-exists-p gnus-offline-news-spool-directory))
-	    (make-directory gnus-offline-news-spool-directory t))
-	(setq news-spool-request-post-directory gnus-offline-news-spool-directory)))
-  
-  ;; When startup ... state is offline.
-  (setq gnus-nntp-service nil
-	gnus-nntp-server nil)
-  
-  ;; Setup needed Hooks
-  (gnus-offline-setup-needed-hooks))
-;;
-;;
-(defun gnus-offline-initialize-variables ()
-  "*Initialize gnus-offline internal variable."
-  (if (featurep 'nnmail)
-      (setq gnus-offline-mail-fetch-method 'nnmail))
-  (if (featurep 'gnus-agent)
-      (setq gnus-offline-news-fetch-method 'nnagent))
-  (if (featurep 'nnspool)
-      (setq gnus-offline-news-fetch-method 'nnspool))
-  (if (eq gnus-offline-drafts-queue-type 'miee)
-      (load "miee"))
-  (gnus-offline-define-menu-and-key))
+	 (gnus-offline-set-online-sendmail-function))))
 ;;
 ;;
 (defun gnus-offline-set-offline-sendmail-function ()
@@ -407,17 +298,6 @@ If value is nil , dialup line is disconnected status.")
   "*Initialize sendnews-function when plugged status."
   (setq message-send-news-function 'message-send-news-with-gnus))
 ;;
-(defun gnus-offline-setup-needed-hooks ()
-  "*Initialize needed hooks for gnus-offline."
-  (add-hook 'gnus-group-mode-hook 'gnus-offline-processed-by-timer)
-  (add-hook 'gnus-after-getting-new-news-hook 'gnus-offline-after-get-new-news)
-  (add-hook 'gnus-after-getting-news-hook 'gnus-offline-after-get-new-news)
-  (if (eq gnus-offline-news-fetch-method 'nnspool)
-      (add-hook 'after-getting-news-hook 'gnus-offline-nnspool-hangup-line))
-  (add-hook 'mime-edit-translate-hook 'gnus-offline-message-add-header)
-  (if (featurep 'pop3-fma)
-      (add-hook 'mime-edit-translate-hook 'pop3-fma-message-add-header)))
-;;
 ;; Get new news jobs. (gnus-agent and nnspool)
 ;;
 (defun gnus-offline-gnus-get-new-news (&optional arg)
@@ -434,12 +314,12 @@ If value is nil , dialup line is disconnected status.")
 ;;
 (defun gnus-offline-connect-server ()
   "*Dialup function."
-  ;; Dialup if gnus-offline-connect-program is specified
-  (if (stringp gnus-offline-connect-program)
+  ;; Dialup if gnus-offline-dialup-program is specified
+  (if (stringp gnus-offline-dialup-program)
       (progn
 	(message "Dialing ...")
-	(apply 'call-process gnus-offline-connect-program nil nil nil
-	       gnus-offline-connect-program-arguments)
+	(apply 'call-process gnus-offline-dialup-program nil nil nil
+	       gnus-offline-dialup-program-arguments)
 	(sleep-for 1)
 	(message "Dialing ... done."))))
 
@@ -451,11 +331,6 @@ If value is nil , dialup line is disconnected status.")
   ;; Set mail group level
   (if (eq gnus-offline-articles-to-fetch 'mail)
       (gnus-offline-set-mail-group-level gnus-offline-mail-group-level))
-
-  ;; Re initialize internal variable...if failed.
-  (if (or (not gnus-offline-mail-fetch-method)
-	  (not gnus-offline-news-fetch-method))
-      (gnus-offline-initialize-variables))
 
   ;; Set to online environ.
   (setq gnus-offline-connected t)
@@ -562,23 +437,20 @@ If value is nil , dialup line is disconnected status.")
 ;;
 (defun gnus-offline-disable-fetch-mail ()
   "*Set do not fetch mail."
-  (if (eq gnus-offline-mail-fetch-method 'nnmail)
-      (setq nnmail-spool-file nil)))
+  (setq nnmail-spool-file nil))
 ;;
 ;; Enable fetch mail
 ;;
 (defun gnus-offline-enable-fetch-mail ()
   "*Set to fetch mail."
-  (if (eq gnus-offline-mail-fetch-method 'nnmail)
-      (progn
-	(setq gnus-offline-mail-fetch-method 'nnmail)
-	(setq nnmail-movemail-program 'pop3-fma-movemail)
-	(setq nnmail-spool-file (append
-				 pop3-fma-local-spool-file-alist
-				 (mapcar
-				  (lambda (spool)
-				    (car spool))
-				  pop3-fma-spool-file-alist))))))
+  (setq gnus-offline-mail-fetch-method 'nnmail)
+  (setq nnmail-movemail-program 'pop3-fma-movemail)
+  (setq nnmail-spool-file (append
+			   pop3-fma-local-spool-file-alist
+			   (mapcar
+			    (lambda (spool)
+			      (car spool))
+			    pop3-fma-spool-file-alist))))
 ;;
 ;; Enable fetch news
 ;;
@@ -699,10 +571,8 @@ If value is nil , dialup line is disconnected status.")
   (if gnus-offline-auto-hangup
       (progn
 	(setq gnus-offline-auto-hangup nil
-	      gnus-offline-auto-hangup-indicator "Con"
 	      str "disabled."))
     (setq gnus-offline-auto-hangup t
-	  gnus-offline-auto-hangup-indicator "Hup"
 	  str "enabled."))
   (message (format "%s %s" string str)))
 ;;
@@ -853,14 +723,13 @@ If value is nil , dialup line is disconnected status.")
    (cons "Gnus Offline Utility"
 	 (make-sparse-keymap "Gnus Offline Utiliry")))
   
-  (if (featurep 'pop3-fma)
-      (global-set-key
-       [menu-bar
-	miee
-	gnus-offline
-	gnus-offline-toggle-movemail-program]
-       '("Toggle movemail program" .
-	 gnus-offline-toggle-movemail-program)))
+  (global-set-key
+   [menu-bar
+    miee
+    gnus-offline
+    gnus-offline-toggle-movemail-program]
+   '("Toggle movemail program" .
+     gnus-offline-toggle-movemail-program))
   
   (global-set-key
    [menu-bar
@@ -931,12 +800,11 @@ If value is nil , dialup line is disconnected status.")
     (cons "Offline" (make-sparse-keymap "Offline"))
     'help)               ;; Actually this adds before "Help".
 
-  (if (featurep 'pop3-fma)
-      (global-set-key
-       [menu-bar
-	offline
-	gnus-offline-toggle-movemail-program]
-       '("Toggle movemail program" . gnus-offline-toggle-movemail-program)))
+  (global-set-key
+   [menu-bar
+    offline
+    gnus-offline-toggle-movemail-program]
+   '("Toggle movemail program" . gnus-offline-toggle-movemail-program))
   
   (global-set-key
    [menu-bar

@@ -1,3 +1,11 @@
+1998-11-09  Tatsuya Ichikawa  <t-ichi@po.shiojiri.ne.jp>
+
+	* lisp/gnus-offline.el: v2.00b1 Separate setting part and
+	functional part - setting part move to gnus-ofsetup.el (New file).
+
+	* lisp/gnus-ofsetup.el: New file - setting function for
+	gnus-offline.
+
 1998-11-09  Katsumi Yamaoka   <yamaoka@jpl.org>
 
 	* lisp/pop3-fma.el: Set the value of `nnmail-read-passwd' as a
