@@ -1,3 +1,16 @@
+1999-12-21  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 13.
+
+	* lisp/dgnuspath.el.in: Add the path of APEL to `load-path' as well
+	as its parent directory.
+
+	* lisp/imap.el (base64-encode-string, base64-decode-string):
+	Autoload "base64" instead of the tricky definitions.
+
+	* lisp/base64.el: Restore the original code and invalidate it; use
+	mel for the base64 codec.
+
 1999-12-20  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/imap.el (mel-find-function): Always require `mel' instead of
