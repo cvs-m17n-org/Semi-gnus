@@ -21586,6 +21586,20 @@ Spam $B%0%k!<%W$G$O!"%G%#%U%)%k%H$G$9$Y$F$N%a%C%;!<%8$,(B spam $B$G$"$k$H2r<a
 @emph{Ham} $B%0%k!<%W$rH4$1$k$H$-$K!"(Bham $B0u$,IU$$$F$$$k$9$Y$F$N5-;v(B
 $B$O(B ham $B%W%m%;%C%5!<$KAw$i$l!"$=$l$i$r(B spam $B$G$O$J$$I8K\$H$7$F3X=,$7$^$9!#(B
 
+@vindex spam-process-ham-in-spam-groups
+$BJQ?t(B @code{spam-process-ham-in-spam-groups} $B$O%G%#%U%)%k%H$G(B
+$B$O(B @code{nil} $B$G$9!#(BSpam $B%0%k!<%W$G8+$D$+$C$?(B ham $B$,%W%m%;%C%5!<$KAw$i$l(B
+$B$k$h$&$K$7$?$$>l9g$O(B @code{t} $B$K$7$F2<$5$$!#DL>o$3$l$O9T$J$o$l$^$;$s!#$"(B
+$B$J$?$,<+J,$G(B ham $B5-;v$r(B ham $B%0%k!<%W$KAw$C$F!"$=$3$G=hM}$9$k$3$H$,4|BT$5(B
+$B$l$F$$$^$9!#(B
+
+@vindex spam-process-ham-in-nonham-groups
+$BJQ?t(B @code{spam-process-ham-in-nonham-groups} $B$O%G%#%U%)%k%H$G(B
+$B$O(B @code{nil} $B$G$9!#(BHam $B$G$O$J$$(B (spam $B$^$?$OL$J,N`$N(B) $B%0%k!<%W$G8+$D$+$C(B
+$B$?(B ham $B$,%W%m%;%C%5!<$KAw$i$l$k$h$&$K$7$?$$>l9g$O(B @code{t} $B$K$7$F2<$5$$!#(B
+$BDL>o$3$l$O9T$J$o$l$^$;$s!#$"$J$?$,<+J,$G(B ham $B5-;v$r(B ham $B%0%k!<%W$KAw$C$F!"(B
+$B$=$3$G=hM}$9$k$3$H$,4|BT$5$l$F$$$^$9!#(B
+
 @vindex gnus-spam-process-destinations
 @emph{Ham} $B$^$?$O(B @emph{$BL$J,N`(B} $B%0%k!<%W$rH4$1$k$H$-$K!"$9$Y$F(B
 $B$N(B @strong{spam} $B5-;v$O!"(B@code{spam-process-destination} $B%0%k!<%W%Q%i%a!<(B
