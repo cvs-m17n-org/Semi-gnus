@@ -1,3 +1,24 @@
+1998-02-10  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/gnus-art.el (gnus-article-prepare): Don't bind coding
+	systems.
+
+	* lisp/gnus.el (gnus-version-number): Update to 6.0.4.
+	(gnus-version): Sync with qgnus-0.23.
+
+	* lisp/pop3.el, lisp/nnmh.el, lisp/nnheader.el, lisp/message.el,
+	lisp/gnus-sum.el, lisp/gnus-msg.el, lisp/gnus-draft.el,
+	lisp/gnus-art.el: Merge qgnus-0.23.
+
+1998-02-09  Shuhei Kobayashi  <shuhei-k@jaist.ac.jp>
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog, lisp/nntp.el,
+	lisp/nnheader.el, lisp/message.el, lisp/gnus.el,
+	lisp/gnus-xmas.el, lisp/gnus-sum.el, lisp/gnus-start.el,
+	lisp/gnus-msg.el, lisp/gnus-group.el, lisp/gnus-draft.el,
+	lisp/gnus-art.el, lisp/gnus-agent.el, lisp/ChangeLog: Importing
+	qgnus-0.23
+
 1998-02-04  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/message.el (message-references-generator): New variable.
