@@ -1,3 +1,7 @@
+2000-05-24  TSUCHIYA Masatoshi  <tsuchiya@pine.kuee.kyoto-u.ac.jp>
+
+	* lisp/nnshimbun.el: Add `Wired News' support.
+
 2000-05-24  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Complete
