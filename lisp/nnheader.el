@@ -1,5 +1,5 @@
 ;;; nnheader.el --- header access macros for Semi-gnus and its backends
-;; Copyright (C) 1987,88,89,90,93,94,95,96,97,98 Free Software Foundation, Inc.
+;; Copyright (C) 1987-1990,1993-1999 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;         Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -51,7 +51,7 @@
 
 (defvar nnheader-file-name-translation-alist nil
   "*Alist that says how to translate characters in file names.
-For instance, if \":\" is illegal as a file character in file names
+For instance, if \":\" is invalid as a file character in file names
 on your system, you could say something like:
 
 \(setq nnheader-file-name-translation-alist '((?: . ?_)))")
@@ -264,11 +264,12 @@ on your system, you could say something like:
 
 (defmacro nnheader-nov-read-integer ()
   '(prog1
-       (if (= (following-char) ?\t)
+       (if (eq (char-after) ?\t)
 	   0
 	 (let ((num (ignore-errors (read (current-buffer)))))
 	   (if (numberp num) num 0)))
-     (or (eobp) (forward-char 1))))
+     (unless (eobp)
+       (search-forward "\t" eol 'move))))
 
 ;; (defvar nnheader-none-counter 0)
 
@@ -284,7 +285,7 @@ on your system, you could say something like:
      (nnheader-nov-field)		; refs
      (nnheader-nov-read-integer)	; chars
      (nnheader-nov-read-integer)	; lines
-     (if (= (following-char) ?\n)
+     (if (eq (char-after) ?\n)
 	 nil
        (nnheader-nov-field))		; misc
      )))
@@ -376,11 +377,11 @@ the line could be found."
     (beginning-of-line)
     (eq num article)))
 
-(defun nnheader-retrieve-headers-from-directory (articles
-						 directory dependencies
-						 &optional
-						 fetch-old force-new large
-						 backend)
+(defun nnheader-retrieve-headers-from-directory* (articles
+						  directory dependencies
+						  &optional
+						  fetch-old force-new large
+						  backend)
   (with-temp-buffer
     (let* ((file nil)
 	   (number (length articles))
@@ -400,7 +401,7 @@ the line could be found."
 				   (setq article (pop articles)))
 				  directory)))
 		     (not (file-directory-p file)))
-	    ;;(erase-buffer)
+	    (erase-buffer)
 	    (nnheader-insert-head file)
 	    (save-restriction
 	      (std11-narrow-to-header)
@@ -505,9 +506,61 @@ the line could be found."
 	(when large
 	  (nnheader-message 5 "%s: Receiving headers...done" backend))
 
-        ;; (nnheader-fold-continuation-lines)
-	(cons 'header (nreverse headers))
-	))))
+	headers))))
+
+(defun nnheader-retrieve-headers-from-directory (articles
+						 directory dependencies
+						 &optional
+						 fetch-old force-new large
+						 backend)
+  (cons 'header
+	(nreverse (nnheader-retrieve-headers-from-directory*
+		   articles directory dependencies
+		   fetch-old force-new large backend))))
+
+(defun nnheader-get-newsgroup-headers-xover* (sequence
+					      &optional
+					      force-new dependencies
+					      group)
+  "Parse the news overview data in the server buffer, and return a
+list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
+  ;; Get the Xref when the users reads the articles since most/some
+  ;; NNTP servers do not include Xrefs when using XOVER.
+  ;; (setq gnus-article-internal-prepare-hook '(gnus-article-get-xrefs))
+  (let ((cur nntp-server-buffer)
+	number headers header)
+    (save-excursion
+      (set-buffer nntp-server-buffer)
+      ;; Allow the user to mangle the headers before parsing them.
+      (gnus-run-hooks 'gnus-parse-headers-hook)
+      (goto-char (point-min))
+      (while (not (eobp))
+	(condition-case ()
+	    (while (and sequence (not (eobp)))
+	      (setq number (read cur))
+	      (while (and sequence
+			  (< (car sequence) number))
+		(setq sequence (cdr sequence)))
+	      (and sequence
+		   (eq number (car sequence))
+		   (progn
+		     (setq sequence (cdr sequence))
+		     (setq header (inline
+				    (gnus-nov-parse-line
+				     number dependencies force-new))))
+		   (push header headers))
+	      (forward-line 1))
+	  (error
+	   (gnus-error 4 "Strange nov line (%d)"
+		       (count-lines (point-min) (point)))))
+	(forward-line 1))
+      ;; A common bug in inn is that if you have posted an article and
+      ;; then retrieves the active file, it will answer correctly --
+      ;; the new article is included.  However, a NOV entry for the
+      ;; article may not have been generated yet, so this may fail.
+      ;; We work around this problem by retrieving the last few
+      ;; headers using HEAD.
+      headers)))
 
 ;; Various cruft the backends and Gnus need to communicate.
 
@@ -581,7 +634,8 @@ the line could be found."
 (defun nnheader-insert-references (references message-id)
   "Insert a References header based on REFERENCES and MESSAGE-ID."
   (if (and (not references) (not message-id))
-      ()				; This is illegal, but not all articles have Message-IDs.
+      ;; This is invalid, but not all articles have Message-IDs.
+      ()
     (mail-position-on-field "References")
     (let ((begin (save-excursion (beginning-of-line) (point)))
 	  (fill-column 78)
