@@ -1,5 +1,9 @@
 2001-12-05  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
+	* lisp/gnus-namazu.el (gnus-namazu-need-path-normalization): New
+	option.
+	(gnus-namazu/normalize-results): Refined.
+
 	* lisp/gnus-namazu.el (gnus-namazu-index-directory): Abolished.
 	(gnus-namazu-index-directories): New option.
 	(gnus-namazu-coding-system): Changed the default value for Windows

@@ -133,6 +133,12 @@ options make any sense in this context."
   :type 'coding-system
   :group 'gnus-namazu)
 
+(defcustom gnus-namazu-need-path-normalization
+  (eq system-type 'windows-nt)
+  "*Non-nil means that outputs of namazu may contain a not normalized path."
+  :type 'boolean
+  :group 'gnus-namazu)
+
 
 (defmacro gnus-namazu/make-article (group number)
   `(cons ,group ,number))
@@ -175,14 +181,13 @@ options make any sense in this context."
 (defsubst gnus-namazu/normalize-results ()
   (goto-char (point-min))
   (while (not (eobp))
-    (cond
-     ((eq ?~ (char-after (point)))
-      (insert (expand-file-name (buffer-substring (gnus-point-at-bol)
-						  (gnus-point-at-eol))))
+    (when (if gnus-namazu-need-path-normalization
+	      (or (not (looking-at "/\\(.\\)|/"))
+		  (replace-match "\\1:/"))
+	    (eq ?~ (char-after (point))))
+      (insert (expand-file-name
+	       (buffer-substring (gnus-point-at-bol) (gnus-point-at-eol))))
       (delete-region (point) (gnus-point-at-eol)))
-     ((and (eq system-type 'windows-nt)
-	   (looking-at "/\\(.\\)|/"))
-      (replace-match "\\1:/")))
     (forward-line 1)))
 
 (defsubst gnus-namazu/call-namazu (query)
