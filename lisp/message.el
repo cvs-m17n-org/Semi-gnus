@@ -33,7 +33,7 @@
 
 (eval-when-compile
   (require 'cl)
-  (require 'std10)
+  (require 'smtp)
   )
 
 (require 'mailheader)
@@ -2242,8 +2242,8 @@ to find out how to use this."
       (message-narrow-to-headers)
       (setq recipients
 	    ;; XXX: Should be replaced by better one.
-	    (std10-deduce-address-list (current-buffer)
-				       (point-min) (point-max)))
+	    (smtp-deduce-address-list (current-buffer)
+				      (point-min) (point-max)))
       ;; Remove BCC lines.
       (message-remove-header "bcc"))
     ;; replace the header delimiter with a blank line.
@@ -2254,8 +2254,9 @@ to find out how to use this."
     (backward-char 1)
     (run-hooks 'message-send-mail-hook)
     (if recipients
-	(let ((result (std10-send-buffer user-mail-address recipients
-					 nil t)))
+	(let ((result (smtp-via-smtp user-mail-address
+				     recipients
+				     (current-buffer))))
 	  (unless (eq result t)
 	    (error "Sending failed; " result)))
       (error "Sending failed; no recipients"))))
