@@ -1,5 +1,12 @@
 1998-12-22  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/gnus-art.el (mime-preview-over-to-next-method-alist): Use
+	`gnus-summary-next-article' in `gnus-original-article-mode'.
+	(mime-preview-over-to-previous-method-alist): Use
+	`gnus-summary-prev-article' in `gnus-original-article-mode'.
+
+1998-12-22  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus-bbdb.el (toplevel): Define `bbdb-pop-up-elided-display'
 	for avoiding byte-compile warning.
 
