@@ -11980,7 +11980,7 @@ Quoted Readable 符号化を復号化します。
 もしくは次のようなもの:
 @lisp
 (setq nnmail-split-methods
-      '(("duplicates" "^Gnus-Warning:")
+      '(("duplicates" "^Gnus-Warning:.*duplicate")
         ;; 他の法則。
         [...]))
 @end lisp

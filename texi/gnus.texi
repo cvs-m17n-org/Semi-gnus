@@ -12659,7 +12659,7 @@ methods:
 Or something like:
 @lisp
 (setq nnmail-split-methods
-      '(("duplicates" "^Gnus-Warning:")
+      '(("duplicates" "^Gnus-Warning:.*duplicate")
         ;; Other rules.
         [...]))
 @end lisp
