@@ -1,3 +1,25 @@
+1998-02-15  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
+
+	* lisp/nnmail.el, lisp/nnmh.el: Use original.
+
+	* lisp/gnus.el, lisp/gnus-draft.el, lisp/gnus-sum.el,
+ 	lisp/message.el, lisp/gnus-art.el: Sync up with qgnus-0.25.
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog, lisp/nntp.el,
+ 	lisp/nnmh.el, lisp/nnmail.el, lisp/nnfolder.el, lisp/nndoc.el,
+ 	lisp/message.el, lisp/gnus.el, lisp/gnus-sum.el,
+ 	lisp/gnus-draft.el, lisp/gnus-cus.el, lisp/gnus-cite.el,
+ 	lisp/gnus-async.el, lisp/gnus-art.el, lisp/ChangeLog: Importing
+ 	Quassia Gnus v0.25.
+
+1998-02-11  Shuhei Kobayashi  <shuhei-k@jaist.ac.jp>
+
+	* texi/message.texi, texi/gnus.texi, texi/ChangeLog,
+ 	lisp/message.el, lisp/gnus.el, lisp/gnus-uu.el,
+ 	lisp/gnus-topic.el, lisp/gnus-sum.el, lisp/gnus-start.el,
+ 	lisp/gnus-score.el, lisp/gnus-group.el, lisp/gnus-art.el,
+ 	lisp/gnus-agent.el, lisp/ChangeLog: Importing qgnus-0.24
+
 1998-02-10  MORIOKA Tomohiko  <morioka@jaist.ac.jp>
 
 	* lisp/gnus-art.el (gnus-article-prepare): Don't bind coding
