@@ -2,8 +2,9 @@
 ;;;
 ;;; Copyright (C) 1998 Tatsuya Ichikawa
 ;;; Author: Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
+;;; Author: Keiichi Suzuki <keiichi@nanap.org>
 ;;;
-;;; This file is part of Semi-gnus.
+;;; This file is part of Nana-gnus.
 ;;;
 ;;; GNU Emacs is free software; you can redistribute it and/or modify
 ;;; it under the terms of the GNU General Public License as published by
@@ -23,311 +24,190 @@
 ;;;; Commentary:
 ;;; How to use.
 ;;;
-;;;      M-x load[RET]gnus-ofsetup
-;;;      M-x gnus-setup-for-offline
+;;;      M-x load-library[RET]gnus-ofsetup[RET]
+;;;      M-x gnus-setup-for-offline[RET]
 ;;;
 
 ;;; Code:
 
-(defvar gnus-offline-setting-file "~/.gnus-offline.el")
-(defvar gnus-offline-use-miee nil)
-(defvar gnus-offline-news-fetch-method nil)
-(defvar gnus-offline-mail-fetch-method nil)
-(defvar gnus-offline-hangup-program nil)
-(defvar gnus-offline-dialup-program nil)
-(defvar pop3-fma-spool-file-alist nil)
-(defvar pop3-fma-movemail-type nil)
-(defvar pop3-fma-movemail-arguments nil)
-(defvar use-miee nil)
-(defvar address nil)
-(defvar mail-source nil)
-(defvar options nil)
+(eval-when-compile
+  (require 'poe))
 
-;;; To silence byte compiler
-(and
- (fboundp 'eval-when-compile)
- (eval-when-compile
-   (save-excursion
-     (beginning-of-defun)
-     (eval-region (point-min) (point)))
-   (let (case-fold-search)
-     (mapcar
-      (function
-       (lambda (symbol)
-	 (unless (boundp symbol)
-	   (make-local-variable symbol)
-	   (eval (list 'setq symbol nil)))))
-      '(:group
-	:prefix :type
-	sendmail-to-spool-directory
-	news-spool-request-post-directory
-	nnspool-version
-	nnagent-version
-	msspool-news-server
-	msspool-news-service
-	gnspool-get-news
-	mail-spool-send
-	news-spool-post
-	gnus-agent-handle-level
-	))
-     (make-local-variable 'byte-compile-warnings)
-     (setq byte-compile-warnings nil))))
+(defvar gnus-offline-setting-file "~/.nana-gnus-offline.el")
+
+(defun gnus-ofsetup-read-from-minibuffer (format &rest args)
+  (let ((server
+	 (read-from-minibuffer
+	  (apply 'format
+		 (concat format
+			 " (if you are finished, input null string.) : ")
+		 args))))
+    (unless (string-match "^[ \t]*$" server)
+      server)))
+
+(defun gnus-ofsetup-completing-read-symbol (msg &rest syms)
+  (intern
+   (completing-read (concat msg " (TAB to completion): ")
+		    (mapcar
+		     (lambda (sym)
+		       (list (symbol-name sym)))
+		     syms)
+		    nil t nil)))
+
+(defun gnus-ofsetup-read-pop-account (server)
+  (let ((account (gnus-ofsetup-read-from-minibuffer
+		  "Mail account at \"%s\"" server)))
+    (when account
+      (let ((auth (gnus-ofsetup-completing-read-symbol 
+		   "Authentification Method"
+		   'pass 'apop)))
+	(list (concat server "@" account) :auth-scheme auth)))))
 
 (defun gnus-setup-for-offline ()
   "*Set up Gnus for offline environment."
   (interactive)
-  
-  (if (not (file-exists-p gnus-offline-setting-file))
-      (progn
-	(let ((news-method
-	       (completing-read
-		"Method for offline News reading (TAB to completion): "
-		'(("gnus-agent" 1) ("nnspool" 2))
-		nil t nil))
-	      (mail-method 'nnmail)
-	      (program
-	       (read-file-name "Dialup/Hangup program(type nil or null string you do not use): "))
-	      (mta-type
-	       (completing-read
-		"Select MTA type for sending mail (TAB to completion): "
-		'(("smtp" 1) ("sendmail" 2))
-		nil t nil))
-	      (num-of-address
-	       (read-from-minibuffer "How many e-mail address do you have: "))
-	      )
-	  (if (string-equal news-method "nnspool")
-	      (setq use-miee t)
-	    (setq use-miee (y-or-n-p "Use MIEE post/send message ")))
-	  ;;
-	  ;; Set variables.
-	  (if (string-equal news-method "gnus-agent")
-	      (setq gnus-offline-news-fetch-method 'nnagent)
-	    (setq gnus-offline-news-fetch-method 'nnspool))
-	  ;;
-	  (setq gnus-offline-mail-fetch-method mail-method)
-	  (setq gnus-offline-use-miee use-miee)
-	  
-	  ;; Set programs.
-	  (if (or (string-equal program "nil")
-		  (string-equal program ""))
-	      (progn
-		(setq gnus-offline-hangup-program nil)
-		(setq gnus-offline-dialup-program nil))
-	    (let ((options
-		   (read-from-minibuffer "Dialup program options: ")))
-	      (setq gnus-offline-dialup-program-arguments
-		    (split-string options "[\t ]+")))
-	    (let ((options
-		   (read-from-minibuffer "Hangup program options: ")))
-	      (setq gnus-offline-hangup-program-arguments
-		    (split-string options "[\t ]+")))
-	    (setq gnus-offline-hangup-program program)
-	    (setq gnus-offline-dialup-program program))
-	    
-	    ;; Set spool directory for outgoing messages.
-	  (if use-miee
-	      (progn
-		;; Setting for MIEE with nnspool.
-		(let ((news-spool
-		       (read-from-minibuffer
-			"News spool directory for sending: "
-			"/usr/spool/news.out"))
-		      (mail-spool
-		       (read-from-minibuffer
-			"Mail spool directory for sending: "
-			"/usr/spool/mail.out")))
-		  (setq gnus-offline-mail-spool-directory mail-spool)
-		  (setq gnus-offline-news-spool-directory news-spool)
-		  (setq gnus-offline-drafts-queue-type 'miee)
-		  
-		  ;; Load MIEE.
-		  (load "miee")
-		  ;; Set news post function for MIEE.
-		  (setq message-send-news-function 'gnspool-request-post)
-		  ;; Spool directory setting - MIEE.
-		  (if (not (file-exists-p gnus-offline-mail-spool-directory))
-		      (make-directory gnus-offline-mail-spool-directory t))
-		  (setq sendmail-to-spool-directory
-			gnus-offline-mail-spool-directory)
-		  (if (not (file-exists-p gnus-offline-news-spool-directory))
-		      (make-directory gnus-offline-news-spool-directory t))
-		  (setq news-spool-request-post-directory
-			gnus-offline-news-spool-directory)))
-	    
-	    ;; Set drafts type gnus-agent.
-	    (setq gnus-offline-drafts-queue-type 'agent))
-	  
-	  ;; Setting for gnus-agent.
-	  (if (eq gnus-offline-news-fetch-method 'nnagent)
-	      (let ((agent-directory
-		     (read-from-minibuffer "Agent directory: " "~/News/agent")))
-		(setq gnus-agent-directory agent-directory)))
-	    
-	  ;; Determin MTA type.
-	  (if (string-equal mta-type "smtp")
-	      (setq gnus-offline-MTA-type 'smtp)
-	    (setq gnus-offline-MTA-type 'sendmail)
-	    )
-	  ;;
-	  ;; Set E-Mail Address and pop3 movemail type.
-	  (setq i (string-to-int num-of-address))
-	  (setq address nil)
-	  (if (not (locate-library "mail-source"))
-	      (progn
-		(while (> i 0)
-		  (setq address
-			(append address
-				(list
-				 (list
-				  (concat "po:"
-					  (read-from-minibuffer
-					   "Email address (user@mailhost): "))
-				  (completing-read
-				   "Authentification Method (TAB to completion): "
-				   '(("pass" 1) ("apop" 2)) nil t nil)))))
-		  (setq i (- i 1)))
-		;; Replace "hoge" -> 'hoge
-		(mapcar
-		 (lambda (x)
-		   (if (string-equal (nth 1 x) "pass")
-		       (setcar (cdr x) 'pass)
-		     (setcar (cdr x) 'apop)))
-		 address)
-		(setq pop3-fma-spool-file-alist address)
-		;; Set movemail type.
-		(let ((movemail-type
-		       (completing-read
-			"Select movemail type for retreave mail (TAB to completion): "
-			'(("exe" 1) ("lisp" 2))
-			nil t nil))
-		      )
-		  (if (string-equal movemail-type "exe")
-		      (let ((options
-			     (read-from-minibuffer "movemail options: ")))
-			(setq pop3-fma-movemail-arguments (split-string options "[\t ]+"))))
-		  (if (string-equal movemail-type "exe")
-		      (setq pop3-fma-movemail-type 'exe)
-		    (setq pop3-fma-movemail-type 'lisp))))
-	    ;;
-	    ;; Use mail-source.el
-	    (setq mail-source nil)
-	    (while (> i 0)
-	      (let ((user (read-from-minibuffer "Mail Account name : "))
-		    (server (read-from-minibuffer "Mail server : "))
-		    (auth (completing-read
-			  "Authentification Method (TAB to completion): "
-			  '(("pop" 1) ("apop" 2)) nil t nil))
-		    (islisp (y-or-n-p "Do you use pop3.el to fetch mail? ")))
-		(if (not islisp)
-		    (let ((prog (read-file-name "movemail program name: "
-						exec-directory "movemail"))
-			  (args (read-from-minibuffer "movemail options: " "-pf")))
-		      (setq mail-source
-			    (append mail-source
-				    (list
-				     (list
-				      'pop
-				      :user user
-				      :server server
-				      :program
-				      (format "%s %s %s %s %s"
-					      prog
-					      args
-					      "po:%u"
-					      "%t"
-					      "%p")
-					      :authentication auth)))))
-		  (setq mail-source
-			(append mail-source
-				(list
-				 (list
-				  'pop
-				  :user user
-				  :server server
-				  :authentication auth))))))
-	      (setq i (- i 1)))
-	    ;; Replace "hoge" -> 'hoge
-	    (mapcar
-	     (lambda (x)
-	       (if (string-equal (car (last x)) "pop")
-		   (setcar (last x) (quote 'pop))
-		 (setcar (last x) (quote 'apop))))
-	     mail-source)
-	    (setq gnus-offline-mail-source mail-source)))
+  (unless (file-exists-p gnus-offline-setting-file)
+    (let (movemail-option
+	  news-fetch-method mail-fetch-method agent-directory drafts-queue-type
+	  news-spool-directory mail-spool-directory send-news-function
+	  sendmail-to-spool-directory news-spool-request-post-directory
+	  MTA-type dialup-program dialup-program-arguments hangup-program
+	  hangup-program-arguments movemail-program
+	  movemail-program-apop-option spool-file save-passwd)
+      (setq news-fetch-method
+	    (gnus-ofsetup-completing-read-symbol
+	     "Method for offline News reading"
+	     'nnagent 'nnspool))
+      (when (eq news-fetch-method 'nnagent)
+	(setq agent-directory
+	      (read-from-minibuffer "Agent directory: " "~/News/agent")))
+      (setq drafts-queue-type
+	    (cond
+	     ((or (eq news-fetch-method 'nnspool)
+		  (y-or-n-p "Use MIEE post/send message "))
+	      ;; Setting for MIEE with nnspool.
+	      (setq news-spool-directory
+		    (read-from-minibuffer
+		     "News spool directory for sending: "
+		     "/usr/spool/news.out"))
+	      (setq mail-spool-directory
+		    (read-from-minibuffer
+		     "Mail spool directory for sending: "
+		     "/usr/spool/mail.out"))
+	      ;; Set news post function for MIEE.
+	      (setq send-news-function 'gnspool-request-post)
+	      ;; Spool directory setting - MIEE.
+	      (unless (file-exists-p mail-spool-directory)
+		(make-directory mail-spool-directory t))
+	      (setq sendmail-to-spool-directory mail-spool-directory)
+	      (unless (file-exists-p news-spool-directory)
+		(make-directory news-spool-directory t))
+	      (setq news-spool-request-post-directory news-spool-directory)
+	      'miee)
+	     (t
+	      'agent)))
+      (setq mail-fetch-method 'nnmail)
+      (setq MTA-type (gnus-ofsetup-completing-read-symbol
+		      "Select MTA type for sending mail"
+		      'smtp 'sendmail))
+      (setq dialup-program
+	    (read-file-name
+	     "Dialup program (if you do not use it, input null string): "
+	     nil nil t))
+      (if (string-match "^[ \t]*$" dialup-program)
+	  (setq dialup-program nil)
+	(setq dialup-program-arguments
+	      (split-string
+	       (read-from-minibuffer "Dialup program options: ")
+	       "[\t ]+")))
+      (setq hangup-program
+	    (read-file-name
+	     "Hangup program (if you do not use it, input null string): "
+	     (and dialup-program
+		  (file-name-directory dialup-program))
+	     dialup-program
+	     t))
+      (if (string-match "^[ \t]*$" hangup-program)
+	  (setq hangup-program nil)
+	(setq hangup-program-arguments
+	      (split-string
+	       (read-from-minibuffer "Hangup program options: ")
+	       "[\t ]+")))
 
-	(setq save-passwd
-	      (y-or-n-p "Do you save password information to newsrc file? "))
+      ;; Set `movemail' type.
+      (setq movemail-program
+	    (if (y-or-n-p "Do you use pop3.el to fetch mail? ")
+		'nnmail-pop3-movemail
+	      (read-file-name "movemail program name: "
+			      exec-directory "movemail")))
+      (when (stringp movemail-program)
+	(setq movemail-option (read-from-minibuffer "movemail options: " "-f"))
+	(setq movemail-program-apop-option
+	      (read-from-minibuffer "movemail options for APOP: ")))
+    
+      ;; Set E-Mail Addresses.
+      (setq spool-file nil)
+      (let (server spool)
+	(while (setq server (gnus-ofsetup-read-from-minibuffer "POP server"))
+	  (while (setq spool (gnus-ofsetup-read-pop-account server))
+	    (setq spool-file (cons spool spool-file)))))
+
+      (setq save-passwd
+	    (y-or-n-p "Do you save password information to newsrc file? "))
 	
-	;; Write to setting file.
-	(setq tmp-buffer (get-buffer-create "* Setting"))
-	(set-buffer "* Setting")
+      ;; Write to setting file.
+      (save-excursion
+	(set-buffer (get-buffer-create "* Setting"))
 	(erase-buffer)
 	(insert ";;\n");
 	(insert ";; This file is created by gnus-ofsetup.el\n")
-	(insert ";; Creation date : ")
-	(insert (current-time-string))
-	(insert "\n")
+	(insert ";; Creation date : " (current-time-string) "\n")
 	(insert ";;\n")
 
 	;; write Basic setting
-	(insert "(setq gnus-offline-news-fetch-method '")
-	(insert (prin1-to-string gnus-offline-news-fetch-method))
-	(insert ")\n")
-	(insert "(setq gnus-offline-mail-fetch-method '")
-	(insert (prin1-to-string gnus-offline-mail-fetch-method))
-	(insert ")\n")
-	(insert "(setq gnus-offline-use-miee ")
-	(insert (prin1-to-string gnus-offline-use-miee))
-	(insert ")\n")
-	(insert "(setq gnus-offline-dialup-program ")
-	(insert (prin1-to-string gnus-offline-dialup-program))
-	(insert ")\n")
+	(insert "(setq gnus-offline-news-fetch-method '"
+		(prin1-to-string news-fetch-method) ")\n")
+	(insert "(setq gnus-offline-mail-fetch-method '"
+		(prin1-to-string mail-fetch-method) ")\n")
 
 	;; write dialup/hangup program and options.
-	(if (stringp gnus-offline-dialup-program)
-	    (progn
-	      (insert "(setq gnus-offline-dialup-program-arguments '")
-	      (insert (prin1-to-string gnus-offline-dialup-program-arguments))
-	      (insert ")\n")))
-	(insert "(setq gnus-offline-hangup-program ")
-	(insert (prin1-to-string gnus-offline-hangup-program))
-	(insert ")\n")
-	(if (stringp gnus-offline-hangup-program)
-	    (progn
-	      (insert "(setq gnus-offline-hangup-program-arguments '")
-	      (insert (prin1-to-string gnus-offline-hangup-program-arguments))
-	      (insert ")\n")))
+	(insert "(setq gnus-offline-dialup-program "
+		(prin1-to-string dialup-program) ")\n")
+	(when (stringp dialup-program)
+	  (insert "(setq gnus-offline-dialup-program-arguments '"
+		  (prin1-to-string dialup-program-arguments) ")\n"))
+	(insert "(setq gnus-offline-hangup-program "
+		(prin1-to-string hangup-program) ")\n")
+	(when (stringp hangup-program)
+	  (insert "(setq gnus-offline-hangup-program-arguments '"
+		  (prin1-to-string hangup-program-arguments)
+		  ")\n"))
 
 	;; write setting about MIEE.
-	(if gnus-offline-use-miee
-	    (progn
-	      (insert "(setq gnus-offline-mail-spool-directory ")
-	      (insert (prin1-to-string gnus-offline-mail-spool-directory))
-	      (insert ")\n")
-	      (insert "(setq gnus-offline-news-spool-directory ")
-	      (insert (prin1-to-string gnus-offline-news-spool-directory))
-	      (insert ")\n")
-	      (insert "(setq sendmail-to-spool-directory gnus-offline-mail-spool-directory)\n")
-	      (insert "(setq news-spool-request-post-directory gnus-offline-news-spool-directory)\n")
-	      (insert "(load \"miee\")\n")
-	      (insert "(setq message-send-news-function '")
-	      (insert (prin1-to-string message-send-news-function))
-	      (insert ")\n")))
+	(when (eq drafts-queue-type 'miee)
+	  (insert "(setq gnus-offline-mail-spool-directory "
+		  (prin1-to-string mail-spool-directory) ")\n")
+	  (insert "(setq gnus-offline-news-spool-directory "
+		  (prin1-to-string news-spool-directory) ")\n")
+	  (insert "(setq sendmail-to-spool-directory\n"
+		  "gnus-offline-mail-spool-directory)\n")
+	  (insert "(setq news-spool-request-post-directory\n"
+		  "gnus-offline-news-spool-directory)\n")
+	  (insert "(load \"miee\")\n")
+	  (insert "(setq message-send-news-function '"
+		  (prin1-to-string send-news-function) ")\n"))
 
 	;; write setting about nnspool and gnus-agent.
-	(if (equal gnus-offline-news-fetch-method 'nnspool)
+	(if (equal news-fetch-method 'nnspool)
 	    (insert "(message-offline-state)\n")
-	  (insert "(setq gnus-agent-directory ")
-	  (insert (prin1-to-string gnus-agent-directory))
-	  (insert ")\n"))
+	  (insert "(setq gnus-agent-directory "
+		  (prin1-to-string agent-directory) ")\n"))
 
 	;; write setting about queue type -- MIEE or nnagent.
-	(insert "(setq gnus-offline-drafts-queue-type '")
-	(insert (prin1-to-string gnus-offline-drafts-queue-type))
-	(insert ")\n")
-	(insert "(setq gnus-offline-MTA-type '")
-	(insert (prin1-to-string gnus-offline-MTA-type))
-	(insert ")\n")
+	(insert "(setq gnus-offline-drafts-queue-type '"
+		(prin1-to-string drafts-queue-type) ")\n")
+	(insert "(setq gnus-offline-MTA-type '"
+		(prin1-to-string MTA-type) ")\n")
 
 	;; Offline setting for gnus-nntp-*
 	(insert "(setq gnus-nntp-service nil)\n")
@@ -338,45 +218,29 @@
 	(insert "(add-hook 'gnus-group-mode-hook 'gnus-offline-error-check t)\n")
 	(insert "(add-hook 'gnus-after-getting-new-news-hook 'gnus-offline-after-get-new-news)\n")
 	(insert "(add-hook 'gnus-after-getting-news-hook 'gnus-offline-after-get-new-news)\n")
-	(if (eq gnus-offline-news-fetch-method 'nnspool)
-	    (progn
-	      (insert "(add-hook 'after-getting-news-hook 'gnus-offline-nnspool-hangup-line)\n")
-	      (insert "(add-hook 'gnus-before-startup-hook (lambda () (setq nnmail-spool-file nil)))\n")))
+	(when (eq news-fetch-method 'nnspool)
+	  (insert "(add-hook 'gnus-after-getting-news-hook 'gnus-offline-nnspool-hangup-line)\n")
+	  (insert "(add-hook 'gnus-before-startup-hook (lambda () (setq nnmail-spool-file nil)))\n"))
 	(insert "(add-hook 'message-send-hook 'gnus-offline-message-add-header)\n")
 	(insert "(autoload 'gnus-offline-setup \"gnus-offline\")\n")
 	(insert "(add-hook 'gnus-load-hook 'gnus-offline-setup)\n")
 
-	(if (not (locate-library "mail-source"))
-	    (progn
-	      ;; Write setting about pop3-fma.
-	      (insert "(require 'pop3-fma)\n")
-	      (insert "(add-hook 'message-send-hook 'pop3-fma-message-add-header)\n")
-	      (insert "(setq pop3-fma-spool-file-alist '")
-	      (insert (prin1-to-string pop3-fma-spool-file-alist))
-	      (insert ")\n")
-	      (insert "(setq pop3-fma-movemail-type '")
-	      (insert (prin1-to-string pop3-fma-movemail-type))
-	      (insert ")\n")
-	      (if save-passwd
-		  (insert "(add-hook 'gnus-setup-news-hook \n    (lambda ()\n        (setq pop3-fma-save-password-information t)\n        (add-to-list 'gnus-variable-list 'pop3-fma-password)))\n"))
-	      (if (eq pop3-fma-movemail-type 'exe)
-		  (progn
-		    (insert "(setq pop3-fma-movemail-arguments '")
-		    (insert (prin1-to-string pop3-fma-movemail-arguments))
-		    (insert ")\n"))))
-	  ;; Write stting about mail-source.el
-	  (insert "(setq gnus-offline-mail-source '")
-	  (insert (prin1-to-string gnus-offline-mail-source))
-	  (insert ")\n")
-	  (insert "(setq nnmail-spool-file gnus-offline-mail-source)\n")
-	  (insert "(require 'read-passwd)\n")
-	  (insert "(setq mail-source-read-passwd 'read-pw-read-passwd)\n")
-	  (insert "(add-hook 'gnus-setup-news-hook 'read-pw-set-mail-source-passwd-cache)\n")
-	  (if save-passwd
-	      (insert "(add-hook 'gnus-setup-news-hook \n    (lambda ()\n        (add-to-list 'gnus-variable-list 'mail-source-password-cache)))\n"))
-	  )
-	(write-region (point-min) (point-max) gnus-offline-setting-file)
-	(kill-buffer "* Setting"))
-    )
+	;; Write stting about nnmail.el
+	(insert "(setq nnmail-movemail-program '"
+		(prin1-to-string movemail-program) ")\n")
+	(when (stringp movemail-program)
+	  (insert "(setenv \"MOVEMAIL\""
+		  (prin1-to-string movemail-option) ")\n")
+	  (insert "(setq nnmail-movemail-program-apop-option '"
+		  (prin1-to-string movemail-program-apop-option) ")\n"))
+	(insert "(setq gnus-offline-mail-source '"
+		(prin1-to-string spool-file) ")\n")
+	(when save-passwd
+	  (insert "(add-hook 'gnus-setup-news-hook 
+    (lambda ()
+        (add-to-list 'gnus-variable-list 'nnmail-internal-password-cache)))\n"))
+	(write-region (point-min) (point-max) gnus-offline-setting-file))
+      (kill-buffer "* Setting")))
   (load gnus-offline-setting-file))
+
 ;; gnus-ofsetup.el Ends here.
