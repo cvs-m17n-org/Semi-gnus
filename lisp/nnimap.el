@@ -212,7 +212,7 @@ variable is the symbol `default' the default behaviour is
 used (which currently is nil, unless you use a statistical
 spam.el test); if this variable is another non-nil value bodies
 will be downloaded."
-  :version "21.4"
+  :version "22.1"
   :group 'nnimap
   :type '(choice (const :tag "Let system decide" deault)
 		 boolean))
@@ -224,7 +224,7 @@ will be downloaded."
 This means that errors caught by nnimap when closing the mailbox will
 not prevent Gnus from updating the group status, which may be harmful.
 However, it increases speed."
-  :version "21.4"
+  :version "22.1"
   :type 'boolean
   :group 'nnimap)
 
@@ -233,7 +233,7 @@ However, it increases speed."
 This increases the speed of closing mailboxes (quiting group) but may
 decrease the speed of selecting another mailbox later.  Re-selecting
 the same mailbox will be faster though."
-  :version "21.4"
+  :version "22.1"
   :type 'boolean
   :group 'nnimap)
 
@@ -246,7 +246,7 @@ more carefully for new mail.
 
 In summary, the default is O((1-p)*k+p*n) and changing it to nil makes
 it O(n).  If p is small, then the default is probably faster."
-  :version "21.4"
+  :version "22.1"
   :type 'boolean
   :group 'nnimap)
 
@@ -769,10 +769,10 @@ If EXAMINE is non-nil the group is selected read-only."
       (imap-close nnimap-server-buffer)
       (nnheader-report 'nnimap "Server %s is not IMAP4 compliant" server))
     (let* ((list (netrc-parse nnimap-authinfo-file))
- 	   (port (if nnimap-server-port
- 		     (int-to-string nnimap-server-port)
- 		   "imap"))
-	   (user (netrc-machine-user-or-password 
+	   (port (if nnimap-server-port
+		     (int-to-string nnimap-server-port)
+		   "imap"))
+	   (user (netrc-machine-user-or-password
 		  "login"
 		  list
 		  (list server
@@ -780,7 +780,7 @@ If EXAMINE is non-nil the group is selected read-only."
 			    nnimap-address))
 		  (list port)
 		  (list "imap" "imaps")))
-	   (passwd (netrc-machine-user-or-password 
+	   (passwd (netrc-machine-user-or-password
 		    "password"
 		    list
 		    (list server
@@ -791,7 +791,7 @@ If EXAMINE is non-nil the group is selected read-only."
       (if (imap-authenticate user passwd nnimap-server-buffer)
 	  (prog2
 	      (setq nnimap-server-buffer-alist
-		    (nnimap-remove-server-from-buffer-alist 
+		    (nnimap-remove-server-from-buffer-alist
 		     server
 		     nnimap-server-buffer-alist))
 	      (push (list server nnimap-server-buffer)
@@ -850,7 +850,7 @@ Return nil if the server couldn't be closed for some reason."
       (setq nnimap-server-buffer nil
 	    nnimap-current-server nil
 	    nnimap-server-buffer-alist
-	    (nnimap-remove-server-from-buffer-alist 
+	    (nnimap-remove-server-from-buffer-alist
 	     server
 	     nnimap-server-buffer-alist)))
     (nnoo-close-server 'nnimap server)))
@@ -1366,7 +1366,7 @@ function is generally only called when Gnus is shutting down."
 			     (let (msgid)
 			       (and (setq msgid
 					  (nnmail-fetch-field "message-id"))
-				    (nnmail-cache-insert msgid 
+				    (nnmail-cache-insert msgid
 							 to-group
 							 (nnmail-fetch-field "subject"))))))
 			 ;; Add the group-art list to the history list.

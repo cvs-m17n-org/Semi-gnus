@@ -51,7 +51,7 @@ input and write the converted data to its standard output."
 (defcustom binhex-use-external
   (exec-installed-p binhex-decoder-program)
   "*Use external binhex program."
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-extract
   :type 'boolean)
 

@@ -60,7 +60,7 @@
   "Whether to create backup files.
 This variable takes the same values as the `version-control'
 variable."
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-start
   :type '(choice (const :tag "Never" never)
 		 (const :tag "If existing" nil)
@@ -71,7 +71,7 @@ variable."
 the buffer or write directly to the file.  The buffer is faster
 because all of the contents are written at once.  The direct write
 uses considerably less memory."
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-start
   :type '(choice (const :tag "Write via buffer" t)
                  (const :tag "Write directly to file" nil)))
@@ -305,7 +305,7 @@ claim them."
 (defcustom gnus-subscribe-newsgroup-hooks nil
   "*Hooks run after you subscribe to a new group.
 The hooks will be called with new group's name as argument."
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-group-new
   :type 'hook)
 
@@ -412,7 +412,7 @@ This hook is called as the first thing when Gnus is started."
 
 (defcustom gnus-get-top-new-news-hook nil
   "A hook run just before Gnus checks for new news globally."
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-group-new
   :type 'hook)
 
@@ -1943,7 +1943,7 @@ If SCAN, request a scan of that group as well."
                             (setcdr range (1- article))
                             (setq modified t)
                             ranges))))))))
-                  
+
     (when modified
       (when (eq modified 'remove-null)
         (setq r (delq nil r)))
@@ -2337,7 +2337,7 @@ If FORCE is non-nil, the .newsrc file is read."
                                   t)))))
 
               (funcall func convert-to)))
-          (gnus-dribble-enter 
+          (gnus-dribble-enter
            (format ";Converted gnus from version '%s' to '%s'."
                    gnus-newsrc-file-version gnus-version)))))))
 

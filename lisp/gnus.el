@@ -987,7 +987,7 @@ For example:
      (\"mail\\\\.me\" (gnus-use-scoring  t))
      (\"list\\\\..*\" (total-expire . t)
 		  (broken-reply-to . t)))"
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-group-various
   :type '(repeat (cons regexp
 		       (repeat sexp))))
@@ -1347,7 +1347,7 @@ If the default site is too slow, try one of these:
 			(gnus-replace-in-string name "\\." "-") "-charter.html")))
   "*An alist of (HIERARCHY . FORM) pairs used to construct the URL of a charter.
 When FORM is evaluated `name' is bound to the name of the group."
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-group-various
   :type '(repeat (cons (string :tag "Hierarchy") (sexp :tag "Form"))))
 
@@ -1355,7 +1355,7 @@ When FORM is evaluated `name' is bound to the name of the group."
   "*Non-nil means that control messages are displayed using `browse-url'.
 Otherwise they are fetched with ange-ftp and displayed in an ephemeral
 group."
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-group-various
   :type 'boolean)
 
@@ -1810,7 +1810,7 @@ total number of articles in the group.")
 		  (list
 		   (regexp :tag "Group Name Regular Expression")
 		   (boolean :tag "Ignored")))
- 
+
  :parameter-type '(boolean :tag "Group Ignored by the Registry")
  :parameter-document
  "Whether the Gnus Registry should ignore this group.")
@@ -1819,7 +1819,7 @@ total number of articles in the group.")
 (defcustom gnus-install-group-spam-parameters t
   "*Disable the group parameters for spam detection.
 Enable if `G c' in XEmacs is giving you trouble, and make sure to submit a bug report."
-  :version "21.4"
+  :version "22.1"
   :type 'boolean
   :group 'gnus-start)
 
@@ -1956,8 +1956,8 @@ Only applicable to non-spam (unclassified and ham) groups.")
   (gnus-define-group-parameter
    spam-process
    :type list
-   :parameter-type 
-   '(choice 
+   :parameter-type
+   '(choice
      :tag "Spam Summary Exit Processor"
      :value nil
      (list :tag "Spam Summary Exit Processor Choices"
@@ -2006,11 +2006,11 @@ a backend on summary exit.  If non-nil, this should be a list of group
 name regexps that should match all groups in which to do automatic
 spam processing, associated with the appropriate processor."
    :variable-group spam
-   :variable-type 
+   :variable-type
    '(repeat :tag "Spam/Ham Processors"
 	    (list :tag "Spam Summary Exit Processor Choices"
 		  (regexp :tag "Group Regexp")
-		  (set 
+		  (set
 		   :tag "Spam/Ham Summary Exit Processor"
 		   (const :tag "Spam: Bogofilter"    (spam spam-use-bogofilter))
 		   (const :tag "Spam: Blacklist"     (spam spam-use-blacklist))
@@ -2053,7 +2053,7 @@ spam processing, associated with the appropriate processor."
   (gnus-define-group-parameter
    spam-autodetect
    :type list
-   :parameter-type 
+   :parameter-type
    '(boolean :tag "Spam autodetection")
    :function-document
    "Should spam be autodetected (with spam-split) in this group?"
@@ -2064,7 +2064,7 @@ spam processing, associated with the appropriate processor."
    Only unseen articles will be examined, unless
    spam-autodetect-recheck-messages is set."
    :variable-group spam
-   :variable-type 
+   :variable-type
    '(repeat
      :tag "Autodetection setting"
      (list
@@ -2078,7 +2078,7 @@ spam-autodetect-recheck-messages is set.")
   (gnus-define-group-parameter
    spam-autodetect-methods
    :type list
-   :parameter-type 
+   :parameter-type
    '(choice :tag "Spam autodetection-specific methods"
      (const none)
      (const default)
@@ -2111,7 +2111,7 @@ Requires the spam-autodetect parameter.  Only unseen articles
 will be examined, unless spam-autodetect-recheck-messages is
 set."
    :variable-group spam
-   :variable-type 
+   :variable-type
    '(repeat
      :tag "Autodetection methods"
      (list
@@ -2139,7 +2139,7 @@ set."
 	(variable-item spam-use-bogofilter-headers)
 	(variable-item spam-use-bogofilter)))))
      :parameter-document
-   "Spam autodetection methods.  
+   "Spam autodetection methods.
 Requires the spam-autodetect parameter.  Only unseen articles
 will be examined, unless spam-autodetect-recheck-messages is
 set.")
@@ -2147,7 +2147,7 @@ set.")
   (gnus-define-group-parameter
    spam-process-destination
    :type list
-   :parameter-type 
+   :parameter-type
    '(choice :tag "Destination for spam-processed articles at summary exit"
 	    (string :tag "Move to a group")
 	    (repeat :tag "Move to multiple groups"
@@ -2165,7 +2165,7 @@ to do spam-processed article moving, associated with the destination
 group or nil for explicit expiration.  This only makes sense for
 mail groups."
    :variable-group spam
-   :variable-type 
+   :variable-type
    '(repeat
      :tag "Spam-processed articles destination"
      (list
@@ -2178,11 +2178,11 @@ mail groups."
        (const :tag "Expire" nil))))
    :parameter-document
    "Where spam-processed articles will go at summary exit.")
-  
+
   (gnus-define-group-parameter
    ham-process-destination
    :type list
-   :parameter-type 
+   :parameter-type
    '(choice
      :tag "Destination for ham articles at summary exit from a spam group"
      (string :tag "Move to a group")
@@ -2202,7 +2202,7 @@ to do ham article moving, associated with the destination
 group or nil for explicit ignoring.  This only makes sense for
 mail groups, and only works in spam groups."
    :variable-group spam
-   :variable-type 
+   :variable-type
    '(repeat
      :tag "Ham articles destination"
      (list
@@ -2386,7 +2386,7 @@ face."
 When set, Gnus will prefer using the locally stored content rather
 than re-fetching it from the server.  You also need to enable
 `gnus-agent' for this to have any affect."
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-agent
   :type 'boolean)
 
@@ -2405,7 +2405,7 @@ covered by that variable."
 You may customize gnus-agent to disable its use.  However, some
 back ends have started to use the agent as a client-side cache.
 Disabling the agent may result in noticeable loss of performance."
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-agent
   :type 'boolean)
 
@@ -2440,7 +2440,7 @@ and also Meadow version if it exists) or either `config' (show system
 configuration) or `type' (show system type).  If you set it to a
 string, be sure to use a valid format, see RFC 2616."
 
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-message
   :type '(choice (list (set :format "%v" :inline t
 			    (const gnus  :tag "Gnus version")
@@ -3486,7 +3486,7 @@ that that variable is buffer-local to the summary buffers."
               ;; gnus-server-method-cache so this only happens once,
               ;; if at all.
               (let (match)
-                (mapcar 
+                (mapcar
                  (lambda (info)
                    (let ((info-method (gnus-info-method info)))
                      (unless (stringp info-method)
@@ -4150,10 +4150,10 @@ Allow completion over sensible values."
 (defun gnus-agent-method-p (method)
   "Say whether METHOD is covered by the agent."
   (or (eq (car gnus-agent-method-p-cache) method)
-      (setq gnus-agent-method-p-cache 
+      (setq gnus-agent-method-p-cache
             (cons method
-                  (member (if (stringp method) 
-                              method 
+                  (member (if (stringp method)
+                              method
                             (gnus-method-to-server method)) gnus-agent-covered-methods))))
   (cdr gnus-agent-method-p-cache))
 

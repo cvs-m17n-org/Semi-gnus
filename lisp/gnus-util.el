@@ -1143,7 +1143,7 @@ Return the modified alist."
             (standard-output
 	     (lambda (c)
                (aset ,buffer ,leng c)
-                   
+
 	       (if (= ,size (setq ,leng (1+ ,leng)))
 		   (progn (write-region ,buffer nil ,file ,append 'no-msg)
 			  (setq ,leng 0
@@ -1212,7 +1212,7 @@ Return the modified alist."
 Setting it to nil has no effect after the first time `gnus-byte-compile'
 is run."
   :type 'boolean
-  :version "21.4"
+  :version "22.1"
   :group 'gnus-various)
 
 (defun gnus-byte-compile (form)
@@ -1580,8 +1580,8 @@ empty directories from OLD-PATH."
 			(setq temp (cdr temp)))
 		      (= (length temp) 0))
 	  (delete-directory old-dir)
-	  (setq old-dir (file-name-as-directory 
-			 (file-truename 
+	  (setq old-dir (file-name-as-directory
+			 (file-truename
 			  (concat old-dir "..")))))))))
 
 (defun gnus-set-file-modes (filename mode)
