@@ -3720,12 +3720,12 @@ Gnus $B$,<!$N%0%k!<%W$K0\F0$9$k$3$H$r3NG'$r$9$k$?$a$K!"%-!<$r2!$9$3$H$rMW5a(B
 @kindex SPACE $B!J35N,!K(B
 @findex gnus-summary-next-page
 @kbd{SPACE} $B$O5-;v$r0l%Z!<%8@h$K%9%/%m!<%k$7$^$9!#5-;v$N:G8e$K$$$k>l9g$O(B
-$B<!$N5-;v$rA*Br$7$^$9(B (@code{gnus-summary-prev-page})$B!#(B
+$B<!$N5-;v$rA*Br$7$^$9(B (@code{gnus-summary-next-page})$B!#(B
 
 @item DEL
 @kindex DEL $B!J35N,!K(B
 @findex gnus-summary-prev-page
-$B8=:_$N5-;v$r0l%Z!<%8A0$K%9%/%m!<%k$7$^$9(B (code{gnus-summary-prev-page})$B!#(B
+$B8=:_$N5-;v$r0l%Z!<%8A0$K%9%/%m!<%k$7$^$9(B (@code{gnus-summary-prev-page})$B!#(B
 
 @item RET
 @kindex RET $B!J35N,!K(B
@@ -6065,14 +6065,14 @@ gnus $B$,Ds0F$r$7$^$9!K$rF~NO$9$k$h$&$KB%$5$l!"$=$l$+$iL?Na$,<B9T$5$l$^$9!#(B
 @kindex W H h $B!J35N,!K(B
 @findex gnus-article-highlight-headers
 @vindex gnus-header-face-alist
-$B%X%C%@!<$r%O%$%i%$%H$7$^$9(B (@code{gnus-article-highlight-headers})$B!#%O%$%i(B
-$B%$%H$OJQ?t(B @code{gnus-header-face-alist} $B$K$7$?$,$C$F$J$5$l!"$=$l$O$=$l$>(B
-$B$l$NMWAG$,(B @var{($B@55,I=8=(B $BL>A0(B $BFbMF(B)} $B$H$$$&MM<0$N%j%9%H$G$9!#(B @var{$B@55,I=(B
-$B8=(B}$B$O%X%C%@!<$K9gCW$9$k@55,I=8=!"(B@var{$BL>A0(B}$B$O%X%C%@!<$NL>A0$r%O%$%i%$%H$9(B
-$B$k$N$K;H$o$l$k%U%'%$%9(B (face) (@pxref{FacesandFonts})$B!"(B@var{$BFbMF(B}$B$O%X%C%@!<(B
-$B$NCM$r%O%$%i%$%H$9$k%U%'%$%9$G$9!#:G=i$K9gCW$7$?$b$N$,;H$o$l$^$9!#(B@var{$B@5(B
-$B5,I=8=(B}$B$O(B @samp{^} $B$,IU$1$i$l$k$Y$-$G$O$J$$;v$KCm0U$7$F$/$@$5$$!=!=(Bgnus $B$,(B
-$B$=$l$rIU$12C$($^$9!#(B
+$B%X%C%@!<$r%O%$%i%$%H$7$^$9(B (@code{gnus-article-highlight-headers})$B!#%O%$(B
+$B%i%$%H$OJQ?t(B @code{gnus-header-face-alist} $B$K$7$?$,$C$F$J$5$l!"$=$l$O$=(B
+$B$l$>$l$NMWAG$,(B @var{($B@55,I=8=(B $BL>A0(B $BFbMF(B)} $B$H$$$&MM<0$N%j%9%H$G$9!#(B @var
+{$B@55,I=8=(B}$B$O%X%C%@!<$K9gCW$9$k@55,I=8=!"(B@var{$BL>A0(B}$B$O%X%C%@!<$NL>A0$r%O%$(B
+$B%i%$%H$9$k$N$K;H$o$l$k%U%'%$%9(B (face) (@pxref{Faces and Fonts})$B!"(B@var{$BFb(B
+$BMF(B}$B$O%X%C%@!<$NCM$r%O%$%i%$%H$9$k%U%'%$%9$G$9!#:G=i$K9gCW$7$?$b$N$,;H$o(B
+$B$l$^$9!#(B@var{$B@55,I=8=(B}$B$O(B @samp{^} $B$,IU$1$i$l$k$Y$-$G$O$J$$;v$KCm0U$7$F$/(B
+$B$@$5$$!=!=(Bgnus $B$,$=$l$rIU$12C$($^$9!#(B
 
 @item W H c
 @kindex W H c $B!J35N,!K(B
@@ -6958,7 +6958,7 @@ gnus $B$N5-;vA*Br4X?t$r5-;v72$r(B uudecode $B$7$=$N7k2L$rI=<($9$k$h$&$KJQ99$9
 @vindex gnus-tree-mode-line-format
 $BLZ%b!<%I%P%C%U%!$G$N%b!<%I9T$N$?$a$N%U%)!<%^%C%HJ8;zNs$G$9(B (@pxref{Mode
 Line Formatting})$B!#%G%#%U%)%k%H$O(B @samp{Gnus: %%b %S %Z} $B$G$9!#;HMQ2DG=(B
-$B$J;XDj$O(B @pxref{Summary Buffer ModeLine} $B$r;2>H$7$F$/$@$5$$!#(B
+$B$J;XDj$O(B @pxref{Summary Buffer Mode Line} $B$r;2>H$7$F$/$@$5$$!#(B
 
 @item gnus-selected-tree-face
 @vindex gnus-selected-tree-face
@@ -9686,7 +9686,7 @@ Unix mbox $B%U%!%$%k$,=EMW$@$1$l$I8E$$%a!<%k$GK~$?$5$l$F$$$^$9!#$"$J$?$O$=(B
 
 @item
 `G f' $B$HBG$C$F!"(Bmbox $B%U%!%$%k$+$i(B @code{nndoc} $B%0%k!<%W$r:n@.$9$k$h$&$K(B
-$BB%?J$5$l$?$H$-$K(B mbox $B%U%!%$%k$X$N%Q%9$rM?$($^$9(B (@pxref{Foregin
+$BB%?J$5$l$?$H$-$K(B mbox $B%U%!%$%k$X$N%Q%9$rM?$($^$9(B (@pxref{Foreign
 Groups})$B!#(B
 
 @item
@@ -9803,7 +9803,7 @@ Gnus $B$O5-;v$,$I$N%0%k!<%W$KB0$7$F$$$k$+$K4p$E$$$F!"$=$l$,$I$N$/$i$$@8B8(B
 @code{never} $B$N$I$A$i$+$G$"$k;v$,$G$-$^$9!#(B
 
 $B4|8B@Z$l4|4V$rA*BrE*$KJQ99$9$k$?$a$K%0%k!<%W%Q%i%a!<%?(B 
-@code{expiry-wait} $B$r;H$&;v$b$G$-$^$9(B (@pxref{Groups Parameters})$B!#(B
+@code{expiry-wait} $B$r;H$&;v$b$G$-$^$9(B (@pxref{Group Parameters})$B!#(B
 
 @vindex nnmail-keep-last-article
 @code{nnmail-keep-last-article} $B$,(B @code{nil} $B$G$J$$$H!"(Bgnus $B$O%a!<%k%K%e!<(B
@@ -11535,7 +11535,7 @@ $ emacs -batch -l ~/.gnus.el -f gnus-agent-batch-fetch
 @kindex J S (Agent Group)
 @findex gnus-group-send-drafts
 $B2<=q$-%0%k!<%W$K$"$kAw?.2DG=$J%a%C%;!<%8$rA4$FAw?.$9$k(B
-(@code{gnus-agent-fetch-session})$B!#(B @xref{Drafts}
+(@code{gnus-group-send-session})$B!#(B @xref{Drafts}
 
 @item J a
 @kindex J a (Agent Group)
@@ -13312,7 +13312,7 @@ bbbd $B%5!<%P!<$,<B9T$5$l$F$$$k%[%9%H$N%]!<%H$G$9!#=i4|CM$O(B9000$B$G$9!#(B
 $BL>$OC1=c$J%9%3%"IU$1$r$9$k$H$-$N$b$N$HF1$8$G!"9gCW$N7?$bF1$8$G$9!#(B
 
 
-@node Advanced Scring Examples
+@node Advanced Scoring Examples
 @subsection $B>e5i%9%3%"IU$1$NNc(B
 
 Lars $B$,(B Gnus $B$K4X$7$FOC$r$7$F$$$k$H$-$KH`$K$h$C$F=q$+$l$?5-;v$N%9%3%"$r(B
@@ -13748,8 +13748,8 @@ gnus-compile} $B$r<B9T$9$k;v$G3JCJ$KB.EYDc2<$r8:$i$9;v$,$G$-$^$9!#(B
 $BA^F~$5$l$^$9!#4X?t$O0UL#$NL5$$CM$H6&$K8F$P$l$k;v$b$"$j$($^$9$N$G!"$=$l$N(B
 $BBP:v$r$9$k$Y$-$G$9!#(B
 
-$B?7$7$$4X?t$rDj5A$7$J$$$G$b!"%A%k%@=$>~;R(B (@pxref{Advanced Formattin}) $B$r(B
-$B;H$C$F$[$H$s$IF1$8;v$rC#@.$9$k;v$,$G$-$^$9!#Nc$G$9(B: @samp{%~(form
+$B?7$7$$4X?t$rDj5A$7$J$$$G$b!"%A%k%@=$>~;R(B (@pxref{Advanced Formatting}) 
+$B$r;H$C$F$[$H$s$IF1$8;v$rC#@.$9$k;v$,$G$-$^$9!#Nc$G$9(B: @samp{%~(form
 (count-lines (point-min) (point)))@@}$B!#$3$3$GM?$($i$l$?<0$OI>2A$5$l$F!"(B
 $B8=:_$N9T?t$r$b$?$i$7!"$=$l$+$iA^F~$5$l$^$9!#(B
 
@@ -14279,9 +14279,9 @@ Gnus $B$O$5$^$6$^$J@)8f;R(B @dfn{handlers} $B$rDj5A$9$k$3$H$K$h$C$F$=(B
 (gnus-demon-scan-pgp 60 t)
 @end lisp
 
-$B$3$N(B @var{$B;~4V(B} $B%Q%i%a!<%?$H$=$7$F(B @var{$B6uE>(B} $B%Q%i%a!<%?$O!"4qL/(B
-$B$G$+$DAG@2$i$7$$J}K!$G0l=o$KF0:n$7$^$9!#4pK\E*$K$O!"(B@var {$B6uE>(B} 
-$B$,(B @code{nil} $B$N;~$K$O$3$N4X?t$O(B @var{$B;~4V(B} $BJ,Kh$K8F$S=P$5$l$^$9!#(B
+$B$3$N(B @var{$B;~4V(B} $B%Q%i%a!<%?$H$=$7$F(B @var{$B6uE>(B} $B%Q%i%a!<%?$O!"4qL/$G$+$DAG(B
+$B@2$i$7$$J}K!$G0l=o$KF0:n$7$^$9!#4pK\E*$K$O!"(B@var{$B6uE>(B} $B$,(B @code{nil} $B$N(B
+$B;~$K$O$3$N4X?t$O(B @var{$B;~4V(B} $BJ,Kh$K8F$S=P$5$l$^$9!#(B
 
 $B$b$7(B @var{$B6uE>(B} $B$,(B @code{t} $B$G$"$l$P!"$3$N4X?t$O(B Emacs $B$,2?$b$7(B
 $B$F$$$J$$;~$K8B$j!"(B@var{$B;~4V(B} $BJ,8e$K8F$S=P$5$l$^$9!#0lC6(B Emacs $B$,(B
@@ -14415,17 +14415,16 @@ Richard E. Depew --- $B%"%a%j%+$NC1FHH?%9%Q%`2H!#<g$KHs%P%$%J%j%0(B
 $B$^$9!#(B
 @end table
 
-$B$3$l$iA4$F$N?M!9$N(B NoCeM $B%a%C%;!<%8$KN10U$9$kI,MW$O$"$j$^$;$s(B 
---- $B8@$&$3$H$rJ9$-$?$$?M$@$1$G$$$$$s$G$9!#$^$?$=$N?M$+$i$N(B NoCeM
-$B%a%C%;!<%8A4$F$r<u$1F~$l$kI,MW$b$"$j$^$;$s!#(BNoCeM $B%a%C%;!<%8$K$O(B
-$B$=$l$>$l<oJL(B @dfn{type} $B%X%C%@!<$,$D$$$F$*$j!"$3$l$O$=$N%a%C%;!<(B
-$B%8$N87L)$JDj5A$rM?$($F$$$^$9(B($BB?>/$O87L)$J!"DxEY$M!#$?$$$F$$$O>/(B
-$B$@$1$I(B)$B!#NI$/;H$o$l$k<oJL$K$O!"(B@samp{spam}$B!"(B @samp{spew}$B!"(B 
-@samp{mmf}$B!"(B@samp{binary}$B!"(B@samp{troll} $B$,$"$j$^$9!#$3$l$r;XDj$9(B
-$B$k$K$O!"%j%9%H$NCf$G(B @var{($BH/9T<T(B $B>r7o(B ...)} $BMWAG$r;H$&I,MW$,$"(B
-$B$j$^$9!#3F>r7o$OJ8;zNs(B ($B;H$$$?$$<oJL$K%^%C%A$9$k@55,I=8=(B) $B$+!"$^(B
-$B$?$O(B @code {(not $BJ8;zNs(B)} $B$H$$$&7A<0$N%j%9%H$G$9!#$3$N>l9g$O(B 
-@var{$BJ8;zNs(B} $B$O;H$$$?$/$J$$<oJL$K%^%C%A$9$k@55,I=8=$G$9!#(B
+$B$3$l$iA4$F$N?M!9$N(B NoCeM $B%a%C%;!<%8$KN10U$9$kI,MW$O$"$j$^$;$s(B --- $B8@$&$3(B
+$B$H$rJ9$-$?$$?M$@$1$G$$$$$s$G$9!#$^$?$=$N?M$+$i$N(B NoCeM$B%a%C%;!<%8A4$F$r<u(B
+$B$1F~$l$kI,MW$b$"$j$^$;$s!#(BNoCeM $B%a%C%;!<%8$K$O$=$l$>$l<oJL(B @dfn{type} $B%X%C(B
+$B%@!<$,$D$$$F$*$j!"$3$l$O$=$N%a%C%;!<%8$N87L)$JDj5A$rM?$($F$$$^$9(B($BB?>/$O(B
+$B87L)$J!"DxEY$M!#$?$$$F$$$O>/$@$1$I(B)$B!#NI$/;H$o$l$k<oJL$K$O!"(B@samp{spam}$B!"(B 
+@samp{spew}$B!"(B @samp{mmf}$B!"(B@samp{binary}$B!"(B@samp{troll} $B$,$"$j$^$9!#$3$l$r(B
+$B;XDj$9$k$K$O!"%j%9%H$NCf$G(B @var{($BH/9T<T(B $B>r7o(B ...)} $BMWAG$r;H$&I,MW$,$"$j(B
+$B$^$9!#3F>r7o$OJ8;zNs(B ($B;H$$$?$$<oJL$K%^%C%A$9$k@55,I=8=(B) $B$+!"$^$?$O(B 
+@code{(not $BJ8;zNs(B)} $B$H$$$&7A<0$N%j%9%H$G$9!#$3$N>l9g$O(B @var{$BJ8;zNs(B} $B$O;H(B
+$B$$$?$/$J$$<oJL$K%^%C%A$9$k@55,I=8=$G$9!#(B
 
 $BNc$($P!"(BChris Lewis $B$+$i$N(B NoCeM $B%a%C%;!<%8$G!"(B@samp{troll} $B%a%C(B
 $B%;!<%80J30$NA4$F$rM_$7$$>l9g$K$O!"(B
@@ -15704,13 +15703,16 @@ Rajappa Iyer,
 Andreas Jaeger,
 Randell Jesup,
 Fred Johansen,
+Gareth Jones,
 Simon Josefsson,
 Greg Klanderman,
 Karl Kleinpaste,
 Peter Skov Knudsen,
 Shuhei Kobayashi, @c Kobayashi
+Koseki Yoshinori, @c Koseki
 Thor Kristoffersen,
 Jens Lautenbacher,
+Martin Larose,
 Seokchan Lee, @c Lee
 Carsten Leonhardt,
 James LewisMoss,
@@ -15742,7 +15744,9 @@ William Perry,
 Stephen Peters,
 Jens-Ulrik Holger Petersen,
 Ulrich Pfeifer,
+Matt Pharr,
 John McClary Prevost,
+Bill Pringlemeir,
 Mike Pullen,
 Jim Radford,
 Colin Rafferty,
@@ -15781,6 +15785,7 @@ Teddy,
 Chuck Thompson,
 Philippe Troin,
 James Troup,
+Trung Tran-Duc,
 Aaron M. Ucko,
 Aki Vehtari,
 Didier Verna,
@@ -16039,7 +16044,7 @@ Gnus $B%-%c%C%7%e$,$:$C$HB.$/$J$j$^$7$?!#(B
 
 @item
 $B%0%k!<%W$rB?$/$N4p=`$K=>$C$FJB$SBX$($G$-$k$h$&$K$J$j$^$7$?(B 
-(@pxref{Soring Groups})$B!#(B
+(@pxref{Sorting Groups})$B!#(B
 
 @item
 $B%"%I%l%9$N%j%9%H$H4|8B@Z$l>C5n$N;~4V$r@_Dj$9$k?7$7$$%0%k!<%W%Q%i%a!<%?$,(B
@@ -16060,7 +16065,7 @@ Gnus $B%-%c%C%7%e$,$:$C$HB.$/$J$j$^$7$?!#(B
 
 @item
 @kbd{*} $BL?Na$K$h$C$F!"5-;v$r1JB3$K$9$k;v$,$G$-$k$h$&$K$J$j$^$7$?(B 
-(@pxref{Presistent Articles})$B!#(B
+(@pxref{Persistent Articles})$B!#(B
 
 @item
 $B5-;v$NMWAG$r1#$9A4$F$N4X?t$O@Z$jBX$(4X?t$K$J$j$^$7$?!#(B
