@@ -447,6 +447,7 @@ query the user whether to use the value.  If it is t or the symbol
 		 (const :tag "always" use)
 		 (const :tag "ask" ask)))
 
+;;; XXX: 'ask and 'use are not implemented yet.
 (defcustom message-use-mail-reply-to 'ask
   "*Specifies what to do with Mail-Reply-To/Reply-To header.
 If nil, always ignore the header.  If it is t or the symbol `use', use
