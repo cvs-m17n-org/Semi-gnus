@@ -146,6 +146,11 @@ mailbox format."
   :group 'message-sending
   :type 'function)
 
+(defcustom message-8bit-encoding-list '(8bit binary)
+  "*8bit encoding type in Content-Transfer-Encoding field."
+  :group 'message-sending
+  :type '(repeat (symbol :tag "Type")))
+
 (defcustom message-courtesy-message
   "The following message is a courtesy copy of an article\nthat has been posted to %s as well.\n\n"
   "*This is inserted at the start of a mailed copy of a posted message.
@@ -2268,7 +2273,8 @@ the user from the mailer."
   (require 'mail-utils)
   (let ((tembuf (message-generate-new-buffer-clone-locals " message temp"))
 	(case-fold-search nil)
-	(news (message-news-p)))
+	(news (message-news-p))
+	failure)
     (save-restriction
       (message-narrow-to-headers)
       ;; Insert some headers.
@@ -2277,46 +2283,59 @@ the user from the mailer."
 	(message-generate-headers message-required-mail-headers))
       ;; Let the user do all of the above.
       (run-hooks 'message-header-hook))
-    (unwind-protect
-	(save-excursion
-	  (set-buffer tembuf)
-	  (erase-buffer)
-	  (insert-buffer message-encoding-buffer)
-	  ;; Remove some headers.
-	  (save-restriction
-	    (message-narrow-to-headers)
+    (if (not (message-check-mail-syntax))
+	(progn
+	  (message "")
+	  nil)
+      (unwind-protect
+	  (save-excursion
+	    (set-buffer tembuf)
+	    (erase-buffer)
+	    (insert-buffer message-encoding-buffer)
 	    ;; Remove some headers.
-	    (message-remove-header message-ignored-mail-headers t))
-	  (goto-char (point-max))
-	  ;; require one newline at the end.
-	  (or (= (preceding-char) ?\n)
-	      (insert ?\n))
-	  (when (and news
-		     (or (message-fetch-field "cc")
-			 (message-fetch-field "to")))
-	    (message-insert-courtesy-copy))
-;;	  (mime-edit-maybe-split-and-send
-;;	   (function
-;;	    (lambda ()
-;;	      (interactive)
-;;	      (funcall message-send-mail-function)
-;;	      )))
-	  (mime-edit-maybe-split-and-send
-	   (function
-	    (lambda ()
-	      (interactive)
-	      (save-restriction
-		(std11-narrow-to-header mail-header-separator)
-		(goto-char (point-min))
-		(when (re-search-forward "^Message-Id:" nil t)
-		  (delete-region (match-end 0)(std11-field-end))
-		  (insert (concat " " (message-make-message-id)))
-		  ))
-	      (funcall message-send-mail-function))))
-	  (funcall message-send-mail-function))
-      (kill-buffer tembuf))
-    (set-buffer message-edit-buffer)
-    (push 'mail message-sent-message-via)))
+	    (save-restriction
+	      (message-narrow-to-headers)
+	      ;; Remove some headers.
+	      (message-remove-header message-ignored-mail-headers t))
+	    (goto-char (point-max))
+	    ;; require one newline at the end.
+	    (or (= (preceding-char) ?\n)
+		(insert ?\n))
+	    (when (and news
+		       (or (message-fetch-field "cc")
+			   (message-fetch-field "to")))
+	      (message-insert-courtesy-copy))
+	    (setq failure
+		  (or
+		   (catch 'message-sending-mail-failure
+		     (mime-edit-maybe-split-and-send
+		      (function
+		       (lambda ()
+			 (interactive)
+			 (save-restriction
+			   (std11-narrow-to-header mail-header-separator)
+			   (goto-char (point-min))
+			   (when (re-search-forward "^Message-Id:" nil t)
+			     (delete-region (match-end 0) (std11-field-end))
+			     (insert " " (message-make-message-id))))
+			 (condition-case err
+			     (funcall message-send-mail-function)
+			   (error
+			    (throw 'message-sending-mail-failure err))))))
+		     nil)
+		   (condition-case err
+		       (funcall message-send-mail-function)
+		     (error err)))))
+	(kill-buffer tembuf))
+      (set-buffer message-edit-buffer)
+      (if failure
+	  (progn
+	    (message "Couldn't send message via mail: %s"
+		     (if (eq 'error (car failure))
+			 (cadr failure)
+		       failure))
+	    nil)
+	(push 'mail message-sent-message-via)))))
 
 (defun message-send-mail-with-sendmail ()
   "Send off the prepared buffer with sendmail."
@@ -2507,20 +2526,23 @@ to find out how to use this."
 	    ;; require one newline at the end.
 	    (or (= (preceding-char) ?\n)
 		(insert ?\n))
-	    (mime-edit-maybe-split-and-send
-	     (function
-	      (lambda ()
-		(interactive)
-		(save-restriction
-		  (std11-narrow-to-header mail-header-separator)
-		  (goto-char (point-min))
-		  (when (re-search-forward "^Message-Id:" nil t)
-		    (delete-region (match-end 0)(std11-field-end))
-		    (insert (concat " " (message-make-message-id)))
-		    ))
-		(funcall message-send-news-function method)
-		)))
-	    (setq result (funcall message-send-news-function method)))
+	    (setq result
+		  (and
+		   (catch 'message-sending-news-done
+		     (mime-edit-maybe-split-and-send
+		      (function
+		       (lambda ()
+			 (interactive)
+			 (save-restriction
+			   (std11-narrow-to-header mail-header-separator)
+			   (goto-char (point-min))
+			   (when (re-search-forward "^Message-Id:" nil t)
+			     (delete-region (match-end 0)(std11-field-end))
+			     (insert " " (message-make-message-id))))
+			 (unless (funcall message-send-news-function method)
+			   (throw 'message-sending-news-done nil)))))
+		     t)
+		   (funcall message-send-news-function method))))
 	(kill-buffer tembuf))
       (set-buffer message-edit-buffer)
       (if result
@@ -2791,6 +2813,9 @@ to find out how to use this."
 	 (y-or-n-p
 	  "The article contains control characters.  Really post? ")
        t))
+   ;; Check 8bit characters.
+   (message-check '8bit
+     (message-check-8bit))
    ;; Check excessive size.
    (message-check 'size
      (if (> (buffer-size) 60000)
@@ -2817,6 +2842,54 @@ to find out how to use this."
 	     "Your .sig is %d lines; it should be max 4.  Really post? "
 	     (1- (count-lines (point) (point-max)))))
 	 t)))))
+
+(defun message-check-mail-syntax ()
+  "Check the syntax of the message."
+  (save-excursion
+    (save-restriction
+      (widen)
+      (and
+       ;; We narrow to the headers and check them first.
+       (save-excursion
+	 (save-restriction
+	   (message-narrow-to-headers)
+	   (message-check-mail-header-syntax)))
+       ;; Check the body.
+       (save-excursion
+	 (set-buffer message-edit-buffer)
+	 (message-check-mail-body-syntax))))))
+
+(defun message-check-mail-header-syntax ()
+  t)
+
+(defun message-check-mail-body-syntax ()
+  (and
+   ;; Check 8bit characters.
+   (message-check '8bit
+     (message-check-8bit)
+     )))
+
+(defun message-check-8bit ()
+  "Check the article contains 8bit characters."
+  (save-excursion
+    (set-buffer message-encoding-buffer)
+    (message-narrow-to-headers)
+    (let* ((case-fold-search t)
+	   (field-value (message-fetch-field "content-transfer-encoding")))
+      (if (and field-value
+	       (member (downcase field-value) message-8bit-encoding-list))
+	  t
+	(widen)
+	(set-buffer (get-buffer-create " message syntax"))
+	(erase-buffer)
+	(goto-char (point-min))
+	(set-buffer-multibyte nil)
+	(insert-buffer message-encoding-buffer)
+	(goto-char (point-min))
+	(if (re-search-forward "[^\x00-\x7f]" nil t)
+	    (y-or-n-p
+	     "The article contains 8bit characters.  Really post? ")
+	  t)))))
 
 (defun message-checksum ()
   "Return a \"checksum\" for the current buffer."
@@ -2868,7 +2941,6 @@ to find out how to use this."
 		(rmail-output file 1 nil t)
 	      (let ((mail-use-rfc822 t))
 		(rmail-output file 1 t t))))))
-
       (kill-buffer (current-buffer)))))
 
 (defun message-output (filename)
