@@ -1,3 +1,13 @@
+2000-01-27  Katsumi Yamaoka <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-revision-number): Increment to 05.
+
+	* lisp/gnus-art.el (gnus-treat-display-smileys): Check for the
+	module `gnus-bitmap' instead of `smiley-mule'.
+
+	* lisp/gnus-sum.el (gnus-summary-exit): Recenter the group buffer
+	without redisplaying if the point is out of view.
+
 2000-01-25  Katsumi Yamaoka <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
