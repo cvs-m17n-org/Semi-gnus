@@ -26,7 +26,7 @@ How to get?
     Please do following in a directory to extract (ex. site-lisp):
 
     % cvs -d :pserver:anonymous@chamonix.jaist.ac.jp:/hare/cvs/root \
-	co gnus
+	co -r semi-gnus gnus
 
 (2) compile
 
@@ -40,7 +40,7 @@ How to get?
 
     Please do following in your Open gnus directory:
 
-    % cvs update
+    % cvs -r semi-gnus update
 
 
 How to join development
