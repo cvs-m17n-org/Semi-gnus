@@ -1,3 +1,9 @@
+1999-04-13  Katsumi Yamaoka   <yamaoka@jpl.org>
+
+	* lisp/gnus-sum.el (gnus-summary-move-article): Bug fix - don't
+	remove the element `(expirable . expire)' from
+	`gnus-article-mark-lists'.
+
 1999-03-30  Yoshiki Hayashi  <g740685@komaba.ecc.u-tokyo.ac.jp>
 
 	* lisp/nnheader.el (nnheader-skip-field): New macro.
