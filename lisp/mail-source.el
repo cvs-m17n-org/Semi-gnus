@@ -508,7 +508,8 @@ If ARGS, PROMPT is used as an argument to `format'."
   "Fetcher for imap sources."
   (mail-source-bind (imap source)
     (let ((found 0)
-	  (buf (get-buffer-create " *imap source*"))
+	  (buf (get-buffer-create
+		(format " *imap source %s:%s:%s *" server user mailbox)))
 	  (mail-source-string (format "imap:%s:%s" server mailbox))
 	  remove)
       (if (and (imap-open server port stream authentication buf)
