@@ -1211,73 +1211,78 @@ always hide."
   "Toggle hiding of headers.  If given a negative prefix, always show;
 if given a positive prefix, always hide."
   (interactive (gnus-article-hidden-arg))
-  (save-restriction
-    (widen)
-    (let ((force (when (numberp arg)
-		   (cond ((> arg 0) 'always-hide)
-			 ((< arg 0) 'always-show))))
-	  (window (get-buffer-window gnus-article-buffer))
-	  (header-start (if (get-text-property
-			     (point-min) 'article-treated-header)
-			    (point-min)
-			  (next-single-property-change
-			   (point-min) 'article-treated-header)))
-	  header-end field-start field-end
-	  (inhibit-read-only t)
-	  buffer-read-only)
-      (while (and header-start
-		  (setq header-end (next-single-property-change
-				    header-start 'article-treated-header)))
-	(narrow-to-region header-start header-end)
-	(goto-char header-start)
+  (let ((force (when (numberp arg)
+		 (cond ((> arg 0) 'always-hide)
+		       ((< arg 0) 'always-show))))
+	(window (get-buffer-window gnus-article-buffer))
+	(header-end (point-min))
+	header-start field-end field-start
+	(inhibit-point-motion-hooks t)
+	(inhibit-read-only t)
+	buffer-read-only)
+    (save-restriction
+      (widen)
+      (while (and (setq header-start
+			(text-property-any header-end (point-max)
+					   'article-treated-header t))
+		  (setq header-end
+			(text-property-not-all header-start (point-max)
+					       'article-treated-header t)))
+	(setq field-end header-start)
 	(cond
-	 (;; Hide fields.
-	  (and (not (eq 'always-hide force))
-	       (setq field-start (if (get-text-property
-				      header-start 'exposed-invisible-field)
-				     header-start
-				   (next-single-property-change
-				    header-start 'exposed-invisible-field))))
-	  (while (and field-start
-		      ;; Under FSF Emacs, `next-single-property-change's
-		      ;; return value may be larger than point-max even if
-		      ;; the 4th arg LIMIT is specified.
-		      (< field-start header-end)
-		      (setq field-end (next-single-property-change
-				       field-start
-				       'exposed-invisible-field)))
-	    (put-text-property field-start field-end
-			       'exposed-invisible-field nil)
-	    (put-text-property field-start field-end 'invisible t)
-	    (setq field-start (next-single-property-change
-			       field-end 'exposed-invisible-field))))
-	 (;; Expose invisible fields.
+	 (;; Hide exposed invisible fields.
 	  (and (not (eq 'always-show force))
-	       (setq field-start (if (get-text-property header-start
-							'invisible)
-				     header-start
-				   (next-single-property-change header-start
-								'invisible))))
+	       (setq field-start
+		     (text-property-any field-end header-end
+					'exposed-invisible-field t)))
 	  (while (and field-start
-		      (< field-start header-end)
-		      (setq field-end (next-single-property-change
-				       field-start 'invisible)))
+		      (setq field-end (text-property-not-all
+				       field-start header-end
+				       'exposed-invisible-field t)))
+	    (add-text-properties field-start field-end gnus-hidden-properties)
+	    (setq field-start (text-property-any field-end header-end
+						 'exposed-invisible-field t)))
+	  (put-text-property header-start header-end
+			     'exposed-invisible-field nil))
+	 (;; Expose invisible fields.
+	  (and (not (eq 'always-hide force))
+	       (setq field-start
+		     (text-property-any field-end header-end 'invisible t)))
+	  (while (and field-start
+		      (setq field-end (text-property-not-all
+				       field-start header-end
+				       'invisible t)))
 	    ;; If the invisible text is not terminated with newline, we
 	    ;; won't expose it.  Because it may be created by x-face-mule.
-	    (when (eq ?\n (char-before field-end))
-	      (put-text-property field-start field-end 'invisible nil)
+	    ;; BTW, XEmacs sometimes fail in putting a invisible text
+	    ;; property with `gnus-article-hide-text' (really?).  In that
+	    ;; case, the invisible text might be started from the middle of
+	    ;; a line so we will expose the sort of thing.
+	    (when (or (not (or (eq header-start field-start)
+			       (eq ?\n (char-before field-start))))
+		      (eq ?\n (char-before field-end)))
+	      (remove-text-properties field-start field-end
+				      gnus-hidden-properties)
 	      (put-text-property field-start field-end
 				 'exposed-invisible-field t))
-	    (setq field-start (next-single-property-change
-			       field-end 'invisible))))
-	 (;; Maybe hide fields.
+	    (setq field-start (text-property-any field-end header-end
+						 'invisible t))))
+	 (;; Hide fields.
 	  (not (eq 'always-show force))
-	  (gnus-article-maybe-hide-headers))
-	 )
-	(goto-char header-end)
-	(widen)
-	(setq header-start (next-single-property-change
-			    header-end 'article-treated-header)))
+	  (narrow-to-region header-start header-end)
+	  (article-hide-headers)
+	  ;; Re-display X-Face image under XEmacs.
+	  (when (and (featurep 'xemacs)
+		     (gnus-functionp gnus-article-x-face-command))
+	    (let ((func (cadr (assq 'gnus-treat-display-xface
+				    gnus-treatment-function-alist)))
+		  (condition 'head))
+	      (when (and func
+			 (gnus-treat-predicate gnus-treat-display-xface))
+		(funcall func)
+		(put-text-property header-start header-end 'read-only nil))))
+	  (widen))
+	 ))
       (goto-char (point-min))
       (when window
 	(set-window-start window (point-min))))))
@@ -1893,8 +1898,8 @@ should replace the \"Date:\" one, or should be added below it."
 	  (let ((buffer-read-only nil))
 	    ;; Delete any old X-Sent headers.
 	    (when (setq date-pos
-			(next-single-property-change (point-min)
-						     'article-date-lapsed))
+			(text-property-any (point-min) (point-max)
+					   'article-date-lapsed t))
 	      (goto-char (setq date-pos (set-marker (make-marker) date-pos)))
 	      (delete-region (match-beginning 0)
 			     (progn (forward-line 1) (point))))
@@ -2885,7 +2890,10 @@ If ALL-HEADERS is non-nil, no headers are hidden."
       (widen)
       (if gnus-show-mime
 	  (gnus-article-prepare-mime-display)
-	(std11-narrow-to-header)
+	(narrow-to-region (goto-char (point-min))
+			  (if (search-forward "\n\n" nil t)
+			      (point)
+			    (point-max)))
 	(gnus-treat-article 'head)
 	(put-text-property (point-min) (point-max) 'article-treated-header t)
 	(goto-char (point-max))
