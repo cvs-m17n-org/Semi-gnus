@@ -1,7 +1,7 @@
 \input texinfo                  @c -*-texinfo-*-
 
 @setfilename gnus
-@settitle Semi-gnus 6.10.020 Manual
+@settitle Semi-gnus 6.10.021 Manual
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
@@ -318,7 +318,7 @@ into another language, under the above conditions for modified versions.
 @tex
 
 @titlepage
-@title Semi-gnus 6.10.020 Manual
+@title Semi-gnus 6.10.021 Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
@@ -361,7 +361,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So Semi-gnus does not discriminate various language communities.
 Oh, if you are a Klingon, please wait Unicode Next Generation.
 
-This manual corresponds to Semi-gnus 6.10.020.
+This manual corresponds to Semi-gnus 6.10.021.
 
 @end ifinfo
 
@@ -13087,6 +13087,12 @@ If @code{gnus-adaptive-word-minimum} is set to a number, the adaptive
 word scoring process will never bring down the score of an article to
 below this number.  The default is @code{nil}.
 
+@vindex gnus-adative-word-no-group-words
+If @code{gnus-adative-word-no-group-words} is set to t, gnus won't
+adaptively word score any of the words in the group name.  Useful for
+groups like comp.editors.emacs, where most of the subject lines contain
+the word "emacs".
+
 After using this scheme for a while, it might be nice to write a
 @code{gnus-psychoanalyze-user} command to go through the rules and see
 what words you like and what words you don't like.  Or perhaps not.
@@ -16112,6 +16118,7 @@ Luc Van Eycken,
 Sam Falkner,
 Nelson Jose dos Santos Ferreira,
 Sigbjorn Finne,
+Paul Fisher,
 Decklin Foster,
 Gary D. Foster,
 Paul Franklin,
@@ -16196,6 +16203,7 @@ Jason Rumney,
 Wolfgang Rupprecht,
 Jay Sachs,
 Dewey M. Sasser,
+Conrad Sauerwald,
 Loren Schall,
 Dan Schmidt,
 Ralph Schleicher,
@@ -18120,6 +18128,13 @@ exits the group.
 
 @item
 The jingle is only played on the second invocation of Gnus.
+
+@item
+gnus-ignored-mime-types to avoid seeing buttons for Vcards and the
+like.
+
+@item
+Boucing articles should do MIME.
 
 @item
 Solve the halting problem.

@@ -253,10 +253,10 @@ is restarted, and sometimes reloaded."
 (defconst gnus-product-name "T-gnus"
   "Product name of this version of gnus.")
 
-(defconst gnus-version-number "6.10.020"
+(defconst gnus-version-number "6.10.021"
   "Version number for this version of gnus.")
 
-(defconst gnus-original-version-number "0.31"
+(defconst gnus-original-version-number "0.32"
     "Version number for this version of Gnus.")
 
 (defconst gnus-original-product-name "Pterodactyl Gnus"
@@ -1664,8 +1664,7 @@ gnus-newsrc-hashtb should be kept so that both hold the same information.")
       gnus-uu-decode-unshar-and-save-view gnus-uu-decode-save-view
       gnus-uu-decode-binhex-view gnus-uu-unmark-thread
       gnus-uu-mark-over)
-     ("gnus-uu" gnus-uu-delete-work-dir gnus-quote-arg-for-sh-or-csh
-      gnus-uu-unmark-thread)
+     ("gnus-uu" gnus-uu-delete-work-dir gnus-uu-unmark-thread)
      ("gnus-msg" (gnus-summary-send-map keymap)
       gnus-article-mail gnus-copy-article-buffer gnus-extended-version)
      ("gnus-msg" :interactive t

@@ -1896,7 +1896,7 @@ The following commands are available:
   (setq mode-name "Summary")
   (make-local-variable 'minor-mode-alist)
   (use-local-map gnus-summary-mode-map)
-  (buffer-disable-undo (current-buffer))
+  (buffer-disable-undo)
   (setq buffer-read-only t)		;Disable modification
   (setq truncate-lines t)
   (setq selective-display t)
@@ -3940,6 +3940,7 @@ If SELECT-ARTICLES, only select those articles from GROUP."
       ;; Init the dependencies hash table.
       (setq gnus-newsgroup-dependencies
 	    (gnus-make-hashtable (length articles)))
+      (gnus-set-global-variables)
       ;; Retrieve the headers and read them in.
       (gnus-message 5 "Fetching headers for %s..." gnus-newsgroup-name)
       (setq gnus-newsgroup-headers
@@ -7386,7 +7387,8 @@ groups."
       (if (and (not read-only)
 	       (not (gnus-request-replace-article
 		     (cdr gnus-article-current) (car gnus-article-current)
-		     (current-buffer))))
+		     (current-buffer)
+		     (not gnus-article-decoded-p))))
 	  (error "Couldn't replace article")
 	;; Update the summary buffer.
 	(if (and references
@@ -8737,7 +8739,7 @@ save those articles instead."
 				(lambda (f)
 				  (if (equal f " ")
 				      f
-				    (gnus-quote-arg-for-sh-or-csh f)))
+				    (mm-quote-arg f)))
 				files " ")))))
 	  (setq ps (cdr ps)))))
     (if (and gnus-view-pseudos (not not-view))

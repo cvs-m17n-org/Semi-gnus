@@ -42,7 +42,10 @@
 		     find-charset-region base64-decode-string
 		     base64-encode-string
 		     find-coding-systems-region get-charset-property
-		     coding-system-get w3-region))
+		     coding-system-get w3-region
+		     rmail-summary-exists rmail-select-summary
+		     rmail-update-summary
+		     ))
       (maybe-bind '(global-face-data
 		    mark-active transient-mark-mode mouse-selection-click-count
 		    mouse-selection-click-count-buffer buffer-display-table
@@ -72,9 +75,10 @@
 		 url-view-url w3-prepare-buffer
 		 char-int
 		 annotationp delete-annotation make-image-specifier
-		 make-annotation base64-decode-string base64-encode-string
-		 w3-do-setup w3-region)))
-
+ 		 make-annotation base64-decode-string base64-encode-region
+ 		 w3-do-setup w3-region
+ 		 rmail-summary-exists rmail-select-summary rmail-update-summary
+ 		 )))
 (setq load-path (cons "." load-path))
 (require 'custom)
 
