@@ -2061,7 +2061,8 @@ The backup file \".newsrc.eld_\" will be created before re-reading."
 					       &rest variables)
   (let (gnus-product-file-version method file-ver)
     (if (or (condition-case err
-		(let ((coding-system-for-read coding))
+		(let ((coding-system-for-read coding)
+		      (input-coding-system coding))
 		  (load (expand-file-name file gnus-product-directory) t t t)
 		  nil)
 	      (error (message "%s" err)))

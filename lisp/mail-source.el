@@ -642,7 +642,9 @@ This only works when `display-time' is enabled."
       (if (and (imap-open server port stream authentication buf)
 	       (imap-authenticate user password buf)
 	       (imap-mailbox-select mailbox nil buf))
-	  (let (str (coding-system-for-write 'binary))
+	  (let (str
+		(coding-system-for-write 'binary)
+		(output-coding-system 'binary))
 	    (with-temp-file mail-source-crash-box
 	      ;; if predicate is nil, use all uids
 	      (dolist (uid (imap-search (or predicate "1:*") buf))
