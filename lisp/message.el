@@ -4772,91 +4772,67 @@ OTHER-HEADERS is an alist of header/value pairs."
 		     (Subject . ,(or subject ""))))))
 
 (defun message-get-reply-headers (wide &optional to-address)
-  (let (follow-to mct never-mct from to cc reply-to mrt mft)
+  (let (follow-to mct never-mct to cc author mft recipients)
     ;; Find all relevant headers we need.
-    (setq from (message-fetch-field "from")
-	  to (message-fetch-field "to")
-	  cc (message-fetch-field "cc")
-	  mct (when message-use-mail-copies-to
-		(message-fetch-field "mail-copies-to"))
-	  reply-to (message-fetch-field "reply-to")
-	  mrt (when message-use-mail-reply-to
-		(message-fetch-field "mail-reply-to"))
-	  mft (when (and (not (or to-address mrt reply-to))
-			 message-use-mail-followup-to)
-		(message-fetch-field "mail-followup-to")))
+    (let ((mrt (when message-use-mail-reply-to
+		 (message-fetch-field "mail-reply-to")))
+	  (reply-to (message-fetch-field "reply-to")))
+      (setq to (message-fetch-field "to")
+	    cc (message-fetch-field "cc")
+	    mct (when message-use-mail-copies-to
+		  (message-fetch-field "mail-copies-to"))
+	    author (or mrt
+		       reply-to
+		       (message-fetch-field "from")
+		       "")
+	    mft (when (and (not (or to-address mrt reply-to))
+			   message-use-mail-followup-to)
+		  (message-fetch-field "mail-followup-to"))))
 
-    ;; Handle special values of Mail-Copies-To.
-    (when mct
-      (cond
-       ((and (or (equal (downcase mct) "never")
-		 (equal (downcase mct) "nobody")))
-	(when (or (not (eq message-use-mail-copies-to 'ask))
-		  (message-y-or-n-p
-		   (concat "Obey Mail-Copies-To: never? ") t "\
+    (save-match-data
+      ;; Handle special values of Mail-Copies-To.
+      (when mct
+	(cond ((or (equal (downcase mct) "never")
+		   (equal (downcase mct) "nobody"))
+	       (when (or (not (eq message-use-mail-copies-to 'ask))
+			 (message-y-or-n-p
+			  (concat "Obey Mail-Copies-To: never? ") t "\
 You should normally obey the Mail-Copies-To: header.
 
 	`Mail-Copies-To: " mct "'
 directs you not to send your response to the author."))
-	  (setq never-mct t))
-	(setq mct nil))
-       ((and (or (equal (downcase mct) "always")
-		 (equal (downcase mct) "poster")))
-	(if (or (not (eq message-use-mail-copies-to 'ask))
-		(message-y-or-n-p
-		 (concat "Obey Mail-Copies-To: always? ") t "\
+		 (setq never-mct t))
+	       (setq mct nil))
+	      ((or (equal (downcase mct) "always")
+		   (equal (downcase mct) "poster"))
+	       (if (or (not (eq message-use-mail-copies-to 'ask))
+		       (message-y-or-n-p
+			(concat "Obey Mail-Copies-To: always? ") t "\
 You should normally obey the Mail-Copies-To: header.
 
 	`Mail-Copies-To: " mct "'
 sends a copy of your response to the author."))
-	    (setq mct (or mrt reply-to from))
-	  (setq mct nil)))
-       ((and (eq message-use-mail-copies-to 'ask)
-	     (not (message-y-or-n-p
-		   (concat "Obey Mail-Copies-To: " mct " ? ") t "\
+		   (setq mct author)
+		 (setq mct nil)))
+	      ((and (eq message-use-mail-copies-to 'ask)
+		    (not (message-y-or-n-p
+			  (concat "Obey Mail-Copies-To: " mct " ? ") t "\
 You should normally obey the Mail-Copies-To: header.
 
 	`Mail-Copies-To: " mct "'
 sends a copy of your response to " (if (string-match "," mct)
 				       "the specified addresses"
 				     "that address") ".")))
-	(setq mct nil))))
+	       (setq mct nil))))
 
-    ;; Handle Mail-Followup-To.
-    (when (and mft
-	       (eq message-use-mail-followup-to 'ask)
-	       (not (message-y-or-n-p
-		     (concat "Obey Mail-Followup-To: " mft "? ") t "\
-You should normally obey the Mail-Followup-To: header.
-
-	`Mail-Followup-To: " mft "'
-directs your response to " (if (string-match "," mft)
-			       "the specified addresses"
-			     "that address only") ".
-
-A typical situation where Mail-Followup-To is used is when the author thinks
-that further discussion should take place only in "
-			     (if (string-match "," mft)
-				 "the specified mailing lists"
-			       "that mailing list") ".")))
-      (setq mft nil))
-
-    (if (and (not mft)
-	     (or (not wide)
-		 to-address))
-	(progn
-	  (setq follow-to (list (cons 'To
-				      (or to-address mrt reply-to mft from))))
-	  (when (and wide mct
-		     (not (member (cons 'To mct) follow-to)))
-	    (push (cons 'Cc mct) follow-to)))
-      (let (ccalist)
-	(save-excursion
-	  (message-set-work-buffer)
-	  (if (and mft
-		   wide
-		   (or (not (eq message-use-mail-followup-to 'ask))
-		       (message-y-or-n-p "Obey Mail-Followup-To? " t "\
+      ;; Build (textual) list of new recipient addresses.
+      (cond
+       ((not wide)
+	(setq recipients (concat ", " author)))
+       ((and mft
+	     (string-match "[^ \t,]" mft)
+	     (or (not (eq message-use-mail-followup-to 'ask))
+		 (message-y-or-n-p "Obey Mail-Followup-To? " t "\
 You should normally obey the Mail-Followup-To: header.  In this
 article, it has the value of
 
@@ -4877,43 +4853,49 @@ fragmented and very difficult to follow.
 
 Also, some source/announcement lists are not intended for discussion;
 responses here are directed to other addresses.")))
-	      (insert mft)
-	    (unless never-mct
-	      (insert (or mrt reply-to from "")))
-	    (insert (if to (concat (if (bolp) "" ", ") to) ""))
-	    (insert (if mct (concat (if (bolp) "" ", ") mct) ""))
-	    (insert (if cc (concat (if (bolp) "" ", ") cc) "")))
-	  (goto-char (point-min))
-	  (while (re-search-forward "[ \t]+" nil t)
-	    (replace-match " " t t))
-	  ;; Remove addresses that match `rmail-dont-reply-to-names'.
-	  (let ((rmail-dont-reply-to-names message-dont-reply-to-names))
-	    (insert (prog1 (rmail-dont-reply-to (buffer-string))
-		      (erase-buffer))))
-	  (goto-char (point-min))
-	  ;; Perhaps "Mail-Copies-To: never" removed the only address?
-	  (when (eobp)
-	    (insert (or mrt reply-to from "")))
-	  (setq ccalist
-		(mapcar
-		 (lambda (addr)
-		   (cons (mail-strip-quoted-names addr) addr))
-		 (message-tokenize-header (buffer-string))))
-	  (let ((s ccalist))
-	    (while s
-	      (setq ccalist (delq (assoc (car (pop s)) s) ccalist)))))
-	(setq follow-to (list (cons 'To (cdr (pop ccalist)))))
-	(when ccalist
-	  (let ((ccs (cons 'Cc (mapconcat
-				(lambda (addr) (cdr addr)) ccalist ", "))))
-	    (when (string-match "^ +" (cdr ccs))
-	      (setcdr ccs (substring (cdr ccs) (match-end 0))))
-	    (push ccs follow-to)))
-	;; Allow the user to be asked whether or not to reply to all
-	;; recipients in a wide reply.
-	(if (and ccalist wide message-wide-reply-confirm-recipients
-		 (not (y-or-n-p "Reply to all recipients? ")))
-	    (setq follow-to (delq (assoc 'Cc follow-to) follow-to)))))
+	(setq recipients (concat ", " mft)))
+       (to-address
+	(setq recipients (concat ", " to-address))
+	;; If the author explicitly asked for a copy, we don't deny it to them.
+	(if mct (setq recipients (concat recipients ", " mct))))
+       (t
+	(setq recipients (if never-mct "" (concat ", " author)))
+	(if to  (setq recipients (concat recipients ", " to)))
+	(if cc  (setq recipients (concat recipients ", " cc)))
+	(if mct (setq recipients (concat recipients ", " mct)))))
+      ;; Strip the leading ", ".
+      (unless (string= recipients "")
+	(setq recipients (substring recipients 2)))
+      ;; Squeeze whitespace.
+      (while (string-match "[ \t][ \t]+" recipients)
+	(setq recipients (replace-match " " t t recipients)))
+      ;; Remove addresses that match `rmail-dont-reply-to-names'.
+      (let ((rmail-dont-reply-to-names message-dont-reply-to-names))
+	(setq recipients (rmail-dont-reply-to recipients)))
+      ;; Perhaps "Mail-Copies-To: never" removed the only address?
+      (if (string-equal recipients "")
+	  (setq recipients author))
+      ;; Convert string to a list of (("foo@bar" . "Name <foo@bar>") ...).
+      (setq recipients
+	    (mapcar
+	     (lambda (addr)
+	       (cons (mail-strip-quoted-names addr) addr))
+	     (message-tokenize-header recipients)))
+      ;; Remove first duplicates.  (Why not all duplicates?  Is this a bug?)
+      (let ((s recipients))
+	(while s
+	  (setq recipients (delq (assoc (car (pop s)) s) recipients))))
+      ;; Build the header alist.  Allow the user to be asked whether
+      ;; or not to reply to all recipients in a wide reply.
+      (setq follow-to (list (cons 'To (cdr (pop recipients)))))
+      (when (and recipients
+		 (or (not message-wide-reply-confirm-recipients)
+		     (y-or-n-p "Reply to all recipients? ")))
+	(setq recipients (mapconcat
+			  (lambda (addr) (cdr addr)) recipients ", "))
+	(if (string-match "^ +" recipients)
+	    (setq recipients (substring recipients (match-end 0))))
+	(push (cons 'Cc recipients) follow-to)))
     follow-to))
 
 ;;;###autoload
