@@ -1060,8 +1060,19 @@ that were fetched.  Say, for nnultimate groups."
 
 (defcustom gnus-summary-muttprint-program "muttprint"
   "Command (and optional arguments) used to run Muttprint."
+  :version "21.3"
   :group 'gnus-summary
   :type 'string)
+
+(defcustom gnus-article-no-strict-mime nil
+  "If non-nil, don't require strict MIME.
+Some brain-damaged MUA/MTA, e.g. Lotus Domino 5.0.6 clients, does not
+supply the MIME-Version header or deliberately strip it From the mail.
+Set it to non-nil, Gnus will treat some articles as MIME even if
+the MIME-Version header is missed."
+  :version "21.3"
+  :type 'boolean
+  :group 'gnus-article)
 
 ;;; Internal variables
 
@@ -4437,7 +4448,7 @@ or a straight list of headers."
 		  (delq number gnus-newsgroup-unreads))
 	    (if gnus-newsgroup-auto-expire
 		(setq gnus-newsgroup-expirable
-		      (gnus-add-to-sorted-list 
+		      (gnus-add-to-sorted-list
 		       gnus-newsgroup-expirable number))
 	      (push (cons number gnus-low-score-mark)
 		    gnus-newsgroup-reads))))
@@ -4884,7 +4895,8 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	  (if (or read-all
 		  (and (zerop (length gnus-newsgroup-marked))
 		       (zerop (length gnus-newsgroup-unreads)))
-		  (eq gnus-newsgroup-display 'gnus-not-ignore))
+		  ;; Fetch all if the predicate is non-nil.
+		  gnus-newsgroup-display)
 	      ;; We want to select the headers for all the articles in
 	      ;; the group, so we select either all the active
 	      ;; articles in the group, or (if that's nil), the
@@ -4893,7 +4905,7 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	       (gnus-uncompress-range (gnus-active group))
 	       (gnus-cache-articles-in-group group))
 	    ;; Select only the "normal" subset of articles.
-	    (gnus-sorted-nunion  
+	    (gnus-sorted-nunion
 	     (gnus-sorted-union gnus-newsgroup-dormant gnus-newsgroup-marked)
 	     gnus-newsgroup-unreads)))
 	 (scored-list (gnus-killed-articles gnus-newsgroup-killed articles))
@@ -4905,6 +4917,8 @@ If SELECT-ARTICLES, only select those articles from GROUP."
 	  (cond
 	   ((numberp read-all)
 	    read-all)
+	   ((numberp gnus-newsgroup-display)
+	    gnus-newsgroup-display)
 	   (t
 	    (condition-case ()
 		(cond
@@ -6035,7 +6049,7 @@ The prefix argument ALL means to select all articles."
 	    (set-buffer gnus-group-buffer)
 	    (gnus-undo-force-boundary))
 	  (gnus-update-read-articles
-	   group (gnus-sorted-union 
+	   group (gnus-sorted-union
 		  gnus-newsgroup-unreads gnus-newsgroup-unselected))
 	  ;; Set the current article marks.
 	  (let ((gnus-newsgroup-scored
@@ -9301,15 +9315,15 @@ Iff NO-EXPIRE, auto-expiry will be inhibited."
 	(setq gnus-newsgroup-reads (delq article gnus-newsgroup-reads))
 	(cond ((= mark gnus-ticked-mark)
 	       (setq gnus-newsgroup-marked
-		     (gnus-add-to-sorted-list gnus-newsgroup-marked 
+		     (gnus-add-to-sorted-list gnus-newsgroup-marked
 					      article)))
 	      ((= mark gnus-dormant-mark)
 	       (setq gnus-newsgroup-dormant
-		     (gnus-add-to-sorted-list gnus-newsgroup-dormant 
+		     (gnus-add-to-sorted-list gnus-newsgroup-dormant
 					      article)))
 	      (t
 	       (setq gnus-newsgroup-unreads
-		     (gnus-add-to-sorted-list gnus-newsgroup-unreads 
+		     (gnus-add-to-sorted-list gnus-newsgroup-unreads
 					      article))))
 	(gnus-pull article gnus-newsgroup-reads)
 
@@ -10420,7 +10434,9 @@ If REVERSE, save parts that do not match TYPE."
     (save-excursion
       (set-buffer gnus-article-buffer)
       (let ((handles (or gnus-article-mime-handles
-			 (mm-dissect-buffer) (mm-uu-dissect))))
+			 (mm-dissect-buffer
+			  gnus-article-no-strict-mime)
+			 (mm-uu-dissect))))
 	(when handles
 	  (gnus-summary-save-parts-1 type dir handles reverse)
 	  (unless gnus-article-mime-handles ;; Don't destroy this case.
@@ -11128,7 +11144,7 @@ returned."
 (defun gnus-summary-insert-articles (articles)
   (when (setq articles
 	      (gnus-sorted-difference articles
-				      (mapcar (lambda (h) 
+				      (mapcar (lambda (h)
 						(mail-header-number h))
 					      gnus-newsgroup-headers)))
     (setq gnus-newsgroup-headers

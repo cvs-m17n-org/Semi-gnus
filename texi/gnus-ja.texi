@@ -10334,8 +10334,8 @@ Gnus は外へ出て行く全てのメッセージに、一つかそれ以上のそのサーバーのグ
 
 それぞれの様式は任意の量の @dfn{属性} を持つ事ができます。それぞれの属性
 は @code{(@var{name} @var{value})} の対により成り立っています。属性名
-は、@code{signature}, @code{signature-file}, @code{address}
-(@code{user-mail-address} を上書きする), @code{name}
+は、@code{signature}, @code{signature-file}, @code{x-face-file},
+@code{address} (@code{user-mail-address} を上書きする), @code{name}
 (@code{user-full-name} を上書きする) または @code{body} のどれかである事
 ができます。属性名は文字列またはシンボルである事もできます。その場合は、
 これはヘッダー名として使われ、その値が記事のヘッダーに挿入されます。もし
