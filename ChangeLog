@@ -1,3 +1,9 @@
+2002-09-05  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* texi/ptexinfmt.el: discard @documentdescription.  Support
+	@ifplaintext, @ifnotplaintext, @ifhtml.  Remove obsolete commands.
+	(texinfo-format-ifhtml, texinfo-format-ifplaintext): New function.
+
 2002-09-04  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
 
 	* lisp/gnus-namazu.el (gnus-namazu/highlight-words): Stricten
