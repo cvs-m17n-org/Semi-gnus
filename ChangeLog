@@ -1,5 +1,11 @@
 1998-11-12  Katsumi Yamaoka   <yamaoka@jpl.org>
 
+	* lisp/message.el (message-maybe-split-and-send-mail): Use
+	`defsubst' instead of `defun'.
+	(message-maybe-split-and-send-news): Ditto.
+
+1998-11-12  Katsumi Yamaoka   <yamaoka@jpl.org>
+
 	* lisp/gnus-msg.el (gnus-summary-resend-bounced-mail): Bind
 	`gnus-message-setup-hook' to minimum setting.
 
