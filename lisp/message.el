@@ -534,8 +534,8 @@ should return the new buffer name."
   :type 'boolean)
 
 (defcustom message-kill-buffer-query-function 'yes-or-no-p
-  "*Function used to prompt user whether to kill the message buffer.  If
-it is t, the buffer will be killed unconditionally."
+  "*Function used to prompt user whether to kill the message buffer.
+If it is t, the buffer will be killed unconditionally."
   :type '(radio (function-item yes-or-no-p)
 		(function-item y-or-n-p)
 		(function-item nnheader-Y-or-n-p)
@@ -546,6 +546,12 @@ it is t, the buffer will be killed unconditionally."
   "*Non-nil means that the associated file will be removed before
 removing the message buffer.  However, it is treated as nil when the
 command `message-mimic-kill-buffer' is used."
+  :group 'message-buffers
+  :type 'boolean)
+
+(defcustom message-kill-buffer-query-if-modified t
+  "*Non-nil means that killing a modified message buffer has to be confirmed.
+This is used by `message-kill-buffer'."
   :group 'message-buffers
   :type 'boolean)
 
@@ -3785,6 +3791,7 @@ Instead, just auto-save the buffer and then bury it."
   "Kill the current buffer."
   (interactive)
   (when (or (not (buffer-modified-p))
+	    (not message-kill-buffer-query-if-modified)
 	    (eq t message-kill-buffer-query-function)
 	    (funcall message-kill-buffer-query-function
 		     "The buffer modified; kill anyway? "))
