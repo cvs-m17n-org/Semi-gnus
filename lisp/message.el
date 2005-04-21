@@ -549,9 +549,10 @@ command `message-mimic-kill-buffer' is used."
   :group 'message-buffers
   :type 'boolean)
 
-(defcustom message-kill-buffer-query-if-modified t
+(defcustom message-kill-buffer-query t
   "*Non-nil means that killing a modified message buffer has to be confirmed.
 This is used by `message-kill-buffer'."
+  :version "23.0" ;; No Gnus
   :group 'message-buffers
   :type 'boolean)
 
@@ -3791,7 +3792,7 @@ Instead, just auto-save the buffer and then bury it."
   "Kill the current buffer."
   (interactive)
   (when (or (not (buffer-modified-p))
-	    (not message-kill-buffer-query-if-modified)
+	    (not message-kill-buffer-query)
 	    (eq t message-kill-buffer-query-function)
 	    (funcall message-kill-buffer-query-function
 		     "The buffer modified; kill anyway? "))
