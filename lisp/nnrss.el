@@ -203,54 +203,61 @@ The return value will be `html' or `text'."
 	(nntp-server-buffer (or buffer nntp-server-buffer))
 	post err)
     (when e
-      (catch 'error
-	(with-current-buffer nntp-server-buffer
-	  (erase-buffer)
-	  (if group
-	      (mm-with-unibyte-current-buffer
-		(insert "Newsgroups: "
-			(if (mm-coding-system-p 'utf-8)
-			    (mm-encode-coding-string group 'utf-8)
-			  group)
-			"\n")))
-	  (if (nth 3 e)
-	      (insert "Subject: " (nth 3 e) "\n"))
-	  (if (nth 4 e)
-	      (insert "From: " (nth 4 e) "\n"))
-	  (if (nth 5 e)
-	      (insert "Date: " (nnrss-format-string (nth 5 e)) "\n"))
-	  (insert (format "Message-ID: <%d@%s.nnrss>\n"
-			  (car e)
-			  (gnus-replace-in-string group "[\t\n ]+" "_")))
-	  (insert "\n")
-	  (let ((text (if (nth 6 e)
-			  (mapconcat 'identity
-				     (delete "" (split-string (nth 6 e) "\n+"))
-				     " ")))
-		(link (nth 2 e))
-		(mail-header-separator "")
-		mime-edit-insert-user-agent-field)
-	    (when (or text link)
-	      (if (eq 'html (nnrss-body-presentation-method))
-		  (progn
-		    (mime-edit-insert-text "html")
-		    (insert "<html><head></head><body>\n")
-		    (when text
-		      (insert text "\n"))
-		    (when link
-		      (insert "<p><a href=\"" link "\">link</a></p>\n"))
-		    (insert "</body></html>\n"))
-		(mime-edit-insert-text "plain")
-		(if text
-		    (progn
-		      (insert text "\n")
-		      (when link
-			(insert "\n" link "\n")))
+      (with-current-buffer nntp-server-buffer
+	(erase-buffer)
+	(if group
+	    (mm-with-unibyte-current-buffer
+	      (insert "Newsgroups: "
+		      (if (mm-coding-system-p 'utf-8)
+			  (mm-encode-coding-string group 'utf-8)
+			group)
+		      "\n")))
+	(if (nth 3 e)
+	    (insert "Subject: " (nth 3 e) "\n"))
+	(if (nth 4 e)
+	    (insert "From: " (nth 4 e) "\n"))
+	(if (nth 5 e)
+	    (insert "Date: " (nnrss-format-string (nth 5 e)) "\n"))
+	(insert (format "Message-ID: <%d@%s.nnrss>\n"
+			(car e)
+			(gnus-replace-in-string group "[\t\n ]+" "_")))
+	(insert "\n")
+	(let ((text (if (nth 6 e)
+			(mapconcat 'identity
+				   (delete "" (split-string (nth 6 e) "\n+"))
+				   " ")))
+	      (link (nth 2 e))
+	      (enclosure (nth 7 e))
+	      (mail-header-separator "")
+	      mime-edit-insert-user-agent-field)
+	  (when (or text link enclosure)
+	    (if (eq 'html (nnrss-body-presentation-method))
+		(progn
+		  (mime-edit-insert-text "html")
+		  (insert "<html><head></head><body>\n")
+		  (when text
+		    (insert text "\n"))
 		  (when link
-		    (insert link "\n"))))
-	      (mime-edit-translate-body)))
-	  (when nnrss-content-function
-	    (funcall nnrss-content-function e group article)))))
+		    (insert "<p><a href=\"" link "\">link</a></p>\n"))
+		  (when enclosure
+		    (insert "<p><a href=\"" (car enclosure) "\">"
+			    (cadr enclosure) "</a> " (nth 2 enclosure)
+			    " " (nth 3 enclosure) "</p>\n"))
+		  (insert "</body></html>\n"))
+	      (mime-edit-insert-text "plain")
+	      (when text
+		(insert text "\n")
+		(when (or link enclosure)
+		  (insert "\n")))
+	      (when link
+		(insert link "\n"))
+	      (when enclosure
+		(insert (car enclosure) " "
+			(nth 2 enclosure) " "
+			(nth 3 enclosure) "\n")))
+	    (mime-edit-translate-body)))
+	(when nnrss-content-function
+	  (funcall nnrss-content-function e group article))))
     (cond
      (err
       (nnheader-report 'nnrss err))
@@ -520,8 +527,8 @@ nnrss: %s: Not valid XML %s and w3-parse doesn't work %s"
 ;;; Snarf functions
 
 (defun nnrss-check-group (group server)
-  (let (file xml subject url extra changed author
-	     date rss-ns rdf-ns content-ns dc-ns)
+  (let (file xml subject url extra changed author date
+	     enclosure rss-ns rdf-ns content-ns dc-ns)
     (if (and nnrss-use-local
 	     (file-exists-p (setq file (expand-file-name
 					(nnrss-translate-file-chars
@@ -569,6 +576,27 @@ nnrss: %s: Not valid XML %s and w3-parse doesn't work %s"
 	(setq date (or (nnrss-node-text dc-ns 'date item)
 		       (nnrss-node-text rss-ns 'pubDate item)
 		       (message-make-date)))
+	(when (setq enclosure (cadr (assq (intern (concat rss-ns "enclosure")) item)))
+	  (let ((url (cdr (assq 'url enclosure)))
+		(len (cdr (assq 'length enclosure)))
+		(type (cdr (assq 'type enclosure)))
+		(name))
+	    (setq len
+		  (if (and len (integerp (setq len (string-to-number len))))
+		      ;; actually already in `ls-lisp-format-file-size' but
+		      ;; probably not worth to require it for one function
+		      (do ((size (/ len 1.0) (/ size 1024.0))
+			   (post-fixes (list "" "k" "M" "G" "T" "P" "E")
+				       (cdr post-fixes)))
+			  ((< size 1024)
+			   (format "%.1f%s" size (car post-fixes))))
+		    "0"))
+	    (setq url (or url ""))
+	    (setq name (if (string-match "/\\([^/]*\\)$" url)
+			   (match-string 1 url)
+			 "file"))
+	    (setq type (or type ""))
+	    (setq enclosure (list url name len type))))
 	(push
 	 (list
 	  (incf nnrss-group-max)
@@ -577,7 +605,8 @@ nnrss: %s: Not valid XML %s and w3-parse doesn't work %s"
 	  (and subject (nnrss-mime-encode-string subject))
 	  (and author (nnrss-mime-encode-string author))
 	  date
-	  (and extra (nnrss-decode-entities-string extra)))
+	  (and extra (nnrss-decode-entities-string extra))
+	  enclosure)
 	 nnrss-group-data)
 	(puthash (or url extra) t nnrss-group-hashtb)
 	(setq changed t))
