@@ -1,3 +1,11 @@
+2005-04-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (article-update-date-lapsed): Check for
+	mime-preview-original-major-mode as well.
+	(gnus-article-save-original-date): New macro.
+	(gnus-article-prepare-mime-display): Use it.
+	(gnus-article-prepare-display): Use it.
+
 2005-03-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: Use configure-package-path instead of
