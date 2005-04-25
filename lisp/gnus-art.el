@@ -3262,21 +3262,19 @@ This format is defined by the `gnus-article-time-format' variable."
   (interactive (list t))
   (article-date-ut 'iso8601 highlight))
 
-(defun gnus-article-date-value ()
-  "Return the value of the date header.
-The buffer is expected to be narrowed to just the header of the article."
-  (goto-char (point-min))
-  (let* ((case-fold-search t)
-	 (start (when (and (re-search-forward "^date:[\t\n ]+" nil t)
-			   (not (bolp)))
-		  (match-end 0))))
-    (when (and start
-	       (re-search-forward "[\t ]*\n\\(?:[^\t ]\\|\\'\\)" nil t))
-      (buffer-substring-no-properties start (match-beginning 0)))))
-
 (defmacro gnus-article-save-original-date (&rest forms)
-  "Save the original date as a text property."
-  `(let ((date (,(symbol-function 'gnus-article-date-value))))
+  "Save the original date as a text property and evaluate FORMS."
+  `(let* ((case-fold-search t)
+	  (start (progn
+		   (goto-char (point-min))
+		   (when (and (re-search-forward "^date:[\t\n ]+" nil t)
+			      (not (bolp)))
+		     (match-end 0))))
+	  (date (when (and start
+			   (re-search-forward "[\t ]*\n\\(?:[^\t ]\\|\\'\\)"
+					      nil t))
+		  (buffer-substring-no-properties start
+						  (match-beginning 0)))))
      (goto-char (point-max))
      (skip-chars-backward "\n")
      (put-text-property (point-min) (point) 'original-date date)
