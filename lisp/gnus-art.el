@@ -3277,6 +3277,9 @@ The buffer is expected to be narrowed to just the header of the article."
 (defmacro gnus-article-save-original-date (&rest forms)
   "Save the original date as a text property."
   `(let ((date (,(symbol-function 'gnus-article-date-value))))
+     (goto-char (point-max))
+     (skip-chars-backward "\n")
+     (put-text-property (point-min) (point) 'original-date date)
      ,@forms
      (goto-char (point-max))
      (skip-chars-backward "\n")
