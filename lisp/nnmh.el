@@ -211,7 +211,6 @@ as unread by Gnus.")
   (setq dir (expand-file-name dir))
   ;; Recurse down all directories.
   (let ((dirs (and (file-readable-p dir)
-		   (> (nth 1 (file-attributes (file-chase-links dir))) 2)
 		   (nnheader-directory-files dir t nil t)))
 	rdir)
     ;; Recurse down directories.
@@ -289,8 +288,8 @@ as unread by Gnus.")
 (deffoo nnmh-close-group (group &optional server)
   t)
 
-(deffoo nnmh-request-move-article (article group server
-					   accept-form &optional last)
+(deffoo nnmh-request-move-article (article group server accept-form 
+					   &optional last move-is-internal)
   (let ((buf (get-buffer-create " *nnmh move*"))
 	result)
     (and
@@ -578,4 +577,5 @@ as unread by Gnus.")
 
 (provide 'nnmh)
 
+;;; arch-tag: 36c12a98-3bad-44b3-9953-628078ef0e04
 ;;; nnmh.el ends here

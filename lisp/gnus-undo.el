@@ -186,9 +186,9 @@ A numeric argument serves as a repeat count."
       (error "Nothing further to undo"))
     (setq gnus-undo-actions (delq action gnus-undo-actions))
     (setq gnus-undo-boundary t)
-    (while action
-      (funcall (pop action)))))
+    (mapc 'funcall action)))
 
 (provide 'gnus-undo)
 
+;;; arch-tag: 0d787bc7-787d-499a-837f-211d2cb07f2e
 ;;; gnus-undo.el ends here

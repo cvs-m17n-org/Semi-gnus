@@ -102,7 +102,8 @@
 (require 'gnus-art)
 
 (defgroup gnus-diary nil
-  "Utilities on top of the nndiary backend for Gnus.")
+  "Utilities on top of the nndiary backend for Gnus."
+  :version "22.1")
 
 (defcustom gnus-diary-summary-line-format "%U%R%z %uD: %(%s%) (%ud)\n"
   "*Summary line format for nndiary groups."
@@ -457,4 +458,5 @@ If ARG (or prefix) is non-nil, force prompting for all fields."
 
 (provide 'gnus-diary)
 
+;;; arch-tag: 98467e70-337e-4ddc-b92d-45d403ff1b4b
 ;;; gnus-diary.el ends here

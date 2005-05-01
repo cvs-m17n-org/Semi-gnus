@@ -34,11 +34,13 @@
 
 (defcustom gnus-x-face-directory (expand-file-name "x-faces" gnus-directory)
   "*Directory where X-Face PBM files are stored."
+  :version "22.1"
   :group 'gnus-fun
   :type 'directory)
 
 (defcustom gnus-convert-pbm-to-x-face-command "pbmtoxbm %s | compface"
   "Command for converting a PBM to an X-Face."
+  :version "22.1"
   :group 'gnus-fun
   :type 'string)
 
@@ -46,6 +48,7 @@
   "Command for converting an image to an X-Face.
 By default it takes a GIF filename and output the X-Face header data
 on stdout."
+  :version "22.1"
   :group 'gnus-fun
   :type 'string)
 
@@ -53,6 +56,7 @@ on stdout."
   "Command for converting an image to an Face.
 By default it takes a JPEG filename and output the Face header data
 on stdout."
+  :version "22.1"
   :group 'gnus-fun
   :type 'string)
 
@@ -275,4 +279,5 @@ colors of the displayed X-Faces."
 
 (provide 'gnus-fun)
 
+;;; arch-tag: 9d000a69-15cc-4491-9dc0-4627484f50c1
 ;;; gnus-fun.el ends here

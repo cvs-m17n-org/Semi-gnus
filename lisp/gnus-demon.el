@@ -37,8 +37,10 @@
 (require 'gnus-util)
 (eval-and-compile
   (if (featurep 'xemacs)
-      (require 'itimer)
+      (require 'timer-funcs)
     (require 'timer)))
+
+(autoload 'parse-time-string "parse-time" nil nil)
 
 (defgroup gnus-demon nil
   "Demonic behaviour."
@@ -322,4 +324,5 @@ minutes, the connection is closed."
 
 (provide 'gnus-demon)
 
+;;; arch-tag: 8dd5cd3d-6ae4-46b4-9b15-f5fca09fd392
 ;;; gnus-demon.el ends here

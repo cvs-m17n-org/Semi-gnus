@@ -284,7 +284,7 @@
       (nconc rest articles))))
 
 (deffoo nnmbox-request-move-article
-    (article group server accept-form &optional last)
+    (article group server accept-form &optional last move-is-internal)
   (let ((buf (get-buffer-create " *nnmbox move*"))
 	result)
     (and
@@ -695,4 +695,5 @@
 
 (provide 'nnmbox)
 
+;;; arch-tag: 611dd95f-be37-413a-b3ae-8b059ba93659
 ;;; nnmbox.el ends here

@@ -1,5 +1,5 @@
 ;;; nnfolder.el --- mail folder access for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org> (adding MARKS)
@@ -370,10 +370,11 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 (deffoo nnfolder-request-create-group (group &optional server args)
   (nnfolder-possibly-change-group nil server)
   (nnmail-activate 'nnfolder)
-  (when group
-    (unless (assoc group nnfolder-group-alist)
-      (push (list group (cons 1 0)) nnfolder-group-alist)
-      (nnfolder-save-active nnfolder-group-alist nnfolder-active-file)
+  (when (and group
+	     (not (assoc group nnfolder-group-alist)))
+    (push (list group (cons 1 0)) nnfolder-group-alist)
+    (nnfolder-save-active nnfolder-group-alist nnfolder-active-file)
+    (save-current-buffer
       (nnfolder-read-folder group)))
   t)
 
@@ -466,8 +467,8 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
       (nnfolder-save-active nnfolder-group-alist nnfolder-active-file)
       (gnus-sorted-difference articles (nreverse deleted-articles)))))
 
-(deffoo nnfolder-request-move-article (article group server
-					       accept-form &optional last)
+(deffoo nnfolder-request-move-article (article group server accept-form 
+					       &optional last move-is-internal)
   (save-excursion
     (let ((buf (get-buffer-create " *nnfolder move*"))
 	  result)
@@ -872,7 +873,7 @@ deleted.  Point is left where the deleted region was."
 	 (buffer (set-buffer
 		  (let ((nnheader-file-coding-system
 			 nnfolder-file-coding-system))
-		    (nnheader-find-file-noselect file)))))
+		    (nnheader-find-file-noselect file t)))))
     (mm-enable-multibyte) ;; Use multibyte buffer for future copying.
     (if (equal (cadr (assoc group nnfolder-scantime-alist))
 	       (nth 5 (file-attributes file)))
@@ -1027,9 +1028,7 @@ This command does not work if you use short group names."
       (when (not (message-mail-file-mbox-p file))
 	(ignore-errors
 	  (delete-file file)))))
-  (let ((files (directory-files nnfolder-directory))
-	file)
-    (while (setq file (pop files))
+    (dolist (file (directory-files nnfolder-directory))
       (when (and (not (backup-file-name-p file))
 		 (message-mail-file-mbox-p
 		  (nnheader-concat nnfolder-directory file)))
@@ -1044,7 +1043,7 @@ This command does not work if you use short group names."
 	  (nnfolder-possibly-change-folder file)
 	  (nnfolder-possibly-change-group file)
 	  (nnfolder-close-group file))))
-    (nnheader-message 5 "")))
+    (nnheader-message 5 ""))
 
 (defun nnfolder-group-pathname (group)
   "Make file name for GROUP."
@@ -1272,4 +1271,5 @@ This command does not work if you use short group names."
 
 (provide 'nnfolder)
 
+;;; arch-tag: a040d0f4-4f4e-445f-8972-839575c5f7e6
 ;;; nnfolder.el ends here

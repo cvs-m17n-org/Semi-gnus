@@ -196,8 +196,8 @@
 			'nnmh-request-group
 			(list group server dont-check)))
 
-(deffoo nndraft-request-move-article (article group server
-					      accept-form &optional last)
+(deffoo nndraft-request-move-article (article group server accept-form 
+				      &optional last move-is-internal)
   (nndraft-possibly-change-group group)
   (let ((buf (get-buffer-create " *nndraft move*"))
 	result)
@@ -307,4 +307,5 @@
 
 (provide 'nndraft)
 
+;;; arch-tag: 3ce26ca0-41cb-48b1-8703-4dad35e188aa
 ;;; nndraft.el ends here

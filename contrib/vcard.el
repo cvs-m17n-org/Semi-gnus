@@ -7,8 +7,6 @@
 ;; Keywords: extensions
 ;; Created: 1997-09-27
 
-;; $Id: vcard.el,v 1.1.1.4 2004-01-05 00:12:59 yamaoka Exp $
-
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
@@ -307,4 +305,5 @@ presentation buffer."
 
 (provide 'vcard)
 
+;;; arch-tag: 64df032f-e54c-4cfb-9e8c-8bead284f61b
 ;;; vcard.el ends here

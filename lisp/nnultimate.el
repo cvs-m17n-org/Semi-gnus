@@ -39,6 +39,7 @@
 (require 'mm-util)
 (require 'mm-url)
 (require 'nnweb)
+(require 'parse-time)
 (autoload 'w3-parse-buffer "w3-parse")
 
 (nnoo-declare nnultimate)
@@ -476,4 +477,5 @@
 ;; coding: iso-8859-1
 ;; End:
 
+;;; arch-tag: ab6bfc45-8fe1-4647-9c78-41050eb152b8
 ;;; nnultimate.el ends here

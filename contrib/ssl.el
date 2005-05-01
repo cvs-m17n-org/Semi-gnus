@@ -1,7 +1,4 @@
 ;;; ssl.el --- ssl functions for emacsen without them builtin
-;; Author: $Author: yamaoka $
-;; Created: $Date: 2004-01-05 00:12:59 $
-;; Version: $Revision: 1.1.1.3 $
 ;; Keywords: comm
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
@@ -199,3 +196,5 @@ specifying a port number to connect to."
     proc))
 
 (provide 'ssl)
+
+;;; arch-tag: 659fae92-1c67-4055-939f-32153c2f5114

@@ -7,8 +7,6 @@
 ;; Keywords: crypto
 ;; Created: 2000-04-28
 
-;; $Id: gpg-ring.el,v 1.1.1.3 2004-01-05 00:12:59 yamaoka Exp $
-
 ;; This file is NOT (yet?) part of GNU Emacs.
 
 ;; GNU Emacs is free software; you can redistribute it and/or modify
@@ -480,4 +478,5 @@ used."
 
 (provide 'gpg-ring)
 
+;;; arch-tag: a4c5b2d1-aff0-4ab6-96e9-267727226c2d
 ;;; gpg-ring.el ends here

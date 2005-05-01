@@ -5,22 +5,13 @@
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
-@dircategory Emacs
-@direntry
-* Message: (message).   Mail and news composition mode that goes with Gnus.
-@end direntry
-@iftex
-@finalout
-@end iftex
-@setchapternewpage odd
-
-@ifnottex
-
+@copying
 This file documents Message, the Emacs message composition mode.
 
-Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004 
+Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005 
 Free Software Foundation, Inc.
 
+@quotation
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
 any later version published by the Free Software Foundation; with no
@@ -37,9 +28,17 @@ This document is part of a collection distributed under the GNU Free
 Documentation License.  If you want to distribute this document
 separately from the collection, you can do so by adding a copy of the
 license to the document, as described in section 6 of the license.
-@end ifnottex
+@end quotation
+@end copying
 
-@tex
+@dircategory Emacs
+@direntry
+* Message: (message).   Mail and news composition mode that goes with Gnus.
+@end direntry
+@iftex
+@finalout
+@end iftex
+@setchapternewpage odd
 
 @titlepage
 @title Message Manual
@@ -48,29 +47,9 @@ license to the document, as described in section 6 of the license.
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-     Free Software Foundation, Inc.
-
-Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.1 or
-any later version published by the Free Software Foundation; with the
-Invariant Sections being none, with the Front-Cover texts being ``A GNU
-Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
-license is included in the section entitled ``GNU Free Documentation
-License'' in the Emacs manual.
-
-(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
-this GNU Manual, like GNU software.  Copies published by the Free
-Software Foundation raise funds for GNU development.''
-
-This document is part of a collection distributed under the GNU Free
-Documentation License.  If you want to distribute this document
-separately from the collection, you can do so by adding a copy of the
-license to the document, as described in section 6 of the license.
+@insertcopying
 @end titlepage
 @page
-
-@end tex
 
 @node Top
 @top Message
@@ -167,16 +146,15 @@ If you want the replies to go to the @code{Sender} instead of the
 This function will be called narrowed to the head of the article that is
 being replied to.
 
-As you can see, this function should return a string if it has an
-opinion as to what the To header should be.  If it does not, it should
-just return @code{nil}, and the normal methods for determining the To
-header will be used.
+As you can see, this function should return a list.  In this case, it
+returns @code{((To . "Whom"))} if it has an opinion as to what the To
+header should be.  If it does not, it should just return @code{nil}, and
+the normal methods for determining the To header will be used.
 
-This function can also return a list.  In that case, each list element
-should be a cons, where the @sc{car} should be the name of a header
-(e.g. @code{Cc}) and the @sc{cdr} should be the header value
-(e.g. @samp{larsi@@ifi.uio.no}).  All these headers will be inserted into
-the head of the outgoing mail.
+Each list element should be a cons, where the @sc{car} should be the
+name of a header (e.g. @code{Cc}) and the @sc{cdr} should be the header
+value (e.g. @samp{larsi@@ifi.uio.no}).  All these headers will be
+inserted into the head of the outgoing mail.
 
 
 @node Wide Reply
@@ -245,7 +223,13 @@ only you can cancel your own messages, which is nice.  The downside
 is that if you lose your @file{.emacs} file (which is where Gnus
 stores the secret cancel lock password (which is generated
 automatically the first time you use this feature)), you won't be
-able to cancel your message.
+able to cancel your message.  If you want to manage a password yourself,
+you can put something like the following in your @file{~/.gnus.el} file:
+
+@lisp
+(setq canlock-password "geheimnis"
+      canlock-password-for-verify canlock-password)
+@end lisp
 
 Whether to insert the header or not is controlled by the
 @code{message-insert-canlock} variable.
@@ -330,8 +314,7 @@ and resend the message in the current buffer to that address.
 
 @vindex message-ignored-resent-headers
 Headers that match the @code{message-ignored-resent-headers} regexp will
-be removed before sending the message.  The default is
-@samp{^Return-receipt}.
+be removed before sending the message.
 
 
 @node Bouncing
@@ -1097,6 +1080,11 @@ The text is killed and replaced with the contents of the variable
 @code{message-elide-ellipsis}.  The default value is to use an ellipsis
 (@samp{[...]}).
 
+@item C-c M-k
+@kindex C-c M-k
+@findex message-kill-address
+Kill the address under point.
+
 @item C-c C-z
 @kindex C-c C-x
 @findex message-kill-to-signature
@@ -1417,6 +1405,9 @@ hidden when composing a message.
       '(not "From" "Subject" "To" "Cc" "Newsgroups"))
 @end lisp
 
+Headers are hidden using narrowing, you can use @kbd{M-x widen} to
+expose them in the buffer.
+
 @item message-header-synonyms
 @vindex message-header-synonyms
 A list of lists of header synonyms.  E.g., if this list contains a
@@ -1447,6 +1438,12 @@ Regexp of headers to be removed before mailing.  The default is
 This string is inserted at the end of the headers in all message
 buffers that are initialized as mail.
 
+@item message-generate-hashcash
+@vindex message-generate-hashcash
+Boolean variable that indicate whether @samp{X-Hashcash} headers
+should be computed for the message.  @xref{Hashcash, ,Hashcash,gnus,
+The Gnus Manual}.
+
 @end table
 
 
@@ -1463,10 +1460,10 @@ buffers that are initialized as mail.
 @findex smtpmail-send-it
 @findex feedmail-send-it
 Function used to send the current buffer as mail.  The default is
-@code{message-send-mail-with-sendmail}.  Other valid values include
+@code{message-send-mail-with-sendmail}, or @code{smtpmail-send-it}
+according to the system.  Other valid values include
 @code{message-send-mail-with-mh}, @code{message-send-mail-with-qmail},
-@code{message-smtpmail-send-it}, @code{smtpmail-send-it} and
-@code{feedmail-send-it}.
+@code{message-smtpmail-send-it} and @code{feedmail-send-it}.
 
 @item message-mh-deletable-headers
 @vindex message-mh-deletable-headers
@@ -1573,8 +1570,8 @@ This optional header will be computed by Message.
 @cindex Sun
 @cindex i-did-not-set--mail-host-address--so-tickle-me
 This required header will be generated by Message.  A unique ID will be
-created based on the date, time, user name and system name.  For the
-domain part, message will look (in this order) at
+created based on the date, time, user name (for the local part) and the
+domain part.  For the domain part, message will look (in this order) at
 @code{message-user-fqdn}, @code{system-name}, @code{mail-host-address}
 and @code{message-user-mail-address} (i.e. @code{user-mail-address})
 until a probably valid fully qualified domain name (FQDN) was found.
@@ -1884,6 +1881,7 @@ follows this line--} by default.
 @item message-directory
 @vindex message-directory
 Directory used by many mailey things.  The default is @file{~/Mail/}.
+All other mail file variables are derived from @code{message-directory}.
 
 @item message-auto-save-directory
 @vindex message-auto-save-directory
@@ -1959,6 +1957,12 @@ Hook run when canceling news articles.
 @vindex message-mode-syntax-table
 Syntax table used in message mode buffers.
 
+@item message-cite-articles-with-x-no-archive
+@vindex message-cite-articles-with-x-no-archive
+If non-@code{nil}, don't strip quoted text from articles that have
+@samp{X-No-Archive} set.  Even if this variable isn't set, you can
+undo the stripping by hitting the @code{undo} keystroke.
+
 @item message-strip-special-text-properties
 @vindex message-strip-special-text-properties
 Emacs has a number of special text properties which can break message
@@ -1994,7 +1998,6 @@ A function to be called if @var{predicate} returns non-@code{nil}.
 ((news message-news-p message-send-via-news)
  (mail message-mail-p message-send-via-mail))
 @end lisp
-
 
 
 @end table
@@ -2214,3 +2217,7 @@ basis of the new @code{Cc} header, except if this header is
 @bye
 
 @c End:
+
+@ignore
+   arch-tag: 16ab76af-a281-4e34-aed6-5624569f7601
+@end ignore

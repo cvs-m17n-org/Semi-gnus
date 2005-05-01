@@ -32,8 +32,7 @@
 (require 'mm-decode)
 
 (defun mm-partial-find-parts (id &optional art)
-  (let ((headers (save-excursion
-		   (set-buffer gnus-summary-buffer)
+  (let ((headers (with-current-buffer gnus-summary-buffer
 		   gnus-newsgroup-headers))
 	phandles header)
     (while (setq header (pop headers))
@@ -151,4 +150,5 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 
 (provide 'mm-partial)
 
+;;; arch-tag: 460e7424-05f2-4a1d-a0f2-70ec081eff7d
 ;;; mm-partial.el ends here

@@ -58,6 +58,7 @@
 (defalias 'mail-header-parse-date 'ietf-drums-parse-date)
 (defalias 'mail-narrow-to-head 'ietf-drums-narrow-to-header)
 (defalias 'mail-quote-string 'ietf-drums-quote-string)
+(defalias 'mail-header-make-address 'ietf-drums-make-address)
 
 (defalias 'mail-header-fold-field 'rfc2047-fold-field)
 (defalias 'mail-header-unfold-field 'rfc2047-unfold-field)
@@ -72,4 +73,5 @@
 
 (provide 'mail-parse)
 
+;;; arch-tag: 3e63d75c-c962-4784-ab01-7ba07ca9d2d4
 ;;; mail-parse.el ends here

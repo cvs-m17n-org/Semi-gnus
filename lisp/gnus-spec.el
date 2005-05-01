@@ -1,5 +1,5 @@
 ;;; gnus-spec.el --- format spec functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -32,12 +32,14 @@
 
 (defcustom gnus-use-correct-string-widths (featurep 'xemacs)
   "*If non-nil, use correct functions for dealing with wide characters."
+  :version "22.1"
   :group 'gnus-format
   :type 'boolean)
 
 (defcustom gnus-make-format-preserve-properties (featurep 'xemacs)
   "*If non-nil, use a replacement `format' function which preserves
 text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
+  :version "22.1"
   :group 'gnus-format
   :type 'boolean)
 
@@ -180,10 +182,11 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
     (pop-to-buffer "*Gnus Format*")
     (erase-buffer)
     (lisp-interaction-mode)
-    (insert (pp-to-string spec))))
+    (insert (gnus-pp-to-string spec))))
 
 (defun gnus-update-format-specifications (&optional force &rest types)
-  "Update all (necessary) format specifications."
+  "Update all (necessary) format specifications.
+Return a list of updated types."
   ;; Make the indentation array.
   ;; See whether all the stored info needs to be flushed.
   (when (or force
@@ -193,21 +196,22 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 	    (not (equal emacs-version
 			(cdr (assq 'version gnus-format-specs)))))
     (setq gnus-format-specs nil))
-  ;; Flush the group format spec cache if there's the grouplens stuff.
-  (let ((spec (assq 'group gnus-format-specs)))
-    (when (and (memq 'group types)
-	       (string-match " gnus-tmp-grouplens[ )]"
-			     (gnus-prin1-to-string (cdr spec))))
-      (setq gnus-format-specs (delq spec gnus-format-specs))))
+  ;; Flush the group format spec cache if there's the grouplens stuff
+  ;; or it doesn't support decoded group names.
+  (when (memq 'group types)
+    (let* ((spec (assq 'group gnus-format-specs))
+	   (sspec (gnus-prin1-to-string (nth 2 spec))))
+      (when (or (string-match " gnus-tmp-grouplens[ )]" sspec)
+		(not (string-match " gnus-tmp-decoded-group[ )]" sspec)))
+	(setq gnus-format-specs (delq spec gnus-format-specs)))))
 
   ;; Go through all the formats and see whether they need updating.
-  (let (new-format entry type val)
+  (let (new-format entry type val updated)
     (while (setq type (pop types))
       ;; Jump to the proper buffer to find out the value of the
       ;; variable, if possible.  (It may be buffer-local.)
       (save-excursion
-	(let ((buffer (intern (format "gnus-%s-buffer" type)))
-	      val)
+	(let ((buffer (intern (format "gnus-%s-buffer" type))))
 	  (when (and (boundp buffer)
 		     (setq val (symbol-value buffer))
 		     (gnus-buffer-exists-p val))
@@ -237,10 +241,12 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 		(setcar (cdr entry) val)
 		(setcar entry new-format))
 	    (push (list type new-format val) gnus-format-specs))
-	  (set (intern (format "gnus-%s-line-format-spec" type)) val)))))
+	  (set (intern (format "gnus-%s-line-format-spec" type)) val)
+	  (push type updated))))
 
-  (unless (assq 'version gnus-format-specs)
-    (push (cons 'version emacs-version) gnus-format-specs)))
+    (unless (assq 'version gnus-format-specs)
+      (push (cons 'version emacs-version) gnus-format-specs))
+    updated))
 
 (defvar gnus-mouse-face-0 'highlight)
 (defvar gnus-mouse-face-1 'highlight)
@@ -277,21 +283,15 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 
 (defun gnus-spec-tab (column)
   (if (> column 0)
-      `(insert (make-string (max (- ,column (current-column)) 0) ? ))
+      `(insert-char ?  (max (- ,column (current-column)) 0))
     (let ((column (abs column)))
-      (if gnus-use-correct-string-widths
-	  `(progn
-	     (if (> (current-column) ,column)
-		 (while (progn
-			  (delete-backward-char 1)
-			  (> (current-column) ,column))))
-	     (insert (make-string (max (- ,column (current-column)) 0) ? )))
-	`(progn
-	   (if (> (current-column) ,column)
-	       (delete-region (point)
-			      (- (point) (- (current-column) ,column)))
-	     (insert (make-string (max (- ,column (current-column)) 0)
-				  ? ))))))))
+      `(if (> (current-column) ,column)
+	   (let ((end (point)))
+	     (if (= (move-to-column ,column) ,column)
+		 (delete-region (point) end)
+	       (delete-region (1- (point)) end)
+	       (insert " ")))
+	 (insert-char ?  (max (- ,column (current-column)) 0))))))
 
 (defun gnus-correct-length (string)
   "Return the correct width of STRING."
@@ -763,4 +763,5 @@ If PROPS, insert the result."
 ;; coding: iso-8859-1
 ;; End:
 
+;;; arch-tag: a4328fa1-1f84-4b09-97ad-4b5767cfd50f
 ;;; gnus-spec.el ends here

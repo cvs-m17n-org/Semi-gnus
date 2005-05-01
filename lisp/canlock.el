@@ -44,7 +44,7 @@
 (eval-when-compile
   (require 'cl))
 
-(require 'sha1-el)
+(require 'sha1)
 
 (defvar mail-header-separator)
 
@@ -55,13 +55,13 @@
 (defcustom canlock-password nil
   "Password to use when signing a Cancel-Lock or a Cancel-Key header."
   :type '(radio (const :format "Not specified " nil)
-		(string :tag "Password" :size 0))
+		(string :tag "Password"))
   :group 'canlock)
 
 (defcustom canlock-password-for-verify canlock-password
   "Password to use when verifying a Cancel-Lock or a Cancel-Key header."
   :type '(radio (const :format "Not specified " nil)
-		(string :tag "Password" :size 0))
+		(string :tag "Password"))
   :group 'canlock)
 
 (defcustom canlock-force-insert-header nil
@@ -247,4 +247,5 @@ it fails."
 
 (provide 'canlock)
 
+;;; arch-tag: 033c4f09-b9f1-459d-bd0d-254430283f78
 ;;; canlock.el ends here

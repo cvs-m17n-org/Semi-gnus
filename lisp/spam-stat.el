@@ -129,6 +129,7 @@
 Use the functions to build a dictionary of words and their statistical
 distribution in spam and non-spam mails.  Then use a function to determine
 whether a buffer contains spam or not."
+  :version "22.1"
   :group 'gnus)
 
 (defcustom spam-stat-file "~/.spam-stat.el"
@@ -167,7 +168,7 @@ no effect when spam-stat is invoked through spam.el."
   :type 'string
   :group 'spam-stat)
 
-(defcustom spam-stat-split-fancy-spam-threshhold 0.9
+(defcustom spam-stat-split-fancy-spam-threshold 0.9
   "Spam score threshold in spam-stat-split-fancy."
   :type 'number
   :group 'spam-stat)
@@ -177,13 +178,36 @@ no effect when spam-stat is invoked through spam.el."
   :type 'hook
   :group 'spam-stat)
 
+(defcustom spam-stat-score-buffer-user-functions nil
+  "List of additional scoring functions.
+Called  one by one on the buffer. 
+
+If all of these functions return non-nil answers, these numerical
+answers are added to the computed spam stat score on the buffer.  If
+you defun such functions, make sure they don't return the buffer in a
+narrowed state or such: use, for example, `save-excursion'.  Each of
+your functions is also passed the initial spam-stat score which might
+aid in your scoring.
+
+Also be careful when defining such functions.  If they take a long
+time, they will slow down your mail splitting.  Thus, if the buffer is
+large, don't forget to use smaller regions, by wrapping your work in,
+say, `with-spam-stat-max-buffer-size'."
+  :type '(repeat sexp)
+  :group 'spam-stat)
+
 (defcustom spam-stat-process-directory-age 90
   "Max. age of files to be processed in directory, in days.
 When using `spam-stat-process-spam-directory' or
 `spam-stat-process-non-spam-directory', only files that have
 been touched in this many days will be considered.  Without
 this filter, re-training spam-stat with several thousand messages
-will start to take a very long time.")
+will start to take a very long time."
+  :type 'number
+  :group 'spam-stat)
+
+(defvar spam-stat-last-saved-at nil
+  "Time stamp of last change of spam-stat-file on this run")
 
 (defvar spam-stat-syntax-table
   (let ((table (copy-syntax-table text-mode-syntax-table)))
@@ -241,6 +265,9 @@ Use `spam-stat-ngood', `spam-stat-nbad', `spam-stat-good',
 
 (defvar spam-stat-nbad 0
   "The number of bad mails in the dictionary.")
+
+(defvar spam-stat-error-holder nil
+  "A holder for condition-case errors while scoring buffers.")
 
 (defsubst spam-stat-good (entry)
   "Return the number of times this word belongs to good mails."
@@ -383,7 +410,7 @@ Use `spam-stat-ngood', `spam-stat-nbad', `spam-stat-good',
 ;; Saving and Loading
 
 (defun spam-stat-save (&optional force)
-  "Save the `spam-stat' hash table as Lisp file.
+  "Save the `spam-stat' hash table as lisp file.
 With a prefix argument save unconditionally."
   (interactive "P")
   (when (or force spam-stat-dirty)
@@ -400,14 +427,25 @@ spam-stat (spam-stat-to-hash-table '(" spam-stat-ngood spam-stat-nbad))
 				  (spam-stat-bad entry))))
 		   spam-stat)
 	  (insert ")))"))))
-	(setq spam-stat-dirty nil)))
+    (message "Saved %s."  spam-stat-file)
+    (setq spam-stat-dirty nil
+          spam-stat-last-saved-at (nth 5 (file-attributes spam-stat-file)))))
 
 (defun spam-stat-load ()
   "Read the `spam-stat' hash table from disk."
   ;; TODO: maybe we should warn the user if spam-stat-dirty is t?
   (let ((coding-system-for-read spam-stat-coding-system))
-    (load-file spam-stat-file))
-  (setq spam-stat-dirty nil))
+    (cond (spam-stat-dirty (message "Spam stat not loaded: spam-stat-dirty t"))
+          ((or (not (boundp 'spam-stat-last-saved-at))
+               (null spam-stat-last-saved-at)
+               (not (equal spam-stat-last-saved-at
+                           (nth 5 (file-attributes spam-stat-file)))))
+           (progn 
+             (load-file spam-stat-file)
+             (setq spam-stat-dirty nil
+                   spam-stat-last-saved-at 
+                   (nth 5 (file-attributes spam-stat-file)))))
+          (t (message "Spam stat file not loaded: no change in disk..")))))
 
 (defun spam-stat-to-hash-table (entries)
   "Turn list ENTRIES into a hash table and store as `spam-stat'.
@@ -461,29 +499,51 @@ where DIFF is the difference between SCORE and 0.5."
     result))
 
 (defun spam-stat-score-buffer ()
-  "Return a score describing the spam-probability for this buffer."
+  "Return a score describing the spam-probability for this buffer.
+Add user supplied modifications if supplied."
+  (interactive) ; helps in debugging. 
   (setq spam-stat-score-data (spam-stat-buffer-words-with-scores))
   (let* ((probs (mapcar 'cadr spam-stat-score-data))
-	 (prod (apply #'* probs)))
-    (/ prod (+ prod (apply #'* (mapcar #'(lambda (x) (- 1 x))
-				       probs))))))
+	 (prod (apply #'* probs))
+	 (score0 
+	  (/ prod (+ prod (apply #'* (mapcar #'(lambda (x) (- 1 x))
+					     probs)))))
+	 (score1s
+	  (condition-case
+	      spam-stat-error-holder
+	      (spam-stat-score-buffer-user score0)
+	    (error nil)))
+	 (ans
+	  (if score1s (+ score0 score1s) score0)))
+    (when (interactive-p) 
+      (message "%S" ans))
+    ans))
+
+(defun spam-stat-score-buffer-user (&rest args)
+  (let* ((scores
+	  (mapcar 
+	   (lambda (fn) 
+	     (apply fn args))
+	   spam-stat-score-buffer-user-functions)))
+    (if (memq nil scores) nil 
+      (apply #'+ scores))))
 
 (defun spam-stat-split-fancy ()
   "Return the name of the spam group if the current mail is spam.
 Use this function on `nnmail-split-fancy'.  If you are interested in
 the raw data used for the last run of `spam-stat-score-buffer',
 check the variable `spam-stat-score-data'."
-  (condition-case var
+  (condition-case spam-stat-error-holder
       (progn
 	(set-buffer spam-stat-buffer)
 	(goto-char (point-min))
-	(when (> (spam-stat-score-buffer) spam-stat-split-fancy-spam-threshhold)
+	(when (> (spam-stat-score-buffer) spam-stat-split-fancy-spam-threshold)
 	  (when (boundp 'nnmail-split-trace)
 	    (mapc (lambda (entry)
 		    (push entry nnmail-split-trace))
 		  spam-stat-score-data))
 	  spam-stat-split-fancy-spam-group))
-    (error (message "Error in spam-stat-split-fancy: %S" var)
+    (error (message "Error in spam-stat-split-fancy: %S" spam-stat-error-holder)
 	   nil)))
 
 ;; Testing
@@ -605,6 +665,9 @@ COUNT defaults to 5"
   (remove-hook 'gnus-select-article-hook
 	       'spam-stat-store-gnus-article-buffer))
 
+(add-hook 'spam-stat-unload-hook 'spam-stat-unload-hook)
+
 (provide 'spam-stat)
 
+;;; arch-tag: ff1d2200-8ddb-42fb-bb7b-1b5e20448554
 ;;; spam-stat.el ends here

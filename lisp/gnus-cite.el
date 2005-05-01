@@ -1,6 +1,6 @@
 ;;; gnus-cite.el --- parse citations in articles for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Per Abhiddenware
@@ -124,8 +124,17 @@ The text matching the first grouping will be used as a button."
 (defcustom gnus-cite-unsightly-citation-regexp
   "^-----Original Message-----\nFrom: \\(.+\n\\)+\n"
   "Regexp matching Microsoft-type rest-of-message citations."
+  :version "22.1"
   :group 'gnus-cite
   :type 'regexp)
+
+(defcustom gnus-cite-ignore-quoted-from t
+  "Non-nil means don't regard lines beginning with \">From \" as cited text.
+Those lines may have been quoted by MTAs in order not to mix up with
+the envelope From line."
+  :version "22.1"
+  :group 'gnus-cite
+  :type 'boolean)
 
 (defface gnus-cite-attribution-face '((t
 				       (:italic t)))
@@ -134,6 +143,7 @@ The text matching the first grouping will be used as a button."
 (defcustom gnus-cite-attribution-face 'gnus-cite-attribution-face
   "Face used for attribution lines.
 It is merged with the face for the cited text belonging to the attribution."
+  :version "22.1"
   :group 'gnus-cite
   :type 'face)
 
@@ -739,6 +749,13 @@ See also the documentation for `gnus-article-highlight-citation'."
       ;; Ignore very long prefixes.
       (when (> end (+ begin gnus-cite-max-prefix))
 	(setq end (+ begin gnus-cite-max-prefix)))
+      ;; Ignore quoted envelope From_.
+      (when (and gnus-cite-ignore-quoted-from
+		 (prog2
+		     (setq case-fold-search nil)
+		     (looking-at ">From ")
+		   (setq case-fold-search t)))
+	(setq end (1+ begin)))
       (while (re-search-forward prefix-regexp (1- end) t)
 	;; Each prefix.
 	(setq end (match-end 0)
@@ -1057,4 +1074,5 @@ See also the documentation for `gnus-article-highlight-citation'."
 ;; coding: iso-8859-1
 ;; End:
 
+;;; arch-tag: 1997b044-6067-471e-8c8f-dc903093098a
 ;;; gnus-cite.el ends here

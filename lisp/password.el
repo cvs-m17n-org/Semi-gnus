@@ -35,7 +35,14 @@
 ;;
 ;; (password-cache-add "test" "foo")
 ;;  => nil
-;;
+
+;; Note the previous two can be replaced with:
+;; (password-read-and-add "Password? " "test")
+;; ;; Minibuffer prompt for password.
+;; => "foo"
+;; ;; "foo" is now cached with key "test"
+
+
 ;; (password-read "Password? " "test")
 ;; ;; No minibuffer prompt
 ;;  => "foo"
@@ -53,7 +60,7 @@
 ;;; Code:
 
 (when (featurep 'xemacs)
-  (require 'run-at-time))
+  (require 'timer-funcs))
 
 (eval-when-compile
   (require 'cl))
@@ -83,6 +90,15 @@ The variable `password-cache' control whether the cache is used."
 	   (symbol-value (intern-soft key password-data)))
       (read-passwd prompt)))
 
+(defun password-read-and-add (prompt &optional key)
+  "Read password, for use with KEY, from user, or from cache if wanted.
+Then store the password in the cache.  Uses `password-read' and
+`password-cache-add'."
+  (let ((password (password-read prompt key)))
+    (when (and password key)
+      (password-cache-add key password))
+    password))
+
 (defun password-cache-remove (key)
   "Remove password indexed by KEY from password cache.
 This is typically run be a timer setup from `password-cache-add',
@@ -99,13 +115,14 @@ user again."
   "Add password to cache.
 The password is removed by a timer after `password-cache-expiry'
 seconds."
-  (set (intern key password-data) password)
-  (when password-cache-expiry
+  (when (and password-cache-expiry (null (intern-soft key password-data)))
     (run-at-time password-cache-expiry nil
 		 #'password-cache-remove
 		 key))
+  (set (intern key password-data) password)
   nil)
 
 (provide 'password)
 
+;;; arch-tag: ab160494-16c8-4c68-a4a1-73eebf6686e5
 ;;; password.el ends here

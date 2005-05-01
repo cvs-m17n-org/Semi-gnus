@@ -1,5 +1,5 @@
 ;;; ietf-drums.el --- Functions for parsing RFC822bis headers
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -26,6 +26,16 @@
 ;; successor to RFC822, "Standard For The Format Of Arpa Internet Text
 ;; Messages".  This library is based on
 ;; draft-ietf-drums-msg-fmt-05.txt, released on 1998-08-05.
+
+;; Pending a real regression self test suite, Simon Josefsson added
+;; various self test expressions snipped from bug reports, and their
+;; expected value, below.  I you believe it could be useful, please
+;; add your own test cases, or write a real self test suite, or just
+;; remove this.
+
+;; <m3oekvfd50.fsf@whitebox.m5r.de>
+;; (ietf-drums-parse-address "'foo' <foo@example.com>")
+;; => ("foo@example.com" . "'foo'")
 
 ;;; Code:
 
@@ -64,9 +74,9 @@ backslash and doublequote.")
     (modify-syntax-entry ?> ")" table)
     (modify-syntax-entry ?@ "w" table)
     (modify-syntax-entry ?/ "w" table)
-    (modify-syntax-entry ?* " " table)
-    (modify-syntax-entry ?\; " " table)
-    (modify-syntax-entry ?\' " " table)
+    (modify-syntax-entry ?* "_" table)
+    (modify-syntax-entry ?\; "_" table)
+    (modify-syntax-entry ?\' "_" table)
     (if (featurep 'xemacs)
 	(let ((i 128))
 	  (while (< i 256)
@@ -133,7 +143,7 @@ backslash and doublequote.")
 	  (forward-sexp 1))
 	 ((eq c ?\()
 	  (forward-sexp 1))
-	 ((memq c '(? ?\t ?\n))
+	 ((memq c '(?\  ?\t ?\n))
 	  (delete-char 1))
 	 (t
 	  (forward-char 1))))
@@ -263,6 +273,12 @@ backslash and doublequote.")
       (concat "\"" string "\"")
     string))
 
+(defun ietf-drums-make-address (name address)
+  (if name
+      (concat (ietf-drums-quote-string name) " <" address ">")
+    address))
+
 (provide 'ietf-drums)
 
+;;; arch-tag: 379a0191-dbae-4ca6-a0f5-d4202c209ef9
 ;;; ietf-drums.el ends here

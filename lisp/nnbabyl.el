@@ -305,7 +305,7 @@
       (nconc rest articles))))
 
 (deffoo nnbabyl-request-move-article
-    (article group server accept-form &optional last)
+    (article group server accept-form &optional last move-is-internal)
   (let ((buf (get-buffer-create " *nnbabyl move*"))
 	result)
     (and
@@ -665,4 +665,5 @@
 
 (provide 'nnbabyl)
 
+;;; arch-tag: aa7ddedb-8c07-4c0e-beb0-58e795c2b81b
 ;;; nnbabyl.el ends here

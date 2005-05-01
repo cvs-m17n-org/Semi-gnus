@@ -1,6 +1,6 @@
 ;;; tls.el --- TLS/SSL support via wrapper around GnuTLS
 
-;; Copyright (C) 2003 Free Software Foundation, Inc.
+;; Copyright (C) 1996-1999, 2003, 2004 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 ;; Keywords: comm, tls, gnutls, ssl
@@ -67,14 +67,46 @@ after successful negotiation."
 
 (defcustom tls-process-connection-type nil
   "*Value for `process-connection-type' to use when starting TLS process."
+  :version "22.1"
   :type 'boolean
   :group 'tls)
 
 (defcustom tls-success "- Handshake was completed"
   "*Regular expression indicating completed TLS handshakes.
 The default is what GNUTLS's \"gnutls-cli\" outputs."
+  :version "22.1"
   :type 'regexp
   :group 'tls)
+
+(defcustom tls-certtool-program (executable-find "certtool")
+  "Name of  GnuTLS certtool.
+Used by `tls-certificate-information'."
+  :version "22.1"
+  :type '(repeat string)
+  :group 'tls)
+
+(defun tls-certificate-information (der)
+  "Parse X.509 certificate in DER format into an assoc list."
+  (let ((certificate (concat "-----BEGIN CERTIFICATE-----\n"
+			     (base64-encode-string der)
+			     "\n-----END CERTIFICATE-----\n"))
+	(exit-code 0))
+    (with-current-buffer (get-buffer-create " *certtool*")
+      (erase-buffer)
+      (insert certificate)
+      (setq exit-code (condition-case ()
+			  (call-process-region (point-min) (point-max)
+					       tls-certtool-program
+					       t (list (current-buffer) nil) t
+					       "--certificate-info")
+			(error -1)))
+      (if (/= exit-code 0)
+	  nil
+	(let ((vals nil))
+	  (goto-char (point-min))
+	  (while (re-search-forward "^\\([^:]+\\): \\(.*\\)" nil t)
+	    (push (cons (match-string 1) (match-string 2)) vals))
+	  (nreverse vals))))))
 
 (defun open-tls-stream (name buffer host service)
   "Open a TLS connection for a service to a host.
@@ -124,4 +156,5 @@ specifying a port number to connect to."
 
 (provide 'tls)
 
+;;; arch-tag: 5596d1c4-facc-4bc4-94a9-9863b928d7ac
 ;;; tls.el ends here

@@ -148,14 +148,16 @@ Bourne shell or its equivalent \(not tcsh) is needed for \"2>\"."
 (defun pgg-pgp-decrypt-region (start end)
   "Decrypt the current region between START and END."
   (let* ((pgg-pgp-user-id (or pgg-pgp-user-id pgg-default-user-id))
+	 (key (pgg-pgp-lookup-key pgg-pgp-user-id 'encrypt))
 	 (passphrase
 	  (pgg-read-passphrase
-	   (format "PGP passphrase for %s: " pgg-pgp-user-id)
-	   (pgg-pgp-lookup-key pgg-pgp-user-id 'encrypt)))
+	   (format "PGP passphrase for %s: " pgg-pgp-user-id) key))
 	 (args
 	  '("+verbose=1" "+batchmode" "+language=us" "-f")))
     (pgg-pgp-process-region start end passphrase pgg-pgp-program args)
-    (pgg-process-when-success nil)))
+    (pgg-process-when-success
+      (if pgg-cache-passphrase
+	  (pgg-add-passphrase-cache key passphrase)))))
 
 (defun pgg-pgp-sign-region (start end &optional clearsign)
   "Make detached signature from text between START and END."
@@ -194,9 +196,11 @@ Bourne shell or its equivalent \(not tcsh) is needed for \"2>\"."
 		jka-compr-compression-info-list jam-zcat-filename-list)
 	    (write-region start end orig-file)))
       (set-default-file-modes orig-mode))
-    (when (stringp signature)
-      (copy-file signature (setq signature (concat orig-file ".asc")))
-      (setq args (append args (list signature orig-file))))
+    (if (stringp signature)
+	(progn
+	  (copy-file signature (setq signature (concat orig-file ".asc")))
+	  (setq args (append args (list signature orig-file))))
+      (setq args (append args (list orig-file))))
     (pgg-pgp-process-region (point)(point) nil pgg-pgp-program args)
     (delete-file orig-file)
     (if signature (delete-file signature))
@@ -236,4 +240,5 @@ Bourne shell or its equivalent \(not tcsh) is needed for \"2>\"."
 
 (provide 'pgg-pgp)
 
+;;; arch-tag: 076b7801-37b2-49a6-97c3-218fdecde33c
 ;;; pgg-pgp.el ends here

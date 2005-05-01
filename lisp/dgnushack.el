@@ -190,6 +190,7 @@ fixed in Emacs after 21.3."
     (autoload 'c-mode "cc-mode" nil t)
     (autoload 'customize-apropos "cus-edit" nil t)
     (autoload 'customize-save-variable "cus-edit" nil t)
+    (autoload 'customize-set-variable "cus-edit" nil t)
     (autoload 'customize-variable "cus-edit" nil t)
     (autoload 'delete-annotation "annotations")
     (autoload 'dolist "cl-macs" nil nil 'macro)
@@ -197,6 +198,7 @@ fixed in Emacs after 21.3."
     (autoload 'executable-find "executable")
     (autoload 'font-lock-fontify-buffer "font-lock" nil t)
     (autoload 'info "info" nil t)
+    (autoload 'mail-fetch-field "mail-utils")
     (autoload 'make-annotation "annotations")
     (autoload 'make-display-table "disp-table")
     (autoload 'pp "pp")
@@ -206,7 +208,8 @@ fixed in Emacs after 21.3."
     (autoload 'read-passwd "passwd")
     (autoload 'regexp-opt "regexp-opt")
     (autoload 'reporter-submit-bug-report "reporter")
-    (if (emacs-version>= 21 5)
+    (if (and (emacs-version>= 21 5)
+	     (not (featurep 'sxemacs)))
 	(autoload 'setenv "process" nil t)
       (autoload 'setenv "env" nil t))
     (autoload 'sgml-mode "psgml" nil t)
@@ -228,7 +231,6 @@ fixed in Emacs after 21.3."
     (defalias 'overlays-in 'ignore)
     (defalias 'replace-dehighlight 'ignore)
     (defalias 'replace-highlight 'ignore)
-    (defalias 'run-with-idle-timer 'ignore)
     (defalias 'w3-coding-system-for-mime-charset 'ignore)))
 
 (defun dgnushack-compile-verbosely ()
@@ -273,8 +275,7 @@ dgnushack-compile."
     (dolist (file
 	     (if (featurep 'xemacs)
 		 '("md5.el")
-	       '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"
-		 "run-at-time.el")))
+	       '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el")))
       (setq files (delete file files)))
 
     (dolist (file files)
@@ -408,5 +409,6 @@ dgnushack-compile."
 ;;; End:
 ;;; gnus-load.el ends here"))))
 
-
 ;;; dgnushack.el ends here
+
+;;; arch-tag: 579f585a-24eb-4e1c-8d34-4808e11b68f2

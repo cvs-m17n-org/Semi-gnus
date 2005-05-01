@@ -37,7 +37,8 @@
 
 (nnoo-declare nneething)
 
-(defvoo nneething-map-file-directory "~/.nneething/"
+(defvoo nneething-map-file-directory
+  (nnheader-concat gnus-directory ".nneething/")
   "Where nneething stores the map files.")
 
 (defvoo nneething-map-file ".nneething"
@@ -422,9 +423,10 @@ included.")
     (if (numberp article)
 	(if (setq fname (cadr (assq article nneething-map)))
 	    (expand-file-name fname dir)
-	  (mm-make-temp-file (expand-file-name "nneething" dir)))
+	  (make-temp-name (expand-file-name "nneething" dir)))
       (expand-file-name article dir))))
 
 (provide 'nneething)
 
+;;; arch-tag: 1277f386-88f2-4459-bb24-f3f45962a6c5
 ;;; nneething.el ends here

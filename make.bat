@@ -135,6 +135,8 @@ if ErrorLevel 1 set ERROR=%ERROR%,sieve.texi
 if ErrorLevel 1 set ERROR=%ERROR%,pgg.texi
 %EMACSINFO% message.texi
 if ErrorLevel 1 set ERROR=%ERROR%,message.texi
+%EMACSINFO% sasl.texi
+if ErrorLevel 1 set ERROR=%ERROR%,sasl.texi
 
 if not "%2" == "/copy" goto nocopy
 if not exist %GNUS_INFO_DIR%\nul mkdir %GNUS_INFO_DIR%
@@ -158,6 +160,8 @@ xcopy /R /Q /Y sieve      %GNUS_INFO_DIR%
 if ErrorLevel 1 set ERROR=%ERROR%,copy-sieve-info
 xcopy /R /Q /Y pgg        %GNUS_INFO_DIR%
 if ErrorLevel 1 set ERROR=%ERROR%,copy-pgg-info
+xcopy /R /Q /Y sasl        %GNUS_INFO_DIR%
+if ErrorLevel 1 set ERROR=%ERROR%,copy-sasl-info
 
 echo.
 echo ***************************************************************************
@@ -167,6 +171,7 @@ echo * if they aren't already there:
 echo *
 echo * * PGG: (pgg).	Emacs interface to various PGP implementations.
 echo * * Sieve: (sieve).	Managing Sieve scripts in Emacs.
+echo * * SASL: (sasl).	The Emacs SASL library.
 echo ***************************************************************************
 echo.
 
@@ -181,9 +186,13 @@ if ErrorLevel 1 set ERROR=%ERROR%,copy-etc-gnus-tut-txt
 if not exist %GNUS_ETC_DIR%\gnus\nul mkdir %GNUS_ETC_DIR%\gnus
 xcopy /R /Q /Y .\gnus\* %GNUS_ETC_DIR%\gnus\
 if ErrorLevel 1 set ERROR=%ERROR%,copy-etc-gnus-*
-if not exist %GNUS_ETC_DIR%\smilies\nul mkdir %GNUS_ETC_DIR%\smilies
-xcopy /R /Q /Y .\smilies\* %GNUS_ETC_DIR%\smilies\
-if ErrorLevel 1 set ERROR=%ERROR%,copy-etc-smilies-*
+if not exist %GNUS_ETC_DIR%\images\nul mkdir %GNUS_ETC_DIR%\images
+if not exist %GNUS_ETC_DIR%\images\gnus\nul mkdir %GNUS_ETC_DIR%\images\gnus
+xcopy /R /Q /Y .\images\gnus\* %GNUS_ETC_DIR%\images\gnus\
+if ErrorLevel 1 set ERROR=%ERROR%,copy-etc-images-gnus-*
+if not exist %GNUS_ETC_DIR%\images\smilies\nul mkdir %GNUS_ETC_DIR%\images\smilies
+xcopy /R /Q /Y .\images\smilies\* %GNUS_ETC_DIR%\images\smilies\
+if ErrorLevel 1 set ERROR=%ERROR%,copy-etc-images-smilies-*
 goto warnings
 
 :nocopy
@@ -286,3 +295,7 @@ set GNUS_INFO_DIR=
 set GNUS_ETC_DIR=
 set subdirwarning=
 set ERROR=
+
+goto skipArchTag
+   arch-tag: 502dd14c-acde-4f69-8e82-43203b12a82c
+:skipArchTag

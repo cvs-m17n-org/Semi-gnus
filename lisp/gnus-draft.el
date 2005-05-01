@@ -145,6 +145,7 @@
                                   message-setup-hook))
          (gnus-agent-queue-mail (and (not is-queue)
                                      gnus-agent-queue-mail))
+	 (rfc2047-encode-encoded-words nil)
          type method move-to)
     (gnus-draft-setup article (or group "nndraft:queue"))
     ;; We read the meta-information that says how and where
@@ -271,12 +272,13 @@
 	      `(lambda (arg)
 		 (gnus-post-method arg ,(car ga))))
 	(unless (equal (cadr ga) "")
-	  (message-add-action
-	   `(progn
-	      (gnus-add-mark ,(car ga) 'replied ,(cadr ga))
-	      (gnus-request-set-mark ,(car ga) (list (list (list ,(cadr ga))
-							   'add '(reply)))))
-	   'send))))))
+	  (dolist (article (cdr ga))
+	    (message-add-action
+	     `(progn
+		(gnus-add-mark ,(car ga) 'replied ,article)
+		(gnus-request-set-mark ,(car ga) (list (list (list ,article)
+							     'add '(reply)))))
+	     'send)))))))
 
 (defun gnus-draft-article-sendable-p (article)
   "Say whether ARTICLE is sendable."
@@ -284,4 +286,5 @@
 
 (provide 'gnus-draft)
 
+;;; arch-tag: 3d92af58-8c97-4a5c-9db4-a98e85198022
 ;;; gnus-draft.el ends here

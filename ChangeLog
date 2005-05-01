@@ -1,3 +1,77 @@
+2005-02-19  Miles Bader  <miles@gnu.org>
+
+	* etc/Makefile.in (install): Create $(etcdir)/images/gnus dir.
+
+	* etc/Makefile.in (install, uninstall): Fix installed image dirs.
+
+	* etc/Makefile.in (install): Put gnus-tut.txt in the right place.
+
+	* Makefile.in (all): Don't do sub-make in etc.
+	* etc/Makefile.in (all): Remove target.
+
+	* make.bat: Do image copies properly.
+
+2005-02-18  Miles Bader  <miles@gnu.org>
+
+	Move all remaining images from etc/gnus to etc/images/gnus.
+
+2004-06-18  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* Makefile.in (all): Do sub-make in etc.
+	* etc/Makefile.in (all): Link . to images.
+	(install, uninstall): Use $(etcdir)/images for images.
+	* make.bat: Likewise.
+
+2005-01-02  Romain Francoise  <romain@orebokech.com>
+
+	* GNUS-NEWS: Generated.
+
+2004-12-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* GNUS-NEWS: Generated.
+
+2004-12-06  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Generated.
+
+2004-09-30  Simon Josefsson  <jas@extundo.com>
+
+	* Makefile.in (GNUS-NEWS): Depend on texi/gnus-news.texi.
+
+	* GNUS-NEWS: Generated.
+
+2004-09-29  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Generated.
+
+	* Makefile.in (GNUS-NEWS): Add.
+
+2004-09-11  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Generated.
+
+2004-09-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* etc/.cvsignore: Remove unused.
+
+2004-06-16  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* make.bat: Fix line endings around arch-tag.
+
+2004-06-03  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* etc/gnus/gnus-setup.ast (Setting up a NNTP server)
+	(Setting up local mail storage (nnml)): fixed some bugs, added a
+	new screen - still testing
+
+2004-06-01  Simon Josefsson  <jas@extundo.com>
+
+	* make.bat: Add SASL manual.
+
+2004-05-23  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* etc/gnus/news-server.ast: Use library validation.
+
 2004-03-08  Kevin Greiner <kgreiner@xpediantsolutions.com>
 
 	* make.bat: Make sure that gnus-load.el and sieve are writable to
@@ -372,3 +446,5 @@
 ;; Local Variables:
 ;; coding: iso-2022-7bit
 ;; End:
+
+;;; arch-tag: 60301ba8-b152-41b3-8fb2-173bba77f2a8

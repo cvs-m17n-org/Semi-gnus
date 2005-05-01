@@ -35,7 +35,9 @@
 (require 'gnus)
 
 (eval-when-compile
-  (require 'timer))
+  (if (featurep 'xemacs)
+      (require 'timer-funcs)
+    (require 'timer)))
 
 (defgroup mm-url nil
   "A wrapper of url package and external url command for Gnus."
@@ -46,6 +48,7 @@
 				    (require 'url)
 				  (error nil)))
   "*If non-nil, use external grab program `mm-url-program'."
+  :version "22.1"
   :type 'boolean
   :group 'mm-url)
 
@@ -53,7 +56,7 @@
   '((wget "wget" "--user-agent=mm-url" "-q" "-O" "-")
     (w3m  "w3m" "-dump_source")
     (lynx "lynx" "-source")
-    (curl "curl")))
+    (curl "curl" "--silent")))
 
 (defcustom mm-url-program
   (cond
@@ -64,6 +67,7 @@
    (t "GET"))
   "The url grab program.
 Likely values are `wget', `w3m', `lynx' and `curl'."
+  :version "22.1"
   :type '(choice
 	  (symbol :tag "wget" wget)
 	  (symbol :tag "w3m" w3m)
@@ -74,6 +78,7 @@ Likely values are `wget', `w3m', `lynx' and `curl'."
 
 (defcustom mm-url-arguments nil
   "The arguments for `mm-url-program'."
+  :version "22.1"
   :type '(repeat string)
   :group 'mm-url)
 
@@ -443,4 +448,5 @@ spaces.  Die Die Die."
 
 (provide 'mm-url)
 
+;;; arch-tag: 0594f9b3-417c-48b0-adc2-5082e1e7917f
 ;;; mm-url.el ends here

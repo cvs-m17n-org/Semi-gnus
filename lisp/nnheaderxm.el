@@ -27,12 +27,12 @@
 
 ;;; Code:
 
-(require 'run-at-time)
+(require 'timer-funcs)
 
 (defalias 'nnheader-cancel-timer 'delete-itimer)
-(defalias 'nnheader-cancel-function-timers 'ignore)
 (defalias 'nnheader-string-as-multibyte 'identity)
 
 (provide 'nnheaderxm)
 
+;;; arch-tag: ee2b3387-d3ca-4de6-9b64-304d838706dd
 ;;; nnheaderxm.el ends here

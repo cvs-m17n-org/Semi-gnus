@@ -1,5 +1,6 @@
 ;;; mm-uu.el --- Return uu stuff as mm handles
-;; Copyright (c) 1998, 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+;; Copyright (c) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+;;        Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: postscript uudecode binhex shar forward gnatsweb pgp
@@ -80,6 +81,7 @@ This can be either \"inline\" or \"attachment\".")
 
 (defcustom mm-uu-diff-groups-regexp "gnus\\.commits"
   "*Regexp matching diff groups."
+  :version "22.1"
   :type 'regexp
   :group 'gnus-article-mime)
 
@@ -161,6 +163,10 @@ To disable dissecting shar codes, for instance, add
 		     (list (car entry) '(const disabled)))
 		   mm-uu-type-alist)
   :group 'gnus-article-mime)
+
+(defvar mm-uu-text-plain-type '("text/plain" (charset . gnus-decoded))
+  "MIME type and parameters for text/plain parts.
+`gnus-decoded' is a fake charset, which means no further decoding.")
 
 ;; functions
 
@@ -362,7 +368,7 @@ Return that buffer."
       (while (re-search-forward "^- " nil t)
 	(replace-match "" t t)
 	(forward-line 1)))
-    (list (mm-make-handle buf '("text/plain" (charset . gnus-decoded))))))
+    (list (mm-make-handle buf mm-uu-text-plain-type))))
 
 (defun mm-uu-pgp-signed-extract ()
   (let ((mm-security-handle (list (format "multipart/signed"))))
@@ -394,9 +400,7 @@ Return that buffer."
 	(with-current-buffer buf
 	  (mml2015-clean-buffer)
 	  (funcall (mml2015-clear-decrypt-function))))
-    (list
-     (mm-make-handle buf
-		     '("text/plain"  (charset . gnus-decoded))))))
+    (list (mm-make-handle buf mm-uu-text-plain-type))))
 
 (defun mm-uu-pgp-encrypted-extract ()
   (let ((mm-security-handle (list (format "multipart/encrypted"))))
@@ -430,23 +434,24 @@ Return that buffer."
 		    '("application/pgp-keys"))))
 
 ;;;###autoload
-(defun mm-uu-dissect ()
-  "Dissect the current buffer and return a list of uu handles."
+(defun mm-uu-dissect (&optional noheader mime-type)
+  "Dissect the current buffer and return a list of uu handles.
+The optional NOHEADER means there's no header in the buffer.
+MIME-TYPE specifies a MIME type and parameters, which defaults to the
+value of `mm-uu-text-plain-type'."
   (let ((case-fold-search t)
-	text-start start-point end-point file-name result
-	text-plain-type entry func)
+	(mm-uu-text-plain-type (or mime-type mm-uu-text-plain-type))
+	text-start start-point end-point file-name result entry func)
     (save-excursion
       (goto-char (point-min))
       (cond
+       (noheader)
        ((looking-at "\n")
 	(forward-line))
        ((search-forward "\n\n" nil t)
 	t)
        (t (goto-char (point-max))))
-      ;;; gnus-decoded is a fake charset, which means no further
-      ;;; decoding.
-      (setq text-start (point)
-	    text-plain-type '("text/plain"  (charset . gnus-decoded)))
+      (setq text-start (point))
       (while (re-search-forward mm-uu-beginning-regexp nil t)
 	(setq start-point (match-beginning 0))
 	(let ((alist mm-uu-type-alist)
@@ -475,7 +480,7 @@ Return that buffer."
 		     (re-search-forward "." start-point t)))
 	      (push
 	       (mm-make-handle (mm-uu-copy-to-buffer text-start start-point)
-			       text-plain-type)
+			       mm-uu-text-plain-type)
 	       result))
 	  (push
 	   (funcall (mm-uu-function-extract entry))
@@ -488,11 +493,31 @@ Return that buffer."
 		   (re-search-forward "." nil t)))
 	    (push
 	     (mm-make-handle (mm-uu-copy-to-buffer text-start (point-max))
-			     text-plain-type)
+			     mm-uu-text-plain-type)
 	     result))
 	(setq result (cons "multipart/mixed" (nreverse result))))
       result)))
 
+(defun mm-uu-dissect-text-parts (handle)
+  "Dissect text parts and put uu handles into HANDLE."
+  (let ((buffer (mm-handle-buffer handle))
+	type children)
+    (cond ((stringp buffer)
+	   (mapc 'mm-uu-dissect-text-parts (cdr handle)))
+	  ((bufferp buffer)
+	   (when (and (setq type (mm-handle-media-type handle))
+		      (stringp type)
+		      (string-match "\\`text/" type)
+		      (with-current-buffer buffer
+			(setq children
+			      (mm-uu-dissect t (mm-handle-type handle)))))
+	     (kill-buffer buffer)
+	     (setcar handle (car children))
+	     (setcdr handle (cdr children))))
+	  (t
+	   (mapc 'mm-uu-dissect-text-parts handle)))))
+
 (provide 'mm-uu)
 
+;;; arch-tag: 7db076bf-53db-4320-aa19-ca76a1d2ab2c
 ;;; mm-uu.el ends here

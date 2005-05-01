@@ -6,6 +6,8 @@
 ; Oort Gnus v0.08 - This release updated agent to no longer use
 ;                   history file and to support a compressed alist.
 
+(defvar gnus-agent-compressed-agentview-search-only nil)
+
 (defun gnus-agent-convert-to-compressed-agentview (converting-to)
   "Iterates over all agentview files to ensure that they have been
 converted to the compressed format."
@@ -29,6 +31,13 @@ converted to the compressed format."
 
     (if converted-something
         (gnus-message 4 "Successfully converted Gnus %s offline (agent) files to %s" gnus-newsrc-file-version converting-to))))
+
+(defun gnus-agent-convert-to-compressed-agentview-prompt ()
+  (catch 'found-file-to-convert
+    (let ((gnus-agent-compressed-agentview-search-only t))
+      (gnus-agent-convert-to-compressed-agentview nil))))
+
+(gnus-convert-mark-converter-prompt 'gnus-agent-convert-to-compressed-agentview 'gnus-agent-convert-to-compressed-agentview-prompt)
 
 (defun gnus-agent-convert-agentview (file)
   "Load FILE and do a `read' there."
@@ -68,6 +77,9 @@ converted to the compressed format."
 	  (setq changed-version t)))
 
         (when changed-version
+	  (when gnus-agent-compressed-agentview-search-only
+	    (throw 'found-file-to-convert t))
+
           (erase-buffer)
           (let ((compressed nil))
             (mapcar (lambda (pair)
@@ -109,7 +121,7 @@ converted to the compressed format."
             (set-buffer buffer)
             (erase-buffer)
             (insert "The definition of gnus-agent-expire-days has been changed.\nYou currently have it set to the list:\n  ")
-            (let (print-level print-length) (pp gnus-agent-expire-days (current-buffer)))
+            (gnus-pp gnus-agent-expire-days)
 
             (insert "\nIn order to use version '" converting-to "' of gnus, you will need to set\n")
             (insert "gnus-agent-expire-days to an integer. If you still wish to set different\n")
@@ -211,3 +223,5 @@ possible that the hook was persistently saved."
 ;; gnus-agent-unhook-expire-days is safe in that it does not modify
 ;; the .newsrc.eld file.
 (gnus-convert-mark-converter-prompt 'gnus-agent-unhook-expire-days t)
+
+;;; arch-tag: 845c7b8a-88f7-4468-b8d7-94e8fc72cf1a

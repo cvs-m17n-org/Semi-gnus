@@ -59,7 +59,7 @@
 ;; $ echo "a+£"|iconv -f iso-8859-1 -t utf-7
 ;; a+-+AKM
 ;;
-;;  -- fx 
+;;  -- fx
 
 
 ;;; Code:
@@ -78,7 +78,7 @@
 (defconst utf7-utf-16-coding-system
   (cond ((mm-coding-system-p 'utf-16-be-no-signature) ; Mule-UCS
 	 'utf-16-be-no-signature)
-	((and (mm-coding-system-p 'utf-16-be) ; Emacs 21.4 (?), Emacs 22
+	((and (mm-coding-system-p 'utf-16-be) ; Emacs 22.1
 	      ;; Avoid versions with BOM.
 	      (= 2 (length (encode-coding-string "a" 'utf-16-be))))
 	 'utf-16-be)
@@ -224,4 +224,5 @@ Characters are in raw byte pairs in narrowed buffer."
 
 (provide 'utf7)
 
+;;; arch-tag: 96078b55-85c7-4161-aed2-932c24b282c7
 ;;; utf7.el ends here

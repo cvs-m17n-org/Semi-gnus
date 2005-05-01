@@ -19,6 +19,8 @@ INSTALL_DATA = @INSTALL_DATA@
 SHELL = /bin/sh
 PAPERTYPE=a4
 INFO_DEPS=gnus message emacs-mime sieve pgg sasl
+REFCARD=gnus-refcard
+LOGO=gnus-logo
 
 all: $(INFO_DEPS)
 
@@ -28,7 +30,7 @@ most: texi2latex.elc latex latexps
 
 .texi:
 	if test "x$(MAKEINFO)" != "xno" ; then \
-	  $(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<; \
+	  LC_ALL=C $(MAKEINFO) -I $(srcdir) --enable-encoding -o $* $<; \
 	else \
 	  rm -f $@; \
 	  $(EMACSINFO) $<; \
@@ -37,14 +39,14 @@ most: texi2latex.elc latex latexps
 # Files included in gnus.texi
 gnus.texi: gnus-faq.texi gnus-news.texi
 
-# FIXME: Target should be in parent directory.  A cvs commit script could
-# automatically create it.
-GNUS-NEWS:	gnus-news.texi
+# FIXME: A cvs commit script could automatically create it.
+GNUS-NEWS:	gnus-news.texi gnus-news.el
 	$(EMACSCOMP) -l $(srcdir)/gnus-news.el -f batch-gnus-news $< $@
+	mv $@ ../$@
 
-dvi: gnus.dvi message.dvi refcard.dvi emacs-mime.dvi sieve.dvi pgg.dvi sasl.dvi
+dvi: gnus.dvi message.dvi $(REFCARD).dvi emacs-mime.dvi sieve.dvi pgg.dvi sasl.dvi
 
-pdf: gnus.pdf message.pdf refcard.pdf emacs-mime.pdf sieve.pdf pgg.pdf sasl.pdf
+pdf: gnus.pdf message.pdf $(REFCARD).pdf emacs-mime.pdf sieve.pdf pgg.pdf sasl.pdf
 
 .texi.dvi :
 	sed -e '/@iflatex/,/@end iflatex/d' $< > gnustmp.texi 
@@ -61,31 +63,53 @@ pdf: gnus.pdf message.pdf refcard.pdf emacs-mime.pdf sieve.pdf pgg.pdf sasl.pdf
 	cp gnustmp.pdf $*.pdf
 	rm -f gnustmp.*
 
-refcard.dvi: refcard.tex gnuslogo-refcard.eps gnusref.tex
-	TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) refcard.tex
+$(LOGO).pdf:	$(LOGO).eps
+	epstopdf $< --outfile=$@
 
-refcard.pdf: refcard.tex gnuslogo-refcard.eps gnusref.tex
-	epstopdf $(srcdir)/gnuslogo-refcard.eps --outfile=gnuslogo-refcard.pdf
-	TEXINPUTS=$(srcdir):$$TEXINPUTS $(PDFLATEX) refcard.tex
+$(REFCARD).dvi: $(REFCARD).tex $(LOGO).eps
+	TEXINPUTS=$(srcdir):$$TEXINPUTS:: $(LATEX) $(REFCARD).tex
 
-booklet.dvi: booklet.tex gnuslogo-refcard.eps gnusref.tex
+$(REFCARD).pdf: $(REFCARD).tex $(LOGO).pdf
+	TEXINPUTS=$(srcdir):$$TEXINPUTS:: $(PDFLATEX) $(REFCARD).tex
+
+gnus-booklet.dvi: $(REFCARD).tex $(LOGO).eps
 	if [ "$(PAPERTYPE)" == a4 ]; then \
-		TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) bk-a4.tex && \
-		mv bk-a4.dvi booklet.dvi ;\
+	  TEXINPUTS=$(srcdir):$$TEXINPUTS:: \
+          $(LATEX) '\def\booklettrue{}\input{$(REFCARD)}' ;\
 	else \
-		TEXINPUTS=$(srcdir):$$TEXINPUTS $(LATEX) bk-lt.tex && \
-		mv bk-lt.dvi booklet.dvi;\
+	  TEXINPUTS=$(srcdir):$$TEXINPUTS:: \
+          $(LATEX) '\def\booklettrue{}\def\letterpapertrue{}\input{$(REFCARD)}' ;\
 	fi
+	mv $(REFCARD).dvi $@
 
-booklet.pdf: booklet.tex gnuslogo-refcard.eps gnusref.tex
-	epstopdf $(srcdir)/gnuslogo-booklet.eps --outfile=gnuslogo-booklet.pdf
+gnus-booklet.pdf: $(REFCARD).tex  $(LOGO).pdf
 	if [ "$(PAPERTYPE)" == a4 ]; then \
-		TEXINPUTS=$(srcdir):$$TEXINPUTS $(PDFLATEX) bk-a4.tex &&\
-		mv bk-a4.pdf booklet.pdf ;\
+	  TEXINPUTS=$(srcdir):$$TEXINPUTS:: \
+          $(PDFLATEX) '\def\booklettrue{}\input{$(REFCARD)}' ;\
 	else \
-		TEXINPUTS=$(srcdir):$$TEXINPUTS $(PDFLATEX) bk-lt.tex &&\
-		mv bk-lt.pdf booklet.pdf ;\
+	  TEXINPUTS=$(srcdir):$$TEXINPUTS:: \
+          $(PDFLATEX) '\def\booklettrue{}\def\letterpapertrue{}\input{$(REFCARD)}' ;\
 	fi
+	mv $(REFCARD).pdf $@ 
+
+gnus-faq-full-update:  gnus-faq-clean gnus-faq-texi
+
+gnus-faq.xml:
+	cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/gnus \
+	  co -p gnus-faq/src/gnus-faq.xml > $@.tmp
+	head -n 1 $@.tmp | grep '^<.xml version' || \
+	  { echo "Update of $@ failed."; : rm $@.tmp; exit 1; }
+	mv $@.tmp $@
+
+gnus-faq-texi: gnus-faq.xml xml2texi.sh xml2texi.scm
+	./xml2texi.sh $< $@.tmp
+	@echo
+# FIXME: This should be done in xml2texi.scm or gnus-faq.xml should be
+# changed:
+	sed '/[$$]Id:.*[$$]/d' < $@.tmp > $@
+
+gnus-faq-clean:
+	rm -f gnus-faq.xml gnus-faq.*.tmp gnus-faq.texi
 
 clean:
 	rm -f *.[cgk]idx *.aux *.cp *.cps *.dvi *.dvi-x *.fn *.ky	\
@@ -96,8 +120,8 @@ clean:
 	thumbdta.tex xface.tex *.tpt gnus-manual-*.pdf gnus-manual-*.ps.gz
 
 makeinfo:
-	makeinfo --enable-encoding -o gnus gnus.texi
-	makeinfo --enable-encoding -o message message.texi
+	LC_ALL=C makeinfo --enable-encoding -o gnus gnus.texi
+	LC_ALL=C makeinfo --enable-encoding -o message message.texi
 
 texi2latex.elc: texi2latex.el
 	srcdir=$(srcdir)/../lisp $(EMACSCOMP) -l $(srcdir)/../lisp/dgnushack.el --eval '(byte-compile-file "$(srcdir)/texi2latex.el")'
@@ -187,6 +211,7 @@ distclean: veryclean
 	rm -f message-[0-9]
 	rm -f $(INFO_DEPS)
 	rm -f gnusconfig.tex
+	rm -f gnus-faq.xml gnus-faq.*.tmp
 
 install: $(INFO_DEPS)
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(infodir)

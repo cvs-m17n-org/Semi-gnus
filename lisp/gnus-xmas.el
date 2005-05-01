@@ -39,7 +39,7 @@
 (defvar menu-bar-mode (featurep 'menubar))
 (require 'messagexmas)
 (require 'wid-edit)
-(require 'run-at-time)
+(require 'timer-funcs)
 
 (defgroup gnus-xmas nil
   "XEmacsoid support for Gnus"
@@ -243,7 +243,7 @@ call it with the value of the `gnus-data' text property."
 	  (select-window selected))))))
 
 ;; Select the lowest window on the frame.
-(defun gnus-xmas-appt-select-lowest-window ()
+(defun gnus-xmas-select-lowest-window ()
   (let* ((lowest-window (selected-window))
 	 (bottom-edge (car (cdr (cdr (cdr (window-pixel-edges))))))
 	 (last-window (previous-window))
@@ -419,8 +419,8 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-read-event-char 'gnus-xmas-read-event-char)
   (defalias 'gnus-group-startup-message 'gnus-xmas-group-startup-message)
   (defalias 'gnus-tree-minimize 'gnus-xmas-tree-minimize)
-  (defalias 'gnus-appt-select-lowest-window
-    'gnus-xmas-appt-select-lowest-window)
+  (defalias 'gnus-select-lowest-window
+    'gnus-xmas-select-lowest-window)
   (defalias 'gnus-mail-strip-quoted-names 'gnus-xmas-mail-strip-quoted-names)
   (defalias 'gnus-character-to-event 'character-to-event)
   (defalias 'gnus-mode-line-buffer-identification
@@ -837,12 +837,13 @@ Warning: Don't insert text immediately after the image."
   glyph)
 
 (defun gnus-xmas-remove-image (image &optional category)
+  "Remove the image matching IMAGE and CATEGORY found first."
   (map-extents
    (lambda (ext unused)
      (when (equal (extent-end-glyph ext) image)
        (set-extent-property ext 'invisible nil)
-       (set-extent-property ext 'end-glyph nil))
-     nil)
+       (set-extent-property ext 'end-glyph nil)
+       t))
    nil nil nil nil nil 'gnus-image category))
 
 (defun gnus-xmas-assq-delete-all (key alist)
@@ -853,4 +854,5 @@ Warning: Don't insert text immediately after the image."
 
 (provide 'gnus-xmas)
 
+;;; arch-tag: 4e84de3f-ea0a-4ee3-bfeb-e03d46fcacef
 ;;; gnus-xmas.el ends here

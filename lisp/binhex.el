@@ -49,6 +49,7 @@ input and write the converted data to its standard output."
 (defcustom binhex-use-external
   (executable-find binhex-decoder-program)
   "*Use external binhex program."
+  :version "22.1"
   :group 'gnus-extract
   :type 'boolean)
 
@@ -322,4 +323,5 @@ If HEADER-ONLY is non-nil only decode header and return filename."
 
 (provide 'binhex)
 
+;;; arch-tag: 8476badd-1e76-4f1d-a640-f9a38c72eed8
 ;;; binhex.el ends here

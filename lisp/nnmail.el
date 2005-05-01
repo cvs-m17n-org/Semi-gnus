@@ -1,5 +1,5 @@
 ;;; nnmail.el --- mail support functions for the Gnus mail backends
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -118,6 +118,7 @@ If nil, the first match found will be used."
 (defcustom nnmail-split-fancy-with-parent-ignore-groups nil
   "Regexp that matches group names to be ignored when applying `nnmail-split-fancy-with-parent'.
 This can also be a list of regexps."
+  :version "22.1"
   :group 'nnmail-split
   :type '(choice (const :tag "none" nil)
 		 (regexp :value ".*")
@@ -126,6 +127,7 @@ This can also be a list of regexps."
 (defcustom nnmail-cache-ignore-groups nil
   "Regexp that matches group names to be ignored when inserting message ids into the cache (`nnmail-cache-insert').
 This can also be a list of regexps."
+  :version "22.1"
   :group 'nnmail-split
   :type '(choice (const :tag "none" nil)
 		 (regexp :value ".*")
@@ -223,6 +225,7 @@ From header will be expired to the group \"nnfolder:Work\";
 articles containing the sting \"IMPORTANT\" in the Subject header will
 be expired to the group \"nnfolder:IMPORTANT.YYYY.MMM\"; and
 everything else will be expired to \"nnfolder:Archive-YYYY\"."
+  :version "22.1"
   :group 'nnmail-expire
   :type '(repeat (list (choice :tag "Match against"
 			       (string :tag "Header")
@@ -351,6 +354,7 @@ discarded after running the split process."
 
 (defcustom nnmail-spool-hook nil
   "*A hook called when a new article is spooled."
+  :version "22.1"
   :group 'nnmail
   :type 'hook)
 
@@ -365,14 +369,14 @@ messages will be shown to indicate the current status."
 (define-widget 'nnmail-lazy 'default
   "Base widget for recursive datastructures.
 
-This is copy of the `lazy' widget in Emacs 21.4 provided for compatibility."
+This is copy of the `lazy' widget in Emacs 22.1 provided for compatibility."
   :format "%{%t%}: %v"
   :convert-widget 'widget-value-convert-widget
   :value-create (lambda (widget)
                   (let ((value (widget-get widget :value))
                         (type (widget-get widget :type)))
-                    (widget-put widget :children 
-                                (list (widget-create-child-value 
+                    (widget-put widget :children
+                                (list (widget-create-child-value
                                        widget (widget-convert type) value)))))
   :value-delete 'widget-children-value-delete
   :value-get (lambda (widget)
@@ -404,7 +408,7 @@ This is copy of the `lazy' widget in Emacs 21.4 provided for compatibility."
                       (list :tag "Function with fixed arguments (:)"
                             :value (:)
                             (const :format "" :value :)
-                            function 
+                            function
                             (editable-list :inline t (sexp :tag "Arg"))
                             )
                       (list :tag "Function with split arguments (!)"
@@ -412,11 +416,11 @@ This is copy of the `lazy' widget in Emacs 21.4 provided for compatibility."
                             (const :format "" !)
                             function
                             (editable-list :inline t nnmail-split-fancy))
-                      (list :tag "Field match" 
-                            (choice :tag "Field" 
+                      (list :tag "Field match"
+                            (choice :tag "Field"
                                     regexp symbol)
                             (choice :tag "Match"
-                                    regexp 
+                                    regexp
                                     (symbol :value mail))
                             (repeat :inline t
                                     :tag "Restrictions"
@@ -549,7 +553,7 @@ parameter.  It should return nil, `warn' or `delete'."
   :group 'nnmail
   :type '(repeat symbol))
 
-(defcustom nnmail-split-header-length-limit 512
+(defcustom nnmail-split-header-length-limit 2048
   "Header lines longer than this limit are excluded from the split function."
   :version "21.1"
   :group 'nnmail
@@ -557,11 +561,13 @@ parameter.  It should return nil, `warn' or `delete'."
 
 (defcustom nnmail-mail-splitting-charset nil
   "Default charset to be used when splitting incoming mail."
+  :version "22.1"
   :group 'nnmail
   :type 'symbol)
 
 (defcustom nnmail-mail-splitting-decodes nil
   "Whether the nnmail splitting functionality should MIME decode headers."
+  :version "22.1"
   :group 'nnmail
   :type 'boolean)
 
@@ -571,6 +577,15 @@ Normally, regexes given in `nnmail-split-fancy' are implicitly surrounded
 by \"\\=\\<...\\>\".  If this variable is true, they are not implicitly\
  surrounded
 by anything."
+  :version "22.1"
+  :group 'nnmail
+  :type 'boolean)
+
+(defcustom nnmail-split-lowercase-expanded t
+  "Whether to lowercase expanded entries (i.e. \\N) when splitting mails.
+This avoids the creation of multiple groups when users send to an address
+using different case (i.e. mailing-list@domain vs Mailing-List@Domain)."
+  :version "22.1"
   :group 'nnmail
   :type 'boolean)
 
@@ -1464,7 +1479,10 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 	      (setq N 0)
 	    (setq N (- c ?0)))
 	  (when (match-beginning N)
-	    (push (buffer-substring (match-beginning N) (match-end N))
+	    (push (if nnmail-split-lowercase-expanded
+		      (downcase (buffer-substring (match-beginning N)
+						  (match-end N)))
+		    (buffer-substring (match-beginning N) (match-end N)))
 		  expanded))))
       (setq pos (1+ pos)))
     (if did-expand
@@ -1557,7 +1575,7 @@ See the documentation for the variable `nnmail-split-fancy' for details."
   (when (stringp id)
     ;; this will handle cases like `B r' where the group is nil
     (let ((grp (or grp gnus-newsgroup-name "UNKNOWN")))
-      (run-hook-with-args 'nnmail-spool-hook 
+      (run-hook-with-args 'nnmail-spool-hook
 			  id grp subject sender))
     (when nnmail-treat-duplicates
       ;; Store some information about the group this message is written
@@ -1580,7 +1598,7 @@ See the documentation for the variable `nnmail-split-fancy' for details."
 	      (unless (and regexp (string-match regexp grp))
 		(insert id "\t" grp "\n")))
 	  (insert id "\n"))))))
-  
+
 (defun nnmail-cache-primary-mail-backend ()
   (let ((be-list (cons gnus-select-method gnus-secondary-select-methods))
 	(be nil)
@@ -1951,14 +1969,12 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
   (with-output-to-temp-buffer "*nnmail split history*"
     (with-current-buffer standard-output
       (fundamental-mode))		; for Emacs 20.4+
-    (let ((history nnmail-split-history)
-	  elem)
-      (while (setq elem (pop history))
+      (dolist (elem nnmail-split-history)
 	(princ (mapconcat (lambda (ga)
 			    (concat (car ga) ":" (int-to-string (cdr ga))))
 			  elem
 			  ", "))
-	(princ "\n")))))
+	(princ "\n"))))
 
 (defun nnmail-purge-split-history (group)
   "Remove all instances of GROUP from `nnmail-split-history'."
@@ -1991,4 +2007,5 @@ Doesn't change point."
 
 (provide 'nnmail)
 
+;;; arch-tag: fe8f671a-50db-428a-bb5d-f00462f72ed7
 ;;; nnmail.el ends here

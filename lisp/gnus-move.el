@@ -52,10 +52,8 @@ Update the .newsrc.eld file to reflect the change of nntp server."
 
   (save-excursion
     ;; Go through all groups and translate.
-    (let ((newsrc gnus-newsrc-alist)
-	  (nntp-nov-gap nil)
-	  info)
-      (while (setq info (pop newsrc))
+    (let ((nntp-nov-gap nil))
+      (dolist (info gnus-newsrc-alist)
 	(when (gnus-group-native-p (gnus-info-group info))
 	  (gnus-move-group-to-server info from-server to-server))))))
 
@@ -181,4 +179,5 @@ Update the .newsrc.eld file to reflect the change of nntp server."
 
 (provide 'gnus-move)
 
+;;; arch-tag: 503742b8-7d66-4d79-bb31-4a698070707b
 ;;; gnus-move.el ends here

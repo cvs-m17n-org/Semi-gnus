@@ -1,7 +1,7 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
 
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996, 1997,
-;; 1998, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+;; 1998, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -34,6 +34,7 @@
 (require 'wid-edit)
 (require 'mm-util)
 (require 'nnheader)
+(autoload 'message-y-or-n-p "message" nil nil 'macro)
 
 (defgroup gnus nil
   "The coffee-brewing, all singing, all dancing, kitchen sink newsreader."
@@ -155,7 +156,7 @@
 
 (defgroup gnus-summary-sort nil
   "Sorting the summary buffer."
-  :link '(custom-manual "(gnus)Summary Sorting")
+  :link '(custom-manual "(gnus)Sorting the Summary Buffer")
   :group 'gnus-summary)
 
 (defgroup gnus-summary-visual nil
@@ -282,7 +283,7 @@ is restarted, and sometimes reloaded."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
-(defconst gnus-version-number "0.2"
+(defconst gnus-version-number "0.3"
   "Version number for this version of Gnus.")
 
 (defconst gnus-version (format "No Gnus v%s" gnus-version-number)
@@ -313,7 +314,6 @@ be set in `.emacs' instead."
   (defalias 'gnus-overlay-end 'overlay-end)
   (defalias 'gnus-extent-detached-p 'ignore)
   (defalias 'gnus-extent-start-open 'ignore)
-  (defalias 'gnus-appt-select-lowest-window 'appt-select-lowest-window)
   (defalias 'gnus-mail-strip-quoted-names 'mail-strip-quoted-names)
   (defalias 'gnus-character-to-event 'identity)
   (defalias 'gnus-assq-delete-all 'assq-delete-all)
@@ -322,7 +322,8 @@ be set in `.emacs' instead."
   (defvar gnus-mode-line-image-cache t)
   (if (fboundp 'find-image)
       (defun gnus-mode-line-buffer-identification (line)
-	(let ((str (car-safe line)))
+	(let ((str (car-safe line))
+	      (load-path (mm-image-load-path)))
 	  (if (and (stringp str)
 		   (string-match "^Gnus:" str))
 	      (progn (add-text-properties
@@ -871,7 +872,7 @@ be set in `.emacs' instead."
    ((and
      (fboundp 'find-image)
      (display-graphic-p)
-     (let* ((data-directory (nnheader-find-etc-directory "gnus"))
+     (let* ((data-directory (nnheader-find-etc-directory "images/gnus"))
 	    (image (find-image
 		    `((:type xpm :file "gnus.xpm"
 			     :color-symbols
@@ -960,6 +961,7 @@ For example:
      (\"mail\\\\.me\" (gnus-use-scoring  t))
      (\"list\\\\..*\" (total-expire . t)
 		  (broken-reply-to . t)))"
+  :version "22.1"
   :group 'gnus-group-various
   :type '(repeat (cons regexp
 		       (repeat sexp))))
@@ -1309,6 +1311,7 @@ If the default site is too slow, try one of these:
 			(gnus-replace-in-string name "\\." "-") "-charter.html")))
   "*An alist of (HIERARCHY . FORM) pairs used to construct the URL of a charter.
 When FORM is evaluated `name' is bound to the name of the group."
+  :version "22.1"
   :group 'gnus-group-various
   :type '(repeat (cons (string :tag "Hierarchy") (sexp :tag "Form"))))
 
@@ -1316,6 +1319,7 @@ When FORM is evaluated `name' is bound to the name of the group."
   "*Non-nil means that control messages are displayed using `browse-url'.
 Otherwise they are fetched with ange-ftp and displayed in an ephemeral
 group."
+  :version "22.1"
   :group 'gnus-group-various
   :type 'boolean)
 
@@ -1590,6 +1594,7 @@ to be desirable; see the manual for further details."
  "Return GROUP's to-address."
  :variable-document
  "*Alist of group regexps and correspondent to-addresses."
+ :variable-group gnus-group-parameter
  :parameter-type '(gnus-email-address :tag "To Address")
  :parameter-document "\
 This will be used when doing followups and posts.
@@ -1616,6 +1621,7 @@ address was listed in gnus-group-split Addresses (see below).")
  "Return GROUP's to-list."
  :variable-document
  "*Alist of group regexps and correspondent to-lists."
+ :variable-group gnus-group-parameter
  :parameter-type '(gnus-email-address :tag "To List")
  :parameter-document "\
 This address will be used when doing a `a' in the group.
@@ -1634,6 +1640,7 @@ address was listed in gnus-group-split Addresses (see below).")
  "Return GROUP's subscription status."
  :variable-document
  "*Groups which are automatically considered subscribed."
+ :variable-group gnus-group-parameter
  :parameter-type '(const :tag "Subscribed" t)
  :parameter-document "\
 Gnus assumed that you are subscribed to the To/List address.
@@ -1740,6 +1747,7 @@ posting an article."
  "Return GROUP's initial input of the number of articles."
  :variable-document
  "*Alist of group regexps and its initial input of the number of articles."
+ :variable-group gnus-group-parameter
  :parameter-type '(choice :tag "Initial Input for Large Newsgroup"
 			  (const :tag "All" nil)
 			  (integer))
@@ -1765,7 +1773,7 @@ total number of articles in the group.")
 		  (list
 		   (regexp :tag "Group Name Regular Expression")
 		   (boolean :tag "Ignored")))
- 
+
  :parameter-type '(boolean :tag "Group Ignored by the Registry")
  :parameter-document
  "Whether the Gnus Registry should ignore this group.")
@@ -1774,6 +1782,7 @@ total number of articles in the group.")
 (defcustom gnus-install-group-spam-parameters t
   "*Disable the group parameters for spam detection.
 Enable if `G c' in XEmacs is giving you trouble, and make sure to submit a bug report."
+  :version "22.1"
   :type 'boolean
   :group 'gnus-start)
 
@@ -1801,11 +1810,12 @@ registry.")
    :variable gnus-spam-newsgroup-contents
    :variable-default nil
    :variable-document
-   "*Groups in which to automatically mark new articles as spam on
-summary entry.  If non-nil, this should be a list of group name
-regexps that should match all groups in which to do automatic spam
-tagging, associated with a classification (spam, ham, or neither).
-This only makes sense for mail groups."
+   "*Group classification (spam, ham, or neither).  Only
+meaningful when spam.el is loaded.  If non-nil, this should be a
+list of group name regexps associated with a classification for
+each one.  In spam groups, new articles are marked as spam on
+summary entry.  There is other behavior associated with ham and
+no classification when spam.el is loaded - see the manual."
    :variable-group spam
    :variable-type '(repeat
 		    (list :tag "Group contents spam/ham classification"
@@ -1822,7 +1832,45 @@ This only makes sense for mail groups."
 				  (const :tag "Unclassified" nil)))
    :parameter-document
    "The spam classification (spam, ham, or neither) of this group.
-When a spam group is entered, all unread articles are marked as spam.")
+When a spam group is entered, all unread articles are marked as
+spam.  There is other behavior associated with ham and no
+classification when spam.el is loaded - see the manual.")
+
+  (gnus-define-group-parameter
+   spam-resend-to
+   :type list
+   :function-document
+   "The address to get spam resent (through spam-report-resend)."
+   :variable gnus-spam-resend-to
+   :variable-default nil
+   :variable-document
+   "The address to get spam resent (through spam-report-resend)."
+   :variable-group spam
+   :variable-type '(repeat
+		    (list :tag "Group address for resending spam"
+			  (regexp :tag "Group")
+			  (string :tag "E-mail address for resending spam (requires the spam-use-resend exit processor)")))
+   :parameter-type 'string :tag "E-mail address for resending spam (requires the spam-use-resend exit processor)"
+   :parameter-document
+   "The address to get spam resent (through spam-report-resend).")
+
+  (gnus-define-group-parameter
+   ham-resend-to
+   :type list
+   :function-document
+   "The address to get ham resent (through spam-report-resend)."
+   :variable gnus-ham-resend-to
+   :variable-default nil
+   :variable-document
+   "The address to get ham resent (through spam-report-resend)."
+   :variable-group spam
+   :variable-type '(repeat
+		    (list :tag "Group address for resending ham"
+			  (regexp :tag "Group")
+			  (string :tag "E-mail address for resending ham (requires the spam-use-resend exit processor)")))
+   :parameter-type 'string :tag "E-mail address for resending ham (requires the spam-use-resend exit processor)"
+   :parameter-document
+   "The address to get ham resent (through spam-report-resend).")
 
   (defvar gnus-group-spam-exit-processor-ifile "ifile"
     "OBSOLETE: The ifile summary exit spam processor.")
@@ -1874,12 +1922,33 @@ Only applicable to non-spam (unclassified and ham) groups.")
   (gnus-define-group-parameter
    spam-process
    :type list
-   :parameter-type 
-   '(choice 
+   :parameter-type
+   '(choice
      :tag "Spam Summary Exit Processor"
      :value nil
      (list :tag "Spam Summary Exit Processor Choices"
 	   (set
+	    (const :tag "Spam: Bogofilter"    (spam spam-use-bogofilter))
+	    (const :tag "Spam: Blacklist"     (spam spam-use-blacklist))
+	    (const :tag "Spam: Bsfilter"      (spam spam-use-bsfilter))
+	    (const :tag "Spam: Gmane Report"  (spam spam-use-gmane))
+	    (const :tag "Spam: Resend Message"(spam spam-use-resend))
+	    (const :tag "Spam: ifile"	      (spam spam-use-ifile))
+	    (const :tag "Spam: Spam Oracle"   (spam spam-use-spamoracle))
+	    (const :tag "Spam: Spam-stat"     (spam spam-use-stat))
+	    (const :tag "Spam: SpamAssassin"  (spam spam-use-spamassassin))
+	    (const :tag "Spam: CRM114"        (spam spam-use-crm114))
+	    (const :tag "Ham: BBDB"	      (ham spam-use-BBDB))
+	    (const :tag "Ham: Bogofilter"     (ham spam-use-bogofilter))
+	    (const :tag "Ham: Bsfilter"       (ham spam-use-bsfilter))
+	    (const :tag "Ham: Copy"	      (ham spam-use-ham-copy))
+	    (const :tag "Ham: Resend Message" (ham spam-use-resend))
+	    (const :tag "Ham: ifile"	      (ham spam-use-ifile))
+	    (const :tag "Ham: Spam Oracle"    (ham spam-use-spamoracle))
+	    (const :tag "Ham: Spam-stat"      (ham spam-use-stat))
+	    (const :tag "Ham: SpamAssassin"   (ham spam-use-spamassassin))
+	    (const :tag "Ham: CRM114"         (ham spam-use-crm114))
+	    (const :tag "Ham: Whitelist"      (ham spam-use-whitelist))
 	    (variable-item gnus-group-spam-exit-processor-ifile)
 	    (variable-item gnus-group-spam-exit-processor-stat)
 	    (variable-item gnus-group-spam-exit-processor-bogofilter)
@@ -1892,24 +1961,7 @@ Only applicable to non-spam (unclassified and ham) groups.")
 	    (variable-item gnus-group-ham-exit-processor-whitelist)
 	    (variable-item gnus-group-ham-exit-processor-BBDB)
 	    (variable-item gnus-group-ham-exit-processor-spamoracle)
-	    (variable-item gnus-group-ham-exit-processor-copy)
-	    (const :tag "Spam: Bogofilter"    (spam spam-use-bogofilter))
-	    (const :tag "Spam: Blacklist"     (spam spam-use-blacklist))
-	    (const :tag "Spam: Bsfilter"      (spam spam-use-bsfilter))
-	    (const :tag "Spam: Gmane Report"  (spam spam-use-gmane))
-	    (const :tag "Spam: ifile"	      (spam spam-use-ifile))
-	    (const :tag "Spam: Spam Oracle"   (spam spam-use-spamoracle))
-	    (const :tag "Spam: Spam-stat"     (spam spam-use-stat))
-	    (const :tag "Spam: SpamAssassin"  (spam spam-use-spamassassin))
-	    (const :tag "Ham: BBDB"	      (ham spam-use-BBDB))
-	    (const :tag "Ham: Bogofilter"     (ham spam-use-bogofilter))
-	    (const :tag "Ham: Bsfilter"       (ham spam-use-bsfilter))
-	    (const :tag "Ham: Copy"	      (ham spam-use-ham-copy))
-	    (const :tag "Ham: ifile"	      (ham spam-use-ifile))
-	    (const :tag "Ham: Spam Oracle"    (ham spam-use-spamoracle))
-	    (const :tag "Ham: Spam-stat"      (ham spam-use-stat))
-	    (const :tag "Ham: SpamAssassin"   (ham spam-use-spamassassin))
-	    (const :tag "Ham: Whitelist"      (ham spam-use-whitelist)))))
+	    (variable-item gnus-group-ham-exit-processor-copy))))
    :function-document
    "Which spam or ham processors will be applied when the summary is exited."
    :variable gnus-spam-process-newsgroups
@@ -1920,12 +1972,33 @@ a backend on summary exit.  If non-nil, this should be a list of group
 name regexps that should match all groups in which to do automatic
 spam processing, associated with the appropriate processor."
    :variable-group spam
-   :variable-type 
+   :variable-type
    '(repeat :tag "Spam/Ham Processors"
 	    (list :tag "Spam Summary Exit Processor Choices"
 		  (regexp :tag "Group Regexp")
-		  (set 
+		  (set
 		   :tag "Spam/Ham Summary Exit Processor"
+		   (const :tag "Spam: Bogofilter"    (spam spam-use-bogofilter))
+		   (const :tag "Spam: Blacklist"     (spam spam-use-blacklist))
+		   (const :tag "Spam: Bsfilter"	     (spam spam-use-bsfilter))
+		   (const :tag "Spam: Gmane Report"  (spam spam-use-gmane))
+		   (const :tag "Spam: Resend Message"(spam spam-use-resend))
+		   (const :tag "Spam: ifile"	     (spam spam-use-ifile))
+		   (const :tag "Spam: Spam-stat"     (spam spam-use-stat))
+		   (const :tag "Spam: Spam Oracle"   (spam spam-use-spamoracle))
+		   (const :tag "Spam: SpamAssassin"  (spam spam-use-spamassassin))
+		   (const :tag "Spam: CRM114"        (spam spam-use-crm114))
+		   (const :tag "Ham: BBDB"	     (ham spam-use-BBDB))
+		   (const :tag "Ham: Bogofilter"     (ham spam-use-bogofilter))
+		   (const :tag "Ham: Bsfilter"	     (ham spam-use-bsfilter))
+		   (const :tag "Ham: Copy"	     (ham spam-use-ham-copy))
+		   (const :tag "Ham: Resend Message" (ham spam-use-resend))
+		   (const :tag "Ham: ifile"	     (ham spam-use-ifile))
+		   (const :tag "Ham: Spam-stat"	     (ham spam-use-stat))
+		   (const :tag "Ham: Spam Oracle"    (ham spam-use-spamoracle))
+		   (const :tag "Ham: SpamAssassin"   (ham spam-use-spamassassin))
+		   (const :tag "Ham: CRM114"         (ham spam-use-crm114))
+		   (const :tag "Ham: Whitelist"	     (ham spam-use-whitelist))
 		   (variable-item gnus-group-spam-exit-processor-ifile)
 		   (variable-item gnus-group-spam-exit-processor-stat)
 		   (variable-item gnus-group-spam-exit-processor-bogofilter)
@@ -1938,24 +2011,7 @@ spam processing, associated with the appropriate processor."
 		   (variable-item gnus-group-ham-exit-processor-whitelist)
 		   (variable-item gnus-group-ham-exit-processor-BBDB)
 		   (variable-item gnus-group-ham-exit-processor-spamoracle)
-		   (variable-item gnus-group-ham-exit-processor-copy)
-		   (const :tag "Spam: Bogofilter"    (spam spam-use-bogofilter))
-		   (const :tag "Spam: Blacklist"     (spam spam-use-blacklist))
-		   (const :tag "Spam: Bsfilter"	     (spam spam-use-bsfilter))
-		   (const :tag "Spam: ifile"	     (spam spam-use-ifile))
-		   (const :tag "Spam: Gmane Report"  (spam spam-use-gmane))
-		   (const :tag "Spam: Spam-stat"     (spam spam-use-stat))
-		   (const :tag "Spam: Spam Oracle"   (spam spam-use-spamoracle))
-		   (const :tag "Spam: SpamAssassin"  (spam spam-use-spamassassin))
-		   (const :tag "Ham: BBDB"	     (ham spam-use-BBDB))
-		   (const :tag "Ham: Bogofilter"     (ham spam-use-bogofilter))
-		   (const :tag "Ham: Bsfilter"	     (ham spam-use-bsfilter))
-		   (const :tag "Ham: Copy"	     (ham spam-use-ham-copy))
-		   (const :tag "Ham: ifile"	     (ham spam-use-ifile))
-		   (const :tag "Ham: Spam-stat"	     (ham spam-use-stat))
-		   (const :tag "Ham: Spam Oracle"    (ham spam-use-spamoracle))
-		   (const :tag "Ham: SpamAssassin"   (ham spam-use-spamassassin))
-		   (const :tag "Ham: Whitelist"	     (ham spam-use-whitelist)))))
+		   (variable-item gnus-group-ham-exit-processor-copy))))
 
    :parameter-document
    "Which spam or ham processors will be applied when the summary is exited.")
@@ -1963,7 +2019,7 @@ spam processing, associated with the appropriate processor."
   (gnus-define-group-parameter
    spam-autodetect
    :type list
-   :parameter-type 
+   :parameter-type
    '(boolean :tag "Spam autodetection")
    :function-document
    "Should spam be autodetected (with spam-split) in this group?"
@@ -1974,7 +2030,7 @@ spam processing, associated with the appropriate processor."
    Only unseen articles will be examined, unless
    spam-autodetect-recheck-messages is set."
    :variable-group spam
-   :variable-type 
+   :variable-type
    '(repeat
      :tag "Autodetection setting"
      (list
@@ -1988,7 +2044,7 @@ spam-autodetect-recheck-messages is set.")
   (gnus-define-group-parameter
    spam-autodetect-methods
    :type list
-   :parameter-type 
+   :parameter-type
    '(choice :tag "Spam autodetection-specific methods"
      (const none)
      (const default)
@@ -2001,6 +2057,7 @@ spam-autodetect-recheck-messages is set.")
 	  (variable-item spam-use-BBDB)
 	  (variable-item spam-use-ifile)
 	  (variable-item spam-use-spamoracle)
+	  (variable-item spam-use-crm114)
 	  (variable-item spam-use-spamassassin)
 	  (variable-item spam-use-spamassassin-headers)
 	  (variable-item spam-use-bsfilter)
@@ -2020,7 +2077,7 @@ Requires the spam-autodetect parameter.  Only unseen articles
 will be examined, unless spam-autodetect-recheck-messages is
 set."
    :variable-group spam
-   :variable-type 
+   :variable-type
    '(repeat
      :tag "Autodetection methods"
      (list
@@ -2037,6 +2094,7 @@ set."
 	(variable-item spam-use-BBDB)
 	(variable-item spam-use-ifile)
 	(variable-item spam-use-spamoracle)
+	(variable-item spam-use-crm114)
 	(variable-item spam-use-stat)
 	(variable-item spam-use-blackholes)
 	(variable-item spam-use-hashcash)
@@ -2047,7 +2105,7 @@ set."
 	(variable-item spam-use-bogofilter-headers)
 	(variable-item spam-use-bogofilter)))))
      :parameter-document
-   "Spam autodetection methods.  
+   "Spam autodetection methods.
 Requires the spam-autodetect parameter.  Only unseen articles
 will be examined, unless spam-autodetect-recheck-messages is
 set.")
@@ -2055,7 +2113,7 @@ set.")
   (gnus-define-group-parameter
    spam-process-destination
    :type list
-   :parameter-type 
+   :parameter-type
    '(choice :tag "Destination for spam-processed articles at summary exit"
 	    (string :tag "Move to a group")
 	    (repeat :tag "Move to multiple groups"
@@ -2073,7 +2131,7 @@ to do spam-processed article moving, associated with the destination
 group or nil for explicit expiration.  This only makes sense for
 mail groups."
    :variable-group spam
-   :variable-type 
+   :variable-type
    '(repeat
      :tag "Spam-processed articles destination"
      (list
@@ -2086,11 +2144,11 @@ mail groups."
        (const :tag "Expire" nil))))
    :parameter-document
    "Where spam-processed articles will go at summary exit.")
-  
+
   (gnus-define-group-parameter
    ham-process-destination
    :type list
-   :parameter-type 
+   :parameter-type
    '(choice
      :tag "Destination for ham articles at summary exit from a spam group"
      (string :tag "Move to a group")
@@ -2110,7 +2168,7 @@ to do ham article moving, associated with the destination
 group or nil for explicit ignoring.  This only makes sense for
 mail groups, and only works in spam groups."
    :variable-group spam
-   :variable-type 
+   :variable-type
    '(repeat
      :tag "Ham articles destination"
      (list
@@ -2294,7 +2352,7 @@ face."
 When set, Gnus will prefer using the locally stored content rather
 than re-fetching it from the server.  You also need to enable
 `gnus-agent' for this to have any affect."
-  :version "21.3"
+  :version "22.1"
   :group 'gnus-agent
   :type 'boolean)
 
@@ -2313,7 +2371,7 @@ covered by that variable."
 You may customize gnus-agent to disable its use.  However, some
 back ends have started to use the agent as a client-side cache.
 Disabling the agent may result in noticeable loss of performance."
-  :version "21.3"
+  :version "22.1"
   :group 'gnus-agent
   :type 'boolean)
 
@@ -2337,23 +2395,45 @@ This should be an alist for Emacs, or a plist for XEmacs."
 			 (symbol :tag "Parameter")
 			 (sexp :tag "Value")))))
 
-(defcustom gnus-user-agent 'emacs-gnus-type
+(defcustom gnus-user-agent '(emacs gnus type)
   "Which information should be exposed in the User-Agent header.
 
-It can be one of the symbols `gnus' \(show only Gnus version\), `emacs-gnus'
-\(show only Emacs and Gnus versions\), `emacs-gnus-config' \(same as
-`emacs-gnus' plus system configuration\), `emacs-gnus-type' \(same as
-`emacs-gnus' plus system type\) or a custom string.  If you set it to a
-string, be sure to use a valid format, see RFC 2616."
+Can be a list of symbols or a string.  Valid symbols are `gnus'
+\(show Gnus version\) and `emacs' \(show Emacs version\).  In
+addition to the Emacs version, you can add `codename' \(show
+\(S\)XEmacs codename\) or either `config' \(show system
+configuration\) or `type' \(show system type\).  If you set it to
+a string, be sure to use a valid format, see RFC 2616."
+
+  :version "22.1"
   :group 'gnus-message
-  :type '(choice
-	  (item :tag "Show Gnus and Emacs versions and system type"
-		emacs-gnus-type)
-	  (item :tag "Show Gnus and Emacs versions and system configuration"
-		emacs-gnus-config)
-	  (item :tag "Show Gnus and Emacs versions" emacs-gnus)
-	  (item :tag "Show only Gnus version" gnus)
-	  (string :tag "Other")))
+  :type '(choice (list (set :inline t
+			    (const gnus  :tag "Gnus version")
+			    (const emacs :tag "Emacs version")
+			    (choice :tag "system"
+				    (const type   :tag "system type")
+				    (const config :tag "system configuration"))
+			    (const codename :tag "Emacs codename")))
+		 (string)))
+
+;; Convert old (< 2005-01-10) symbol type values:
+(when (symbolp gnus-user-agent)
+  (setq gnus-user-agent
+	(cond ((eq gnus-user-agent 'emacs-gnus-config)
+	       '(emacs gnus config))
+	      ((eq gnus-user-agent 'emacs-gnus-type)
+	       '(emacs gnus type))
+	      ((eq gnus-user-agent 'emacs-gnus)
+	       '(emacs gnus))
+	      ((eq gnus-user-agent 'gnus)
+	       '(gnus))
+	      (t gnus-user-agent)))
+  (gnus-message 1 "Converted `gnus-user-agent' to `%s'." gnus-user-agent)
+  (sit-for 1)
+  (if (get 'gnus-user-agent 'saved-value)
+      (customize-save-variable 'gnus-user-agent gnus-user-agent)
+    (gnus-message 1 "Edit your init file to make this change permanent.")
+    (sit-for 2)))
 
 
 ;;; Internal variables
@@ -2451,7 +2531,6 @@ such as a mark that says whether an article is stored in the cache
 (defvar gnus-headers-retrieved-by nil)
 (defvar gnus-article-reply nil)
 (defvar gnus-override-method nil)
-(defvar gnus-article-check-size nil)
 (defvar gnus-opened-servers nil)
 
 (defvar gnus-current-kill-article nil)
@@ -2645,7 +2724,7 @@ gnus-registry.el will populate this if it's loaded.")
       gnus-uu-decode-uu-and-save-view gnus-uu-decode-unshar-view
       gnus-uu-decode-unshar-and-save-view gnus-uu-decode-save-view
       gnus-uu-decode-binhex-view gnus-uu-unmark-thread
-      gnus-uu-mark-over gnus-uu-post-news)
+      gnus-uu-mark-over gnus-uu-post-news gnus-uu-invert-processable)
      ("gnus-uu" gnus-uu-delete-work-dir gnus-uu-unmark-thread)
      ("gnus-msg" (gnus-summary-send-map keymap)
       gnus-article-mail gnus-copy-article-buffer gnus-extended-version)
@@ -2704,7 +2783,8 @@ gnus-registry.el will populate this if it's loaded.")
       gnus-mime-view-all-parts)
      ("gnus-int" gnus-request-type)
      ("gnus-start" gnus-newsrc-parse-options gnus-1 gnus-no-server-1
-      gnus-dribble-enter gnus-read-init-file gnus-dribble-touch)
+      gnus-dribble-enter gnus-read-init-file gnus-dribble-touch
+      gnus-check-reasonable-setup)
      ("gnus-dup" gnus-dup-suppress-articles gnus-dup-unsuppress-article
       gnus-dup-enter-articles)
      ("gnus-range" gnus-copy-sequence)
@@ -2717,7 +2797,7 @@ gnus-registry.el will populate this if it's loaded.")
       gnus-async-prefetch-article gnus-async-prefetch-remove-group
       gnus-async-halt-prefetch)
      ("gnus-agent" gnus-open-agent gnus-agent-get-function
-      gnus-agent-save-groups gnus-agent-save-active gnus-agent-method-p
+      gnus-agent-save-active gnus-agent-method-p
       gnus-agent-get-undownloaded-list gnus-agent-fetch-session
       gnus-summary-set-agent-mark gnus-agent-save-group-info
       gnus-agent-request-article gnus-agent-retrieve-headers)
@@ -2952,11 +3032,9 @@ Return nil if not defined."
 
 (defun gnus-shutdown (symbol)
   "Shut down everything that waits for SYMBOL."
-  (let ((alist gnus-shutdown-alist)
-	entry)
-    (while (setq entry (pop alist))
-      (when (memq symbol (cdr entry))
-	(funcall (car entry))))))
+  (dolist (entry gnus-shutdown-alist)
+    (when (memq symbol (cdr entry))
+      (funcall (car entry)))))
 
 
 ;;;
@@ -3325,7 +3403,7 @@ that that variable is buffer-local to the summary buffers."
               ;; gnus-server-method-cache so this only happens once,
               ;; if at all.
               (let (match)
-                (mapcar 
+                (mapcar
                  (lambda (info)
                    (let ((info-method (gnus-info-method info)))
                      (unless (stringp info-method)
@@ -3989,10 +4067,10 @@ Allow completion over sensible values."
 (defun gnus-agent-method-p (method)
   "Say whether METHOD is covered by the agent."
   (or (eq (car gnus-agent-method-p-cache) method)
-      (setq gnus-agent-method-p-cache 
+      (setq gnus-agent-method-p-cache
             (cons method
-                  (member (if (stringp method) 
-                              method 
+                  (member (if (stringp method)
+                              method
                             (gnus-method-to-server method)) gnus-agent-covered-methods))))
   (cdr gnus-agent-method-p-cache))
 
@@ -4096,4 +4174,5 @@ prompt the user for the name of an NNTP server to use."
 
 (provide 'gnus)
 
+;;; arch-tag: acebeeab-f331-4f8f-a7ea-89c58c84f636
 ;;; gnus.el ends here

@@ -27,7 +27,8 @@
 
 (defgroup pgg ()
   "Glue for the various PGP implementations."
-  :group 'mime)
+  :group 'mime
+  :version "22.1")
 
 (defcustom pgg-default-scheme 'gpg
   "Default PGP scheme."
@@ -48,6 +49,7 @@
 
 (defcustom pgg-query-keyserver nil
   "Whether PGG queries keyservers for missing keys when verifying messages."
+  :version "22.1"
   :group 'pgg
   :type 'boolean)
 
@@ -85,4 +87,5 @@ Whether the passphrase is cached at all is controlled by
 
 (provide 'pgg-def)
 
+;;; arch-tag: c425f3ab-ed75-4055-bb46-431a418c94b7
 ;;; pgg-def.el ends here

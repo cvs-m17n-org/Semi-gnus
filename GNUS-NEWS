@@ -5,8 +5,51 @@ See the end for copying conditions.
 Please send Gnus bug reports to bugs@gnus.org.
 For older news, see Gnus info node "New Features".
 
+
 
 * Changes in No Gnus
+
+** Upgrading from previous (stable) version if you have used No Gnus.
+
+If you have tried No Gnus (the unstable Gnus branch leading to this
+release) but went back to a stable version, be careful when upgrading
+to this version.  In particular, you will probably want to remove the
+`~/News/marks' directory (perhaps selectively), so that flags are
+read from your `~/.newsrc.eld' instead of from the stale marks file,
+where this release will store flags for nntp.  See a later entry for
+more information about nntp marks.  Note that downgrading isn't safe
+in general.
+
+** The nntp back end store article marks in `~/News/marks'.
+
+The directory can be changed using the (customizable) variable
+`nntp-marks-directory', and marks can be disabled using the (back
+end) variable `nntp-marks-is-evil'.  The advantage of this is that
+you can copy `~/News/marks' (using rsync, scp or whatever) to another
+Gnus installation, and it will realize what articles you have read
+and marked.  The data in `~/News/marks' has priority over the same
+data in `~/.newsrc.eld'.
+
+** Picons can be displayed right from the textual address, see
+`gnus-picon-style'.  *Note Picons::.
+
+** You can import and export your RSS subscriptions from OPML files.
+*Note RSS::.
+
+** The option `mm-fill-flowed' can be used to disable treatment of
+format=flowed messages.  Also, flowed text is disabled when sending
+inline PGP signed messages.
+
+** You can now drag and drop attachments to the Message buffer.
+
+** ANSI SGR control sequences can be transformed using `W A'.
+
+ANSI sequences are used in some Chinese hierarchies for highlighting
+articles (`gnus-article-treat-ansi-sequences').
+
+** International host names (IDNA) can now be decoded inside article
+bodies using `W i' (`gnus-summary-idna-message').  This require that
+GNU Libidn (`http://www.gnu.org/software/libidn/') has been installed.
 
 ** Gnus includes an Emacs Lisp SASL library.
 
@@ -23,16 +66,48 @@ when the server support it.
 
 It is enabled by default (see `password-cache'), with a short timeout
 of 16 seconds (see `password-cache-expiry').  If PGG is used as the
-PGP backend, the PGP passphrase is managed by this mechanism.
+PGP back end, the PGP passphrase is managed by this mechanism.
 Passwords for ManageSieve connections are managed by this mechanism,
 after quering the user about whether to do so.
 
 ** IMAP identity (RFC 2971) is supported.
 
 By default, Gnus do not send any information about itself, but you can
-customize it using `nnimap-id'.
+customize it using the variable `nnimap-id'.
 
-** The "all.SCORE" file can now be edited from the group buffer using `W e'.
+** The `all.SCORE' file can be edited from the group buffer using `W e'.
+
+** Gnus now MIME decode articles even when they lack "MIME-Version"
+header.  This changes the default of `gnus-article-loose-mime'.
+
+** Gnus now view DNS master files sent as text/dns using dns-mode.
+
+** Gnus now support the "hashcash" client puzzle anti-spam idea.  See
+the Gnus manual, section Hashcash, for more information.  Use `(setq
+message-generate-hashcash t)' to enable.
+
+** Gnus supports new limiting commands in the Summary buffer: `/ r'
+(`gnus-summary-limit-to-replied') and `/ R'
+(`gnus-summary-limit-to-recipient').  *Note Limiting::.
+
+** Gnus supports a new sort command in the Summary buffer: `C-c C-s C-t'
+(`gnus-summary-sort-by-recipient').  *Note Summary Sorting::
+
+** The `nnrss' back end now supports multilingual text.  Non-ASCII group
+names for the `nnrss' groups are also supported.  *Note RSS::.
+
+** URLs inside OpenPGP: headers are retrieved and imported to your PGP
+key ring when you click on them.
+
+** Gnus uses narrowing to hide headers in Message buffers.  The
+`References' header is hidden by default.  To make all headers
+visible, use `(setq message-hidden-headers nil)'.
+
+** `gnus-decay-scores' can be a regexp matching score files.  This
+allows to decay only adaptive score files.  *Note Score Decays::.
+
+** S/MIME now feature LDAP user certificate searches.  You need to
+configure the server in `smime-ldap-host-list'.
 
 
 * For older news, see Gnus info node "New Features".
@@ -40,7 +115,7 @@ customize it using `nnimap-id'.
 ----------------------------------------------------------------------
 Copyright information:
 
-Copyright (C) 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
    Permission is granted to anyone to make or distribute verbatim copies
    of this document as received, in any medium, provided that the

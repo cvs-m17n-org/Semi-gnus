@@ -4,27 +4,30 @@
 
 @set VERSION 0.1
 
+
+@copying
+This file describes the PGG.
+
+Copyright (C) 2003 Free Software Foundation, Inc.
+Copyright (C) 2001 Daiki Ueno.
+
+@quotation
+Permission is granted to copy, distribute and/or modify this document
+under the terms of the GNU Free Documentation License, Version 1.1 or
+any later version published by the Free Software Foundation; with no
+Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
+Texts.  A copy of the license is included in the section entitled ``GNU
+Free Documentation License''.
+@end quotation
+@end copying
+
+@dircategory Emacs
 @direntry
 * PGG: (pgg).   Emacs interface to various PGP implementations.
 @end direntry
 
 @settitle PGG @value{VERSION}
 
-@ifinfo
-This file describes the PGG.
-
-Copyright (C) 2003, 2004 Free Software Foundation, Inc.
-Copyright (C) 2001 Daiki Ueno.
-
-Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.1 or
-any later version published by the Free Software Foundation; with no
-Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
-Texts.  A copy of the license is included in the section entitled "GNU
-Free Documentation License".
-@end ifinfo
-
-@tex
 
 @titlepage
 @title PGG
@@ -33,18 +36,9 @@ Free Documentation License".
 @page
 
 @vskip 0pt plus 1filll
-Copyright @copyright{} 2001 Daiki Ueno.
-
-Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.1 or
-any later version published by the Free Software Foundation; with no
-Invariant Sections, with no Front-Cover Texts, and with no Back-Cover
-Texts.  A copy of the license is included in the section entitled "GNU
-Free Documentation License".
+@insertcopying
 @end titlepage
 @page
-
-@end tex
 
 @node Top
 @top PGG
@@ -263,11 +257,11 @@ singleton object wrapped with the luna object system.
 Since PGG was designed for accessing and developing PGP functionality,
 the architecture had to be designed not just for interoperability but
 also for extensiblity.  In this chapter we explore the architecture
-while finding out how to write the PGG backend.
+while finding out how to write the PGG back end.
 
 @menu
 * Initializing::                
-* Backend methods::             
+* Back end methods::             
 * Getting output::              
 @end menu
 
@@ -291,12 +285,12 @@ variable @code{pgg-scheme-gpg-instance} and will be reused from now on.
 @end lisp
 
 The name of the function must follow the
-regulation---@code{pgg-make-scheme-} follows the backend name.
+regulation---@code{pgg-make-scheme-} follows the back end name.
 
-@node Backend methods
-@section Backend methods
+@node Back end methods
+@section Back end methods
 
-In each backend, these methods must be present.  The output of these
+In each back end, these methods must be present.  The output of these
 methods is stored in special buffers (@ref{Getting output}), so that
 these methods must tell the status of the execution.
 
@@ -346,7 +340,7 @@ On success, it returns @code{t}, otherwise @code{nil}.
 @node Getting output
 @section Getting output
 
-The output of the backend methods (@ref{Backend methods}) is stored in
+The output of the back end methods (@ref{Back end methods}) is stored in
 special buffers, so that these methods must tell the status of the
 execution.
 
@@ -399,3 +393,7 @@ If non-@code{nil}, don't check the checksum of the packets.
 @bye
 
 @c End:
+
+@ignore
+   arch-tag: 0c205838-34b9-41a5-b9d7-49ae57ccac85
+@end ignore

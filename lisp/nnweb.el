@@ -1,5 +1,5 @@
 ;;; nnweb.el --- retrieving articles via web search engines
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -54,11 +54,12 @@ Valid types include `google', `dejanews', and `gmane'.")
 (defvar nnweb-type-definition
   '((google
      (article . ignore)
-     (id . "http://groups.google.com/groups?selm=%s&output=gplain")
+     (id . "http://groups.google.de/groups?selm=%s&output=gplain")
      (reference . identity)
      (map . nnweb-google-create-mapping)
      (search . nnweb-google-search)
-     (address . "http://groups.google.com/groups")
+     (address . "http://groups.google.de/groups")
+     (base    . "http://groups.google.de")
      (identifier . nnweb-google-identity))
     (dejanews ;; alias of google
      (article . ignore)
@@ -67,6 +68,7 @@ Valid types include `google', `dejanews', and `gmane'.")
      (map . nnweb-google-create-mapping)
      (search . nnweb-google-search)
      (address . "http://groups.google.com/groups")
+     (base    . "http://groups.google.com")
      (identifier . nnweb-google-identity))
     (gmane
      (article . nnweb-gmane-wash-article)
@@ -349,7 +351,7 @@ Valid types include `google', `dejanews', and `gmane'.")
 	    "a href=/groups\\(\\?[^ \">]*selm=\\([^ &\">]+\\)\\)" nil t)
       (setq mid (match-string 2)
 	    url (format
-		 "http://groups.google.com/groups?selm=%s&output=gplain" mid))
+		 (nnweb-definition 'id) mid))
       (narrow-to-region (search-forward ">" nil t)
 			(search-forward "</a>" nil t))
       (mm-url-remove-markup)
@@ -420,7 +422,7 @@ Valid types include `google', `dejanews', and `gmane'.")
 		    (>= i nnweb-max-hits))
 		(setq more nil)
 	      ;; Yup, there are more articles
-	      (setq more (concat "http://groups.google.com" (match-string 1)))
+	      (setq more (concat (nnweb-definition 'base) (match-string 1)))
 	    (when more
 	      (erase-buffer)
 	      (mm-url-insert more))))
@@ -435,9 +437,9 @@ Valid types include `google', `dejanews', and `gmane'.")
     "?"
     (mm-url-encode-www-form-urlencoded
      `(("q" . ,search)
-       ("num". "100")
+       ("num" . "100")
        ("hq" . "")
-       ("hl" . "")
+       ("hl" . "en")
        ("lr" . "")
        ("safe" . "off")
        ("sites" . "groups")))))
@@ -489,7 +491,7 @@ Valid types include `google', `dejanews', and `gmane'.")
 (defun nnweb-gmane-wash-article ()
   (let ((case-fold-search t))
     (goto-char (point-min))
-    (re-search-forward "<!--X-Head-of-Message-->" nil t)
+    (search-forward "<!--X-Head-of-Message-->" nil t)
     (delete-region (point-min) (point))
     (goto-char (point-min))
     (while (looking-at "^<li><em>\\([^ ]+\\)</em>.*</li>")
@@ -587,4 +589,5 @@ Valid types include `google', `dejanews', and `gmane'.")
 
 (provide 'nnweb)
 
+;;; arch-tag: f59307eb-c90f-479f-b7d2-dbd8bf51b697
 ;;; nnweb.el ends here

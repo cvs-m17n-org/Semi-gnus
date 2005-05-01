@@ -1,5 +1,5 @@
 ;;; mailcap.el --- MIME media types configuration
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;       Free Software Foundation, Inc.
 
 ;; Author: William M. Perry <wmperry@aventail.com>
@@ -135,23 +135,21 @@
       (non-viewer . t)
       (type   . "application/zip")
       ("copiousoutput"))
-     ;; Prefer free viewers.
      ("pdf"
       (viewer . "gv -safer %s")
       (type . "application/pdf")
       (test . window-system)
       ("print" . ,(concat "pdf2ps %s - | " mailcap-print-command)))
      ("pdf"
-      (viewer . "xpdf %s")
+      (viewer . "gpdf %s")
       (type . "application/pdf")
       ("print" . ,(concat "pdftops %s - | " mailcap-print-command))
       (test . (eq window-system 'x)))
      ("pdf"
-      (viewer . "acroread %s")
-      (type   . "application/pdf")
-      ("print" . ,(concat "cat %s | acroread -toPostScript | "
-			  mailcap-print-command))
-      (test . window-system))
+      (viewer . "xpdf %s")
+      (type . "application/pdf")
+      ("print" . ,(concat "pdftops %s - | " mailcap-print-command))
+      (test . (eq window-system 'x)))
      ("pdf"
       (viewer . ,(concat "pdftotext %s -"))
       (type   . "application/pdf")
@@ -255,7 +253,11 @@
      ("html"
       (viewer . mm-w3-prepare-buffer)
       (test   . (fboundp 'w3-prepare-buffer))
-      (type   . "text/html")))
+      (type   . "text/html"))
+     ("dns"
+      (viewer . dns-mode)
+      (test   . (fboundp 'dns-mode))
+      (type   . "text/dns")))
     ("video"
      ("mpeg"
       (viewer . "mpeg_play %s")
@@ -305,6 +307,7 @@ validity.  Otherwise, if it is a non-function Lisp symbol or list
 whose car is a symbol, it is `eval'led to yield the validity.  If it
 is a string or list of strings, it represents a shell command to run
 to return a true or false shell value for the validity.")
+(put 'mailcap-mime-data 'risky-local-variable t)
 
 (defcustom mailcap-download-directory nil
   "*Directory to which `mailcap-save-binary-file' downloads files by default.
@@ -846,6 +849,7 @@ this type is returned."
     (".sit"   . "application/x-stuffit")
     (".siv"   . "application/sieve")
     (".snd"   . "audio/basic")
+    (".soa"   . "text/dns")
     (".src"   . "application/x-wais-source")
     (".tar"   . "archive/tar")
     (".tcl"   . "application/x-tcl")
@@ -985,4 +989,5 @@ If FORCE, re-parse even if already parsed."
 
 (provide 'mailcap)
 
+;;; arch-tag: 1fd4f9c9-c305-4d2e-9747-3a4d45baa0bd
 ;;; mailcap.el ends here

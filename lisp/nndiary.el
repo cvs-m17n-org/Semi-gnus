@@ -223,6 +223,7 @@
 
 (defgroup nndiary nil
   "The Gnus Diary backend."
+  :version "22.1"
   :group 'gnus-diary)
 
 (defcustom nndiary-mail-sources
@@ -723,7 +724,7 @@ all.  This may very well take some time.")
     (nconc rest articles)))
 
 (deffoo nndiary-request-move-article
-    (article group server accept-form &optional last)
+    (article group server accept-form &optional last move-is-internal)
   (let ((buf (get-buffer-create " *nndiary move*"))
 	result)
     (nndiary-possibly-change-directory group server)
@@ -759,7 +760,7 @@ all.  This may very well take some time.")
   (when (nndiary-schedule)
     (let (result)
       (when nnmail-cache-accepted-message-ids
-	(nnmail-cache-insert (nnmail-fetch-field "message-id") 
+	(nnmail-cache-insert (nnmail-fetch-field "message-id")
 			     group
 			     (nnmail-fetch-field "subject")))
       (if (stringp group)
@@ -1213,9 +1214,7 @@ all.  This may very well take some time.")
     (push (list group
 		(cons (or (caar files) (1+ last))
 		      (max last
-			   (or (let ((f files))
-				 (while (cdr f) (setq f (cdr f)))
-				 (caar f))
+			   (or (caar (last files))
 			       0))))
 	  nndiary-group-alist)))
 
@@ -1708,4 +1707,5 @@ all.  This may very well take some time.")
 (provide 'nndiary)
 
 
+;;; arch-tag: 9c542b95-92e7-4ace-a038-330ab296e203
 ;;; nndiary.el ends here

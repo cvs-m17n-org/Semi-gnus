@@ -47,7 +47,7 @@ to values."
 	       (val (cdr (assq spec specification))))
 	  (delete-region (1- (match-beginning 0)) (match-end 0))
 	  (unless val
-	    (error "Invalid format character: %s" spec))
+           (error "Invalid format character: `%%%c'" spec))
 	  (insert (format (concat "%" num "s") val))))
        ;; Signal an error on bogus format strings.
        (t
@@ -68,4 +68,5 @@ starting with a character."
 
 (provide 'format-spec)
 
+;;; arch-tag: c22d49cf-d167-445d-b7f1-2504d4173f53
 ;;; format-spec.el ends here
