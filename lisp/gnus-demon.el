@@ -37,8 +37,10 @@
 (require 'gnus-util)
 (eval-and-compile
   (if (featurep 'xemacs)
-      (require 'itimer)
+      (require 'timer-funcs)
     (require 'timer)))
+
+(autoload 'parse-time-string "parse-time" nil nil)
 
 (defgroup gnus-demon nil
   "Demonic behaviour."

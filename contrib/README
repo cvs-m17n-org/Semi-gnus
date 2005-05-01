@@ -12,10 +12,34 @@ need to a directory which is in load-path.
 
 Here is an overview of the files:
 
+compface.el
+
+	Provides the ELisp-based uncompface program.  It is excellent
+	and practical (actually you can replace lisp/compface.el with
+	it), however the author is missing and the copyright has not
+	been assigned yet.
+
+gnus-namazu.el
+
+	This file defines the command to search mails and persistent
+	articles with Namazu, which is a full-text search engine
+	distributed at http://namazu.org, and to browse its results
+	with Gnus.
+
+	Please note, this file has already been incorporated into the
+	lisp directory in T-gnus.
+
 gpg-ring.el
 gpg.el
 
 hashcash.el
+
+nnir.el
+
+	Interface to various full-text search engines.  Provides less
+	functionality than gnus-namazu.el, but also supports programs
+	other than Namazu.  Current implementation is restricted to
+	nnml folders, but could be extended for other backends.
 
 one-line-cookie.diff
 

@@ -1,6 +1,6 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
@@ -77,42 +77,92 @@
   (require 'cl))
 
 (require 'mail-utils)
-(require 'nnheader)
 
-(defvar pop3-maildrop (or (user-login-name) (getenv "LOGNAME") (getenv "USER") nil)
-  "*POP3 maildrop.")
-(defvar pop3-mailhost (or (getenv "MAILHOST") nil)
-  "*POP3 mailhost.")
-(defvar pop3-port 110
-  "*POP3 port.")
-(defvar pop3-connection-type nil
-  "*POP3 connection type.")
+(defgroup pop3 nil
+  "Post Office Protocol"
+  :group 'mail
+  :group 'mail-source)
 
-(defvar pop3-password-required t
-  "*Non-nil if a password is required when connecting to POP server.")
+(defcustom pop3-maildrop (or (user-login-name)
+			     (getenv "LOGNAME")
+			     (getenv "USER"))
+  "*POP3 maildrop."
+  :version "22.1" ;; Oort Gnus
+  :type 'string
+  :group 'pop3)
+
+(defcustom pop3-mailhost (or (getenv "MAILHOST") ;; nil -> mismatch
+			     "pop3")
+  "*POP3 mailhost."
+  :version "22.1" ;; Oort Gnus
+  :type 'string
+  :group 'pop3)
+
+(defcustom pop3-port 110
+  "*POP3 port."
+  :version "22.1" ;; Oort Gnus
+  :type 'number
+  :group 'pop3)
+
+(defcustom pop3-connection-type nil
+  "*POP3 connection type."
+  :type '(choice (const :tag "Not specified" nil)
+		 (const tls)
+		 (const ssl))
+  :group 'pop3)
+
+(defcustom pop3-password-required t
+  "*Non-nil if a password is required when connecting to POP server."
+  :version "22.1" ;; Oort Gnus
+  :type 'boolean
+  :group 'pop3)
+
+;; Should this be customizable?
 (defvar pop3-password nil
   "*Password to use when connecting to POP server.")
 
-(defvar pop3-authentication-scheme 'pass
+(defcustom pop3-authentication-scheme 'pass
   "*POP3 authentication scheme.
 Defaults to 'pass, for the standard USER/PASS authentication.  Other valid
-values are 'apop.")
+values are 'apop."
+  :version "22.1" ;; Oort Gnus
+  :type '(choice (const :tag "USER/PASS" pass)
+		 (const :tag "APOP" apop))
+  :group 'pop3)
+
+(defcustom pop3-leave-mail-on-server nil
+  "*Non-nil if the mail is to be left on the POP server after fetching.
+
+If `pop3-leave-mail-on-server' is non-nil the mail is to be left
+on the POP server after fetching.  Note that POP servers maintain
+no state information between sessions, so what the client
+believes is there and what is actually there may not match up.
+If they do not, then the whole thing can fall apart and leave you
+with a corrupt mailbox."
+  :version "22.1" ;; Oort Gnus
+  :type 'boolean
+  :group 'pop3)
 
 (defvar pop3-timestamp nil
   "Timestamp returned when initially connected to the POP server.
 Used for APOP authentication.")
 
-(defvar pop3-leave-mail-on-server nil
-  "Non-nil if mail is to be left on the server and UIDL used for message retrieval.")
+(defcustom pop3-maximum-message-size nil
+  "If non-nil only download messages smaller than this."
+  :type '(choice (const :tag "Unlimited" nil)
+		 (integer :tag "Maximum size"))
+  :group 'pop3)
 
-(defvar pop3-maximum-message-size nil
-  "If non-nil only download messages smaller than this.")
+(defcustom pop3-except-header-regexp nil
+  "If non-nil we do not retrieve messages whose headers are matching this regexp."
+  :type '(choice (const :tag "Retrieve any messages" nil)
+		 (regexp :format "\n%t: %v"))
+  :group 'pop3)
 
-(defvar pop3-except-header-regexp nil
-  "If non-nil we do not retrieve messages whose headers are matching this regexp.")
-
-(defvar pop3-uidl-file-name "~/.uidls"
-  "File in which to store the UIDL of processed messages.")
+(defcustom pop3-uidl-file-name "~/.uidls"
+  "File in which to store the UIDL of processed messages."
+  :type 'file
+  :group 'pop3)
 
 (defvar pop3-uidl-support nil
   "Alist of servers and flags of whether they support UIDLs.
@@ -128,18 +178,48 @@ Users don't have to set this value.")
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls"))
 
-(defvar pop3-ssl-program-name
+(defcustom pop3-ssl-program-name
   (if (executable-find "openssl")
       "openssl"
     "ssleay")
-  "The program to run in a subprocess to open an SSL connection.")
+  "The program to run in a subprocess to open an SSL connection."
+  :type 'string
+  :group 'pop3)
 
-(defvar pop3-ssl-program-arguments
+(defcustom pop3-ssl-program-arguments
   '("s_client" "-quiet")
-  "Arguments to be passed to the program `pop3-ssl-program-name'.")
+  "Arguments to be passed to the program `pop3-ssl-program-name'."
+  :type '(repeat (string :format "%v"))
+  :group 'pop3)
 
 (defun pop3-progress-message (format percent &rest args)
   (apply (function message) format args))
+
+;; Borrowed from nnheader-accept-process-output in nnheader.el.
+(defvar pop3-read-timeout
+  (if (string-match "windows-nt\\|os/2\\|emx\\|cygwin"
+		    (symbol-name system-type))
+      ;; http://thread.gmane.org/v9655t3pjo.fsf@marauder.physik.uni-ulm.de
+      ;;
+      ;; IIRC, values lower than 1.0 didn't/don't work on Windows/DOS.
+      ;;
+      ;; There should probably be a runtime test to determine the timing
+      ;; resolution, or a primitive to report it.  I don't know off-hand
+      ;; what's possible.  Perhaps better, maybe the Windows/DOS primitive
+      ;; could round up non-zero timeouts to a minimum of 1.0?
+      1.0
+    0.1)
+  "How long pop3 should wait between checking for the end of output.
+Shorter values mean quicker response, but are more CPU intensive.")
+
+;; Borrowed from nnheader-accept-process-output in nnheader.el.
+(defun pop3-accept-process-output (process)
+  (accept-process-output
+   process
+   (truncate pop3-read-timeout)
+   (truncate (* (- pop3-read-timeout
+		   (truncate pop3-read-timeout))
+		1000))))
 
 (defun pop3-movemail (&optional crashbox)
   "Transfer contents of a maildrop to the specified CRASHBOX."
@@ -195,8 +275,7 @@ Users don't have to set this value.")
 	    (dolist (n retrieved-messages)
 	      (message "Deleting message %d of %d from %s..."
 		       n message-count pop3-mailhost)
-	      (pop3-dele process n)))
-	  )
+	      (pop3-dele process n))))
       (pop3-quit process))
     (kill-buffer crashbuf)
     message-count))
@@ -205,8 +284,7 @@ Users don't have to set this value.")
   "Return the number of messages in the maildrop."
   (let* ((process (pop3-open-server pop3-mailhost pop3-port))
 	 message-count
-	 (pop3-password pop3-password)
-	 )
+	 (pop3-password pop3-password))
     ;; for debugging only
     (if pop3-debug (switch-to-buffer (process-buffer process)))
     ;; query for password
@@ -269,7 +347,7 @@ Argument PORT specifies connecting port."
 		    (goto-char (point-max))
 		    (forward-line -1)
 		    (not (looking-at "+OK")))
-	  (nnheader-accept-process-output process)
+	  (pop3-accept-process-output process)
 	  (sit-for 1))
 	(delete-region (point-min) (point)))
       (and process (memq (process-status process) '(open run))
@@ -308,13 +386,12 @@ Args are NAME BUFFER HOST SERVICE."
 (defun pop3-send-command (process command)
   (set-buffer (process-buffer process))
   (goto-char (point-max))
-;;  (if (= (aref command 0) ?P)
-;;      (insert "PASS <omitted>\r\n")
-;;    (insert command "\r\n"))
+  ;; (if (= (aref command 0) ?P)
+  ;;     (insert "PASS <omitted>\r\n")
+  ;;   (insert command "\r\n"))
   (setq pop3-read-point (point))
   (goto-char (point-max))
-  (process-send-string process (concat command "\r\n"))
-  )
+  (process-send-string process (concat command "\r\n")))
 
 (defun pop3-read-response (process &optional return)
   "Read the response from the server PROCESS.
@@ -326,7 +403,7 @@ Return the response string if optional second argument RETURN is non-nil."
       (goto-char pop3-read-point)
       (while (and (memq (process-status process) '(open run))
 		  (not (search-forward "\r\n" nil t)))
-	(nnheader-accept-process-output process)
+	(pop3-accept-process-output process)
 	(goto-char pop3-read-point))
       (setq match-end (point))
       (goto-char pop3-read-point)
@@ -337,8 +414,7 @@ Return the response string if optional second argument RETURN is non-nil."
 	  (setq pop3-read-point match-end)
 	  (if return
 	      (buffer-substring (point) match-end)
-	    t)
-	  )))))
+	    t))))))
 
 (defun pop3-clean-region (start end)
   (setq end (set-marker (make-marker) end))
@@ -386,8 +462,7 @@ If NOW, use that time instead."
       (goto-char (point-min))
       (if (not (or (looking-at "From .?") ; Unix mail
 		   (looking-at "\001\001\001\001\n") ; MMDF
-		   (looking-at "BABYL OPTIONS:") ; Babyl
-		   ))
+		   (looking-at "BABYL OPTIONS:"))) ; Babyl
 	  (let* ((from (mail-strip-quoted-names (mail-fetch-field "From")))
 		 (tdate (mail-fetch-field "Date"))
 		 (date (split-string (or (and tdate
@@ -413,8 +488,7 @@ If NOW, use that time instead."
 			 ;; like writing a date to day converter.
 			 (format "Sun %s %s %s %s"
 				 (nth 1 date) (nth 0 date)
-				 (nth 3 date) (nth 2 date)))
-			))
+				 (nth 3 date) (nth 2 date)))))
 	    (setq From_ (format "\nFrom %s  %s\n" from date))
 	    (while (string-match "," From_)
 	      (setq From_ (concat (substring From_ 0 (match-beginning 0))
@@ -430,8 +504,7 @@ If NOW, use that time instead."
 	      (goto-char (point-min))
 	      (widen)
 	      (forward-line -1)
-	      (insert (format "Content-Length: %s\n" size)))
-	    )))))
+	      (insert (format "Content-Length: %s\n" size))))))))
 
 ;; UIDL support
 
@@ -552,8 +625,7 @@ If NOW, use that time instead."
 	  (pop3-send-command process (format "APOP %s %s" user hash))
 	  (let ((response (pop3-read-response process t)))
 	    (if (not (and response (string-match "+OK" response)))
-		(pop3-quit process)))))
-    ))
+		(pop3-quit process)))))))
 
 (defun pop3-stls (process)
   "Query whether TLS extension is supported"
@@ -569,8 +641,7 @@ If NOW, use that time instead."
   (pop3-send-command process "STAT")
   (let ((response (pop3-read-response process t)))
     (list (string-to-int (nth 1 (split-string response " ")))
-	  (string-to-int (nth 2 (split-string response " "))))
-    ))
+	  (string-to-int (nth 2 (split-string response " "))))))
 
 (defun pop3-retr (process msg crashbuf)
   "Retrieve message-id MSG to buffer CRASHBUF."
@@ -580,8 +651,7 @@ If NOW, use that time instead."
     (let ((region (pop3-get-extended-response process)))
       (pop3-munge-message-separator (car region) (cadr region))
       (append-to-buffer crashbuf (car region) (cadr region))
-      (delete-region (car region) (cadr region))
-      )))
+      (delete-region (car region) (cadr region)))))
 
 (defun pop3-dele (process msg)
   "Mark message-id MSG as deleted."
@@ -597,8 +667,7 @@ If NOW, use that time instead."
   "Return highest accessed message-id number for the session."
   (pop3-send-command process "LAST")
   (let ((response (pop3-read-response process t)))
-    (string-to-int (nth 1 (split-string response " ")))
-    ))
+    (string-to-int (nth 1 (split-string response " ")))))
 
 (defun pop3-rset (process)
   "Remove all delete marks from current maildrop."
@@ -647,8 +716,7 @@ where
 		  uidl (match-string 2))
 	    (push (cons msgno uidl) pairs)
 	    (beginning-of-line 2))
-	  (cons (length pairs) (nreverse pairs))
-	  )))))
+	  (cons (length pairs) (nreverse pairs)))))))
 
 (defun pop3-list (process &optional msgno)
   "Return the results of a LIST command for PROCESS and optional MSGNO.
@@ -677,8 +745,7 @@ where
 		  len (string-to-int (match-string 2)))
 	    (push (cons msgno len) pairs)
 	    (beginning-of-line 2))
-	  (cons (length pairs) (nreverse pairs))
-	  )))))
+	  (cons (length pairs) (nreverse pairs)))))))
 
 (defun pop3-top (process msgno &optional lines)
   "Return the top LINES of messages for PROCESS and MSGNO.
@@ -687,8 +754,7 @@ If msgno is invalid, return nil.  Otherwise, return a string."
   (if (pop3-read-response process t)
       nil ;; MSGNO is not valid number
     (save-excursion
-      (apply 'buffer-substring (pop3-get-extended-response process)))
-    ))
+      (apply 'buffer-substring (pop3-get-extended-response process)))))
 
 ;;; Utility code
 
@@ -698,8 +764,7 @@ If msgno is invalid, return nil.  Otherwise, return a string."
     (set-buffer (process-buffer process))
     (goto-char start)
     (while (not (re-search-forward "^\\.\r\n" nil t))
-      ;; Fixme: Shouldn't depend on nnheader.
-      (nnheader-accept-process-output process)
+      (pop3-accept-process-output process)
       (goto-char start))
     (setq pop3-read-point (point-marker))
     (goto-char (match-beginning 0))

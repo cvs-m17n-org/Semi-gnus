@@ -1,5 +1,5 @@
 ;;; gnus-spec.el --- format spec functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -34,12 +34,14 @@
 
 (defcustom gnus-use-correct-string-widths t
   "*If non-nil, use correct functions for dealing with wide characters."
+  :version "22.1"
   :group 'gnus-format
   :type 'boolean)
 
 (defcustom gnus-make-format-preserve-properties (featurep 'xemacs)
   "*If non-nil, use a replacement `format' function which preserves
 text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
+  :version "22.1"
   :group 'gnus-format
   :type 'boolean)
 
@@ -189,28 +191,35 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
     (pop-to-buffer "*Gnus Format*")
     (erase-buffer)
     (lisp-interaction-mode)
-    (insert (pp-to-string spec))))
+    (insert (gnus-pp-to-string spec))))
 
-(put 'gnus-search-or-regist-spec 'lisp-indent-function 1)
-(defmacro gnus-search-or-regist-spec (mspec &rest body)
-  (let ((specs (nth 0 mspec)) (type (nth 1 mspec)) (format (nth 2 mspec))
-	(spec (nth 3 mspec)) (entry (nth 4 mspec)) (elem (nth 5 mspec)))
-    `(let* ((,entry (assq ,type ,specs))
-	    (,elem (assoc ,format (cdr ,entry))))
-       (or (cdr ,elem)
-	   (when (progn ,@body)
-	     (if ,entry
-		 (if ,elem
-		     (setcdr ,elem ,spec)
-		   (setcdr ,entry (cons (cons ,format ,spec) (cdr ,entry))))
-	       (push (list ,type (cons ,format ,spec)) ,specs))
-	     (gnus-product-variable-touch (quote ,specs)))
-	   ,spec))))
+(eval-when-compile (defvar unchanged))
+
+(put 'gnus-search-or-regist-spec 'lisp-indent-function 4)
+(defmacro gnus-search-or-regist-spec (specs type format val &rest body)
+  `(let* ((entry (assq ,type ,specs))
+	  (elem (assoc ,format (cdr entry))))
+     ;; That `(cdr elem)' returns non-nil means the spec for `type'
+     ;; doesn't need to be updated.
+     (or (cdr elem)
+	 ;; This variable is set beforehand.
+	 (setq unchanged nil)
+	 ;; Update the spec.  Where `body' will modify `val'.  This
+	 ;; section will be skipped if compiling the spec is disabled.
+	 (when (progn ,@body)
+	   (if entry
+	       (if elem
+		   (setcdr elem ,val)
+		 (setcdr entry (cons (cons ,format ,val) (cdr entry))))
+	     (push (list ,type (cons ,format ,val)) ,specs))
+	   (gnus-product-variable-touch (quote ,specs)))
+	 ;; Return the new spec without compiling.
+	 ,val)))
 
 (defun gnus-update-format-specification-1 (type format val)
   (set (intern (format "gnus-%s-line-format-spec" type))
-       (gnus-search-or-regist-spec (gnus-format-specs-compiled
-				    type format val entry elem)
+       (gnus-search-or-regist-spec
+	   gnus-format-specs-compiled type format val
 	 (when (and gnus-compile-user-specs val)
 	   (setq val (prog1
 			 (progn
@@ -225,7 +234,8 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 			 (bury-buffer "*Compile-Log-Show*"))))))))
 
 (defun gnus-update-format-specifications (&optional force &rest types)
-  "Update all (necessary) format specifications."
+  "Update all (necessary) format specifications.
+Return a list of updated types."
   ;; Make the indentation array.
   ;; See whether all the stored info needs to be flushed.
   (when force
@@ -234,46 +244,52 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 	  gnus-format-specs-compiled nil)
     (gnus-product-variable-touch 'gnus-format-specs
 				 'gnus-format-specs-compiled))
-  ;; Flush the group format spec cache if there's the grouplens stuff.
-  (let ((spec (assq 'group gnus-format-specs)))
-    (when (and (memq 'group types)
-	       (string-match " gnus-tmp-grouplens[ )]"
-			     (gnus-prin1-to-string (cdr spec))))
-      (setq gnus-format-specs (delq spec gnus-format-specs)
-	    spec (assq 'group gnus-format-specs-compiled)
-	    gnus-format-specs-compiled (delq spec gnus-format-specs-compiled))))
+  ;; Flush the group format spec cache if there's the grouplens stuff
+  ;; or it doesn't support decoded group names.
+  (when (memq 'group types)
+    (let* ((spec (assq 'group gnus-format-specs))
+	   (sspec (gnus-prin1-to-string (nth 2 spec))))
+      (when (or (string-match " gnus-tmp-grouplens[ )]" sspec)
+		(not (string-match " gnus-tmp-decoded-group[ )]" sspec)))
+	(setq gnus-format-specs (delq spec gnus-format-specs)
+	      spec (assq 'group gnus-format-specs-compiled)
+	      gnus-format-specs-compiled (delq spec
+					       gnus-format-specs-compiled)))))
 
   ;; Go through all the formats and see whether they need updating.
-  (let (type val)
+  (let (new-format type val unchanged updated)
     (save-excursion
       (while (setq type (pop types))
 	;; Jump to the proper buffer to find out the value of the
 	;; variable, if possible.  (It may be buffer-local.)
-	(let* ((new-format
-		(let ((buffer (intern (format "gnus-%s-buffer" type))))
-		  (when (and (boundp buffer)
-			     (setq val (symbol-value buffer))
-			     (gnus-buffer-exists-p val))
-		    (set-buffer val))
-		  (symbol-value
-		   (intern (format "gnus-%s-line-format" type))))))
-	  (or (gnus-update-format-specification-1 type new-format nil)
-	      ;; This is a new format.
-	      (gnus-update-format-specification-1
-	       type new-format
-	       (gnus-search-or-regist-spec (gnus-format-specs
-					    type new-format val entry elem)
-		 (setq val (if (stringp new-format)
-			       ;; This is a "real" format.
-			       (gnus-parse-format
-				new-format
-				(symbol-value
-				 (intern (format "gnus-%s-line-format-alist"
-						 type)))
-				(not (string-match "mode$"
-						   (symbol-name type))))
-			     ;; This is a function call or something.
-			     new-format))))))))))
+	(let ((buffer (intern (format "gnus-%s-buffer" type))))
+	  (when (and (boundp buffer)
+		     (setq val (symbol-value buffer))
+		     (gnus-buffer-exists-p val))
+	    (set-buffer val))
+	  (setq new-format (symbol-value
+			    (intern (format "gnus-%s-line-format" type)))))
+	(setq unchanged t)
+	(or (gnus-update-format-specification-1 type new-format nil)
+	    ;; This is a new format.
+	    (gnus-update-format-specification-1
+	     type new-format
+	     (gnus-search-or-regist-spec
+		 gnus-format-specs type new-format val
+	       (setq val (if (stringp new-format)
+			     ;; This is a "real" format.
+			     (gnus-parse-format
+			      new-format
+			      (symbol-value
+			       (intern (format "gnus-%s-line-format-alist"
+					       type)))
+			      (not (string-match "mode$"
+						 (symbol-name type))))
+			   ;; This is a function call or something.
+			   new-format)))))
+	(unless unchanged
+	  (push type updated))))
+    updated))
 
 (defvar gnus-mouse-face-0 'highlight)
 (defvar gnus-mouse-face-1 'highlight)
@@ -310,21 +326,15 @@ text properties. This is only needed on XEmacs, as FSF Emacs does this anyway."
 
 (defun gnus-spec-tab (column)
   (if (> column 0)
-      `(insert (make-string (max (- ,column (current-column)) 0) ? ))
+      `(insert-char ?  (max (- ,column (current-column)) 0))
     (let ((column (abs column)))
-      (if gnus-use-correct-string-widths
-	  `(progn
-	     (if (> (current-column) ,column)
-		 (while (progn
-			  (delete-backward-char 1)
-			  (> (current-column) ,column))))
-	     (insert (make-string (max (- ,column (current-column)) 0) ? )))
-	`(progn
-	   (if (> (current-column) ,column)
-	       (delete-region (point)
-			      (- (point) (- (current-column) ,column)))
-	     (insert (make-string (max (- ,column (current-column)) 0)
-				  ? ))))))))
+      `(if (> (current-column) ,column)
+	   (let ((end (point)))
+	     (if (= (move-to-column ,column) ,column)
+		 (delete-region (point) end)
+	       (delete-region (1- (point)) end)
+	       (insert " ")))
+	 (insert-char ?  (max (- ,column (current-column)) 0))))))
 
 (defun gnus-correct-length (string)
   "Return the correct width of STRING."

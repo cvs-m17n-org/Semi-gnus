@@ -44,7 +44,7 @@
   :group 'gnus-visual)
 
 ;; Maybe this should go.
-(defcustom smiley-data-directory (nnheader-find-etc-directory "smilies")
+(defcustom smiley-data-directory (nnheader-find-etc-directory "images/smilies")
   "*Location of the smiley faces files."
   :type 'directory
   :group 'smiley)
@@ -137,6 +137,7 @@ regexp to replace with IMAGE.  IMAGE is the name of a PBM file in
       (push "xbm" types))
     types)
   "*List of suffixes on picon file names to try."
+  :version "22.1"
   :type '(repeat string)
   :group 'smiley)
 

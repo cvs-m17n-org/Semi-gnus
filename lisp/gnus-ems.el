@@ -45,13 +45,10 @@
 (eval-and-compile
   (autoload 'gnus-xmas-define "gnus-xmas")
   (autoload 'gnus-xmas-redefine "gnus-xmas")
-  (autoload 'appt-select-lowest-window "appt")
   (autoload 'gnus-get-buffer-create "gnus")
   (autoload 'nnheader-find-etc-directory "nnheader"))
 
 (autoload 'smiley-region "smiley")
-;; Fixme: shouldn't require message
-(autoload 'message-text-with-property "message")
 
 (defun gnus-kill-all-overlays ()
   "Delete all overlays in the current buffer."
@@ -148,6 +145,18 @@
 	       (gnus-truncate-string val (string-width val) ,cut))))))
     ))
 
+;; Clone of `appt-select-lowest-window' in appt.el.
+(defun gnus-select-lowest-window ()
+"Select the lowest window on the frame."
+  (let ((lowest-window (selected-window))
+	(bottom-edge (nth 3 (window-edges))))
+    (walk-windows (lambda (w)
+		    (let ((next-bottom-edge (nth 3 (window-edges w))))
+		      (when (< bottom-edge next-bottom-edge)
+			(setq bottom-edge next-bottom-edge
+			      lowest-window w)))))
+    (select-window lowest-window)))
+
 (defun gnus-region-active-p ()
   "Say whether the region is active."
   (and (boundp 'transient-mark-mode)
@@ -219,13 +228,26 @@
     glyph))
 
 (defun gnus-remove-image (image &optional category)
-  (dolist (position (message-text-with-property 'display))
-    (when (and (equal (get-text-property position 'display) image)
-	       (equal (get-text-property position 'gnus-image-category)
+  "Remove the image matching IMAGE and CATEGORY found first."
+  (let ((start (point-min))
+	val end)
+    (while (and (not end)
+		(or (setq val (get-text-property start 'display))
+		    (and (setq start
+			       (next-single-property-change start 'display))
+			 (setq val (get-text-property start 'display)))))
+      (setq end (or (next-single-property-change start 'display)
+		    (point-max)))
+      (if (and (equal val image)
+	       (equal (get-text-property start 'gnus-image-category)
 		      category))
-      (put-text-property position (1+ position) 'display nil)
-      (when (get-text-property position 'gnus-image-text-deletable)
-	(delete-region position (1+ position))))))
+	  (progn
+	    (put-text-property start end 'display nil)
+	    (when (get-text-property start 'gnus-image-text-deletable)
+	      (delete-region start end)))
+	(unless (= end (point-max))
+	  (setq start end
+		end nil))))))
 
 (defun-maybe assoc-ignore-case (key alist)
   "Like `assoc', but assumes KEY is a string and ignores case when comparing."

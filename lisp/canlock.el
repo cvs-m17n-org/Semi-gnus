@@ -44,15 +44,7 @@
 (eval-when-compile
   (require 'cl))
 
-(eval-and-compile
-  (require 'sha1-el)
-  (condition-case nil
-      (sha1 "" nil nil 'binary)
-    (wrong-number-of-arguments
-     (let ((mel (locate-library "mel")))
-       (when mel
-	 (load (expand-file-name "sha1-el" (file-name-directory mel))
-	       nil t))))))
+(require 'sha1)
 
 (defvar mail-header-separator)
 
@@ -63,13 +55,13 @@
 (defcustom canlock-password nil
   "Password to use when signing a Cancel-Lock or a Cancel-Key header."
   :type '(radio (const :format "Not specified " nil)
-		(string :tag "Password" :size 0))
+		(string :tag "Password"))
   :group 'canlock)
 
 (defcustom canlock-password-for-verify canlock-password
   "Password to use when verifying a Cancel-Lock or a Cancel-Key header."
   :type '(radio (const :format "Not specified " nil)
-		(string :tag "Password" :size 0))
+		(string :tag "Password"))
   :group 'canlock)
 
 (defcustom canlock-force-insert-header nil

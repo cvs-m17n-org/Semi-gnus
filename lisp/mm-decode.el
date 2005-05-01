@@ -1,5 +1,5 @@
 ;;; mm-decode.el --- Functions for decoding MIME things
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -98,8 +98,9 @@
 
 (defcustom mm-text-html-renderer
   (cond ((locate-library "w3") 'w3)
-	((locate-library "w3m") 'w3m)
-	((executable-find "w3m") 'w3m-standalone)
+	((executable-find "w3m") (if (locate-library "w3m")
+				     'w3m
+				   'w3m-standalone))
 	((executable-find "links") 'links)
 	((executable-find "lynx") 'lynx)
 	(t 'html2text))
@@ -113,6 +114,7 @@ The defined renderer types are:
 `lynx' : use lynx;
 `html2text' : use html2text;
 nil    : use external viewer."
+  :version "22.1"
   :type '(choice (const w3)
 		 (const w3m)
 		 (const w3m-standalone)
@@ -121,7 +123,6 @@ nil    : use external viewer."
 		 (const html2text)
 		 (const nil)
 		 (function))
-  :version "21.3"
   :group 'mime-display)
 
 (defvar mm-inline-text-html-renderer nil
@@ -132,6 +133,7 @@ It is suggested to customize `mm-text-html-renderer' instead.")
   "If non-nil, Gnus will allow retrieving images in HTML contents with
 the <img> tags.  It has no effect on Emacs/w3.  See also the
 documentation for the `mm-w3m-safe-url-regexp' variable."
+  :version "22.1"
   :type 'boolean
   :group 'mime-display)
 
@@ -147,12 +149,14 @@ when displaying the image.  The default value is \"\\\\`cid:\" which only
 matches parts embedded to the Multipart/Related type MIME contents and
 Gnus will never connect to the spammer's site arbitrarily.  You may
 set this variable to nil if you consider all urls to be safe."
+  :version "22.1"
   :type '(choice (regexp :tag "Regexp")
 		 (const :tag "All URLs are safe" nil))
   :group 'mime-display)
 
 (defcustom mm-inline-text-html-with-w3m-keymap t
   "If non-nil, use emacs-w3m command keys in the article buffer."
+  :version "22.1"
   :type 'boolean
   :group 'mime-display)
 
@@ -162,7 +166,7 @@ set this variable to nil if you consider all urls to be safe."
 If t, all defined external MIME handlers are used.  If nil, files are saved by
 `mailcap-save-binary-file'.  If it is the symbol `ask', you are prompted
 before the external MIME handler is invoked."
-  :version "21.4"
+  :version "22.1"
   :type '(choice (const :tag "Always" t)
 		 (const :tag "Never" nil)
 		 (const :tag "Ask" ask))
@@ -217,6 +221,7 @@ before the external MIME handler is invoked."
        (locate-library "diff-mode")))
     ("application/emacs-lisp" mm-display-elisp-inline identity)
     ("application/x-emacs-lisp" mm-display-elisp-inline identity)
+    ("text/dns" mm-display-dns-inline identity)
     ("text/html"
      mm-inline-text-html
      (lambda (handle)
@@ -278,13 +283,14 @@ type inline."
     "application/pdf" "application/x-dvi")
   "List of media types for which the external viewer will not be killed
 when selecting a different article."
+  :version "22.1"
   :type '(repeat string)
   :group 'mime-display)
 
 (defcustom mm-automatic-display
   '("text/plain" "text/enriched" "text/richtext" "text/html"
     "text/x-vcard" "image/.*" "message/delivery-status" "multipart/.*"
-    "message/rfc822" "text/x-patch" "application/pgp-signature"
+    "message/rfc822" "text/x-patch" "text/dns" "application/pgp-signature"
     "application/emacs-lisp" "application/x-emacs-lisp"
     "application/x-pkcs7-signature"
     "application/pkcs7-signature" "application/x-pkcs7-mime"
@@ -374,11 +380,13 @@ If not set, `default-directory' will be used."
 
 (defcustom mm-attachment-file-modes 384
   "Set the mode bits of saved attachments to this integer."
+  :version "22.1"
   :type 'integer
   :group 'mime-display)
 
 (defcustom mm-external-terminal-program "xterm"
   "The program to start an external terminal."
+  :version "22.1"
   :type 'string
   :group 'mime-display)
 
@@ -411,6 +419,7 @@ If not set, `default-directory' will be used."
   "Option of verifying signed parts.
 `never', not verify; `always', always verify;
 `known', only verify known protocols.  Otherwise, ask user."
+  :version "22.1"
   :type '(choice (item always)
 		 (item never)
 		 (item :tag "only known protocols" known)
@@ -429,6 +438,7 @@ If not set, `default-directory' will be used."
   "Option of decrypting encrypted parts.
 `never', not decrypt; `always', always decrypt;
 `known', only decrypt known protocols.  Otherwise, ask user."
+  :version "22.1"
   :type '(choice (item always)
 		 (item never)
 		 (item :tag "only known protocols" known)
@@ -499,10 +509,10 @@ Postpone undisplaying of viewers for types in
     (message "Destroying external MIME viewers")
     (mm-destroy-parts mm-postponed-undisplay-list)))
 
-(defun mm-dissect-buffer (&optional no-strict-mime loose-mime)
+(defun mm-dissect-buffer (&optional no-strict-mime loose-mime from)
   "Dissect the current buffer and return a list of MIME handles."
   (save-excursion
-    (let (ct ctl type subtype cte cd description id result from)
+    (let (ct ctl type subtype cte cd description id result)
       (save-restriction
 	(mail-narrow-to-head)
 	(when (or no-strict-mime
@@ -513,23 +523,20 @@ Postpone undisplaying of viewers for types in
 		cte (mail-fetch-field "content-transfer-encoding")
 		cd (mail-fetch-field "content-disposition")
 		description (mail-fetch-field "content-description")
-		from (mail-fetch-field "from")
 		id (mail-fetch-field "content-id"))
+	  (unless from
+		(setq from (mail-fetch-field "from")))
 	  ;; FIXME: In some circumstances, this code is running within
 	  ;; an unibyte macro.  mail-extract-address-components
 	  ;; creates unibyte buffers. This `if', though not a perfect
 	  ;; solution, avoids most of them.
 	  (if from
 	      (setq from (cadr (mail-extract-address-components from))))))
-      (when cte
-	(setq cte (mail-header-strip cte)))
       (if (or (not ctl)
 	      (not (string-match "/" (car ctl))))
 	  (mm-dissect-singlepart
 	   (list mm-dissect-default-type)
-	   (and cte (intern (downcase (mail-header-remove-whitespace
-				       (mail-header-remove-comments
-					cte)))))
+	   (and cte (intern (downcase (mail-header-strip cte))))
 	   no-strict-mime
 	   (and cd (ignore-errors (mail-header-parse-content-disposition cd)))
 	   description)
@@ -557,14 +564,12 @@ Postpone undisplaying of viewers for types in
 					'from from
 					'start start)
 				  (car ctl))
-	     (cons (car ctl) (mm-dissect-multipart ctl))))
+	     (cons (car ctl) (mm-dissect-multipart ctl from))))
 	  (t
 	   (mm-possibly-verify-or-decrypt
 	    (mm-dissect-singlepart
 	     ctl
-	     (and cte (intern (downcase (mail-header-remove-whitespace
-					 (mail-header-remove-comments
-					  cte)))))
+	     (and cte (intern (downcase (mail-header-strip cte))))
 	     no-strict-mime
 	     (and cd (ignore-errors
 		       (mail-header-parse-content-disposition cd)))
@@ -584,7 +589,7 @@ Postpone undisplaying of viewers for types in
     (mm-make-handle
      (mm-copy-to-buffer) ctl cte nil cdl description nil id)))
 
-(defun mm-dissect-multipart (ctl)
+(defun mm-dissect-multipart (ctl from)
   (goto-char (point-min))
   (let* ((boundary (concat "\n--" (mail-content-type-get ctl 'boundary)))
 	 (close-delimiter (concat (regexp-quote boundary) "--[ \t]*$"))
@@ -601,7 +606,7 @@ Postpone undisplaying of viewers for types in
 	(save-excursion
 	  (save-restriction
 	    (narrow-to-region start (point))
-	    (setq parts (nconc (list (mm-dissect-buffer t)) parts)))))
+	    (setq parts (nconc (list (mm-dissect-buffer t nil from)) parts)))))
       (end-of-line 2)
       (or (looking-at boundary)
 	  (forward-line 1))
@@ -610,24 +615,23 @@ Postpone undisplaying of viewers for types in
       (save-excursion
 	(save-restriction
 	  (narrow-to-region start end)
-	  (setq parts (nconc (list (mm-dissect-buffer t)) parts)))))
+	  (setq parts (nconc (list (mm-dissect-buffer t nil from)) parts)))))
     (mm-possibly-verify-or-decrypt (nreverse parts) ctl)))
 
 (defun mm-copy-to-buffer ()
   "Copy the contents of the current buffer to a fresh buffer."
   (save-excursion
-    (let ((flag enable-multibyte-characters)
-	  (new-buffer (generate-new-buffer " *mm*")))
+    (let ((obuf (current-buffer))
+	  beg)
       (goto-char (point-min))
       (search-forward-regexp "^\n" nil t)
-      (save-restriction
-	(narrow-to-region (point) (point-max))
-	(when flag
-	  (set-buffer-multibyte nil))
-	(copy-to-buffer new-buffer (point-min) (point-max))
-	(when flag
-	  (set-buffer-multibyte t)))
-      new-buffer)))
+      (setq beg (point))
+      (set-buffer
+       ;; Preserve the data's unibyteness (for url-insert-file-contents).
+       (let ((default-enable-multibyte-characters (mm-multibyte-p)))
+	 (generate-new-buffer " *mm*")))
+      (insert-buffer-substring obuf beg)
+      (current-buffer))))
 
 (defun mm-display-parts (handle &optional no-default)
   (if (stringp (car handle))
@@ -1023,27 +1027,10 @@ external if displayed external."
 
 (defun mm-insert-part (handle)
   "Insert the contents of HANDLE in the current buffer."
-  (let ((cur (current-buffer)))
-    (save-excursion
-      (if (member (mm-handle-media-supertype handle) '("text" "message"))
-	  (with-temp-buffer
-	    (insert-buffer-substring (mm-handle-buffer handle))
-	    (prog1
-		(mm-decode-content-transfer-encoding
-		 (mm-handle-encoding handle)
-		 (mm-handle-media-type handle))
-	      (let ((temp (current-buffer)))
-		(set-buffer cur)
-		(insert-buffer-substring temp))))
-	(mm-with-unibyte-buffer
-	  (insert-buffer-substring (mm-handle-buffer handle))
-	  (prog1
-	      (mm-decode-content-transfer-encoding
-	       (mm-handle-encoding handle)
-	       (mm-handle-media-type handle))
-	    (let ((temp (current-buffer)))
-	      (set-buffer cur)
-	      (insert-buffer-substring temp))))))))
+  (save-excursion
+    (insert (if (mm-multibyte-p)
+		(mm-string-as-multibyte (mm-get-part handle))
+	      (mm-get-part handle)))))
 
 (defun mm-file-name-delete-whitespace (file-name)
   "Remove all whitespace characters from FILE-NAME."

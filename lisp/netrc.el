@@ -34,61 +34,16 @@
 ;;; .netrc and .authinfo rc parsing
 ;;;
 
-;; autoload password
+;; autoload encrypt
 (eval-and-compile
-  (autoload 'password-read "password"))
+  (autoload 'encrypt-find-model "encrypt")
+  (autoload 'encrypt-insert-file-contents "encrypt"))
 
 (defgroup netrc nil
  "Netrc configuration.")
 
-(defcustom netrc-encrypting-method nil
-  "Decoding method used for the netrc file.
-Use the OpenSSL symmetric ciphers here.  Leave nil for no
-decoding.  Encrypt the file with netrc-encrypt, but make sure you
-have set netrc-encrypting-method to a non-nil value."
-  :type '(choice
-	  (const :tag "DES-3" "des3")
-	  (const :tag "IDEA" "idea")
-	  (const :tag "RC4" "rc4")
-	  (string :tag "Explicit cipher name")
-	  (const :tag "None" nil))
-  :group 'netrc)
-
-(defcustom netrc-openssl-path (executable-find "openssl")
-  "File path of the OpenSSL shell."
-  :type '(choice (file :tag "Location of openssl")
-		 (const :tag "openssl is not installed" nil))
-  :group 'netrc)
-
-(defun netrc-encrypt (plain-file encrypted-file)
-  (interactive "fPlain File: \nFEncrypted File: ")
-  "Encrypt FILE to ENCRYPTED-FILE with netrc-encrypting-method cipher."
-  (when (and (file-exists-p plain-file)
-	     (stringp encrypted-file)
-	     netrc-encrypting-method
-	     netrc-openssl-path)
-    (let ((buffer-file-coding-system 'binary)
-	  (coding-system-for-read 'binary)
-	  (coding-system-for-write 'binary)
-	  (password 
-	   (password-read
-	    (format "OpenSSL Password for cipher %s? "
-		    netrc-encrypting-method)
-	    (format "netrc-openssl-password-%s"
-		    netrc-encrypting-method))))
-      (when password
-	(with-temp-buffer
-	  (insert-file-contents plain-file)
-	  (setenv "NETRC_OPENSSL_PASSWORD" password)
-	  (shell-command-on-region 
-	   (point-min) 
-	   (point-max)
-	   (format "%s %s -pass env:NETRC_OPENSSL_PASSWORD -e"
-		   netrc-openssl-path
-		   netrc-encrypting-method)
-	   t
-	   t)
-	  (write-file encrypted-file t))))))
+(defvar netrc-services-file "/etc/services"
+  "The name of the services file.")
 
 (defun netrc-parse (file)
   (interactive "fFile to Parse: ")
@@ -98,30 +53,13 @@ have set netrc-encrypting-method to a non-nil value."
       (let ((tokens '("machine" "default" "login"
 		      "password" "account" "macdef" "force"
 		      "port"))
+	    (encryption-model (encrypt-find-model file))
 	    alist elem result pair)
-	(if (and netrc-encrypting-method
-		 netrc-openssl-path)
-	    (let ((buffer-file-coding-system 'binary)
-		  (coding-system-for-read 'binary)
-		  (coding-system-for-write 'binary)
-		  (password 
-		   (password-read
-		    (format "OpenSSL Password for cipher %s? "
-			    netrc-encrypting-method)
-		    (format "netrc-openssl-password-%s" 
-			    netrc-encrypting-method))))
-	      (when password
-		(insert-file-contents file)
-		(setenv "NETRC_OPENSSL_PASSWORD" password)
-		(shell-command-on-region
-		 (point-min) 
-		 (point-max)
-		 (format "%s %s -pass env:NETRC_OPENSSL_PASSWORD -d"
-			 netrc-openssl-path
-			 netrc-encrypting-method)
-		 t
-		 t)))
+
+	(if encryption-model
+	    (encrypt-insert-file-contents file encryption-model)
 	  (insert-file-contents file))
+
 	(goto-char (point-min))
 	;; Go through the file, line by line.
 	(while (not (eobp))
@@ -186,15 +124,78 @@ Entries without port tokens default to DEFAULTPORT."
     (when result
       (setq result (nreverse result))
       (while (and result
-		  (not (equal (or port defaultport "nntp")
-			      (or (netrc-get (car result) "port")
-				  defaultport "nntp"))))
+		  (not (netrc-port-equal
+			(or port defaultport "nntp")
+			(or (netrc-get (car result) "port")
+			    defaultport "nntp"))))
 	(pop result))
       (car result))))
+
+(defun netrc-machine-user-or-password (mode authinfo-file-or-list machines ports defaults)
+  "Get the user name or password according to MODE from AUTHINFO-FILE-OR-LIST.
+Matches a machine from MACHINES and a port from PORTS, giving
+default ports DEFAULTS to `netrc-machine'.
+
+MODE can be \"login\" or \"password\", suitable for passing to
+`netrc-get'."
+  (let ((authinfo-list (if (stringp authinfo-file-or-list)
+			   (netrc-parse authinfo-file-or-list)
+			 authinfo-file-or-list))
+	(ports (or ports '(nil)))
+	(defaults (or defaults '(nil)))
+	info)
+    (dolist (machine machines)
+      (dolist (default defaults)
+	(dolist (port ports)
+	  (let ((alist (netrc-machine authinfo-list machine port default)))
+	  (setq info (or (netrc-get alist mode) info))))))
+    info))
 
 (defun netrc-get (alist type)
   "Return the value of token TYPE from ALIST."
   (cdr (assoc type alist)))
+
+(defun netrc-port-equal (port1 port2)
+  (when (numberp port1)
+    (setq port1 (or (netrc-find-service-name port1) port1)))
+  (when (numberp port2)
+    (setq port2 (or (netrc-find-service-name port2) port2)))
+  (equal port1 port2))
+
+(defun netrc-parse-services ()
+  (when (file-exists-p netrc-services-file)
+    (let ((services nil))
+      (with-temp-buffer
+	(insert-file-contents netrc-services-file)
+	(while (search-forward "#" nil t)
+	  (delete-region (1- (point)) (line-end-position)))
+	(goto-char (point-min))
+	(while (re-search-forward
+		"^ *\\([^ \n\t]+\\)[ \t]+\\([0-9]+\\)/\\([^ \t\n]+\\)" nil t)
+	  (push (list (match-string 1) (string-to-number (match-string 2))
+		      (intern (downcase (match-string 3))))
+		services))
+	(nreverse services)))))
+
+(defun netrc-find-service-name (number &optional type)
+  (let ((services (netrc-parse-services))
+	service)
+    (setq type (or type 'tcp))
+    (while (and (setq service (pop services))
+		(not (and (= number (cadr service))
+			  (eq type (caddr service)))))
+      )
+    (car service)))
+
+(defun netrc-find-service-number (name &optional type)
+  (let ((services (netrc-parse-services))
+	service)
+    (setq type (or type 'tcp))
+    (while (and (setq service (pop services))
+		(not (and (string= name (car service))
+			  (eq type (caddr service)))))
+      )
+    (cadr service)))
 
 (provide 'netrc)
 

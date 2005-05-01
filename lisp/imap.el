@@ -1,5 +1,5 @@
 ;;; imap.el --- imap library
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <jas@pdc.kth.se>
@@ -69,7 +69,7 @@
 ;; imap-message-append,               imap-envelope-from
 ;; imap-body-lines
 ;;
-;; It is my hope that theese commands should be pretty self
+;; It is my hope that these commands should be pretty self
 ;; explanatory for someone that know IMAP.  All functions have
 ;; additional documentation on how to invoke them.
 ;;
@@ -145,6 +145,7 @@
 (eval-and-compile
   (autoload 'starttls-open-stream "starttls")
   (autoload 'starttls-negotiate "starttls")
+  (autoload 'sasl-find-mechanism "sasl")
   (autoload 'digest-md5-parse-digest-challenge "digest-md5")
   (autoload 'digest-md5-digest-response "digest-md5")
   (autoload 'digest-md5-digest-uri "digest-md5")
@@ -220,7 +221,8 @@ used to communicate with subprocesses.  Values are nil to use a
 pipe, or t or `pty' to use a pty.  The value has no effect if the
 system has no ptys or if all ptys are busy: then a pipe is used
 in any case.  The value takes effect when a IMAP server is
-opened, changing it after that has no effect.."
+opened, changing it after that has no effect."
+  :version "22.1"
   :group 'imap
   :type 'boolean)
 
@@ -233,12 +235,20 @@ encoded mailboxes which doesn't translate into ISO-8859-1."
   :type 'boolean)
 
 (defcustom imap-log nil
-  "If non-nil, a imap session trace is placed in *imap-log* buffer."
+  "If non-nil, a imap session trace is placed in *imap-log* buffer.
+Note that username, passwords and other privacy sensitive
+information (such as e-mail) may be stored in the *imap-log*
+buffer.  It is not written to disk, however.  Do not enable this
+variable unless you are comfortable with that."
   :group 'imap
   :type 'boolean)
 
 (defcustom imap-debug nil
-  "If non-nil, random debug spews are placed in *imap-debug* buffer."
+  "If non-nil, random debug spews are placed in *imap-debug* buffer.
+Note that username, passwords and other privacy sensitive
+information (such as e-mail) may be stored in the *imap-debug*
+buffer.  It is not written to disk, however.  Do not enable this
+variable unless you are comfortable with that."
   :group 'imap
   :type 'boolean)
 
@@ -295,6 +305,7 @@ stream.")
 			      kerberos4
 			      digest-md5
 			      cram-md5
+			      ;;sasl
 			      login
 			      anonymous)
   "Priority of authenticators to consider when authenticating to server.")
@@ -302,6 +313,7 @@ stream.")
 (defvar imap-authenticator-alist
   '((gssapi     imap-gssapi-auth-p    imap-gssapi-auth)
     (kerberos4  imap-kerberos4-auth-p imap-kerberos4-auth)
+    (sasl	imap-sasl-auth-p      imap-sasl-auth)
     (cram-md5   imap-cram-md5-p       imap-cram-md5-auth)
     (login      imap-login-p          imap-login-auth)
     (anonymous  imap-anonymous-p      imap-anonymous-auth)
@@ -317,7 +329,7 @@ for doing the actual authentication.")
 (defvar imap-error nil
   "Error codes from the last command.")
 
-;; Internal constants.  Change theese and die.
+;; Internal constants.  Change these and die.
 
 (defconst imap-default-port 143)
 (defconst imap-default-ssl-port 993)
@@ -622,7 +634,7 @@ sure of changing the value of `foo'."
       (message "imap: Opening SSL connection with `%s'..." cmd)
       (erase-buffer)
       (let ((port (or port imap-default-ssl-port))
-	    (process-connection-type nil)
+	    (process-connection-type imap-process-connection-type)
 	    process)
 	(when (prog1
 		  (setq process (as-binary-process
@@ -902,6 +914,66 @@ Returns t if login was successful, nil otherwise."
 		(concat "LOGIN anonymous \"" (concat (user-login-name) "@"
 						     (system-name)) "\"")))))
 
+;;; Compiler directives.
+
+(defvar imap-sasl-client)
+(defvar imap-sasl-step)
+
+(defun imap-sasl-make-mechanisms (buffer)
+  (let ((mecs '()))
+    (mapc (lambda (sym)
+	    (let ((name (symbol-name sym)))
+	      (if (and (> (length name) 5)
+		       (string-equal "AUTH=" (substring name 0 5 )))
+		  (setq mecs (cons (substring name 5) mecs)))))
+	  (imap-capability nil buffer))
+    mecs))
+
+(defun imap-sasl-auth-p (buffer)
+  (and (condition-case ()
+	   (require 'sasl)
+	 (error nil))
+       (sasl-find-mechanism (imap-sasl-make-mechanisms buffer))))
+
+(defun imap-sasl-auth (buffer)
+  "Login to server using the SASL method."
+  (message "imap: Authenticating using SASL...")
+  (with-current-buffer buffer
+    (make-local-variable 'imap-username)
+    (make-local-variable 'imap-sasl-client)
+    (make-local-variable 'imap-sasl-step)
+    (let ((mechanism (sasl-find-mechanism (imap-sasl-make-mechanisms buffer)))
+	  logged user)
+      (while (not logged)
+	(setq user (or imap-username
+		       (read-from-minibuffer
+			(concat "IMAP username for " imap-server " using SASL "
+				(sasl-mechanism-name mechanism) ": ")
+			(or user imap-default-user))))
+	(when user
+	  (setq imap-sasl-client (sasl-make-client mechanism user "imap2" imap-server)
+		imap-sasl-step (sasl-next-step imap-sasl-client nil))
+	  (let ((tag (imap-send-command
+		      (if (sasl-step-data imap-sasl-step)
+			  (format "AUTHENTICATE %s %s"
+				  (sasl-mechanism-name mechanism)
+				  (sasl-step-data imap-sasl-step))
+			(format "AUTHENTICATE %s" (sasl-mechanism-name mechanism)))
+		      buffer)))
+	    (while (eq (imap-wait-for-tag tag) 'INCOMPLETE)
+	      (sasl-step-set-data imap-sasl-step (base64-decode-string imap-continuation))
+	      (setq imap-continuation nil
+		    imap-sasl-step (sasl-next-step imap-sasl-client imap-sasl-step))
+	      (imap-send-command-1 (if (sasl-step-data imap-sasl-step)
+				       (base64-encode-string (sasl-step-data imap-sasl-step) t)
+				     "")))
+	    (if (imap-ok-p (imap-wait-for-tag tag))
+		(setq imap-username user
+		      logged t)
+	      (message "Login failed...")
+	      (sit-for 1)))))
+      logged)))
+
 (defun imap-digest-md5-p (buffer)
   (and (imap-capability 'AUTH=DIGEST-MD5 buffer)
        (condition-case ()
@@ -1049,7 +1121,7 @@ password is remembered in the buffer."
   (with-current-buffer (or buffer (current-buffer))
     (if (not (eq imap-state 'nonauth))
 	(or (eq imap-state 'auth)
-	    (eq imap-state 'select)
+	    (eq imap-state 'selected)
 	    (eq imap-state 'examine))
       (make-local-variable 'imap-username)
       (make-local-variable 'imap-password)
@@ -1467,7 +1539,7 @@ or 'unseen.  The IMAP command tag is returned."
 (defun imap-fetch (uids props &optional receive nouidfetch buffer)
   "Fetch properties PROPS from message set UIDS from server in BUFFER.
 UIDS can be a string, number or a list of numbers.  If RECEIVE
-is non-nil return theese properties."
+is non-nil return these properties."
   (with-current-buffer (or buffer (current-buffer))
     (when (imap-ok-p (imap-send-command-wait
 		      (format "%sFETCH %s %s" (if nouidfetch "" "UID ")
@@ -1995,7 +2067,9 @@ Return nil if no complete line has arrived."
 	(when (eq (char-after) ?\))
 	  (imap-forward)
 	  (nreverse addresses)))
-    (assert (imap-parse-nil) t "In imap-parse-address-list")))
+    ;; With assert, the code might not be eval'd.
+    ;; (assert (imap-parse-nil) t "In imap-parse-address-list")
+    (imap-parse-nil)))
 
 ;;   mailbox         = "INBOX" / astring
 ;;                       ; INBOX is case-insensitive.  All case variants of
@@ -2560,7 +2634,9 @@ Return nil if no complete line has arrived."
 	      (imap-forward)
 	      (push (imap-parse-string-list) dsp)
 	      (imap-forward))
-	  (assert (imap-parse-nil) t "In imap-parse-body-ext"))
+	  ;; With assert, the code might not be eval'd.
+	  ;; (assert (imap-parse-nil) t "In imap-parse-body-ext")
+	  (imap-parse-nil))
 	(push (nreverse dsp) ext))
       (when (eq (char-after) ?\ ) ;; body-fld-lang
 	(imap-forward)

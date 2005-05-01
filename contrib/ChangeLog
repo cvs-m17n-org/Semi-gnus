@@ -1,3 +1,49 @@
+2005-01-26  Steve Youngs  <steve@sxemacs.org>
+
+	* gpg.el: Add timer/itimer compatibility.
+
+2004-10-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* README (compface.el): Describe.
+
+2004-10-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* compface.el: Move the version of ELisp-based uncompface program
+	from the lisp directory because of the copyright problem.
+
+2004-09-27  Simon Josefsson  <jas@extundo.com>
+
+	* hashcash.el: Move to ../lisp/.
+
+2004-07-30  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* gnus-namazu.el (gnus-namazu/make-directory-table): Treat drive
+	letters when calcurating pathnames of remote groups.
+	From KOSEKI Yoshinori <kose@meadowy.org> (tiny change).
+
+2004-05-27  Simon Josefsson  <jas@extundo.com>
+
+	* starttls.el: Moved to ../lisp/.
+
+2004-05-26  Simon Josefsson  <jas@extundo.com>
+
+	* starttls.el: Sync with proposed Emacs version.
+
+2004-05-13  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* gnus-namazu.el (gnus-namazu/setup): Do not update indices
+	`gnus-namazu-command-prefix' is non-nil.
+
+2004-05-12  Kai Grossjohann  <kai@emptydomain.de>
+
+	* README (nnir.el): Describe.
+
+2004-05-11  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* README (gnus-namazu.el): Describe.
+
+	* gnus-namazu.el: New file.
+
 2004-04-05  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* nnir.el (nnir-group-server): Move before first use.

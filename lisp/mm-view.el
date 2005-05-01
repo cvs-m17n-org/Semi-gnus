@@ -1,6 +1,6 @@
 ;;; mm-view.el --- functions for viewing MIME objects
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003,
-;; 2004 Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
+;; Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -78,6 +78,7 @@
   (let ((b (point-marker))
 	buffer-read-only)
     (put-image (mm-get-image handle) b)
+    (insert "\n\n")
     (mm-handle-set-undisplayer
      handle
      `(lambda ()
@@ -129,26 +130,26 @@
 	(charset (mail-content-type-get
 		  (mm-handle-type handle) 'charset)))
     (save-excursion
-      (insert text)
+      (insert (if charset (mm-decode-string text charset) text))
       (save-restriction
 	(narrow-to-region b (point))
-	(goto-char (point-min))
-	(if (or (and (boundp 'w3-meta-content-type-charset-regexp)
-		     (re-search-forward
-		      w3-meta-content-type-charset-regexp nil t))
-		(and (boundp 'w3-meta-charset-content-type-regexp)
-		     (re-search-forward
-		      w3-meta-charset-content-type-regexp nil t)))
+	(unless charset
+	  (goto-char (point-min))
+	  (when (or (and (boundp 'w3-meta-content-type-charset-regexp)
+			 (re-search-forward
+			  w3-meta-content-type-charset-regexp nil t))
+		    (and (boundp 'w3-meta-charset-content-type-regexp)
+			 (re-search-forward
+			  w3-meta-charset-content-type-regexp nil t)))
 	    (setq charset
-		  (or (let ((bsubstr (buffer-substring-no-properties
-				      (match-beginning 2)
-				      (match-end 2))))
-			(if (fboundp 'w3-coding-system-for-mime-charset)
-			    (w3-coding-system-for-mime-charset bsubstr)
-			  (mm-charset-to-coding-system bsubstr)))
-		      charset)))
-	(delete-region (point-min) (point-max))
-	(insert (mm-decode-string text charset))
+		  (let ((bsubstr (buffer-substring-no-properties
+				  (match-beginning 2)
+				  (match-end 2))))
+		    (if (fboundp 'w3-coding-system-for-mime-charset)
+			(w3-coding-system-for-mime-charset bsubstr)
+		      (mm-charset-to-coding-system bsubstr))))
+	    (delete-region (point-min) (point-max))
+	    (insert (mm-decode-string text charset))))
 	(save-window-excursion
 	  (save-restriction
 	    (let ((w3-strict-width width)
@@ -201,13 +202,14 @@
   (setq w3m-display-inline-images mm-inline-text-html-with-images))
 
 (defun mm-w3m-cid-retrieve-1 (url handle)
-  (if (mm-multiple-handles handle)
-      (dolist (elem handle)
-	(mm-w3m-cid-retrieve-1 url elem))
-    (when (and (listp handle)
-	       (equal url (mm-handle-id handle)))
-      (mm-insert-part handle)
-      (throw 'found-handle (mm-handle-media-type handle)))))
+  (dolist (elem handle)
+    (when (listp elem)
+      (if (equal url (mm-handle-id elem))
+	  (progn
+	    (mm-insert-part elem)
+	    (throw 'found-handle (mm-handle-media-type elem))))
+      (if (equal "multipart" (mm-handle-media-supertype elem))
+	  (mm-w3m-cid-retrieve-1 url elem)))))
 
 (defun mm-w3m-cid-retrieve (url &rest args)
   "Insert a content pointed by URL if it has the cid: scheme."
@@ -224,19 +226,17 @@
 	(b (point))
 	(charset (mail-content-type-get (mm-handle-type handle) 'charset)))
     (save-excursion
-      (insert text)
+      (insert (if charset (mm-decode-string text charset) text))
       (save-restriction
 	(narrow-to-region b (point))
-	(goto-char (point-min))
-	(when (re-search-forward w3m-meta-content-type-charset-regexp nil t)
-	  (setq charset (or (w3m-charset-to-coding-system (match-string 2))
-			    charset)))
-	(when charset
-	  (delete-region (point-min) (point-max))
-	  (insert (mm-decode-string text charset)))
+	(unless charset
+	  (goto-char (point-min))
+	  (when (setq charset (w3m-detect-meta-charset))
+	    (delete-region (point-min) (point-max))
+	    (insert (mm-decode-string text charset))))
 	(let ((w3m-safe-url-regexp mm-w3m-safe-url-regexp)
 	      w3m-force-redisplay)
-	  (w3m-region (point-min) (point-max)))
+	  (w3m-region (point-min) (point-max) nil charset))
 	(when (and mm-inline-text-html-with-w3m-keymap
 		   (boundp 'w3m-minor-mode-map)
 		   w3m-minor-mode-map)
@@ -301,11 +301,14 @@
        (buffer-string)))))
 
 (defun mm-inline-render-with-function (handle func &rest args)
-  (let ((source (mm-get-part handle)))
+  (let ((source (mm-get-part handle))
+	(charset (mail-content-type-get (mm-handle-type handle) 'charset)))
     (mm-insert-inline
      handle
-     (mm-with-unibyte-buffer
-       (insert source)
+     (mm-with-multibyte-buffer
+       (insert (if charset
+		   (mm-decode-string source charset)
+		 source))
        (apply func args)
        (buffer-string)))))
 
@@ -375,6 +378,8 @@
   "Insert TEXT inline from HANDLE."
   (let ((b (point)))
     (insert text)
+    (unless (bolp)
+      (insert "\n"))
     (mm-handle-set-undisplayer
      handle
      `(lambda ()
@@ -456,32 +461,52 @@
 	      (delete-region ,(point-min-marker) ,(point-max-marker)))))))))
 
 (defun mm-display-inline-fontify (handle mode)
-  (let (text)
+  (let ((charset (mail-content-type-get (mm-handle-type handle) 'charset))
+	text coding-system)
+    (unless (eq charset 'gnus-decoded)
+      (mm-with-unibyte-buffer
+	(mm-insert-part handle)
+	(mm-decompress-buffer
+	 (or (mail-content-type-get (mm-handle-disposition handle) 'name)
+	     (mail-content-type-get (mm-handle-disposition handle) 'filename))
+	 t t)
+	(unless charset
+	  (setq coding-system (mm-find-buffer-file-coding-system)))
+	(setq text (buffer-string))))
     ;; XEmacs @#$@ version of font-lock refuses to fully turn itself
     ;; on for buffers whose name begins with " ".  That's why we use
-    ;; save-current-buffer/get-buffer-create rather than
-    ;; with-temp-buffer.
-    (save-current-buffer
-      (set-buffer (generate-new-buffer "*fontification*"))
-      (unwind-protect
-	  (progn
-	    (buffer-disable-undo)
-	    (mm-insert-part handle)
-	    (funcall mode)
-	    (require 'font-lock)
-	    (let ((font-lock-verbose nil))
-	      ;; I find font-lock a bit too verbose.
-	      (font-lock-fontify-buffer))
-	    ;; By default, XEmacs font-lock uses non-duplicable text
-	    ;; properties.  This code forces all the text properties
-	    ;; to be copied along with the text.
-	    (when (fboundp 'extent-list)
-	      (map-extents (lambda (ext ignored)
-			     (set-extent-property ext 'duplicable t)
-			     nil)
-			   nil nil nil nil nil 'text-prop))
-	    (setq text (buffer-string)))
-	(kill-buffer (current-buffer))))
+    ;; `with-current-buffer'/`generate-new-buffer' rather than
+    ;; `with-temp-buffer'.
+    (with-current-buffer (generate-new-buffer "*fontification*")
+      (buffer-disable-undo)
+      (mm-enable-multibyte)
+      (insert (cond ((eq charset 'gnus-decoded)
+		     (mm-insert-part handle))
+		    (coding-system
+		     (mm-decode-coding-string text coding-system))
+		    (charset
+		     (mm-decode-string text charset))
+		    (t
+		     text)))
+      (require 'font-lock)
+      ;; Inhibit font-lock this time (*-mode-hook might run
+      ;; `turn-on-font-lock') so that jit-lock may not turn off
+      ;; font-lock immediately after this.
+      (let ((font-lock-mode t))
+	(funcall mode))
+      (let ((font-lock-verbose nil))
+	;; I find font-lock a bit too verbose.
+	(font-lock-fontify-buffer))
+      ;; By default, XEmacs font-lock uses non-duplicable text
+      ;; properties.  This code forces all the text properties
+      ;; to be copied along with the text.
+      (when (fboundp 'extent-list)
+	(map-extents (lambda (ext ignored)
+		       (set-extent-property ext 'duplicable t)
+		       nil)
+		     nil nil nil nil nil 'text-prop))
+      (setq text (buffer-string))
+      (kill-buffer (current-buffer)))
     (mm-insert-inline handle text)))
 
 ;; Shouldn't these functions check whether the user even wants to use
@@ -494,6 +519,9 @@
 
 (defun mm-display-elisp-inline (handle)
   (mm-display-inline-fontify handle 'emacs-lisp-mode))
+
+(defun mm-display-dns-inline (handle)
+  (mm-display-inline-fontify handle 'dns-mode))
 
 ;;      id-signedData OBJECT IDENTIFIER ::= { iso(1) member-body(2)
 ;;          us(840) rsadsi(113549) pkcs(1) pkcs7(7) 2 }

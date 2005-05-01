@@ -1,5 +1,5 @@
 ;;; infohack.el --- a hack to format info file.
-;; Copyright (C)  2001  Free Software Foundation, Inc.
+;; Copyright (C)  2001, 2003, 2004  Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: info
@@ -26,11 +26,60 @@
 ;;; Code:
 
 (let ((default-directory (expand-file-name "../lisp/")))
-  ;; Adjust `load-path' for APEL.
-  (load-file "dgnushack.el")
+  (if (file-exists-p (expand-file-name "dgnuspath.el"))
+      (load (expand-file-name "dgnuspath.el") nil nil t))
   ;; Replace "./" with "../lisp/" in `load-path'.
   (setq load-path (mapcar 'expand-file-name load-path)))
+
+(when (featurep 'xemacs)
+  (condition-case nil
+      (require 'timer-funcs)
+    (error "
+You should upgrade your XEmacs packages, especially xemacs-base.\n")))
+
+;; XEmacs 21.4.17 doesn't provide `line-end-position' which is used
+;; when formatting Info files.  2005-02-23
+(condition-case nil
+    (require 'poe)
+  (error "\nIn %s,
+APEL was not found or an error occurred.  You will need to run the
+configure script again adding the --with-addpath=APEL_PATH option.\n"
+	 load-path))
+
 (load-file (expand-file-name "ptexinfmt.el" "./"))
+
+(if (fboundp 'texinfo-copying)
+    nil
+  ;; Support @copying and @insertcopying for Emacs 21.3 and lesser and
+  ;; XEmacs.
+  (defvar texinfo-copying-text ""
+    "Text of the copyright notice and copying permissions.")
+
+  (defun texinfo-copying ()
+    "Copy the copyright notice and copying permissions from the Texinfo file,
+as indicated by the @copying ... @end copying command;
+insert the text with the @insertcopying command."
+    (let ((beg (progn (beginning-of-line) (point)))
+	  (end  (progn (re-search-forward "^@end copying[ \t]*\n") (point))))
+      (setq texinfo-copying-text
+	    (buffer-substring-no-properties
+	     (save-excursion (goto-char beg) (forward-line 1) (point))
+	     (save-excursion (goto-char end) (forward-line -1) (point))))
+      (delete-region beg end)))
+
+  (defun texinfo-insertcopying ()
+    "Insert the copyright notice and copying permissions from the Texinfo file,
+which are indicated by the @copying ... @end copying command."
+    (insert (concat "\n" texinfo-copying-text)))
+
+  (defadvice texinfo-format-scan (before expand-@copying-section activate)
+    "Extract @copying and replace @insertcopying with it."
+    (goto-char (point-min))
+    (when (search-forward "@copying" nil t)
+      (texinfo-copying))
+    (while (search-forward "@insertcopying" nil t)
+      (delete-region (match-beginning 0) (match-end 0))
+      (texinfo-insertcopying))))
 
 (defun infohack-remove-unsupported ()
   (goto-char (point-min))
@@ -158,20 +207,25 @@ Both characters must have the same length of multi-byte form."
 	  (texinfo-every-node-update)
 	  (set-buffer-modified-p nil)
 	  (message "texinfo formatting %s..." file)
-	  (if (featurep 'mule)
-	      ;; Encode messages to terminal.
-	      (let ((si:message (symbol-function 'message)))
-		(fset 'message
-		      (byte-compile
-		       `(lambda (fmt &rest args)
-			  (funcall ,si:message "%s"
-				   (encode-coding-string
-				    (apply 'format fmt args)
-				    'iso-2022-7bit)))))
-		(unwind-protect
-		    (texinfo-format-buffer nil)
-		  (fset 'message si:message)))
-	    (texinfo-format-buffer nil))
+	  (let ((si:message (symbol-function 'message)))
+	    ;; Encode messages to terminal.
+	    (fset
+	     'message
+	     (byte-compile
+	      (if (featurep 'xemacs)
+		  `(lambda (fmt &rest args)
+		     (unless (and (string-equal fmt "%s clean")
+				  (equal (car args) buffer-file-name))
+		       (funcall ,si:message "%s"
+				(encode-coding-string (apply 'format fmt args)
+						      'iso-2022-7bit))))
+		`(lambda (fmt &rest args)
+		   (funcall ,si:message "%s"
+			    (encode-coding-string (apply 'format fmt args)
+						  'iso-2022-7bit))))))
+	    (unwind-protect
+		(texinfo-format-buffer nil)
+	      (fset 'message si:message)))
 	  (if (buffer-modified-p)
 	      (progn (message "Saving modified %s" (buffer-file-name))
 		     (save-buffer))))

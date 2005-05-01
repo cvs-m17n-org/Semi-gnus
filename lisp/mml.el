@@ -1,5 +1,5 @@
 ;;; mml.el --- A package for parsing and validating MML documents
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -38,13 +38,16 @@
   (autoload 'message-fetch-field "message")
   (autoload 'message-mark-active-p "message")
   (autoload 'fill-flowed-encode "flow-fill")
-  (autoload 'message-posting-charset "message")
-  (autoload 'x-dnd-get-local-file-name "x-dnd"))
+  (autoload 'message-posting-charset "message"))
+
+(eval-when-compile
+  (autoload 'dnd-get-local-file-name "dnd"))
 
 (defcustom mml-content-type-parameters
   '(name access-type expiration size permission format)
   "*A list of acceptable parameters in MML tag.
 These parameters are generated in Content-Type header if exists."
+  :version "22.1"
   :type '(repeat (symbol :tag "Parameter"))
   :group 'message)
 
@@ -52,12 +55,14 @@ These parameters are generated in Content-Type header if exists."
   '(filename creation-date modification-date read-date)
   "*A list of acceptable parameters in MML tag.
 These parameters are generated in Content-Disposition header if exists."
+  :version "22.1"
   :type '(repeat (symbol :tag "Parameter"))
   :group 'message)
 
 (defcustom mml-insert-mime-headers-always nil
   "If non-nil, always put Content-Type: text/plain at top of empty parts.
 It is necessary to work against a bug in certain clients."
+  :version "22.1"
   :type 'boolean
   :group 'message)
 
@@ -155,6 +160,8 @@ one charsets.")
 	;; included in the message
 	(let* (secure-mode
 	       (taginfo (mml-read-tag))
+	       (keyfile (cdr (assq 'keyfile taginfo)))
+	       (certfile (cdr (assq 'certfile taginfo)))
 	       (recipients (cdr (assq 'recipients taginfo)))
 	       (sender (cdr (assq 'sender taginfo)))
 	       (location (cdr (assq 'tag-location taginfo)))
@@ -178,6 +185,10 @@ one charsets.")
 		 (setq tags (list "sign" method "encrypt" method))))
 	  (eval `(mml-insert-tag ,secure-mode
 				 ,@tags
+				 ,(if keyfile "keyfile")
+				 ,keyfile
+				 ,(if certfile "certfile")
+				 ,certfile
 				 ,(if recipients "recipients")
 				 ,recipients
 				 ,(if sender "sender")
@@ -394,22 +405,25 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
       (cond
        ((or (eq (car cont) 'part) (eq (car cont) 'mml))
 	(let ((raw (cdr (assq 'raw cont)))
-	      coded encoding charset filename type flowed)
-	  (setq type (or (cdr (assq 'type cont)) "text/plain"))
+	      type charset coding filename encoding flowed coded)
+	  (setq type (or (cdr (assq 'type cont)) "text/plain")
+		charset (cdr (assq 'charset cont))
+		coding (mm-charset-to-coding-system charset))
+	  (cond ((eq coding 'ascii)
+		 (setq charset nil
+		       coding nil))
+		(charset
+		 (setq charset (intern (downcase charset)))))
 	  (if (and (not raw)
 		   (member (car (split-string type "/")) '("text" "message")))
 	      (progn
 		(with-temp-buffer
-		  (setq charset (mm-charset-to-coding-system
-				 (cdr (assq 'charset cont))))
-		  (when (eq charset 'ascii)
-		    (setq charset nil))
 		  (cond
 		   ((cdr (assq 'buffer cont))
 		    (insert-buffer-substring (cdr (assq 'buffer cont))))
 		   ((and (setq filename (cdr (assq 'filename cont)))
 			 (not (equal (cdr (assq 'nofile cont)) "yes")))
-		    (let ((coding-system-for-read charset))
+		    (let ((coding-system-for-read coding))
 		      (mm-insert-file-contents filename)))
 		   ((eq 'mml (car cont))
 		    (insert (cdr (assq 'contents cont))))
@@ -465,11 +479,17 @@ If MML is non-nil, return the buffer up till the correspondent mml tag."
 	    (mm-with-unibyte-buffer
 	      (cond
 	       ((cdr (assq 'buffer cont))
-		(insert-buffer-substring (cdr (assq 'buffer cont))))
+		(insert (with-current-buffer (cdr (assq 'buffer cont))
+			  (mm-with-unibyte-current-buffer
+			    (buffer-string)))))
 	       ((and (setq filename (cdr (assq 'filename cont)))
 		     (not (equal (cdr (assq 'nofile cont)) "yes")))
 		(let ((coding-system-for-read mm-binary-coding-system))
-		  (mm-insert-file-contents filename nil nil nil nil t)))
+		  (mm-insert-file-contents filename nil nil nil nil t))
+		(unless charset
+		  (setq charset (mm-coding-system-to-mime-charset
+				 (mm-find-buffer-file-coding-system
+				  filename)))))
 	       (t
 		(insert (cdr (assq 'contents cont)))))
 	      (setq encoding (mm-encode-buffer type)
@@ -702,7 +722,8 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
   ;; First decode the head.
   (save-restriction
     (message-narrow-to-head)
-    (mail-decode-encoded-word-region (point-min) (point-max)))
+    (let ((rfc2047-quote-decoded-words-containing-tspecials t))
+      (mail-decode-encoded-word-region (point-min) (point-max))))
   (unless handles
     (setq handles (mm-dissect-buffer t)))
   (goto-char (point-min))
@@ -803,7 +824,7 @@ If HANDLES is non-nil, use it instead reparsing the buffer."
       (insert " " param)
       (when (> (current-column) 71)
 	(goto-char point)
-	(insert "\n ")
+	(insert "\n")
 	(end-of-line)))))
 
 ;;;
@@ -895,11 +916,11 @@ See Info node `(emacs-mime)Composing'.
 	       (> (prefix-numeric-value arg) 0)))
     (add-minor-mode 'mml-mode " MML" mml-mode-map)
     (easy-menu-add mml-menu mml-mode-map)
-    (when (boundp 'x-dnd-protocol-alist)
-      (set (make-local-variable 'x-dnd-protocol-alist)
-	   '(("^file:///" . mml-x-dnd-attach-file)
-	     ("^file://"  . x-dnd-open-file)
-	     ("^file:"    . mml-x-dnd-attach-file))))
+    (when (boundp 'dnd-protocol-alist)
+      (set (make-local-variable 'dnd-protocol-alist)
+	   '(("^file:///" . mml-dnd-attach-file)
+	     ("^file://"  . dnd-open-file)
+	     ("^file:"    . mml-dnd-attach-file))))
     (run-hooks 'mml-mode-hook)))
 
 ;;;
@@ -946,11 +967,9 @@ See Info node `(emacs-mime)Composing'.
 		      (if (string-match "^text/.*" type)
 			  "inline"
 			"attachment")))
-        (disposition (completing-read 
-                      (format "Disposition: (default %s): " default)
-                      '(("attachment") ("inline") (""))
-                      nil
-                      nil)))
+	 (disposition (completing-read "Disposition: "
+				       '(("attachment") ("inline") (""))
+				       nil t)))
     (if (not (equal disposition ""))
 	disposition
       default)))
@@ -1017,9 +1036,9 @@ description of the attachment."
 			'disposition (or disposition "attachment")
 			'description description))
 
-(defun mml-x-dnd-attach-file (uri action)
+(defun mml-dnd-attach-file (uri action)
   "Attach a drag and drop file."
-  (let ((file (x-dnd-get-local-file-name uri t)))
+  (let ((file (dnd-get-local-file-name uri t)))
     (when (and file (file-regular-p file))
       (let* ((type (mml-minibuffer-read-type file))
 	    (description (mml-minibuffer-read-description))
@@ -1075,10 +1094,15 @@ Should be adopted if code in `message-send-mail' is changed."
     (message-position-on-field "Mail-Followup-To" "X-Draft-From")
     (insert (message-make-mail-followup-to))))
 
+(defvar mml-preview-buffer nil)
+
 (defun mml-preview (&optional raw)
   "Display current buffer with Gnus, in a new buffer.
 If RAW, don't highlight the article."
   (interactive "P")
+  (setq mml-preview-buffer (generate-new-buffer
+			    (concat (if raw "*Raw MIME preview of "
+				      "*MIME preview of ") (buffer-name))))
   (save-excursion
     (let* ((buf (current-buffer))
 	   (message-options message-options)
@@ -1090,13 +1114,13 @@ If RAW, don't highlight the article."
 					   (message-fetch-field "Newsgroups")))
 					message-posting-charset)))
       (message-options-set-recipient)
-      (switch-to-buffer (generate-new-buffer
-			 (concat (if raw "*Raw MIME preview of "
-				   "*MIME preview of ") (buffer-name))))
       (when (boundp 'gnus-buffers)
-	(push (current-buffer) gnus-buffers))
-      (erase-buffer)
-      (insert-buffer-substring buf)
+	(push mml-preview-buffer gnus-buffers))
+      (save-restriction
+	(widen)
+	(set-buffer mml-preview-buffer)
+	(erase-buffer)
+	(insert-buffer-substring buf))
       (mml-preview-insert-mail-followup-to)
       (let ((message-deletable-headers (if (message-news-p)
 					   nil
@@ -1109,6 +1133,7 @@ If RAW, don't highlight the article."
 	   (concat "^" (regexp-quote mail-header-separator) "\n") nil t)
 	  (replace-match "\n"))
       (let ((mail-header-separator ""));; mail-header-separator is removed.
+	(message-sort-headers)
 	(mml-to-mime))
       (if raw
 	  (when (fboundp 'set-buffer-multibyte)
@@ -1141,7 +1166,12 @@ If RAW, don't highlight the article."
 		     (lambda (event)
 		       (interactive "@e")
 		       (widget-button-press (widget-event-point event) event)))
-      (goto-char (point-min)))))
+      (goto-char (point-min))))
+  (if (and (boundp 'gnus-buffer-configuration)
+	   (assq 'mml-preview gnus-buffer-configuration))
+      (let ((gnus-message-buffer (current-buffer)))
+	(gnus-configure-windows 'mml-preview))
+    (pop-to-buffer mml-preview-buffer)))
 
 (defun mml-validate ()
   "Validate the current MML document."

@@ -1,5 +1,5 @@
 ;;; gnus-util.el --- utility functions for Semi-gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -64,12 +64,12 @@
     (defalias 'gnus-replace-in-string 'replace-in-string))
    ((fboundp 'replace-regexp-in-string)
     (defun gnus-replace-in-string  (string regexp newtext &optional literal)
-      (replace-regexp-in-string regexp newtext string nil literal)))))
+      "Replace all matches for REGEXP with NEWTEXT in STRING.
+If LITERAL is non-nil, insert NEWTEXT literally.  Return a new
+string containing the replacements.
 
-;;; bring in the netrc functions as aliases
-(defalias 'gnus-netrc-get 'netrc-get)
-(defalias 'gnus-netrc-machine 'netrc-machine)
-(defalias 'gnus-parse-netrc 'netrc-parse)
+This is a compatibility function for different Emacsen."
+      (replace-regexp-in-string regexp newtext string nil literal)))))
 
 (defun gnus-boundp (variable)
   "Return non-nil if VARIABLE is bound and non-nil."
@@ -227,12 +227,15 @@ is slower."
 
 (defun gnus-remove-text-with-property (prop)
   "Delete all text in the current buffer with text property PROP."
-  (save-excursion
-    (goto-char (point-min))
-    (while (not (eobp))
-      (while (get-text-property (point) prop)
-	(delete-char 1))
-      (goto-char (next-single-property-change (point) prop nil (point-max))))))
+  (let ((start (point-min))
+	end)
+    (unless (get-text-property start prop)
+      (setq start (next-single-property-change start prop)))
+    (while start
+      (setq end (text-property-any start (point-max) prop nil))
+      (delete-region start (or end (point-max)))
+      (setq start (when end
+		    (next-single-property-change start prop))))))
 
 (defun gnus-newsgroup-directory-form (newsgroup)
   "Make hierarchical directory name from NEWSGROUP name."
@@ -484,11 +487,22 @@ inside loops."
 (defun gnus-split-references (references)
   "Return a list of Message-IDs in REFERENCES."
   (let ((beg 0)
+	(references (or references ""))
 	ids)
     (while (string-match "<[^<]+[^< \t]" references beg)
       (push (substring references (match-beginning 0) (setq beg (match-end 0)))
 	    ids))
     (nreverse ids)))
+
+(defun gnus-extract-references (references)
+  "Return a list of Message-IDs in REFERENCES (in In-Reply-To
+  format), trimmed to only contain the Message-IDs."
+  (let ((ids (gnus-split-references references)) 
+	refs)
+    (dolist (id ids)
+      (when (string-match "<[^<>]+>" id)
+	(push (match-string 0 id) refs)))
+    refs))
 
 (defsubst gnus-parent-id (references &optional n)
   "Return the last Message-ID in REFERENCES.
@@ -575,6 +589,15 @@ If N, return the Nth ancestor instead."
 	 (substring gname (match-end 0))
        gname)))
 
+(defmacro gnus-group-server (group)
+  "Find the server name of a foreign newsgroup.
+For example, (gnus-group-server \"nnimap+yxa:INBOX.foo\") would
+yield \"nnimap:yxa\"."
+  `(let ((gname ,group))
+     (if (string-match "^\\([^+]+\\).\\([^:]+\\):" gname)
+	 (format "%s:%s" (match-string 1 gname) (match-string 2 gname))
+       (format "%s:%s" (car gnus-select-method) (cadr gnus-select-method)))))
+
 (defun gnus-make-sort-function (funs)
   "Return a composite sort condition based on the functions in FUNS."
   (cond
@@ -620,24 +643,49 @@ If N, return the Nth ancestor instead."
   (define-key (symbol-value (intern (format "gnus-%s-mode-map" type)))
     [menu-bar edit] 'undefined))
 
+(defmacro gnus-bind-print-variables (&rest forms)
+  "Bind print-* variables and evaluate FORMS.
+This macro is used with `prin1', `pp', etc. in order to ensure printed
+Lisp objects are loadable.  Bind `print-quoted' and `print-readably'
+to t, and `print-escape-multibyte', `print-escape-newlines',
+`print-escape-nonascii', `print-length', `print-level' and
+`print-string-length' to nil."
+  `(let ((print-quoted t)
+	 (print-readably t)
+	 ;;print-circle
+	 ;;print-continuous-numbering
+	 print-escape-multibyte
+	 print-escape-newlines
+	 print-escape-nonascii
+	 ;;print-gensym
+	 print-length
+	 print-level
+	 print-string-length)
+     ,@forms))
+
 (defun gnus-prin1 (form)
   "Use `prin1' on FORM in the current buffer.
-Bind `print-quoted' and `print-readably' to t while printing."
-  (let ((print-quoted t)
-	(print-readably t)
-	(print-escape-multibyte nil)
-	print-level print-length)
-    (prin1 form (current-buffer))))
+Bind `print-quoted' and `print-readably' to t, and `print-length' and
+`print-level' to nil.  See also `gnus-bind-print-variables'."
+  (gnus-bind-print-variables (prin1 form (current-buffer))))
 
 (defun gnus-prin1-to-string (form)
   "The same as `prin1'.
-Bind `print-quoted' and `print-readably' to t, and `print-length'
-and `print-level' to nil."
-  (let ((print-quoted t)
-	(print-readably t)
-	(print-length nil)
-	(print-level nil))
-    (prin1-to-string form)))
+Bind `print-quoted' and `print-readably' to t, and `print-length' and
+`print-level' to nil.  See also `gnus-bind-print-variables'."
+  (gnus-bind-print-variables (prin1-to-string form)))
+
+(defun gnus-pp (form &optional stream)
+  "Use `pp' on FORM in the current buffer.
+Bind `print-quoted' and `print-readably' to t, and `print-length' and
+`print-level' to nil.  See also `gnus-bind-print-variables'."
+  (gnus-bind-print-variables (pp form (or stream (current-buffer)))))
+
+(defun gnus-pp-to-string (form)
+  "The same as `pp-to-string'.
+Bind `print-quoted' and `print-readably' to t, and `print-length' and
+`print-level' to nil.  See also `gnus-bind-print-variables'."
+  (gnus-bind-print-variables (pp-to-string form)))
 
 (defun gnus-make-directory (directory)
   "Make DIRECTORY (and all its parents) if it doesn't exist."
@@ -675,6 +723,23 @@ and `print-level' to nil."
   "Delete FILE if it exists."
   (when (file-exists-p file)
     (delete-file file)))
+
+(defun gnus-delete-directory (directory)
+  "Delete files in DIRECTORY.  Subdirectories remain.
+If there's no subdirectory, delete DIRECTORY as well."
+  (when (file-directory-p directory)
+    (let ((files (directory-files
+		  directory t "^\\([^.]\\|\\.\\([^.]\\|\\..\\)\\).*"))
+	  file dir)
+      (while files
+	(setq file (pop files))
+	(if (eq t (car (file-attributes file)))
+	    ;; `file' is a subdirectory.
+	    (setq dir t)
+	  ;; `file' is a file or a symlink.
+	  (delete-file file)))
+      (unless dir
+	(delete-directory directory)))))
 
 (defun gnus-strip-whitespace (string)
   "Return STRING stripped of all whitespace."
@@ -1078,7 +1143,7 @@ Return the modified alist."
             (standard-output
 	     (lambda (c)
                (aset ,buffer ,leng c)
-                   
+
 	       (if (= ,size (setq ,leng (1+ ,leng)))
 		   (progn (write-region ,buffer nil ,file ,append 'no-msg)
 			  (setq ,leng 0
@@ -1147,7 +1212,7 @@ Return the modified alist."
 Setting it to nil has no effect after the first time `gnus-byte-compile'
 is run."
   :type 'boolean
-  :version "21.1"
+  :version "22.1"
   :group 'gnus-various)
 
 (defun gnus-byte-compile (form)
@@ -1170,7 +1235,7 @@ is run."
   "Delete by side effect any elements of LIST whose car is `equal' to KEY.
 The modified LIST is returned.  If the first member
 of LIST has a car that is `equal' to KEY, there is no way to remove it
-by side effect; therefore, write `(setq foo (remassoc key foo))' to be
+by side effect; therefore, write `(setq foo (gnus-remassoc key foo))' to be
 sure of changing the value of `foo'."
   (when alist
     (if (equal key (caar alist))
@@ -1439,42 +1504,64 @@ predicate on the elements."
       (nconc (nreverse res) list1 list2))))
 
 (eval-when-compile
-  (defvar xemacs-codename))
+  (defvar xemacs-codename)
+  (defvar sxemacs-codename)
+  (defvar emacs-program-version)
+  (unless (featurep 'meadow)
+    (defalias 'Meadow-version 'ignore)))
 
 (defun gnus-emacs-version ()
   "Stringified Emacs version."
-  (let ((system-v
-	 (cond
-	  ((eq gnus-user-agent 'emacs-gnus-config)
-	   system-configuration)
-	  ((eq gnus-user-agent 'emacs-gnus-type)
-	   (symbol-name system-type))
-	  (t nil))))
+  (let* ((lst (if (listp gnus-user-agent)
+		  gnus-user-agent
+		'(gnus emacs type)))
+	 (system-v (cond ((memq 'config lst)
+			  system-configuration)
+			 ((memq 'type lst)
+			  (symbol-name system-type))
+			 (t nil)))
+	 (mule-v (when (and (memq 'mule lst)
+			    (featurep 'mule))
+		   (concat
+		    " MULE"
+		    (when (boundp 'mule-version)
+		      (concat "/" (symbol-value 'mule-version)))
+		    (when (featurep 'meadow)
+		      (let ((mver (Meadow-version)))
+			(if (string-match "^Meadow-" mver)
+			    (concat " Meadow/"
+				    (substring mver (match-end 0)))))))))
+	 codename emacsname)
+    (cond ((featurep 'sxemacs)
+	   (setq emacsname "SXEmacs"
+		 codename sxemacs-codename))
+	  ((featurep 'xemacs)
+	   (setq emacsname "XEmacs"
+		 codename xemacs-codename))
+	  (t
+	   (setq emacsname "Emacs")))
     (cond
-     ((eq gnus-user-agent 'gnus)
+     ((not (memq 'emacs lst))
       nil)
      ((string-match "^\\(\\([.0-9]+\\)*\\)\\.[0-9]+$" emacs-version)
+      ;; Emacs:
       (concat "Emacs/" (match-string 1 emacs-version)
 	      (if system-v
 		  (concat " (" system-v ")")
-		"")))
-     ((string-match
-       "\\([A-Z]*[Mm][Aa][Cc][Ss]\\)[^(]*\\(\\((beta.*)\\|'\\)\\)?"
-       emacs-version)
-      (concat
-       (match-string 1 emacs-version)
-       (format "/%d.%d" emacs-major-version emacs-minor-version)
-       (if (match-beginning 3)
-	   (match-string 3 emacs-version)
-	 "")
-       (if (boundp 'xemacs-codename)
-	   (concat
-	    " (" xemacs-codename
-	    (if system-v
-		(concat ", " system-v ")")
-	      ")"))
-	 "")))
-     (t emacs-version))))
+		"")
+	      mule-v))
+     ((or (featurep 'sxemacs) (featurep 'xemacs))
+      ;; XEmacs or SXEmacs:
+      (concat emacsname "/" emacs-program-version
+	      " ("
+	      (when (and (memq 'codename lst)
+			 codename)
+		(concat codename
+			(when system-v ", ")))
+	      (when system-v system-v)
+	      ")"
+	      mule-v))
+     (t (concat emacs-version mule-v)))))
 
 (defun gnus-rename-file (old-path new-path &optional trim)
   "Rename OLD-PATH as NEW-PATH.  If TRIM, recursively delete
@@ -1493,10 +1580,14 @@ empty directories from OLD-PATH."
 			(setq temp (cdr temp)))
 		      (= (length temp) 0))
 	  (delete-directory old-dir)
-	  (setq old-dir (file-name-as-directory 
-			 (file-truename 
+	  (setq old-dir (file-name-as-directory
+			 (file-truename
 			  (concat old-dir "..")))))))))
 
+(defun gnus-set-file-modes (filename mode)
+  "Wrapper for set-file-modes."
+  (ignore-errors
+    (set-file-modes filename mode)))
 
 (provide 'gnus-util)
 

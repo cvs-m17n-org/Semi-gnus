@@ -146,9 +146,15 @@ will be expired along with non-matching score entries."
   :type 'boolean)
 
 (defcustom gnus-decay-scores nil
-  "*If non-nil, decay non-permanent scores."
+  "*If non-nil, decay non-permanent scores.
+
+If it is a regexp, only decay score files matching regexp."
   :group 'gnus-score-decay
-  :type 'boolean)
+  :type `(choice (const :tag "never" nil)
+		 (const :tag "always" t)
+		 (const :tag "adaptive score files"
+			,(concat "\\." gnus-adaptive-file-suffix "\\'"))
+		 (regexp)))
 
 (defcustom gnus-decay-score-function 'gnus-decay-score
   "*Function called to decay a score.
@@ -235,9 +241,10 @@ This variable allows the same syntax as `gnus-home-score-file'."
 
 (defcustom gnus-adaptive-word-length-limit nil
   "*Words of a length lesser than this limit will be ignored when doing adaptive scoring."
+  :version "22.1"
   :group 'gnus-score-adapt
   :type '(radio (const :format "Unlimited " nil)
-		(integer :format "Maximum length: %v\n" :size 0)))
+		(integer :format "Maximum length: %v")))
 
 (defcustom gnus-ignored-adaptive-words nil
   "List of words to be ignored when doing adaptive word scoring."
@@ -304,6 +311,13 @@ If this variable is nil, exact matching will always be used."
   :group 'gnus-score-adapt
   :group 'gnus-score-files
   :type 'regexp)
+
+(defcustom gnus-adaptive-pretty-print nil
+  "If non-nil, adaptive score files fill are pretty printed."
+  :group 'gnus-score-files
+  :group 'gnus-score-adapt
+  :version "23.0" ;; No Gnus
+  :type 'boolean)
 
 (defcustom gnus-score-default-header nil
   "Default header when entering new scores.
@@ -774,7 +788,7 @@ file for the command instead of the current score file."
 	(setq i (1+ i))))
     (goto-char (point-min))
     ;; display ourselves in a small window at the bottom
-    (gnus-appt-select-lowest-window)
+    (gnus-select-lowest-window)
     (if (< (/ (window-height) 2) window-min-height)
 	(switch-to-buffer "*Score Help*")
       (split-window)
@@ -1236,7 +1250,9 @@ If FORMAT, also format the current score file."
 	  (decay (car (gnus-score-get 'decay alist)))
 	  (eval (car (gnus-score-get 'eval alist))))
       ;; Perform possible decays.
-      (when (and gnus-decay-scores
+      (when (and (if (stringp gnus-decay-scores)
+		     (string-match gnus-decay-scores file)
+		   gnus-decay-scores)
 		 (or cached (file-exists-p file))
 		 (or (not decay)
 		     (gnus-decay-scores alist decay)))
@@ -1438,17 +1454,18 @@ If FORMAT, also format the current score file."
 	  (setq score (setcdr entry (gnus-delete-alist 'touched score)))
 	  (erase-buffer)
 	  (let (emacs-lisp-mode-hook)
-	    (if (string-match
-		 (concat (regexp-quote gnus-adaptive-file-suffix) "$")
-		 file)
-		;; This is an adaptive score file, so we do not run
-		;; it through `pp'.  These files can get huge, and
-		;; are not meant to be edited by human hands.
+	    (if (and (not gnus-adaptive-pretty-print)
+		     (string-match
+		      (concat (regexp-quote gnus-adaptive-file-suffix) "$")
+		      file))
+		;; This is an adaptive score file, so we do not run it through
+		;; `pp' unless requested.  These files can get huge, and are
+		;; not meant to be edited by human hands.
 		(gnus-prin1 score)
 	      ;; This is a normal score file, so we print it very
 	      ;; prettily.
 	      (let ((lisp-mode-syntax-table score-mode-syntax-table))
-		(pp score (current-buffer)))))
+		(gnus-pp score))))
 	  (gnus-make-directory (file-name-directory file))
 	  ;; If the score file is empty, we delete it.
 	  (if (zerop (buffer-size))
@@ -2391,7 +2408,8 @@ score in `gnus-newsgroup-scored' by SCORE."
     (when winconf
       (set-window-configuration winconf))
     (gnus-score-remove-from-cache bufnam)
-    (gnus-score-load-file bufnam)))
+    (gnus-score-load-file bufnam)
+    (run-hooks 'gnus-score-edit-done-hook)))
 
 (defun gnus-score-find-trace ()
   "Find all score rules that applies to the current article."

@@ -6,8 +6,6 @@
 ;; Author: TSUCHIYA Masatoshi <tsuchiya@namazu.org>
 ;; Keywords: mail searching namazu
 
-;; This file is a part of Semi-Gnus.
-
 ;; This program is free software; you can redistribute it and/or modify
 ;; it under the terms of the GNU General Public License as published by
 ;; the Free Software Foundation; either version 2, or (at your option)
@@ -37,26 +35,30 @@
 
 ;;; Quick Start:
 
-;; If this module has already been installed, only 3 steps are
+;; If this module has already been installed, only four steps are
 ;; required to search articles with this module.
 ;;
 ;;   (1) Install Namazu.
-;;   (2) Start Gnus and type M-x gnus-namazu-create-index RET to make
+;;
+;;   (2) Put this expression into your ~/.gnus.
+;;
+;;          (gnus-namazu-insinuate)
+;;
+;;   (3) Start Gnus and type M-x gnus-namazu-create-index RET to make
 ;;       index of articles.
-;;   (3) In group buffer or in summary buffer, type C-c C-n query RET.
+;;
+;;   (4) In group buffer or in summary buffer, type C-c C-n query RET.
 
 
 ;;; Install:
 
 ;; Before installing this module, you must install Namazu.
 ;;
-;; This file is a part of T-gnus but is not *YET* a part of Gnus.
-;; When you would like to use this module in Gnus (not T-gnus), put
-;; this file into the lisp/ directory in the Gnus source tree and run
-;; `make install'.  And then, put the following expression into your
+;; When you would like to byte-compile this module in Gnus, put this
+;; file into the lisp/ directory in the Gnus source tree and run `make
+;; install'.  And then, put the following expression into your
 ;; ~/.gnus.
 ;;
-;;      (require 'gnus-namazu)
 ;;      (gnus-namazu-insinuate)
 ;;
 ;; In order to make index of articles with Namazu before using this
@@ -139,6 +141,18 @@
   :type 'string
   :group 'gnus-namazu)
 
+(defcustom gnus-namazu-command-prefix nil
+  "*Prefix commands to execute Namazu.
+If you put your index on a remote server, set this option as follows:
+
+    (setq gnus-namazu-command-prefix
+          '(\"ssh\" \"-x\" \"remote-server\"))
+
+This makes gnus-namazu execute \"ssh -x remote-server namazu ...\"
+instead of executing \"namazu\" directly."
+  :type '(repeat string)
+  :group 'gnus-namazu)
+
 (defcustom gnus-namazu-additional-arguments nil
   "*Additional arguments of Namazu.
 The options `-q', `-a', and `-l' are always used, very few other
@@ -211,23 +225,24 @@ options make any sense in this context."
   "Face used for namazu query matching words."
   :group 'gnus-namazu)
 
-(defcustom gnus-namazu-command-prefix nil
-  "*Prefix command, 
-if set '(\"ssh\" \"-x\" \"host\"),
-then execute \"ssh -x host namazu ...\""
-  :type '(repeat string)
-  :group 'gnus-namazu)
+(defcustom gnus-namazu-remote-groups nil
+  "*Alist of regular expressions matching remote groups and their base paths.
+If you use an IMAP server and have a special index, set this option as
+follows:
 
-(defcustom gnus-namazu-imap-group-prefix nil
-  "*Prefix of imap group name.
-ex. nnimap+server:INBOX."
-  :type 'string
-  :group 'gnus-namazu)
+    (setq gnus-namazu-remote-groups
+          '((\"^nnimap\\\\+server:INBOX\\\\.\" . \"~/Maildir/.\")))
 
-(defcustom gnus-namazu-imap-maildir nil
-  "*Maildir directory name."
-  :type 'string
-  :group 'gnus-namazu)
+This means that the group \"nnimap+server:INBOX.group\" is placed in
+\"~/Maildir/.group\"."
+  :group 'gnus-namazu
+  :type '(repeat
+	  (cons (regexp :tag "Regexp of group name")
+		(string :tag "Base path of groups")))
+  :set (lambda (symbol value)
+	 (prog1 (set-default symbol value)
+	   (when (featurep 'gnus-namazu)
+	     (gnus-namazu/make-directory-table t)))))
 
 ;;; Internal Variable:
 (defconst gnus-namazu/group-name-regexp "\\`nnvirtual:namazu-search\\?")
@@ -279,7 +294,8 @@ ex. nnimap+server:INBOX."
 	   (push (cons gnus-namazu/group-name-regexp
 		       gnus-namazu-coding-system)
 		 gnus-group-name-charset-group-alist))))
-  (gnus-namazu-update-all-indices))
+  (unless gnus-namazu-command-prefix
+    (gnus-namazu-update-all-indices)))
 
 (defun gnus-namazu/server-directory (server)
   "Return the top directory of the server SERVER."
@@ -312,31 +328,17 @@ ex. nnimap+server:INBOX."
 	(default-process-coding-system
 	  (cons gnus-namazu-coding-system gnus-namazu-coding-system))
 	program-coding-system-alist
-	(file-name-coding-system gnus-namazu-coding-system))
-    (if gnus-namazu-command-prefix
-	(apply 'call-process
-	       (append
-		(list (car gnus-namazu-command-prefix))
-		'(nil t nil)
-		(cdr gnus-namazu-command-prefix)
-		`(,gnus-namazu-command
-		  "-q"			; don't be verbose
-		  "-a"			; show all matches
-		  "-l"			; use list format
-		  ,@gnus-namazu-additional-arguments
-		  ,query
-		  ,@gnus-namazu-index-directories)))
-      (apply 'call-process
-	     `(,gnus-namazu-command
-	       nil			; input from /dev/null
-	       t			; output
-	       nil			; don't redisplay
-	       "-q"			; don't be verbose
-	       "-a"			; show all matches
-	       "-l"			; use list format
-	       ,@gnus-namazu-additional-arguments
-	       ,query
-	       ,@gnus-namazu-index-directories)))))
+	(file-name-coding-system gnus-namazu-coding-system)
+	(commands
+	 (append gnus-namazu-command-prefix
+		 (list gnus-namazu-command
+		       "-q"		; don't be verbose
+		       "-a"		; show all matches
+		       "-l")		; use list format
+		 gnus-namazu-additional-arguments
+		 (list query)
+		 gnus-namazu-index-directories)))
+    (apply 'call-process (car commands) nil t nil (cdr commands))))
 
 (defvar gnus-namazu/directory-table nil)
 (defun gnus-namazu/make-directory-table (&optional force)
@@ -363,7 +365,19 @@ ex. nnimap+server:INBOX."
 		    (setq dir (nnmail-group-pathname
 			       (gnus-group-short-name group)
 			       (gnus-namazu/server-directory method))))
-	       (push (cons dir group) alist)))))
+	       (push (cons dir group) alist)))
+	   (dolist (pair gnus-namazu-remote-groups)
+	     (when (string-match (car pair) group)
+	       (setq dir (nnmail-group-pathname
+			  (substring group (match-end 0))
+			  "/"))
+	       (push (cons (concat (cdr pair)
+				   ;; nnmail-group-pathname() on some
+				   ;; systems returns pathnames which
+				   ;; have drive letters at their top.
+				   (substring dir (1+ (string-match "/" dir))))
+			   group)
+		     alist)))))
        gnus-newsrc-hashtb)
       (dolist (pair (nconc agent cache alist))
 	(set (intern (if gnus-namazu-case-sensitive-filesystem
@@ -392,22 +406,12 @@ ex. nnimap+server:INBOX."
 		       ;; as file names of articles.
 		       (skip-chars-backward "0-9")
 		       (point))))
-	(and (if (not gnus-namazu-imap-maildir)
-		 (setq group
-		       (symbol-value
-			(intern-soft (if gnus-namazu-case-sensitive-filesystem
-					 group
-				       (downcase group))
-				     (cdr gnus-namazu/directory-table))))
-	       ;; FIXME:
-	       ;; gnus-select-method is '(nnimap "server")
-	       ;; nnimap+server:INBOX.group = ~/Maildir/.group 
-	       ;; Namazu resault: ~/Maildir/.group/123
-	       (setq group (and (string-match 
-				 (concat gnus-namazu-imap-maildir
-					 "/\\.\\(.*\\)/") group)
-				(concat gnus-namazu-imap-group-prefix 
-					(match-string 1 group)))))
+	(and (setq group
+		   (symbol-value
+		    (intern-soft (if gnus-namazu-case-sensitive-filesystem
+				     group
+				   (downcase group))
+				 (cdr gnus-namazu/directory-table))))
 	     (or (not groups)
 		 (member group groups))
 	     (push (gnus-namazu/make-article
@@ -794,8 +798,7 @@ than the period that is set to `gnus-namazu-index-update-interval'"
 			 (mapcar 'list gnus-namazu-index-directories) nil t)
       (gnus-namazu/default-index-directory))
     t))
-  (when (and (not gnus-namazu-imap-maildir)
-	     (setq directory (gnus-namazu/update-p directory force)))
+  (when (setq directory (gnus-namazu/update-p directory force))
     (with-current-buffer (get-buffer-create (concat " *mknmz*" directory))
       (buffer-disable-undo)
       (erase-buffer)
@@ -830,11 +833,10 @@ than the period that is set to `gnus-namazu-index-update-interval'"
   (gnus-namazu-update-indices gnus-namazu-index-directories force))
 
 (defun gnus-namazu-update-indices (&optional directories force)
-  (when (and (not gnus-namazu-imap-maildir)
-	     (setq directories
-		   (delq nil (mapcar (lambda (d) 
-				       (gnus-namazu/update-p d force)) 
-				     directories))))
+  (when (setq directories
+	      (delq nil (mapcar (lambda (d)
+				  (gnus-namazu/update-p d force))
+				directories)))
     (setq gnus-namazu/update-directories (cons force (cdr directories)))
     (gnus-namazu-update-index (car directories) force)))
 

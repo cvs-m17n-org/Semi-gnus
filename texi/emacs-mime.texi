@@ -5,23 +5,14 @@
 @synindex fn cp
 @synindex vr cp
 @synindex pg cp
-@dircategory Emacs
-@direntry
-* Emacs MIME: (emacs-mime).   The MIME de/composition library.
-@end direntry
-@documentencoding ISO-8859-1
-@iftex
-@finalout
-@end iftex
-@setchapternewpage odd
 
-@ifnottex
-
+@copying
 This file documents the Emacs MIME interface functionality.
 
-Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
+Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003
           Free Software Foundation, Inc.
 
+@quotation
 Permission is granted to copy, distribute and/or modify this document
 under the terms of the GNU Free Documentation License, Version 1.1 or
 any later version published by the Free Software Foundation; with no
@@ -38,40 +29,26 @@ This document is part of a collection distributed under the GNU Free
 Documentation License.  If you want to distribute this document
 separately from the collection, you can do so by adding a copy of the
 license to the document, as described in section 6 of the license.
-@end ifnottex
+@end quotation
+@end copying
 
-@tex
+@dircategory Emacs
+@direntry
+* Emacs MIME: (emacs-mime).   Emacs MIME de/composition library.
+@end direntry
+@iftex
+@finalout
+@end iftex
+@setchapternewpage odd
 
 @titlepage
 @title Emacs MIME Manual
 
 @author by Lars Magne Ingebrigtsen
 @page
-
 @vskip 0pt plus 1filll
-Copyright @copyright{} 1998, 1999, 2000, 2001, 2002, 2003 Free Software
-Foundation, Inc.
-
-Permission is granted to copy, distribute and/or modify this document
-under the terms of the GNU Free Documentation License, Version 1.1 or
-any later version published by the Free Software Foundation; with the
-Invariant Sections being none, with the Front-Cover texts being ``A GNU
-Manual'', and with the Back-Cover Texts as in (a) below.  A copy of the
-license is included in the section entitled ``GNU Free Documentation
-License'' in the Emacs manual.
-
-(a) The FSF's Back-Cover Text is: ``You have freedom to copy and modify
-this GNU Manual, like GNU software.  Copies published by the Free
-Software Foundation raise funds for GNU development.''
-
-This document is part of a collection distributed under the GNU Free
-Documentation License.  If you want to distribute this document
-separately from the collection, you can do so by adding a copy of the
-license to the document, as described in section 6 of the license.
+@insertcopying
 @end titlepage
-@page
-
-@end tex
 
 @node Top
 @top Emacs MIME
@@ -351,7 +328,7 @@ you could say something like:
 
 @item mm-inline-large-images
 @vindex mm-inline-large-images
-When displaying inline images that are larger than the window, XEmacs
+When displaying inline images that are larger than the window, Emacs
 does not enable scrolling, which means that you cannot see the whole
 image.  To prevent this, the library tries to determine the image size
 before displaying it inline, and if it doesn't fit the window, the
@@ -837,12 +814,12 @@ by using the @code{encoding} @acronym{MML} tag (@pxref{MML Definition}).
 @vindex mm-coding-system-priorities
 Prioritize coding systems to use for outgoing messages.  The default
 is @code{nil}, which means to use the defaults in Emacs.  It is a list of
-coding system symbols (aliases of coding systems does not work, use
-@kbd{M-x describe-coding-system} to make sure you are not specifying
-an alias in this variable).  For example, if you have configured Emacs
+coding system symbols (aliases of coding systems are also allowed, use
+@kbd{M-x describe-coding-system} to make sure you are specifying correct
+coding system names).  For example, if you have configured Emacs
 to prefer UTF-8, but wish that outgoing messages should be sent in
 ISO-8859-1 if possible, you can set this variable to
-@code{(iso-latin-1)}.  You can override this setting on a per-message
+@code{(iso-8859-1)}.  You can override this setting on a per-message
 basis by using the @code{charset} @acronym{MML} tag (@pxref{MML Definition}).
 
 @item mm-content-transfer-encoding-defaults
@@ -852,8 +829,18 @@ used except, e.g., when other requirements force a safer encoding
 (digitally signed messages require 7bit encoding).  Besides the normal
 @acronym{MIME} encodings, @code{qp-or-base64} may be used to indicate that for
 each case the most efficient of quoted-printable and base64 should be
-used.  You can override this setting on a per-message basis by using
-the @code{encoding} @acronym{MML} tag (@pxref{MML Definition}).
+used.
+
+@code{qp-or-base64} has another effect.  It will fold long lines so that
+MIME parts may not be broken by MTA.  So do @code{quoted-printable} and
+@code{base64}.
+
+Note that it affects body encoding only when a part is a raw forwarded
+message (which will be made by @code{gnus-summary-mail-forward} with the
+arg 2 for example) or is neither the @samp{text/*} type nor the
+@samp{message/*} type.  Even though in those cases, you can override
+this setting on a per-message basis by using the @code{encoding}
+@acronym{MML} tag (@pxref{MML Definition}).
 
 @item mm-use-ultra-safe-encoding
 @vindex mm-use-ultra-safe-encoding
@@ -1326,11 +1313,6 @@ library does.
 The following variables are tweakable:
 
 @table @code
-@item rfc2047-default-charset
-@vindex rfc2047-default-charset
-Characters in this charset should not be decoded by this library.
-This defaults to @code{iso-8859-1}.
-
 @item rfc2047-header-encoding-alist
 @vindex rfc2047-header-encoding-alist
 This is an alist of header / encoding-type pairs.  Its main purpose is
@@ -1338,9 +1320,10 @@ to prevent encoding of certain headers.
 
 The keys can either be header regexps, or @code{t}.
 
-The values can be either @code{nil}, in which case the header(s) in
-question won't be encoded, or @code{mime}, which means that they will be
-encoded.
+The values can be @code{nil}, in which case the header(s) in question
+won't be encoded, @code{mime}, which means that they will be encoded, or
+@code{address-mime}, which means the header(s) will be encoded carefully
+assuming they contain addresses.
 
 @item rfc2047-charset-encoding-alist
 @vindex rfc2047-charset-encoding-alist
@@ -1348,21 +1331,19 @@ RFC2047 specifies two forms of encoding---@code{Q} (a
 Quoted-Printable-like encoding) and @code{B} (base64).  This alist
 specifies which charset should use which encoding.
 
-@item rfc2047-encoding-function-alist
-@vindex rfc2047-encoding-function-alist
+@item rfc2047-encode-function-alist
+@vindex rfc2047-encode-function-alist
 This is an alist of encoding / function pairs.  The encodings are
 @code{Q}, @code{B} and @code{nil}.
-
-@item rfc2047-q-encoding-alist
-@vindex rfc2047-q-encoding-alist
-The @code{Q} encoding isn't quite the same for all headers.  Some
-headers allow a narrower range of characters, and that is what this
-variable is for.  It's an alist of header regexps / allowable character
-ranges.
 
 @item rfc2047-encoded-word-regexp
 @vindex rfc2047-encoded-word-regexp
 When decoding words, this library looks for matches to this regexp.
+
+@item rfc2047-encode-encoded-words
+@vindex rfc2047-encode-encoded-words
+The boolean variable specifies whether encoded words
+(e.g. @samp{=?hello?=}) should be encoded again.
 
 @end table
 
@@ -1393,6 +1374,24 @@ Decode the encoded words in the region.
 @item rfc2047-decode-string
 @findex rfc2047-decode-string
 Decode a string and return the results.
+
+@item rfc2047-encode-parameter
+@findex rfc2047-encode-parameter
+Encode a parameter in the RFC2047-like style.  This is a replacement for
+the @code{rfc2231-encode-string} function.  @xref{rfc2231}.
+
+When attaching files as @acronym{MIME} parts, we should use the RFC2231
+encoding to specify the file names containing non-@acronym{ASCII}
+characters.  However, many mail softwares don't support it in practice
+and recipients won't be able to extract files with correct names.
+Instead, the RFC2047-like encoding is acceptable generally.  This
+function provides the very RFC2047-like encoding, resigning to such a
+regrettable trend.  To use it, put the following line in your
+@file{~/.gnus.el} file:
+
+@lisp
+(defalias 'mail-header-encode-parameter 'rfc2047-encode-parameter)
+@end lisp
 
 @end table
 

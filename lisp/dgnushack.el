@@ -1,6 +1,6 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;; 2004, 2005 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Katsumi Yamaoka <yamaoka@jpl.org>
@@ -158,21 +158,22 @@ fixed in Emacs after 21.3."
 	  (setq ad-return-value (cons fn (nreverse backwards))))
       ad-do-it)))
 
-;; Add `early-package-load-path' to `load-path' for XEmacs.  Those paths
+;; Add `configure-package-path' to `load-path' for XEmacs.  Those paths
 ;; won't appear in `load-path' when XEmacs starts with the `-no-autoloads'
-;; option because of a bug. :<
+;; option or the `-vanilla' option because of a bug. :<
 (when (and (featurep 'xemacs)
-	   (string-match "--package-path=\\([^ ]+\\)"
-			 system-configuration-options))
+	   (boundp 'configure-package-path)
+	   (listp configure-package-path))
   (let ((paths
 	 (apply 'nconc
 		(mapcar
 		 (lambda (path)
-		   (when (file-directory-p
-			  (setq path (expand-file-name "lisp" path)))
+		   (when (and (stringp path)
+			      (not (string-equal path ""))
+			      (file-directory-p
+			       (setq path (expand-file-name "lisp" path))))
 		     (directory-files path t)))
-		 (split-string (match-string 1 system-configuration-options)
-			       "::"))))
+		 configure-package-path)))
 	path adds)
     (while paths
       (setq path (car paths)
@@ -186,50 +187,33 @@ fixed in Emacs after 21.3."
     (setq load-path (nconc (nreverse adds) load-path))))
 
 (if (file-exists-p (expand-file-name "dgnuspath.el" srcdir))
-    (load (expand-file-name "dgnuspath.el" srcdir) nil nil t)
-  (message "  ** There's no dgnuspath.el file"))
+    (load (expand-file-name "dgnuspath.el" srcdir) nil nil t))
 
 (condition-case err
     (load "~/.lpath.el" t nil t)
   (error (message "Error in \"~/.lpath.el\" file: %s" err)))
 
+(when (featurep 'xemacs)
+  (condition-case nil
+      (require 'timer-funcs)
+    (error "
+You should upgrade your XEmacs packages, especially xemacs-base.\n"))
+
+  ;; The reason that to load `advice' is necessary is:
+  ;; 1. `path-util' loads poe.elc.
+  ;; 2. poe.elc requires the `ad-add-advice' function which is expanded
+  ;;    from `defadvice'.
+  ;; 3. XEmacs is running with the -no-autoloads option.
+  (require 'advice))
+
 ;; Don't load path-util until `char-after' and `char-before' have been
 ;; optimized because it requires `poe' and then modify the functions.
-
-;; If the APEL modules are installed under the non-standard directory,
-;; for example "/var/home/john/lisp/apel-VERSION/", you should add that
-;; name using the configure option "--with-addpath=".
-;; And also the directory where the EMU modules are installed, for
-;; example "/usr/local/share/mule/19.34/site-lisp/", it should be
-;; included in the standard `load-path' or added by the configure
-;; option "--with-addpath=".
-(let ((path (or (locate-library "path-util")
-		(locate-library "apel/path-util")));; backward compat.
-      parent lpath)
-  (if path
-      (progn
-	(when (string-match "/$" (setq path (file-name-directory path)))
-	  (setq path (substring path 0 (match-beginning 0))))
-	;; path == "/var/home/john/lisp/apel-VERSION"
-	(when (string-match "/$" (setq parent (file-name-directory path)))
-	  (setq parent (substring path 0 (match-beginning 0))))
-	;; parent == "/var/home/john/lisp"
-	(if (setq lpath (or (member path load-path)
-			    (member (file-name-as-directory path) load-path)))
-	    (unless (or (member parent load-path)
-			(member (file-name-as-directory parent) load-path))
-	      (push parent (cdr lpath)))
-	  (push path load-path)
-	  (unless (or (member parent load-path)
-		      (member (file-name-as-directory parent) load-path))
-	    (push parent (cdr load-path))))
-	(require 'advice)
-	(require 'path-util))
-    (error "
-APEL modules are not found in %s.
-Try to re-configure with --with-addpath=APEL_PATH and run make again.
-"
-	   load-path)))
+(condition-case nil
+    (require 'path-util)
+  (error "\nIn %s,
+APEL was not found or an error occurred.  You will need to run the
+configure script again adding the --with-addpath=APEL_PATH option.\n"
+	 load-path))
 
 (unless (locate-library "mel")
   (add-path "flim"))
@@ -239,10 +223,9 @@ Try to re-configure with --with-addpath=APEL_PATH and run make again.
 			  (file-name-directory (get-latest-path "^apel$" t)))
 	load-path)
   (unless (module-installed-p 'mel)
-    (error "
-FLIM modules does not found in %s.
-Try to re-configure with --with-addpath=FLIM_PATH and run make again.
-"
+    (error "In %s,
+FLIM was not found.  You will need to run the configure script again
+adding the --with-addpath=FLIM_PATH option.\n"
 	   load-path)))
 (add-path "semi")
 
@@ -310,6 +293,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (autoload 'c-mode "cc-mode" nil t)
     (autoload 'customize-apropos "cus-edit" nil t)
     (autoload 'customize-save-variable "cus-edit" nil t)
+    (autoload 'customize-set-variable "cus-edit" nil t)
     (autoload 'customize-variable "cus-edit" nil t)
     (autoload 'delete-annotation "annotations")
     (autoload 'dolist "cl-macs" nil nil 'macro)
@@ -317,6 +301,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (autoload 'executable-find "executable")
     (autoload 'font-lock-fontify-buffer "font-lock" nil t)
     (autoload 'info "info" nil t)
+    (autoload 'mail-fetch-field "mail-utils")
     (autoload 'make-annotation "annotations")
     (autoload 'make-display-table "disp-table")
     (autoload 'pp "pp")
@@ -326,7 +311,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (autoload 'read-passwd "passwd")
     (autoload 'regexp-opt "regexp-opt")
     (autoload 'reporter-submit-bug-report "reporter")
-    (if (emacs-version>= 21 5)
+    (if (and (emacs-version>= 21 5)
+	     (not (featurep 'sxemacs)))
 	(autoload 'setenv "process" nil t)
       (autoload 'setenv "env" nil t))
     (autoload 'sgml-mode "psgml" nil t)
@@ -348,7 +334,6 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
     (defalias 'overlays-in 'ignore)
     (defalias 'replace-dehighlight 'ignore)
     (defalias 'replace-highlight 'ignore)
-    (defalias 'run-with-idle-timer 'ignore)
     (defalias 'w3-coding-system-for-mime-charset 'ignore)))
 
 ;; T-gnus stuff.
@@ -422,8 +407,7 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 			""))
 	     '("gnus-bbdb.el")))
 	  (unless (featurep 'xemacs)
-	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"
-	      "run-at-time.el"))
+	    '("gnus-xmas.el" "messagexmas.el" "nnheaderxm.el"))
 	  (when (and (fboundp 'base64-decode-string)
 		     (subrp (symbol-function 'base64-decode-string)))
 	    '("base64.el"))
@@ -447,8 +431,8 @@ Try to re-configure with --with-addpath=FLIM_PATH and run make again.
 (defconst dgnushack-dont-compile-files
   '("gnus-load.el"
     "mm-bodies.el" "mm-decode.el" "mm-encode.el" "mm-extern.el"
-    "mm-partial.el" "mm-url.el" "mm-uu.el" "mm-view.el" "mml-sec.el"
-    "mml-smime.el" "mml.el" "mml1991.el" "mml2015.el")
+    "mm-partial.el" "mm-uu.el" "mm-view.el" "mml-sec.el" "mml-smime.el"
+    "mml.el" "mml1991.el" "mml2015.el")
   "Files which should not be byte-compiled.")
 
 (defun dgnushack-compile-verbosely ()
@@ -689,6 +673,22 @@ dgnushack-compile."
 				     t)
 		    'string-lessp))
 	(while (setq file (pop files))
-	  (insert "info/" file "\n"))))))
+	  (insert "info/" file "\n"))
+	(insert "etc/gnus-tut.txt\n")
+	(setq files
+	      (sort (directory-files "../etc/images/gnus/" nil
+				     "\\.\\(pbm\\|xbm\\|xpm\\)\\'"
+				     t)
+		    'string-lessp))
+	(while (setq file (pop files))
+	  (insert "etc/images/gnus/" file "\n"))
+	(insert "etc/images/gnus/x-splash\n")
+	(setq files
+	      (sort (directory-files "../etc/images/smilies/" nil
+				     "\\.\\(pbm\\|xpm\\)\\'"
+				     t)
+		    'string-lessp))
+	(while (setq file (pop files))
+	  (insert "etc/images/smilies/" file "\n"))))))
 
 ;;; dgnushack.el ends here

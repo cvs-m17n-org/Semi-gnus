@@ -1,6 +1,6 @@
 ;;; gnus-uu.el --- extract (uu)encoded files in Gnus
 ;; Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 2000,
-;;        2001, 2002, 2003 Free Software Foundation, Inc.
+;;        2001, 2002, 2003, 2004 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Created: 2 Oct 1993
@@ -479,7 +479,16 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
     (if (and n (not (numberp n)))
 	(setq message-forward-as-mime (not message-forward-as-mime)
 	      n nil))
-    (let ((gnus-article-reply (gnus-summary-work-articles n)))
+    (let ((gnus-article-reply (gnus-summary-work-articles n))
+	  gnus-newsgroup-processable)
+      (when (and (not n)
+		 (= (length gnus-article-reply) 1))
+	;; The case where neither a number of articles nor a region is
+	;; specified.
+	(gnus-summary-top-thread)
+	(setq gnus-article-reply (gnus-uu-get-list-of-articles nil)))
+      ;; Specify articles to be forwarded.
+      (setq gnus-newsgroup-processable (copy-sequence gnus-article-reply))
       (gnus-setup-message 'forward
 	(setq gnus-uu-digest-from-subject nil)
 	(setq gnus-uu-digest-buffer
@@ -851,7 +860,7 @@ When called interactively, prompt for REGEXP."
 	      (put-text-property (point-min) (point-max) 'invisible nil)
 	      (put-text-property (point-min) (point-max) 'intangible nil))
 	    (goto-char (point-min))
-	    (re-search-forward "\n\n")
+	    (search-forward "\n\n")
 	    (unless gnus-uu-digest-buffer
 	      ;; Quote all 30-dash lines.
 	      (save-excursion
@@ -1730,7 +1739,7 @@ Gnus might fail to display all of it.")
 
       (setq gnus-uu-work-dir
 	    (mm-make-temp-file (concat gnus-uu-tmp-dir "gnus") 'dir))
-      (set-file-modes gnus-uu-work-dir 448)
+      (gnus-set-file-modes gnus-uu-work-dir 448)
       (setq gnus-uu-work-dir (file-name-as-directory gnus-uu-work-dir))
       (push (cons gnus-newsgroup-name gnus-uu-work-dir)
 	    gnus-uu-tmp-alist))))
@@ -1886,7 +1895,7 @@ The user will be asked for a file name."
   (when (gnus-uu-post-encode-file "uuencode" path file-name)
     (goto-char (point-min))
     (forward-line 1)
-    (while (re-search-forward " " nil t)
+    (while (search-forward " " nil t)
       (replace-match "`"))
     t))
 

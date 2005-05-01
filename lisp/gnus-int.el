@@ -48,6 +48,7 @@ If the server is covered by Gnus agent, the possible values are
 `denied', set the server denied; `offline', set the server offline;
 nil, ask user.  If the server is not covered by Gnus agent, set the
 server denied."
+  :version "22.1"
   :group 'gnus-start
   :type '(choice (const :tag "Ask" nil)
 		 (const :tag "Deny server" denied)
@@ -562,15 +563,15 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
     not-deleted))
 
 (defun gnus-request-move-article (article group server accept-function
-					  &optional last)
+					  &optional last move-is-internal)
   (let* ((gnus-command-method (gnus-find-method-for-group group))
 	 (result (funcall (gnus-get-function gnus-command-method
 					     'request-move-article)
 			  article (gnus-group-real-name group)
-			  (nth 1 gnus-command-method) accept-function last)))
+			  (nth 1 gnus-command-method) accept-function last move-is-internal)))
     (when (and result gnus-agent
 	       (gnus-agent-method-p gnus-command-method))
-      (gnus-agent-expire (list article) group 'force))
+      (gnus-agent-unfetch-articles group (list article)))
     result))
 
 (defun gnus-request-accept-article (group &optional gnus-command-method last
@@ -587,8 +588,8 @@ If GROUP is nil, all groups on GNUS-COMMAND-METHOD are scanned."
     (insert "\n"))
   (let ((gnus-command-method (or gnus-command-method
 				 (gnus-find-method-for-group group)))
-	(result 
-	 (funcall 
+	(result
+	 (funcall
 	  (gnus-get-function gnus-command-method 'request-accept-article)
 	  (if (stringp group) (gnus-group-real-name group) group)
 	  (cadr gnus-command-method)

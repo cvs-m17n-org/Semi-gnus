@@ -1,5 +1,6 @@
 ;;; nnslashdot.el --- interfacing with Slashdot
-;; Copyright (C) 1999, 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004
+;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -253,8 +254,7 @@
 	    (when (numberp article)
 	      (if (= article 1)
 		  (progn
-		    (re-search-forward
-		     "Posted by")
+		    (search-forward "Posted by")
 		    (search-forward "<BR>")
 		    (setq contents
 			  (buffer-substring
@@ -468,11 +468,9 @@
 	(insert-file-contents file)
 	(goto-char (point-min))
 	(setq nnslashdot-groups (read (current-buffer))))
-      (if (and nnslashdot-groups (< (length (car nnslashdot-groups)) 5))
-	  (let ((groups nnslashdot-groups))
-	    (while groups
-	      (nnslashdot-make-tuple (car groups) 5)
-	      (setq groups (cdr groups))))))))
+      (when (and nnslashdot-groups (< (length (car nnslashdot-groups)) 5))
+	(dolist (group nnslashdot-groups)
+	  (nnslashdot-make-tuple group 5))))))
 
 (defun nnslashdot-write-groups ()
   (with-temp-file (expand-file-name "groups" nnslashdot-directory)

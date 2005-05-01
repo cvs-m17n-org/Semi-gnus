@@ -230,7 +230,7 @@ This must be bound to a button-down mouse event."
   (let* ((echo-keystrokes 0)
 	 (start-posn (event-start start-event))
 	 (start-point (posn-point start-posn))
-	 (start-line (1+ (count-lines 1 start-point)))
+         (start-line (1+ (count-lines (point-min) start-point)))
 	 (start-window (posn-window start-posn))
 	 (bounds (gnus-window-edges start-window))
 	 (top (nth 1 bounds))
@@ -277,6 +277,7 @@ This must be bound to a button-down mouse event."
 	     (let* ((this-line (1+ (count-lines 1 end-point)))
 		    (min-line (min this-line start-line))
 		    (max-line (max this-line start-line)))
+	       ;; Why not use `forward-line'?  --Stef
 	       (while (< min-line max-line)
 		 (goto-line min-line)
 		 (gnus-pick-article)
@@ -787,7 +788,7 @@ Two predefined functions are available:
 	  (setq beg (point))
 	  (forward-char -1)
 	  ;; Draw "-" lines leftwards.
-	  (while (and (> (point) 1)
+	  (while (and (not (bobp))
 		      (eq (char-after (1- (point))) ? ))
 	    (delete-char -1)
 	    (insert (car gnus-tree-parent-child-edges))
@@ -858,7 +859,8 @@ Two predefined functions are available:
 		(gnus-extent-detached-p gnus-selected-tree-overlay))
 	;; Create a new overlay.
 	(gnus-overlay-put
-	 (setq gnus-selected-tree-overlay (gnus-make-overlay 1 2))
+	 (setq gnus-selected-tree-overlay
+	       (gnus-make-overlay (point-min) (1+ (point-min))))
 	 'face gnus-selected-tree-face))
       ;; Move the overlay to the article.
       (gnus-move-overlay

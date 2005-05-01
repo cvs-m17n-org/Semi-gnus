@@ -60,6 +60,10 @@
 (eval-when-compile (require 'cl))
 
 (eval-and-compile
+  (autoload 'news-setup "rnewspost")
+  (autoload 'news-reply-mode "rnewspost")
+  (autoload 'cancel-timer "timer")
+  (autoload 'telnet "telnet" nil t)
   (autoload 'telnet-send-input "telnet" nil t)
   (autoload 'gnus-declare-backend "gnus-start"))
 
@@ -242,7 +246,7 @@ expiry mechanism."
     (nndb-request-expire-articles-local articles group server force)))
 
 (deffoo nndb-request-move-article
-    (article group server accept-form &optional last)
+    (article group server accept-form &optional last move-is-internal)
   "Move ARTICLE (a number) from GROUP on SERVER.
 Evals ACCEPT-FORM in current buffer, where the article is.
 Optional LAST is ignored."

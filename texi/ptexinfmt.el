@@ -36,6 +36,22 @@
 
 ;; Modified by Yamaoka not to use APEL functions.
 
+;; Unimplemented command:
+;;  @abbr
+;;  @float, @caption, @shortcaption, @listoffloats
+;;  @deftypecv[x]
+;;  @headitem
+;;  @comma{}
+;;  @quotation (optional arguments)
+;;  @acronym (optional argument)
+;;  @dofirstparagraphindent
+;;  @indent
+;;  @verbatiminclude
+;;  @\
+;;  @definfoenclose
+;;  @deftypeivar
+;;  @deftypeop
+
 ;;; Code:
 
 (require 'backquote)
@@ -148,10 +164,10 @@ DOCSTRING will be printed if ASSERTION is nil and
 	  (insert (format " {%s}\n" str))
 	  (goto-char (point-min))
 	  (if (= (car (texinfo-multitable-widths)) (length str))
-	      nil
-	    t)))
+	      t
+	    nil)))
     ;; function definition is void
-    t))
+    nil))
 
 (ptexinfmt-broken-facility texinfo-multitable-item
   "`texinfo-multitable-item' unsupport wide-char."
@@ -194,6 +210,9 @@ DOCSTRING will be printed if ASSERTION is nil and
 ;; misc
 (put 'page 'texinfo-format 'texinfo-discard-line)
 (put 'hyphenation 'texinfo-format 'texinfo-discard-command-and-arg)
+
+;; @slanted{} (makeinfo 4.8 or later)
+(put 'slanted 'texinfo-format 'texinfo-format-noop)
 
 ;; @tie{} (makeinfo 4.3 or later)
 (put 'tie 'texinfo-format 'texinfo-format-tie)

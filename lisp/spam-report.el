@@ -43,7 +43,7 @@ If you are using spam.el, consider setting gnus-spam-process-newsgroups
 or the gnus-group-spam-exit-processor-report-gmane group/topic parameter
 instead."
   :type '(radio (const nil)
-		(regexp :format "%t: %v\n" :size 0 :value "^nntp\+.*:gmane\."))
+		(regexp :value "^nntp\+.*:gmane\."))
   :group 'spam-report)
 
 (defcustom spam-report-gmane-spam-header
@@ -79,24 +79,59 @@ The function must accept the arguments `host' and `report'."
   :type 'file
   :group 'spam-report)
 
+(defcustom spam-report-resend-to nil
+  "Email address that spam articles are resent to when reporting.
+If not set, the user will be prompted to enter a value which will be
+saved for future use."
+  :type 'string
+  :group 'spam-report)
+
 (defvar spam-report-url-ping-temp-agent-function nil
   "Internal variable for `spam-report-agentize' and `spam-report-deagentize'.
 This variable will store the value of `spam-report-url-ping-function' from
 before `spam-report-agentize' was run, so that `spam-report-deagentize' can
 undo that change.")
 
+(defun spam-report-resend (articles &optional ham)
+  "Report an article as spam by resending via email.
+Reports is as ham when HAM is set."
+  (dolist (article articles)
+    (gnus-message 6 
+		  "Reporting %s article %d to <%s>..."
+		  (if ham "ham" "spam")
+		  article spam-report-resend-to)
+    (unless spam-report-resend-to
+      (customize-set-variable 
+       spam-report-resend-to
+       (read-from-minibuffer "email address to resend SPAM/HAM to? ")))
+    ;; This is ganked from the `gnus-summary-resend-message' function.
+    ;; It involves rendering the SPAM, which is undesirable, but there does
+    ;; not seem to be a nicer way to achieve this.
+    ;; select this particular article
+    (gnus-summary-select-article nil nil nil article)
+    ;; resend it to the destination address
+    (save-excursion
+      (set-buffer gnus-original-article-buffer)
+      (message-resend spam-report-resend-to))))
+
+(defun spam-report-resend-ham (articles)
+  "Report an article as ham by resending via email."
+  (spam-report-resend articles t))
+
 (defun spam-report-gmane (&rest articles)
-  "Report an article as spam through Gmane"
+  "Report an article as spam through Gmane."
+  (interactive (gnus-summary-work-articles current-prefix-arg))
   (dolist (article articles)
     (when (and gnus-newsgroup-name
 	       (or (null spam-report-gmane-regex)
 		   (string-match spam-report-gmane-regex gnus-newsgroup-name)))
       (gnus-message 6 "Reporting spam article %d to spam.gmane.org..." article)
       (if spam-report-gmane-use-article-number
-	  (spam-report-url-ping "spam.gmane.org"
-				(format "/%s:%d"
-					(gnus-group-real-name gnus-newsgroup-name)
-					article))
+	  (spam-report-url-ping 
+	   "spam.gmane.org"
+	   (format "/%s:%d"
+		   (gnus-group-real-name gnus-newsgroup-name)
+		   article))
 	(with-current-buffer nntp-server-buffer
 	  (gnus-request-head article gnus-newsgroup-name)
 	  (goto-char (point-min))
@@ -108,6 +143,7 @@ undo that change.")
 		(spam-report-url-ping host report))
 	    (gnus-message 3 "Could not find X-Report-Spam in article %d..."
 			  article)))))))
+
 
 (defun spam-report-url-ping (host report)
   "Ping a host through HTTP, addressing a specific GET resource using

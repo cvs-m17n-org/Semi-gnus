@@ -1,5 +1,5 @@
 ;;; gnus-srvr.el --- virtual server support for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -71,6 +71,7 @@ See Info node `(gnus)Formatting Variables'."
 (defcustom gnus-server-browse-in-group-buffer nil
   "Whether server browsing should take place in the group buffer.
 If nil, a faster, but more primitive, buffer is used instead."
+  :version "22.1"
   :group 'gnus-server-visual
   :type 'boolean)
 
@@ -204,26 +205,31 @@ If nil, a faster, but more primitive, buffer is used instead."
 
 (defcustom gnus-server-agent-face 'gnus-server-agent-face
   "Face name to use on AGENTIZED servers."
+  :version "22.1"
   :group 'gnus-server-visual
   :type 'face)
 
 (defcustom gnus-server-opened-face 'gnus-server-opened-face
   "Face name to use on OPENED servers."
+  :version "22.1"
   :group 'gnus-server-visual
   :type 'face)
 
 (defcustom gnus-server-closed-face 'gnus-server-closed-face
   "Face name to use on CLOSED servers."
+  :version "22.1"
   :group 'gnus-server-visual
   :type 'face)
 
 (defcustom gnus-server-denied-face 'gnus-server-denied-face
   "Face name to use on DENIED servers."
+  :version "22.1"
   :group 'gnus-server-visual
   :type 'face)
 
 (defcustom gnus-server-offline-face 'gnus-server-offline-face
   "Face name to use on OFFLINE servers."
+  :version "22.1"
   :group 'gnus-server-visual
   :type 'face)
 
@@ -313,7 +319,6 @@ The following commands are available:
   (gnus-set-format 'server t)
   (let ((alist gnus-server-alist)
 	(buffer-read-only nil)
-	(opened gnus-opened-servers)
 	done server op-ser)
     (erase-buffer)
     (setq gnus-inserted-opened-servers nil)
@@ -328,16 +333,15 @@ The following commands are available:
 	(pop alist)))
     ;; Then we insert the list of servers that have been opened in
     ;; this session.
-    (while opened
-      (when (and (not (member (caar opened) done))
+    (dolist (open gnus-opened-servers)
+      (when (and (not (member (car open) done))
 		 ;; Just ignore ephemeral servers.
-		 (not (member (caar opened) gnus-ephemeral-servers)))
-	(push (caar opened) done)
+		 (not (member (car open) gnus-ephemeral-servers)))
+	(push (car open) done)
 	(gnus-server-insert-server-line
-	 (setq op-ser (format "%s:%s" (caaar opened) (nth 1 (caar opened))))
-	 (caar opened))
-	(push (list op-ser (caar opened)) gnus-inserted-opened-servers))
-      (setq opened (cdr opened))))
+	 (setq op-ser (format "%s:%s" (caar open) (nth 1 (car open))))
+	 (car open))
+	(push (list op-ser (car open)) gnus-inserted-opened-servers))))
   (goto-char (point-min))
   (gnus-server-position-point))
 
@@ -391,7 +395,14 @@ The following commands are available:
       (if cached
 	  (setq gnus-server-method-cache
 		(delq cached gnus-server-method-cache)))
-      (if entry (setcdr entry info)
+      (if entry
+	  (progn
+	    ;; Remove the server from `gnus-opened-servers' since
+	    ;; it has never been opened with the new `info' yet.
+	    (gnus-opened-servers-remove (cdr entry))
+	    ;; Don't make a new Lisp object.
+	    (setcar (cdr entry) (car info))
+	    (setcdr (cdr entry) (cdr info)))
 	(setq gnus-server-alist
 	      (nconc gnus-server-alist (list (cons server info))))))))
 
@@ -492,9 +503,8 @@ The following commands are available:
 (defun gnus-server-open-all-servers ()
   "Open all servers."
   (interactive)
-  (let ((servers gnus-inserted-opened-servers))
-    (while servers
-      (gnus-server-open-server (car (pop servers))))))
+  (dolist (server gnus-inserted-opened-servers)
+    (gnus-server-open-server (car server))))
 
 (defun gnus-server-close-server (server)
   "Close SERVER."
@@ -853,23 +863,26 @@ buffer.
   (setq buffer-read-only t)
   (gnus-run-hooks 'gnus-browse-mode-hook))
 
-(defun gnus-browse-read-group (&optional no-article)
-  "Enter the group at the current line."
-  (interactive)
+(defun gnus-browse-read-group (&optional no-article number)
+  "Enter the group at the current line.
+If NUMBER, fetch this number of articles."
+  (interactive "P")
   (let ((group (gnus-browse-group-name)))
     (if (or (not (gnus-get-info group))
 	    (gnus-ephemeral-group-p group))
 	(unless (gnus-group-read-ephemeral-group
 		 group gnus-browse-current-method nil
-		 (cons (current-buffer) 'browse))
+		 (cons (current-buffer) 'browse)
+		 nil nil nil number)
 	  (error "Couldn't enter %s" group))
       (unless (gnus-group-read-group nil no-article group)
 	(error "Couldn't enter %s" group)))))
 
-(defun gnus-browse-select-group ()
-  "Select the current group."
-  (interactive)
-  (gnus-browse-read-group 'no))
+(defun gnus-browse-select-group (&optional number)
+  "Select the current group.
+If NUMBER, fetch this number of articles."
+  (interactive "P")
+  (gnus-browse-read-group 'no number))
 
 (defun gnus-browse-next-group (n)
   "Go to the next group."

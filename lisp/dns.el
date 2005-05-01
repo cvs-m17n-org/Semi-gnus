@@ -1,5 +1,5 @@
 ;;; dns.el --- Domain Name Service lookups
-;; Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+;; Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: network
@@ -56,6 +56,7 @@ If nil, /etc/resolv.conf will be consulted.")
     (MX 15)
     (TXT 16)
     (AAAA 28) ; RFC3596
+    (SRV 33) ; RFC2782
     (AXFR 252)
     (MAILB 253)
     (MAILA 254)
@@ -284,6 +285,11 @@ If TCP-P, the first two bytes of the package with be the length field."
 		  (list 'retry (dns-read-int32))
 		  (list 'expire (dns-read-int32))
 		  (list 'minimum (dns-read-int32))))
+	   ((eq type 'SRV)
+	    (list (list 'priority (dns-read-bytes 2))
+		  (list 'weight (dns-read-bytes 2))
+		  (list 'port (dns-read-bytes 2))
+		  (list 'target (dns-read-name buffer))))
 	   ((eq type 'MX)
 	    (cons (dns-read-bytes 2) (dns-read-name buffer)))
 	   ((or (eq type 'CNAME) (eq type 'NS) (eq type 'PTR))
@@ -299,6 +305,25 @@ If TCP-P, the first two bytes of the package with be the length field."
       (while (re-search-forward "^nameserver[\t ]+\\([^ \t\n]+\\)" nil t)
 	(push (match-string 1) dns-servers))
       (setq dns-servers (nreverse dns-servers)))))
+
+(defun dns-read-txt (string)
+  (if (> (length string) 1)
+      (substring string 1)
+    string))
+
+(defun dns-get-txt-answer (answers)
+  (let ((result "")
+	(do-next nil))
+    (dolist (answer answers)
+      (dolist (elem answer)
+	(when (consp elem)
+	  (cond
+	   ((eq (car elem) 'type)
+	    (setq do-next (eq (cadr elem) 'TXT)))
+	   ((eq (car elem) 'data)
+	    (when do-next
+	      (setq result (concat result (dns-read-txt (cadr elem))))))))))
+    result))
 
 ;;; Interface functions.
 (defmacro dns-make-network-process (server)
@@ -325,12 +350,19 @@ If TCP-P, the first two bytes of the package with be the length field."
 	 ;; connection to the DNS server.
 	 (open-network-stream "dns" (current-buffer) server "domain")))))
 
-(defun query-dns (name &optional type fullp)
+(defun query-dns (name &optional type fullp reversep)
   "Query a DNS server for NAME of TYPE.
-If FULLP, return the entire record returned."
+If FULLP, return the entire record returned.
+If REVERSEP, look up an IP address."
   (setq type (or type 'A))
   (unless dns-servers
     (dns-parse-resolv-conf))
+
+  (when reversep
+    (setq name (concat
+		(mapconcat 'identity (nreverse (split-string name "\\.")) ".")
+		".in-addr.arpa")
+	  type 'PTR))
 
   (if (not dns-servers)
       (message "No DNS server configuration found")
@@ -356,6 +388,7 @@ If FULLP, return the entire record returned."
 		      tcp-p))
 	  (while (and (zerop (buffer-size))
 		      (> times 0))
+	    (sit-for (/ step 1000.0))
 	    (accept-process-output process 0 step)
 	    (decf times step))
 	  (ignore-errors
@@ -369,7 +402,9 @@ If FULLP, return the entire record returned."
 		  result
 		(let ((answer (car (dns-get 'answers result))))
 		  (when (eq type (dns-get 'type answer))
-		    (dns-get 'data answer)))))))))))
+		    (if (eq type 'TXT)
+			(dns-get-txt-answer (dns-get 'answers result))
+		      (dns-get 'data answer))))))))))))
 
 (provide 'dns)
 

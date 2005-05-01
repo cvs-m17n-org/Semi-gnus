@@ -28,10 +28,9 @@
 
 ;;; Code:
 
-(require 'run-at-time)
+(require 'timer-funcs)
 
 (defalias 'nnheader-cancel-timer 'delete-itimer)
-(defalias 'nnheader-cancel-function-timers 'ignore)
 (defalias 'nnheader-string-as-multibyte 'identity)
 
 (defun nnheader-xmas-Y-or-n-p (prompt)

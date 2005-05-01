@@ -1,3 +1,80 @@
+2005-05-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-vers.el: T-gnus 6.17.3 revision 00.
+
+2005-04-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (article-update-date-lapsed): Check for
+	mime-preview-original-major-mode as well.
+	(gnus-article-prepare-mime-display): Use
+	gnus-article-save-original-date.
+	(gnus-article-prepare-display): Ditto.
+
+2005-03-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Use configure-package-path instead of
+	system-configuration-options to add early-package-load-path to
+	load-path for XEmacs 21.5.
+
+2005-02-24  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/ptexinfmt.el (texinfo-multitable-widths): Reverse the logic
+	that shows whether it is broken.
+
+2005-02-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Load timer-funcs and advice for XEmacs;
+	simplify the way to check whether APEL is available.
+
+	* texi/infohack.el: Load dgnuspath.el; load timer-funcs for XEmacs;
+	load poe; don't load dgnushack.el, which is harmful to XEmacs since
+	some required functions, e.g., make-overlay, are invalidated.
+
+2005-02-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* Makefile.in (EXAMINE_PACKAGEDIR): Use configure-package-path.
+
+	* aclocal.m4 (AC_EXAMINE_PACKAGEDIR): Ditto.
+
+2005-02-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* Makefile.in (install): Run install-etc.
+	(install-ja): Ditto.
+	(install-package): Run install-package-etc.
+	(install-package-ja): Ditto.
+	(install-package-etc): New rule.
+
+	* lisp/dgnushack.el (dgnushack-install-package-manifest): List
+	icon files.
+
+2005-02-19  Miles Bader  <miles@gnu.org>
+
+	* etc/Makefile.in (install): Create $(etcdir)/images/gnus dir.
+
+	* etc/Makefile.in (install, uninstall): Fix installed image dirs.
+
+	* etc/Makefile.in (install): Put gnus-tut.txt in the right place.
+
+	* Makefile.in (all): Don't do sub-make in etc.
+	* etc/Makefile.in (all): Remove target.
+
+	* make.bat: Do image copies properly.
+
+2005-02-18  Miles Bader  <miles@gnu.org>
+
+	Move all remaining images from etc/gnus to etc/images/gnus.
+
+2004-06-18  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* Makefile.in (all): Do sub-make in etc.
+	* etc/Makefile.in (all): Link . to images.
+	(install, uninstall): Use $(etcdir)/images for images.
+	* make.bat: Likewise.
+
+2005-02-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/infohack.el (infohack-texi-format): Silence XEmacs.
+
 2005-02-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-inews-yank-articles): Don't delete newlines.
@@ -14,6 +91,236 @@
 
 	* lisp/gnus-msg.el (gnus-inews-yank-articles): Delete newlines
 	only if they are excessive.
+
+2005-01-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (invisible-region): Don't advise it when
+	noninteractive.
+
+2005-01-11  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus.el (gnus-user-agent): Default to
+	`(emacs gnus mime config mule)'.
+
+	* lisp/gnus-vers.el (gnus-extended-version): Include SEMI, FLIM
+	and APEL versions.
+
+	* lisp/gnus-util.el (gnus-emacs-version): Include Mule and Meadow
+	versions.
+
+	* lisp/gnus-msg.el (gnus-message-make-user-agent): Invalidate
+	optional the 1st arg.
+
+2005-01-02  Romain Francoise  <romain@orebokech.com>
+
+	* GNUS-NEWS: Generated.
+
+2004-12-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* GNUS-NEWS: Generated.
+
+2004-12-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnrss.el: Require nnheader instead of mm-util, mime-parse
+	instead of rfc2231; require eword-encode, mime-edit and mime-view;
+	reload nnheader when compiling to override mm-util macros.
+	(nnrss-file-coding-system): New variable.
+	(nnrss-format-string): Redefine it as an inline function.
+	(nnrss-decode-group-name): New function.
+	(nnrss-string-as-multibyte): Remove.
+	(nnrss-retrieve-headers): Decode group name; don't use
+	nnrss-format-string.
+	(nnrss-request-group): Decode group name.
+	(nnrss-body-presentation-method): New function.
+	(nnrss-request-article): Decode group name; allow a Message-ID as
+	well as an article number; encode group name; don't use
+	nnrss-format-string; replace whitespace with _ in Message-ID; use
+	nnrss-body-presentation-method and mime-edit-translate-body to
+	compose a MIME article.
+	(nnrss-request-expire-articles): Decode group name.
+	(nnrss-request-delete-group): Decode group name.
+	(nnrss-fetch): Clarify error message.
+	(nnrss-read-server-data): Use insert-file-contents instead of load;
+	bind file-name-coding-system; use multibyte buffer.
+	(nnrss-save-server-data): Bind coding-system-for-write to the
+	value of nnrss-file-coding-system; bind file-name-coding-system;
+	add coding cookie.
+	(nnrss-read-group-data): Use insert-file-contents instead of load;
+	bind file-name-coding-system; use multibyte buffer.
+	(nnrss-save-group-data): Bind coding-system-for-write to the
+	value of nnrss-file-coding-system; bind file-name-coding-system.
+	(nnrss-decode-entities-string): Rename from n-d-e-unibyte-string;
+	make it work with non-ASCII text.
+	(nnrss-snarf-moreover-categories): Use mime-decode-parameters
+	instead of rfc2231-decode-encoded-string.
+	(nnrss-find-el): Make it work with old xml.el as well.
+
+2004-12-26  Tsuyoshi AKIHO  <akiho@kawachi.zaq.ne.jp>
+
+	* lisp/nnrss.el (nnrss-get-encoding): New function.
+	(nnrss-fetch): Use unibyte buffer initially; bind
+	coding-system-for-read while performing mm-url-insert; remove ^Ms;
+	decode contents according to the encoding attribute.
+	(nnrss-save-group-data): Add coding cookie.
+	(nnrss-mime-encode-string): New function.
+	(nnrss-check-group): Use it to encode subject and author.
+
+2004-12-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/infohack.el (infohack-texi-format): Revert.
+
+2004-12-22  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/infohack.el (infohack-texi-format): Bind undo-outer-limit.
+
+2004-12-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (mm-emacs-mule): New variable.
+	(mm-encode-coding-region): New function.
+	(mm-decode-coding-region): New function.
+	(mm-set-buffer-file-coding-system): New function.
+	(mm-with-multibyte-buffer): New macro.
+
+2004-12-20  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el (dgnushack-dont-compile-files): Exclude mm-url.el.
+
+	* lisp/mm-url.el: Require nnheader instead of mm-util.
+
+	* lisp/nnheader.el (mm-char-or-char-int-p): New function.
+
+2004-12-06  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Generated.
+
+2004-11-14  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/encrypt.el: Bind password-cache-expiry when compiling.
+
+2004-10-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-spec.el (gnus-search-or-regist-spec): Manage the flag
+	which indicates whether the spec is updated; simplify the form.
+	(gnus-update-format-specifications): Correct the way to detect
+	whether specs are updated.
+
+2004-10-18  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/encrypt.el: Autoload password-read-and-add and
+	password-cache-remove.
+
+2004-10-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/mml-smime.el: Don't care even if there's no smime.el.
+
+2004-09-30  Simon Josefsson  <jas@extundo.com>
+
+	* Makefile.in (GNUS-NEWS): Depend on texi/gnus-news.texi.
+
+	* GNUS-NEWS: Generated.
+
+2004-09-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-encrypt.el: Bind password-cache-expiry when compiling.
+
+2004-09-29  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Generated.
+
+	* Makefile.in (GNUS-NEWS): Add.
+
+2004-09-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-encrypt.el: Autoload password-read-and-add and
+	password-cache-remove.
+
+2004-09-11  Simon Josefsson  <jas@extundo.com>
+
+	* GNUS-NEWS: Generated.
+
+2004-09-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* etc/.cvsignore: Remove unused.
+
+2004-09-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/gnus-ja.texi: Uncomment the @copying section.
+	* texi/message-ja.texi: Ditto.
+
+2004-09-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* texi/gnus-ja.texi: Comment the @copying section temporarily.
+	* texi/message-ja.texi: Ditto.
+
+2004-08-27  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus.el: Don't autoload x-face-e21.
+
+	* lisp/gnus-art.el (gnus-article-x-face-command): Discard
+	x-face-e21.
+	(gnus-article-x-face-command): Ditto.
+	(gnus-treat-display-x-face): Ditto.
+	(gnus-treat-display-face): Ditto.
+
+2004-08-02  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* texi/ptexinfmt.el (slanted): Rename @s to @slanted.
+
+2004-07-29  KOSEKI Yoshinori  <kose@meadowy.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu/make-directory-table): Fix
+	normalization of dir (remove drive letter).
+
+2004-07-20  TAKAHASHI Kaoru  <kaoru@kaisei.org>
+
+	* texi/ptexinfmt.el: Support @s.
+
+2004-06-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (nnheader-parse-nov): Pass the eol value to
+	nnheader-nov-read-integer.
+
+2004-06-16  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* make.bat: Fix line endings around arch-tag.
+
+2004-06-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/lpath.el: Fbind lsdb-complete-name.
+
+2004-06-03  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* etc/gnus/gnus-setup.ast (Setting up a NNTP server)
+	(Setting up local mail storage (nnml)): fixed some bugs, added a
+	new screen - still testing
+
+2004-06-01  Simon Josefsson  <jas@extundo.com>
+
+	* make.bat: Add SASL manual.
+
+2004-05-23  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* etc/gnus/news-server.ast: Use library validation.
+
+2004-05-21  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (mm-disable-multibyte): New function.
+	(mm-enable-multibyte): New function.
+	(mm-encode-coding-region): New function.
+	(mm-string-make-unibyte): New function.
+
+	* lisp/utf7.el: Require `nnheader' instead of `mm-util'.
+
+2004-05-02  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* gnus-namazu.el (gnus-namazu-imap-group-prefix): Abolished.
+	(gnus-namazu-imap-maildir): Abolished.
+	(gnus-namazu-remote-groups): New option.
+	(gnus-namazu/call-namazu): Simplified.
+	(gnus-namazu/make-directory-table): Refer the above option.
+	(gnus-namazu/search): Cancel the last change to support IMAP.
+	(gnus-namazu-update-index): Ditto.
+	(gnus-namazu-update-indices): Ditto.
 
 2004-05-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 

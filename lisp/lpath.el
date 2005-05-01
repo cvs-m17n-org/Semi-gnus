@@ -10,17 +10,17 @@
   (mapcar (lambda (var) (unless (boundp var) (set var nil))) args))
 
 (maybe-fbind '(Info-directory
-	       Info-menu bbdb-create-internal bbdb-records create-image
-	       display-graphic-p find-coding-system find-image image-size
-	       image-type-available-p insert-image make-mode-line-mouse-map
-	       make-temp-file propertize put-image replace-regexp-in-string
-	       rmail-msg-is-pruned rmail-msg-restore-non-pruned-header
-	       sort-coding-systems spam-BBDB-register-routine
-	       spam-enter-ham-BBDB string-to-multibyte tool-bar-add-item
-	       tool-bar-add-item-from-menu tool-bar-local-item-from-menu
-	       url-generic-parse-url url-http-file-exists-p
-	       url-insert-file-contents vcard-pretty-print w32-focus-frame
-	       w3m-charset-to-coding-system w3m-region x-focus-frame))
+	       Info-menu create-image display-graphic-p
+	       display-time-event-handler find-coding-system find-image
+	       image-size image-type-available-p insert-image
+	       make-mode-line-mouse-map make-temp-file propertize put-image
+	       replace-regexp-in-string rmail-msg-is-pruned
+	       rmail-msg-restore-non-pruned-header sort-coding-systems
+	       tool-bar-add-item tool-bar-add-item-from-menu
+	       tool-bar-local-item-from-menu url-generic-parse-url
+	       url-http-file-exists-p url-insert-file-contents
+	       vcard-pretty-print w32-focus-frame w3m-detect-meta-charset
+	       w3m-region x-focus-frame))
 (maybe-bind '(eudc-protocol
 	      filladapt-mode mc-pgp-always-sign
 	      rmail-insert-mime-forwarded-message-function url-current-object
@@ -28,8 +28,7 @@
 	      w3-meta-charset-content-type-regexp
 	      w3-meta-content-type-charset-regexp
 	      w3m-cid-retrieve-function-alist w3m-current-buffer
-	      w3m-display-inline-images w3m-meta-content-type-charset-regexp
-	      w3m-minor-mode-map))
+	      w3m-display-inline-images w3m-minor-mode-map))
 
 (if (featurep 'xemacs)
     (progn
@@ -60,7 +59,8 @@
 		 w3-coding-system-for-mime-charset w3-do-setup
 		 w3-prepare-buffer w3-region window-pixel-height
 		 window-pixel-width))
-  (maybe-bind '(help-echo-owns-message mail-mode-hook mm-w3m-mode-map)))
+  (maybe-bind '(help-echo-owns-message mail-mode-hook mm-w3m-mode-map
+				       show-nonbreak-escape)))
 
 (when (and (featurep 'xemacs)
 	   (not (featurep 'mule)))
@@ -89,7 +89,7 @@
 	(t
 	 '(function-max-args smiley-encode-buffer))))
       (common-fns
-       nil)
+       '(lsdb-complete-name))
       (variables
        (cond
 	((featurep 'xemacs)

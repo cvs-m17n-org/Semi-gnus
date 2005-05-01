@@ -1,7 +1,7 @@
 ;;; nnheader.el --- header access macros for Semi-gnus and its backends
 
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000, 2001, 2002, 2003
+;;        1997, 1998, 2000, 2001, 2002, 2003, 2004
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -67,7 +67,7 @@ they will keep on jabbering all the time."
   :group 'gnus-server
   :type 'boolean)
 
-(defvar nnheader-max-head-length 4096
+(defvar nnheader-max-head-length 8192
   "*Max length of the head of articles.
 
 Value is an integer, nil, or t.  nil means read in chunks of a file
@@ -83,7 +83,15 @@ Integer values will in effect be rounded up to the nearest multiple of
 (defvar nnheader-read-timeout
   (if (string-match "windows-nt\\|os/2\\|emx\\|cygwin"
 		    (symbol-name system-type))
-      1.0				; why?
+      ;; http://thread.gmane.org/v9655t3pjo.fsf@marauder.physik.uni-ulm.de
+      ;;
+      ;; IIRC, values lower than 1.0 didn't/don't work on Windows/DOS.
+      ;;
+      ;; There should probably be a runtime test to determine the timing
+      ;; resolution, or a primitive to report it.  I don't know off-hand
+      ;; what's possible.  Perhaps better, maybe the Windows/DOS primitive
+      ;; could round up non-zero timeouts to a minimum of 1.0?
+      1.0
     0.1)
   "How long nntp should wait between checking for the end of output.
 Shorter values mean quicker response, but are more CPU intensive.")
@@ -139,6 +147,8 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (autoload 'gnus-buffer-live-p "gnus-util"))
 
 ;; mm-util stuff.
+(defvar mm-emacs-mule t "True in Emacs with Mule.")
+
 (unless (featurep 'mm-util)
   ;; Should keep track of `mm-image-load-path' in mm-util.el.
   (defun nnheader-image-load-path (&optional package)
@@ -162,6 +172,9 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
       'ignore))
   (defalias 'mm-encode-coding-string 'encode-coding-string)
   (defalias 'mm-decode-coding-string 'decode-coding-string)
+  (defalias 'mm-encode-coding-region 'encode-coding-region)
+  (defalias 'mm-decode-coding-region 'decode-coding-region)
+  (defalias 'mm-set-buffer-file-coding-system 'set-buffer-file-coding-system)
 
   ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
   (defun nnheader-detect-coding-region (start end)
@@ -181,15 +194,27 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
 
   ;; Should keep track of `mm-with-unibyte-buffer' in mm-util.el.
   (defmacro nnheader-with-unibyte-buffer (&rest forms)
-  "Create a temporary buffer, and evaluate FORMS there like `progn'.
+    "Create a temporary buffer, and evaluate FORMS there like `progn'.
 Use unibyte mode for this."
-  `(let (default-enable-multibyte-characters)
-     (with-temp-buffer ,@forms)))
+    `(let (default-enable-multibyte-characters)
+       (with-temp-buffer ,@forms)))
   (put 'nnheader-with-unibyte-buffer 'lisp-indent-function 0)
   (put 'nnheader-with-unibyte-buffer 'edebug-form-spec '(body))
   (put 'mm-with-unibyte-buffer 'lisp-indent-function 0)
   (put 'mm-with-unibyte-buffer 'edebug-form-spec '(body))
   (defalias 'mm-with-unibyte-buffer 'nnheader-with-unibyte-buffer)
+
+  ;; Should keep track of `mm-with-multibyte-buffer' in mm-util.el.
+  (defmacro nnheader-with-multibyte-buffer (&rest forms)
+    "Create a temporary buffer, and evaluate FORMS there like `progn'.
+Use multibyte mode for this."
+    `(let ((default-enable-multibyte-characters t))
+       (with-temp-buffer ,@forms)))
+  (put 'nnheader-with-multibyte-buffer 'lisp-indent-function 0)
+  (put 'nnheader-with-multibyte-buffer 'edebug-form-spec '(body))
+  (put 'mm-with-multibyte-buffer 'lisp-indent-function 0)
+  (put 'mm-with-multibyte-buffer 'edebug-form-spec '(body))
+  (defalias 'mm-with-multibyte-buffer 'nnheader-with-multibyte-buffer)
 
   ;; Should keep track of `mm-with-unibyte-current-buffer' in mm-util.el.
   (defmacro nnheader-with-unibyte-current-buffer (&rest forms)
@@ -231,29 +256,29 @@ nil, ."
 
   ;; Should keep track of `mm-guess-mime-charset' in mm-util.el.
   (defun nnheader-guess-mime-charset ()
-  "Guess the default MIME charset from the language environment."
-  (let ((language-info
-	 (and (boundp 'current-language-environment)
-	      (assoc current-language-environment
-		     language-info-alist)))
-	item)
-    (cond
-     ((null language-info)
-      'iso-8859-1)
-     ((setq item
-	    (cadr
-	     (or (assq 'coding-priority language-info)
-		 (assq 'coding-system language-info))))
-      (if (fboundp 'coding-system-get)
-	  (or (coding-system-get item 'mime-charset)
-	      item)
-	item))
-     ((setq item (car (last (assq 'charset language-info))))
-      (if (eq item 'ascii)
-	  'iso-8859-1
-	 (charsets-to-mime-charset (list item))))
-     (t
-      'iso-8859-1))))
+    "Guess the default MIME charset from the language environment."
+    (let ((language-info
+	   (and (boundp 'current-language-environment)
+		(assoc current-language-environment
+		       language-info-alist)))
+	  item)
+      (cond
+       ((null language-info)
+	'iso-8859-1)
+       ((setq item
+	      (cadr
+	       (or (assq 'coding-priority language-info)
+		   (assq 'coding-system language-info))))
+	(if (fboundp 'coding-system-get)
+	    (or (coding-system-get item 'mime-charset)
+		item)
+	  item))
+       ((setq item (car (last (assq 'charset language-info))))
+	(if (eq item 'ascii)
+	    'iso-8859-1
+	  (charsets-to-mime-charset (list item))))
+       (t
+	'iso-8859-1))))
   (defalias 'mm-guess-mime-charset 'nnheader-guess-mime-charset)
 
   (defalias 'mm-char-int 'char-int)
@@ -286,7 +311,30 @@ nil, ."
     "Return non-nil if SYM is a coding system."
     (or (and (fboundp 'find-coding-system) (find-coding-system sym))
 	(and (fboundp 'coding-system-p) (coding-system-p sym))))
-  (defalias 'mm-coding-system-p 'nnheader-coding-system-p))
+  (defalias 'mm-coding-system-p 'nnheader-coding-system-p)
+
+  (defalias 'mm-disable-multibyte
+    (static-if (featurep 'xemacs)
+	'ignore
+      (lambda nil (set-buffer-multibyte nil))))
+  (defalias 'mm-enable-multibyte
+    (static-if (featurep 'xemacs)
+	'ignore
+      ;; Why isn't it t but `to'?  See mm-util.el.
+      (lambda nil (set-buffer-multibyte 'to))))
+
+  (defalias 'mm-encode-coding-region 'encode-coding-region)
+
+  (defalias 'mm-string-make-unibyte
+    (if (fboundp 'string-make-unibyte)
+	'string-make-unibyte
+      'identity))
+
+  (defalias 'mm-char-or-char-int-p
+    (cond
+     ((fboundp 'char-or-char-int-p) 'char-or-char-int-p)
+     ((fboundp 'char-valid-p) 'char-valid-p)
+     (t 'identity))))
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)
@@ -598,12 +646,16 @@ given, the return value will not contain the last newline."
 
 (defvar nnheader-fake-message-id 1)
 
-(defsubst nnheader-generate-fake-message-id ()
-  (concat "fake+none+" (int-to-string (incf nnheader-fake-message-id))))
+(defsubst nnheader-generate-fake-message-id (&optional number)
+  (if (numberp number)
+      (format "fake+none+%s+%d" gnus-newsgroup-name number)
+    (format "fake+none+%s+%s"
+	    gnus-newsgroup-name
+	    (int-to-string (incf nnheader-fake-message-id)))))
 
 (defsubst nnheader-fake-message-id-p (id)
   (save-match-data			; regular message-id's are <.*>
-    (string-match "\\`fake\\+none\\+[0-9]+\\'" id)))
+    (string-match "\\`fake\\+none\\+.*\\+[0-9]+\\'" id)))
 
 ;; Parsing headers and NOV lines.
 
@@ -668,7 +720,7 @@ given, the return value will not contain the last newline."
 		(or (search-forward ">" (point-at-eol) t) (point)))
 	     ;; If there was no message-id, we just fake one to make
 	     ;; subsequent routines simpler.
-	     (nnheader-generate-fake-message-id)))
+	     (nnheader-generate-fake-message-id number)))
 	 ;; References.
 	 (progn
 	   (goto-char p)
@@ -767,20 +819,28 @@ given, the return value will not contain the last newline."
 	       out)))
      out))
 
-(defmacro nnheader-nov-read-message-id ()
-  '(let ((id (nnheader-nov-field)))
+(defvar nnheader-uniquify-message-id nil)
+
+(defmacro nnheader-nov-read-message-id (&optional number)
+  `(let ((id (nnheader-nov-field)))
      (if (string-match "^<[^>]+>$" id)
-	 id
-       (nnheader-generate-fake-message-id))))
+	 ,(if nnheader-uniquify-message-id
+	      `(if (string-match "__[^@]+@" id)
+		   (concat (substring id 0 (match-beginning 0))
+			   (substring id (1- (match-end 0))))
+		 id)
+	    'id)
+       (nnheader-generate-fake-message-id ,number))))
 
 (defun nnheader-parse-nov ()
-  (let ((eol (point-at-eol)))
+  (let* ((eol (point-at-eol))
+	 (number (nnheader-nov-read-integer)))
     (make-full-mail-header
-     (nnheader-nov-read-integer)	; number
+     number				; number
      (nnheader-nov-field)		; subject
      (nnheader-nov-field)		; from
      (nnheader-nov-field)		; date
-     (nnheader-nov-read-message-id)	; id
+     (nnheader-nov-read-message-id number) ; id
      (nnheader-nov-field)		; refs
      (nnheader-nov-read-integer)	; chars
      (nnheader-nov-read-integer)	; lines
@@ -1211,6 +1271,14 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
      (point-max)))
   (goto-char (point-min)))
 
+(defun nnheader-get-lines-and-char ()
+  "Return the number of lines and chars in the article body."
+  (goto-char (point-min))
+  (if (not (re-search-forward "\n\r?\n" nil t))
+      (list 0 0)
+    (list (count-lines (point) (point-max))
+	  (- (point-max) (point)))))
+
 (defun nnheader-remove-body ()
   "Remove the body from an article in this current buffer."
   (goto-char (point-min))
@@ -1530,6 +1598,8 @@ find-file-hooks, etc.
             (nnheader-insert-file-contents file)))))))
 
 (defun nnheader-find-file-noselect (&rest args)
+  "Open a file with some variables bound.
+See `find-file-noselect' for the arguments."
   (let ((format-alist nil)
 	(auto-mode-alist (nnheader-auto-mode-alist))
 	(default-major-mode 'fundamental-mode)

@@ -37,7 +37,8 @@
 
 (nnoo-declare nneething)
 
-(defvoo nneething-map-file-directory "~/.nneething/"
+(defvoo nneething-map-file-directory
+  (nnheader-concat gnus-directory ".nneething/")
   "Where nneething stores the map files.")
 
 (defvoo nneething-map-file ".nneething"
@@ -521,7 +522,7 @@ This variable is used as the alternative of `mailcap-mime-extensions'.")
     (if (numberp article)
 	(if (setq fname (cadr (assq article nneething-map)))
 	    (expand-file-name fname dir)
-	  (mm-make-temp-file (expand-file-name "nneething" dir)))
+	  (make-temp-name (expand-file-name "nneething" dir)))
       (expand-file-name article dir))))
 
 (provide 'nneething)
