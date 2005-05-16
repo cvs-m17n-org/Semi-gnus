@@ -592,7 +592,10 @@ given, the return value will not contain the last newline."
   (mime-find-field-decoder 'From 'nov))
 
 (defalias 'mail-header-extra 'mime-gnus-entity-extra-internal)
-(defalias 'mail-header-set-extra 'mime-gnus-entity-set-extra-internal)
+
+(defun mail-header-set-extra (header extra)
+  "Set the extra headers in HEADER to EXTRA."
+  (mime-gnus-entity-set-extra-internal header extra))
 
 (defun nnheader-decode-field-body (field-body field-name
 					      &optional mode max-column)
