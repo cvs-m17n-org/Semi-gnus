@@ -37,7 +37,6 @@
 
 (require 'wid-edit)
 (require 'nnheader)
-(autoload 'message-y-or-n-p "message" nil nil 'macro)
 
 (require 'gnus-vers)
 
@@ -4080,7 +4079,7 @@ If NEWSGROUP is nil, return the global kill file name instead."
       (setq valids (cdr valids)))
     outs))
 
-(eval-when-compile
+(eval-and-compile
   (autoload 'message-y-or-n-p "message" nil nil 'macro))
 
 (defun gnus-read-group (prompt &optional default)
