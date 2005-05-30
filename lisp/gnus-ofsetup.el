@@ -468,7 +468,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
       ;; Create a list of mail source specifiers.
       (setq num-of-address
 	    (read-from-minibuffer (gnus-ofsetup-gettext 'setup-11)))
-      (setq i (setq n (string-to-int num-of-address)))
+      (setq i (setq n (string-to-number num-of-address)))
       ;;
       (while (> i 0)
 	(let* ((j (- n (1- i)))

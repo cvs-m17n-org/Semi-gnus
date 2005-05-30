@@ -798,10 +798,10 @@ Please check your .emacs or .gnus.el to work nnspool fine.")
   "*Set interval time for gnus-daemon."
   (interactive)
   (setq gnus-offline-interval-time
-	(string-to-int (read-from-minibuffer
-			(format (gnus-offline-gettext 'interval-time-1)
-				gnus-offline-interval-time)
-			nil)))
+	(string-to-number (read-from-minibuffer
+			   (format (gnus-offline-gettext 'interval-time-1)
+				   gnus-offline-interval-time)
+			   nil)))
   (if (< gnus-offline-interval-time 2)
       (progn
 	(message "%s" (gnus-offline-gettext 'interval-time-2))

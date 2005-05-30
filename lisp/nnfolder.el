@@ -201,7 +201,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 		       ((search-backward (concat "\n" nnfolder-article-marker)
 					 nil t)
 			(goto-char (match-end 0))
-			(setq num (string-to-int
+			(setq num (string-to-number
 				   (buffer-substring
 				    (point) (point-at-eol))))
 			(goto-char start)
@@ -211,7 +211,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 		      (search-forward (concat "\n" nnfolder-article-marker)
 				      nil t)
 		      (progn
-			(setq num (string-to-int
+			(setq num (string-to-number
 				   (buffer-substring
 				    (point) (point-at-eol))))
 			(> num article))
@@ -286,7 +286,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 	    (cons nnfolder-current-group
 		  (if (search-forward (concat "\n" nnfolder-article-marker)
 				      nil t)
-		      (string-to-int (buffer-substring
+		      (string-to-number (buffer-substring
 				      (point) (point-at-eol)))
 		    -1))))))))
 

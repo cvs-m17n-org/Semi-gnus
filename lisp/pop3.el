@@ -640,8 +640,8 @@ If NOW, use that time instead."
   "Return the number of messages in the maildrop and the maildrop's size."
   (pop3-send-command process "STAT")
   (let ((response (pop3-read-response process t)))
-    (list (string-to-int (nth 1 (split-string response " ")))
-	  (string-to-int (nth 2 (split-string response " "))))))
+    (list (string-to-number (nth 1 (split-string response " ")))
+	  (string-to-number (nth 2 (split-string response " "))))))
 
 (defun pop3-retr (process msg crashbuf)
   "Retrieve message-id MSG to buffer CRASHBUF."
@@ -667,7 +667,7 @@ If NOW, use that time instead."
   "Return highest accessed message-id number for the session."
   (pop3-send-command process "LAST")
   (let ((response (pop3-read-response process t)))
-    (string-to-int (nth 1 (split-string response " ")))))
+    (string-to-number (nth 1 (split-string response " ")))))
 
 (defun pop3-rset (process)
   "Remove all delete marks from current maildrop."
@@ -712,7 +712,7 @@ where
 	  (apply 'narrow-to-region (pop3-get-extended-response process))
 	  (goto-char (point-min))
 	  (while (looking-at "\\([^ \n\t]*\\) \\([^ \n\t]*\\)")
-	    (setq msgno (string-to-int (match-string 1))
+	    (setq msgno (string-to-number (match-string 1))
 		  uidl (match-string 2))
 	    (push (cons msgno uidl) pairs)
 	    (beginning-of-line 2))
@@ -741,8 +741,8 @@ where
 	  (apply 'narrow-to-region (pop3-get-extended-response process))
 	  (goto-char (point-min))
 	  (while (looking-at "\\([^ \n\t]*\\) \\([^ \n\t]*\\)")
-	    (setq msgno (string-to-int (match-string 1))
-		  len (string-to-int (match-string 2)))
+	    (setq msgno (string-to-number (match-string 1))
+		  len (string-to-number (match-string 2)))
 	    (push (cons msgno len) pairs)
 	    (beginning-of-line 2))
 	  (cons (length pairs) (nreverse pairs)))))))
