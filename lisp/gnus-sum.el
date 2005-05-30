@@ -2774,7 +2774,7 @@ The following commands are available:
   (make-local-variable 'gnus-summary-mark-positions)
   (gnus-make-local-hook 'pre-command-hook)
   (add-hook 'pre-command-hook 'gnus-set-global-variables nil t)
-  (gnus-run-hooks 'gnus-summary-mode-hook)
+  (gnus-run-mode-hooks 'gnus-summary-mode-hook)
   (turn-on-gnus-mailing-list-mode)
   (gnus-update-format-specifications nil 'summary 'summary-mode 'summary-dummy)
   (gnus-update-summary-mark-positions))
