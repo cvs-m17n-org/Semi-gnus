@@ -1,7 +1,7 @@
 ;;; nnheader.el --- header access macros for Semi-gnus and its backends
 
 ;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000, 2001, 2002, 2003, 2004
+;;        1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -1570,15 +1570,21 @@ A buffer may be modified in several ways after reading into the buffer due
 to advanced Emacs features, such as file-name-handlers, format decoding,
 find-file-hooks, etc.
   This function ensures that none of these modifications will take place."
-  (let ((format-alist nil)
-	(auto-mode-alist (nnheader-auto-mode-alist))
-	(default-major-mode 'fundamental-mode)
-	(enable-local-variables nil)
-	(after-insert-file-functions nil)
-	(enable-local-eval nil)
-	(find-file-hooks nil))
-    (insert-file-contents-as-coding-system
-     nnheader-file-coding-system filename visit beg end replace)))
+  (let* ((format-alist nil)
+	 (auto-mode-alist (nnheader-auto-mode-alist))
+	 (default-major-mode 'fundamental-mode)
+	 (enable-local-variables nil)
+	 (after-insert-file-functions nil)
+	 (enable-local-eval nil)
+	 (ffh (if (boundp 'find-file-hook)
+		  'find-file-hook
+		'find-file-hooks))
+	 (val (symbol-value ffh)))
+    (set ffh nil)
+    (unwind-protect
+	(insert-file-contents-as-coding-system
+	 nnheader-file-coding-system filename visit beg end replace)
+      (set ffh val))))
 
 (defun nnheader-insert-nov-file (file first)
   (let ((size (nth 7 (file-attributes file)))
@@ -1603,15 +1609,21 @@ find-file-hooks, etc.
 (defun nnheader-find-file-noselect (&rest args)
   "Open a file with some variables bound.
 See `find-file-noselect' for the arguments."
-  (let ((format-alist nil)
-	(auto-mode-alist (nnheader-auto-mode-alist))
-	(default-major-mode 'fundamental-mode)
-	(enable-local-variables nil)
-	(after-insert-file-functions nil)
-	(enable-local-eval nil)
-	(find-file-hooks nil))
-    (apply 'find-file-noselect-as-coding-system
-	   nnheader-file-coding-system args)))
+  (let* ((format-alist nil)
+	 (auto-mode-alist (nnheader-auto-mode-alist))
+	 (default-major-mode 'fundamental-mode)
+	 (enable-local-variables nil)
+	 (after-insert-file-functions nil)
+	 (enable-local-eval nil)
+	 (ffh (if (boundp 'find-file-hook)
+		  'find-file-hook
+		'find-file-hooks))
+	 (val (symbol-value ffh)))
+    (set ffh nil)
+    (unwind-protect
+	(apply 'find-file-noselect-as-coding-system
+	       nnheader-file-coding-system args)
+      (set ffh val))))
 
 (defun nnheader-auto-mode-alist ()
   "Return an `auto-mode-alist' with only the .gz (etc) thingies."

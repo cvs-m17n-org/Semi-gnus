@@ -635,6 +635,10 @@ sure of changing the value of `foo'."
       (erase-buffer)
       (let ((port (or port imap-default-ssl-port))
 	    (process-connection-type imap-process-connection-type)
+	    (set-process-query-on-exit-flag
+	     (if (fboundp 'set-process-query-on-exit-flag)
+		 'set-process-query-on-exit-flag
+	       'process-kill-without-query))
 	    process)
 	(when (prog1
 		  (setq process (as-binary-process
@@ -645,7 +649,7 @@ sure of changing the value of `foo'."
 					       (format-spec-make
 						?s server
 						?p (number-to-string port))))))
-		(process-kill-without-query process))
+		(funcall set-process-query-on-exit-flag process nil))
 	  (with-current-buffer buffer
 	    (goto-char (point-min))
 	    (while (and (memq (process-status process) '(open run))

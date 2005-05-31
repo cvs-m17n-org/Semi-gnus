@@ -1265,7 +1265,7 @@ password contained in '~/.nntp-authinfo'."
       (nntp-kill-buffer pbuffer))
     (when (and (buffer-name pbuffer)
 	       process)
-      (process-kill-without-query process)
+      (gnus-set-process-query-on-exit-flag process nil)
       (if (and (nntp-wait-for process "^2.*\n" buffer nil t)
 	       (memq (process-status process) '(open run)))
 	  (prog1
@@ -1301,7 +1301,7 @@ password contained in '~/.nntp-authinfo'."
 					    (format-spec-make
 					     ?s nntp-address
 					     ?p nntp-port-number))))))
-    (process-kill-without-query proc)
+    (gnus-set-process-query-on-exit-flag proc nil)
     (save-excursion
       (set-buffer buffer)
       (let ((nntp-connection-alist (list proc buffer nil)))
@@ -1312,7 +1312,7 @@ password contained in '~/.nntp-authinfo'."
 
 (defun nntp-open-tls-stream (buffer)
   (let ((proc (open-tls-stream "nntpd" buffer nntp-address nntp-port-number)))
-    (process-kill-without-query proc)
+    (gnus-set-process-query-on-exit-flag proc nil)
     (save-excursion
       (set-buffer buffer)
       (let ((nntp-connection-alist (list proc buffer nil)))

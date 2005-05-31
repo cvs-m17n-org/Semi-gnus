@@ -1596,6 +1596,14 @@ empty directories from OLD-PATH."
   (ignore-errors
     (set-file-modes filename mode)))
 
+(defun gnus-set-process-query-on-exit-flag (process flag)
+  "Run `set-process-query-on-exit-flag' if it is available.
+Otherwise, run `process-kill-without-query'."
+  (let ((fn (if (fboundp 'set-process-query-on-exit-flag)
+		'set-process-query-on-exit-flag
+	      'process-kill-without-query)))
+    (funcall fn process flag)))
+
 (provide 'gnus-util)
 
 ;;; gnus-util.el ends here
