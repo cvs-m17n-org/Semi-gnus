@@ -1,6 +1,6 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
@@ -37,10 +37,15 @@
 
 ;;; Gnus:
 
-;; You can use this program for Gnus, without needing any modification.
-;; There are two ways to do that; one is to replace Gnus' pop3.el with
-;; it when installing Gnus; the other is to replace Gnus' pop3.el which
-;; has been installed with this module and byte-compile it.
+;; Put something like the following line in your ~/.gnus.el file if
+;; you'd like to use this module together with Gnus, not T-gnus.
+;;
+;;(eval-after-load "mail-source" '(require 'pop3))
+;;
+;; There are two ways to install this module; one is to replace
+;; pop3.el of the Gnus version with this module when installing Gnus;
+;; the other is to replace pop3.el of the Gnus version which has been
+;; installed with this module and byte-compile it.
 
 ;; Note: you should not modify the value for the `pop' section of the
 ;; `mail-source-keyword-map' variable.
