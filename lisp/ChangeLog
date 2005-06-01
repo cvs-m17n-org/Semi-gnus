@@ -1,11 +1,3 @@
-2005-05-31  Katsumi Yamaoka  <yamaoka@jpl.org>
-
-	* lpath.el: Fbind ldap-search-entries.
-
-	* gnus-util.el (gnus-set-process-query-on-exit-flag): Use defalias.
-
-	* starttls.el (starttls-set-process-query-on-exit-flag): Ditto.
-
 2005-05-31  Simon Josefsson  <jas@extundo.com>
 
 	* smime.el (smime-replace-in-string): Define.
@@ -16,13 +8,16 @@
 	* gnus-art.el (article-display-x-face): Replace
 	process-kill-without-query by gnus-set-process-query-on-exit-flag.
 
-	* gnus-util.el (gnus-set-process-query-on-exit-flag): New function.
+	* gnus-util.el (gnus-set-process-query-on-exit-flag): Alias to
+	set-process-query-on-exit-flag or process-kill-without-query.
 
 	* html2text.el (html2text-fix-paragraphs): Use `while - re-search'
 	loop instead of replace-regexp.
 
 	* imap.el (imap-ssl-open): Use set-process-query-on-exit-flag
 	instead of process-kill-without-query if it is available.
+
+	* lpath.el: Fbind ldap-search-entries.
 
 	* mm-util.el (mm-insert-file-contents): Bind find-file-hook
 	instead of find-file-hooks if it is available.
@@ -43,8 +38,8 @@
 	(nntp-open-ssl-stream): Ditto.
 	(nntp-open-tls-stream): Ditto.
 
-	* starttls.el (starttls-set-process-query-on-exit-flag): New
-	function.
+	* starttls.el (starttls-set-process-query-on-exit-flag): Alias to
+	set-process-query-on-exit-flag or process-kill-without-query.
 	(starttls-open-stream-gnutls): Use it instead of
 	process-kill-without-query.
 	(starttls-open-stream): Ditto.
