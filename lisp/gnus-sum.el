@@ -329,7 +329,7 @@ This variable can either be the symbols `first' (place point on the
 first subject), `unread' (place point on the subject line of the first
 unread article), `best' (place point on the subject line of the
 higest-scored article), `unseen' (place point on the subject line of
-the first unseen article), 'unseen-or-unread' (place point on the subject
+the first unseen article), `unseen-or-unread' (place point on the subject
 line of the first unseen article or, if all article have been seen, on the
 subject line of the first unread article), or a function to be called to
 place point on some subject line."
@@ -996,7 +996,7 @@ automatically when it is selected."
   :group 'gnus-summary
   :type 'boolean)
 
-(defcustom gnus-summary-selected-face 'gnus-summary-selected-face
+(defcustom gnus-summary-selected-face 'gnus-summary-selected
   "Face used for highlighting the current article in the summary buffer."
   :group 'gnus-summary-visual
   :type 'face)
@@ -1005,42 +1005,42 @@ automatically when it is selected."
 
 (defcustom gnus-summary-highlight
   '(((eq mark gnus-canceled-mark)
-     . gnus-summary-cancelled-face)
+     . gnus-summary-cancelled)
     ((and uncached (> score default-high))
-     . gnus-summary-high-undownloaded-face)
+     . gnus-summary-high-undownloaded)
     ((and uncached (< score default-low))
-     . gnus-summary-low-undownloaded-face)
+     . gnus-summary-low-undownloaded)
     (uncached
-     . gnus-summary-normal-undownloaded-face)
+     . gnus-summary-normal-undownloaded)
     ((and (> score default-high)
 	  (or (eq mark gnus-dormant-mark)
 	      (eq mark gnus-ticked-mark)))
-     . gnus-summary-high-ticked-face)
+     . gnus-summary-high-ticked)
     ((and (< score default-low)
 	  (or (eq mark gnus-dormant-mark)
 	      (eq mark gnus-ticked-mark)))
-     . gnus-summary-low-ticked-face)
+     . gnus-summary-low-ticked)
     ((or (eq mark gnus-dormant-mark)
 	 (eq mark gnus-ticked-mark))
-     . gnus-summary-normal-ticked-face)
+     . gnus-summary-normal-ticked)
     ((and (> score default-high) (eq mark gnus-ancient-mark))
-     . gnus-summary-high-ancient-face)
+     . gnus-summary-high-ancient)
     ((and (< score default-low) (eq mark gnus-ancient-mark))
-     . gnus-summary-low-ancient-face)
+     . gnus-summary-low-ancient)
     ((eq mark gnus-ancient-mark)
-     . gnus-summary-normal-ancient-face)
+     . gnus-summary-normal-ancient)
     ((and (> score default-high) (eq mark gnus-unread-mark))
-     . gnus-summary-high-unread-face)
+     . gnus-summary-high-unread)
     ((and (< score default-low) (eq mark gnus-unread-mark))
-     . gnus-summary-low-unread-face)
+     . gnus-summary-low-unread)
     ((eq mark gnus-unread-mark)
-     . gnus-summary-normal-unread-face)
+     . gnus-summary-normal-unread)
     ((> score default-high)
-     . gnus-summary-high-read-face)
+     . gnus-summary-high-read)
     ((< score default-low)
-     . gnus-summary-low-read-face)
+     . gnus-summary-low-read)
     (t
-     . gnus-summary-normal-read-face))
+     . gnus-summary-normal-read))
   "*Controls the highlighting of summary buffer lines.
 
 A list of (FORM . FACE) pairs.  When deciding how a a particular
@@ -8594,7 +8594,6 @@ If BACKWARD, search backward instead."
 	       (start (or (search-backward "\n\n" nil t) (point-min))))
 	   (goto-char
 	    (or (text-property-any start end 'x-face-image t);; x-face-e21
-		(text-property-any start end 'x-face-mule-bitmap-image t)
 		(, opoint)))))))
 
   (defmacro gnus-summary-search-article-highlight-matched-text
@@ -8620,11 +8619,7 @@ If BACKWARD, search backward instead."
 		       gnus-treat-display-x-face
 		       gnus-treat-buttonize-head
 		       gnus-treat-decode-article-as-default-mime-charset))
-		    (static-if (featurep 'xemacs)
-			items
-		      (cons '(x-face-mule-delete-x-face-field
-			      (quote never))
-			    items))))
+		    items))
 		 (gnus-treat-display-x-face
 		  (when (, x-face) gnus-treat-display-x-face)))
 	     (gnus-article-prepare-mime-display)))
@@ -8672,8 +8667,7 @@ Optional argument BACKWARD means do search for backward.
 						 gnus-article-buffer t)))))
 	      (gnus-summary-select-article nil t)
 	      (setq treated nil)))
-	(let ((gnus-inhibit-treatment t)
-	      (x-face-mule-delete-x-face-field 'never))
+	(let ((gnus-inhibit-treatment t))
 	  (setq treated (eq 'old (gnus-summary-select-article)))
 	  (when (and treated
 		     (not

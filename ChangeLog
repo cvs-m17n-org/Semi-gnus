@@ -1,3 +1,21 @@
+2005-65-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/gnus-art.el (gnus-article-x-face-command): Remove
+	x-face-mule.
+	(gnus-treat-display-x-face): Ditto.
+
+	* lisp/gnus-msg.el (gnus-copy-article-buffer): Don't remove bitmap
+	images.
+
+	* lisp/gnus-sum.el
+	(gnus-summary-search-article-highlight-goto-x-face): Don't take
+	care of x-face-mule.
+	(gnus-summary-search-article-highlight-matched-text): Ditto.
+	(gnus-summary-search-article): Ditto.
+
+	* lisp/gnus.el (gnus-colon-keywords): Remove.
+	Don't autoload x-face-mule; don't require base64.
+
 2005-05-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el: T-gnus 6.17.3 revision 00.

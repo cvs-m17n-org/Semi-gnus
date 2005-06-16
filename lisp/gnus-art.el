@@ -278,9 +278,6 @@ This can also be a list of the above values."
       "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | ee -"))
    ((gnus-image-type-available-p 'pbm)
     'gnus-display-x-face-in-from)
-   ((and window-system
-	 (module-installed-p 'x-face-mule))
-    'x-face-mule-gnus-article-display-x-face)
    (t
     "{ echo '/* Width=48, Height=48 */'; uncompface; } | icontopbm | \
 display -"))
@@ -288,19 +285,14 @@ display -"))
 If it is a string, the command will be executed in a sub-shell
 asynchronously.	 The compressed face will be piped to this command."
   :type `(choice
-	  ,@(let ((x-face-mule (if (featurep 'xemacs)
-				   nil
-				 (module-installed-p 'x-face-mule))))
-	      (delq nil
-		    (list
-		     'string
-		     (if (or (gnus-image-type-available-p 'xface)
-			     (gnus-image-type-available-p 'pbm))
-			 '(function-item gnus-display-x-face-in-from))
-		     (if x-face-mule
-			 '(function-item
-			   x-face-mule-gnus-article-display-x-face))
-		     'function))))
+	  :format "%{%t%}:\n%[Value Menu%] %v"
+	  ,@(delq nil
+		  (list
+		   'string
+		   (if (or (gnus-image-type-available-p 'xface)
+			   (gnus-image-type-available-p 'pbm))
+		       '(function-item gnus-display-x-face-in-from))
+		   'function)))
   :version "21.1"
   :group 'gnus-picon
   :group 'gnus-article-washing)
@@ -706,21 +698,23 @@ above them."
   :type 'face
   :group 'gnus-article-buttons)
 
-(defcustom gnus-signature-face 'gnus-signature-face
+(defcustom gnus-signature-face 'gnus-signature
   "Face used for highlighting a signature in the article buffer.
-Obsolete; use the face `gnus-signature-face' for customizations instead."
+Obsolete; use the face `gnus-signature' for customizations instead."
   :type 'face
   :group 'gnus-article-highlight
   :group 'gnus-article-signature)
 
-(defface gnus-signature-face
+(defface gnus-signature
   '((t
      (:italic t)))
   "Face used for highlighting a signature in the article buffer."
   :group 'gnus-article-highlight
   :group 'gnus-article-signature)
+;; backward-compatibility alias
+(put 'gnus-signature-face 'face-alias 'gnus-signature)
 
-(defface gnus-header-from-face
+(defface gnus-header-from
   '((((class color)
       (background dark))
      (:foreground "spring green"))
@@ -732,8 +726,10 @@ Obsolete; use the face `gnus-signature-face' for customizations instead."
   "Face used for displaying from headers."
   :group 'gnus-article-headers
   :group 'gnus-article-highlight)
+;; backward-compatibility alias
+(put 'gnus-header-from-face 'face-alias 'gnus-header-from)
 
-(defface gnus-header-subject-face
+(defface gnus-header-subject
   '((((class color)
       (background dark))
      (:foreground "SeaGreen3"))
@@ -745,8 +741,10 @@ Obsolete; use the face `gnus-signature-face' for customizations instead."
   "Face used for displaying subject headers."
   :group 'gnus-article-headers
   :group 'gnus-article-highlight)
+;; backward-compatibility alias
+(put 'gnus-header-subject-face 'face-alias 'gnus-header-subject)
 
-(defface gnus-header-newsgroups-face
+(defface gnus-header-newsgroups
   '((((class color)
       (background dark))
      (:foreground "yellow" :italic t))
@@ -760,8 +758,10 @@ In the default setup this face is only used for crossposted
 articles."
   :group 'gnus-article-headers
   :group 'gnus-article-highlight)
+;; backward-compatibility alias
+(put 'gnus-header-newsgroups-face 'face-alias 'gnus-header-newsgroups)
 
-(defface gnus-header-name-face
+(defface gnus-header-name
   '((((class color)
       (background dark))
      (:foreground "SeaGreen"))
@@ -773,8 +773,10 @@ articles."
   "Face used for displaying header names."
   :group 'gnus-article-headers
   :group 'gnus-article-highlight)
+;; backward-compatibility alias
+(put 'gnus-header-name-face 'face-alias 'gnus-header-name)
 
-(defface gnus-header-content-face
+(defface gnus-header-content
   '((((class color)
       (background dark))
      (:foreground "forest green" :italic t))
@@ -786,12 +788,14 @@ articles."
   "Face used for displaying header content."
   :group 'gnus-article-headers
   :group 'gnus-article-highlight)
+;; backward-compatibility alias
+(put 'gnus-header-content-face 'face-alias 'gnus-header-content)
 
 (defcustom gnus-header-face-alist
-  '(("From" nil gnus-header-from-face)
-    ("Subject" nil gnus-header-subject-face)
-    ("Newsgroups:.*," nil gnus-header-newsgroups-face)
-    ("" gnus-header-name-face gnus-header-content-face))
+  '(("From" nil gnus-header-from)
+    ("Subject" nil gnus-header-subject)
+    ("Newsgroups:.*," nil gnus-header-newsgroups)
+    ("" gnus-header-name gnus-header-content))
   "*Controls highlighting of article headers.
 
 An alist of the form (HEADER NAME CONTENT).
@@ -1296,9 +1300,7 @@ See Info node `(gnus)Customizing Articles' for details."
 
 (defcustom gnus-treat-display-x-face
   (and (not noninteractive)
-       (or (eq gnus-article-x-face-command
-	       'x-face-mule-gnus-article-display-x-face)
-	   (and (fboundp 'image-type-available-p)
+       (or (and (fboundp 'image-type-available-p)
 		(image-type-available-p 'xbm)
 		(string-match "^0x" (shell-command-to-string "uncompface"))
 		(executable-find "icontopbm"))
@@ -6997,7 +6999,7 @@ do the highlighting.  See the documentation for those functions."
 (defun gnus-article-highlight-signature ()
   "Highlight the signature in an article.
 It does this by highlighting everything after
-`gnus-signature-separator' using `gnus-signature-face'."
+`gnus-signature-separator' using the face `gnus-signature'."
   (interactive)
   (when gnus-signature-face
     (gnus-with-article-buffer
