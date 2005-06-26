@@ -13468,8 +13468,8 @@ table) に従って完全に合致しなければなりません。正規表現でフィールド名か
 
 この例で、通常 @samp{joedavis@@foo.org} から来たメッセージ
 は @samp{joemail} に格納されません。しかし、
-@code{nnmail-split-fancy-match-partial-words} を t に設定すると合致が起
-きます。要するに、語を区切る条件が削除され、代わりに合致がよ
+@code{nnmail-split-fancy-match-partial-words} を @code{t} に設定すると合
+致が起きます。要するに、語を区切る条件が削除され、代わりに合致がよ
 り grep らしくなるのです。
 
 @findex nnmail-split-fancy-with-parent
