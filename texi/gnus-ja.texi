@@ -20881,27 +20881,25 @@ NoCeM メッセージを発行する人はたくさんいます。このリストでは、誰の言うこ
 
 @item gnus-nocem-verifyer
 @vindex gnus-nocem-verifyer
-@findex mc-verify
-これは NoCeM 発行者が誰であるかと言っているかを証明する関数でなくてはな
-りません。初期設定では @code{mc-verify} であり、これは Mailcrypt 関数で
-す。もしこれが非常に遅くて、あなたが証明結果を気にしない (これはたぶん危
-険です) のであれば、この変数を @code{nil} にすることができます。
-
-もし署名済みの NoCeM メッセージを証明済み、未署名のメッセージを未証
-明 (でもそれを使う) としたいのなら、以下のようにすることができます。
+@findex pgg-verify-region
+これは NoCeM 発行者が本人であることを検証する関数でなくてはなりません。
+初期設定では、以下に示す @code{pgg-verify-region} を使う関数で
+す (註: Gnus では @code{pgg-verify} がディフォルトです)。
 
 @lisp
-(setq gnus-nocem-verifyer 'my-gnus-mc-verify)
-
-(defun my-gnus-mc-verify ()
-  (not (eq 'forged
-           (ignore-errors
-             (if (mc-verify)
-                 t
-               'forged)))))
+(lambda ()
+  (pgg-verify-region (point-min) (point-max)))
 @end lisp
 
-まあ、これはたぶん危険でしょうけどね。
+これは検証に成功したら非-@code{nil} を返し、そうでなければ (NoCeM メッセー
+ジが署名されていない場合を含みます) @code{nil} を返します。もしこれが非
+常に遅くて、検証結果を気にしない (これはたぶん危険です) のであれば、この
+変数を @code{nil} にすることができます。
+
+以前、デフォルトは Mailcrypt の関数である @code{mc-verify} でした。まだ
+それを使うことができますが、PGP の公開鍵を GnuPG の鍵束に加えることを厭
+わなければ、GnuPG とともに動作するディフォルトの関数に変えることができま
+す。
 
 @item gnus-nocem-directory
 @vindex gnus-nocem-directory
