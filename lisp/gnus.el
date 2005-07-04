@@ -278,7 +278,7 @@ is restarted, and sometimes reloaded."
   :group 'gnus)
 
 (defgroup gnus-exit nil
-  "Exiting gnus."
+  "Exiting Gnus."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
