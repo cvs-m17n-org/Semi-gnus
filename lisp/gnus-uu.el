@@ -1,6 +1,6 @@
 ;;; gnus-uu.el --- extract (uu)encoded files in Gnus
 ;; Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 2000,
-;;        2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+;;        2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Created: 2 Oct 1993
@@ -844,7 +844,7 @@ When called interactively, prompt for REGEXP."
 	      (erase-buffer)
 	      (insert (format
 		       "Date: %s\nFrom: %s\nSubject: %s Digest\n\n"
-		       (current-time-string) name name))
+		       (message-make-date) name name))
 	      (insert "Topics:\n")))
 	(when (not (eq in-state 'end))
 	  (setq state (list 'middle))))
