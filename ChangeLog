@@ -1,3 +1,7 @@
+2005-07-18  Romain Francoise  <romain@orebokech.com>
+
+	* GNUS-NEWS: Generated.
+
 2005-65-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-x-face-command): Remove
