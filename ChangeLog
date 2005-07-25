@@ -1,8 +1,12 @@
+2005-07-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/dgnushack.el: Autoload sha1 and sha1-binary for XEmacs.
+
 2005-07-18  Romain Francoise  <romain@orebokech.com>
 
 	* GNUS-NEWS: Generated.
 
-2005-65-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+2005-06-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-x-face-command): Remove
 	x-face-mule.

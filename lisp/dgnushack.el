@@ -318,6 +318,8 @@ adding the --with-addpath=FLIM_PATH option.\n"
 	(autoload 'setenv "process" nil t)
       (autoload 'setenv "env" nil t))
     (autoload 'sgml-mode "psgml" nil t)
+    (autoload 'sha1 "sha1")
+    (autoload 'sha1-binary "sha1")
     (autoload 'smtpmail-send-it "smtpmail")
     (autoload 'sort-numeric-fields "sort" nil t)
     (autoload 'sort-subr "sort")
