@@ -744,25 +744,24 @@ Combined Groups
 * Virtual Groups::              たくさんのグループの記事を結合する
 * Kibozed Groups::              ニューススプールの中からの記事を検索する
 
-@c TRANSLATEME
 Email Based Diary
 
-* The NNDiary Back End::        Basic setup and usage.
-* The Gnus Diary Library::      Utility toolkit on top of nndiary.
-* Sending or Not Sending::      A final note on sending diary messages.
+* The NNDiary Back End::        基本的な設定と使い方
+* The Gnus Diary Library::      NNDiary の上位階層にある実用的なツールキット
+* Sending or Not Sending::      日記メッセージを送るときに注意すること
 
 The NNDiary Back End
 
-* Diary Messages::              What makes a message valid for nndiary.
-* Running NNDiary::             NNDiary has two modes of operation.
-* Customizing NNDiary::         Bells and whistles.
+* Diary Messages::              メッセージを NNDiary で使えるようにするには
+* Running NNDiary::             NNDiary には二つの動作モードがある
+* Customizing NNDiary::         ベルとホイッスル
 
 The Gnus Diary Library
 
-* Diary Summary Line Format::           A nicer summary buffer line format.
-* Diary Articles Sorting::              A nicer way to sort messages.
-* Diary Headers Generation::            Not doing it manually.
-* Diary Group Parameters::              Not handling them manually.
+* Diary Summary Line Format::   より良い概略バッファのモード行の書法仕様
+* Diary Articles Sorting::      メッセージを並べ替える気の利いた方法
+* Diary Headers Generation::    手作業でそれをしないで
+* Diary Group Parameters::      手作業でそれらを扱わないで
 
 Gnus Unplugged
 
@@ -16896,54 +16895,56 @@ Namazu は、事前に準備された索引を用いて検索を行うように設計された検索
 この場合、索引を手動で更新するために @kbd{M-x
 gnus-namazu-update-all-indices} とする必要があるかもしれません。
 
-@c TRANSLATEME
 @node Email Based Diary
-@section Email Based Diary
+@section 電子メールによる日記
 @cindex diary
 @cindex email based diary
 @cindex calendar
 
-This section describes a special mail back end called @code{nndiary},
-and its companion library @code{gnus-diary}.  It is ``special'' in the
-sense that it is not meant to be one of the standard alternatives for
-reading mail with Gnus.  See @ref{Choosing a Mail Back End} for that.
-Instead, it is used to treat @emph{some} of your mails in a special way,
-namely, as event reminders.
+この項では @code{nndiary} という特別なメール・バックエンドと、その仲間
+の @code{gnus-diary} ライブラリについて説明します。それが「特別」なのは、
+Gnus でメールを読むための標準の選択肢の一つであるつもりは無いからです。
+それ (標準の選択肢) については @ref{Choosing a Mail Back End} を参照して
+下さい。代わりに、特別な方法であなたのメールのいくつかを扱う、すなわちこ
+れはリマインダ (予定を思い出させるもの) として使われます。
 
-Here is a typical scenario:
+典型的な筋書きは、こうです。
 
 @itemize @bullet
 @item
-You've got a date with Andy Mc Dowell or Bruce Willis (select according
-to your sexual preference) in one month.  You don't want to forget it.
+あなたはアンディ・マクドウェルかブルース・ウィリス (あなたの好みに合わせ
+て、どちらかを選んで下さい) と、一ヶ月後にデートの約束をしました。それを
+忘れるわけにはいきません。
 @item
-So you send a ``reminder'' message (actually, a diary one) to yourself.
+そこで、自分宛てにリマインダのメッセージを (実際のところ、毎日一通) 送り
+ます。
 @item
-You forget all about it and keep on getting and reading new mail, as usual.
+あなたはそれをすっかり忘れて、受け取った新しいメールをいつもどおりに読み
+続けます。
 @item
-From time to time, as you type `g' in the group buffer and as the date
-is getting closer, the message will pop up again to remind you of your
-appointment, just as if it were new and unread.
+デートの日が近付いてくると、グループバッファで @kbd{g} をタイプしたとき
+に、ときどきあなたの予定を思い出させるために、あたかも新着で未読のように、
+メッセージが再びポップアップするでしょう。
 @item
-Read your ``new'' messages, this one included, and start dreaming again
-of the night you're gonna have.
+これを含んでいる「新しい」メッセージを読んでください、そして、再びあなた
+が過ごす夜を夢見て下さい。
 @item
-Once the date is over (you actually fell asleep just after dinner), the
-message will be automatically deleted if it is marked as expirable.
+いったんデートが終わると (実際にはディナーのすぐ後で寝入ってしまったとし
+ても)、期限切れ消去の印が付いていれば、メッセージは自動的に消去されます。
 @end itemize
 
-The Gnus Diary back end has the ability to handle regular appointments
-(that wouldn't ever be deleted) as well as punctual ones, operates as a
-real mail back end and is configurable in many ways.  All of this is
-explained in the sections below.
+Gnus Diary バックエンドは、(常に取り消されることが無い) 定期的な予定を、
+几帳面な人たちと同じように扱う能力を持っていて、本当のメール・バックエン
+ドのように動作し、いろんなやり方で設定することができます。このすべてが、
+以下の各項で説明されます。
 
 @menu
-* The NNDiary Back End::        Basic setup and usage.
-* The Gnus Diary Library::      Utility toolkit on top of nndiary.
-* Sending or Not Sending::      A final note on sending diary messages.
+* The NNDiary Back End::        基本的な設定と使い方
+* The Gnus Diary Library::      nndiary の上位階層にある実用的なツールキット
+* Sending or Not Sending::      日記メッセージを送るときに注意すること
 @end menu
 
-
+@c TRANSLATEME
 @node The NNDiary Back End
 @subsection The NNDiary Back End
 @cindex nndiary
@@ -16961,9 +16962,9 @@ of Gnus.  This adds a timestamp to each group's parameters.  @ref{Group
 Timestamp} to see how it's done.
 
 @menu
-* Diary Messages::              What makes a message valid for nndiary.
-* Running NNDiary::             NNDiary has two modes of operation.
-* Customizing NNDiary::         Bells and whistles.
+* Diary Messages::              メッセージを nndiary で使えるようにするには
+* Running NNDiary::             NNDiary には二つの動作モードがある
+* Customizing NNDiary::         ベルとホイッスル
 @end menu
 
 @node Diary Messages
@@ -17139,10 +17140,10 @@ useful things for you.
 
 
 @menu
-* Diary Summary Line Format::           A nicer summary buffer line format.
-* Diary Articles Sorting::              A nicer way to sort messages.
-* Diary Headers Generation::            Not doing it manually.
-* Diary Group Parameters::              Not handling them manually.
+* Diary Summary Line Format::   より良い概略バッファのモード行の書法仕様
+* Diary Articles Sorting::      メッセージを並べ替える気の利いた方法
+* Diary Headers Generation::    手作業でそれをしないで
+* Diary Group Parameters::      手作業でそれらを扱わないで
 @end menu
 
 @node Diary Summary Line Format
