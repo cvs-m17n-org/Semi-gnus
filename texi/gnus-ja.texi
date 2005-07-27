@@ -1509,7 +1509,7 @@ gnus がどのグループが新しいかの記録を持っていないことになりますので、新
 @vindex gnus-init-file
 @vindex gnus-site-init-file
 Gnus が起動すると、@code{gnus-site-init-file} (初期設定で
-は @file{.../site-lisp/gnus}) と @code{gnus-init-file} (初期設定で
+は @file{.../site-lisp/gnus-init}) と @code{gnus-init-file} (初期設定で
 は @file{~/.gnus}) のファイルを読み込みます。これらは普通
 の Emacs Lisp ファイルで、@file{~/.emacs} や @file{site-init} ファイル
 を gnus 関係のもので乱雑にしないようにするために使うことができます。
@@ -1517,7 +1517,10 @@ Gnus はこれらと同じ名前のファイルに、接尾語 @file{.elc} と @file{.el
 付いているものも調べます。言い換えれば、
 @code{gnus-init-file} を @file{~/.gnus} に設定すると、
 gnus は @file{~/.gnus.elc}, @file{~/.gnus.el} を探し、最後
-に @file{~/.gnus} を (この順番に) 探します。
+に @file{~/.gnus} を (この順番に) 探します。@option{-q} また
+は @option{--no-init-file} オプション (@pxref{Initial Options, ,Initial
+Options, emacs, The Emacs Manual}) が指定されて Emacs が起動された場合、
+Gnus は @code{gnus-init-file} を読み込みません。
 
 @node Auto Save
 @section 自動保存
