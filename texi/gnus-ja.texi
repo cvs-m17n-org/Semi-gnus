@@ -758,7 +758,7 @@ The NNDiary Back End
 
 The Gnus Diary Library
 
-* Diary Summary Line Format::   $B$h$jNI$$35N,%P%C%U%!$N%b!<%I9T$N=qK!;EMM(B
+* Diary Summary Line Format::   $B$h$jNI$$35N,9T;EMM(B
 * Diary Articles Sorting::      $B%a%C%;!<%8$rJB$YBX$($k5$$NMx$$$?J}K!(B
 * Diary Headers Generation::    $B<j:n6H$G$=$l$r$7$J$$$G(B
 * Diary Group Parameters::      $B<j:n6H$G$=$l$i$r07$o$J$$$G(B
@@ -4694,8 +4694,8 @@ Gnus $B$OJQ?t(B @code{gnus-extract-address-components} $B$NCM$r(B @code{From
 @code{To} $B$d(B @code{Newsreader} $B%X%C%@!<$,Be$o$j$K;HMQ$5$l$^$9!#(B
 
 $B$=$l$i$N(B @code{From} $B%U%#!<%k%I$,F~$lBX$o$C$F$$$k5-;v$H!"IaDL$N5-;v$r6h(B
-$BJL$9$k$?$a$K!"35N,9T$N(B @code{To} $B$^$?$O(B @code{Newsgroups} $B%X%C%@$K!"$"$k(B
-$BJ8;zNs$,A0CV$5$l$^$9!#$=$NJ8;zNs$O%G%#%U%)%k%H$G!"(B@code{To} $B$K(B
+$BJL$9$k$?$a$K!"35N,9T$N(B @code{To} $B$^$?$O(B @code{Newsgroups} $B%X%C%@!<$K!"$"(B
+$B$kJ8;zNs$,A0CV$5$l$^$9!#$=$NJ8;zNs$O%G%#%U%)%k%H$G!"(B@code{To} $B$K(B
 $B$O(B @samp{-> } $B$,!"(B@code{Newsgroups} $B$K$O(B @samp{=> } $B$,;H$o$l$^$9$,!"(B
 @code{gnus-summary-to-prefix} $B$H(B @code{gnus-summary-newsgroup-prefix} $B$K(B
 $B$h$C$F!"$=$l$i$NJ8;zNs$r%+%9%?%^%$%:$9$k$3$H$,$G$-$^$9!#(B
@@ -13537,9 +13537,9 @@ table) $B$K=>$C$F40A4$K9gCW$7$J$1$l$P$J$j$^$;$s!#@55,I=8=$G%U%#!<%k%IL>$+(B
 $BL>A0$rJ;5-$7$^$9(B ($B$?$@$7%a!<%k$N>l9g$@$1!"$5$b$J$1$l$P%0%k!<%WL>$OD4$Y$^(B
 $B$;$s(B)$B!#$5$F!"$$$h$$$h%a!<%k$N?6$jJ,$1$,;O$^$k$H!"4X?t(B
 @code{nnmail-split-fancy-with-parent} $B$O!"BP>]$H$J$k3F5-;v$N(B References
-($B$H(B In-Reply-To) $B%X%C%@$rD4$Y!"(B@code{nnmail-message-id-cache-file} $B$K;X(B
-$BDj$5$l$F$$$k%U%!%$%k$K$=$l$i$N%a%C%;!<%8(B ID $B$,$"$k$+$I$&$+D4$Y$^$9!#?F5-(B
-$B;v$,8+$D$+$k$H!"$=$N%0%k!<%WL>$,@55,I=(B
+($B$H(B In-Reply-To) $B%X%C%@!<$rD4$Y!"(B@code{nnmail-message-id-cache-file} $B$K(B
+$B;XDj$5$l$F$$$k%U%!%$%k$K$=$l$i$N%a%C%;!<%8(B ID $B$,$"$k$+$I$&$+D4$Y$^$9!#?F(B
+$B5-;v$,8+$D$+$k$H!"$=$N%0%k!<%WL>$,@55,I=(B
 $B8=(B @code{nnmail-split-fancy-with-parent-ignore-groups} $B$K%^%C%A$7$J$1$l(B
 $B$P!"$3$N4X?t$OBP1~$9$k%0%k!<%WL>$rJV$9$o$1$G$9!#$3$3$G!"JQ(B
 $B?t(B @code{nnmail-message-id-cache-length} $B$NCM$r4{DjCM$h$j$b4v$i$+Bg$-$J(B
@@ -15734,9 +15734,9 @@ Nnmail $B$NMxMQ<T$O:G8e$N@55,I=8=$OA4$F$N5-;v$K9gCW$9$k$h$&$K6u$G$J$/$F$O(B
 $B;HMQ2DG=$K$J$C$F$$$J$$$+$.$j!":G=i$K9gCW$7$?5,B'$,(B ``$B>!$A(B'' $B$^$9!#Aj8_Ej(B
 $B9F$r$7$F$$$k>l9g$O!"A4$F$N9gCW$7$?5,B'$,(B ``$B>!$A(B'' $B$^$9!#(B
 
-$B$3$NJQ?t$O$=$NCM$H$7$F4X?t$r;}$D$3$H$b$G$-$^$9!#$=$N4X?t$O5-;v$N%X%C%@$N(B
-$BItJ,$KHO0O$,69$a$i$l$?>uBV$G8F$P$l!"5-;v$N0\F0@h$@$H;W$&%0%k!<%W$rJV$9$b(B
-$B$N$G$J$1$l$P$J$j$^$;$s!#(B@code{nnimap-split-fancy} $B$r;2>H$7$F2<$5$$!#(B
+$B$3$NJQ?t$O$=$NCM$H$7$F4X?t$r;}$D$3$H$b$G$-$^$9!#$=$N4X?t$O5-;v$N%X%C%@!<(B
+$B$NItJ,$KHO0O$,69$a$i$l$?>uBV$G8F$P$l!"5-;v$N0\F0@h$@$H;W$&%0%k!<%W$rJV$9(B
+$B$b$N$G$J$1$l$P$J$j$^$;$s!#(B@code{nnimap-split-fancy} $B$r;2>H$7$F2<$5$$!#(B
 
 $BJ,3d%3!<%I$OI,MW$J$i%a!<%k%\%C%/%9$r:n@.$7$^$9!#(B
 
@@ -16021,11 +16021,11 @@ Gnus $B$O$?$@C1$K%K%e!<%9$d%a!<%k$rFI$`0J>e$N$3$H$,$G$-$^$9!#0J2<(B
 $B$D$^$k$H$3$m!"(Bgnus $B$O%K%e!<%9%j!<%@$J$s$G$9!#K:$l$F$k$+$b$7$l$J$$$N$GG0(B
 $B$N$?$a!#(B@code{nneething} $B$O$3$l$rFsCJ3,$G=hM}$7$^$9!#:G=i$K!"LdBj$H$J$k(B
 $B%U%!%$%k$r$=$l$>$lA':w$7$F$^$o$j$^$9!#$b$7$=$N%U%!%$%k$,5-;v$N$h$&$K8+$((B
-$B$?$J$i(B ($B$9$J$o$A!":G=i$N?t9T$,%X%C%@!<$N$h$&$K8+$($?$i(B) $B$=$l$r%X%C%@$H$7(B
-$B$F;H$$$^$9!#$b$7$=$l$,%X%C%@!<$N$J$$$?$@$NE,Ev$J%U%!%$%k(B ($BNc$($P(B C $B$N%=!<(B
-$B%9%U%!%$%k(B) $B$G$"$C$?$J$i!"(B@code{nneething} $B$O%X%C%@!<$r5u6u$+$i:n$j=P$7(B
-$B$^$9!#$3$l$O%U%!%$%k$N=jM-<T!"L>A0!"F|IU$r;H$$!"$3$l$i$NMWAG$KBP$7$F$G$-(B
-$B$k$3$H$r2?$G$b$d$j$^$9!#(B
+$B$?$J$i(B ($B$9$J$o$A!":G=i$N?t9T$,%X%C%@!<$N$h$&$K8+$($?$i(B) $B$=$l$r%X%C%@!<$H(B
+$B$7$F;H$$$^$9!#$b$7$=$l$,%X%C%@!<$N$J$$$?$@$NE,Ev$J%U%!%$%k(B ($BNc$($P(B C $B$N(B
+$B%=!<%9%U%!%$%k(B) $B$G$"$C$?$J$i!"(B@code{nneething} $B$O%X%C%@!<$r5u6u$+$i:n$j(B
+$B=P$7$^$9!#$3$l$O%U%!%$%k$N=jM-<T!"L>A0!"F|IU$r;H$$!"$3$l$i$NMWAG$KBP$7$F(B
+$B$G$-$k$3$H$r2?$G$b$d$j$^$9!#(B
 
 $B$3$l$O$"$J$?$K$H$C$F$OA4$F<+F0E*$K5/$3$k$3$H$G!"$"$J$?$O%K%e!<%9%0%k!<%W(B
 $B$K$H$F$bNI$/;w$?2?$+$r8+$;$i$l$k$3$H$K$J$k$G$7$g$&!#$[$s$H$&$K@#J,0c$o$J(B
@@ -16947,22 +16947,20 @@ Gnus Diary $B%P%C%/%(%s%I$O!"(B($B>o$K<h$j>C$5$l$k$3$H$,L5$$(B) $BDj4|E*$JM
 * Sending or Not Sending::      $BF|5-%a%C%;!<%8$rAw$k$H$-$KCm0U$9$k$3$H(B
 @end menu
 
-@c TRANSLATEME
 @node The NNDiary Back End
-@subsection The NNDiary Back End
+@subsection NNDiary $B%P%C%/%(%s%I(B
 @cindex nndiary
 @cindex the nndiary back end
 
-@code{nndiary} is a back end very similar to @code{nnml} (@pxref{Mail
-Spool}).  Actually, it could appear as a mix of @code{nnml} and
-@code{nndraft}.  If you know @code{nnml}, you're already familiar with
-the message storing scheme of @code{nndiary}: one file per message, one
-directory per group.
+@code{nndiary} $B$O(B @code{nnml} (@pxref{Mail Spool}) $B$K$H$F$b$h$/;w$F$$$k(B
+$B%P%C%/%(%s%I$G$9!#8=$K$=$l$O(B @code{nnml} $B$H(B @code{nndraft} $B$r9g$o$;$?$b(B
+$B$N$K8+$($k$G$7$g$&!#(B@code{nnml} $B$r$4B8CN$J$i$P!"$"$J$?$O$9$G(B
+$B$K(B @code{nndiary} $B$,%a%C%;!<%8$r3JG<$9$k;EAH$_(B ($B0lDL$"$?$j0l$D$N%U%!%$%k!"(B
+$B0l%0%k!<%W$"$?$j0l$D$N%G%#%l%/%H%j(B) $B$K@:DL$7$F$$$^$9!#(B
 
-  Before anything, there is one requirement to be able to run
-@code{nndiary} properly: you @emph{must} use the group timestamp feature
-of Gnus.  This adds a timestamp to each group's parameters.  @ref{Group
-Timestamp} to see how it's done.
+$B2?$O$5$F$*$-!"(B@code{nndiary} $B$r$A$c$s$HF0:n$5$;$k$K$O!"0l$D$NMW7o$,$"$j(B
+$B$^$9(B: Gnus $B$N%0%k!<%W$NF|IU$N5!G=$r;H$o(B@emph{$B$J$1$l$P(B}$B$J$j$^$;$s!#$=$l$,(B
+$B$I$&$$$&$U$&$K9T$J$o$l$k$+$O(B @ref{Group Timestamp} $B$r8+$F2<$5$$!#(B
 
 @menu
 * Diary Messages::              $B%a%C%;!<%8$r(B nndiary $B$G;H$($k$h$&$K$9$k$K$O(B
@@ -16971,48 +16969,47 @@ Timestamp} to see how it's done.
 @end menu
 
 @node Diary Messages
-@subsubsection Diary Messages
+@subsubsection $BF|!9$N%a%C%;!<%8(B
 @cindex nndiary messages
 @cindex nndiary mails
 
-@code{nndiary} messages are just normal ones, except for the mandatory
-presence of 7 special headers.  These headers are of the form
-@code{X-Diary-<something>}, @code{<something>} being one of
-@code{Minute}, @code{Hour}, @code{Dom}, @code{Month}, @code{Year},
-@code{Time-Zone} and @code{Dow}.  @code{Dom} means ``Day of Month'', and
-@code{dow} means ``Day of Week''.  These headers actually behave like
-crontab specifications and define the event date(s):
+$B<7$D$NFCJL$J%X%C%@!<$,I,?\$G$"$k$3$H0J30!"(B@code{nndiary} $B$N%a%C%;!<%8$O(B
+$BIaDL$N$b$N$G$9!#$=$l$i$N%X%C%@!<$O(B @code{X-Diary-<something>} $B$NMM<0$GI=(B
+$B$5$l!"(B@code{<something>} $B$NItJ,$O(B @code{Minute}, @code{Hour},
+@code{Dom}, @code{Month}, @code{Year}, @code{Time-Zone} $B$*$h$S(B
+@code{Dow} $B$N$&$A$N0l$D$G$9!#(B@code{Dom} $B$O!VF|(B(Day of Month)$B!W$r!"(B
+@code{Dow} $B$O!VMKF|(B(Day ofWeek)$B!W$r0UL#$7$^$9!#$3$l$i$N%X%C%@!<(B
+$B$O(B crontab $B$N;EMM$N$h$&$KF/$$$F!"M=DjF|$rDj5A$7$^$9!#(B
 
 @itemize @bullet
 @item
-For all headers except the @code{Time-Zone} one, a header value is
-either a star (meaning all possible values), or a list of fields
-(separated by a comma).
+@code{Time-Zone} $B$N$b$N0J30$N$9$Y$F$N%X%C%@!<$K$D$$$F!"%X%C%@!<$NCM$O@1(B
+$B0u(B ($B2DG=$J$9$Y$F$NCM$r0UL#$7$^$9(B) $B$+%3%s%^$G6h@Z$i$l$?%U%#!<%k%I$N%j%9%H(B
+$B$G$9!#(B
 @item
-A field is either an integer, or a range.
+$B%U%#!<%k%I$O@0?t$+HO0O$G$9!#(B
 @item
-A range is two integers separated by a dash.
+$BHO0O$H$O!"%@%C%7%e(B (-) $B$G6h@Z$i$l$?Fs$D$N@0?t$G$9!#(B
 @item
-Possible integer values are 0--59 for @code{Minute}, 0--23 for
-@code{Hour}, 1--31 for @code{Dom}, 1--12 for @code{Month}, above 1971
-for @code{Year} and 0--6 for @code{Dow} (0 meaning Sunday).
+$B2DG=$JCM$O!"$=$l$>$l(B @code{Minute} $B$K$O(B 0--59$B!"(B@code{Hour} $B$K$O(B 0--23$B!"(B
+@code{Dom} $B$K$O(B 1--31$B!"(B@code{Month} $B$K$O(B 1--12$B!"(B@code{Year} $B$K$O(B 1971 $B$h(B
+$B$jBg$-$$CM!"$=$7$F(B @code{Dow} $B$K$O(B 0--6 (0 $B$,F|MKF|(B) $B$G$9!#(B
 @item
-As a special case, a star in either @code{Dom} or @code{Dow} doesn't
-mean ``all possible values'', but ``use only the other field''.  Note
-that if both are star'ed, the use of either one gives the same result.
+$BFCJL$J>l9g$H$7$F!"(B@code{Dom} $B$^$?$O(B @code{Dow} $B$K$*$1$k@10u$O!V2DG=$J$9(B
+$B$Y$F$NCM!W$G$O$J$/!"!V$b$&0lJ}$N%U%#!<%k%I$@$1$r;H$&!W0UL#$K$J$j$^$9!#N>(B
+$BJ}$H$b@10u$K$7$?>l9g$O!"$I$A$i$r;H$C$F$bF1$87k2L$K$J$k$3$H$KCm0U$7$F2<$5(B
+$B$$!#(B
 @item
-The @code{Time-Zone} header is special in that it can only have one
-value (@code{GMT}, for instance).  A star doesn't mean ``all possible
-values'' (because it makes no sense), but ``the current local time
-zone''.  Most of the time, you'll be using a star here.  However, for a
-list of available time zone values, see the variable
-@code{nndiary-headers}.
+@code{Time-Zone} $B%X%C%@!<$O!"CM$r0l$D$7$+;}$F$J$$(B ($BNc$($P(B @code{GMT}) $BE@(B
+$B$GFCJL$G$9!#@10u$O!V2DG=$J$9$Y$F$NCM!W$G$O$J$/(B ($B$=$l$O0UL#$r$J$5$J$$$N$G(B)$B!"(B
+$B!V8=:_$N%m!<%+%k$J%?%$%`%>!<%s!W$r0UL#$7$^$9!#$3$3$G$O$?$$$F$$@10u$r;H$&(B
+$B$G$7$g$&!#$7$+$7!"MxMQ$G$-$k%?%$%`%>!<%s$NCM$K$D$$$F$O!"JQ(B
+$B?t(B @code{nndiary-headers} $B$r8+$F2<$5$$!#(B
 @end itemize
 
-As a concrete example, here are the diary headers to add to your message
-for specifying ``Each Monday and each 1st of month, at 12:00, 20:00,
-21:00, 22:00, 23:00 and 24:00, from 1999 to 2010'' (I'll let you find
-what to do then):
+1999$BG/$+$i(B 2010$BG/$^$G$NKh=57nMKF|$HKh7n$N0lF|$N(B 12:00, 20:00, 21:00,
+22:00, 23:00 $B$*$h$S(B 24:00 $B$r@_Dj$9$k$?$a$K!"%a%C%;!<%8$K2C$($kF|5-%X%C%@!<(B
+$B$N6qBNNc$G$9(B ($B$=$N;~2?$r$7$?$iNI$$$+$O!"<+J,$G9M$($F2<$5$$(B):
 
 @example
 X-Diary-Minute: 0
@@ -17025,46 +17022,48 @@ X-Diary-Time-Zone: *
 @end example
 
 @node Running NNDiary
-@subsubsection Running NNDiary
+@subsubsection NNDiary $B$rF0$+$9(B
 @cindex running nndiary
 @cindex nndiary operation modes
 
-@code{nndiary} has two modes of operation: ``traditional'' (the default)
-and ``autonomous''.  In traditional mode, @code{nndiary} does not get new
-mail by itself.  You have to move (@kbd{B m}) or copy (@kbd{B c}) mails
-from your primary mail back end to nndiary groups in order to handle them
-as diary messages.  In autonomous mode, @code{nndiary} retrieves its own
-mail and handles it independently from your primary mail back end.
+@code{nndiary} $B$K$OFs$D$NF0:n%b!<%I$,$"$j$^$9!#0l$D$O%G%#%U%)%k%H$N(B
+$B!VEAE}7?(B(traditional)$B!W!"$b$&0l$D$O!V<+N'7?(B(autonomous)$B!W$G$9!#EAE}7?$N(B
+$B%b!<%I$G$O!"(B@code{nndiary} $B$O$=$l<+?H$,?7Ce%a!<%k$r<hF@$9$k$3$H$O$"$j$^(B
+$B$;$s!#F|5-%a%C%;!<%8$H$7$F07$&$?$a$K!"%a!<%k$r4pK\$N%a!<%k!&%P%C%/%(%s%I(B
+$B$+$i(B nndiary $B%0%k!<%W$K!"0\F0(B (@kbd{B m}) $B$^$?$O%3%T!<(B (@kbd{B c}) $B$7$J(B
+$B$1$l$P$J$j$^$;$s!#<+N'7?$N%b!<%I$G$O!"(B@code{nndiary} $B$O$=$l<+?H$N%a!<%k(B
+$B$r<h$C$F$-$F!"4pK\$N%a!<%k!&%P%C%/%(%s%I$H$OFHN)$7$F$=$l$r07$$$^$9!#(B
 
-One should note that Gnus is not inherently designed to allow several
-``master'' mail back ends at the same time.  However, this does make
-sense with @code{nndiary}: you really want to send and receive diary
-messages to your diary groups directly.  So, @code{nndiary} supports
-being sort of a ``second primary mail back end'' (to my knowledge, it is
-the only back end offering this feature).  However, there is a limitation
-(which I hope to fix some day): respooling doesn't work in autonomous
-mode.
+$BK\<AE*$K(B Gnus $B$O!"F1;~$KJ#?t$N!V%^%9%?!<!W%a!<%k!&%P%C%/%(%s%I$r5vMF$9$k(B
+$B$h$&$K$O@_7W$5$l$F$$$J$3$H$K!"Cm0U$9$Y$-$G$9!#$7$+$7(B @code{nndiary} $B$G$O!"(B
+$B$3$l$O0UL#$r$J$7$^$9!#$"$J$?$OK\Ev$K!"F|5-%a%C%;!<%8$rF|5-%0%k!<%W$KD>@\(B
+$BAw$C$F!"$=$l$i$r<u$1<h$j$?$$$N$G$9!#$=$3$G(B @code{nndiary} $B$O!"$^$5$K!VFs(B
+$BHVL\$NBh0l%a!<%k!&%P%C%/%(%s%I!W$r%5%]!<%H$7$^$9(B ($B;d$,CN$C$F$$$k8B$j!"$=(B
+$B$l$O$3$N5!G=$rDs6!$9$kM#0l$N%P%C%/%(%s%I$G$9(B)$B!#$7$+$7$J$,$i@)Ls$,$"$C(B
+$B$F(B ($B$$$D$NF|$K$+2r>C$9$k$3$H$r4j$$$^$9$,(B)$B!"<+N'7?$N%b!<%I$G$O:F%9%W!<%k(B
+$B$,$G$-$^$;$s!#(B
 
-In order to use @code{nndiary} in autonomous mode, you have several
-things to do:
+$B<+N'7?$N%b!<%I$G(B @code{nndiary} $B$r;H$&$?$a$K$O!"$$$/$D$+$N$3$H$r$d$C$F$b(B
+$B$i$o$J$1$l$P$J$j$^$;$s(B:
 
 @itemize @bullet
 @item
-Allow @code{nndiary} to retrieve new mail by itself.  Put the following
-line in your @file{gnusrc} file:
+$B?7Ce%a!<%k$r(B @code{nndiary} $B$,<+J,$G<h$j9~$a$k$h$&$K$7$^$9!#0J2<$N9T(B
+$B$r(B @file{gnusrc} $B%U%!%$%k$K5-F~$7$F2<$5$$(B:
 
 @lisp
 (setq nndiary-get-new-mail t)
 @end lisp
 @item
-You must arrange for diary messages (those containing @code{X-Diary-*}
-headers) to be split in a private folder @emph{before} Gnus treat them.
-Again, this is needed because Gnus cannot (yet ?) properly handle
-multiple primary mail back ends.  Getting those messages from a separate
-source will compensate this misfeature to some extent.
+$BF|5-%a%C%;!<%8(B (@code{X-Diary-*} $B%X%C%@!<$r4^$s$G$$$k(B) $B$,!"(BGnus $B$,$=$l$i(B
+$B$r=hM}$9$k(B @emph{$BA0(B} $B$K@lMQ$N%U%)%k%@!<$KJ,G[$5$l$k$h$&$K!"=`Hw$r9T$J$o(B
+$B$J$1$l$P$J$j$^$;$s!#7+$jJV$7$^$9$,!"(BGnus $B$,J#?t$NBh0l%a!<%k!&%P%C%/%(%s(B
+$B%I$rE,@Z$K07$&$3$H$,(B ($B$^$@(B ?) $B$G$-$J$$$N$G!"$3$l$,I,MW$G$9!#JL!9$N%=!<%9(B
+$B$+$i$=$l$i$N%a%C%;!<%8$r<h$j9~$`$3$H$K$h$C$F!"$3$N7gE@$O$"$kDxEYJd$o$l$^(B
+$B$9!#(B
 
-As an example, here's my procmailrc entry to store diary files in
-@file{~/.nndiary} (the default @code{nndiary} mail source file):
+$BF|5-%U%!%$%k$r(B @file{~/.nndiary} ($B$3$l$,%G%#%U%)%k%H$N(B @code{nndiary} $B$N(B
+$B%a!<%k%=!<%9!&%U%!%$%k$G$9(B) $B$K3JG<$9$k$?$a$N(B procmailrc $B$N9`$NNc$G$9(B:
 
 @example
 :0 HD :
@@ -17073,137 +17072,134 @@ As an example, here's my procmailrc entry to store diary files in
 @end example
 @end itemize
 
-Once this is done, you might want to customize the following two options
-that affect the diary mail retrieval and splitting processes:
+$B$$$C$?$s$3$l$r<B;\$7$?$i!"F|5-%a!<%k$N<h$j9~$_$HJ,3d$N=hM}$K1F6A$9$k!"0J(B
+$B2<$NFs$D$N%*%W%7%g%s$r%+%9%?%^%$%:$9$kI,MW$,$"$k$G$7$g$&(B:
 
 @defvar nndiary-mail-sources
-This is the diary-specific replacement for the standard
-@code{mail-sources} variable.  It obeys the same syntax, and defaults to
-@code{(file :path "~/.nndiary")}.
+$BI8=`$N(B @code{mail-sources} $BJQ?t$N!"F|5-MQ$KFC2=$7$?BeBXIJ$G$9!#F1$8%7%s(B
+$B%?%C%/%9$r;H$$!"%G%#%U%)%k%HCM$O(B @code{(file :path "~/.nndiary")} $B$G$9!#(B
 @end defvar
 
 @defvar nndiary-split-methods
-This is the diary-specific replacement for the standard
-@code{nnmail-split-methods} variable.  It obeys the same syntax.
+$BI8=`$N(B @code{nnmail-split-methods} $BJQ?t$N!"F|5-MQ$KFC2=$7$?BeBXIJ$G$9!#(B
+$BF1$8%7%s%?%C%/%9$r;H$$$^$9!#(B
 @end defvar
 
-  Finally, you may add a permanent @code{nndiary} virtual server
-(something like @code{(nndiary "diary")} should do) to your
-@code{gnus-secondary-select-methods}.
+$B:G=*E*$K$O(B @code{gnus-secondary-select-methods} $B$K!"915WE*(B
+$B$J(B @code{nndiary} $B2>A[%5!<%P!<(B (@code{(nndiary "diary")} $B$,9T$J$&$Y$-$G(B
+$B$"$k$h$&$J$b$N(B) $B$rDI2C$7$F$bNI$$$G$7$g$&!#(B
 
-  Hopefully, almost everything (see the TODO section in
-@file{nndiary.el}) will work as expected when you restart Gnus: in
-autonomous mode, typing @kbd{g} and @kbd{M-g} in the group buffer, will
-also get your new diary mails and split them according to your
-diary-specific rules, @kbd{F} will find your new diary groups etc.
+$B$&$^$/$$$1$P!"(BGnus $B$r:F5/F0$9$k$H!"$[$H$s$I$9$Y(B
+$B$F(B (@file{nndiary.el} $B$N(B TODO $B$N9`$r;2>H(B) $B$,4|BTDL$j$K(B ($B<+N'7?$N%b!<%I$G(B
+$B$O!"(B@kbd{g} $B$d(B @kbd{M-g} $B$r%0%k!<%W%P%C%U%!$G%?%$%W$9$l$P?7$7$$F|5-%a!<(B
+$B%k$r$b<h$j9~$s$G!"F|5-MQ$KFC2=$7$?5,B'$K=>$C$F$=$l$i$rJ,3d$9$k$7!"(B
+@kbd{F} $B$O?7$7$$F|5-%0%k!<%W$r8+$D$1$F$/$l$k!"$J$I(B) $BF0:n$9$k$G$7$g$&!#(B
 
 @node Customizing NNDiary
-@subsubsection Customizing NNDiary
+@subsubsection NNDiary $B$N%+%9%?%^%$%:(B
 @cindex customizing nndiary
 @cindex nndiary customization
 
-Now that @code{nndiary} is up and running, it's time to customize it.
-The custom group is called @code{nndiary} (no, really ?!).  You should
-browse it to figure out which options you'd like to tweak.  The following
-two variables are probably the only ones you will want to change:
+$B$5$"(B @code{nndiary} $B$,N)$A>e$,$C$FF0:n$7$F$$$^$9!#$=$l$r%+%9%?%^%$%:$9$k(B
+$B$H$-$,Mh$^$7$?!#%+%9%?%^%$%:$9$k$?$a$N%0%k!<%W$O(B @code{nndiary} $B$G$9(B ($B$X(B
+$B$(!<(B)$B!#$I$N%*%W%7%g%s$r%+%9%?%^%$%:$7E]$7$?$$$+$r8+$D$1$k$?$a$K!"$=$l$K(B
+$BL\$rDL$7$F2<$5$$!#$"$J$?$,JQ99$7$?$$$N$O!"$*$=$i$/0J2<$N$?$C$?Fs$D$NJQ?t(B
+$B$G$7$g$&(B:
 
 @defvar nndiary-reminders
-This is the list of times when you want to be reminded of your
-appointements (e.g. 3 weeks before, then 2 days before, then 1 hour
-before and that's it).  Remember that ``being reminded'' means that the
-diary message will pop up as brand new and unread again when you get new
-mail.
+$BM=Dj$r;W$$=P$5$;$F$b$i$$$?$$;~9o$N%j%9%H(B ($BNc$($P;0=54VA0!"$=$l$+$iFsF|A0!"(B
+$B$=$l$+$i0l;~4VA0!"$=$7$F$=$N$H$-(B) $B$G$9!#!V;W$$=P$5$;$F$b$i$&!W$N0UL#$O!"(B
+$B?7Ce%a!<%k$r<h$j9~$s$@$H$-$K!"F|5-%a%C%;!<%8$,???7$7$/L$FI$K$J$C$F!"%]%C(B
+$B%W%"%C%W$9$k$3$H$G$"$k$3$H$r;W$$=P$7$F2<$5$$!#(B
 @end defvar
 
 @defvar nndiary-week-starts-on-monday
-Rather self-explanatory.  Otherwise, Sunday is assumed (this is the
-default).
+$BFI$s$G;z$NG!$7!#$5$b$J$/$PF|MKF|$,2>Dj$5$l$^$9(B ($B$=$l$,%G%#%U%)%k%H$G$9(B)$B!#(B
 @end defvar
 
-
 @node The Gnus Diary Library
-@subsection The Gnus Diary Library
+@subsection Gnus Diary $B%i%$%V%i%j(B
 @cindex gnus-diary
 @cindex the gnus diary library
 
-Using @code{nndiary} manually (I mean, writing the headers by hand and
-so on) would be rather boring.  Fortunately, there is a library called
-@code{gnus-diary} written on top of @code{nndiary}, that does many
-useful things for you.
+@code{nndiary} $B$r<j:n6H$G;H$&$N(B ($B%X%C%@!<$r<j$G=q$/!"$H$+(B) $B$O!"$$$5$5$+(B
+$B$&$s$6$j$7$^$9!#9,$$(B @code{nndiary} $B$N>e0L3,AX$K=q$+$l(B
+$B$?(B @code{gnus-diary} $B$H$$$&%i%$%V%i%j$,$"$C$F!"$?$/$5$s$NJXMx$J$3$H$r$d$C(B
+$B$F$/$l$^$9!#(B
 
-  In order to use it, add the following line to your @file{gnusrc} file:
+$B$=$l$r;H$&$?$a$K$O!"0J2<$N9T$r(B @file{gnusrc} $B%U%!%$%k$K2C$($F2<$5$$(B:
 
 @lisp
 (require 'gnus-diary)
 @end lisp
 
-  Also, you shouldn't use any @code{gnus-user-format-function-[d|D]}
-(@pxref{Summary Buffer Lines}).  @code{gnus-diary} provides both of these
-(sorry if you used them before).
-
+$B$5$i$K!"$I$s$J(B @code{gnus-user-format-function-[d|D]} (@pxref{Summary
+Buffer Lines}) $B$b!";H$C$F$O$$$1$^$;$s!#(B@code{gnus-diary} $B$O$=$l$i$NN>J}(B
+$B$rDs6!$7$^$9(B ($B$"$J$?$,$=$l$i$r;H$C$F$$$?$i!"$9$_$^$;$s(B)$B!#(B
 
 @menu
-* Diary Summary Line Format::   $B$h$jNI$$35N,%P%C%U%!$N%b!<%I9T$N=qK!;EMM(B
+* Diary Summary Line Format::   $B$h$jNI$$35N,9T;EMM(B
 * Diary Articles Sorting::      $B%a%C%;!<%8$rJB$YBX$($k5$$NMx$$$?J}K!(B
 * Diary Headers Generation::    $B<j:n6H$G$=$l$r$7$J$$$G(B
 * Diary Group Parameters::      $B<j:n6H$G$=$l$i$r07$o$J$$$G(B
 @end menu
 
 @node Diary Summary Line Format
-@subsubsection Diary Summary Line Format
+@subsubsection $BF|5-$N35N,9T;EMM(B
 @cindex diary summary buffer line
 @cindex diary summary line format
 
-Displaying diary messages in standard summary line format (usually
-something like @samp{From Joe: Subject}) is pretty useless.  Most of
-the time, you're the one who wrote the message, and you mostly want to
-see the event's date.
+$BI8=`$N35N,9T;EMM(B ($BDL>o(B @samp{From Joe: Subject} $B$N$h$&$J$b$N(B) $B$GF|5-%a%C(B
+$B%;!<%8$rI=<($9$k$N$O!"$^$C$?$/Lr$KN)$A$^$;$s!#$?$$$F$$$O$"$J$?$,%a%C%;!<(B
+$B%8$r=q$$$??M$G!"$*$*$+$?M=Dj$NF|IU$r8+$?$$$H;W$C$F$$$k$G$7$g$&!#(B
 
-  @code{gnus-diary} provides two supplemental user formats to be used in
-summary line formats.  @code{D} corresponds to a formatted time string
-for the next occurrence of the event (e.g. ``Sat, Sep 22 01, 12:00''),
-while @code{d} corresponds to an approximative remaining time until the
-next occurrence of the event (e.g. ``in 6 months, 1 week'').
+@code{gnus-diary} $B$O!"35N,9T;EMM$G;H$&Fs$D$NDI2C$NMxMQ<TDj5A$N=qK!;EMM$r(B
+$BDs6!$7$^$9!#(B@code{D} $B$O<!$NM=Dj$,@8$8$k$H$-$N$?$a$N@07A$5$l$?;~9oI=(B
+$B<((B ($BNc$($P(B ``Sat, Sep 22 01, 12:00'') $B$rI=$9$N$KBP$7$F!"(B@code{d} $B$O<!$N(B
+$BM=Dj$,@8$8$k$^$G$N$*$*$h$=$N;D$j;~4V(B ($BNc$($P(B ``in 6 months, 1 week'') $B$r(B
+$BI=$7$^$9!#(B
 
-  For example, here's how Joe's birthday is displayed in my
-@code{nndiary+diary:birthdays} summary buffer (note that the message is
-expirable, but will never be deleted, as it specifies a periodic event):
+$B%8%g!<$NCB@8F|$,!"35N,9T$K$I$&I=<($5$l$k$+$NNc$G$9(B ($BDj4|E*$JM=Dj$r;XDj$9(B
+$B$k$H>C$5$l$J$$$3$H$r=|$$$F!"%a%C%;!<%8$,4|8B@Z$l>C5n2DG=$G$"$k$3$H$KCmL\(B
+$B$7$F2<$5$$(B):
 
 @example
    E  Sat, Sep 22 01, 12:00: Joe's birthday (in 6 months, 1 week)
 @end example
 
-In order to get something like the above, you would normally add the
-following line to your diary groups'parameters:
+$B>e5-$N$h$&$J$b$N$rF@$k$?$a$K!"IaCJ$@$C$?$i!"$"$J$?$O0J2<$N9T$rF|5-%0%k!<(B
+$B%W$N%Q%i%a!<%?$K2C$($h$&$H$9$k$G$7$g$&(B:
 
 @lisp
 (gnus-summary-line-format "%U%R%z %uD: %(%s%) (%ud)\n")
 @end lisp
 
-However, @code{gnus-diary} does it automatically (@pxref{Diary Group
-Parameters}).  You can however customize the provided summary line format
-with the following user options:
+$B$G$b(B @code{gnus-diary} $B$O$=$l$r<+F0$G9T$J$$$^$9(B (@pxref{Diary Group
+Parameters})$B!#$"$J$?$O$7$+$7!"0J2<$N%f!<%6!&%*%W%7%g%s72$GDs6!$5$l$k35N,(B
+$B9T;EMM$r!"%+%9%?%^%$%:$9$k$3$H$,$G$-$^$9(B:
 
 @defvar gnus-diary-summary-line-format
-Defines the summary line format used for diary groups (@pxref{Summary
-Buffer Lines}).  @code{gnus-diary} uses it to automatically update the
-diary groups'parameters.
+$BF|5-%0%k!<%W$G;H$&35N,9T;EMM$rDj5A$7$^$9(B (@pxref{Summary Buffer Lines})$B!#(B
+@code{gnus-diary} $B$O$=$l$r!"F|5-%0%k!<%W$N%Q%i%a!<%?$r<+F0$G99?7$9$k$?$a(B
+$B$K;H$$$^$9!#(B
 @end defvar
 
 @defvar gnus-diary-time-format
-Defines the format to display dates in diary summary buffers.  This is
-used by the @code{D} user format.  See the docstring for details.
+$BF|5-$N35N,%P%C%U%!$KF|IU$rI=<($9$k$?$a$N=qK!;EMM$rDj5A$7$^$9!#$3$l(B
+$B$OMxMQ<TDj5A$N=qK!;EMM(B @code{D} $B$G;H$o$l$^$9!#>\:Y$OJQ?t$N@bL@J8$r8+$F2<(B
+$B$5$$!#(B
 @end defvar
 
 @defvar gnus-diary-delay-format-function
-Defines the format function to use for displaying delays (remaining
-times) in diary summary buffers.  This is used by the @code{d} user
-format.  There are currently built-in functions for English and French;
-you can also define your own.  See the docstring for details.
+$BF|5-$N35N,%P%C%U%!$KCY1d(B ($B;D$j;~4V(B) $B$rI=<($9$k$?$a$N@07A4X?t$rDj5A$7$^$9!#(B
+$B$3$l$OMxMQ<TDj5A$N=qK!;EMM(B @code{d} $B$G;H$o$l$^$9!#8=:_$O1Q8l$H%U%i%s%98l(B
+$B$N$?$a$NAH$_9~$_4X?t$,$"$j!"<+J,$GDj5A$9$k$3$H$b$G$-$^$9!#>\:Y$OJQ?t$N@b(B
+$BL@J8$r8+$F2<$5$$!#(B
 @end defvar
 
+@c TRANSLATEME
 @node Diary Articles Sorting
-@subsubsection Diary Articles Sorting
+@subsubsection $BF|5-5-;v$NJB$YBX$((B
 @cindex diary articles sorting
 @cindex diary summary lines sorting
 @findex gnus-summary-sort-by-schedule
@@ -17223,7 +17219,7 @@ default) sorting functions in the group parameters (@pxref{Diary Group
 Parameters}).
 
 @node Diary Headers Generation
-@subsubsection Diary Headers Generation
+@subsubsection $BF|5-%X%C%@!<$N@8@.(B
 @cindex diary headers generation
 @findex gnus-diary-check-message
 
@@ -17245,7 +17241,7 @@ you can very easily reschedule an already valid diary message, for
 instance.
 
 @node Diary Group Parameters
-@subsubsection Diary Group Parameters
+@subsubsection $BF|5-%0%k!<%W$N%Q%i%a!<%?(B
 @cindex diary group parameters
 
 When you create a new diary group, or visit one, @code{gnus-diary}
@@ -17258,7 +17254,7 @@ on a diary group to prepare a message, these headers will be inserted
 automatically (although not filled with proper values yet).
 
 @node Sending or Not Sending
-@subsection Sending or Not Sending
+@subsection $BAw?.$9$k$Y$-$+!"$7$J$$$Y$-$+(B
 
 Well, assuming you've read of of the above, here are two final notes on
 mail sending with @code{nndiary}:
@@ -22666,10 +22662,10 @@ Ham $B$,(B spam $B%0%k!<%W$+$i0\F0$5$l$kA0$K0u$r>C$7$?$$>l9g$O!"$3$NJQ?t$r%;%
 $B$O(B @code{spam-use-regex-headers} $B%P%C%/%(%s%I$r;H$&>l9g!"(B
 @code{X-Spam-Status} $B%X%C%@!<$,;H$o$l$^$9!#(B@code{spam-use-bogofilter} $B$r(B
 $B;H$&>l9g$O!"(B@code{X-Bogosity} $B$,;H$o$l$^$9!#(B@code{spam-use-crm114} $B$r;H(B
-$B$&$N$J$i$P!"(BCRM114 $B%9%3%"!&%U%)!<%^%C%H$K9gCW$9$k!"$$$:$l$+$N%X%C%@$,;H(B
-$B$o$l$^$9!#(B@file{spam.el} $B$r%m!<%I$9$k(B @emph{$BA0(B} $B$K!"E,@Z$J%P%C%/%(%s%IJQ(B
-$B?t$r(B t $B$K@_Dj$9$k8B$j!"$&$^$/$$$/$G$7$g$&!#(B@code{spam.el} $B$O!"(BGnus $B$,Fb(B
-$BItE*$KI,MW$H$9$k%X%C%@!<$N%j%9%H$K!"@5$7$$%X%C%@!<$r<+F0E*$KDI2C$7$^$9!#(B
+$B$&$N$J$i$P!"(BCRM114 $B%9%3%"!&%U%)!<%^%C%H$K9gCW$9$k!"$$$:$l$+$N%X%C%@!<$,(B
+$B;H$o$l$^$9!#(B@file{spam.el} $B$r%m!<%I$9$k(B @emph{$BA0(B} $B$K!"E,@Z$J%P%C%/%(%s%I(B
+$BJQ?t$r(B t $B$K@_Dj$9$k8B$j!"$&$^$/$$$/$G$7$g$&!#(B@code{spam.el} $B$O!"(BGnus $B$,(B
+$BFbItE*$KI,MW$H$9$k%X%C%@!<$N%j%9%H$K!"@5$7$$%X%C%@!<$r<+F0E*$KDI2C$7$^$9!#(B
 
 $B35N,%P%C%U%!$K(B spam $B$N%9%3%"$rI=<($5$;$k$K$O!"$3$N9T$r(B @code{gnus.el} $B%U%!(B
 $B%$%k$K2C$($F2<$5$$(B ($BCm(B: @code{spam.el} $B$O%G%#%U%)%k%H$G$O$=$l$r9T$J$o$J(B
