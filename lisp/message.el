@@ -3552,8 +3552,10 @@ be added to the \"References\" field."
 		 (prog1
 		     t
 		   (delete-windows-on buffer t)
-		   ; The mark will be set at the end of the article.
-		   (insert-buffer-substring buffer))))
+		   ; Set the mark at the end of the yanked message.
+		   (push-mark (save-excursion
+				(insert-buffer-substring buffer)
+				(point))))))
       ;; Add new IDs to the References field.
       (when (and message-yank-add-new-references
 		 (interactive-p))
