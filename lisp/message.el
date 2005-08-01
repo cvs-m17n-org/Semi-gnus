@@ -3553,7 +3553,7 @@ be added to the \"References\" field."
 		     t
 		   (delete-windows-on buffer t)
 		   ; The mark will be set at the end of the article.
-		   (insert-buffer buffer))))
+		   (insert-buffer-substring buffer))))
       ;; Add new IDs to the References field.
       (when (and message-yank-add-new-references
 		 (interactive-p))

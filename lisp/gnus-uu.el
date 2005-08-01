@@ -901,16 +901,16 @@ When called interactively, prompt for REGEXP."
 	(if gnus-uu-digest-buffer
 	    (with-current-buffer gnus-uu-digest-buffer
 	      (erase-buffer)
-	      (insert-buffer "*gnus-uu-pre*")
+	      (insert-buffer-substring "*gnus-uu-pre*")
 	      (goto-char (point-max))
-	      (insert-buffer "*gnus-uu-body*"))
+	      (insert-buffer-substring "*gnus-uu-body*"))
 	  (save-excursion
 	    (set-buffer "*gnus-uu-pre*")
 	    (insert (format "\n\n%s\n\n" (make-string 70 ?-)))
 	    (if gnus-uu-digest-buffer
 		(with-current-buffer gnus-uu-digest-buffer
 		  (erase-buffer)
-		  (insert-buffer "*gnus-uu-pre*"))
+		  (insert-buffer-substring "*gnus-uu-pre*"))
 	      (gnus-write-buffer-as-coding-system
 	       nnheader-text-coding-system gnus-uu-saved-article-name)))
 	  (save-excursion
@@ -923,7 +923,7 @@ When called interactively, prompt for REGEXP."
 	    (if gnus-uu-digest-buffer
 		(with-current-buffer gnus-uu-digest-buffer
 		  (goto-char (point-max))
-		  (insert-buffer "*gnus-uu-body*"))
+		  (insert-buffer-substring "*gnus-uu-body*"))
 	      (let ((file-name-coding-system nnmail-pathname-coding-system))
 		(write-region-as-coding-system
 		 nnheader-text-coding-system
