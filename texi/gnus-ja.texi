@@ -20937,7 +20937,7 @@ The GNU Emacs Lisp Reference Manual})$B!#(BXEmacs $B$G$O!"%U%l!<%`%W%m%Q%F%#%
 @section $B%b!<%I9T(B
 @cindex mode lines
 
-@vindex gnus-update-mode-lines
+@vindex gnus-updated-mode-lines
 @code{gnus-updated-mode-lines} $B$O$I$N%P%C%U%!$,$=$N%b!<%I9T$r>o$K:G?7$N(B
 $B$b$N$K$7$F$*$/$+$r;XDj$7$^$9!#$=$l$O%7%s%\%k$N%j%9%H$G$9!#;H$&;v$N$G$-$k(B
 $B%7%s%\%k$O(B @code{group}, @code{article}, @code{summary}, @code{server},
