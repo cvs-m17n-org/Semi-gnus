@@ -3145,7 +3145,7 @@ of lines before the signature intact."
 	    (end-of-line -1)))
 	(unless (= point (point))
 	  (kill-region point (point))
-	  (unless (bol)
+	  (unless (bolp)
 	    (insert "\n")))))))
 
 (defun message-newline-and-reformat (&optional arg not-break)
