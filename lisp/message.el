@@ -1040,33 +1040,23 @@ configuration.  See the variable `gnus-cite-attribution-suffix'."
 (defcustom message-yank-prefix "> "
   "*Prefix inserted on the lines of yanked messages.
 Fix `message-cite-prefix-regexp' if it is set to an abnormal value.
-See also `message-yank-cited-prefix'."
+See also `message-yank-cited-prefix' and `message-yank-empty-prefix'."
   :type 'string
   :link '(custom-manual "(message)Insertion Variables")
   :group 'message-insertion)
 
-(defcustom message-yank-add-new-references t
-  "Non-nil means new IDs will be added to \"References\" field when an
-article is yanked by the command `message-yank-original' interactively.
-If it is a symbol `message-id-only', only an ID from \"Message-ID\" field
-is used, otherwise IDs extracted from \"References\", \"In-Reply-To\" and
-\"Message-ID\" fields are used."
-  :type '(radio (const :tag "Do not add anything" nil)
-		(const :tag "From Message-Id, References and In-Reply-To fields" t)
-		(const :tag "From only Message-Id field." message-id-only))
-  :group 'message-insertion)
-
-(defcustom message-list-references-add-position nil
-  "Integer value means position for adding to \"References\" field when
-an article is yanked by the command `message-yank-original' interactively."
-  :type '(radio (const :tag "Add to last" nil)
-		(integer :tag "Position from last ID"))
-  :group 'message-insertion)
-
 (defcustom message-yank-cited-prefix ">"
-  "*Prefix inserted on cited or empty lines of yanked messages.
+  "*Prefix inserted on cited lines of yanked messages.
 Fix `message-cite-prefix-regexp' if it is set to an abnormal value.
-See also `message-yank-prefix'."
+See also `message-yank-prefix' and `message-yank-empty-prefix'."
+  :version "22.1"
+  :type 'string
+  :link '(custom-manual "(message)Insertion Variables")
+  :group 'message-insertion)
+
+(defcustom message-yank-empty-prefix ">"
+  "*Prefix inserted on empty lines of yanked messages.
+See also `message-yank-prefix' and `message-yank-cited-prefix'."
   :version "22.1"
   :type 'string
   :link '(custom-manual "(message)Insertion Variables")
@@ -1094,6 +1084,16 @@ Note that `message-cite-original' uses `mail-citation-hook' if that is non-nil."
   :group 'message-insertion)
 
 ;;;###autoload
+(defcustom message-indent-citation-function 'message-indent-citation
+  "*Function for modifying a citation just inserted in the mail buffer.
+This can also be a list of functions.  Each function can find the
+citation between (point) and (mark t).  And each function should leave
+point and mark around the citation text as modified."
+  :type 'function
+  :link '(custom-manual "(message)Insertion Variables")
+  :group 'message-insertion)
+
+;;;###autoload
 (defcustom message-suspend-font-lock-when-citing nil
   "Non-nil means suspend font-lock'ing while citing an original message.
 Some lazy demand-driven fontification tools (or Emacs itself) have a
@@ -1104,14 +1104,23 @@ even if it is an add-hoc expedient."
   :type 'boolean
   :group 'message-insertion)
 
-;;;###autoload
-(defcustom message-indent-citation-function 'message-indent-citation
-  "*Function for modifying a citation just inserted in the mail buffer.
-This can also be a list of functions.  Each function can find the
-citation between (point) and (mark t).  And each function should leave
-point and mark around the citation text as modified."
-  :type 'function
-  :link '(custom-manual "(message)Insertion Variables")
+(defcustom message-yank-add-new-references t
+  "Non-nil means new IDs will be added to \"References\" field when an
+article is yanked by the command `message-yank-original' interactively.
+If it is a symbol `message-id-only', only an ID from \"Message-ID\" field
+is used, otherwise IDs extracted from \"References\", \"In-Reply-To\" and
+\"Message-ID\" fields are used."
+  :type '(radio
+	  (const :tag "Do not add anything" nil)
+	  (const :tag "From Message-Id, References and In-Reply-To fields" t)
+	  (const :tag "From only Message-Id field." message-id-only))
+  :group 'message-insertion)
+
+(defcustom message-list-references-add-position nil
+  "Integer value means position for adding to \"References\" field when
+an article is yanked by the command `message-yank-original' interactively."
+  :type '(radio (const :tag "Add to last" nil)
+		(integer :tag "Position from last ID"))
   :group 'message-insertion)
 
 ;;;###autoload
@@ -3501,9 +3510,12 @@ However, if `message-yank-prefix' is non-nil, insert that prefix on each line."
       (save-excursion
 	(goto-char start)
 	(while (< (point) (mark t))
-	  (if (or (looking-at ">") (looking-at "^$"))
-	      (insert message-yank-cited-prefix)
-	    (insert message-yank-prefix))
+	  (cond ((looking-at ">")
+		 (insert message-yank-cited-prefix))
+		((looking-at "^$")
+		 (insert message-yank-empty-prefix))
+		(t
+		 (insert message-yank-prefix)))
 	  (forward-line 1))))
     (goto-char start)))
 
@@ -3637,10 +3649,13 @@ be added to the \"References\" field."
 	  (push (buffer-name buffer) buffers))))
     (nreverse buffers)))
 
+;; FIXME: the following function duplicates `message-cite-original'
+;; almost in entirety, merging the two would be nice.
 (defun message-cite-original-without-signature ()
-  "Cite function in the standard Message manner."
+  "Cite function in the standard Message manner, excluding the signature."
   (let ((start (point))
 	(end (mark t))
+	(x-no-archive nil)
 	(functions
 	 (when message-indent-citation-function
 	   (if (listp message-indent-citation-function)
@@ -3648,15 +3663,15 @@ be added to the \"References\" field."
 	     (list message-indent-citation-function))))
 	(message-reply-headers (or message-reply-headers
 				   (make-mail-header))))
-    (mail-header-set-from message-reply-headers
-			  (save-restriction
-			    (narrow-to-region
-			     (point)
-			     (if (search-forward "\n\n" nil t)
-				 (1- (point))
-			       (point-max)))
-			    (or (message-fetch-field "from")
-				"unknown sender")))
+    (mail-header-set-from
+     message-reply-headers
+     (save-restriction
+       (narrow-to-region (point) (if (search-forward "\n\n" nil t)
+				     (1- (point))
+				   (point-max)))
+       (setq x-no-archive (message-fetch-field "x-no-archive"))
+       (or (message-fetch-field "from")
+	   "unknown sender")))
     ;; Allow undoing.
     (undo-boundary)
     (goto-char end)
@@ -3675,7 +3690,14 @@ be added to the \"References\" field."
     (when message-citation-line-function
       (unless (bolp)
 	(insert "\n"))
-      (funcall message-citation-line-function))))
+      (funcall message-citation-line-function))
+    (when (and x-no-archive
+	       (not message-cite-articles-with-x-no-archive)
+	       (string-match "yes" x-no-archive))
+      (undo-boundary)
+      (delete-region (point) (mark t))
+      (insert "> [Quoted text removed due to X-No-Archive]\n")
+      (forward-line -1))))
 
 (eval-when-compile (defvar mail-citation-hook))		;Compiler directive
 (defun message-cite-original ()

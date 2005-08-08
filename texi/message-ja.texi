@@ -1766,7 +1766,8 @@ Manual}, にあります。
 @cindex quoting
 記事に返答かフォローアップをするときは、普通はあなたが応答している人のも
 のに引用符を付けたいでしょう。引用文の挿入は @dfn{貼り付け} によってなさ
-れ (すでに引用符が付いているものと空行は対象外、
+れ (すでに @code{message-yank-cited-prefix} を使って引用符が付いている行
+と、@code{message-yank-empty-prefix} が付けられた空行は対象外;
 @code{message-yank-cited-prefix} を参照のこと)、それぞれの貼り付けられた
 行はその前に @code{message-yank-prefix} を付けられます。初期値
 は @samp{> } です。
@@ -1776,8 +1777,17 @@ Manual}, にあります。
 @cindex yanking
 @cindex cited
 @cindex quoting
-記事から引用されたテキストがすでに引用されたものだったり空だった場合、そ
-れぞれの行にはこの変数の値が前置されます。初期値は @samp{>} です。
+記事から引用されたテキストがすでに引用されたものだった場合、それぞれの行
+にはこの変数の値が前置されます。初期値は @samp{>} です。
+@code{message-yank-prefix} も参照して下さい。
+
+@item message-yank-empty-prefix
+@vindex message-yank-empty-prefix
+@cindex yanking
+@cindex quoting
+記事からテキストを引用するとき、それぞれの空行にこの変数の値が前置されま
+す。初期値は @samp{>} です。この変数を空文字に設定することによって、引用
+されたテキストを自動的に段落分けすることができます。
 @code{message-yank-prefix} も参照して下さい。
 
 @item message-yank-add-new-references
