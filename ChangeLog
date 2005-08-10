@@ -1,3 +1,7 @@
+2005-08-10  Romain Francoise  <romain@orebokech.com>
+
+	* GNUS-NEWS: Generated.
+
 2005-07-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: Autoload sha1 and sha1-binary for XEmacs.
