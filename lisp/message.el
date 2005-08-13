@@ -1074,7 +1074,7 @@ Used by `message-yank-original' via `message-yank-cite'."
   "*Function for citing an original message.
 Predefined functions include `message-cite-original' and
 `message-cite-original-without-signature'.
-Note that `message-cite-original' uses `mail-citation-hook' if that is non-nil."
+Note that these functions use `mail-citation-hook' if that is non-nil."
   :type '(radio (function-item message-cite-original)
 		(function-item message-cite-original-without-signature)
 		(function-item mu-cite-original)
@@ -3649,59 +3649,14 @@ be added to the \"References\" field."
 	  (push (buffer-name buffer) buffers))))
     (nreverse buffers)))
 
-;; FIXME: the following function duplicates `message-cite-original'
-;; almost in entirety, merging the two would be nice.
-(defun message-cite-original-without-signature ()
-  "Cite function in the standard Message manner, excluding the signature."
-  (let ((start (point))
-	(end (mark t))
-	(x-no-archive nil)
-	(functions
-	 (when message-indent-citation-function
-	   (if (listp message-indent-citation-function)
-	       message-indent-citation-function
-	     (list message-indent-citation-function))))
-	(message-reply-headers (or message-reply-headers
-				   (make-mail-header))))
-    (mail-header-set-from
-     message-reply-headers
-     (save-restriction
-       (narrow-to-region (point) (if (search-forward "\n\n" nil t)
-				     (1- (point))
-				   (point-max)))
-       (setq x-no-archive (message-fetch-field "x-no-archive"))
-       (or (message-fetch-field "from")
-	   "unknown sender")))
-    ;; Allow undoing.
-    (undo-boundary)
-    (goto-char end)
-    (when (re-search-backward message-signature-separator start t)
-      ;; Also peel off any blank lines before the signature.
-      (forward-line -1)
-      (while (looking-at "^[ \t]*$")
-	(forward-line -1))
-      (forward-line 1)
-      (delete-region (point) end)
-      (unless (search-backward "\n\n" start t)
-	;; Insert a blank line if it is peeled off.
-	(insert "\n")))
-    (goto-char start)
-    (mapc 'funcall functions)
-    (when message-citation-line-function
-      (unless (bolp)
-	(insert "\n"))
-      (funcall message-citation-line-function))
-    (when (and x-no-archive
-	       (not message-cite-articles-with-x-no-archive)
-	       (string-match "yes" x-no-archive))
-      (undo-boundary)
-      (delete-region (point) (mark t))
-      (insert "> [Quoted text removed due to X-No-Archive]\n")
-      (forward-line -1))))
+(eval-when-compile (defvar mail-citation-hook))	; Compiler directive
 
-(eval-when-compile (defvar mail-citation-hook))		;Compiler directive
-(defun message-cite-original ()
-  "Cite function in the standard Message manner."
+(defun message-cite-original-1 (strip-signature)
+  "Cite an original message.
+If STRIP-SIGNATURE is non-nil, strips off the signature from the
+original message.
+
+This function uses `mail-citation-hook' if that is non-nil."
   (if (and (boundp 'mail-citation-hook)
 	   mail-citation-hook)
       (run-hooks 'mail-citation-hook)
@@ -3725,6 +3680,20 @@ be added to the \"References\" field."
 	(setq x-no-archive (message-fetch-field "x-no-archive")))
       (goto-char start)
       (mapc 'funcall functions)
+      (when strip-signature
+	;; Allow undoing.
+	(undo-boundary)
+	(goto-char end)
+	(when (re-search-backward message-signature-separator start t)
+	  ;; Also peel off any blank lines before the signature.
+	  (forward-line -1)
+	  (while (looking-at "^[ \t]*$")
+	    (forward-line -1))
+	  (forward-line 1)
+	  (delete-region (point) end)
+	  (unless (search-backward "\n\n" start t)
+	    ;; Insert a blank line if it is peeled off.
+	    (insert "\n"))))
       (when message-citation-line-function
 	(unless (bolp)
 	  (insert "\n"))
@@ -3736,6 +3705,15 @@ be added to the \"References\" field."
 	(delete-region (point) (mark t))
 	(insert "> [Quoted text removed due to X-No-Archive]\n")
 	(forward-line -1)))))
+
+(defun message-cite-original ()
+  "Cite function in the standard Message manner."
+  (message-cite-original-1 nil))
+
+(defun message-cite-original-without-signature ()
+  "Cite function in the standard Message manner.
+This function strips off the signature from the original message."
+  (message-cite-original-1 t))
 
 (defun message-insert-citation-line ()
   "Insert a simple citation line."
