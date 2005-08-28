@@ -1,8 +1,8 @@
 ;;; nntp.el --- nntp access for Gnus
 
-;; Copyright (C) 1987, 1988, 1989, 1990, 1992, 1993, 1994, 1995, 1996,
-;; 1997, 1998, 2000, 2001, 2002, 2003, 2004, 2005
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1987, 1988, 1989, 1990, 1992, 1993,
+;;   1994, 1995, 1996, 1997, 1998, 2000, 2001, 2002,
+;;   2003, 2004, 2005 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         Katsumi Yamaoka <yamaoka@jpl.org>
@@ -309,7 +309,7 @@ noticing asynchronous data.")
 (defvar nntp-async-timer nil)
 (defvar nntp-async-process-list nil)
 
-(defvar nntp-ssl-program 
+(defvar nntp-ssl-program
   "openssl s_client -quiet -ssl3 -connect %s:%p"
 "A string containing commands for SSL connections.
 Within a string, %s is replaced with the server address and %p with
@@ -951,7 +951,7 @@ command whose response triggered the error."
     (if (numberp article) (int-to-string article) article))))
 
 (deffoo nntp-request-group (group &optional server dont-check)
-  (nntp-with-open-group 
+  (nntp-with-open-group
     nil server
     (when (nntp-send-command "^[245].*\n" "GROUP" group)
       (let ((entry (nntp-find-connection-entry nntp-server-buffer)))
@@ -1453,7 +1453,7 @@ password contained in '~/.nntp-authinfo'."
     ;; that the server has closed the connection.  This MUST be
     ;; handled here as the buffer restored by the save-excursion may
     ;; be the process's former output buffer (i.e. now killed)
-    (or (and process 
+    (or (and process
 	     (memq (process-status process) '(open run)))
         (nntp-report "Server closed connection"))))
 
@@ -1635,7 +1635,7 @@ password contained in '~/.nntp-authinfo'."
           (goto-char (point-min))
           (when (re-search-forward "^[0-9][0-9][0-9] .*\n\\([0-9]+\\)" nil t)
             (let ((low-limit (string-to-number
-			      (buffer-substring (match-beginning 1) 
+			      (buffer-substring (match-beginning 1)
 						(match-end 1)))))
               (while (and articles (<= (car articles) low-limit))
                 (setq articles (cdr articles))))))
@@ -2080,7 +2080,7 @@ Please refer to the following variables to customize the connection:
 (defun nntp-save-marks (group server)
   (let ((file-name-coding-system nnmail-pathname-coding-system)
 	(file (expand-file-name
-	       nntp-marks-file-name 
+	       nntp-marks-file-name
 	       (nnmail-group-pathname
 		group (nntp-marks-directory server)))))
     (condition-case err
