@@ -1,3 +1,15 @@
+2005-08-29  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-sum.el (gnus-summary-mime-map): Added
+	gnus-article-save-part-and-strip, gnus-article-delete-part and
+	gnus-article-jump-to-part.
+
+	* gnus-art.el (gnus-article-edit-article): Added quiet argument.
+	(gnus-article-edit-part): Use it.
+	(gnus-article-part-wrapper): Added no-handle argument.
+	(gnus-article-save-part-and-strip, gnus-article-delete-part): New
+	functions.
+
 2005-08-29  Romain Francoise  <romain@orebokech.com>
 
 	* gnus-fun.el (gnus-convert-image-to-face-command): Fix typo in
@@ -14,6 +26,8 @@
 	(gnus-article-edit-part, gnus-mime-save-part-and-strip)
 	(gnus-mime-delete-part): Allow selecting specified part after
 	deleting or stripping parts.
+	(gnus-article-jump-to-part): Don't use `read-number'.  Use last
+	part if argument is bogus.
 
 2005-08-22  Karl Chen  <quarl@cs.berkeley.edu>  (tiny change)
 

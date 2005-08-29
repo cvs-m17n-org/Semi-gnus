@@ -4460,14 +4460,17 @@ General format specifiers can also be used.  See Info node
   (interactive "P")
   (pop-to-buffer gnus-article-buffer)
   (let ((parts (length gnus-article-mime-handle-alist)))
-    (while (not (and (integerp n) (<= n parts) (>= n 1)))
-      (setq n (read-number
-	       (concat
-		(if n
-		    (format "`%s' is not a valid part.  " n)
-		  "")
-		(format	"Jump to part (2..%s): " parts))
-	       parts)))
+    (or n (setq n
+		(string-to-number
+		 (read-string ;; Emacs 21 doesn't have `read-number'.
+		  (format "Jump to part (2..%s): " parts)))))
+    (unless (and (integerp n) (<= n parts) (>= n 1))
+      (setq n
+	    (progn
+	      (gnus-message 7 "Invalid part `%s', using %s instead."
+			    n parts)
+	      parts)))
+    (gnus-message 9 "Jumping to part %s." n)
     (gnus-article-goto-part n)))
 
 (eval-when-compile
@@ -4510,7 +4513,8 @@ and `gnus-mime-delete-part', and not provided at run-time normally."
 	(gnus-summary-edit-article-done
 	 ,(or (mail-header-references gnus-current-headers) "")
 	 ,(gnus-group-read-only-p)
-	 ,gnus-summary-buffer no-highlight)))
+	 ,gnus-summary-buffer no-highlight))
+     t)
     (gnus-article-edit-done)
     (gnus-summary-expand-window)
     (gnus-summary-show-article)
@@ -4860,13 +4864,15 @@ If no internal viewer is available, use an external viewer."
     (if action-pair
 	(funcall (cdr action-pair)))))
 
-(defun gnus-article-part-wrapper (n function)
+(defun gnus-article-part-wrapper (n function &optional no-handle)
   (with-current-buffer gnus-article-buffer
     (when (> n (length gnus-article-mime-handle-alist))
       (error "No such part"))
     (gnus-article-goto-part n)
-    (let ((handle (cdr (assq n gnus-article-mime-handle-alist))))
-      (funcall function handle))))
+    (if no-handle
+	(funcall function)
+      (let ((handle (cdr (assq n gnus-article-mime-handle-alist))))
+	(funcall function handle)))))
 
 (defun gnus-article-pipe-part (n)
   "Pipe MIME part N, which is the numerical prefix."
@@ -4903,6 +4909,18 @@ N is the numerical prefix."
   "Inline MIME part N, which is the numerical prefix."
   (interactive "p")
   (gnus-article-part-wrapper n 'gnus-mime-inline-part))
+
+(defun gnus-article-save-part-and-strip (n)
+  "Save MIME part N and replace it with an external body.
+N is the numerical prefix."
+  (interactive "p")
+  (gnus-article-part-wrapper n 'gnus-mime-save-part-and-strip t))
+
+(defun gnus-article-delete-part (n)
+  "Delete MIME part N and add some information about the removed part.
+N is the numerical prefix."
+  (interactive "p")
+  (gnus-article-part-wrapper n 'gnus-mime-delete-part t))
 
 (defun gnus-article-mime-match-handle-first (condition)
   (if condition
@@ -6172,7 +6190,7 @@ groups."
        ,(or (mail-header-references gnus-current-headers) "")
        ,(gnus-group-read-only-p) ,gnus-summary-buffer no-highlight))))
 
-(defun gnus-article-edit-article (start-func exit-func)
+(defun gnus-article-edit-article (start-func exit-func &optional quiet)
   "Start editing the contents of the current article buffer."
   (let ((winconf (current-window-configuration)))
     (set-buffer gnus-article-buffer)
@@ -6187,7 +6205,8 @@ groups."
     (setq gnus-prev-winconf winconf)
     (when gnus-article-edit-article-setup-function
       (funcall gnus-article-edit-article-setup-function))
-    (gnus-message 6 "C-c C-c to end edits; C-c C-k to exit")))
+    (unless quiet
+      (gnus-message 6 "C-c C-c to end edits; C-c C-k to exit"))))
 
 (defun gnus-article-edit-done (&optional arg)
   "Update the article edits and exit."
