@@ -972,6 +972,19 @@ used."
   :type '(repeat (cons (string :tag "name")
 		       (function))))
 
+(defcustom gnus-auto-select-part 1
+  "Advance to next MIME part when deleting or stripping parts.
+
+When 0, point will be placed on the same part as before.  When
+positive (negative), move point forward (backwards) this many
+parts.  When nil, redisplay article."
+  :version "23.0" ;; No Gnus
+  :group 'gnus-article-mime
+  :type '(choice (const nil :tag "Redisplay article.")
+		 (const 1 :tag "Next part.")
+		 (const 0 :tag "Current part.")
+		 integer))
+
 ;;;
 ;;; The treatment variables
 ;;;
@@ -4442,8 +4455,23 @@ General format specifiers can also be used.  See Info node
 	  (delete-region (point) (point-max))
 	  (mm-display-parts handles))))))
 
+(defun gnus-article-jump-to-part (n)
+  "Jump to MIME part N."
+  (interactive "P")
+  (pop-to-buffer gnus-article-buffer)
+  (let ((parts (length gnus-article-mime-handle-alist)))
+    (while (not (and (integerp n) (<= n parts) (>= n 1)))
+      (setq n (read-number
+	       (concat
+		(if n
+		    (format "`%s' is not a valid part.  " n)
+		  "")
+		(format	"Jump to part (2..%s): " parts))
+	       parts)))
+    (gnus-article-goto-part n)))
+
 (eval-when-compile
-  (defsubst gnus-article-edit-part (handles)
+  (defsubst gnus-article-edit-part (handles &optional current-id)
     "Edit an article in order to delete a mime part.
 This function is exclusively used by `gnus-mime-save-part-and-strip'
 and `gnus-mime-delete-part', and not provided at run-time normally."
@@ -4485,7 +4513,10 @@ and `gnus-mime-delete-part', and not provided at run-time normally."
 	 ,gnus-summary-buffer no-highlight)))
     (gnus-article-edit-done)
     (gnus-summary-expand-window)
-    (gnus-summary-show-article)))
+    (gnus-summary-show-article)
+    (when (and current-id (integerp gnus-auto-select-part))
+      (gnus-article-jump-to-part
+       (+ current-id gnus-auto-select-part)))))
 
 (defun gnus-mime-save-part-and-strip ()
   "Save the MIME part under point then replace it with an external body."
@@ -4496,29 +4527,28 @@ and `gnus-mime-delete-part', and not provided at run-time normally."
   (when (mm-complicated-handles gnus-article-mime-handles)
     (error "\
 The current article has a complicated MIME structure, giving up..."))
-  (when (gnus-yes-or-no-p "\
-Deleting parts may malfunction or destroy the article; continue? ")
-    (let* ((data (get-text-property (point) 'gnus-data))
-	   file param
-	   (handles gnus-article-mime-handles))
-      (setq file (and data (mm-save-part data)))
-      (when file
-	(with-current-buffer (mm-handle-buffer data)
-	  (erase-buffer)
-	  (insert "Content-Type: " (mm-handle-media-type data))
-	  (mml-insert-parameter-string (cdr (mm-handle-type data))
-				       '(charset))
-	  (insert "\n")
-	  (insert "Content-ID: " (message-make-message-id) "\n")
-	  (insert "Content-Transfer-Encoding: binary\n")
-	  (insert "\n"))
-	(setcdr data
-		(cdr (mm-make-handle nil
-				     `("message/external-body"
-				       (access-type . "LOCAL-FILE")
-				       (name . ,file)))))
-	(set-buffer gnus-summary-buffer)
-	(gnus-article-edit-part handles)))))
+  (let* ((data (get-text-property (point) 'gnus-data))
+	 (id (get-text-property (point) 'gnus-part))
+	 file param
+	 (handles gnus-article-mime-handles))
+    (setq file (and data (mm-save-part data)))
+    (when file
+      (with-current-buffer (mm-handle-buffer data)
+	(erase-buffer)
+	(insert "Content-Type: " (mm-handle-media-type data))
+	(mml-insert-parameter-string (cdr (mm-handle-type data))
+				     '(charset))
+	(insert "\n")
+	(insert "Content-ID: " (message-make-message-id) "\n")
+	(insert "Content-Transfer-Encoding: binary\n")
+	(insert "\n"))
+      (setcdr data
+	      (cdr (mm-make-handle nil
+				   `("message/external-body"
+				     (access-type . "LOCAL-FILE")
+				     (name . ,file)))))
+      ;; (set-buffer gnus-summary-buffer)
+      (gnus-article-edit-part handles id))))
 
 (defun gnus-mime-delete-part ()
   "Delete the MIME part under point.
@@ -4530,9 +4560,11 @@ Replace it with some information about the removed part."
   (when (mm-complicated-handles gnus-article-mime-handles)
     (error "\
 The current article has a complicated MIME structure, giving up..."))
-  (when (gnus-yes-or-no-p "\
-Deleting parts may malfunction or destroy the article; continue? ")
+  (when (or gnus-expert-user
+	    (gnus-yes-or-no-p "\
+Deleting parts may malfunction or destroy the article; continue? "))
     (let* ((data (get-text-property (point) 'gnus-data))
+	   (id (get-text-property (point) 'gnus-part))
 	   (handles gnus-article-mime-handles)
 	   (none "(none)")
 	   (description
@@ -4563,8 +4595,8 @@ Deleting parts may malfunction or destroy the article; continue? ")
 			nil `("text/plain") nil nil
 			(list "attachment")
 			(format "Deleted attachment (%s bytes)" bsize))))))
-      (set-buffer gnus-summary-buffer)
-      (gnus-article-edit-part handles))))
+      ;; (set-buffer gnus-summary-buffer)
+      (gnus-article-edit-part handles id))))
 
 (defun gnus-mime-save-part ()
   "Save the MIME part under point."
