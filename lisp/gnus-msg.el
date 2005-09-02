@@ -1850,7 +1850,7 @@ this is a reply."
 	     (gcc (cond
 		   ((functionp group)
 		    (funcall group))
-		   ((or (stringp group) (list group))
+		   ((or (stringp group) (listp group))
 		    group))))
 	(when gcc
 	  (insert "Gcc: "
