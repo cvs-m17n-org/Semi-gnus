@@ -7916,7 +7916,7 @@ For example:
     (narrow-to-region (point) (point))
     (unless (gnus-unbuttonized-mime-type-p (car handle))
       (gnus-insert-mime-security-button handle))
-    (gnus-mime-display-mixed (cdr handle))
+    (gnus-mime-display-part (cadr handle))
     (unless (bolp)
       (insert "\n"))
     (unless (gnus-unbuttonized-mime-type-p (car handle))
