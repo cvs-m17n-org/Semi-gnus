@@ -5998,12 +5998,12 @@ gnus $B%(!<%8%'%s%H(B (@pxref{Agent Basics}) $B$O$$$/$D$+$N5-;v$r<+F0E*$K%@%&
 @findex gnus-summary-mark-as-processable
 $B8=:_$N5-;v$K%W%m%;%90u$rIU$1$^(B
 $B$9(B (@code{gnus-summary-mark-as-processable})$B!#(B
-@findex gnus-summary-unmark-as-processable
 
 @item M P u
 @itemx M-#
 @kindex M P u ($B35N,(B)
 @kindex M-# ($B35N,(B)
+@findex gnus-summary-unmark-as-processable
 $B$b$78=:_$N5-;v$K%W%m%;%90u$,$"$l$P<h$j=|$-$^(B
 $B$9(B (@code{gnus-summary-unmark-as-processable})$B!#(B
 
@@ -6396,13 +6396,13 @@ Gnus $B$O<B:]$K$O$I$N5-;v$b?F$K$O$;$:!":G=i$N8I;y$r=|$$$F$9$Y$F$N8I;y$NI=(B
 @item gnus-summary-gather-subject-limit
 @vindex gnus-summary-gather-subject-limit
 $BL5B+G{%9%l%C%I$O5-;v$NI=Bj$rHf3S$9$k$3$H$K$h$C$F=8$a$i$l$^$9!#$b$7$3$NJQ(B
-$B?t$,(B @code{nil} $B$G$"$k$H!"(BGnus $B$OL5B+G{%9%l%C%I$r0l$D$NBg$-$JD6%9%l%C%I(B
+$B?t$,(B @code{nil} $B$G$"$k$H!"(Bgnus $B$OL5B+G{%9%l%C%I$r0l$D$NBg$-$JD6%9%l%C%I(B
 $B$K=8$a$kA0$K!"L5B+G{%9%l%C%I$NI=Bj$,40A4$K0lCW$9$k$3$H$rMW5a$7$^$9!#$3$l(B
 $B$O!"D9$$I=Bj$N9T$r@Z$jMn$H$7$F$7$^$&4VH4$1$J%K%e!<%9%j!<%@!<$,B8:_$9$k8=(B
 $B>u$G$O!"$"$^$j$K87$7$$MW5a$+$bCN$l$^$;$s!#$=$&;W$&$N$J$i!"$3$NJQ?t$rNc$((B
 $B$P(B 20 $B$K@_Dj$7$F!"I=Bj$N:G=i$N(B 20 $BJ8;z$@$1$,0lCW$9$k$3$H$rMW5a$9$k$h$&$K(B
 $B$7$F2<$5$$!#$3$NJQ?t$rK\Ev$KDc$$?t;z$K@_Dj$9$k$H!"L\$K$D$$$?$b$N$N$9$Y$F(B
-$B$r(B Gnus $B$,0l$D$N%9%l%C%I$K=8$a$k$N$r8+$k$3$H$K$J$k$G$7$g$&!#$=$l$O$"$^$j(B
+$B$r(B gnus $B$,0l$D$N%9%l%C%I$K=8$a$k$N$r8+$k$3$H$K$J$k$G$7$g$&!#$=$l$O$"$^$j(B
 $BM-MQ$G$O$"$j$^$;$s!#(B
 
 @cindex fuzzy article gathering
@@ -24250,10 +24250,10 @@ Lars $B$5$s$,D4@=$7$F%j%j!<%9$7$?(B Gnus $B$K2C$($F!"F|K\$G$O(B Semi-gnus $
 $B$,9T$J$o$l$F$$$^$9!#$3$l$O(B @acronym{SEMI} $B$H$$$&(B @acronym{MIME} $B$N5!G=$r(B
 $B<B8=$9$k$?$a$N%i%$%V%i%j$r;H$&$3$H$rA0Ds$H$7$F$$$^$9!#(B
 
-$B$3$l$i$N(B gnus $B$O(B Gnus 5.6 $B$H(B Pterodactyl Gnus $B$r85$K$7$F$$$^$9!#$=$l$i(B
-$B$O(B ``Semi-gnus'' $B$HAm>N$5$l!"(BT-gnus, Nana-gnus $B$*$h$S(B Chaos $B$N0[$J$C$?7O(B
-$BE}$,$"$j$^$9!#$3$l$i$O6/NO$J(B @acronym{MIME} $B$N5!G=$H3F9q8lBP1~$N5!G=$rDs(B
-$B6!$9$k$b$N$G!"FC$KF|K\?M$NMxMQ<T$K$H$C$FBg;v$J$b$N$G$9!#(B
+$B$3$l$i$N(B gnus $B$O!"<g$K(B Gnus 5.6 $B$H(B Pterodactyl Gnus $B$r85$K$7$F$$$^$9!#$=(B
+$B$l$i$O(B ``Semi-gnus'' $B$HAm>N$5$l!"(BT-gnus, Nana-gnus $B$*$h$S(B Chaos $B$N0[$J$C(B
+$B$?7OE}$,$"$j$^$9!#$3$l$i$O6/NO$J(B @acronym{MIME} $B$N5!G=$H3F9q8lBP1~$N5!G=(B
+$B$rDs6!$9$k$b$N$G!"FC$KF|K\?M$NMxMQ<T$K$H$C$FBg;v$J$b$N$G$9!#(B
 
 @node Why?
 @subsection $B$J$<(B?
@@ -25802,8 +25802,8 @@ Gnus $B$O:#$G$O(B Sender: $B%X%C%@!<$r<+F0$G$O@8@.$7$^$;$s!#(B
 $B$NA[Dj%"%k%4%j%:%`$,@5$7$$$3$H$O$^$l$G!"(BSender: $B%X%C%@!<$NM#0l$N(B ($B5DO@$N(B
 $BE*$K$J$k(B) $BMQES$O!"%K%e!<%9$r(B cancel/supersede $B$9$k;q3J$,$"$k$+$I$&$+$r8!(B
 $B::$9$k$3$H(B ($B$3$l$OBe$o$j$K!"B>$N9`$G=R$Y$i$l$k(B Cancel Locks $B$K$h$C$F2r7h(B
-$B$5$l$?(B) $B$J$N$G!"$=$N%X%C%@!<$N@8@.$O%G%#%U%)%k%H$GM^@)$5$l$F$$$^$9!#(B
-$BJQ?t(B @code{message-required-headers}$B!"(B
+$B$5$l$?(B) $B$J$N$G!"$=$N%X%C%@!<$N@8@.$O%G%#%U%)%k%H$GM^@)$5$l$F$$$^$9!#JQ(B
+$B?t(B @code{message-required-headers}$B!"(B
 @code{message-required-news-headers} $B$*$h(B
 $B$S(B @code{message-required-mail-headers} $B$r;2>H$7$F2<$5$$!#(B
 
