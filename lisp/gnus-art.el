@@ -32,7 +32,8 @@
 (eval-when-compile
   (require 'cl)
   (require 'static)
-  (defvar tool-bar-map))
+  (defvar tool-bar-map)
+  (defvar w3m-minor-mode-map))
 
 (require 'path-util)
 (require 'gnus)

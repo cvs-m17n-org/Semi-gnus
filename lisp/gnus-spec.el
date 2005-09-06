@@ -29,6 +29,7 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+(defvar gnus-newsrc-file-version)
 
 (require 'alist)
 (require 'gnus)

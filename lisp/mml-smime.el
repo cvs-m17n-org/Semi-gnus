@@ -27,6 +27,8 @@
 
 (eval-when-compile (require 'cl))
 
+(defvar gnus-extract-address-components)
+
 ;; EMIKO doesn't provide the smime.el module.
 (condition-case nil
     (require 'smime)
@@ -55,7 +57,7 @@
       (if (not (and (not (file-exists-p tmp))
 		    (get-buffer tmp)))
 	  (push tmp certfiles)
-	(setq file (mm-make-temp-file (expand-file-name "mml." 
+	(setq file (mm-make-temp-file (expand-file-name "mml."
 							mm-tmp-directory)))
 	(with-current-buffer tmp
 	  (write-region (point-min) (point-max) file))
