@@ -1,3 +1,13 @@
+2005-09-07  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* nnweb.el (nnweb-google-wash-article): Print a message if article
+	is not available.
+
+2005-09-07  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* gnus-art.el (gnus-mime-display-single): Revert 2004-10-07
+	change.  Decode text/* parts content before displaying.
+
 2005-09-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* mm-view.el (mm-display-inline-fontify): Disable support modes.
