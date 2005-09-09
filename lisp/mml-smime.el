@@ -1,5 +1,7 @@
 ;;; mml-smime.el --- S/MIME support for MML
-;; Copyright (c) 2000, 2001, 2003, 2005 Free Software Foundation, Inc.
+
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004,
+;;   2005 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 ;; Keywords: Gnus, MIME, S/MIME, MML
@@ -26,8 +28,6 @@
 ;;; Code:
 
 (eval-when-compile (require 'cl))
-
-(defvar gnus-extract-address-components)
 
 ;; EMIKO doesn't provide the smime.el module.
 (condition-case nil
@@ -146,7 +146,6 @@
     result))
 
 (defun mml-smime-encrypt-query ()
-  ;; todo: add ldap support (xemacs ldap api?)
   ;; todo: try dns/ldap automatically first, before prompting user
   (let (certs done)
     (while (not done)
