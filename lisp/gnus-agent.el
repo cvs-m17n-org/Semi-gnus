@@ -126,7 +126,7 @@ fetched will be limited to it. If not a positive integer, never consider it."
   :type '(choice (const nil)
 		 (integer :tag "Number")))
 
-(defcustom gnus-agent-synchronize-flags nil
+(defcustom gnus-agent-synchronize-flags t
   "Indicate if flags are synchronized when you plug in.
 If this is `ask' the hook will query the user."
   :version "21.1"
