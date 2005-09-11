@@ -1,13 +1,32 @@
+2005-09-11  Jari Aalto  <jari.aalto@cante.net>
+
+	* html2text.el: (html2text-replace-list): Add new entities.
+
 2005-09-11  Romain Francoise  <romain@orebokech.com>
 
+	* message.el (message-alternative-emails): Improve docstring.
+	(message-setup-1): Call `message-use-alternative-email-as-from'
+	after `message-setup-hook' to give it precedence over posting
+	styles, etc.
+	(message-use-alternative-email-as-from): Add docstring.  Remove
+	the original From header if present.
+
+	* nnml.el (nnml-compressed-files-size-threshold): New variable.
+	(nnml-save-mail): Use it.
+
 	* gnus-uu.el (gnus-uu-mark-series): Return number of marked
-	articles.  New argument `silent'.
+	articles.  Add new argument `silent'.
 	(gnus-uu-mark-all): Report the total number of marked articles.
 
 2005-09-10  Romain Francoise  <romain@orebokech.com>
 
 	* gnus-uu.el (gnus-message-process-mark): Use gnus-message.
 	(gnus-uu-mark-series): Likewise.
+
+2005-09-10  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* spam-report.el (spam-report-gmane): Fix generation of spam
+	report URL.
 
 2005-09-10  Simon Josefsson  <jas@extundo.com>
 
