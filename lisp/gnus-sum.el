@@ -1972,7 +1972,6 @@ increase the score of each group you read."
   "t" gnus-summary-toggle-header
   "g" gnus-treat-smiley
   "v" gnus-summary-verbose-headers
-  "m" gnus-summary-toggle-mime
   "a" gnus-article-strip-headers-in-body ;; mnemonic: wash archive
   "p" gnus-article-verify-x-pgp-sig
   "d" gnus-article-treat-dumbquotes
