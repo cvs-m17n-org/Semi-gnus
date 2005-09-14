@@ -5219,6 +5219,8 @@ If displaying \"text/html\" is discouraged \(see
 
 (defun gnus-mime-display-part (handle)
   (cond
+   ;; Maybe a broken MIME message.
+   ((null handle))
    ;; Single part.
    ((not (stringp (car handle)))
     (gnus-mime-display-single handle))
