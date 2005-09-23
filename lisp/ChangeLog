@@ -1,5 +1,16 @@
 2005-09-22  Reiner Steib  <Reiner.Steib@gmx.de>
 
+	* spam-report.el (spam-report-url-ping-plain): Use
+	gnus-extended-version as User-Agent.
+
+	* gnus-agent.el (gnus-agent-synchronize-flags): Explain why the
+	default value is nil.
+
+	* mm-uu.el (mm-uu-type-alist): Added slrn style verbatim-marks.
+	(mm-uu-verbatim-marks-extract): New function.
+	(mm-uu-extract): New face.
+	(mm-uu-copy-to-buffer): Use it.
+
 	* spam-report.el (spam-report-gmane-ham): Renamed from
 	`spam-report-gmane-unspam'.
 	(spam-report-gmane-internal): Renamed from `spam-report-gmane'.
@@ -20,15 +31,6 @@
 	(spam-report-gmane-spam): new wrappers around spam-report-gmane
 	(spam-report-gmane): changed to take a single article and do
 	unspam registration
-
-2005-09-21  Katsumi Yamaoka  <yamaoka@jpl.org>
-
-	* mm-view.el (mm-inline-text-html-render-with-w3m): Revert.
-
-2005-09-21  Katsumi Yamaoka  <yamaoka@jpl.org>
-
-	* mm-view.el (mm-inline-text-html-render-with-w3m): Bind
-	w3m-treat-image-size to avoid inserting excessive newlines.
 
 2005-09-20  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
