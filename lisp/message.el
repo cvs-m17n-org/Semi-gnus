@@ -2125,29 +2125,31 @@ Leading \"Re: \" is not stripped by this function.  Use the function
 				    old-subject ")\n")))))))))
 
 ;;;###autoload
-(defun message-mark-inserted-region (beg end)
+(defun message-mark-inserted-region (beg end &optional verbatim)
   "Mark some region in the current article with enclosing tags.
-See `message-mark-insert-begin' and `message-mark-insert-end'."
-  (interactive "r")
+See `message-mark-insert-begin' and `message-mark-insert-end'.
+If VERBATIM, use slrn style verbatim marks (\"#v+\" and \"#v-\")."
+  (interactive "r\nP")
   (save-excursion
     ;; add to the end of the region first, otherwise end would be invalid
     (goto-char end)
-    (insert message-mark-insert-end)
+    (insert (if verbatim "#v-\n" message-mark-insert-end))
     (goto-char beg)
-    (insert message-mark-insert-begin)))
+    (insert (if verbatim "#v+\n" message-mark-insert-begin))))
 
 ;;;###autoload
-(defun message-mark-insert-file (file)
+(defun message-mark-insert-file (file &optional verbatim)
   "Insert FILE at point, marking it with enclosing tags.
-See `message-mark-insert-begin' and `message-mark-insert-end'."
-  (interactive "fFile to insert: ")
+See `message-mark-insert-begin' and `message-mark-insert-end'.
+If VERBATIM, use slrn style verbatim marks (\"#v+\" and \"#v-\")."
+  (interactive "fFile to insert: \nP")
     ;; reverse insertion to get correct result.
   (let ((p (point)))
-    (insert message-mark-insert-end)
+    (insert (if verbatim "#v-\n" message-mark-insert-end))
     (goto-char p)
     (insert-file-contents file)
     (goto-char p)
-    (insert message-mark-insert-begin)))
+    (insert (if verbatim "#v+\n" message-mark-insert-begin))))
 
 ;;;###autoload
 (defun message-add-archive-header ()
@@ -2314,6 +2316,14 @@ With prefix-argument just set Follow-Up, don't cross-post."
 				       "cc"))))))))
 
 ;;; End of functions adopted from `message-utils.el'.
+
+(defun message-remove-duplicates (list)
+  (let (new)
+    (while list
+      (or (member (car list) new)
+	  (setq new (cons (car list) new)))
+      (setq list (cdr list)))
+    (nreverse new)))
 
 (defun message-remove-header (header &optional is-regexp first reverse)
   "Remove HEADER in the narrowed buffer.
@@ -5625,13 +5635,17 @@ subscribed address (and not the additional To and Cc header contents)."
   (let ((field (message-fetch-field header))
 	rhs ace  address)
     (when field
-      (dolist (address (mail-header-parse-addresses field))
-	(setq address (car address)
-	      rhs (downcase (or (cadr (split-string address "@")) ""))
-	      ace (downcase (idna-to-ascii rhs)))
+      (dolist (rhs
+	       (message-remove-duplicates
+		(mapcar (lambda (rhs) (or (cadr (split-string rhs "@")) ""))
+			(mapcar 'downcase
+				(mapcar
+				 'car (mail-header-parse-addresses field))))))
+	(setq ace (downcase (idna-to-ascii rhs)))
 	(when (and (not (equal rhs ace))
 		   (or (not (eq message-use-idna 'ask))
-		       (y-or-n-p (format "Replace %s with %s? " rhs ace))))
+		       (y-or-n-p (format "Replace %s with %s in %s:? "
+					 rhs ace header))))
 	  (goto-char (point-min))
 	  (while (re-search-forward (concat "^" header ":") nil t)
 	    (message-narrow-to-field)
@@ -5651,6 +5665,8 @@ See `message-idna-encode'."
 	(message-idna-to-ascii-rhs-1 "From")
 	(message-idna-to-ascii-rhs-1 "To")
 	(message-idna-to-ascii-rhs-1 "Reply-To")
+	(message-idna-to-ascii-rhs-1 "Mail-Reply-To")
+	(message-idna-to-ascii-rhs-1 "Mail-Followup-To")
 	(message-idna-to-ascii-rhs-1 "Cc")))))
 
 (defun message-generate-headers (headers)

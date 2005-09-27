@@ -77,12 +77,22 @@ decoder, such as hexbin."
   "The default disposition of uu parts.
 This can be either \"inline\" or \"attachment\".")
 
-(defvar mm-uu-emacs-sources-regexp "gnu\\.emacs\\.sources"
-  "The regexp of Emacs sources groups.")
-
-(defcustom mm-uu-diff-groups-regexp "gnus\\.commits"
-  "*Regexp matching diff groups."
+(defcustom mm-uu-emacs-sources-regexp "\\.emacs\\.sources"
+  "The regexp of Emacs sources groups."
   :version "22.1"
+  :type 'regexp
+  :group 'gnus-article-mime)
+
+(defcustom mm-uu-diff-groups-regexp
+  "\\(gmane\\|gnu\\)\\..*\\(diff\\|commit\\|cvs\\|bug\\|devel\\)"
+  "Regexp matching diff groups."
+  :version "22.1"
+  :type 'regexp
+  :group 'gnus-article-mime)
+
+(defcustom mm-uu-tex-groups-regexp "\\.tex\\>"
+  "*Regexp matching TeX groups."
+  :version "23.0"
   :type 'regexp
   :group 'gnus-article-mime)
 
@@ -160,7 +170,18 @@ This can be either \"inline\" or \"attachment\".")
      "^#v\\+$"
      "^#v\\-$"
      mm-uu-verbatim-marks-extract
-     nil)))
+     nil)
+    (LaTeX
+     "^\\\\documentclass"
+     "^\\\\end{document}"
+     mm-uu-latex-extract
+     nil
+     mm-uu-latex-test))
+  "A list of specifications for non-MIME attachments.
+Each element consist of the following entries: label,
+start-regexp, end-regexp, extract-function, test-function.
+
+After modifying this list you must run \\[mm-uu-configure].")
 
 (defcustom mm-uu-configure-list '((shar . disabled))
   "A list of mm-uu configuration.
@@ -236,6 +257,8 @@ apply the face `mm-uu-extract'."
   (member (cons key val) mm-uu-configure-list))
 
 (defun mm-uu-configure (&optional symbol value)
+  "Configure detection of non-MIME attachments."
+  (interactive)
   (if symbol (set-default symbol value))
   (setq mm-uu-beginning-regexp nil)
   (mapcar (lambda (entry)
@@ -289,7 +312,13 @@ apply the face `mm-uu-extract'."
     (progn (goto-char start-point) (forward-line) (point))
     (progn (goto-char end-point) (forward-line -1) (point))
     t)
-   '("text/verbatim" (charset . gnus-decoded))))
+   '("text/x-gnus-verbatim" (charset . gnus-decoded))))
+
+(defun mm-uu-latex-extract ()
+  (mm-make-handle
+   (mm-uu-copy-to-buffer start-point end-point t)
+   ;; application/x-tex?
+   '("text/x-gnus-verbatim" (charset . gnus-decoded))))
 
 (defun mm-uu-emacs-sources-extract ()
   (mm-make-handle (mm-uu-copy-to-buffer start-point end-point)
@@ -315,6 +344,11 @@ apply the face `mm-uu-extract'."
   (and gnus-newsgroup-name
        mm-uu-diff-groups-regexp
        (string-match mm-uu-diff-groups-regexp gnus-newsgroup-name)))
+
+(defun mm-uu-latex-test ()
+  (and gnus-newsgroup-name
+       mm-uu-tex-groups-regexp
+       (string-match mm-uu-tex-groups-regexp gnus-newsgroup-name)))
 
 (defun mm-uu-forward-extract ()
   (mm-make-handle (mm-uu-copy-to-buffer
