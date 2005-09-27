@@ -1130,7 +1130,7 @@ gnus はそのリストの中のグループを購読し、残りを削除します。システム管理
 ないとき (例えば、アドレスを間違えた場合) やサーバーが何らかの理由で一時
 的に調子がおかしくなっているときに起こります。もしそのまま続行することに
 して、外部グループが一つも無い場合、実はグループバッファーではほとんど何
-もできないということに気がつくでしょう。でも、ねぇ、それはあなたの問題で
+もできないということに気が付くでしょう。でも、ねぇ、それはあなたの問題で
 す。ブブーッ!
 
 @findex gnus-no-server
@@ -6381,7 +6381,7 @@ gnus は孤児になった記事群の最初のものを親にします。この親はすべての他の
 @item みせかけ (dummy)
 @vindex gnus-summary-dummy-line-format
 @vindex gnus-summary-make-false-root-always
-gnus は親のふりをするみせかけの概略行をつくります。このみせか
+gnus は親のふりをするみせかけの概略行を作ります。このみせか
 けの行はどの本当の記事にも対応しないので、それを選択することは、
 みせかけの記事の後の最初の本当の記事を選択をするだけになります。
 みせかけの根本の様式を指定するために、
@@ -16896,12 +16896,12 @@ To: alt-religion-emacs@@GATEWAY
 @table @code
 @item nngateway-simple-header-transformaton
 @var{newsgroup}@@@code{nngateway-address} のような @code{To} ヘッダーを
-つくります。
+作ります。
 
 @findex nngateway-mail2news-header-transformation
 
 @item nngateway-mail2news-header-transformation
-@code{nngateway-address} のような @code{To} ヘッダーをつくります。
+@code{nngateway-address} のような @code{To} ヘッダーを作ります。
 
 ここに例があります。
 
@@ -28165,7 +28165,7 @@ parameters    = "(" *elisp-forms ")"
 @itemx gnus-info-set-marks
 @findex gnus-info-marks
 @findex gnus-info-set-marks
-印しつき記事の範囲のリストを取得/設定します。
+印し付き記事の範囲のリストを取得/設定します。
 
 @item gnus-info-method
 @itemx gnus-info-set-method
