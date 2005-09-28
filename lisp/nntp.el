@@ -222,9 +222,6 @@ then use this hook to rsh to the remote machine and start a proxy NNTP
 server there that you can connect to.  See also
 `nntp-open-connection-function'")
 
-(defvoo nntp-warn-about-losing-connection t
-  "*If non-nil, beep when a server closes connection.")
-
 ;; Marks
 (defvoo nntp-marks-is-evil nil
   "*If non-nil, Gnus will never generate and use marks file for nntp groups.
