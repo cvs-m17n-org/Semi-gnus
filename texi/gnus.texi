@@ -13039,7 +13039,9 @@ Address of the intermediate host to connect to.
 
 The following variables affect the behavior of all, or several of the
 pre-made connection functions.  When not specified, all functions are
-affected.
+affected (the values of the following variables will be used as the
+default if each virtual @code{nntp} server doesn't specify those server
+variables individually).
 
 @table @code
 
@@ -13047,7 +13049,7 @@ affected.
 @vindex nntp-pre-command
 A command wrapper to use when connecting through a non native
 connection function (all except @code{nntp-open-network-stream},
-@code{nntp-open-tls-stream}, and @code{nntp-open-ssl-stream}.  This is
+@code{nntp-open-tls-stream}, and @code{nntp-open-ssl-stream}).  This is
 where you would put a @samp{SOCKS} wrapper for instance.
 
 @item nntp-address
