@@ -127,7 +127,7 @@ AC_DEFUN(AC_PATH_ETCDIR, [
     if test "$EMACS_FLAVOR" = "xemacs"; then
       etcdir="\$(lispdir)/../../etc"
     else
-    etcdir="\$(lispdir)/../etc"
+      etcdir="\$(lispdir)/../../etc"
     fi
   fi
   AC_MSG_RESULT($etcdir)

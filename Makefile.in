@@ -173,6 +173,12 @@ xinfo:
 xinfo-ja:
 	cd texi && $(MAKE) EMACS="$(XEMACS)" ja-info
 
+list-installed-shadows:
+	cd lisp && $(MAKE) EMACS="$(EMACS)" lispdir="$(lispdir)" list-installed-shadows
+
+remove-installed-shadows:
+	cd lisp && $(MAKE) EMACS="$(EMACS)" lispdir="$(lispdir)" remove-installed-shadows
+
 uninstall:
 	cd lisp && $(MAKE) lispdir="$(lispdir)" uninstall
 	cd texi && $(MAKE) uninstall
