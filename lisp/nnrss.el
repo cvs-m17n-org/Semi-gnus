@@ -229,9 +229,10 @@ The return value will be `html' or `text'."
 				   " ")))
 	      (link (nth 2 e))
 	      (enclosure (nth 7 e))
+	      (comments (nth 8 e))
 	      (mail-header-separator "")
 	      mime-edit-insert-user-agent-field)
-	  (when (or text link enclosure)
+	  (when (or text link enclosure comments)
 	    (if (eq 'html (nnrss-body-presentation-method))
 		(progn
 		  (mime-edit-insert-text "html")
@@ -244,6 +245,8 @@ The return value will be `html' or `text'."
 		    (insert "<p><a href=\"" (car enclosure) "\">"
 			    (cadr enclosure) "</a> " (nth 2 enclosure)
 			    " " (nth 3 enclosure) "</p>\n"))
+		  (when comments
+		    (insert "<p><a href=\"" comments "\">comments</a></p>\n"))
 		  (insert "</body></html>\n"))
 	      (mime-edit-insert-text "plain")
 	      (when text
@@ -255,7 +258,9 @@ The return value will be `html' or `text'."
 	      (when enclosure
 		(insert (car enclosure) " "
 			(nth 2 enclosure) " "
-			(nth 3 enclosure) "\n")))
+			(nth 3 enclosure) "\n"))
+	      (when comments
+		(insert comments "\n")))
 	    (mime-edit-translate-body)))
 	(when nnrss-content-function
 	  (funcall nnrss-content-function e group article))))
@@ -529,7 +534,7 @@ nnrss: %s: Not valid XML %s and w3-parse doesn't work %s"
 
 (defun nnrss-check-group (group server)
   (let (file xml subject url extra changed author date
-	     enclosure rss-ns rdf-ns content-ns dc-ns)
+	     enclosure comments rss-ns rdf-ns content-ns dc-ns)
     (if (and nnrss-use-local
 	     (file-exists-p (setq file (expand-file-name
 					(nnrss-translate-file-chars
@@ -577,6 +582,7 @@ nnrss: %s: Not valid XML %s and w3-parse doesn't work %s"
 	(setq date (or (nnrss-node-text dc-ns 'date item)
 		       (nnrss-node-text rss-ns 'pubDate item)
 		       (message-make-date)))
+	(setq comments (nnrss-node-text rss-ns 'comments item))
 	(when (setq enclosure (cadr (assq (intern (concat rss-ns "enclosure")) item)))
 	  (let ((url (cdr (assq 'url enclosure)))
 		(len (cdr (assq 'length enclosure)))
@@ -607,7 +613,8 @@ nnrss: %s: Not valid XML %s and w3-parse doesn't work %s"
 	  (and author (nnrss-mime-encode-string author))
 	  date
 	  (and extra (nnrss-decode-entities-string extra))
-	  enclosure)
+	  enclosure
+	  comments)
 	 nnrss-group-data)
 	(puthash (or url extra) t nnrss-group-hashtb)
 	(setq changed t))
