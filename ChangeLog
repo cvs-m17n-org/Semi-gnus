@@ -1,3 +1,7 @@
+2005-10-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (mm-delete-duplicates): New function.
+
 2005-10-04  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* aclocal.m4 (AC_PATH_LISPDIR): Default to .../site-lisp/gnus for
