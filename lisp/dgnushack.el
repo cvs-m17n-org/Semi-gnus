@@ -232,6 +232,17 @@ adding the --with-addpath=FLIM_PATH option.\n"
 	   load-path)))
 (add-path "semi")
 
+;; Work around for an incompatibility (XEmacs 21.4 vs. 21.5), see the
+;; following threads:
+;;
+;; http://thread.gmane.org/gmane.emacs.gnus.general/56414
+;; Subject: attachment problems found but not fixed
+;;
+;; http://thread.gmane.org/gmane.emacs.gnus.general/56459
+;; Subject: Splitting mail -- XEmacs 21.4 vs 21.5
+;;
+;; http://thread.gmane.org/gmane.emacs.xemacs.beta/20519
+;; Subject: XEmacs 21.5 and Gnus fancy splitting.
 (when (and (featurep 'xemacs)
 	   (let ((table (copy-syntax-table emacs-lisp-mode-syntax-table)))
 	     (modify-syntax-entry ?= " " table)
