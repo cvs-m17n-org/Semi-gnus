@@ -2989,6 +2989,11 @@ the address is inserted by default."
   (message-goto-body)
   (forward-line -1))
 
+(defun message-in-body-p ()
+  "Return t if point is in the message body."
+  (let ((body (save-excursion (message-goto-body) (point))))
+    (>= (point) body)))
+
 (defun message-goto-signature ()
   "Move point to the beginning of the message signature.
 If there is no signature in the article, go to the end and
