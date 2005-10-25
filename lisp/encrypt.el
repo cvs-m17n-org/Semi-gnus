@@ -131,8 +131,8 @@ Format example:
 
     (if outdata
 	(progn
-	  (gnus-message 9 "%s was decrypted with %s (cipher %s)"
-			file (symbol-name method) cipher)
+	  (message "%s was decrypted with %s (cipher %s)"
+		   file (symbol-name method) cipher)
 	  (delete-region (point-min) (point-max))
 	  (goto-char (point-min))
 	  (insert outdata))
@@ -177,8 +177,8 @@ Format example:
 
     (if outdata
 	(progn
-	  (gnus-message 9 "%s was encrypted with %s (cipher %s)"
-			file (symbol-name method) cipher)
+	  (message "%s was encrypted with %s (cipher %s)"
+		   file (symbol-name method) cipher)
 	  (delete-region (point-min) (point-max))
 	  (goto-char (point-min))
 	  (insert outdata)
