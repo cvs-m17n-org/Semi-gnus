@@ -184,7 +184,6 @@ the alias.  Else windows-NUMBER is used."
     (unless (mm-coding-system-p cp)
       (codepage-setup number))
     (when (and alias
-	       (mm-coding-system-p alias)
 	       ;; Don't add alias if setup of cp failed.
 	       (mm-coding-system-p cp))
       (add-to-list 'mm-charset-synonym-alist (cons alias cp)))))
