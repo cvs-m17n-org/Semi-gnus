@@ -31,6 +31,9 @@
 (eval-when-compile (require 'static))
 (require 'gnus-util)			; for gnus-pp, gnus-run-mode-hooks
 
+(defvar gnus-score-edit-done-hook nil
+  "*Hook run at the end of closing the score buffer.")
+
 (defvar gnus-score-mode-hook nil
   "*Hook run in score mode buffers.")
 
