@@ -1,3 +1,7 @@
+2005-10-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* Testing CVS setup.  Yes.  Yes.  Yes.  Yes.
+
 2005-10-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (mm-delete-duplicates): New function.
