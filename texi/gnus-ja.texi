@@ -25893,12 +25893,14 @@ Gnus 5.8 $B$N?7$7$$5!G=(B:
 @item
 Gnus $B$O(B @acronym{MIME} $B$KBP1~$7$?%j!<%@!<$K$J$j$^$7$?!#$3$l$O(B Gnus $B$NB?(B
 $B$/$NItJ,$K1F6A$7$F$$$F!"$?$/$5$s$N?7$7$$%3%^%s%I$,DI2C$5$l$F$$$^$9!#>\:Y(B
-$B$O%^%K%e%"%k$r;2>H$7$F2<$5$$!#(B
+$B$O%^%K%e%"%k$r;2>H$7$F2<$5$$!#(B($BLuCm(B: T-gnus $B$O(B @acronym{SEMI} $B$*$h(B
+$B$S(B @acronym{FLIM} $B$N=t5!G=$K4p$E$$$F$$$^$9!#(B)
 
 @item
 $B$7$+$b(B Gnus $B$O3F9q8lBP1~$K$J$j$^$7$?!#$3$3$G$OMWLs$G$-$J$$$/$i$$(B
 $B$K(B Gnus $B$NB?$/$NItJ,$K1F6A$7$F$$$F!"?7$7$$$?$/$5$s$NJQ?t$,DI2C$5$l$F$$$^(B
-$B$9!#(B
+$B$9!#(B($BLuCm(B: T-gnus $B$O(B @acronym{SEMI} $B$*$h$S(B @acronym{FLIM} $B$N=t5!G=$K4p$E(B
+$B$$$F$$$^$9!#(B)
 
 @item
 @code{gnus-auto-select-first} $B$,!"%]%$%s%H$rCV$/>l=j$r7hDj$9$k$?$a$N4X?t(B
@@ -25932,6 +25934,11 @@ Gnus $B$O(B @code{nnimap} $B$K$h$C$F(B @acronym{IMAP} $B$N%a!<%k$rFI$`$3$H$
 
 Gnus 5.10 $B$N?7$7$$5!G=(B:
 
+$BLuCm(B: Gnus $B$OFH<+$K(B @acronym{MIME} $B$N5!G=$r;}$C$F$$$k$N$KBP$7$F!"(B
+T-gnus $B$O(B @acronym{SEMI} $B$d(B @acronym{FLIM} $B$KMj$C$F$$$^$9!#$7$?$,$C$F!"(B
+$B0J2<$G@bL@$5$l$F$$$k$$$/$D$+$N5!G=$O(B T-gnus $B$G$O;H$($J$$$3$H$KCm0U$7$F2<(B
+$B$5$$!#(B
+
 @itemize @bullet
 @item
 $BNN0h$,3h@-2=$5$l$F$$$k>l9g$K!"(B
@@ -25950,7 +25957,8 @@ Gnus 5.10 $B$N?7$7$$5!G=(B:
 
 @item
 $B2~Dj$5$l$?(B Gnus @acronym{FAQ} $B$,%^%K%e%"%k$K4^$^$l$F$$$^$9!#(B
-@xref{Frequently Asked Questions}.
+@xref{Frequently Asked Questions}. ($BLuCm(B: T-gnus $B$N$?$a(B
+$B$N(B @acronym{FAQ} $B$O1J$i$/2~Dj$5$l$F$$$^$;$s!#(B)
 
 @item
 Oort $B$r;H$C$?$3$H$,$"$k>l9g$N!"0JA0$N(B ($B0BDj$J(B) $BHG$+$i$N%0%l!<%I%"%C%W!#(B
@@ -26423,7 +26431,7 @@ Sieve $B$N5,B'$O%0%k!<%W%Q%i%a!<%?!<$H$7$F2C$($k$3$H$,$G$-!"%0%k!<%W%P%C%U%!!<
 $B$G(B @kbd{D g} $B$r;H$&$H40A4$J(B Sieve $B%9%/%j%W%H$,@8@.$5$l$^$9!#$=$&$7$?$i!"(B
 $B@8@.$5$l$?(B Sieve $B%P%C%U%!!<$G(B @kbd{C-c C-l} $B$r;H$C$F!"%5!<%P!<$K%"%C%W%m!<(B
 $B%I$7$F2<$5$$!#(B@ref{Sieve Commands}$B!"$=$l$K?7$7$$(B Sieve $B$N%^%K%e%"(B
-$B%k(B (@pxref{Top, ,Top, sieve-ja, Emacs Sieve}) $B$r;2>H$7$F2<$5$$!#(B
+$B%k(B (@pxref{Top, ,Top, sieve, Emacs Sieve}) $B$r;2>H$7$F2<$5$$!#(B
 
 @item
 $B3HD%$5$l$?=qK!;EMM(B (format specs)$B!#(B
@@ -26532,7 +26540,7 @@ C-m} $B$KJQ$o$j$^$7$?!#(B
 No Gnus $B$N?7$7$$5!G=(B:
 @c FIXME: Gnus 5.12?
 
-@include gnus-news-ja.texi
+@include gnus-news.texi
 
 @iftex
 
