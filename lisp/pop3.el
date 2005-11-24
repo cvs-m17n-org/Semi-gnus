@@ -128,11 +128,11 @@
 
 (defcustom pop3-authentication-scheme 'pass
   "*POP3 authentication scheme.
-Defaults to 'pass, for the standard USER/PASS authentication.  Other valid
-values are 'apop."
-  :version "22.1" ;; Oort Gnus
-  :type '(choice (const :tag "USER/PASS" pass)
+Defaults to `pass', for the standard USER/PASS authentication.  The other
+valid value is 'apop'."
+  :type '(choice (const :tag "Normal user/password" pass)
 		 (const :tag "APOP" apop))
+  :version "22.1" ;; Oort Gnus
   :group 'pop3)
 
 (defcustom pop3-leave-mail-on-server nil
@@ -306,6 +306,19 @@ Shorter values mean quicker response, but are more CPU intensive.")
     (pop3-quit process)
     message-count))
 
+(defcustom pop3-stream-type nil
+  "*Transport security type for POP3 connexions.
+This may be either nil (plain connexion), `ssl' (use an
+SSL/TSL-secured stream) or `starttls' (use the starttls mechanism
+to turn on TLS security after opening the stream).  However, if
+this is nil, `ssl' is assumed for connexions to port
+995 (pop3s)."
+  :version "23.1"			; fixme?
+  :group 'pop3
+  :type '(choice (const :tag "Plain" nil)
+		 (const :tag "SSL/TLS" ssl)
+		 (const starttls)))
+
 (defun pop3-open-server (mailhost port)
   "Open TCP connection to MAILHOST on PORT.
 Returns the process associated with the connection.
@@ -319,9 +332,12 @@ Argument PORT specifies connecting port."
       (setq
        process
        (cond
-	((eq pop3-connection-type 'ssl)
+	((or (eq pop3-connection-type 'ssl)
+	     (eq pop3-stream-type 'ssl)
+	     (and (not pop3-stream-type) (= port 995))) ; pop3s
 	 (pop3-open-ssl-stream "POP" (current-buffer) mailhost port))
-	((eq pop3-connection-type 'tls)
+	((or (memq pop3-connection-type '(tls starttls))
+	     (memq pop3-stream-type '(tls starttls)))
 	 (pop3-open-tls-stream "POP" (current-buffer) mailhost port))
 	(t
 	 (let ((coding-system-for-read 'binary)
@@ -346,6 +362,7 @@ Argument PORT specifies connecting port."
 	    "-connect" ,(format "%s:%d" host service)))
 	 (process (open-ssl-stream name buffer host service)))
     (when process
+      ;; There's a load of info printed that needs deleting.
       (with-current-buffer buffer
 	(goto-char (point-min))
 	(while (and (memq (process-status process) '(open run))
@@ -481,6 +498,8 @@ If NOW, use that time instead."
 	    ;; Date: 08 Jul 1996 23:22:24 -0400
 	    ;; should be
 	    ;; Tue Jul 9 09:04:21 1996
+
+	    ;; Fixme: This should use timezone on the date field contents.
 	    (setq date
 		  (cond ((not date)
 			 "Tue Jan 1 00:00:0 1900")
@@ -826,6 +845,13 @@ to `mail-sources' while fetching mails with Gnus."
 ;; Possible responses:
 ;;  +OK [negotiation is ready]
 ;;  -ERR [security layer is already active]
+
+;; STLS      (RFC 2595)
+;; Arguments: none
+;; Restrictions: Only permitted in AUTHORIZATION state.
+;; Possible responses:
+;;  +OK
+;;  -ERR
 
 ;;; TRANSACTION STATE
 
