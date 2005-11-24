@@ -334,7 +334,7 @@ Argument PORT specifies connecting port."
        (cond
 	((or (eq pop3-connection-type 'ssl)
 	     (eq pop3-stream-type 'ssl)
-	     (and (not pop3-stream-type) (= port 995))) ; pop3s
+	     (and (not pop3-stream-type) (member port '(995 "pop3s"))))
 	 (pop3-open-ssl-stream "POP" (current-buffer) mailhost port))
 	((or (memq pop3-connection-type '(tls starttls))
 	     (memq pop3-stream-type '(tls starttls)))
