@@ -335,10 +335,18 @@ Argument PORT specifies connecting port."
 	((or (eq pop3-connection-type 'ssl)
 	     (eq pop3-stream-type 'ssl)
 	     (and (not pop3-stream-type) (member port '(995 "pop3s"))))
+	 ;; gnutls-cli, openssl don't accept service names
+	 (if (or (equal port "pop3s")
+		 (null port))
+	     (setq port 995))
 	 (pop3-open-ssl-stream "POP" (current-buffer) mailhost port))
 	((or (memq pop3-connection-type '(tls starttls))
 	     (memq pop3-stream-type '(tls starttls)))
-	 (pop3-open-tls-stream "POP" (current-buffer) mailhost port))
+	 ;; gnutls-cli, openssl don't accept service names
+	 (if (equal port "pop3")
+	     (setq port 110))
+	 (pop3-open-tls-stream "POP" (current-buffer)
+			       mailhost (or port 110)))
 	(t
 	 (let ((coding-system-for-read 'binary)
 	       (coding-system-for-write 'binary))
