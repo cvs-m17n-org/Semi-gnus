@@ -1,3 +1,10 @@
+2005-12-06  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* nntp.el (nntp-marks-directory): Fix custom group.
+
+	* gnus-fun.el (gnus-face-from-file): Decrease quant in smaller
+	steps when < 10.
+
 2005-12-02  ARISAWA Akihiro  <ari@mbf.ocn.ne.jp>  (tiny change)
 
 	* mm-view.el (mm-inline-text-html-render-with-w3m): Fix misplaced
