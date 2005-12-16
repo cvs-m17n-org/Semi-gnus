@@ -922,6 +922,7 @@ header line with the old Message-ID."
 	      (when (featurep 'smiley-mule)
 		(smiley-encode-buffer)))
 	    (gnus-article-delete-text-of-type 'annotation)
+	    (gnus-article-delete-text-of-type 'multipart)
 	    (gnus-remove-text-with-property 'gnus-prev)
 	    (gnus-remove-text-with-property 'gnus-next)
 	    (gnus-remove-text-with-property 'gnus-decoration)
