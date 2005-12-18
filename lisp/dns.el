@@ -406,7 +406,8 @@ If REVERSEP, look up an IP address."
 	    (decf times step))
 	  (ignore-errors
 	    (delete-process process))
-	  (when tcp-p
+	  (when (and tcp-p
+		     (>= (buffer-size) 2))
 	    (goto-char (point-min))
 	    (delete-region (point) (+ (point) 2)))
 	  (unless (zerop (buffer-size))
