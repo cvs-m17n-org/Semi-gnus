@@ -250,8 +250,26 @@ The return value will be `html' or `text'."
 		  (insert "</body></html>\n"))
 	      (mime-edit-insert-text "plain")
 	      (when text
-		;; See `nnrss-check-group', which inserts <br />s.
-		(insert (gnus-replace-in-string text "<br />" "\n") "\n")
+		(goto-char (prog1
+			       (point)
+			     (insert text)))
+		;; See `nnrss-check-group', which inserts "<br /><br />".
+		(if (search-forward "<br /><br />" nil t)
+		    (if (eobp)
+			(replace-match "\n")
+		      (replace-match "\n\n")
+		      (let ((fill-column default-fill-column)
+			    (window (get-buffer-window nntp-server-buffer)))
+			(when window
+			  (setq fill-column
+				(max 1 (/ (* (window-width window) 7) 8))))
+			(fill-region (point) (point-max))
+			(goto-char (point-max))
+			;; XEmacs version of `fill-column' inserts newline.
+			(unless (bolp)
+			  (insert "\n"))))
+		  (goto-char (point-max))
+		  (insert "\n"))
 		(when (or link enclosure)
 		  (insert "\n")))
 	      (when link
