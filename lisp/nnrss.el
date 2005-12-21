@@ -265,7 +265,7 @@ The return value will be `html' or `text'."
 				(max 1 (/ (* (window-width window) 7) 8))))
 			(fill-region (point) (point-max))
 			(goto-char (point-max))
-			;; XEmacs version of `fill-column' inserts newline.
+			;; XEmacs version of `fill-region' inserts newline.
 			(unless (bolp)
 			  (insert "\n"))))
 		  (goto-char (point-max))
