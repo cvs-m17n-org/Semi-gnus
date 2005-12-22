@@ -1,3 +1,10 @@
+2005-12-22  TSUCHIYA Masatoshi  <tsuchiya@namazu.org>
+
+	* lisp/gnus-namazu.el (gnus-namazu-remote-groups): Accept `t' as an
+	symbol that matches the method specified by `gnus-select-method'.
+	(gnus-namazu/make-directory-table): Follow the above change.
+	(gnus-namazu/call-namazu): Wrap a query string with quotes.
+
 2005-12-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* GNUS-NEWS: Generated.
