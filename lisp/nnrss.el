@@ -93,8 +93,14 @@ ARTICLE is the article number of the current headline.")
 (defvar nnrss-compatible-encoding-alist '((iso-8859-1 . windows-1252))
   "Alist of encodings and those supersets.
 The cdr of each element is used to decode data if it is available when
-the car is what the data specify as the encoding. Or, the car is used
+the car is what the data specify as the encoding.  Or, the car is used
 for decoding when the cdr that the data specify is not available.")
+
+(defvar nnrss-wash-html-in-text-plain-parts nil
+  "*Non-nil means render text in text/plain parts as HTML.
+The function specified by the `mm-text-html-renderer' variable will be
+used to render text.  If it is nil, text will simply be folded.  This
+variable is not used in T-gnus.")
 
 (nnoo-define-basics nnrss)
 

@@ -15604,6 +15604,15 @@ system $B$G%(%s%3!<%I$5$l$^$9!#$=$l$,(B @code{nil} $B$G$"$k$H!"(BEmacs $B$G
 @code{nnmail-pathname-coding-system} $BJQ?t$NCM$rE,@Z$K@_Dj$7$J$1$l$P$J$j(B
 $B$^$;$s!#(B
 
+@code{nnrss} $B%P%C%/%(%s%I$O(B @samp{text/plain} $B$+(B @samp{text/html} $B$N5-;v(B
+$B$r:n$j$^$9!#$I$A$i$r:n$k$+$O(B @code{mime-preview-condition} $BJQ?t$NCM$K$h$C(B
+$B$F7h$^$j$^$9!#$b$7(B @uref{http://emacs-w3m.namazu.org/, emacs-w3m} $B$K4^$^(B
+$B$l$F$$$k(B @code{mime-w3m} $B%b%8%e!<(B
+$B%k(B (@pxref{SEMI MUAs, ,@acronym{SEMI} MUA $B$G(B HTML $B%a!<%k$rFI$`(B,
+emacs-w3m-ja, Emacs-w3m-ja}) $B$r;H$C$F$$$k$N$J$i$P!"(B@samp{text/html} $B$N5-(B
+$B;v$r:n$k$h$&$K!"<+F0E*$K(B @code{mime-preview-condition} $BJQ?t$,@_Dj$5$l$k(B
+$B$G$7$g$&!#(B
+
 @cindex OPML
 $B$"$J$?$N9VFIL\O?$r(B @acronym{OPML} $B%U%)!<%^%C%H(B (Outline Processor Markup
 Language) $B$G%m!<%I(B/$B%;!<%V$9$k$?$a$K!"0J2<$N%3%^%s%I$r;H$&$3$H$b$G$-$^$9!#(B
@@ -15679,15 +15688,6 @@ Language) $B$G%m!<%I(B/$B%;!<%V$9$k$?$a$K!"0J2<$N%3%^%s%I$r;H$&$3$H$b$G$-$^$9
       (kbd "<RET>") 'browse-nnrss-url))
 (add-to-list 'nnmail-extra-headers nnrss-url-field)
 @end lisp
-
-@code{nnrss} $B%P%C%/%(%s%I$O(B @samp{text/plain} $B$+(B @samp{text/html} $B$N5-;v(B
-$B$r:n$j$^$9!#$I$A$i$r:n$k$+$O(B @code{mime-preview-condition} $BJQ?t$NCM$K$h$C(B
-$B$F7h$^$j$^$9!#$b$7(B @uref{http://emacs-w3m.namazu.org/, emacs-w3m} $B$K4^$^(B
-$B$l$F$$$k(B @code{mime-w3m} $B%b%8%e!<(B
-$B%k(B (@pxref{SEMI MUAs, ,@acronym{SEMI} MUA $B$G(B HTML $B%a!<%k$rFI$`(B,
-emacs-w3m-ja, Emacs-w3m-ja}) $B$r;H$C$F$$$k$N$J$i$P!"(B@samp{text/html} $B$N5-(B
-$B;v$r:n$k$h$&$K!"<+F0E*$K(B @code{mime-preview-condition} $BJQ?t$,@_Dj$5$l$k(B
-$B$G$7$g$&!#(B
 
 @node Customizing W3
 @subsection W3 $B$N%+%9%?%^%$%:(B
