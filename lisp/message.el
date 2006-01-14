@@ -1,7 +1,7 @@
 ;;; message.el --- composing mail and news messages
 
 ;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-;;   2005 Free Software Foundation, Inc.
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -6961,7 +6961,9 @@ news, Source is the list of newsgroups is was posted to."
 		(gnus-group-decoded-name group)
 	      (or (and (setq from (message-fetch-field "from"))
 		       (car (std11-extract-address-components
-			     (nnheader-decode-from from))))
+			     (nnheader-decode-from from)))
+		       (cadr (std11-extract-address-components
+			      (nnheader-decode-from from))))
 		  "(nowhere)")))
 	  "] " subject))
 
