@@ -7465,12 +7465,12 @@ Pre-defined symbols include `message-tool-bar-gnome' and
     (message-send-and-exit "send")
     (message-dont-send "save-draft")
     (message-kill-buffer "close") ;; stock_cancel
-    (mml-attach-file "attach" mml-mode-map)
+;;    (mml-attach-file "attach" mml-mode-map)
     (ispell-message "spell" nil :visible (not flyspell-mode))
     ;; We should have a mail-preview icon with an envelope like the one in
     ;; stock_mail-reply.
-    (mml-preview "mail-preview" mml-mode-map)
-    (mml-secure-message-sign-encrypt "lock" mml-mode-map :visible nil)
+;;    (mml-preview "mail-preview" mml-mode-map)
+;;    (mml-secure-message-sign-encrypt "lock" mml-mode-map :visible nil)
     (message-insert-importance-high "important" nil :visible nil)
     (message-insert-importance-low "unimportant" nil :visible nil)
     (message-insert-disposition-notification-to "receipt" nil :visible nil)
@@ -7486,9 +7486,9 @@ See `gmm-tool-bar-from-list' for details on the format of the list."
   '((message-send-and-exit "mail/send")
     (message-kill-buffer "close")
     (message-dont-send "cancel")
-    (mml-attach-file "attach" mml-mode-map)
+;;    (mml-attach-file "attach" mml-mode-map)
     (ispell-message "spell")
-    (mml-preview "preview" mml-mode-map)
+;;    (mml-preview "preview" mml-mode-map)
     (message-insert-importance-high "important")
     (message-insert-importance-low "unimportant")
     (message-insert-disposition-notification-to "receipt"))
