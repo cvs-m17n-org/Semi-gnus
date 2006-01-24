@@ -1,3 +1,10 @@
+2006-01-24  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gmm-utils.el (gmm-tool-bar-item): Add "Separator".
+	(gmm-tool-bar-from-list): Suppress tooltip for `gmm-ignore'.
+
+	* message.el (message-tool-bar-gnome): Use gmm-ignore.
+
 2006-01-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gnus-xmas.el (gnus-mime-security-button-menu): New alias.
@@ -83,15 +90,30 @@
 	* mml.el (mml-attach-file): Describe `description' in doc string.
 	(mml-menu): Add Emacs MIME manual and PGG manual.
 
-2005-12-12  Richard M. Stallman  <rms@gnu.org>
+2006-01-20  Richard M. Stallman  <rms@gnu.org>
 
 	* mm-url.el (mm-url-load-url): Require url-parse and url-vars.
 
-2005-11-14  Kevin Greiner  <kevin.greiner@compsol.cc>
+2006-01-20  Kevin Greiner  <kevin.greiner@compsol.cc>
 
 	* nntp.el (nntp-end-of-line): Doc fix.
 
-2005-11-04  Ken Manheimer  <ken.manheimer@gmail.com>
+2006-01-20  Chong Yidong  <cyd@stupidchicken.com>
+
+	* imap.el (imap-open): Handle case where buffer is a buffer
+	object.
+
+2005-01-20  Stefan Monnier  <monnier@iro.umontreal.ca>
+
+	* gnus-delay.el (gnus-delay): Don't autoload.
+	It's useless and could trigger a bug in cus-dep.el causing ldefs-boot
+	to be re-loaded when customizing the `gnus-delay' group.
+
+2005-01-20  Chong Yidong  <cyd@stupidchicken.com>
+
+	* message.el (message-insert-citation-line): Use newlines.
+
+2006-01-19  Ken Manheimer  <ken.manheimer@gmail.com>
 
 	* pgg-pgp.el (pgg-pgp-encrypt-region, pgg-pgp-decrypt-region)
 	(pgg-pgp-sign-region): Add optional 'passphrase' argument to all
@@ -107,12 +129,7 @@
 	(pgg-pgp5-sign-region): Use new name of
 	pgg-add-passphrase-to-cache function.
 
-2005-10-30  Chong Yidong  <cyd@stupidchicken.com>
-
-	* imap.el (imap-open): Handle case where buffer is a buffer
-	object.
-
-2005-10-29  Ken Manheimer  <ken.manheimer@gmail.com>
+2006-01-19  Ken Manheimer  <ken.manheimer@gmail.com>
 
 	* pgg-gpg.el (pgg-gpg-select-matching-key): Fix: look at the right
 	part of the decoded armor to find the key-identifier.
@@ -138,7 +155,7 @@
 	(pgg-decrypt): Convey provided passphrase in subordinate call to
 	pgg-decrypt-region.
 
-2005-10-20  Ken Manheimer  <ken.manheimer+emacs@gmail.com>
+2006-01-19  Ken Manheimer  <ken.manheimer+emacs@gmail.com>
 
 	* pgg.el (pgg-encrypt-region, pgg-encrypt-symmetric-region)
 	(pgg-encrypt-symmetric, pgg-encrypt, pgg-decrypt-region)
@@ -161,7 +178,7 @@
 	'notruncate' argument, so the passphrase cache can be used
 	reliably with identifiers besides a pgp packet's key id.
 
-2005-10-29  Sascha Wilde  <swilde@sha-bang.de>
+2006-01-19  Sascha Wilde  <swilde@sha-bang.de>
 
 	* pgg-gpg.el (pgg-gpg-encrypt-symmetric-region): New function for
 	symmetric encryption.
@@ -172,16 +189,6 @@
 
 	* pgg.el (pgg-encrypt-symmetric, pgg-encrypt-symmetric-region):
 	New user commands for symmetric encryption.
-
-2005-11-30  Stefan Monnier  <monnier@iro.umontreal.ca>
-
-	* gnus-delay.el (gnus-delay): Don't autoload.
-	It's useless and could trigger a bug in cus-dep.el causing ldefs-boot
-	to be re-loaded when customizing the `gnus-delay' group.
-
-2005-11-19  Chong Yidong  <cyd@stupidchicken.com>
-
-	* message.el (message-insert-citation-line): Use newlines.
 
 2006-01-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
