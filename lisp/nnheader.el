@@ -156,11 +156,12 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defun nnheader-image-load-path (&optional package)
     (let (dir result)
       (dolist (path load-path (nreverse result))
-	(if (file-directory-p
-	     (setq dir (concat (file-name-directory
-				(directory-file-name path))
-			       "etc/" (or package "gnus/"))))
-	    (push dir result))
+	(when (and path
+		   (file-directory-p
+		    (setq dir (concat (file-name-directory
+				       (directory-file-name path))
+				      "etc/images/" (or package "gnus/")))))
+	  (push dir result))
 	(push path result))))
   (defalias 'mm-image-load-path 'nnheader-image-load-path)
 
