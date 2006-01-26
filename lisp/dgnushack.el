@@ -367,7 +367,7 @@ adding the --with-addpath=FLIM_PATH option.\n"
   (autoload 'std11-unfold-region "nnheader"))
 
 (defconst dgnushack-unexporting-files
-  (append '("dgnushack.el" "dgnuspath.el" "lpath.el")
+  (append '("dgnushack.el" "dgnuspath.el" "lpath.el" "legacy-gnus-agent.el")
 	  (unless (or (condition-case code
 			  (require 'w3-parse)
 			(error

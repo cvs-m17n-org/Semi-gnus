@@ -11,7 +11,7 @@
 2005-01-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-unexporting-files): Exclude
-	dgnuskwds.el, legacy-gnus-agent.el and gnus-load.el.
+	dgnuskwds.el and gnus-load.el.
 
 	* lisp/nnheader.el (mm-subst-char-in-string): New function.
 	(nnheader-replace-chars-in-string): Use it.
