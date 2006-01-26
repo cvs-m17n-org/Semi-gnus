@@ -1,7 +1,14 @@
+2005-01-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/nnheader.el (mm-subst-char-in-string): New function.
+	(nnheader-replace-chars-in-string): Use it.
+
 2005-01-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (nnheader-image-load-path): Synch it up with
 	mm-image-load-path in mm-util.el.
+	(mm-subst-char-in-string): New function.
+	(nnheader-replace-chars-in-string): Use it.
 
 2005-01-23  Katsumi Yamaoka  <yamaoka@jpl.org>
 
