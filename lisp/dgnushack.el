@@ -367,8 +367,7 @@ adding the --with-addpath=FLIM_PATH option.\n"
   (autoload 'std11-unfold-region "nnheader"))
 
 (defconst dgnushack-unexporting-files
-  (append '("dgnushack.el" "dgnuspath.el" "dgnuskwds.el" "lpath.el"
-	    "legacy-gnus-agent.el")
+  (append '("dgnushack.el" "dgnuspath.el" "lpath.el")
 	  (unless (or (condition-case code
 			  (require 'w3-parse)
 			(error
@@ -429,9 +428,7 @@ adding the --with-addpath=FLIM_PATH option.\n"
 		     (subrp (symbol-function 'base64-decode-string)))
 	    '("base64.el"))
 	  (when (and (fboundp 'md5) (subrp (symbol-function 'md5)))
-	    '("md5.el"))
-	  (when (featurep 'xemacs)
-	    '("gnus-load.el")))
+	    '("md5.el")))
   "Files which will not be installed.")
 
 (defconst dgnushack-exporting-files

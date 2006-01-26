@@ -200,9 +200,8 @@ info-ja:
 	cd texi && $(MAKE) EMACS=$(EMACS) ja
 
 clean:
-	rm -f */*.orig */*.rej *.orig *.rej
-	rm -f MANIFEST.*
-	for i in lisp texi; do (cd $$i; $(MAKE) clean); done
+	for i in lisp texi etc texi/ps; do (cd $$i; $(MAKE) clean); done
+	rm -f *.orig *.rej *~ MANIFEST.*
 
 elclean:
 	cd lisp && rm -f *.elc auto-autoloads.el custom-load.el gnus-load.el
@@ -214,7 +213,6 @@ xsome:
 	$(MAKE) EMACS="$(XEMACS)" some
 
 distclean: clean
-	rm -rf *~
 	for i in lisp texi etc texi/ps; do (cd $$i; $(MAKE) distclean); done
 	rm -f config.log config.status config.cache Makefile
 

@@ -107,8 +107,7 @@ gnus-load.el:
 	$(EMACS_COMP) -f dgnushack-make-load
 
 clean:
-	rm -f *.orig *.rej *.elc *~ \
-		auto-autoloads.el custom-load.el gnus-load.el dgnuskwds.el
+	rm -f *.elc *.orig *.rej *~ auto-autoloads.* custom-load.* gnus-load.el
 
 distclean: clean
 	rm -f Makefile dgnuspath.el
