@@ -179,6 +179,22 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defalias 'mm-decode-coding-region 'decode-coding-region)
   (defalias 'mm-set-buffer-file-coding-system 'set-buffer-file-coding-system)
 
+  ;; Should keep track of `mm-subst-char-in-string' in mm-util.el.
+  (if (fboundp 'subst-char-in-string)
+      (defalias 'mm-subst-char-in-string 'subst-char-in-string)
+    (defun mm-subst-char-in-string (from to string &optional inplace)
+      "Replace characters in STRING from FROM to TO.
+	  Unless optional argument INPLACE is non-nil, return a new string."
+      (let ((string (if inplace string (copy-sequence string)))
+	    (len (length string))
+	    (idx 0))
+	;; Replace all occurrences of FROM with TO.
+	(while (< idx len)
+	  (when (= (aref string idx) from)
+	    (aset string idx to))
+	  (setq idx (1+ idx)))
+	string)))
+
   ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
   (defun nnheader-detect-coding-region (start end)
     "Like 'detect-coding-region' except returning the best one."
@@ -1452,20 +1468,8 @@ without formatting."
       (apply 'insert format args))
     t))
 
-(static-if (fboundp 'subst-char-in-string)
-    (defsubst nnheader-replace-chars-in-string (string from to)
-      (subst-char-in-string from to string))
-  (defun nnheader-replace-chars-in-string (string from to)
-    "Replace characters in STRING from FROM to TO."
-    (let ((string (substring string 0))	;Copy string.
-	  (len (length string))
-	  (idx 0))
-      ;; Replace all occurrences of FROM with TO.
-      (while (< idx len)
-	(when (= (aref string idx) from)
-	  (aset string idx to))
-	(setq idx (1+ idx)))
-      string)))
+(defsubst nnheader-replace-chars-in-string (string from to)
+  (mm-subst-char-in-string from to string))
 
 (defun nnheader-replace-duplicate-chars-in-string (string from to)
   "Replace characters in STRING from FROM to TO."
