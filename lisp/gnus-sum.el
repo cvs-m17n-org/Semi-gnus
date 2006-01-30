@@ -31,7 +31,7 @@
 
 (eval-when-compile
   (require 'cl)
-  (defvar tool-bar-map))
+  (defvar tool-bar-mode))
 
 (require 'gnus)
 (require 'gnus-group)
