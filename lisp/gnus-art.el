@@ -2446,8 +2446,7 @@ If PROMPT (the prefix), prompt for a coding system to use."
 	(article-narrow-to-head)
 	(setq ct (message-fetch-field "Content-Type" t)
 	      cte (message-fetch-field "Content-Transfer-Encoding" t)
-	      ctl (and ct (ignore-errors
-			    (mail-header-parse-content-type ct)))
+	      ctl (and ct (mail-header-parse-content-type ct))
 	      charset (cond
 		       (prompt
 			(mm-read-coding-system "Charset to decode: "))
@@ -2558,9 +2557,7 @@ If READ-CHARSET, ask for a coding system."
 	    (setq type
 		  (gnus-fetch-field "content-transfer-encoding"))
 	    (let* ((ct (gnus-fetch-field "content-type"))
-		   (ctl (and ct
-			     (ignore-errors
-			       (mail-header-parse-content-type ct)))))
+		   (ctl (and ct (mail-header-parse-content-type ct))))
 	      (setq charset (and ctl
 				 (mail-content-type-get ctl 'charset)))
 	      (if (stringp charset)
@@ -2588,9 +2585,7 @@ If READ-CHARSET, ask for a coding system."
 	    (setq type
 		  (gnus-fetch-field "content-transfer-encoding"))
 	    (let* ((ct (gnus-fetch-field "content-type"))
-		   (ctl (and ct
-			     (ignore-errors
-			       (mail-header-parse-content-type ct)))))
+		   (ctl (and ct (mail-header-parse-content-type ct))))
 	      (setq charset (and ctl
 				 (mail-content-type-get ctl 'charset)))
 	      (if (stringp charset)
@@ -2656,9 +2651,7 @@ charset defined in `gnus-summary-show-article-charset-alist' is used."
 	(when (gnus-buffer-live-p gnus-original-article-buffer)
 	  (with-current-buffer gnus-original-article-buffer
 	    (let* ((ct (gnus-fetch-field "content-type"))
-		   (ctl (and ct
-			     (ignore-errors
-			       (mail-header-parse-content-type ct)))))
+		   (ctl (and ct (mail-header-parse-content-type ct))))
 	      (setq charset (and ctl
 				 (mail-content-type-get ctl 'charset)))
 	      (when (stringp charset)
