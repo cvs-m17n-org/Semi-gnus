@@ -15174,9 +15174,12 @@ The name of the @dfn{marks} files.  The default is @file{.marks}.
 @item nnml-use-compressed-files
 @vindex nnml-use-compressed-files
 If non-@code{nil}, @code{nnml} will allow using compressed message
-files.  This variable requires @code{auto-compression-mode} to be
-enabled (@pxref{Compressed Files, ,Compressed Files, emacs, The Emacs
-Manual})
+files.  This requires @code{auto-compression-mode} to be enabled
+(@pxref{Compressed Files, ,Compressed Files, emacs, The Emacs Manual}).
+If the value of @code{nnml-use-compressed-files} is a string, it is used
+as the file extension specifying the comression program.  You can set it
+to @samp{.bz2} if your Emacs supports it.  A value of @code{t} is
+equivalent to @samp{.gz}.
 
 @item nnml-compressed-files-size-threshold
 @vindex nnml-compressed-files-size-threshold
@@ -25233,14 +25236,17 @@ Gnus 5.6 begat Pterodactyl Gnus on August 29th 1998 and was released as
 ``Gnus 5.8'' (after 99 releases and a CVS repository) on December 3rd
 1999.
 
-On the 26th of October 2000, Oort Gnus was begun.
+On the 26th of October 2000, Oort Gnus was begun and was released as
+Gnus 5.10 on May 1st 2003 (24 releases).
+
+On the January 4th 2004, No Gnus was begun.
 
 If you happen upon a version of Gnus that has a prefixed name --
 ``(ding) Gnus'', ``September Gnus'', ``Red Gnus'', ``Quassia Gnus'',
-``Pterodactyl Gnus'', ``Oort Gnus'' -- don't panic.  Don't let it know
-that you're frightened.  Back away.  Slowly.  Whatever you do, don't
-run.  Walk away, calmly, until you're out of its reach.  Find a proper
-released version of Gnus and snuggle up to that instead.
+``Pterodactyl Gnus'', ``Oort Gnus'', ``No Gnus'' -- don't panic.
+Don't let it know that you're frightened.  Back away.  Slowly.  Whatever
+you do, don't run.  Walk away, calmly, until you're out of its reach.
+Find a proper released version of Gnus and snuggle up to that instead.
 
 
 @node Other Gnus Versions
