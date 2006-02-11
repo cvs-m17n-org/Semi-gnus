@@ -1,4 +1,4 @@
-2000-12-06  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-12-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (TopLevel): Defalias `coding-system-category'
 	to `get-code-mnemonic' for Mule.
@@ -24,20 +24,20 @@
 
 	* texi/message-ja.texi: Use two lines for direntry.
 
-2000-12-01  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-12-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: Attempt to add another FLIM path to `load-path'
 	if the module `mel' does not found.  This procedure may be needed
 	when recent FLIM 1.14 is used under old Emacsen.
 
-2000-11-27  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 08.
 
 	* lisp/message.el (message-send-mail-with-smtp): Leave the error
 	handling in `smtp-send-buffer's own care.
 
-2000-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-22  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 07.
 
@@ -50,7 +50,7 @@
 	`x-face-decode-message-header' when Emacs 21 is running and
 	x-face-e21 is installed.
 
-2000-11-21  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-send-mail-with-smtp): Use
 	`smtp-send-buffer' if it exists instead of `smtp-via-smtp'.
@@ -66,12 +66,12 @@
 
 	* texi/gnus-ja.texi (Drafts): Fix typo.
 
-2000-11-14  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (article-verify-x-pgp-sig): Autoload "mm-uu".
 	(gnus-treat-x-pgp-sig): Default to nil.
 
-2000-11-10  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* Mule23@1934.en, Mule23@1934.ja, sample.lpath.el: Upgrade.
 
@@ -84,7 +84,7 @@
 	(AC_CHECK_EMACS): Ignore cache.
 	(AC_DEFINE_GNUS_PRODUCT_NAME): Cache.
 
-2000-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* configure: Regenerate.
 
@@ -103,7 +103,7 @@
 	* lisp/lpath.el (md5): Don't bind.
 	(url-insert-file-contents): Fbind for FSF Emacsen.
 
-2000-11-08  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-08  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/Makefile.in (install-ja-info): Specify `EMACS' and
 	`infodir'.
@@ -172,7 +172,7 @@
 	for direntries.
 	* texi/message-ja.texi: Ditto.
 
-2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/Makefile.in (install): Don't check for the file names.
 
@@ -186,7 +186,7 @@
 	* lisp/gnus-topic.el (gnus-topic-rename): Use current topic as
 	initial value for read-string.
 
-2000-11-06  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/Makefile.in (install): Use the lisp function
 	`dgnushack-exported-files'.
@@ -215,11 +215,11 @@
 	* lisp/smiley.el (smiley-deformed-regexp-alist): Modify regexp for
 	the winking face.
 
-2000-11-02  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-make-manifest): Fix info directory.
 
-2000-11-02  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* Makefile.in (install-package-ja): Compile and install lisp files
 	first.
@@ -244,12 +244,12 @@
 	Split from `dgnushack-info-file-regexp'.
 	(dgnushack-texi-file-regexp): Remove.
 
-2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-texi-format): Remove @ignore'd areas
 	before processing.
 
-2000-11-01  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-11-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 06.
 
@@ -258,7 +258,7 @@
 	* lisp/gnus-start.el (gnus-product-read-variable-file-1): Make it
 	talkative.
 
-2000-10-31  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-10-31  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el: Bind `:key-type' and `:value-type' for old
 	Emacsen.
@@ -269,7 +269,7 @@
 	direntry generate probrem.
 	(Advised by Tetsuo Tsukamoto <czkmt@remus.dti.ne.jp>)
 
-2000-10-31  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-10-31  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-insert-line): Work with quoted
 	double-quote characters.
@@ -285,7 +285,7 @@
 	* lisp/ptexinfmt.el (texinfo-format-printindex): Mule for Windows
 	detection fixed.
 
-2000-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-10-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-group-startup-message): Rewrite for Emacs 21.
 	* lisp/lpath.el: Fbind `propertize'.
@@ -299,12 +299,12 @@
 	* lisp/nnshimbun.el (nnshimbun-netbsd-get-headers): Fix regular
 	expression to extract xover urls.
 
-2000-10-12  Jesper Harder <jesper_harder@hotmail.com>
+2000-10-12  Jesper Harder  <jesper_harder@hotmail.com>
 
 	* make.bat: Makes it possible to generate the Info files on
 	windows again.
 
-2000-10-11  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-10-11  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* Makefile.in (info-ja, xinfo-ja): No need to use `MAKEINFO=no'.
 	(install-info-ja, install-info, install-lisp, install-ja): New
@@ -321,11 +321,11 @@
 	* lisp/nnshimbun.el (nnshimbun-type-definition): Fix regular
 	expression to extract article body from `ZDNet'.
 
-2000-10-06  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-10-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/imap.el: Require `base64' instead of to autoload it.
 
-2000-10-05  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-10-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Don't use
 	`gnus-point-at-eol'.
@@ -340,7 +340,7 @@
 	`make-full-mail-header-from-decoded-header' instead of
 	`make-full-mail-header'.
 
-2000-10-03  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-10-03  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-group.el (gnus-group-get-new-news): Update modeline
 	using `gnus-agent-toggle-plugged' if agent is activated.
@@ -353,7 +353,7 @@
 	* lisp/gnus-art.el (gnus-article-add-button): Quote
 	`:button-keymap' for Mule 2.3 but it won't work.
 
-2000-09-29  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-09-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-ignored-supersedes-headers): Synch with
 	Gnus.
@@ -369,7 +369,7 @@
 	* lisp/ptexinfmt.el (texinfo-format-printindex): Use (featurep
 	'meadow) instead of `texinfmt-version'.
 
-2000-09-25  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-09-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 05.
 
@@ -383,7 +383,7 @@
 	broken-facility check, for Mule for Windows.
 	(texinfo-format-printindex): New function.
 
-2000-09-19  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-09-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-copy-article-buffer): Encode bitmap
 	smileys to ordinary text before removing any text properties.  It
@@ -398,7 +398,7 @@
 
 	* lisp/gnus-art.el: Always require `wid-edit'.
 
-2000-09-14  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-09-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-compile): Don't compile gnus-ml.el
 	when FSFmacs is running.
@@ -462,19 +462,19 @@
 	* lisp/nnshimbun.el (nnshimbun-zdnet-get-headers): Follow changes
 	of ZDNet.
 
-2000-08-25  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-08-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
 
 2000-08-25  Yagi Tatsuya  <yagi@is.titech.ac.jp>
-            Katsumi Yamaoka <yamaoka@jpl.org>
+            Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nntp.el (nntp-list-options, nntp-options-subscribe,
 	nntp-options-not-subscribe): New server variables.
 	(nntp-request-list): Use them.
 	* texi/gnus.texi, texi/gnus-ja.texi: Update for them.
 
-2000-08-23  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-08-23  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-group-startup-message): Use `image-size' to
 	simplify the program.
@@ -482,7 +482,7 @@
 	* lisp/gnus-group.el (gnus-group-rename-group): Inhibit renaming of
 	zombie or killed groups.
 
-2000-08-21  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-08-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (nnheader-replace-chars-in-string): Use
 	`static-if'.
@@ -500,7 +500,7 @@
 
 	* lisp/nnshimbun.el: Add `mew' and `xemacs' support.
 
-2000-08-17  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-08-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (dgnushack-texi-format): Require `ptexinfmt'
 	instead of `texinfmt'.
@@ -516,7 +516,7 @@
 
 	* lisp/ptexinfmt.el: New file imported from Wanderlust.
 
-2000-08-09  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-08-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nntp.el (nntp-open-telnet): Wait for the telnet prompt
 	before sending a command; allow the rtelnet prompt as well.
@@ -524,13 +524,13 @@
 	* lisp/message.el (message-make-forward-subject): Remove garbage
 	line.
 
-2000-08-01  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-08-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* configure: Regenerate.
 	* aclocal.m4 (AC_CHECK_EMACS): Unset `EMACS' environment variable
 	if it is `t'.
 
-2000-07-24  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-07-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
 
@@ -595,7 +595,7 @@
 
 	* acinclude.m4 (AC_CHECK_W3): Fix typo.
 
-2000-07-13  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-07-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* configure: Regenerate with autoconf v2.14.1.
 	* aclocal.m4: Regenerate with aclocal v1.4.
@@ -613,7 +613,7 @@
 	* configure.in: Use them.
 	* configure: Generate it.
 
-2000-07-03  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-07-03  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (T-gnus): Update to 6.14.5.
 	(gnus-revision-number): Clear to 00.
@@ -635,7 +635,7 @@
 
 	* contrib/rfc2015.el: New file.
 
-2000-06-27  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-06-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 04.
 
@@ -647,13 +647,13 @@
 	* lisp/gnus-bbdb.el(gnus-bbdb/update-record): Fix to fetch last
 	mail field.
 
-2000-06-09  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-06-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-news-group-p): Sync with Gnus.
 	(gnus-select-method): Remove "*" from doc string.
 	(gnus-group-startup-message): Use `dino' colors.
 
-2000-06-08  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-06-08  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-fix-before-sending): Expose all
 	invisible text with the property `message-invisible'; don't expose
@@ -666,7 +666,7 @@
 	(add-hook 'message-send-hook 'x-face-xmas-remove-x-face-glyph)
 	instead.
 
-2000-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-06-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-save-drafts): Rewrite.
 
@@ -697,7 +697,7 @@
 	* lisp/gnus-start.el (gnus-slave-save-newsrc): Bind coding system
 	to `gnus-startup-file-coding-system'.
 
-2000-06-06  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-06-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 03.
 
@@ -730,7 +730,7 @@
 	(nnshimbun-nov-fix-header): New function.
 	(nnshimbun-make-date-string): Fix for a two-digit year.
 
-2000-05-26  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnshimbun.el (nnshimbun-make-html-contents): Show X-Face.
 	(nnshimbun-make-text-or-html-contents): Ditto.
@@ -741,7 +741,7 @@
 
 	* README.semi, README.semi.ja: Update for CVS via SSH.
 
-2000-05-25  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/gnus-ja.texi: Change coding-system to `iso-2022-7bit-ss2'.
 	* texi/TRANSLATION.ja: Replace CRLF with LF.
@@ -767,7 +767,7 @@
 	(nnshimbun-wired-get-all-headers): Replace regexp-opt with
 	nnshimbun-regexp-opt.
 
-2000-05-24  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Complete
 	completions.
@@ -784,7 +784,7 @@
 	* lisp/nnshimbun.el (nnshimbun-retrieve-url): Add argument to
 	ignore w3's cache.
 
-2000-05-24  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-group.el (gnus-group-make-shimbun-group): Add
 	completion to the shimbun address; delete empty strings from
@@ -812,7 +812,7 @@
 
 	* texi/gnus-ja.texi (nnshimbun): Add description.
 
-2000-05-21  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 02.
 
@@ -832,7 +832,7 @@
 	(TopLevel): Require `sasl' when compiling instead of `digest-md5';
 	don't autoload "digest-md5".
 
-2000-05-17  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nndraft.el (nndraft-request-replace-article): Replace
 	`mm-text-coding-system' with `mail-source-text-coding-system';
@@ -847,7 +847,7 @@
 	`output-coding-system' instead of `coding-system-for-write' when
 	old Mule is used.
 
-2000-05-16  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-forward) Replace the use of `eolp' with
 	`bolp' for detecting the start of the line.
@@ -858,12 +858,12 @@
 	* lisp/gnus-bbdb.el (gnus-bbdb/pop-up-bbdb-buffer): Don't bind
 	`bbdb-use-pop-up' while executing `bbdb-pop-up-bbdb-buffer'.
 
-2000-05-10  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-debug): Break MIME tags from the snoopies.
 	(gnus-bug): Insert text/plain tag at the end of the buffer.
 
-2000-05-10  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 01.
 
@@ -876,11 +876,11 @@
 	* lisp/gnus-bbdb.el (gnus-bbdb/split-mail): Support group address.
 	(gnus-bbdb/insert-address-regexp): New function.
 
-2000-05-09  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-debug): Add "nntp.el" and `defvoo'.
 
-2000-05-08  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-05-08  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (T-gnus): Update to 6.14.4.
 
@@ -895,7 +895,7 @@
 	gnus.texi,gnus-ja.texi,emacs-mime.texi,Makefile.in,ChangeLog}: Sync
 	up with Gnus v5.8.6.
 
-2000-04-28  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* texi/gnus.texi, texi/gnus-ja.texi, texi/gnus-faq-ja.texi, README:
 	You might be able to use T-gnus with the versions of XEmacs prior
@@ -903,7 +903,7 @@
 
 	* contrib/timer.el: New file. Imported from fsf-compat-1.07-pkg.
 
-2000-04-27  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/mm-view.el (gnus-article-mime-handles): Don't bind it.
 
@@ -918,12 +918,12 @@
 	* lisp/dgnushack.el: Add code to avoid mule-2.3@19.34 failing to
 	make info from texi. Thanks to Hayashi-san.
 
-2000-04-25  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (union, member-if, mapcon, last): Remove
 	compiler macros.
 
-2000-04-24  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (T-gnus): Update to 6.14.3.
 
@@ -951,7 +951,7 @@
 	* README: Requires XEmacs 21.1.1 and later.
 	* texi/{gnus.texi, gnus-faq-ja.texi}: Ditto.
 
-2000-04-20  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-20  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (T-gnus): Update to 6.14.2.
 	(gnus-revision-number): Clear to 00.
@@ -974,12 +974,12 @@
 
 	* contrib/{vcard.el,one-line-cookie.diff,README}: New files.
 
-2000-04-14  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-msg.el (gnus-summary-yank-message): Rewrite for the use
 	of the separated message frames; use `gnus-copy-article-buffer'.
 
-2000-04-13  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-13  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 18.
 	(gnus-extended-version): Use `gnus-product-name' and
@@ -994,7 +994,7 @@
 	modification.
 	(gnus-search-or-regist-spec): Change interface.
 
-2000-04-12  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-12  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-article-prev-page): Bind
 	`window-pixel-scroll-increment' to nil while scrolling for
@@ -1002,7 +1002,7 @@
 	XEmacs 21.2.20 and later.
 	(gnus-article-next-page): Ditto.
 
-2000-04-12  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-12  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 17.
 
@@ -1026,22 +1026,22 @@
 	* lisp/imap.el (imap-body-lines): Check Content-Type: of the
 	article case insensitively.
 
-2000-04-07  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-cite-original): Use "unknown sender" if
 	from field does not exist in the yanked article.
 
-2000-04-06  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-04-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-cite-original): Extract from field for
 	the simple citation line.
 
-2000-03-21  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-03-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnimap.el (nnimap-request-article-part): Returns nil if the
 	article does not exist.
 
-2000-03-17  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-03-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 16.
 
@@ -1051,7 +1051,7 @@
 	* lisp/imap.el (imap-ssl-open): Ditto.
 	* lisp/gnus-start.el (gnus-product-read-variable-file-1): Ditto.
 
-2000-03-17  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-03-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-start.el (gnus-re-read-newsrc-el-file): New function.
 	(gnus-read-newsrc-el-file): If it fails, attempt to re-read the
@@ -1059,12 +1059,12 @@
 	compiled format specs in the file which may be created by the other
 	Gnusae should be ignored.
 
-2000-03-16  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-03-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-product-variable-file-list): Use `*ctext*'
 	when Mule 2.3 is running.
 
-2000-03-16  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-03-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-vers.el (gnus-revision-number): Increment to 15.
 
@@ -1153,7 +1153,7 @@
 	* lisp/gnus-msg.el (gnus-inews-add-send-actions): Use
 	`product-string'.
 
-2000-03-09  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-03-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 14.
 	(gnus-compile-user-specs): New user option.
@@ -1172,7 +1172,7 @@
 	(gnus-format-specs-compiled): Modify the form.
 	(TopLevel): Require `alist'.
 
-2000-03-09  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-03-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 13.
 
@@ -1226,7 +1226,7 @@
 	(gnus-summary-article-map): Bind them.
 	(gnus-wheel-summary-scroll): Fix paren style.
 
-2000-03-02  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-03-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 11.
 
@@ -1255,7 +1255,7 @@
 	this attribute was obsoleted in RFC2060.
 	(nnimap-request-body): Ditto.
 
-2000-02-29  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-02-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 09.
 
@@ -1302,13 +1302,13 @@
 	* lisp/nnimap.el (nnimap-retrieve-headers-progress): Remove
 	confusing tabs from original header.
 
-2000-02-02  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-02-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/pop3.el (pop3-md5): Fset to `md5' if the module `md5' is
 	installed.
 	(pop3-apop): Use built-in `md5' if it exists.
 
-2000-01-27  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-01-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
 
@@ -1318,7 +1318,7 @@
 	* lisp/gnus-sum.el (gnus-summary-exit): Recenter the group buffer
 	without redisplaying if the point is out of view.
 
-2000-01-25  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-01-25  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
 
@@ -1341,14 +1341,14 @@
 	gnus-offline-connect-server): Ditto.
 	* lisp/dgnushack.el (dgnushack-make-package): Ditto.
 
-2000-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-01-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
 
 	* lisp/gnus-sum.el (gnus-summary-exit): Don't recenter the group
 	buffer if it is called non-interactively.
 
-2000-01-18  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-01-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
 
@@ -1369,17 +1369,17 @@
 	* lisp/base64.el: Unbound base64-*-string and base64-*-region
 	when defined by autoload.
 
-2000-01-11  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-01-11  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-reselect-current-group): Restore
 	the original code; hide group contents while rescanning.
 
-2000-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-01-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-sum.el (gnus-summary-reselect-current-group): Truncate
 	lines in the imitation buffer; turn off h-scrollbar for XEmacs.
 
-2000-01-07  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-01-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
 
@@ -1403,7 +1403,7 @@
 
 	* lisp/dgnushack.el (char-before): Use the byte-optimaization.
 
-2000-01-05  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.14.1.
 	(gnus-revision-number): Clear to 00.
@@ -1433,7 +1433,7 @@
 	* texi/{postamble.tex,message.texi,gnus.texi,gnus-ja.texi,
 	emacs-mime.texi,ChangeLog}: Sync up with Gnus v5.8.3.
 
-2000-01-05  Katsumi Yamaoka <yamaoka@jpl.org>
+2000-01-05  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* README.semi, README.semi.ja, texi/gnus-faq-ja.texi: Update for
 	the new CVS server.
@@ -1465,7 +1465,7 @@
 	bind `coding-system-for-read' to raw-text-dos, else bind it to
 	binary.
 
-1999-12-28  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 14.
 
@@ -1492,7 +1492,7 @@
 	(imap-starttls-p): Rename from `imap-tls-p'.
 	(imap-starttls-open): Rename from `imap-tls-open'.
 
-1999-12-21  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-21  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 13.
 
@@ -1505,7 +1505,7 @@
 	* lisp/base64.el: Restore the original code and invalidate it; use
 	mel for the base64 codec.
 
-1999-12-20  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-20  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/imap.el (mel-find-function): Always require `mel' instead of
 	the use of autoloading.  Because the function `mel-find-function'
@@ -1521,7 +1521,7 @@
 
 	* lisp/imap.el (base64-encode-string): Fix. May work.
 
-1999-12-16  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-16  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-goto-mail-copies-to): If the field is
 	newly created, a string "never" is inserted in default.
@@ -1531,7 +1531,7 @@
 	(message-mode-map): New key stroke `C-c C-f c' for the command
 	`message-goto-mail-copies-to'.
 
-1999-12-15  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-15  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 12.
 
@@ -1559,12 +1559,12 @@
 	macros under XEmacs.  It is based on Hrvoje's advice.
 	(member-if): New compiler macro for emulating cl function.
 
-1999-12-14  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/imap.el (imap-base64-encode-string): Use `static-if' instead
 	of `static-condition-case'.
 
-1999-12-14  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-14  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 11.
 
@@ -1643,7 +1643,7 @@
 	* lisp/read-passwd.el (read-pw-set-mail-source-passwd-cache):
 	Ignore non-POP mail sources.
 
-1999-12-10  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
 
@@ -1654,12 +1654,12 @@
 	instead of `gnus-union'.
 
 1999-12-10  A.Hitachi       <a_hitachi@msi.biglobe.ne.jp>
-            Katsumi Yamaoka <yamaoka@jpl.org>
+            Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (union): New compiler macro for emulating cl
 	function.
 
-1999-12-10  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-10  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-util.el: Require `gnus-ems'.
 	(gnus-ems-redefine): Call it to redefine the functions
@@ -1668,7 +1668,7 @@
 
 	* lisp/dgnushack.el (mapcon, mapc): Eliminate the redundant code.
 
-1999-12-09  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 06.
 
@@ -1677,7 +1677,7 @@
 	* lisp/dgnushack.el (dgnushack-install-package): Preserve any file
 	in $(PACKAGEDIR)/lisp/t-gnus if it is without .el or .elc suffix.
 
-1999-12-09  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/dgnushack.el (mapcon): New compiler macro for emulating cl
 	function.
@@ -1718,7 +1718,7 @@
 	* lisp/gnus-ofsetup.el (gnus-ofsetup-customize): Compile lambda
 	expressions.
 
-1999-12-08  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-08  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/message.el (message-yank-add-new-references): Fix doc string.
 
@@ -1734,7 +1734,7 @@
 	* lisp/gnus-ofsetup.el (gnus-ofsetup-gettext): Rename from
 	`gnus-ofsetup-get-message'.
 
-1999-12-07  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
 	(smiley-toggle-buffer): Autoload "smiley" or "gnus-bitmap".
@@ -1777,7 +1777,7 @@
 	* lisp/gnus-start.el (save-buffers-kill-emacs): Compile the advice
 	at the compile time. Use `gnus-alive-p'.
 
-1999-12-06  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-06  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
 
@@ -1819,7 +1819,7 @@
 	* t-gnus-6_14: NEW PUBLIC BRANCH.
 
 1999-12-03  Hirokazu FUKUI  <hfukui@sannet.ne.jp>
-            Katsumi Yamaoka <yamaoka@jpl.org>
+            Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
 
@@ -1832,12 +1832,12 @@
 	possible, otherwise the functions defined in mel are used.
 	(imap-cram-md5-auth): Use them.
 
-1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/imap.el: Remove autoload settings for `base64-decode-string'
 	and `base64-encode-string'.
 
-1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.4.
 	(gnus-revision-number): Clear to 00.
@@ -1864,7 +1864,7 @@
 	emacs-mime.texi,Makefile.in,ChangeLog}: Sync up with Pterodactyl
 	Gnus v0.99.
 
-1999-12-02  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-select-method): Undo (`if' -> `when').
 	* lisp/gnus-picon.el (gnus-picons-file-suffixes): Ditto.
@@ -1873,7 +1873,7 @@
 
 	* lisp/gnus-group.el (gnus-useful-groups): Undo (`or' -> `unless').
 
-1999-12-01  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-12-01  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 10.
 
@@ -1920,14 +1920,14 @@
 	(gnus-ofsetup-resource-en): Fix doc strings.
 	(gnus-ofsetup-resource-ja): Ditto.
 
-1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
 
 	* lisp/gnus-art.el (gnus-article-wash-status): Sync up with
 	Pterodactyl Gnus v0.98.
 
-1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnimap.el (nnimap-request-newgroups): Don't use `member-if'.
 
@@ -1946,7 +1946,7 @@
 	* lisp/gnus-art.el (gnus-emphasis-alist): Use `car' and `cdr'
 	instead of `cadr'.
 
-1999-11-30  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-30  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-start.el (save-buffers-kill-emacs): Don't use the macro
 	`when' in the body of `defadvice'.  Use `if' instead.
@@ -1954,12 +1954,12 @@
 	* lisp/dgnushack.el (last, mapc): New compiler macros for emulating
 	cl functions.
 
-1999-11-29  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-29  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-start.el (gnus-after-getting-new-news-hook): Don't use
 	the macro `when' in the arg of `defcustom'.  Use `if' instead.
 
-1999-11-27  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-27  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 06.
 
@@ -1977,7 +1977,7 @@
 
 	* lisp/gnus.el (gnus-version): Shows also gnus-revision-number.
 
-1999-11-24  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
 
@@ -1992,14 +1992,14 @@
 
 	* lisp/dgnushack.el (union, copy-list): Remove compiler macros.
 
-1999-11-24  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-24  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 04.
 
 	* lisp/dgnushack.el (union, copy-list): New compiler macros for
 	emulating cl functions.
 
-1999-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-22  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 03.
 	(gnus-select-method): Use `condition-case' instead of
@@ -2021,7 +2021,7 @@
 	gnus-kill.el,gnus-group.el,gnus-cite.el,gnus-async.el,gnus-art.el,
 	gnus-agent.el,earcon.el}: Require `cl' using `eval-when-compile'.
 
-1999-11-22  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-22  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 02.
 
@@ -2061,7 +2061,7 @@
 	(imap-ssl-open): Enclose `open-ssl-stream' with
 	`as-binary-process'.
 
-1999-11-19  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 01.
 	(gnus-select-method): Use `condition-case' instead of
@@ -2107,13 +2107,13 @@
 	Use mail-sources instead of nnmail-spool-file.
 	From: Toshiaki -PCX- Tanaka.
 
-1999-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-group-startup-message): Insert space before
 	"based on".
 	* lisp/gnus-xmas.el (gnus-xmas-group-startup-message): Ditto.
 
-1999-11-09  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-11-09  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-version-number): Update to 6.13.3.
 	(gnus-revision-number): Clear to 00.
@@ -2149,7 +2149,7 @@
 	* lisp/pop3.el (pop3-progress-message): New function.
 	(pop3-movemail): Use it.
 
-1999-10-28  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-10-28  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (TopLevel): Autolaod "gnus-msg" for the function
 	`gnus-following-method'.
@@ -2160,7 +2160,7 @@
 
 	* lisp/gnus-art.el (gnus-following-method): Move to gnus-msg.el.
 
-1999-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-10-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 14.
 	(TopLevel): Autoload "gnus-bitmap" instead of "smiley-mule" for the
@@ -2171,7 +2171,7 @@
 	(gnus-article-x-face-command): Default to external command if
 	`window-system' is nil.
 
-1999-10-26  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-10-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 13.
 	(TopLevel): Rearrange autoload settings.
@@ -2208,7 +2208,7 @@
 	when "eword-decode" is loaded. It is for X-Gnus-Offline-Backend
 	header.
 
-1999-10-19  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-10-19  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 10.
 	(TopLevel): Autoload "x-face-mule" and "smiley-mule" for the
@@ -2243,7 +2243,7 @@
 	`x-face-mule' is installed.
 	(TopLevel): Require `static' first; require `path-util'.
 
-1999-10-18  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-10-18  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 09.
 
@@ -2272,7 +2272,7 @@
 	`message-font-lock-keywords'.
 	(message-font-lock-keywords-2): Ditto.
 
-1999-10-11  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-10-11  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 08.
 
@@ -2283,7 +2283,7 @@
 	(gnus-treatment-function-alist): Undo the last change.
 	(gnus-treat-emphasize): Default to nil.
 
-1999-10-08  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-10-08  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 07.
 	(TopLevel): Autoload "gnus-art" for the function
@@ -2304,7 +2304,7 @@
 	(gnus-treatment-function-alist): Put `gnus-treat-hide-signature'
 	off after `gnus-treat-highlight-signature'.
 
-1999-10-08  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-10-08  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 06.
 
@@ -2315,16 +2315,16 @@
 	put `gnus-treat-emphasize' off after
 	`gnus-treat-highlight-headers'.
 
-1999-10-07  Yoshiki Hayashi <t90553@mail.ecc.u-tokyo.ac.jp>
+1999-10-07  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
 
 	* lisp/gnus.el (gnus-revision-number): Increment to 05.
 
-1999-10-07  Katsumi Yamaoka <yamaoka@jpl.org>
+1999-10-07  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/gnus-art.el (gnus-treat-predicate): Examine whether the
 	argument is list or not before condition.
 
-1999-10-07  Yoshiki Hayashi <t90553@mail.ecc.u-tokyo.ac.jp>
+1999-10-07  Yoshiki Hayashi  <t90553@mail.ecc.u-tokyo.ac.jp>
 
 	* lisp/gnus-art.el (gnus-treat-predicate): Work for
 	(typep "something").
