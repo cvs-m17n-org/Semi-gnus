@@ -1,3 +1,34 @@
+2006-02-21  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-group.el (gnus-group-make-tool-bar): Add IMAGE argument to
+	gmm-image-load-path calls.
+
+	* gnus-sum.el (gnus-summary-make-tool-bar): Ditto.
+
+	* message.el (message-make-tool-bar): Ditto.
+
+	* mml.el (mml-preview): Added comment concerning tool bar icons.
+
+	* gnus-group.el (gnus-group-tool-bar-gnome): Use new icon names.
+	(gnus-group-make-tool-bar): Use `gmm-image-load-path'.
+
+	* gnus-sum.el (gnus-summary-tool-bar-gnome): Use new icon names.
+	(gnus-summary-make-tool-bar): Use `gmm-image-load-path'.
+
+	* message.el (message-tool-bar-gnome): Use new icon names.
+	(message-make-tool-bar): Use `gmm-image-load-path'.
+
+	* gmm-utils.el (gmm-defun-compat, gmm-image-search-load-path): New
+	functions from MH-E.
+	(gmm-image-load-path): New variable from MH-E.
+	(gmm-image-load-path): New function from MH-E.  Added arguments
+	LIBRARY, IMAGE and PATH.  Don't modify paths.  Don't use
+	*-image-load-path-called-flag.
+
+2006-02-21  Arne J,Ax(Brgensen <arne@arnested.dk>
+
+	* mm-view.el (mm-view-pkcs7-verify): Implement using smime.el.
+
 2006-02-21  Wolfram Fenske  <wolfram.fenske@student.uni-magdeburg.de>
 	(tiny change)
 
@@ -5269,8 +5300,10 @@
 	* spam.el (spam-mark-junk-as-spam-routine)
 	(spam-mark-new-messages-in-spam-group-as-spam): allow user to
 	disable assigning the spam-mark to new messages
-	(spam-ham-copy-or-move-routine): todo decleared twice (tiny
-	change).  From Adam Sj,Ax(Bgren <asjo@koldfront.dk>.
+
+2004-05-26  Adam Sj,Ax(Bgren  <asjo@koldfront.dk> (tiny change)
+
+	(spam-ham-copy-or-move-routine): todo decleared twice
 
 2004-05-26  Katsumi Yamaoka  <yamaoka@jpl.org>
 

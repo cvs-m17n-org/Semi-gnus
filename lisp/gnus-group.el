@@ -1040,15 +1040,15 @@ Pre-defined symbols include `gnus-group-tool-bar-gnome' and
   :group 'gnus-group)
 
 (defcustom gnus-group-tool-bar-gnome
-  '((gnus-group-post-news "compose")
-    (gnus-group-get-new-news "inbox") ;; Add... nil :visible gnus-plugged ?
+  '((gnus-group-post-news "mail/compose")
+    (gnus-group-get-new-news "mail/inbox") ;; Add... nil :visible gnus-plugged ?
     ;; FIXME: gnus-*-read-group should have a better help text.
     (gnus-topic-read-group "open" nil :visible gnus-topic-mode)
     (gnus-group-read-group "open" nil :visible (not gnus-topic-mode))
     ;; (gnus-group-find-new-groups "???" nil)
     (gnus-group-save-newsrc "save")
     (gnus-group-describe-group "describe")
-    (gnus-group-unsubscribe-current-group "toggle-subscription")
+    (gnus-group-unsubscribe-current-group "gnus/toggle-subscription")
     ;; (gnus-group-subscribe "subscribe" t
     ;; 			  :help "Subscribe to the current group")
     ;; (gnus-group-unsubscribe "unsubscribe" t
@@ -1056,7 +1056,7 @@ Pre-defined symbols include `gnus-group-tool-bar-gnome' and
     ;;
     ;; Some useful agent icons?  I don't use the agent so agent users should
     ;; suggest useful commands:
-    (gnus-group-send-queue "outbox" t
+    (gnus-group-send-queue "mail/outbox" t
 			   :visible (and gnus-agent gnus-plugged)
 			   :help "Send articles from the queue group")
     (gnus-agent-toggle-plugged "connect" nil
@@ -1064,7 +1064,7 @@ Pre-defined symbols include `gnus-group-tool-bar-gnome' and
     (gnus-agent-toggle-plugged "disconnect" nil
      			       :visible (and gnus-agent gnus-plugged))
     ;;
-    (gnus-group-exit "exit-mode")
+    (gnus-group-exit "exit")
     (gnus-info-find-node "help"))
   "List of functions for the group tool bar (GNOME style).
 
@@ -1125,7 +1125,12 @@ When FORCE, rebuild the tool bar."
 	     ;; The Gnus 5.10.6 code checked (default-value 'tool-bar-mode).
 	     ;; Why?  --rsteib
 	     (or (not gnus-group-tool-bar-map) force))
-    (let* ((load-path (mm-image-load-path))
+    (let* ((load-path
+	    (gmm-image-load-path "gnus" "gnus/toggle-subscription.xpm"
+				 'load-path))
+	   (image-load-path
+	    (gmm-image-load-path "gnus" "gnus/toggle-subscription.xpm"
+				 'image-load-path))
 	   (map (gmm-tool-bar-from-list gnus-group-tool-bar
 					gnus-group-tool-bar-zap-list
 					'gnus-group-mode-map)))

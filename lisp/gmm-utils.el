@@ -233,6 +233,80 @@ DEFAULT-MAP specifies the default key map for ICON-LIST."
 	    icon-list))
     tool-bar-map))
 
+;; WARNING: The following is subject to change.  Don't rely on it yet.
+
+;; From MH-E without modifications:
+
+(defmacro gmm-defun-compat (name function arg-list &rest body)
+  "Create function NAME.
+If FUNCTION exists, then NAME becomes an alias for FUNCTION.
+Otherwise, create function NAME with ARG-LIST and BODY."
+  (let ((defined-p (fboundp function)))
+    (if defined-p
+        `(defalias ',name ',function)
+      `(defun ,name ,arg-list ,@body))))
+
+(gmm-defun-compat gmm-image-search-load-path
+  image-search-load-path (file &optional path)
+  "Emacs 21 and XEmacs don't have `image-search-load-path'.
+This function returns nil on those systems."
+  nil)
+
+;; From MH-E with modifications:
+
+(defvar gmm-image-load-path nil
+  "Directory where images are found.
+See the function `gmm-image-load-path'.")
+
+(defun gmm-image-load-path (library image &optional path)
+  "Return a suitable search path for images of LIBRARY.
+
+Images for LIBRARY are found in \"../../etc/images\" relative to
+the files in \"lisp/LIBRARY\", in `image-load-path', or in
+`load-path'.
+
+This function returns value of `load-path' augmented with the
+path to IMAGE.  If PATH is given, it is used instead of
+`load-path'."
+  (unless library (error "No library specified."))
+  (unless image   (error "No image specified."))
+  (cond (gmm-image-load-path) ;; User setting exists.
+	((let (gmm-library-name) ;; Try relative setting
+	   ;; First, find library in the load-path.
+	   (setq gmm-library-name (locate-library library))
+	   (if (not gmm-library-name)
+	       (error "Cannot find library `%s' in load-path" library))
+	   ;; And then set gmm-image-load-path relative to that.
+	   (setq gmm-image-load-path
+		 (expand-file-name (concat
+				    (file-name-directory gmm-library-name)
+				    "../../etc/images")))
+	   (file-exists-p (expand-file-name image gmm-image-load-path))))
+	((gmm-image-search-load-path image)
+	 ;; Images in image-load-path.
+	 (setq gmm-image-load-path
+	       (file-name-directory (gmm-image-search-load-path image))))
+	((locate-library image)
+	 ;; Images in load-path.
+	 (setq gmm-image-load-path
+	       (file-name-directory (locate-library image)))))
+  ;;
+  (unless (file-exists-p gmm-image-load-path)
+    (error "Directory `%s' in gmm-image-load-path does not exist"
+	     gmm-image-load-path))
+  (unless (file-exists-p (expand-file-name image gmm-image-load-path))
+    (error "Directory `%s' in gmm-image-load-path does not contain image `%s'."
+	   gmm-image-load-path image))
+  ;; Return augmented `image-load-path' or `load-path'.
+  (cond ((and path (symbolp path))
+	 (nconc (list gmm-image-load-path)
+		(delete gmm-image-load-path (if (boundp path)
+						(symbol-value path)
+					      nil))))
+	(t
+	 (nconc (list gmm-image-load-path)
+		(delete gmm-image-load-path load-path)))))
+
 (provide 'gmm-utils)
 
 ;;; gmm-utils.el ends here

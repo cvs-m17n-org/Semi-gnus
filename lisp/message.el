@@ -7459,16 +7459,16 @@ Pre-defined symbols include `message-tool-bar-gnome' and
 ;; http://thread.gmane.org/gmane.emacs.gnus.general/61719
 (defcustom message-tool-bar-gnome
   '((gmm-ignore "separator")
-    (message-send-and-exit "send")
-    (message-dont-send "save-draft")
+    (message-send-and-exit "mail/send")
+    (message-dont-send "mail/save-draft")
     (message-kill-buffer "close") ;; stock_cancel
-;;    (mml-attach-file "attach" mml-mode-map)
+;;    (mml-attach-file "mail/attach" mml-mode-map)
     (ispell-message "spell" nil :visible (not flyspell-mode))
     (flyspell-buffer "spell" t :visible flyspell-mode
 		     :help "Flyspell whole buffer")
     ;; We should have a mail-preview icon with an envelope like the one in
     ;; stock_mail-reply.
-;;    (mml-preview "mail-preview" mml-mode-map)
+;;    (mml-preview "mail/preview" mml-mode-map)
 ;;    (mml-secure-message-sign-encrypt "lock" mml-mode-map :visible nil)
     (message-insert-importance-high "important" nil :visible nil)
     (message-insert-importance-low "unimportant" nil :visible nil)
@@ -7523,7 +7523,12 @@ When FORCE, rebuild the tool bar."
 	     tool-bar-mode
 	     (or (not message-tool-bar-map) force))
     (setq message-tool-bar-map
-	  (let ((load-path (mm-image-load-path)))
+	  (let ((load-path
+		 (gmm-image-load-path "message" "mail/save-draft.xpm"
+				      'load-path))
+		(image-load-path
+		 (gmm-image-load-path "message" "mail/save-draft.xpm"
+				      'image-load-path)))
 	    (gmm-tool-bar-from-list message-tool-bar
 				    message-tool-bar-zap-list
 				    'message-mode-map))))
