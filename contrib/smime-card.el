@@ -192,5 +192,3 @@ card under the id following the `card:' prefix in FILE."
 ;;; Announce
 
 (provide 'smime-card)
-
-;;; smime-card.el ends here
