@@ -4161,8 +4161,8 @@ not have PROP."
 ;;	  (when (let ((char (char-after)))
 ;;		  (or (< (mm-char-int char) 128)
 ;;		      (and (mm-multibyte-p)
-;;			   ;; Fixme: Wrong for Emacs 23 and for things
-;;			   ;; like undecable utf-8.  Should at least
+;;			   ;; Fixme: Wrong for Emacs 23 (unicode) and for
+;;			   ;; things like undecable utf-8.  Should at least
 ;;			   ;; use find-coding-systems-region.
 ;;			   (memq (char-charset char)
 ;;				 '(eight-bit-control eight-bit-graphic
@@ -7461,14 +7461,12 @@ Pre-defined symbols include `message-tool-bar-gnome' and
     (message-send-and-exit "mail/send")
     (message-dont-send "mail/save-draft")
     (message-kill-buffer "close") ;; stock_cancel
-;;    (mml-attach-file "mail/attach" mml-mode-map)
+    ;;(mml-attach-file "mail/attach" mml-mode-map)
     (ispell-message "spell" nil :visible (not flyspell-mode))
     (flyspell-buffer "spell" t :visible flyspell-mode
 		     :help "Flyspell whole buffer")
-    ;; We should have a mail-preview icon with an envelope like the one in
-    ;; stock_mail-reply.
-;;    (mml-preview "mail/preview" mml-mode-map)
-;;    (mml-secure-message-sign-encrypt "lock" mml-mode-map :visible nil)
+    ;;(mml-preview "mail/preview" mml-mode-map)
+    ;;(mml-secure-message-sign-encrypt "lock" mml-mode-map :visible nil)
     (message-insert-importance-high "important" nil :visible nil)
     (message-insert-importance-low "unimportant" nil :visible nil)
     (message-insert-disposition-notification-to "receipt" nil :visible nil)
@@ -7483,7 +7481,7 @@ See `gmm-tool-bar-from-list' for details on the format of the list."
   :group 'message)
 
 (defcustom message-tool-bar-retro
-  '(;; Old Emacs 21 icon for consitency.
+  '(;; Old Emacs 21 icon for consistency.
     (message-send-and-exit "gnus/mail_send")
     (message-kill-buffer "close")
     (message-dont-send "cancel")

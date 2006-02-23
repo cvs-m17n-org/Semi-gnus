@@ -1,3 +1,32 @@
+2006-02-23  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-group.el (gnus-group-tool-bar-gnome): Fix
+	gnus-agent-toggle-plugged.  Re-order icons.
+	(gnus-group-tool-bar-gnome): Add
+	gnus-group-{prev,next}-unread-group.
+	(gnus-group-tool-bar-gnome): Re-order icons.
+
+	* gnus-sum.el (gnus-summary-tool-bar-gnome): Move
+	gnus-summary-insert-new-articles.
+
+	* message.el (message-tool-bar-gnome, message-tool-bar-retro): Fix
+	comments.
+
+	* utf7.el (utf7-utf-16-coding-system): Fix comment.  utf-16-be is
+	also available in Emacs 21.3.
+
+	* message.el (message-fix-before-sending): Change "Emacs 23" to
+	"Emacs 23 (unicode)" in comment.
+
+	* qp.el (quoted-printable-encode-region): Change "Emacs 22" to
+	"Emacs 23 (unicode)" in comment.
+
+	* mm-util.el: Change "Emacs 22" to "Emacs 23 (unicode)" in
+	comment.
+	(mm-coding-system-p): Add comment about no-MULE XEmacs.
+
+	* mm-view.el (mm-fill-flowed): Add :version.
+
 2006-02-23  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* gmm-utils.el (gmm-image-load-path): Don't modify image-load-path
@@ -1980,7 +2009,7 @@
 
 	* gnus-topic.el (gnus-topic-mode): Ditto.
 
-2005-07-08  Ralf Angeli  <angeli@iwi.uni-sb.de>  (tiny change)
+2005-07-08  Ralf Angeli  <angeli@iwi.uni-sb.de>
 
 	* gnus-art.el (gnus-article-next-page, gnus-article-next-page-1)
 	(gnus-article-prev-page): Take scroll-margin into consideration.
@@ -6764,11 +6793,10 @@
 	* rfc2047.el (rfc2047-pad-base64): Deal with more cases of invalid
 	padding.
 
-2004-01-27  Simon Josefsson  <jas@extundo.com>
+2004-01-27  Ralf Angeli  <angeli@iwi.uni-sb.de>
 
-	* mm-view.el (mm-fill-flowed): Add.
-	(mm-inline-text): Use it.  Tiny patch from Ralf Angeli
-	<angeli@iwi.uni-sb.de>.
+	* mm-view.el (mm-fill-flowed): New variable.
+	(mm-inline-text): Use it.
 
 2004-01-27  Teodor Zlatanov  <tzz@lifelogs.com>
 

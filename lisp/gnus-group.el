@@ -1041,7 +1041,20 @@ Pre-defined symbols include `gnus-group-tool-bar-gnome' and
 
 (defcustom gnus-group-tool-bar-gnome
   '((gnus-group-post-news "mail/compose")
-    (gnus-group-get-new-news "mail/inbox") ;; Add... nil :visible gnus-plugged ?
+    ;; Some useful agent icons?  I don't use the agent so agent users should
+    ;; suggest useful commands:
+    (gnus-agent-toggle-plugged "connect" t
+     			       :visible (and gnus-agent (not gnus-plugged)))
+    (gnus-agent-toggle-plugged "disconnect" t
+     			       :visible (and gnus-agent gnus-plugged))
+    ;; FIXME: gnus-agent-toggle-plugged (in gnus-agent-group-make-menu-bar)
+    ;; should have a better help text.
+    (gnus-group-send-queue "mail/outbox" t
+			   :visible (and gnus-agent gnus-plugged)
+			   :help "Send articles from the queue group")
+    (gnus-group-get-new-news "mail/inbox" nil
+			     :visible (or (not gnus-agent)
+					  gnus-plugged))
     ;; FIXME: gnus-*-read-group should have a better help text.
     (gnus-topic-read-group "open" nil :visible gnus-topic-mode)
     (gnus-group-read-group "open" nil :visible (not gnus-topic-mode))
@@ -1049,21 +1062,8 @@ Pre-defined symbols include `gnus-group-tool-bar-gnome' and
     (gnus-group-save-newsrc "save")
     (gnus-group-describe-group "describe")
     (gnus-group-unsubscribe-current-group "gnus/toggle-subscription")
-    ;; (gnus-group-subscribe "subscribe" t
-    ;; 			  :help "Subscribe to the current group")
-    ;; (gnus-group-unsubscribe "unsubscribe" t
-    ;; 			    :help "Unsubscribe from the current group")
-    ;;
-    ;; Some useful agent icons?  I don't use the agent so agent users should
-    ;; suggest useful commands:
-    (gnus-group-send-queue "mail/outbox" t
-			   :visible (and gnus-agent gnus-plugged)
-			   :help "Send articles from the queue group")
-    (gnus-agent-toggle-plugged "connect" nil
-     			       :visible (and gnus-agent (not gnus-plugged)))
-    (gnus-agent-toggle-plugged "disconnect" nil
-     			       :visible (and gnus-agent gnus-plugged))
-    ;;
+    (gnus-group-prev-unread-group "prev-node") ;; Emacs 22
+    (gnus-group-next-unread-group "next-node") ;; Emacs 22
     (gnus-group-exit "exit")
     (gnus-info-find-node "help"))
   "List of functions for the group tool bar (GNOME style).
