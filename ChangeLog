@@ -1,3 +1,9 @@
+2006-02-23  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* lisp/message.el (message-tool-bar-gnome, message-tool-bar-retro):
+	Replace mml-attach-file and mml-preview with mime-edit-insert-file
+	and mime-edit-preview-message.
+
 2006-02-22  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* etc/images/gnus/mail_send.xpm: Emacs 21 icon for
@@ -33,7 +39,7 @@
 
 	* etc/images/mail/save.xpm, etc/images/mail/preview.xpm: New icons.
 
-2006-02-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+2006-02-15  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* lisp/nnheader.el (mm-make-temp-file): Be always alias to
 	make-temp-file.
