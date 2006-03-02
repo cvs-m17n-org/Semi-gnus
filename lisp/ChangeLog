@@ -1,3 +1,36 @@
+2006-03-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-art.el (gnus-article-browse-html-temp-list): Rename from
+	gnus-article-browse-html-temp.
+	(gnus-article-browse-delete-temp): Make it customizable.  Add
+	`file'.  Adjust doc string.
+	(gnus-article-browse-delete-temp-files): Add argument.  Allow
+	query for each file.  Adjust doc string.
+	(gnus-article-browse-html-parts): Add
+	`gnus-article-browse-delete-temp-files' to
+	`gnus-summary-prepare-exit-hook' and `gnus-exit-gnus-hook'.
+
+2006-03-02  Hynek Schlawack  <hynek@ularx.de>
+
+	* gnus-art.el (gnus-article-browse-html-temp)
+	(gnus-article-browse-delete-temp): New variables.
+	(gnus-article-browse-delete-temp-files): New function.
+	(gnus-article-browse-html-parts): Use it.
+
+2006-03-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-group.el (gnus-group-redraw-check): Remove redundant tests.
+
+	* gmm-utils.el (gmm-image-load-path): Mention ../etc search in doc
+	string.
+
+	* gnus-sum.el (gnus-summary-tool-bar-gnome): Don't use
+	gnus-summary-insert-new-articles when unplugged.  Remove
+	gnus-summary-search-article-forward.
+
+	* gmm-utils.el (gmm-tool-bar-style): Test tool-bar-mode and
+	display-visual-class instead of display-color-cells.
+
 2006-03-02  Katsumi Yamaoka  <yamaoka@jpl.org>
 
 	* dgnushack.el: Autoload customize-group for XEmacs.
