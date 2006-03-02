@@ -306,6 +306,7 @@ adding the --with-addpath=FLIM_PATH option.\n"
     (autoload 'browse-url "browse-url" nil t)
     (autoload 'c-mode "cc-mode" nil t)
     (autoload 'customize-apropos "cus-edit" nil t)
+    (autoload 'customize-group "cus-edit" nil t)
     (autoload 'customize-save-variable "cus-edit" nil t)
     (autoload 'customize-set-variable "cus-edit" nil t)
     (autoload 'customize-variable "cus-edit" nil t)
