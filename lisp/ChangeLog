@@ -1,5 +1,22 @@
 2006-03-06  Reiner Steib  <Reiner.Steib@gmx.de>
 
+	* gmm-utils.el (gmm-image-load-path): Add alias.
+
+	* nnml.el (nnml-generate-nov-databases-directory): Rename from
+	nnml-generate-nov-databases-1.
+	(nnml-generate-nov-databases): Use it.
+	(nnml-generate-nov-databases-directory): Document no-active
+	argument.
+
+	* gmm-utils.el (gmm-image-load-path-for-library): Return single
+	directory if path is t.  Add no-error.
+
+	* gnus-group.el (gnus-group-make-tool-bar): Use add-hook.
+	Suggested by Stefan Monnier <monnier@iro.umontreal.ca>.
+
+	* gnus-art.el (gnus-article-browse-delete-temp-files): Simplify
+	resetting gnus-article-browse-html-temp-list.
+
 	* gmm-utils.el (gmm-image-load-path-for-library): Sync with
 	mh-compat.el revision 1.9 in Emacs.  Rename `gmm-image-load-path'.
 	Add example to docstring.  Rename local variables.  Move error

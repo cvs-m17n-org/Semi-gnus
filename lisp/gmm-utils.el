@@ -299,7 +299,7 @@ This function returns nil on those systems."
 ;; From MH-E with modifications:
 
 (gmm-defun-compat gmm-image-load-path-for-library
-  image-load-path-for-library (library image &optional path)
+  image-load-path-for-library (library image &optional path no-error)
   "Return a suitable search path for images relative to LIBRARY.
 
 Images for LIBRARY are searched for in \"../../etc/images\" and
@@ -307,8 +307,12 @@ Images for LIBRARY are searched for in \"../../etc/images\" and
 well as in `image-load-path' and `load-path'.
 
 This function returns the value of `load-path' augmented with the
-path to IMAGE. If PATH is given, it is used instead of
-`load-path'.
+path to IMAGE.  If PATH is given, it is used instead of
+`load-path'.  If PATH is t, return a single image directory
+instead of a path.
+
+If NO-ERROR is non-nil, don't signal an error if no suitable path
+for can be found.
 
 Here is an example that uses a common idiom to provide
 compatibility with versions of Emacs that lack the variable
@@ -362,12 +366,17 @@ This function is used by Emacs versions that don't have
                  (setq img (directory-file-name parent)
                        dir (expand-file-name "../" dir)))
                (setq image-directory dir)))))
+     (no-error
+      ;; In this case we will return a nil element
+      (gmm-message 1 "Could not find image %s for library %s" image library))
      (t
       (error "Could not find image %s for library %s" image library)))
 
     ;; Return augmented `image-load-path' or `load-path'.
-    (cond ((and path (symbolp path))
-           (nconc (list image-directory)
+    (cond ((eq path t)
+	   image-directory)
+	  ((and path (symbolp path))
+	   (nconc (list image-directory)
                   (delete image-directory
                           (if (boundp path)
                               (copy-sequence (symbol-value path))
@@ -375,6 +384,9 @@ This function is used by Emacs versions that don't have
           (t
            (nconc (list image-directory)
                   (delete image-directory (copy-sequence load-path)))))))
+
+;; No time to do it right ATM, sorry...
+(defalias 'gmm-image-load-path 'gmm-image-load-path-for-library)
 
 (defun gmm-customize-mode (&optional mode)
   "Customize customization group for MODE.
