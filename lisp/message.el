@@ -7461,7 +7461,7 @@ Pre-defined symbols include `message-tool-bar-gnome' and
     (message-send-and-exit "mail/send")
     (message-dont-send "mail/save-draft")
     (message-kill-buffer "close") ;; stock_cancel
-    (mime-edit-insert-file "mail/attach" mime-edit-mode-map)
+    (mime-edit-insert-file "attach" mime-edit-mode-map)
     (ispell-message "spell" nil :visible (not flyspell-mode))
     (flyspell-buffer "spell" t :visible flyspell-mode
 		     :help "Flyspell whole buffer")
@@ -7523,11 +7523,13 @@ When FORCE, rebuild the tool bar."
 	     (or (not message-tool-bar-map) force))
     (setq message-tool-bar-map
 	  (let ((load-path
-		 (gmm-image-load-path "message" "mail/save-draft.xpm"
-				      'load-path))
+		 (gmm-image-load-path-for-library "message"
+						  "mail/save-draft.xpm"
+						  nil t))
 		(image-load-path
-		 (gmm-image-load-path "message" "mail/save-draft.xpm"
-				      'image-load-path)))
+		 (gmm-image-load-path-for-library "message"
+						  "mail/save-draft.xpm"
+						  'image-load-path t)))
 	    (gmm-tool-bar-from-list message-tool-bar
 				    message-tool-bar-zap-list
 				    'message-mode-map))))

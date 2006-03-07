@@ -26326,6 +26326,8 @@ Gnus エージェントは大規模な更新を経て、今やディフォルトで有効になります。
 いかれた Outlook (Express) の記事を醜くなくするための、Raymond Scholz
 @email{rscholz@@zonix.de} によって新設されたファイルです。
 
+@c FIXME: `gnus-load' について言及している README が、CVS には含まれてい
+@c ません。私たちはこの項目のためのより良い場所を見つけるべきです。
 @item
 @code{(require 'gnus-load)}
 
