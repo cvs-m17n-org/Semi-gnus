@@ -1009,19 +1009,6 @@ simple manner.")
 
 (defvar gnus-group-tool-bar-map nil)
 
-;; Work around for Emacs not updating the tool bar automatically, see
-; http://www.google.com/groups?as_umsgid=v9u0an3hti.fsf@marauder.physik.uni-ulm.de
-;; Don't make this customizable yet.
-(defvar gnus-group-redraw-when-idle 2
-  "When non-nil, redraw the Group buffer frame when idle.
-Internal variable.")
-
-(defun gnus-group-redraw-check ()
-  "Check if we need to redraw the frame."
-  (when gnus-group-redraw-when-idle
-    (run-with-idle-timer gnus-group-redraw-when-idle
-			 nil 'force-window-update)))
-
 (defun gnus-group-tool-bar-update (&optional symbol value)
   "Update group buffer toolbar.
 Setter function for custom variables."
@@ -1144,8 +1131,6 @@ When FORCE, rebuild the tool bar."
 	     ;; The Gnus 5.10.6 code checked (default-value 'tool-bar-mode).
 	     ;; Why?  --rsteib
 	     (or (not gnus-group-tool-bar-map) force))
-    (when gnus-group-redraw-when-idle
-      (add-hook 'post-command-hook 'gnus-group-redraw-check nil t))
     (let* ((load-path
 	    (gmm-image-load-path-for-library "gnus"
 					     "gnus/toggle-subscription.xpm"
@@ -1560,6 +1545,18 @@ if it is a string, only list groups matching REGEXP."
 		(gnus-range-difference (list active) (gnus-info-read info))
 		seen))))))
 
+(defcustom gnus-group-update-tool-bar
+  (and (not (featurep 'xemacs))
+       (boundp 'tool-bar-mode)
+       tool-bar-mode
+       ;; Using `redraw-frame' (see `gnus-tool-bar-update') in Emacs 21 might
+       ;; be confusing, so maybe we shouldn't call it by default.
+       (fboundp 'force-window-update))
+  "Force updating the group buffer tool bar."
+  :group 'gnus-group
+  :version "22.1"
+  :type 'boolean)
+
 (defun gnus-group-insert-group-line (gnus-tmp-group gnus-tmp-level
 						    gnus-tmp-marked number
 						    gnus-tmp-method)
@@ -1624,8 +1621,10 @@ if it is a string, only list groups matching REGEXP."
 	  (if (member gnus-tmp-group gnus-group-marked)
 	      gnus-process-mark ? ))
 	 (buffer-read-only nil)
+	 beg end
 	 header gnus-tmp-header)	; passed as parameter to user-funcs.
     (beginning-of-line)
+    (setq beg (point))
     (gnus-add-text-properties
      (point)
      (prog1 (1+ (point))
@@ -1640,6 +1639,12 @@ if it is a string, only list groups matching REGEXP."
 		  gnus-marked ,gnus-tmp-marked-mark
 		  gnus-indentation ,gnus-group-indentation
 		  gnus-level ,gnus-tmp-level))
+    (setq end (point))
+    (when gnus-group-update-tool-bar
+      (gnus-put-text-property beg end 'point-entered
+			      'gnus-tool-bar-update)
+      (gnus-put-text-property beg end 'point-left
+			      'gnus-tool-bar-update))
     (forward-line -1)
     (when (inline (gnus-visual-p 'group-highlight 'highlight))
       (gnus-run-hooks 'gnus-group-update-hook))
