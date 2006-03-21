@@ -1183,11 +1183,11 @@ function is generally only called when Gnus is shutting down."
 	  (let (seen unseen)
 	    ;; read info could contain articles marked unread by other
 	    ;; imap clients!  we correct this
-	    (setq unseen (gnus-compress-sequence 
+	    (setq unseen (gnus-compress-sequence
 			  (imap-search "UNSEEN UNDELETED"))
 		  seen (gnus-range-difference (gnus-info-read info) unseen)
-		  seen (gnus-range-add seen 
-				       (gnus-compress-sequence 
+		  seen (gnus-range-add seen
+				       (gnus-compress-sequence
 					(imap-search "SEEN")))
 		  seen (if (and (integerp (car seen))
 				(null (cdr seen)))
@@ -1525,7 +1525,7 @@ function is generally only called when Gnus is shutting down."
   ;; return articles not deleted
   articles)
 
-(deffoo nnimap-request-move-article (article group server accept-form 
+(deffoo nnimap-request-move-article (article group server accept-form
 					     &optional last move-is-internal)
   (when (nnimap-possibly-change-server server)
     (save-excursion
