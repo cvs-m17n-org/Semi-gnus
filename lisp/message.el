@@ -7215,6 +7215,7 @@ Optional NEWS will use news to forward instead of mail."
 	(set-buffer (get-buffer-create " *message resend*"))
 	(erase-buffer))
       (let ((message-this-is-mail t)
+	    message-generate-hashcash
 	    message-setup-hook)
 	(message-setup `((To . ,address))))
       ;; Insert our usual headers.
@@ -7252,7 +7253,8 @@ Optional NEWS will use news to forward instead of mail."
       ;; Send it.
       (let ((message-encoding-buffer (current-buffer))
 	    (message-edit-buffer (current-buffer))
-	    message-required-mail-headers)
+	    message-required-mail-headers
+	    message-generate-hashcash)
 	(message-send-mail))
       (kill-buffer (current-buffer)))
     (message "Resending message to %s...done" address)))
