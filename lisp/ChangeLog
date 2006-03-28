@@ -1,9 +1,21 @@
-2006-03-26  Andreas Seltenreich  <uwi7@rz.uni-karlsruhe.de>  (tiny change)
+2006-03-27  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-sum.el (gnus-summary-from-or-to-or-newsgroups): Don't use
+	XEmacs-only `replace-in-string'.  Use `gnus-group-real-name'
+	instead.
+
+2006-03-27  Karl Kleinpaste  <karl@charcoal.com>
+
+	* gnus-sum.el (gnus-summary-from-or-to-or-newsgroups): Improve
+	newsgroups handling for NNTP overviews which don't include
+	Newsgroups.
+
+2006-03-26  Andreas Seltenreich  <uwi7@rz.uni-karlsruhe.de>
 
 	* message.el (message-resend): Bind message-generate-hashcash to
 	to nil.
 
-2006-03-26  Andreas Seltenreich  <uwi7@rz.uni-karlsruhe.de>  (tiny change)
+2006-03-26  Andreas Seltenreich  <uwi7@rz.uni-karlsruhe.de>
 
 	* hashcash.el (hashcash-already-paid-p): Bind case-fold-search
 	when searching for already-paid recipients.
