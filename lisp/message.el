@@ -7461,14 +7461,14 @@ Pre-defined symbols include `message-tool-bar-gnome' and
   :group 'message)
 
 (defcustom message-tool-bar-gnome
-  '((gmm-ignore "separator")
+  '((ispell-message "spell" nil :visible (not flyspell-mode))
+    (flyspell-buffer "spell" t :visible flyspell-mode
+		     :help "Flyspell whole buffer")
+    (gmm-ignore "separator")
     (message-send-and-exit "mail/send")
     (message-dont-send "mail/save-draft")
     (message-kill-buffer "close") ;; stock_cancel
     (mime-edit-insert-file "attach" mime-edit-mode-map)
-    (ispell-message "spell" nil :visible (not flyspell-mode))
-    (flyspell-buffer "spell" t :visible flyspell-mode
-		     :help "Flyspell whole buffer")
     (mime-edit-preview-message "mail/preview" mime-edit-mode-map)
     ;;(mml-secure-message-sign-encrypt "lock" mml-mode-map :visible nil)
     (message-insert-importance-high "important" nil :visible nil)
