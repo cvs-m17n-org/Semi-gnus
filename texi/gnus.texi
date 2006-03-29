@@ -51,6 +51,7 @@ license to the document, as described in section 6 of the license.
 \makeindex
 \begin{document}
 
+% Adjust ../Makefile.in if you change the following line:
 \newcommand{\gnusversionname}{T-gnus v6.17}
 \newcommand{\gnuschaptername}{}
 \newcommand{\gnussectionname}{}
@@ -367,6 +368,7 @@ internationalization/localization and multiscript features based on MULE
 API.  So T-gnus does not discriminate various language communities.  Oh,
 if you are a Klingon, please wait Unicode Next Generation.
 
+@c Adjust ../Makefile.in if you change the following line:
 This manual corresponds to T-gnus 6.17.
 
 @end ifinfo
