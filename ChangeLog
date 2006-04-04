@@ -1,3 +1,29 @@
+2006-04-04  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* Makefile.in (TAR_BALL_EXTRA, release-make-tar-ball, README):
+	Remove; README is in CVS now.
+	(release-files, release-files-signed, release-cvs-export)
+	(release-make-tar-ball): Use $(VERSION) instead of $(TAG).
+	(OLD_PATTERN): Catch stable and trunk.
+	(CIN): New variable.
+	(release-files, release-files-signed, release-cvs-export)
+	(release-make-tar-ball, release-diff, release-post-clean): Add
+	CIN.
+
+	* etc/images/README: Add more Emacs 22 icons.  Add suggestion on
+	how to use those in Emacs 21.
+
+	* etc/images/close.xpm, etc/images/cut.xpm, etc/images/home.xpm,
+	etc/images/index.xpm, etc/images/jump-to.xpm, etc/images/new.xpm,
+	etc/images/next-node.xpm, etc/images/open.xpm,
+	etc/images/preferences.xpm, etc/images/prev-node.xpm,
+	etc/images/saveas.xpm, etc/images/spell.xpm: New icons duplicated
+	from Emacs 22.
+
+	* README: Addition from 5.10.6 tar ball.  Clarify "beta".
+	Simplify Info directory setting.  Update required Emacs and XEmacs
+	version.  Use current Gnus version in examples.
+
 2006-03-31  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* GNUS-NEWS: Generated.

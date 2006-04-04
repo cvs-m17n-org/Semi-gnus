@@ -37,8 +37,6 @@ EXAMINE_PACKAGEDIR = $(XEMACS) -batch -q -no-site-file -eval \
 
 # # # # # # # # # # Release variables (for maintainer only):
 #
-# Release files, not included in CVS:
-TAR_BALL_EXTRA = README
 # Files removed from `cvs export' output before creating the tar-ball:
 CVS_IGNORE_FILES = .cvsignore contrib/.cvsignore etc/.cvsignore	\
   lisp/.cvsignore texi/.cvsignore texi/ps/.cvsignore .arch-inventory
@@ -47,11 +45,13 @@ COMMITTER = Lars Magne Ingebrigtsen  <lars@ingebrigtsen.no>
 # CODENAME for development releases (CODENAME must have a trailing space,
 # (e.g. "Oort ")
 CODENAME = 
+# Codename initial (lower case), e.g. 'n' for "No Gnus".
+CIN =
 # Files with hard-coded versions numbers:
 RELEASE_COMMIT_FILES = lisp/ChangeLog lisp/gnus.el \
   texi/ChangeLog texi/gnus.texi texi/message.texi texi/gnus-faq.texi
 # Pattern matching previous version(s):
-OLD_PATTERN = 5.10.[0-9]*
+OLD_PATTERN = '5.10.[0-9]*\|0\.3'
 # CVS tag of the previous version:
 OLD_TAG     = v5-10-6
 # CVS tag of the current release:
@@ -259,7 +259,8 @@ release-check-settings:
 	@echo "COMMITTER = '$(COMMITTER)'"
 	@echo "  (example: 'Foo Bar  <foo.bar@somewhere.invalid>')"
 	@echo "VERSION   = '$(VERSION)' (example: '5.10.6')"
-	@echo "CODENAME  = '$(CODENAME)' (example: 'Oort ')"
+	@echo "CODENAME  = '$(CODENAME)' (example: 'No ')"
+	@echo "CIN       = '$(CIN)' (example: 'n', codename initial)"
 	@echo "TAG       = '$(TAG)' (example: 'v5-10-6')"
 	@echo "OLDTAG    = '$(OLDTAG)' (example: 'v5-10-5')"
 	@echo
@@ -318,45 +319,40 @@ release-commit:	release-check-settings
 
 release-files:	release-make-tar-ball release-diff
 	@echo "Release files have been created:"
-	@ls -l gnus-$(TAG).tar.gz
-	@ls -l gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz
+	@ls -l $(CIN)gnus-$(VERSION).tar.gz
+	@ls -l $(CIN)gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz
 
 release-files-signed:	release-files
 	read -sp "Enter pass phrase: " phrase ; \
-	for i in gnus-$(TAG).tar.gz \
-	         gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz; do \
+	for i in $(CIN)gnus-$(VERSION).tar.gz \
+	         $(CIN)gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz; do \
 	   echo "$$phrase" | gpg --passphrase-fd 0 --detach-sign $$i ; \
 	done; true
-	@ls -l gnus-$(TAG).tar.gz{.sig,}
-	@ls -l gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz{.sig,}
-	@gpg --verify gnus-$(TAG).tar.gz{.sig,}
-	@gpg --verify gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz{.sig,}
+	@ls -l $(CIN)gnus-$(VERSION).tar.gz{.sig,}
+	@ls -l $(CIN)gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz{.sig,}
+	@gpg --verify $(CIN)gnus-$(VERSION).tar.gz{.sig,}
+	@gpg --verify $(CIN)gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz{.sig,}
 
-release-cvs-export gnus-$(TAG):	release-check-settings
-	rm -fr gnus-$(TAG)
-	cvs export -d gnus-$(TAG) -r $(TAG) gnus
+release-cvs-export $(CIN)gnus-$(VERSION):	release-check-settings
+	rm -fr $(CIN)gnus-$(VERSION)
+	cvs export -d $(CIN)gnus-$(VERSION) -r $(TAG) gnus
 
-release-make-tar-ball:	gnus-$(TAG) $(TAR_BALL_EXTRA)
-	[ -d gnus-$(TAG) ] && cd gnus-$(TAG) && \
+release-make-tar-ball:	$(CIN)gnus-$(VERSION)
+	[ -d $(CIN)gnus-$(VERSION) ] && cd $(CIN)gnus-$(VERSION) && \
 	  rm $(CVS_IGNORE_FILES) || true
-	cp -p $(TAR_BALL_EXTRA) gnus-$(TAG)/
-	tar zcvf gnus-$(TAG).tar.gz gnus-$(TAG)
-	ls -l gnus-$(TAG).tar.gz
-
-README:
-	@echo README is not in CVS.  Get it from Lars.
-	false
+	tar zcvf $(CIN)gnus-$(VERSION).tar.gz $(CIN)gnus-$(VERSION)
+	ls -l $(CIN)gnus-$(VERSION).tar.gz
 
 # Make a diff between current and previous release.  Example:
 # ftp://quimby.gnus.org/pub/gnus/ding-patches/gnus-5.10.5-5.10.6.diff.gz
 release-diff:	release-check-settings
 	cvs diff -r $(OLD_TAG) -r $(TAG) | sed -e '/^\? /d' > temp.diff || true
-	mv temp.diff gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff
-	gzip         gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff
-	ls -l        gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz
+	mv temp.diff $(CIN)gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff
+	gzip         $(CIN)gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff
+	ls -l        $(CIN)gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz
 
 release-post-clean:	release-check-settings
-	rm -fr gnus-$(TAG) temp.diff
+	rm -fr $(CIN)gnus-$(TAG) temp.diff
 
 # # # # # # # # # # End of release targets
 
