@@ -50,10 +50,11 @@ CODENAME =
 # Codename initial (lower case), e.g. 'n' for "No Gnus".
 CIN =
 # Files with hard-coded versions numbers:
-RELEASE_COMMIT_FILES = lisp/ChangeLog lisp/gnus.el \
+RELEASE_COMMIT_FILES = ChangeLog README \
+  lisp/ChangeLog lisp/gnus.el \
   texi/ChangeLog texi/gnus.texi texi/message.texi texi/gnus-faq.texi
 # Pattern matching previous version(s):
-OLD_PATTERN = 5.10.[0-9]*\|0\.3
+OLD_PATTERN = \(5.10.[0-9]*\|0\.[1-9][0-9]*\)
 # CVS tag of the previous version:
 OLD_TAG     = v5-10-6
 # CVS tag of the current release:
@@ -264,7 +265,7 @@ release-check-settings:
 	@echo "CODENAME  = '$(CODENAME)' (example: 'No ')"
 	@echo "CIN       = '$(CIN)' (example: 'n', codename initial)"
 	@echo "TAG       = '$(TAG)' (example: 'v5-10-6')"
-	@echo "OLDTAG    = '$(OLDTAG)' (example: 'v5-10-5')"
+	@echo "OLD_TAG   = '$(OLD_TAG)' (example: 'v5-10-5')"
 	@echo
 	@if [ x"$(VERSION)" = x ]; then echo "error: No VERSION given."; exit 1; else :; fi
 	@if [ x"$(TAG)" = x ]; then echo "error: No TAG given."; exit 1; else :; fi
@@ -279,7 +280,7 @@ release-check-settings:
 # Needs GNU grep and a recent GNU sed:
 release-bump-version:	release-check-settings
 	sed -i -e '/^(defconst gnus-version-number /s,"$(OLD_PATTERN)","$(VERSION)",' lisp/gnus.el
-	sed -i -e '/^.newcommand{.gnusversionname}{Gnus v/s,$(OLD_PATTERN),$(VERSION),' texi/gnus.texi
+	sed -i -e '/^.newcommand{.gnusversionname}{[A-Za-z ]*Gnus v/s,$(OLD_PATTERN),$(VERSION),' texi/gnus.texi
 	sed -i -e '/^This manual corresponds to [A-Za-z ]*Gnus v/s,$(OLD_PATTERN),$(VERSION),' texi/gnus.texi
 	sed -i -e '/^corresponding to this manual is [A-Za-z ]*Gnus v/s,$(OLD_PATTERN),$(VERSION),' texi/message.texi
 	sed -i -e 's,/[a-z]*gnus-[0-9.]*/,/$(CIN)gnus-$(VERSION)/,' README
@@ -287,6 +288,11 @@ release-bump-version:	release-check-settings
 	  sed -i -e '/The current release ($(OLD_PATTERN)) should/s,$(OLD_PATTERN),$(VERSION),' texi/gnus-faq.texi; \
 	else \
 	  true; \
+	fi
+	@if grep -q "$(CODENAME)Gnus v$(VERSION) is released" ChangeLog; then \
+	  echo "ChangeLog is already updated"; \
+	else \
+	  sed -i -e "1s|^|`date -I`  $(COMMITTER)\n\n\t* README: $(CODENAME)Gnus v$(VERSION) is released.\n\n|" ChangeLog; \
 	fi
 	@if grep -q "$(CODENAME)Gnus v$(VERSION) is released" texi/ChangeLog; then \
 	  echo "texi/ChangeLog is already updated"; \
@@ -308,6 +314,8 @@ release-commit:	release-check-settings
 	@echo -e '\007'
 	@echo
 	@echo "Really do the release-commit for $(CODENAME)Gnus v$(VERSION)?"
+	@echo "Command line:"
+	@echo "  " cvs commit -m "$(CODENAME)Gnus v$(VERSION) is released." $(RELEASE_COMMIT_FILES)
 	@echo
 	@echo "Hit RET to continue or Ctrl-C to abort."
 	@echo
@@ -315,6 +323,8 @@ release-commit:	release-check-settings
 	cvs commit -m "$(CODENAME)Gnus v$(VERSION) is released." $(RELEASE_COMMIT_FILES)
 	@echo
 	@echo "Add tag $(TAG) to CVS?"
+	@echo "Command line:"
+	@echo "  " cvs tag $(TAG)
 	@echo "Hit RET to continue or Ctrl-C to abort."
 	@echo
 	@read dummy
@@ -337,7 +347,7 @@ release-sign-files:
 	fi; \
 	for i in $(CIN)gnus-$(VERSION).tar.gz \
 	         $(CIN)gnus-`echo $(OLD_TAG)%$(TAG)|tr - .|tr -d v|tr % -`.diff.gz; do \
-	   rm $$i.sig; \
+	   rm -f $$i.sig; \
 	   echo "$$phrase" | gpg --detach-sign $$gpg_opt $$i; \
 	done; true
 	@ls -l $(CIN)gnus-$(VERSION).tar.gz{.sig,}
