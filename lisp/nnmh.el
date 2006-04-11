@@ -1,7 +1,7 @@
 ;;; nnmh.el --- mhspool access for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2003
-;;	Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -21,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -150,7 +150,7 @@ as unread by Gnus.")
 	 (file-exists-p file)
 	 (not (file-directory-p file))
 	 (save-excursion (nnmail-find-file file))
-	 (string-to-int (file-name-nondirectory file)))))
+	 (string-to-number (file-name-nondirectory file)))))
 
 (deffoo nnmh-request-group (group &optional server dont-check)
   (nnheader-init-server-buffer)
@@ -176,7 +176,7 @@ as unread by Gnus.")
 	(nnheader-re-read-dir pathname)
 	(setq dir
 	      (sort
-	       (mapcar 'string-to-int
+	       (mapcar 'string-to-number
 		       (directory-files pathname nil "^[0-9]+$" t))
 	       '<))
 	(cond
@@ -222,7 +222,7 @@ as unread by Gnus.")
 	(nnmh-request-list-1 rdir))))
   ;; For each directory, generate an active file line.
   (unless (string= (expand-file-name nnmh-toplev) dir)
-    (let ((files (mapcar 'string-to-int
+    (let ((files (mapcar 'string-to-number
 			 (directory-files dir nil "^[0-9]+$" t))))
       (when files
 	(save-excursion
@@ -354,7 +354,7 @@ as unread by Gnus.")
 	    nnmh-group-alist)
       (nnmh-possibly-create-directory group)
       (nnmh-possibly-change-directory group server)
-      (let ((articles (mapcar 'string-to-int
+      (let ((articles (mapcar 'string-to-number
 			      (directory-files
 			       nnmh-current-directory nil "^[0-9]+$"))))
 	(when articles
@@ -480,7 +480,7 @@ as unread by Gnus.")
 	(gnus-make-directory dir))
       ;; Find the highest number in the group.
       (let ((files (sort
-		    (mapcar 'string-to-int
+		    (mapcar 'string-to-number
 			    (directory-files dir nil "^[0-9]+$"))
 		    '>)))
 	(when files
@@ -503,7 +503,7 @@ as unread by Gnus.")
   ;; articles in this folder.  The articles that are "new" will be
   ;; marked as unread by Gnus.
   (let* ((dir nnmh-current-directory)
-	 (files (sort (mapcar 'string-to-int
+	 (files (sort (mapcar 'string-to-number
 			      (directory-files nnmh-current-directory
 					       nil "^[0-9]+$" t))
 		      '<))

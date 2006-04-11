@@ -1,5 +1,6 @@
 ;;; dgnushack.el --- a hack to set the load path for byte-compiling
-;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2003
+;; Copyright (C) 1994, 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2003,
+;; 2004, 2005
 ;;        Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -20,12 +21,14 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
 ;;; Code:
+
+(defvar dgnushack-default-load-path (copy-sequence load-path))
 
 (defalias 'facep 'ignore)
 
@@ -79,7 +82,7 @@
 
 (when (and (not (featurep 'xemacs))
 	   (= emacs-major-version 21)
-	   (= emacs-minor-version 3)
+	   (>= emacs-minor-version 3)
 	   (condition-case code
 	       (let ((byte-compile-error-on-warn t))
 		 (byte-optimize-form (quote (pop x)) t)
@@ -137,6 +140,17 @@ fixed in Emacs after 21.3."
 	  (setq ad-return-value (cons fn (nreverse backwards))))
       ad-do-it)))
 
+;; Work around for an incompatibility (XEmacs 21.4 vs. 21.5), see the
+;; following threads:
+;;
+;; http://thread.gmane.org/gmane.emacs.gnus.general/56414
+;; Subject: attachment problems found but not fixed
+;;
+;; http://thread.gmane.org/gmane.emacs.gnus.general/56459
+;; Subject: Splitting mail -- XEmacs 21.4 vs 21.5
+;;
+;; http://thread.gmane.org/gmane.emacs.xemacs.beta/20519
+;; Subject: XEmacs 21.5 and Gnus fancy splitting.
 (when (and (featurep 'xemacs)
 	   (let ((table (copy-syntax-table emacs-lisp-mode-syntax-table)))
 	     (modify-syntax-entry ?= " " table)
@@ -189,6 +203,7 @@ fixed in Emacs after 21.3."
     (autoload 'browse-url "browse-url" nil t)
     (autoload 'c-mode "cc-mode" nil t)
     (autoload 'customize-apropos "cus-edit" nil t)
+    (autoload 'customize-group "cus-edit" nil t)
     (autoload 'customize-save-variable "cus-edit" nil t)
     (autoload 'customize-set-variable "cus-edit" nil t)
     (autoload 'customize-variable "cus-edit" nil t)
@@ -198,6 +213,7 @@ fixed in Emacs after 21.3."
     (autoload 'executable-find "executable")
     (autoload 'font-lock-fontify-buffer "font-lock" nil t)
     (autoload 'info "info" nil t)
+    (autoload 'mail-extract-address-components "mail-extr")
     (autoload 'mail-fetch-field "mail-utils")
     (autoload 'make-annotation "annotations")
     (autoload 'make-display-table "disp-table")
@@ -408,6 +424,83 @@ dgnushack-compile."
 ;;; no-update-autoloads: t
 ;;; End:
 ;;; gnus-load.el ends here"))))
+
+(defun dgnushack-find-lisp-shadows (&optional lispdir)
+  "Return a list of directories in which other Gnus installations exist.
+This function looks for the other Gnus installations which will shadow
+the new Gnus Lisp modules which have been installed in LISPDIR, using
+the default `load-path'.  The return value will make sense only when
+LISPDIR is existent and is listed in the default `load-path'.  Assume
+LISPDIR will be prepended to `load-path' by a user if the default
+`load-path' does not contain it."
+  (unless lispdir
+    (setq lispdir (getenv "lispdir")))
+  (when (and lispdir (file-directory-p lispdir))
+    (setq lispdir (file-truename (directory-file-name lispdir)))
+    (let ((indices '("gnus.elc" "gnus.el" "gnus.el.bz2" "gnus.el.gz"
+		     "message.elc" "message.el" "message.el.bz2"
+		     "message.el.gz"))
+	  (path (delq nil (mapcar
+			   (lambda (p)
+			     (condition-case nil
+				 (when (and p (file-directory-p p))
+				   (file-truename (directory-file-name p)))
+			       (error nil)))
+			   dgnushack-default-load-path)))
+	  rest elcs)
+      (while path
+	(setq rest (cons (car path) rest)
+	      path (delete (car rest) (cdr path))))
+      (setq path (nreverse (cdr (member lispdir rest)))
+	    rest nil)
+      (while path
+	(setq elcs indices)
+	(while elcs
+	  (when (file-exists-p (expand-file-name (pop elcs) (car path)))
+	    (setq rest (cons (car path) rest)
+		  elcs nil)))
+	(setq path (cdr path)))
+      (prog1
+	  (setq path (nreverse rest))
+	(when path
+	  (let (print-level print-length)
+	    (princ (concat "\n\
+WARNING: The other Gnus installation" (if (cdr path) "s have" " has") "\
+ been detected in:\n\n  " (mapconcat 'identity path "\n  ") "\n\n\
+You will need to modify the run-time `load-path', remove them manually,
+or remove them using `make remove-installed-shadows'.\n\n"))))))))
+
+(defun dgnushack-remove-lisp-shadows (&optional lispdir)
+  "Remove the other Gnus installations which shadow the recent one."
+  (let ((path (with-temp-buffer
+		(let ((standard-output (current-buffer)))
+		  (dgnushack-find-lisp-shadows lispdir))))
+	elcs files shadows file)
+    (when path
+      (unless (setq elcs (directory-files srcdir nil "\\.elc\\'"))
+	(error "You should build .elc files first."))
+      (setq files
+	    (apply
+	     'append
+	     (mapcar
+	      (lambda (el)
+		(list (concat el "c") el (concat el ".bz2") (concat el ".gz")))
+	      (append
+	       (list (file-name-nondirectory dgnushack-gnus-load-file)
+		     (file-name-nondirectory dgnushack-cus-load-file))
+	       (mapcar (lambda (elc) (substring elc 0 -1)) elcs)))))
+      (while path
+	(setq shadows files)
+	(while shadows
+	  (setq file (expand-file-name (pop shadows) (car path)))
+	  (when (file-exists-p file)
+	    (princ (concat "  Removing " file "..."))
+	    (condition-case nil
+		(progn
+		  (delete-file file)
+		  (princ "done\n"))
+	      (error (princ "failed\n")))))
+	(setq path (cdr path))))))
 
 ;;; dgnushack.el ends here
 

@@ -29,8 +29,9 @@ warn: clean-some gnus-load.el
 clever some l: gnus-load.el
 	$(EMACS_COMP) -f dgnushack-compile
 
-install: install-el install-elc 
+install: install-el-elc list-installed-shadows
 
+# This entry will never install .el files if there are no .elc files.
 install-el: gnus-load.el
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
 	echo " $(INSTALL_DATA) gnus-load.el $(lispdir)/gnus-load.el"
@@ -50,6 +51,27 @@ install-elc: clever
 	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
 	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
 	done
+
+install-el-elc: clever
+	rm -f dgnushack.elc
+	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
+	echo " $(INSTALL_DATA) gnus-load.el $(lispdir)/gnus-load.el"
+	$(INSTALL_DATA) gnus-load.el $(lispdir)/gnus-load.el
+	for p in *.elc; do \
+	  q=`basename $$p c`; \
+	  if [ -f "$(srcdir)/$$q" ]; then \
+	    echo " $(INSTALL_DATA) $$q $(lispdir)/$$q"; \
+	    $(INSTALL_DATA) $(srcdir)/$$q $(lispdir)/$$q; \
+	  fi; \
+	  echo " $(INSTALL_DATA) $$p $(lispdir)/$$p"; \
+	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
+	done
+
+list-installed-shadows:
+	$(EMACS_COMP) -f dgnushack-find-lisp-shadows
+
+remove-installed-shadows:
+	$(EMACS_COMP) -f dgnushack-remove-lisp-shadows
 
 uninstall:
 	for p in *.elc; do \
@@ -74,8 +96,11 @@ gnus-load.el:
 	$(EMACS_COMP) -f dgnushack-make-auto-load $(srcdir)
 	$(EMACS_COMP) -f dgnushack-make-load
 
-distclean:
-	rm -f *.orig *.rej *.elc auto-autoloads.* custom-load.* *~ Makefile
+clean:
+	rm -f *.elc *.orig *.rej *~ auto-autoloads.* custom-load.* gnus-load.el
+
+distclean: clean
+	rm -f Makefile
 
 Makefile: $(srcdir)/Makefile.in ../config.status
 	cd .. \

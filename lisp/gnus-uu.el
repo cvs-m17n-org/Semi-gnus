@@ -1,6 +1,7 @@
 ;;; gnus-uu.el --- extract (uu)encoded files in Gnus
-;; Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998, 2000,
-;;        2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+
+;; Copyright (C) 1985, 1986, 1987, 1993, 1994, 1995, 1996, 1997, 1998,
+;;   2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Created: 2 Oct 1993
@@ -20,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -487,9 +488,10 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 	;; The case where neither a number of articles nor a region is
 	;; specified.
 	(gnus-summary-top-thread)
-	(setq gnus-article-reply (gnus-uu-get-list-of-articles nil)))
-      ;; Specify articles to be forwarded.
-      (setq gnus-newsgroup-processable (copy-sequence gnus-article-reply))
+	(setq gnus-article-reply (nreverse (gnus-uu-find-articles-matching))))
+      ;; Specify articles to be forwarded.  Note that they should be
+      ;; reversed; see `gnus-uu-get-list-of-articles'.
+      (setq gnus-newsgroup-processable (reverse gnus-article-reply))
       (gnus-setup-message 'forward
 	(setq gnus-uu-digest-from-subject nil)
 	(setq gnus-uu-digest-buffer
@@ -538,19 +540,19 @@ didn't work, and overwrite existing files.  Otherwise, ask each time."
 
 (defun gnus-message-process-mark (unmarkp new-marked)
   (let ((old (- (length gnus-newsgroup-processable) (length new-marked))))
-    (message "%d mark%s %s%s"
-	     (length new-marked)
-	     (if (= (length new-marked) 1) "" "s")
-	     (if unmarkp "removed" "added")
-	     (cond
-	      ((and (zerop old)
-		    (not unmarkp))
-	       "")
-	      (unmarkp
-	       (format ", %d remain marked"
-		       (length gnus-newsgroup-processable)))
-	      (t
-	       (format ", %d already marked" old))))))
+    (gnus-message 6 "%d mark%s %s%s"
+		  (length new-marked)
+		  (if (= (length new-marked) 1) "" "s")
+		  (if unmarkp "removed" "added")
+		  (cond
+		   ((and (zerop old)
+			 (not unmarkp))
+		    "")
+		   (unmarkp
+		    (format ", %d remain marked"
+			    (length gnus-newsgroup-processable)))
+		   (t
+		    (format ", %d already marked" old))))))
 
 (defun gnus-new-processable (unmarkp articles)
   (if unmarkp
@@ -578,16 +580,18 @@ When called interactively, prompt for REGEXP."
   (interactive "sUnmark (regexp): ")
   (gnus-uu-mark-by-regexp regexp t))
 
-(defun gnus-uu-mark-series ()
+(defun gnus-uu-mark-series (&optional silent)
   "Mark the current series with the process mark."
   (interactive)
   (let* ((articles (gnus-uu-find-articles-matching))
-         (l (length articles)))
+	 (l (length articles)))
     (while articles
       (gnus-summary-set-process-mark (car articles))
       (setq articles (cdr articles)))
-    (message "Marked %d articles" l))
-  (gnus-summary-position-point))
+    (unless silent
+      (gnus-message 6 "Marked %d articles" l))
+    (gnus-summary-position-point)
+    l))
 
 (defun gnus-uu-mark-region (beg end &optional unmark)
   "Set the process mark on all articles between point and mark."
@@ -695,14 +699,16 @@ When called interactively, prompt for REGEXP."
   (setq gnus-newsgroup-processable nil)
   (save-excursion
     (let ((data gnus-newsgroup-data)
+	  (count 0)
 	  number)
       (while data
 	(when (and (not (memq (setq number (gnus-data-number (car data)))
 			      gnus-newsgroup-processable))
 		   (vectorp (gnus-data-header (car data))))
 	  (gnus-summary-goto-subject number)
-	  (gnus-uu-mark-series))
-	(setq data (cdr data)))))
+	  (setq count (+ count (gnus-uu-mark-series t))))
+	(setq data (cdr data)))
+      (gnus-message 6 "Marked %d articles" count)))
   (gnus-summary-position-point))
 
 ;; All PostScript functions written by Erik Selberg <speed@cs.washington.edu>.
@@ -845,7 +851,7 @@ When called interactively, prompt for REGEXP."
 	      (erase-buffer)
 	      (insert (format
 		       "Date: %s\nFrom: %s\nSubject: %s Digest\n\n"
-		       (current-time-string) name name))
+		       (message-make-date) name name))
 	      (when (and message-forward-as-mime gnus-uu-digest-buffer)
 		(insert "<#part type=message/rfc822>\nSubject: Topics\n\n"))
 	      (insert "Topics:\n")))
@@ -926,16 +932,16 @@ When called interactively, prompt for REGEXP."
 	(if (and message-forward-as-mime gnus-uu-digest-buffer)
 	    (with-current-buffer gnus-uu-digest-buffer
 	      (erase-buffer)
-	      (insert-buffer "*gnus-uu-pre*")
+	      (insert-buffer-substring "*gnus-uu-pre*")
 	      (goto-char (point-max))
-	      (insert-buffer "*gnus-uu-body*"))
+	      (insert-buffer-substring "*gnus-uu-body*"))
 	  (save-excursion
 	    (set-buffer "*gnus-uu-pre*")
 	    (insert (format "\n\n%s\n\n" (make-string 70 ?-)))
 	    (if gnus-uu-digest-buffer
 		(with-current-buffer gnus-uu-digest-buffer
 		  (erase-buffer)
-		  (insert-buffer "*gnus-uu-pre*"))
+		  (insert-buffer-substring "*gnus-uu-pre*"))
 	      (let ((coding-system-for-write mm-text-coding-system))
 		(gnus-write-buffer gnus-uu-saved-article-name))))
 	  (save-excursion
@@ -948,7 +954,7 @@ When called interactively, prompt for REGEXP."
 	    (if gnus-uu-digest-buffer
 		(with-current-buffer gnus-uu-digest-buffer
 		  (goto-char (point-max))
-		  (insert-buffer "*gnus-uu-body*"))
+		  (insert-buffer-substring "*gnus-uu-body*"))
 	      (let ((coding-system-for-write mm-text-coding-system)
 		    (file-name-coding-system nnmail-pathname-coding-system))
 		(write-region
@@ -1194,7 +1200,7 @@ When called interactively, prompt for REGEXP."
 	  (ignore-errors
 	    (replace-match
 	     (format "%06d"
-		     (string-to-int (buffer-substring
+		     (string-to-number (buffer-substring
 				     (match-beginning 0) (match-end 0)))))))
 	(setq string (buffer-substring 1 (point-max)))
 	(setcar (car string-list) string)
@@ -1302,7 +1308,7 @@ When called interactively, prompt for REGEXP."
 		       (not gnus-uu-be-dangerous)
 		       (or (eq gnus-uu-be-dangerous t)
 			   (gnus-y-or-n-p
-			    (format "Delete unsuccessfully decoded file %s"
+			    (format "Delete unsuccessfully decoded file %s? "
 				    result-file))))
 	      (delete-file result-file)))
 	  (when (memq 'begin process-state)
@@ -1362,7 +1368,7 @@ When called interactively, prompt for REGEXP."
 	      (gnus-message 2 "No begin part at the beginning")
 	      (sleep-for 2))
 	  (setq state 'middle))))
-    
+
       ;; When there are no result-files, then something must be wrong.
     (if result-files
 	(message "")
@@ -1448,7 +1454,7 @@ When called interactively, prompt for REGEXP."
 	  ;; We replace certain characters that could make things messy.
 	  (setq gnus-uu-file-name
 		(gnus-map-function
-		 mm-file-name-rewrite-functions 
+		 mm-file-name-rewrite-functions
 		 (file-name-nondirectory (match-string 1))))
 	  (replace-match (concat "begin 644 " gnus-uu-file-name) t t)
 

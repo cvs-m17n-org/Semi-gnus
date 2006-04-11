@@ -1,7 +1,7 @@
 ;;; mm-bodies.el --- Functions for decoding MIME things
 
-;; Copyright (C) 1998, 1999, 2000, 2001, 2003, 2004
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -19,8 +19,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -93,7 +93,8 @@ If no encoding was done, nil is returned."
     (save-excursion
       (if charset
 	  (progn
-	    (mm-encode-coding-region (point-min) (point-max) charset)
+	    (mm-encode-coding-region (point-min) (point-max)
+				     (mm-charset-to-coding-system charset))
 	    charset)
 	(goto-char (point-min))
 	(let ((charsets (mm-find-mime-charset-region (point-min) (point-max)
@@ -224,8 +225,9 @@ If TYPE is `text/plain' CRLF->LF translation may occur."
 	 (message "Error while decoding: %s" error)
 	 nil))
     (when (and
+	   type
 	   (memq encoding '(base64 x-uuencode x-uue x-binhex x-yenc))
-	   (equal type "text/plain"))
+	   (string-match "\\`text/" type))
       (goto-char (point-min))
       (while (search-forward "\r\n" nil t)
 	(replace-match "\n" t t)))))
@@ -245,8 +247,12 @@ decoding.  If it is nil, default to `mail-parse-charset'."
   (save-excursion
     (when encoding
       (mm-decode-content-transfer-encoding encoding type))
-    (when (featurep 'mule)  ; Fixme: Wrong test for unibyte session.
-      (let ((coding-system (mm-charset-to-coding-system charset)))
+    (when (and (featurep 'mule) ;; Fixme: Wrong test for unibyte session.
+	       (not (eq charset 'gnus-decoded)))
+      (let ((coding-system (mm-charset-to-coding-system
+			    ;; Allow overwrite using
+			    ;; `mm-charset-override-alist'.
+			    charset nil t)))
 	(if (and (not coding-system)
 		 (listp mail-parse-ignored-charsets)
 		 (memq 'gnus-unknown mail-parse-ignored-charsets))
@@ -258,8 +264,7 @@ decoding.  If it is nil, default to `mail-parse-charset'."
 		   ;;in XEmacs
 		   (mm-multibyte-p)
 		   (or (not (eq coding-system 'ascii))
-		       (setq coding-system mail-parse-charset))
-		   (not (eq coding-system 'gnus-decoded)))
+		       (setq coding-system mail-parse-charset)))
 	  (mm-decode-coding-region (point-min) (point-max)
 				   coding-system))
 	(setq buffer-file-coding-system
@@ -278,7 +283,11 @@ decoding.  If it is nil, default to `mail-parse-charset'."
     (setq charset mail-parse-charset))
   (or
    (when (featurep 'mule)
-     (let ((coding-system (mm-charset-to-coding-system charset)))
+     (let ((coding-system (mm-charset-to-coding-system
+			   charset
+			   ;; Allow overwrite using
+			   ;; `mm-charset-override-alist'.
+			   nil t)))
        (if (and (not coding-system)
 		(listp mail-parse-ignored-charsets)
 		(memq 'gnus-unknown mail-parse-ignored-charsets))

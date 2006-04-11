@@ -1,6 +1,7 @@
 ;;; gnus-util.el --- utility functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -19,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -38,9 +39,12 @@
   (require 'cl)
   ;; Fixme: this should be a gnus variable, not nnmail-.
   (defvar nnmail-pathname-coding-system)
+  (defvar nnmail-active-file-coding-system)
 
   ;; Inappropriate references to other parts of Gnus.
   (defvar gnus-emphasize-whitespace-regexp)
+  (defvar gnus-original-article-buffer)
+  (defvar gnus-user-agent)
   )
 (require 'time-date)
 (require 'netrc)
@@ -304,8 +308,8 @@ is slower."
 (defun gnus-completing-read-with-default (default prompt &rest args)
   ;; Like `completing-read', except that DEFAULT is the default argument.
   (let* ((prompt (if default
-		     (concat prompt " (default " default ") ")
-		   (concat prompt " ")))
+		     (concat prompt " (default " default "): ")
+		   (concat prompt ": ")))
 	 (answer (apply 'completing-read prompt args)))
     (if (or (null answer) (zerop (length answer)))
 	default
@@ -466,7 +470,8 @@ inside loops."
     (apply 'format args)))
 
 (defun gnus-error (level &rest args)
-  "Beep an error if LEVEL is equal to or less than `gnus-verbose'."
+  "Beep an error if LEVEL is equal to or less than `gnus-verbose'.
+ARGS are passed to `message'."
   (when (<= (floor level) gnus-verbose)
     (apply 'message args)
     (ding)
@@ -1008,6 +1013,13 @@ ARG is passed to the first function."
   (save-current-buffer
     (apply 'run-hooks funcs)))
 
+(defun gnus-run-mode-hooks (&rest funcs)
+  "Run `run-mode-hooks' if it is available, otherwise `run-hooks'.
+This function saves the current buffer."
+  (if (fboundp 'run-mode-hooks)
+      (save-current-buffer (apply 'run-mode-hooks funcs))
+    (save-current-buffer (apply 'run-hooks funcs))))
+
 ;;; Various
 
 (defvar gnus-group-buffer)		; Compiler directive
@@ -1018,14 +1030,6 @@ ARG is passed to the first function."
        (save-excursion
 	 (set-buffer gnus-group-buffer)
 	 (eq major-mode 'gnus-group-mode))))
-
-(defun gnus-remove-duplicates (list)
-  (let (new)
-    (while list
-      (or (member (car list) new)
-	  (setq new (cons (car list) new)))
-      (setq list (cdr list)))
-    (nreverse new)))
 
 (defun gnus-remove-if (predicate list)
   "Return a copy of LIST with all items satisfying PREDICATE removed."
@@ -1428,6 +1432,26 @@ Return nil otherwise."
 				 display))
 	      display)))))
 
+(eval-when-compile
+  (defvar tool-bar-mode))
+
+(defun gnus-tool-bar-update (&rest ignore)
+  "Update the tool bar."
+  (when (and (boundp 'tool-bar-mode)
+	     tool-bar-mode)
+    (let* ((args nil)
+	   (func (cond ((featurep 'xemacs)
+			'ignore)
+		       ((fboundp 'tool-bar-update)
+			'tool-bar-update)
+		       ((fboundp 'force-window-update)
+			'force-window-update)
+		       ((fboundp 'redraw-frame)
+			(setq args (list (selected-frame)))
+			'redraw-frame)
+		       (t 'ignore))))
+      (apply func args))))
+
 ;; Fixme: This has only one use (in gnus-agent), which isn't worthwhile.
 (defmacro gnus-mapcar (function seq1 &rest seqs2_n)
   "Apply FUNCTION to each element of the sequences, and make a list of the results.
@@ -1548,6 +1572,12 @@ empty directories from OLD-PATH."
   "Wrapper for set-file-modes."
   (ignore-errors
     (set-file-modes filename mode)))
+
+(if (fboundp 'set-process-query-on-exit-flag)
+    (defalias 'gnus-set-process-query-on-exit-flag
+      'set-process-query-on-exit-flag)
+  (defalias 'gnus-set-process-query-on-exit-flag
+    'process-kill-without-query))
 
 (provide 'gnus-util)
 

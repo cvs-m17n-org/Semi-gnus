@@ -1,8 +1,10 @@
 ;;; spam.el --- Identifying spam
-;; Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+
+;; Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
-;; Keywords: network
+;; Maintainer: Ted Zlatanov <tzz@lifelogs.com>
+;; Keywords: network, spam, mail, bogofilter, BBDB, dspam, dig, whitelist, blacklist, gmane, hashcash, spamassassin, bsfilter, ifile, stat, crm114, spamoracle
 
 ;; This file is part of GNU Emacs.
 
@@ -18,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -40,6 +42,7 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'spam-report))
+(eval-when-compile (require 'hashcash))
 
 (require 'gnus-sum)
 
@@ -58,6 +61,8 @@
 ;; autoload spam-report
 (eval-and-compile
   (autoload 'spam-report-gmane "spam-report")
+  (autoload 'spam-report-gmane-spam "spam-report")
+  (autoload 'spam-report-gmane-ham "spam-report")
   (autoload 'spam-report-resend "spam-report"))
 
 ;; autoload gnus-registry
@@ -80,7 +85,9 @@ Populated by spam-install-backend-super.")
 
 (defgroup spam nil
   "Spam configuration."
-  :version "22.1")
+  :version "22.1"
+  :group 'mail
+  :group 'news)
 
 (defcustom spam-summary-exit-behavior 'default
   "Exit behavior at the time of summary exit.
@@ -102,6 +109,7 @@ a group through group/topic parameters overrides this mechanism."
 (defcustom spam-mark-new-messages-in-spam-group-as-spam t
   "Whether new messages in a spam group should get the spam-mark."
   :type 'boolean
+  ;; :version "22.1" ;; Gnus 5.10.8 / No Gnus 0.3
   :group 'spam)
 
 (defcustom spam-log-to-registry nil
@@ -350,7 +358,7 @@ Only meaningful if you enable `spam-use-blackholes'."
   :type '(radio (const nil) regexp)
   :group 'spam)
 
-(defface spam-face
+(defface spam
   '((((class color) (type tty) (background dark))
      (:foreground "gray80" :background "gray50"))
     (((class color) (type tty) (background light))
@@ -360,9 +368,12 @@ Only meaningful if you enable `spam-use-blackholes'."
     (((class color) (background light))
      (:foreground "ivory4"))
     (t :inverse-video t))
-  "Face for spam-marked articles.")
+  "Face for spam-marked articles."
+  :group 'spam)
+;; backward-compatibility alias
+(put 'spam-face 'face-alias 'spam)
 
-(defcustom spam-face 'spam-face
+(defcustom spam-face 'spam
   "Face for spam-marked articles."
   :type 'face
   :group 'spam)
@@ -1049,11 +1060,10 @@ backends)."
 			      nil)
 
 (spam-install-nocheck-backend 'spam-use-gmane
-			      nil
+			      'spam-report-gmane-unregister-routine
 			      'spam-report-gmane-register-routine
-			      ;; does Gmane support unregistration?
-			      nil
-			      nil)
+			      'spam-report-gmane-register-routine
+			      'spam-report-gmane-unregister-routine)
 
 (spam-install-nocheck-backend 'spam-use-resend
 			      'spam-report-resend-register-ham-routine
@@ -1164,6 +1174,15 @@ backends)."
 	(return))))
     result))
 
+(defvar spam-spamassassin-score-regexp
+  ".*\\b\\(?:score\\|hits\\)=\\(-?[0-9.]+\\)"
+  "Regexp matching SpamAssassin score header.
+The first group must match the number.")
+;; "score" for Spamassassin 3.0 or later:
+;; X-Spam-Status: Yes, score=13.1 required=5.0 tests=DNS_FROM_RFC_ABUSE,
+;; 	[...],UNDISC_RECIPS autolearn=disabled version=3.0.3
+
+
 (defun spam-extra-header-to-number (header headers)
   "Transform an extra HEADER to a number, using list of HEADERS.
 Note this has to be fast."
@@ -1172,7 +1191,8 @@ Note this has to be fast."
        ((eq header 'X-Spam-Status)
 	(string-to-number (gnus-replace-in-string
 			   (gnus-extra-header header headers)
-			   ".*hits=" "")))
+			   spam-spamassassin-score-regexp
+			   "\\1")))
        ;; for CRM checking, it's probably faster to just do the string match
        ((and spam-use-crm114 (string-match "( pR: \\([0-9.-]+\\)" header))
 	(match-string 1 header))
@@ -1238,6 +1258,7 @@ Will not return a nil score."
     (gnus-group-spam-exit-processor-stat         spam spam-use-stat)
     (gnus-group-spam-exit-processor-spamoracle   spam spam-use-spamoracle)
     (gnus-group-spam-exit-processor-spamassassin spam spam-use-spamassassin)
+    (gnus-group-spam-exit-processor-report-gmane spam spam-use-gmane) ;; Buggy?
     (gnus-group-ham-exit-processor-ifile         ham spam-use-ifile)
     (gnus-group-ham-exit-processor-bogofilter    ham spam-use-bogofilter)
     (gnus-group-ham-exit-processor-bsfilter      ham spam-use-bsfilter)
@@ -2015,18 +2036,10 @@ See the Info node `(gnus)Fancy Mail Splitting' for more details."
 
 ;;{{{ Hashcash.
 
-(eval-when-compile
-  (autoload 'mail-check-payment "hashcash"))
+(defun spam-check-hashcash ()
+  "Check the headers for hashcash payments."
+  (ignore-errors (mail-check-payment)))	 ;mail-check-payment returns a boolean
 
-(condition-case nil
-    (progn
-      (require 'hashcash)
-
-      (defun spam-check-hashcash ()
-	"Check the headers for hashcash payments."
-	(mail-check-payment)))	 ;mail-check-payment returns a boolean
-
-  (file-error))
 ;;}}}
 
 ;;{{{ BBDB
@@ -2429,7 +2442,11 @@ REMOVE not nil, remove the ADDRESSES."
 ;;{{{ Spam-report glue (gmane and resend reporting)
 (defun spam-report-gmane-register-routine (articles)
   (when articles
-    (apply 'spam-report-gmane articles)))
+    (apply 'spam-report-gmane-spam articles)))
+
+(defun spam-report-gmane-unregister-routine (articles)
+  (when articles
+    (apply 'spam-report-gmane-ham articles)))
 
 (defun spam-report-resend-register-ham-routine (articles)
   (spam-report-resend-register-routine articles t))
@@ -2498,7 +2515,7 @@ REMOVE not nil, remove the ADDRESSES."
 		     (if db `("-d" ,db "-v") `("-v"))))
 	    (setq return (spam-check-bogofilter-headers score))))
 	return)
-    (gnus-error "`spam.el' doesnt support obsolete bogofilter versions")))
+    (gnus-error 5 "`spam.el' doesn't support obsolete bogofilter versions")))
 
 (defun spam-bogofilter-register-with-bogofilter (articles
 						 spam
@@ -2524,7 +2541,7 @@ REMOVE not nil, remove the ADDRESSES."
 		     spam-bogofilter-path
 		     nil nil nil switch
 		     (if db `("-d" ,db "-v") `("-v")))))))
-    (gnus-error "`spam.el' doesnt support obsolete bogofilter versions")))
+    (gnus-error 5 "`spam.el' doesn't support obsolete bogofilter versions")))
 
 (defun spam-bogofilter-register-spam-routine (articles &optional unregister)
   (spam-bogofilter-register-with-bogofilter articles t unregister))
@@ -2609,7 +2626,7 @@ REMOVE not nil, remove the ADDRESSES."
   (if score				; scoring mode
       (let ((header (message-fetch-field spam-spamassassin-spam-status-header)))
 	(when header
-	  (if (string-match "hits=\\(-?[0-9.]+\\)" header)
+	  (if (string-match spam-spamassassin-score-regexp header)
 	      (match-string 1 header)
 	    "0")))
     ;; spam detection mode
@@ -2878,8 +2895,8 @@ installed through spam-necessary-extra-headers."
     (add-to-list 'gnus-extra-headers header))
 
   (setq spam-install-hooks t)
-  ;; TODO: How do we redo this every time spam-face is customized?
-  (push '((eq mark gnus-spam-mark) . spam-face)
+  ;; TODO: How do we redo this every time the `spam' face is customized?
+  (push '((eq mark gnus-spam-mark) . spam)
 	gnus-summary-highlight)
   ;; Add hooks for loading and saving the spam stats
   (add-hook 'gnus-save-newsrc-hook 'spam-maybe-spam-stat-save)

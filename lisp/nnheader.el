@@ -1,8 +1,8 @@
 ;;; nnheader.el --- header access macros for Gnus and its backends
 
-;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000, 2001, 2002, 2003, 2004
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994,
+;;   1995, 1996, 1997, 1998, 2000, 2001, 2002, 2003,
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -22,14 +22,16 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
 ;;; Code:
 
 (eval-when-compile (require 'cl))
+
+(defvar nnmail-extra-headers)
 
 ;; Requiring `gnus-util' at compile time creates a circular
 ;; dependency between nnheader.el and gnus-util.el.
@@ -206,9 +208,9 @@ on your system, you could say something like:
   "Return the extra headers in HEADER."
   `(aref ,header 9))
 
-(defmacro mail-header-set-extra (header extra)
+(defun mail-header-set-extra (header extra)
   "Set the extra headers in HEADER to EXTRA."
-  `(aset ,header 9 ',extra))
+  (aset header 9 extra))
 
 (defsubst make-mail-header (&optional init)
   "Create a new mail header structure initialized with INIT."
@@ -702,9 +704,9 @@ the line could be found."
 (defsubst nnheader-file-to-number (file)
   "Take a FILE name and return the article number."
   (if (string= nnheader-numerical-short-files "^[0-9]+$")
-      (string-to-int file)
+      (string-to-number file)
     (string-match nnheader-numerical-short-files file)
-    (string-to-int (match-string 0 file))))
+    (string-to-number (match-string 0 file))))
 
 (defvar nnheader-directory-files-is-safe
   (or (eq system-type 'windows-nt)
@@ -971,15 +973,21 @@ find-file-hooks, etc.
 (defun nnheader-find-file-noselect (&rest args)
   "Open a file with some variables bound.
 See `find-file-noselect' for the arguments."
-  (let ((format-alist nil)
-	(auto-mode-alist (mm-auto-mode-alist))
-	(default-major-mode 'fundamental-mode)
-	(enable-local-variables nil)
-	(after-insert-file-functions nil)
-	(enable-local-eval nil)
-	(find-file-hooks nil)
-	(coding-system-for-read nnheader-file-coding-system))
-    (apply 'find-file-noselect args)))
+  (let* ((format-alist nil)
+	 (auto-mode-alist (mm-auto-mode-alist))
+	 (default-major-mode 'fundamental-mode)
+	 (enable-local-variables nil)
+	 (after-insert-file-functions nil)
+	 (enable-local-eval nil)
+	 (coding-system-for-read nnheader-file-coding-system)
+	 (ffh (if (boundp 'find-file-hook)
+		  'find-file-hook
+		'find-file-hooks))
+	 (val (symbol-value ffh)))
+    (set ffh nil)
+    (unwind-protect
+	(apply 'find-file-noselect args)
+      (set ffh val))))
 
 (defun nnheader-directory-regular-files (dir)
   "Return a list of all regular files in DIR."

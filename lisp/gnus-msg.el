@@ -1,6 +1,7 @@
 ;;; gnus-msg.el --- mail and post interface for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
-;;        2005 Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -20,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -66,8 +67,10 @@ message in, you can set this variable to a function that checks the
 current newsgroup name and then returns a suitable group name (or list
 of names)."
   :group 'gnus-message
-  :type '(choice (string :tag "Group")
-		 (function)))
+  :type '(choice (const nil)
+		 (function)
+		 (string :tag "Group")
+		 (repeat :tag "List of groups" (string :tag "Group"))))
 
 (defcustom gnus-mailing-list-groups nil
   "*If non-nil a regexp matching groups that are really mailing lists.
@@ -471,27 +474,19 @@ Gcc: header for archiving purposes."
   ;; COMPOSEFUNC should return t if succeed.  Undocumented ???
   t)
 
-(defvar save-selected-window-window)
-
 ;;;###autoload
 (defun gnus-button-mailto (address)
   "Mail to ADDRESS."
   (set-buffer (gnus-copy-article-buffer))
   (gnus-setup-message 'message
-    (message-reply address))
-  (and (boundp 'save-selected-window-window)
-       (not (window-live-p save-selected-window-window))
-       (setq save-selected-window-window (selected-window))))
+    (message-reply address)))
 
 ;;;###autoload
 (defun gnus-button-reply (&optional to-address wide)
   "Like `message-reply'."
   (interactive)
   (gnus-setup-message 'message
-    (message-reply to-address wide))
-  (and (boundp 'save-selected-window-window)
-       (not (window-live-p save-selected-window-window))
-       (setq save-selected-window-window (selected-window))))
+    (message-reply to-address wide)))
 
 ;;;###autoload
 (define-mail-user-agent 'gnus-user-agent
@@ -522,7 +517,7 @@ Gcc: header for archiving purposes."
     (gnus-make-local-hook 'message-header-hook)
     (add-hook 'message-header-hook 'gnus-agent-possibly-save-gcc nil t))
   (setq message-post-method
-	`(lambda (arg)
+	`(lambda (&optional arg)
 	   (gnus-post-method arg ,gnus-newsgroup-name)))
   (setq message-newsreader (setq message-mailer (gnus-extended-version)))
   (message-add-action
@@ -852,6 +847,7 @@ header line with the old Message-ID."
 	      (delete-region (point) (point-max))
 	      (insert yank-string))
 	    (gnus-article-delete-text-of-type 'annotation)
+	    (gnus-article-delete-text-of-type 'multipart)
 	    (gnus-remove-text-with-property 'gnus-prev)
 	    (gnus-remove-text-with-property 'gnus-next)
 	    (gnus-remove-text-with-property 'gnus-decoration)
@@ -1670,7 +1666,7 @@ this is a reply."
 	     (gcc (cond
 		   ((functionp group)
 		    (funcall group))
-		   ((or (stringp group) (list group))
+		   ((or (stringp group) (listp group))
 		    group))))
 	(when gcc
 	  (insert "Gcc: "

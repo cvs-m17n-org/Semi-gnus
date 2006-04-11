@@ -19,8 +19,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -36,7 +36,8 @@
 
 (defgroup encrypt '((password-cache custom-variable)
 		    (password-cache-expiry custom-variable))
-  "File encryption configuration.")
+  "File encryption configuration."
+  :group 'applications)
 
 (defcustom encrypt-file-alist nil
   "List of file names or regexes matched with encryptions.
@@ -125,8 +126,8 @@ Format example:
 
     (if outdata
 	(progn
-	  (gnus-message 9 "%s was decrypted with %s (cipher %s)"
-			file (symbol-name method) cipher)
+	  (message "%s was decrypted with %s (cipher %s)"
+		   file (symbol-name method) cipher)
 	  (delete-region (point-min) (point-max))
 	  (goto-char (point-min))
 	  (insert outdata))
@@ -171,8 +172,8 @@ Format example:
 
     (if outdata
 	(progn
-	  (gnus-message 9 "%s was encrypted with %s (cipher %s)"
-			file (symbol-name method) cipher)
+	  (message "%s was encrypted with %s (cipher %s)"
+		   file (symbol-name method) cipher)
 	  (delete-region (point-min) (point-max))
 	  (goto-char (point-min))
 	  (insert outdata)
@@ -212,7 +213,7 @@ Format example:
 	(progn
 	  (setq new-list (reverse (split-string bs)))
 	  (dolist (x new-list)
-	    (setq x (string-to-int x))
+	    (setq x (string-to-number x))
 	    (insert (format "%c" (logxor x passphrase-sum))))))
       (buffer-substring-no-properties (point-min) (point-max)))))
 

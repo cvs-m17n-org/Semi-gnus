@@ -1,6 +1,7 @@
 ;;; nnimap.el --- imap backend for Gnus
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <jas@pdc.kth.se>
 ;;         Jim Radford <radford@robby.caltech.edu>
@@ -20,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -205,7 +206,7 @@ RFC2060 section 6.4.4."
   "Whether to download entire articles during splitting.
 This is generally not required, and will slow things down considerably.
 You may need it if you want to use an advanced splitting function that
-analyses the body before splitting the article.
+analyzes the body before splitting the article.
 If this variable is nil, bodies will not be downloaded; if this
 variable is the symbol `default' the default behaviour is
 used (which currently is nil, unless you use a statistical
@@ -315,6 +316,11 @@ some servers implement this command inefficiently by opening each and
 every message in the group, thus making it quite slow.
 Unlike other backends, you do not need to take special care if you
 flip this variable.")
+
+(defvoo nnimap-search-uids-not-since-is-evil nil
+  "If non-nil, avoid \"UID SEARCH UID ... NOT SINCE\" queries when expiring.
+Instead, use \"UID SEARCH SINCE\" to prune the list of expirable
+articles within Gnus.  This seems to be faster on Courier in some cases.")
 
 (defvoo nnimap-expunge-on-close 'always ; 'ask, 'never
   "Whether to expunge a group when it is closed.
@@ -779,7 +785,7 @@ If EXAMINE is non-nil the group is selected read-only."
  	   (port (if nnimap-server-port
  		     (int-to-string nnimap-server-port)
  		   "imap"))
-	   (user (netrc-machine-user-or-password 
+	   (user (netrc-machine-user-or-password
 		  "login"
 		  list
 		  (list server
@@ -787,7 +793,7 @@ If EXAMINE is non-nil the group is selected read-only."
 			    nnimap-address))
 		  (list port)
 		  (list "imap" "imaps")))
-	   (passwd (netrc-machine-user-or-password 
+	   (passwd (netrc-machine-user-or-password
 		    "password"
 		    list
 		    (list server
@@ -798,7 +804,7 @@ If EXAMINE is non-nil the group is selected read-only."
       (if (imap-authenticate user passwd nnimap-server-buffer)
 	  (prog2
 	      (setq nnimap-server-buffer-alist
-		    (nnimap-remove-server-from-buffer-alist 
+		    (nnimap-remove-server-from-buffer-alist
 		     server
 		     nnimap-server-buffer-alist))
 	      (push (list server nnimap-server-buffer)
@@ -857,7 +863,7 @@ Return nil if the server couldn't be closed for some reason."
       (setq nnimap-server-buffer nil
 	    nnimap-current-server nil
 	    nnimap-server-buffer-alist
-	    (nnimap-remove-server-from-buffer-alist 
+	    (nnimap-remove-server-from-buffer-alist
 	     server
 	     nnimap-server-buffer-alist)))
     (nnoo-close-server 'nnimap server)))
@@ -1177,18 +1183,12 @@ function is generally only called when Gnus is shutting down."
 	  (let (seen unseen)
 	    ;; read info could contain articles marked unread by other
 	    ;; imap clients!  we correct this
-	    (setq seen (gnus-uncompress-range (gnus-info-read info))
-		  unseen (imap-search "UNSEEN UNDELETED")
-		  seen (gnus-set-difference seen unseen)
-		  ;; seen might lack articles marked as read by other
-		  ;; imap clients! we correct this
-		  seen (append seen (imap-search "SEEN"))
-		  ;; remove dupes
-		  seen (sort seen '<)
-		  seen (gnus-compress-sequence seen t)
-		  ;; we can't return '(1) since this isn't a "list of ranges",
-		  ;; and we can't return '((1)) since g-list-of-unread-articles
-		  ;; is buggy so we return '((1 . 1)).
+	    (setq unseen (gnus-compress-sequence
+			  (imap-search "UNSEEN UNDELETED"))
+		  seen (gnus-range-difference (gnus-info-read info) unseen)
+		  seen (gnus-range-add seen
+				       (gnus-compress-sequence
+					(imap-search "SEEN")))
 		  seen (if (and (integerp (car seen))
 				(null (cdr seen)))
 			   (list (cons (car seen) (car seen)))
@@ -1493,6 +1493,21 @@ function is generally only called when Gnus is shutting down."
 			     (gnus-compress-sequence oldarts)) "\\Deleted")
 		       (setq articles (gnus-set-difference
 				       articles oldarts))))))
+		((and nnimap-search-uids-not-since-is-evil (numberp days))
+		 (let* ((all-new-articles
+			 (gnus-compress-sequence
+			  (imap-search (format "SINCE %s"
+					       (nnimap-date-days-ago days)))))
+			(oldartseq
+			 (gnus-range-difference artseq all-new-articles))
+			(oldarts (gnus-uncompress-range oldartseq)))
+		   (when oldarts
+		     (nnimap-expiry-target oldarts group server)
+		     (when (imap-message-flags-add
+			    (imap-range-to-message-set oldartseq)
+			    "\\Deleted")
+		       (setq articles (gnus-set-difference
+				       articles oldarts))))))
 		((numberp days)
 		 (let ((oldarts (imap-search
 				 (format nnimap-expunge-search-string
@@ -1510,7 +1525,7 @@ function is generally only called when Gnus is shutting down."
   ;; return articles not deleted
   articles)
 
-(deffoo nnimap-request-move-article (article group server accept-form 
+(deffoo nnimap-request-move-article (article group server accept-form
 					     &optional last move-is-internal)
   (when (nnimap-possibly-change-server server)
     (save-excursion
@@ -1533,6 +1548,7 @@ function is generally only called when Gnus is shutting down."
 	       (setq result (eval accept-form))
 	       (kill-buffer buf)
 	       result)
+	     (nnimap-possibly-change-group group server)
 	     (imap-message-flags-add
 	      (imap-range-to-message-set (list article))
 	      "\\Deleted" 'silent nnimap-server-buffer))

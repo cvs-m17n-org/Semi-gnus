@@ -1,5 +1,7 @@
 ;;; sieve-manage.el --- Implementation of the managesive protocol in elisp
-;; Copyright (C) 2001, 2003, 2004 Free Software Foundation, Inc.
+
+;; Copyright (C) 2001, 2002, 2003, 2004, 2005,
+;;   2006 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 
@@ -17,8 +19,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -91,22 +93,27 @@
 
 (defcustom sieve-manage-log "*sieve-manage-log*"
   "Name of buffer for managesieve session trace."
-  :type 'string)
+  :type 'string
+  :group 'sieve-manage)
 
 (defcustom sieve-manage-default-user (user-login-name)
   "Default username to use."
-  :type 'string)
+  :type 'string
+  :group 'sieve-manage)
 
 (defcustom sieve-manage-server-eol "\r\n"
   "The EOL string sent from the server."
-  :type 'string)
+  :type 'string
+  :group 'sieve-manage)
 
 (defcustom sieve-manage-client-eol "\r\n"
   "The EOL string we send to the server."
-  :type 'string)
+  :type 'string
+  :group 'sieve-manage)
 
 (defcustom sieve-manage-streams '(network starttls shell)
-  "Priority of streams to consider when opening connection to server.")
+  "Priority of streams to consider when opening connection to server."
+  :group 'sieve-manage)
 
 (defcustom sieve-manage-stream-alist
   '((network   sieve-manage-network-p          sieve-manage-network-open)
@@ -118,7 +125,8 @@
 
 NAME names the stream, CHECK is a function returning non-nil if the
 server support the stream and OPEN is a function for opening the
-stream.")
+stream."
+  :group 'sieve-manage)
 
 (defcustom sieve-manage-authenticators '(digest-md5
 					 cram-md5
@@ -126,7 +134,8 @@ stream.")
 					 ntlm
 					 plain
 					 login)
-  "Priority of authenticators to consider when authenticating to server.")
+  "Priority of authenticators to consider when authenticating to server."
+  :group 'sieve-manage)
 
 (defcustom sieve-manage-authenticator-alist
   '((cram-md5   sieve-manage-cram-md5-p       sieve-manage-cram-md5-auth)
@@ -141,11 +150,13 @@ stream.")
 
 NAME names the authenticator.  CHECK is a function returning non-nil if
 the server support the authenticator and AUTHENTICATE is a function
-for doing the actual authentication.")
+for doing the actual authentication."
+  :group 'sieve-manage)
 
 (defcustom sieve-manage-default-port 2000
   "Default port number for managesieve protocol."
-  :type 'integer)
+  :type 'integer
+  :group 'sieve-manage)
 
 ;; Internal variables:
 
@@ -189,8 +200,8 @@ LOGINFUNC is passed a username and a password, it should return t if
 it where sucessful authenticating itself to the server, nil otherwise.
 Returns t if login was successful, nil otherwise."
   (with-current-buffer buffer
-    (make-variable-buffer-local 'sieve-manage-username)
-    (make-variable-buffer-local 'sieve-manage-password)
+    (make-local-variable 'sieve-manage-username)
+    (make-local-variable 'sieve-manage-password)
     (let (user passwd ret reason passwd-key)
       (condition-case ()
 	  (while (or (not user) (not passwd))
@@ -433,7 +444,7 @@ Optional variable BUFFER is buffer (buffer, or string naming buffer)
 to work in."
   (setq buffer (or buffer (format " *sieve* %s:%d" server (or port 2000))))
   (with-current-buffer (get-buffer-create buffer)
-    (mapc 'make-variable-buffer-local sieve-manage-local-variables)
+    (mapc 'make-local-variable sieve-manage-local-variables)
     (sieve-manage-disable-multibyte)
     (buffer-disable-undo)
     (setq sieve-manage-server (or server sieve-manage-server))
@@ -521,8 +532,8 @@ password is remembered in the buffer."
   (with-current-buffer (or buffer (current-buffer))
     (if (not (eq sieve-manage-state 'nonauth))
 	(eq sieve-manage-state 'auth)
-      (make-variable-buffer-local 'sieve-manage-username)
-      (make-variable-buffer-local 'sieve-manage-password)
+      (make-local-variable 'sieve-manage-username)
+      (make-local-variable 'sieve-manage-password)
       (if user (setq sieve-manage-username user))
       (if passwd (setq sieve-manage-password passwd))
       (if (funcall (nth 2 (assq sieve-manage-auth

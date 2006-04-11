@@ -1,5 +1,6 @@
 ;;; html2text.el --- a simple html to plain text converter
-;; Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+
+;; Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Joakim Hove <hove@phys.ntnu.no>
 
@@ -17,8 +18,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -42,8 +43,42 @@
 (defvar html2text-format-single-element-list '(("hr" . html2text-clean-hr)))
 
 (defvar html2text-replace-list
-  '(("&nbsp;" . " ") ("&gt;" . ">") ("&lt;" . "<") ("&quot;" . "\"")
-    ("&amp;" . "&") ("&apos;" . "'"))
+  '(("&acute;" . "`")
+    ("&amp;" . "&")
+    ("&apos;" . "'")
+    ("&brvbar;" . "|")
+    ("&cent;" . "c")
+    ("&circ;" . "^")
+    ("&copy;" . "(C)")
+    ("&curren;" . "(#)")
+    ("&deg;" . "degree")
+    ("&divide;" . "/")
+    ("&euro;" . "e")
+    ("&frac12;" . "1/2")
+    ("&gt;" . ">")
+    ("&iquest;" . "?")
+    ("&laquo;" . "<<")
+    ("&ldquo" . "\"")
+    ("&lsaquo;" . "(")
+    ("&lsquo;" . "`")
+    ("&lt;" . "<")
+    ("&mdash;" . "--")
+    ("&nbsp;" . " ")
+    ("&ndash;" . "-")
+    ("&permil;" . "%%")
+    ("&plusmn;" . "+-")
+    ("&pound;" . "£")
+    ("&quot;" . "\"")
+    ("&raquo;" . ">>")
+    ("&rdquo" . "\"")
+    ("&reg;" . "(R)")
+    ("&rsaquo;" . ")")
+    ("&rsquo;" . "'")
+    ("&sect;" . "§")
+    ("&sup1;" . "^1")
+    ("&sup2;" . "^2")
+    ("&sup3;" . "^3")
+    ("&tilde;" . "~"))
   "The map of entity to text.
 
 This is an alist were each element is a dotted pair consisting of an
@@ -58,7 +93,7 @@ completely verbatim - without any use of REGEXP.")
 
 This is a list of tags which should be removed, without any
 formatting.  Note that tags in the list are presented *without*
-any \"<\" or \">\".  All occurences of a tag appearing in this
+any \"<\" or \">\".  All occurrences of a tag appearing in this
 list are removed, irrespective of whether it is a closing or
 opening tag, or if the tag has additional attributes.  The
 deletion is done by the function `html2text-remove-tags'.
@@ -373,7 +408,8 @@ formatting, and then moved afterward.")
 fashion, quite close to pure guess-work. It does work in some cases though."
   (interactive)
   (goto-char (point-min))
-  (replace-regexp "^<br>$" "")
+  (while (re-search-forward "^<br>$" nil t)
+    (delete-region (match-beginning 0) (match-end 0)))
   ;; Removing lonely <br> on a single line, if they are left intact we
   ;; dont have any paragraphs at all.
   (goto-char (point-min))

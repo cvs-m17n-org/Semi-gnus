@@ -1,7 +1,7 @@
 ;;; gnus-salt.el --- alternate summary mode interfaces for Gnus
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2001
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -20,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -128,8 +128,7 @@ It accepts the same format specs that `gnus-summary-line-format' does."
       ;; Set up the menu.
       (when (gnus-visual-p 'pick-menu 'menu)
 	(gnus-pick-make-menu-bar))
-      (add-minor-mode 'gnus-pick-mode " Pick" gnus-pick-mode-map
-			   nil 'gnus-pick-mode)
+      (add-minor-mode 'gnus-pick-mode " Pick" gnus-pick-mode-map)
       (gnus-run-hooks 'gnus-pick-mode-hook))))
 
 (defun gnus-pick-setup-message ()
@@ -362,8 +361,7 @@ This must be bound to a button-down mouse event."
       ;; Set up the menu.
       (when (gnus-visual-p 'binary-menu 'menu)
 	(gnus-binary-make-menu-bar))
-      (add-minor-mode 'gnus-binary-mode " Binary"
-			   gnus-binary-mode-map nil 'gnus-binary-mode)
+      (add-minor-mode 'gnus-binary-mode " Binary" gnus-binary-mode-map)
       (gnus-run-hooks 'gnus-binary-mode-hook))))
 
 (defun gnus-binary-display-article (article &optional all-header)
@@ -496,7 +494,7 @@ Two predefined functions are available:
     (gnus-set-work-buffer)
     (gnus-tree-node-insert (make-mail-header "") nil)
     (setq gnus-tree-node-length (1- (point))))
-  (gnus-run-hooks 'gnus-tree-mode-hook))
+  (gnus-run-mode-hooks 'gnus-tree-mode-hook))
 
 (defun gnus-tree-read-summary-keys (&optional arg)
   "Read a summary buffer key sequence and execute it."
@@ -1009,7 +1007,7 @@ The following commands are available:
   (buffer-disable-undo)
   (setq buffer-read-only t)
   (make-local-variable 'gnus-carpal-attached-buffer)
-  (gnus-run-hooks 'gnus-carpal-mode-hook))
+  (gnus-run-mode-hooks 'gnus-carpal-mode-hook))
 
 (defun gnus-carpal-setup-buffer (type)
   (let ((buffer (symbol-value (intern (format "gnus-carpal-%s-buffer" type)))))

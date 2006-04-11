@@ -1,6 +1,7 @@
 ;;; pgg-parse.el --- OpenPGP packet parsing
 
-;; Copyright (C) 1999, 2003 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2002, 2003, 2004, 2005,
+;;   2006 Free Software Foundation, Inc.
 
 ;; Author: Daiki Ueno <ueno@unixuser.org>
 ;; Created: 1999/10/28
@@ -20,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -38,7 +39,7 @@
 (eval-when-compile (require 'cl))
 
 (defgroup pgg-parse ()
-  "OpenPGP packet parsing"
+  "OpenPGP packet parsing."
   :group 'pgg)
 
 (defcustom pgg-parse-public-key-algorithm-alist
@@ -56,7 +57,8 @@
 	  (cons (sexp :tag "Number") (sexp :tag "Type"))))
 
 (defcustom pgg-parse-hash-algorithm-alist
-  '((1 . MD5) (2 . SHA1) (3 . RIPEMD160) (5 . MD2))
+  '((1 . MD5) (2 . SHA1) (3 . RIPEMD160) (5 . MD2) (8 . SHA256) (9 . SHA384)
+    (10 . SHA512))
   "Alist of the assigned number to the cryptographic hash algorithm."
   :group 'pgg-parse
   :type '(repeat
@@ -111,7 +113,7 @@
   `(mapconcat (lambda (c) (format "%02X" (pgg-char-int c)))
 	      ,string "")
   ;; `(upcase (apply #'format "%02x%02x%02x%02x%02x%02x%02x%02x"
-  ;;                 (string-to-int-list ,string)))
+  ;;                 (string-to-number-list ,string)))
   )
 
 (defmacro pgg-parse-time-field (bytes)
@@ -134,7 +136,7 @@
 
 (defmacro pgg-read-bytes (nbytes)
   `(mapcar #'pgg-char-int (pgg-read-bytes-string ,nbytes))
-  ;; `(string-to-int-list (pgg-read-bytes-string ,nbytes))
+  ;; `(string-to-number-list (pgg-read-bytes-string ,nbytes))
   )
 
 (defmacro pgg-read-body-string (ptag)
@@ -144,7 +146,7 @@
 
 (defmacro pgg-read-body (ptag)
   `(mapcar #'pgg-char-int (pgg-read-body-string ,ptag))
-  ;; `(string-to-int-list (pgg-read-body-string ,ptag))
+  ;; `(string-to-number-list (pgg-read-body-string ,ptag))
   )
 
 (defalias 'pgg-skip-bytes 'forward-char)

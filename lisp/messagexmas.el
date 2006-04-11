@@ -1,7 +1,7 @@
 ;;; messagexmas.el --- XEmacs extensions to message
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2003, 2004
-;;      Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2003, 2004,
+;;   2005 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: mail, news
@@ -20,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -38,13 +38,20 @@
 If this variable is nil, Message will try to locate the directory
 automatically.")
 
-(defvar message-use-toolbar (if (featurep 'toolbar)
-				'default-toolbar
-			      nil)
-  "*If nil, do not use a toolbar.
-If it is non-nil, it must be a toolbar.  The five valid values are
-`default-toolbar', `top-toolbar', `bottom-toolbar',
-`right-toolbar', and `left-toolbar'.")
+(defvar message-use-toolbar (if (featurep 'toolbar) 'default)
+  "*Position to display the toolbar.  Nil means do not use a toolbar.
+If it is non-nil, it should be one of the symbols `default', `top',
+`bottom', `right', and `left'.  `default' means to use the default
+toolbar, the rest mean to display the toolbar on the place which those
+names show.")
+
+(defvar message-toolbar-thickness
+  (if (featurep 'toolbar)
+      (cons (specifier-instance default-toolbar-height)
+	    (specifier-instance default-toolbar-width)))
+  "*Cons of the height and the width specifying the thickness of a toolbar.
+The height is used for the toolbar displayed on the top or the bottom,
+the width is used for the toolbar displayed on the right or the left.")
 
 (defvar message-toolbar
   '([message-spell ispell-message t "Spell"]
@@ -60,7 +67,8 @@ If it is non-nil, it must be a toolbar.  The five valid values are
       (nnheader-find-etc-directory package))))
 
 (defun message-xmas-setup-toolbar (bar &optional force package)
-  (let ((dir (message-xmas-find-glyph-directory package))
+  (let ((dir (or (message-xmas-find-glyph-directory package)
+		 (message-xmas-find-glyph-directory "gnus")))
 	(xpm (if (featurep 'xpm) "xpm" "xbm"))
 	icon up down disabled name)
     (unless package
@@ -84,10 +92,48 @@ If it is non-nil, it must be a toolbar.  The five valid values are
     dir))
 
 (defun message-setup-toolbar ()
-  (and message-use-toolbar
-       (message-xmas-setup-toolbar message-toolbar)
-       (set-specifier (symbol-value message-use-toolbar)
-		      (cons (current-buffer) message-toolbar))))
+  (when (featurep 'toolbar)
+    (if (and message-use-toolbar
+	     (message-xmas-setup-toolbar message-toolbar))
+	(let ((bar (or (intern-soft (format "%s-toolbar" message-use-toolbar))
+		       'default-toolbar))
+	      (height (car message-toolbar-thickness))
+	      (width (cdr message-toolbar-thickness))
+	      (cur (current-buffer))
+	      bars)
+	  (set-specifier (symbol-value bar) message-toolbar cur)
+	  (set-specifier default-toolbar-height height cur)
+	  (set-specifier default-toolbar-width width cur)
+	  (set-specifier top-toolbar-height height cur)
+	  (set-specifier bottom-toolbar-height height cur)
+	  (set-specifier right-toolbar-width width cur)
+	  (set-specifier left-toolbar-width width cur)
+	  (if (eq bar 'default-toolbar)
+	      (progn
+		(remove-specifier default-toolbar-visible-p cur)
+		(remove-specifier top-toolbar cur)
+		(remove-specifier top-toolbar-visible-p cur)
+		(remove-specifier bottom-toolbar cur)
+		(remove-specifier bottom-toolbar-visible-p cur)
+		(remove-specifier right-toolbar cur)
+		(remove-specifier right-toolbar-visible-p cur)
+		(remove-specifier left-toolbar cur)
+		(remove-specifier left-toolbar-visible-p cur))
+	    (set-specifier (symbol-value (intern (format "%s-visible-p" bar)))
+			   t cur)
+	    (setq bars (delq bar (list 'default-toolbar
+				       'bottom-toolbar 'top-toolbar
+				       'right-toolbar 'left-toolbar)))
+	    (while bars
+	      (set-specifier (symbol-value (intern (format "%s-visible-p"
+							   (pop bars))))
+			     nil cur))))
+      (let ((cur (current-buffer)))
+	(set-specifier default-toolbar-visible-p nil cur)
+	(set-specifier top-toolbar-visible-p nil cur)
+	(set-specifier bottom-toolbar-visible-p nil cur)
+	(set-specifier right-toolbar-visible-p nil cur)
+	(set-specifier left-toolbar-visible-p nil cur)))))
 
 (defun message-xmas-exchange-point-and-mark ()
   "Exchange point and mark, but allow for XEmacs' optional argument."

@@ -1,6 +1,7 @@
 ;;; nnfolder.el --- mail folder access for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org> (adding MARKS)
 ;;      ShengHuo Zhu <zsh@cs.rochester.edu> (adding NOV)
@@ -23,8 +24,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -200,7 +201,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 		       ((search-backward (concat "\n" nnfolder-article-marker)
 					 nil t)
 			(goto-char (match-end 0))
-			(setq num (string-to-int
+			(setq num (string-to-number
 				   (buffer-substring
 				    (point) (point-at-eol))))
 			(goto-char start)
@@ -210,7 +211,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 		      (search-forward (concat "\n" nnfolder-article-marker)
 				      nil t)
 		      (progn
-			(setq num (string-to-int
+			(setq num (string-to-number
 				   (buffer-substring
 				    (point) (point-at-eol))))
 			(> num article))
@@ -285,7 +286,7 @@ the group.  Then the marks file will be regenerated properly by Gnus.")
 	    (cons nnfolder-current-group
 		  (if (search-forward (concat "\n" nnfolder-article-marker)
 				      nil t)
-		      (string-to-int (buffer-substring
+		      (string-to-number (buffer-substring
 				      (point) (point-at-eol)))
 		    -1))))))))
 
@@ -825,7 +826,7 @@ deleted.  Point is left where the deleted region was."
       (insert "\n"))
     (forward-char -1)
     (insert (format (concat nnfolder-article-marker "%d   %s\n")
-		    (cdr group-art) (current-time-string)))))
+		    (cdr group-art) (message-make-date)))))
 
 (defun nnfolder-active-number (group)
   ;; Find the next article number in GROUP.
@@ -875,6 +876,7 @@ deleted.  Point is left where the deleted region was."
 			 nnfolder-file-coding-system))
 		    (nnheader-find-file-noselect file t)))))
     (mm-enable-multibyte) ;; Use multibyte buffer for future copying.
+    (buffer-disable-undo)
     (if (equal (cadr (assoc group nnfolder-scantime-alist))
 	       (nth 5 (file-attributes file)))
 	;; This looks up-to-date, so we don't do any scanning.
@@ -901,7 +903,6 @@ deleted.  Point is left where the deleted region was."
 	      maxid start end newscantime
 	      novbuf articles newnum
 	      buffer-read-only)
-	  (buffer-disable-undo)
 	  (setq maxid (cdr active))
 
 	  (unless (or gnus-nov-is-evil nnfolder-nov-is-evil
@@ -1070,7 +1071,8 @@ This command does not work if you use short group names."
     (gnus-make-directory (file-name-directory (buffer-file-name)))
     (let ((coding-system-for-write
 	   (or nnfolder-file-coding-system-for-write
-	       nnfolder-file-coding-system)))
+	       nnfolder-file-coding-system))
+	  (copyright-update nil))
       (save-buffer)))
   (unless (or gnus-nov-is-evil nnfolder-nov-is-evil)
     (nnfolder-save-nov)))

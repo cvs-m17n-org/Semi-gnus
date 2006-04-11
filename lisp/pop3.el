@@ -1,7 +1,7 @@
 ;;; pop3.el --- Post Office Protocol (RFC 1460) interface
 
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Richard L. Pieri <ratinox@peorth.gweep.net>
 ;; Maintainer: FSF
@@ -21,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -38,7 +38,7 @@
 (require 'mail-utils)
 
 (defgroup pop3 nil
-  "Post Office Protocol"
+  "Post Office Protocol."
   :group 'mail
   :group 'mail-source)
 
@@ -75,11 +75,11 @@
 
 (defcustom pop3-authentication-scheme 'pass
   "*POP3 authentication scheme.
-Defaults to 'pass, for the standard USER/PASS authentication.  Other valid
-values are 'apop."
-  :version "22.1" ;; Oort Gnus
-  :type '(choice (const :tag "USER/PASS" pass)
+Defaults to `pass', for the standard USER/PASS authentication.  The other
+valid value is 'apop'."
+  :type '(choice (const :tag "Normal user/password" pass)
 		 (const :tag "APOP" apop))
+  :version "22.1" ;; Oort Gnus
   :group 'pop3)
 
 (defcustom pop3-leave-mail-on-server nil
@@ -166,11 +166,9 @@ Shorter values mean quicker response, but are more CPU intensive.")
           (unless pop3-leave-mail-on-server
             (pop3-dele process n))
 	  (setq n (+ 1 n))
-	  (if pop3-debug (sit-for 1) (sit-for 0.1))
-	  )
+	  (if pop3-debug (sit-for 1) (sit-for 0.1))) ; why?
       (pop3-quit process))
-    (kill-buffer crashbuf)
-    )
+    (kill-buffer crashbuf))
   t)
 
 (defun pop3-get-message-count ()
@@ -194,6 +192,23 @@ Shorter values mean quicker response, but are more CPU intensive.")
     (pop3-quit process)
     message-count))
 
+(autoload 'open-tls-stream "tls")
+(autoload 'starttls-open-stream "starttls")
+(autoload 'starttls-negotiate "starttls") ; avoid warning
+
+(defcustom pop3-stream-type nil
+  "*Transport security type for POP3 connexions.
+This may be either nil (plain connexion), `ssl' (use an
+SSL/TSL-secured stream) or `starttls' (use the starttls mechanism
+to turn on TLS security after opening the stream).  However, if
+this is nil, `ssl' is assumed for connexions to port
+995 (pop3s)."
+  :version "23.0" ;; No Gnus
+  :group 'pop3
+  :type '(choice (const :tag "Plain" nil)
+		 (const :tag "SSL/TLS" ssl)
+		 (const starttls)))
+
 (defun pop3-open-server (mailhost port)
   "Open TCP connection to MAILHOST on PORT.
 Returns the process associated with the connection."
@@ -205,7 +220,44 @@ Returns the process associated with the connection."
 					     mailhost)))
       (erase-buffer)
       (setq pop3-read-point (point-min))
-      (setq process (open-network-stream "POP" (current-buffer) mailhost port))
+      (setq process
+	    (cond
+	     ((or (eq pop3-stream-type 'ssl)
+		  (and (not pop3-stream-type) (member port '(995 "pop3s"))))
+	      ;; gnutls-cli, openssl don't accept service names
+	      (if (or (equal port "pop3s")
+		      (null port))
+		  (setq port 995))
+	      (let ((process (open-tls-stream "POP" (current-buffer)
+					      mailhost port)))
+		(when process
+		  ;; There's a load of info printed that needs deleting.
+		  (while (when (memq (process-status process) '(open run))
+			   (pop3-accept-process-output process)
+			   (goto-char (point-max))
+			   (forward-line -1)
+			   (if (looking-at "\\+OK")
+			       (progn
+				 (delete-region (point-min) (point))
+				 nil)
+			     (pop3-quit process)
+			     (error "POP SSL connexion failed"))))
+		  process)))
+	     ((eq pop3-stream-type 'starttls)
+	      ;; gnutls-cli, openssl don't accept service names
+	      (if (equal port "pop3")
+		  (setq port 110))
+	      (let ((process (starttls-open-stream "POP" (current-buffer)
+						   mailhost (or port 110))))
+		(pop3-send-command process "STLS")
+		(let ((response (pop3-read-response process t)))
+		  (if (and response (string-match "+OK" response))
+		      (starttls-negotiate process)
+		    (pop3-quit process)
+		    (error "POP server doesn't support starttls")))
+		process))
+	     (t 
+	      (open-network-stream "POP" (current-buffer) mailhost port))))
       (let ((response (pop3-read-response process t)))
 	(setq pop3-timestamp
 	      (substring response (or (string-match "<" response) 0)
@@ -312,6 +364,8 @@ If NOW, use that time instead."
 	    ;; Date: 08 Jul 1996 23:22:24 -0400
 	    ;; should be
 	    ;; Tue Jul 9 09:04:21 1996
+
+	    ;; Fixme: This should use timezone on the date field contents.
 	    (setq date
 		  (cond ((not date)
 			 "Tue Jan 1 00:00:0 1900")
@@ -353,7 +407,7 @@ If NOW, use that time instead."
   (pop3-send-command process (format "USER %s" user))
   (let ((response (pop3-read-response process t)))
     (if (not (and response (string-match "+OK" response)))
-	(error (format "USER %s not valid" user)))))
+	(error "USER %s not valid" user))))
 
 (defun pop3-pass (process)
   "Send authentication information to the server."
@@ -369,7 +423,7 @@ If NOW, use that time instead."
 	(setq pass
 	      (read-passwd (format "Password for %s: " pop3-maildrop))))
     (if pass
-	(let ((hash (md5 (concat pop3-timestamp pass))))
+	(let ((hash (md5 (concat pop3-timestamp pass) nil nil 'binary)))
 	  (pop3-send-command process (format "APOP %s %s" user hash))
 	  (let ((response (pop3-read-response process t)))
 	    (if (not (and response (string-match "+OK" response)))
@@ -382,8 +436,8 @@ If NOW, use that time instead."
   "Return the number of messages in the maildrop and the maildrop's size."
   (pop3-send-command process "STAT")
   (let ((response (pop3-read-response process t)))
-    (list (string-to-int (nth 1 (split-string response " ")))
-	  (string-to-int (nth 2 (split-string response " "))))
+    (list (string-to-number (nth 1 (split-string response " ")))
+	  (string-to-number (nth 2 (split-string response " "))))
     ))
 
 (defun pop3-list (process &optional msg)
@@ -433,7 +487,7 @@ This function currently does nothing.")
   "Return highest accessed message-id number for the session."
   (pop3-send-command process "LAST")
   (let ((response (pop3-read-response process t)))
-    (string-to-int (nth 1 (split-string response " ")))
+    (string-to-number (nth 1 (split-string response " ")))
     ))
 
 (defun pop3-rset (process)
@@ -479,6 +533,13 @@ and close the connection."
 ;;  +OK [maildrop locked and ready]
 ;;  -ERR [invalid password]
 ;;  -ERR [unable to lock maildrop]
+
+;; STLS      (RFC 2595)
+;; Arguments: none
+;; Restrictions: Only permitted in AUTHORIZATION state.
+;; Possible responses:
+;;  +OK
+;;  -ERR
 
 ;;; TRANSACTION STATE
 

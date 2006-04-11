@@ -1,6 +1,7 @@
 ;;; mm-uu.el --- Return uu stuff as mm handles
-;; Copyright (c) 1998, 1999, 2000, 2001, 2002, 2003, 2004
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: postscript uudecode binhex shar forward gnatsweb pgp
@@ -19,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -76,12 +77,22 @@ decoder, such as hexbin."
   "The default disposition of uu parts.
 This can be either \"inline\" or \"attachment\".")
 
-(defvar mm-uu-emacs-sources-regexp "gnu\\.emacs\\.sources"
-  "The regexp of Emacs sources groups.")
-
-(defcustom mm-uu-diff-groups-regexp "gnus\\.commits"
-  "*Regexp matching diff groups."
+(defcustom mm-uu-emacs-sources-regexp "\\.emacs\\.sources"
+  "The regexp of Emacs sources groups."
   :version "22.1"
+  :type 'regexp
+  :group 'gnus-article-mime)
+
+(defcustom mm-uu-diff-groups-regexp
+  "\\(gmane\\|gnu\\)\\..*\\(diff\\|commit\\|cvs\\|bug\\|devel\\)"
+  "Regexp matching diff groups."
+  :version "22.1"
+  :type 'regexp
+  :group 'gnus-article-mime)
+
+(defcustom mm-uu-tex-groups-regexp "\\.tex\\>"
+  "*Regexp matching TeX groups."
+  :version "23.0"
   :type 'regexp
   :group 'gnus-article-mime)
 
@@ -91,13 +102,13 @@ This can be either \"inline\" or \"attachment\".")
      "^%%EOF$"
      mm-uu-postscript-extract
      nil)
-    (uu
+    (uu ;; Maybe we should have a more strict test here.
      "^begin[ \t]+0?[0-7][0-7][0-7][ \t]+"
      "^end[ \t]*$"
      mm-uu-uu-extract
      mm-uu-uu-filename)
     (binhex
-     "^:...............................................................$"
+     "^:.\\{63,63\\}$"
      ":$"
      mm-uu-binhex-extract
      nil
@@ -112,8 +123,8 @@ This can be either \"inline\" or \"attachment\".")
      "^exit 0$"
      mm-uu-shar-extract)
     (forward
-;;; Thanks to Edward J. Sabol <sabol@alderaan.gsfc.nasa.gov> and
-;;; Peter von der Ah\'e <pahe@daimi.au.dk>
+     ;; Thanks to Edward J. Sabol <sabol@alderaan.gsfc.nasa.gov> and
+     ;; Peter von der Ah\'e <pahe@daimi.au.dk>
      "^-+ \\(Start of \\)?Forwarded message"
      "^-+ End \\(of \\)?forwarded message"
      mm-uu-forward-extract
@@ -152,7 +163,40 @@ This can be either \"inline\" or \"attachment\".")
      nil
      mm-uu-diff-extract
      nil
-     mm-uu-diff-test)))
+     mm-uu-diff-test)
+    (message-marks
+     ;; Text enclosed with tags similar to `message-mark-insert-begin' and
+     ;; `message-mark-insert-end'.  Don't use those variables to avoid
+     ;; dependency on `message.el'.
+     "^-+[8<>]*-\\{9,\\}[a-z ]+-\\{9,\\}[a-z ]+-\\{9,\\}[8<>]*-+$"
+     "^-+[8<>]*-\\{9,\\}[a-z ]+-\\{9,\\}[a-z ]+-\\{9,\\}[8<>]*-+$"
+     (lambda () (mm-uu-verbatim-marks-extract 0 -1 1 -1))
+     nil)
+    ;; Omitting [a-z8<] leads to false positives (bogus signature separators
+    ;; and mailing list banners).
+    (insert-marks
+     "^ *\\(-\\|_\\)\\{30,\\}.*[a-z8<].*\\(-\\|_\\)\\{30,\\} *$"
+     "^ *\\(-\\|_\\)\\{30,\\}.*[a-z8<].*\\(-\\|_\\)\\{30,\\} *$"
+     (lambda () (mm-uu-verbatim-marks-extract 0 0 1 -1))
+     nil)
+    (verbatim-marks
+     ;; slrn-style verbatim marks, see
+     ;; http://www.slrn.org/manual/slrn-manual-6.html#ss6.81
+     "^#v\\+"
+     "^#v\\-$"
+     (lambda () (mm-uu-verbatim-marks-extract 0 0 1 -1))
+     nil)
+    (LaTeX
+     "^\\([\\\\%][^\n]+\n\\)*\\\\documentclass.*[[{%]"
+     "^\\\\end{document}"
+     mm-uu-latex-extract
+     nil
+     mm-uu-latex-test))
+  "A list of specifications for non-MIME attachments.
+Each element consist of the following entries: label,
+start-regexp, end-regexp, extract-function, test-function.
+
+After modifying this list you must run \\[mm-uu-configure].")
 
 (defcustom mm-uu-configure-list '((shar . disabled))
   "A list of mm-uu configuration.
@@ -188,24 +232,66 @@ To disable dissecting shar codes, for instance, add
 (defsubst mm-uu-function-2 (entry)
   (nth 5 entry))
 
-(defun mm-uu-copy-to-buffer (&optional from to)
+;; In Emacs 22, we could use `min-colors' in the face definition.  But Emacs
+;; 21 and XEmacs don't support it.
+(defcustom mm-uu-hide-markers
+  (< 16 (or (and (fboundp 'defined-colors)
+		 (length (defined-colors)))
+	    (and (fboundp 'device-color-cells)
+		 (device-color-cells))
+	    0))
+  "If non-nil, hide verbatim markers.
+The value should be nil on displays where the face
+`mm-uu-extract' isn't distinguishable to the face `default'."
+  :type '(choice (const :tag "Hide" t)
+		 (const :tag "Don't hide" nil))
+  :version "23.0" ;; No Gnus
+  :group 'gnus-article-mime)
+
+(defface mm-uu-extract '(;; Colors from `gnus-cite-3' plus background:
+			 (((class color)
+			   (background dark))
+			  (:foreground "light yellow"
+			   :background "dark green"))
+			 (((class color)
+			   (background light))
+			  (:foreground "dark green"
+			   :background "light yellow"))
+			 (t
+			  ()))
+  "Face for extracted buffers."
+  ;; See `mm-uu-verbatim-marks-extract'.
+  :version "23.0" ;; No Gnus
+  :group 'gnus-article-mime)
+
+(defun mm-uu-copy-to-buffer (&optional from to properties)
   "Copy the contents of the current buffer to a fresh buffer.
-Return that buffer."
-  (save-excursion
-    (let ((obuf (current-buffer))
-	  (coding-system
-	   ;; Might not exist in non-MULE XEmacs
-	   (when (boundp 'buffer-file-coding-system)
-	     buffer-file-coding-system)))
-      (set-buffer (generate-new-buffer " *mm-uu*"))
+Return that buffer.
+
+If PROPERTIES is non-nil, PROPERTIES are applied to the buffer,
+see `set-text-properties'.  If PROPERTIES equals t, this means to
+apply the face `mm-uu-extract'."
+  (let ((obuf (current-buffer))
+        (coding-system
+         ;; Might not exist in non-MULE XEmacs
+         (when (boundp 'buffer-file-coding-system)
+           buffer-file-coding-system)))
+    (with-current-buffer (generate-new-buffer " *mm-uu*")
       (setq buffer-file-coding-system coding-system)
       (insert-buffer-substring obuf from to)
+      (cond ((eq properties  t)
+	     (set-text-properties (point-min) (point-max)
+				  '(face mm-uu-extract)))
+	    (properties
+	     (set-text-properties (point-min) (point-max) properties)))
       (current-buffer))))
 
 (defun mm-uu-configure-p  (key val)
   (member (cons key val) mm-uu-configure-list))
 
 (defun mm-uu-configure (&optional symbol value)
+  "Configure detection of non-MIME attachments."
+  (interactive)
   (if symbol (set-default symbol value))
   (setq mm-uu-beginning-regexp nil)
   (mapcar (lambda (entry)
@@ -253,9 +339,38 @@ Return that buffer."
   (mm-make-handle (mm-uu-copy-to-buffer start-point end-point)
 		  '("application/postscript")))
 
+(defun mm-uu-verbatim-marks-extract (start-offset end-offset
+						  &optional
+						  start-hide
+						  end-hide)
+  (let ((start (or (and mm-uu-hide-markers
+			start-hide)
+		   start-offset
+		   1))
+	(end   (or (and mm-uu-hide-markers
+			end-hide)
+		   end-offset
+		   -1)))
+    (mm-make-handle
+     (mm-uu-copy-to-buffer
+      (progn (goto-char start-point)
+	     (forward-line start)
+	     (point))
+      (progn (goto-char end-point)
+	   (forward-line end)
+	   (point))
+      t)
+     '("text/x-verbatim" (charset . gnus-decoded)))))
+
+(defun mm-uu-latex-extract ()
+  (mm-make-handle
+   (mm-uu-copy-to-buffer start-point end-point t)
+   ;; application/x-tex?
+   '("text/x-verbatim" (charset . gnus-decoded))))
+
 (defun mm-uu-emacs-sources-extract ()
   (mm-make-handle (mm-uu-copy-to-buffer start-point end-point)
-		  '("application/emacs-lisp")
+		  '("application/emacs-lisp" (charset . gnus-decoded))
 		  nil nil
 		  (list mm-dissect-disposition
 			(cons 'filename file-name))))
@@ -271,12 +386,17 @@ Return that buffer."
 
 (defun mm-uu-diff-extract ()
   (mm-make-handle (mm-uu-copy-to-buffer start-point end-point)
-		  '("text/x-patch")))
+		  '("text/x-patch" (charset . gnus-decoded))))
 
 (defun mm-uu-diff-test ()
   (and gnus-newsgroup-name
        mm-uu-diff-groups-regexp
        (string-match mm-uu-diff-groups-regexp gnus-newsgroup-name)))
+
+(defun mm-uu-latex-test ()
+  (and gnus-newsgroup-name
+       mm-uu-tex-groups-regexp
+       (string-match mm-uu-tex-groups-regexp gnus-newsgroup-name)))
 
 (defun mm-uu-forward-extract ()
   (mm-make-handle (mm-uu-copy-to-buffer
@@ -453,7 +573,8 @@ value of `mm-uu-text-plain-type'."
        (t (goto-char (point-max))))
       (setq text-start (point))
       (while (re-search-forward mm-uu-beginning-regexp nil t)
-	(setq start-point (match-beginning 0))
+	(setq start-point (match-beginning 0)
+	      entry nil)
 	(let ((alist mm-uu-type-alist)
 	      (beginning-regexp (match-string 0)))
 	  (while (not entry)
@@ -498,26 +619,69 @@ value of `mm-uu-text-plain-type'."
 	(setq result (cons "multipart/mixed" (nreverse result))))
       result)))
 
-(defun mm-uu-dissect-text-parts (handle)
-  "Dissect text parts and put uu handles into HANDLE."
-  (let ((buffer (mm-handle-buffer handle))
-	type children)
+;;;###autoload
+(defun mm-uu-dissect-text-parts (handle &optional decoded)
+  "Dissect text parts and put uu handles into HANDLE.
+Assume text has been decoded if DECODED is non-nil."
+  (let ((buffer (mm-handle-buffer handle)))
     (cond ((stringp buffer)
-	   (mapc 'mm-uu-dissect-text-parts (cdr handle)))
+	   (dolist (elem (cdr handle))
+	     (mm-uu-dissect-text-parts elem decoded)))
 	  ((bufferp buffer)
-	   (when (and (setq type (mm-handle-media-type handle))
-		      (stringp type)
-		      (string-match "\\`text/" type)
-		      (with-current-buffer buffer
-			(setq children
-			      (mm-uu-dissect t (mm-handle-type handle)))))
-	     (kill-buffer buffer)
-	     (setcar handle (car children))
-	     (setcdr handle (cdr children))))
+	   (let ((type (mm-handle-media-type handle))
+		 (case-fold-search t) ;; string-match
+		 children charset encoding)
+	     (when (and
+		    (stringp type)
+		    ;; Mutt still uses application/pgp even though
+		    ;; it has already been withdrawn.
+		    (string-match "\\`text/\\|\\`application/pgp\\'" type)
+		    (setq
+		     children
+		     (with-current-buffer buffer
+		       (cond
+			((or decoded
+			     (eq (setq charset (mail-content-type-get
+						(mm-handle-type handle)
+						'charset))
+				 'gnus-decoded))
+			 (setq decoded t)
+			 (mm-uu-dissect
+			  t (cons type '((charset . gnus-decoded)))))
+			(charset
+			 (setq decoded t)
+			 (mm-with-multibyte-buffer
+			   (insert (mm-decode-string (mm-get-part handle)
+						     charset))
+			   (mm-uu-dissect
+			    t (cons type '((charset . gnus-decoded))))))
+			((setq encoding (mm-handle-encoding handle))
+			 (setq decoded nil)
+			 ;; Inherit the multibyteness of the `buffer'.
+			 (with-temp-buffer
+			   (insert-buffer-substring buffer)
+			   (mm-decode-content-transfer-encoding
+			    encoding type)
+			   (mm-uu-dissect t (list type))))
+			(t
+			 (setq decoded nil)
+			 (mm-uu-dissect t (list type)))))))
+	       ;; Ignore it if a given part is dissected into a single
+	       ;; part of which the type is the same as the given one.
+	       (if (and (<= (length children) 2)
+			(string-equal (mm-handle-media-type (cadr children))
+				      type))
+		   (kill-buffer (mm-handle-buffer (cadr children)))
+		 (kill-buffer buffer)
+		 (setcdr handle (cdr children))
+		 (setcar handle (car children)) ;; "multipart/mixed"
+		 (dolist (elem (cdr children))
+		   (mm-uu-dissect-text-parts elem decoded))))))
 	  (t
-	   (mapc 'mm-uu-dissect-text-parts handle)))))
+	   (dolist (elem handle)
+	     (mm-uu-dissect-text-parts elem decoded))))))
 
 (provide 'mm-uu)
 
-;;; arch-tag: 7db076bf-53db-4320-aa19-ca76a1d2ab2c
+;; arch-tag: 7db076bf-53db-4320-aa19-ca76a1d2ab2c
 ;;; mm-uu.el ends here

@@ -1,6 +1,7 @@
 ;;; nndoc.el --- single file access for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -20,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -421,7 +422,7 @@ from the document.")
 	       (search-forward "\n\n" beg t)
 	       (re-search-backward
 		"^Content-Length:[ \t]*\\([0-9]+\\) *$" end t)
-	       (setq len (string-to-int (match-string 1)))
+	       (setq len (string-to-number (match-string 1)))
 	       (search-forward "\n\n" beg t)
 	       (unless (= (setq len (+ (point) len)) (point-max))
 		 (and (< len (point-max))
@@ -444,7 +445,7 @@ from the document.")
 (defun nndoc-rnews-body-end ()
   (and (re-search-backward nndoc-article-begin nil t)
        (forward-line 1)
-       (goto-char (+ (point) (string-to-int (match-string 1))))))
+       (goto-char (+ (point) (string-to-number (match-string 1))))))
 
 (defun nndoc-babyl-type-p ()
   (when (re-search-forward "\^_\^L *\n" nil t)

@@ -1,6 +1,7 @@
 ;;; mm-decode.el --- Functions for decoding MIME things
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -18,8 +19,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -34,7 +35,10 @@
 (eval-and-compile
   (autoload 'mm-inline-partial "mm-partial")
   (autoload 'mm-inline-external-body "mm-extern")
+  (autoload 'mm-extern-cache-contents "mm-extern")
   (autoload 'mm-insert-inline "mm-view"))
+
+(defvar gnus-current-window-configuration)
 
 (add-hook 'gnus-exit-gnus-hook 'mm-destroy-postponed-undisplay-list)
 
@@ -218,7 +222,12 @@ before the external MIME handler is invoked."
     ("text/richtext" mm-inline-text identity)
     ("text/x-patch" mm-display-patch-inline
      (lambda (handle)
-       (locate-library "diff-mode")))
+       ;; If the diff-mode.el package is installed, the function is
+       ;; autoloaded.  Checking (locate-library "diff-mode") would be trying
+       ;; to cater to broken installations.  OTOH checking the function
+       ;; makes it possible to install another package which provides an
+       ;; alternative implementation of diff-mode.  --Stef
+       (fboundp 'diff-mode)))
     ("application/emacs-lisp" mm-display-elisp-inline identity)
     ("application/x-emacs-lisp" mm-display-elisp-inline identity)
     ("text/dns" mm-display-dns-inline identity)
@@ -271,11 +280,13 @@ before the external MIME handler is invoked."
     "application/x-emacs-lisp"
     "application/pgp-signature" "application/x-pkcs7-signature"
     "application/pkcs7-signature" "application/x-pkcs7-mime"
-    "application/pkcs7-mime")
+    "application/pkcs7-mime"
+    ;; Mutt still uses this even though it has already been withdrawn.
+    "application/pgp")
   "List of media types that are to be displayed inline.
 See also `mm-inline-media-tests', which says how to display a media
 type inline."
-  :type '(repeat string)
+  :type '(repeat regexp)
   :group 'mime-display)
 
 (defcustom mm-keep-viewer-alive-types
@@ -284,19 +295,21 @@ type inline."
   "List of media types for which the external viewer will not be killed
 when selecting a different article."
   :version "22.1"
-  :type '(repeat string)
+  :type '(repeat regexp)
   :group 'mime-display)
 
 (defcustom mm-automatic-display
-  '("text/plain" "text/enriched" "text/richtext" "text/html"
+  '("text/plain" "text/enriched" "text/richtext" "text/html" "text/x-verbatim"
     "text/x-vcard" "image/.*" "message/delivery-status" "multipart/.*"
     "message/rfc822" "text/x-patch" "text/dns" "application/pgp-signature"
     "application/emacs-lisp" "application/x-emacs-lisp"
     "application/x-pkcs7-signature"
     "application/pkcs7-signature" "application/x-pkcs7-mime"
-    "application/pkcs7-mime")
+    "application/pkcs7-mime"
+    ;; Mutt still uses this even though it has already been withdrawn.
+    "application/pgp")
   "A list of MIME types to be displayed automatically."
-  :type '(repeat string)
+  :type '(repeat regexp)
   :group 'mime-display)
 
 (defcustom mm-attachment-override-types '("text/x-vcard"
@@ -305,17 +318,17 @@ when selecting a different article."
 					  "application/pkcs7-signature"
 					  "application/x-pkcs7-signature")
   "Types to have \"attachment\" ignored if they can be displayed inline."
-  :type '(repeat string)
+  :type '(repeat regexp)
   :group 'mime-display)
 
 (defcustom mm-inline-override-types nil
   "Types to be treated as attachments even if they can be displayed inline."
-  :type '(repeat string)
+  :type '(repeat regexp)
   :group 'mime-display)
 
 (defcustom mm-automatic-external-display nil
   "List of MIME type regexps that will be displayed externally automatically."
-  :type '(repeat string)
+  :type '(repeat regexp)
   :group 'mime-display)
 
 (defcustom mm-discouraged-alternatives nil
@@ -327,8 +340,13 @@ for instance, text/html parts are very unwanted, and text/richtext are
 somewhat unwanted, then the value of this variable should be set
 to:
 
- (\"text/html\" \"text/richtext\")"
-  :type '(repeat string)
+ (\"text/html\" \"text/richtext\")
+
+Adding \"image/.*\" might also be useful.  Spammers use it as the
+prefered part of multipart/alternative messages.  See also
+`gnus-buttonized-mime-types', to which adding \"multipart/alternative\"
+enables you to choose manually one of two types those mails include."
+  :type '(repeat regexp) ;; See `mm-preferred-alternative-precedence'.
   :group 'mime-display)
 
 (defcustom mm-tmp-directory
@@ -448,20 +466,18 @@ If not set, `default-directory' will be used."
 (defvar mm-viewer-completion-map
   (let ((map (make-sparse-keymap 'mm-viewer-completion-map)))
     (set-keymap-parent map minibuffer-local-completion-map)
+    ;; Should we bind other key to minibuffer-complete-word?
+    (define-key map " " 'self-insert-command)
     map)
   "Keymap for input viewer with completion.")
-
-;; Should we bind other key to minibuffer-complete-word?
-(define-key mm-viewer-completion-map " " 'self-insert-command)
 
 (defvar mm-viewer-completion-map
   (let ((map (make-sparse-keymap 'mm-viewer-completion-map)))
     (set-keymap-parent map minibuffer-local-completion-map)
+    ;; Should we bind other key to minibuffer-complete-word?
+    (define-key map " " 'self-insert-command)
     map)
   "Keymap for input viewer with completion.")
-
-;; Should we bind other key to minibuffer-complete-word?
-(define-key mm-viewer-completion-map " " 'self-insert-command)
 
 ;;; The functions.
 
@@ -519,13 +535,13 @@ Postpone undisplaying of viewers for types in
 		  loose-mime
 		  (mail-fetch-field "mime-version"))
 	  (setq ct (mail-fetch-field "content-type")
-		ctl (ignore-errors (mail-header-parse-content-type ct))
+		ctl (and ct (mail-header-parse-content-type ct))
 		cte (mail-fetch-field "content-transfer-encoding")
 		cd (mail-fetch-field "content-disposition")
 		description (mail-fetch-field "content-description")
 		id (mail-fetch-field "content-id"))
 	  (unless from
-		(setq from (mail-fetch-field "from")))
+	    (setq from (mail-fetch-field "from")))
 	  ;; FIXME: In some circumstances, this code is running within
 	  ;; an unibyte macro.  mail-extract-address-components
 	  ;; creates unibyte buffers. This `if', though not a perfect
@@ -538,7 +554,7 @@ Postpone undisplaying of viewers for types in
 	   (list mm-dissect-default-type)
 	   (and cte (intern (downcase (mail-header-strip cte))))
 	   no-strict-mime
-	   (and cd (ignore-errors (mail-header-parse-content-disposition cd)))
+	   (and cd (mail-header-parse-content-disposition cd))
 	   description)
 	(setq type (split-string (car ctl) "/"))
 	(setq subtype (cadr type)
@@ -557,7 +573,7 @@ Postpone undisplaying of viewers for types in
 	     ;; what really needs to be done here is a way to link a
 	     ;; MIME handle back to it's parent MIME handle (in a multilevel
 	     ;; MIME article).  That would probably require changing
-	     ;; the mm-handle API so we simply store the multipart buffert
+	     ;; the mm-handle API so we simply store the multipart buffer
 	     ;; name as a text property of the "multipart/whatever" string.
 	     (add-text-properties 0 (length (car ctl))
 				  (list 'buffer (mm-copy-to-buffer)
@@ -571,8 +587,7 @@ Postpone undisplaying of viewers for types in
 	     ctl
 	     (and cte (intern (downcase (mail-header-strip cte))))
 	     no-strict-mime
-	     (and cd (ignore-errors
-		       (mail-header-parse-content-disposition cd)))
+	     (and cd (mail-header-parse-content-disposition cd))
 	     description id)
 	    ctl))))
 	(when id
@@ -749,7 +764,18 @@ external if displayed external."
 			  (gnus-map-function mm-file-name-rewrite-functions
 					     (file-name-nondirectory filename))
 			  dir))
-	    (setq file (mm-make-temp-file (expand-file-name "mm." dir))))
+	    ;; Use nametemplate (defined in RFC1524) if it is specified
+	    ;; in mailcap.
+	    (let ((suffix (cdr (assoc "nametemplate" mime-info))))
+	      (if (and suffix
+		       (string-match "\\`%s\\(\\..+\\)\\'" suffix))
+		  (setq suffix (match-string 1 suffix))
+		;; Otherwise, use a suffix according to
+		;; `mailcap-mime-extensions'.
+		(setq suffix (car (rassoc (mm-handle-media-type handle)
+					  mailcap-mime-extensions))))
+	      (setq file (mm-make-temp-file (expand-file-name "mm." dir)
+					    nil suffix))))
 	  (let ((coding-system-for-write mm-binary-coding-system))
 	    (write-region (point-min) (point-max) file nil 'nomesg))
 	  (message "Viewing with %s" method)
@@ -798,8 +824,7 @@ external if displayed external."
 				   (mm-mailcap-command
 				    method file (mm-handle-type handle)))
 		     (if (buffer-live-p buffer)
-			 (save-excursion
-			   (set-buffer buffer)
+			 (with-current-buffer buffer
 			   (buffer-string))))
 		 (progn
 		   (ignore-errors (delete-file file))
@@ -808,14 +833,52 @@ external if displayed external."
 		   (ignore-errors (kill-buffer buffer))))))
 	    'inline)
 	   (t
+	    ;; Deleting the temp file should be postponed for some wrappers,
+	    ;; shell scripts, and so on, which might exit right after having
+	    ;; started a viewer command as a background job.
 	    (let ((command (mm-mailcap-command
 			    method file (mm-handle-type handle))))
 	      (unwind-protect
-		  (start-process "*display*"
-				 (setq buffer
-				       (generate-new-buffer " *mm*"))
-				 shell-file-name
-				 shell-command-switch command)
+		  (progn
+		    (start-process "*display*"
+				   (setq buffer
+					 (generate-new-buffer " *mm*"))
+				   shell-file-name
+				   shell-command-switch command)
+		    (set-process-sentinel
+		     (get-buffer-process buffer)
+		     (lexical-let ;; Don't use `let'.
+			 ;; Function used to remove temp file and directory.
+			 ((fn `(lambda nil
+				 ;; Don't use `ignore-errors'.
+				 (condition-case nil
+				     (delete-file ,file)
+				   (error))
+				 (condition-case nil
+				     (delete-directory
+				      ,(file-name-directory file))
+				   (error))))
+			  ;; Form uses to kill the process buffer and
+			  ;; remove the undisplayer.
+			  (fm `(progn
+				 (kill-buffer ,buffer)
+				 ,(macroexpand
+				   (list 'mm-handle-set-undisplayer
+					 (list 'quote handle)
+					 nil))))
+			  ;; Message to be issued when the process exits.
+			  (done (format "Displaying %s...done" command))
+			  ;; In particular, the timer object (which is
+			  ;; a vector in Emacs but is a list in XEmacs)
+			  ;; requires that it is lexically scoped.
+			  (timer (run-at-time 2.0 nil 'ignore)))
+		       (lambda (process state)
+			 (when (eq 'exit (process-status process))
+			   (if (memq timer timer-list)
+			       (timer-set-function timer fn)
+			     (funcall fn))
+			   (ignore-errors (eval fm))
+			   (message "%s" done))))))
 		(mm-handle-set-external-undisplayer
 		 handle (cons file buffer)))
 	      (message "Displaying %s..." command))
@@ -1014,23 +1077,54 @@ external if displayed external."
 ;;; Functions for outputting parts
 ;;;
 
-(defun mm-get-part (handle)
-  "Return the contents of HANDLE as a string."
-  (mm-with-unibyte-buffer
-    (insert (with-current-buffer (mm-handle-buffer handle)
-	      (mm-with-unibyte-current-buffer
-		(buffer-string))))
-    (mm-decode-content-transfer-encoding
-     (mm-handle-encoding handle)
-     (mm-handle-media-type handle))
-    (buffer-string)))
+(defmacro mm-with-part (handle &rest forms)
+  "Run FORMS in the temp buffer containing the contents of HANDLE."
+  `(let* ((handle ,handle)
+	  ;; The multibyteness of the temp buffer should be turned on
+	  ;; if inserting a multibyte string.  Contrarily, the buffer's
+	  ;; multibyteness should be off if inserting a unibyte string,
+	  ;; especially if a string contains 8bit data.
+	  (default-enable-multibyte-characters
+	    (with-current-buffer (mm-handle-buffer handle)
+	      (mm-multibyte-p))))
+     (with-temp-buffer
+       (insert-buffer-substring (mm-handle-buffer handle))
+       (mm-disable-multibyte)
+       (mm-decode-content-transfer-encoding
+	(mm-handle-encoding handle)
+	(mm-handle-media-type handle))
+       ,@forms)))
+(put 'mm-with-part 'lisp-indent-function 1)
+(put 'mm-with-part 'edebug-form-spec '(body))
 
-(defun mm-insert-part (handle)
-  "Insert the contents of HANDLE in the current buffer."
+(defun mm-get-part (handle &optional no-cache)
+  "Return the contents of HANDLE as a string.
+If NO-CACHE is non-nil, cached contents of a message/external-body part
+are ignored."
+  (if (and (not no-cache)
+	   (equal (mm-handle-media-type handle) "message/external-body"))
+      (progn
+	(unless (mm-handle-cache handle)
+	  (mm-extern-cache-contents handle))
+	(with-current-buffer (mm-handle-buffer (mm-handle-cache handle))
+	  (buffer-string)))
+    (mm-with-part handle
+      (buffer-string))))
+
+(defun mm-insert-part (handle &optional no-cache)
+  "Insert the contents of HANDLE in the current buffer.
+If NO-CACHE is non-nil, cached contents of a message/external-body part
+are ignored."
   (save-excursion
-    (insert (if (mm-multibyte-p)
-		(mm-string-as-multibyte (mm-get-part handle))
-	      (mm-get-part handle)))))
+    (insert
+     (cond ((eq (mail-content-type-get (mm-handle-type handle) 'charset)
+		'gnus-decoded)
+	    (with-current-buffer (mm-handle-buffer handle)
+	      (buffer-string)))
+	   ((mm-multibyte-p)
+	    (mm-string-as-multibyte (mm-get-part handle no-cache)))
+	   (t
+	    (mm-get-part handle no-cache))))))
 
 (defun mm-file-name-delete-whitespace (file-name)
   "Remove all whitespace characters from FILE-NAME."
@@ -1070,20 +1164,22 @@ string if you do not like underscores."
   (setq filename (gnus-replace-in-string filename "[<>|]" ""))
   (gnus-replace-in-string filename "^[.-]+" ""))
 
-(defun mm-save-part (handle)
-  "Write HANDLE to a file."
-  (let* ((name (mail-content-type-get (mm-handle-type handle) 'name))
-	 (filename (mail-content-type-get
-		    (mm-handle-disposition handle) 'filename))
-	 file)
+(defun mm-save-part (handle &optional prompt)
+  "Write HANDLE to a file.
+PROMPT overrides the default one used to ask user for a file name."
+  (let ((filename (or (mail-content-type-get
+		       (mm-handle-disposition handle) 'filename)
+		      (mail-content-type-get
+		       (mm-handle-type handle) 'name)))
+	file)
     (when filename
       (setq filename (gnus-map-function mm-file-name-rewrite-functions
 					(file-name-nondirectory filename))))
     (setq file
 	  (mm-with-multibyte
-	    (read-file-name "Save MIME part to: "
-			    (or mm-default-directory default-directory)
-			    nil nil (or filename name ""))))
+	   (read-file-name (or prompt "Save MIME part to: ")
+			   (or mm-default-directory default-directory)
+			   nil nil (or filename ""))))
     (setq mm-default-directory (file-name-directory file))
     (and (or (not (file-exists-p file))
 	     (yes-or-no-p (format "File %s already exists; overwrite? "
@@ -1237,8 +1333,8 @@ be determined."
     ;; out to a file, and then create a file
     ;; specifier.
     (let ((file (mm-make-temp-file
-		 (expand-file-name "emm.xbm"
-				   mm-tmp-directory))))
+		 (expand-file-name "emm" mm-tmp-directory)
+		 nil ".xbm")))
       (unwind-protect
 	  (progn
 	    (write-region (point-min) (point-max) file)
@@ -1325,9 +1421,8 @@ If RECURSIVE, search recursively."
 	(save-excursion
 	  (save-restriction
 	    (narrow-to-region start (1- (point)))
-	    (when (let ((ctl (ignore-errors
-			       (mail-header-parse-content-type
-				(mail-fetch-field "content-type")))))
+	    (when (let* ((ct (mail-fetch-field "content-type"))
+			 (ctl (and ct (mail-header-parse-content-type ct))))
 		    (if notp
 			(not (equal (car ctl) type))
 		      (equal (car ctl) type)))
@@ -1338,9 +1433,8 @@ If RECURSIVE, search recursively."
       (save-excursion
 	(save-restriction
 	  (narrow-to-region start end)
-	  (when (let ((ctl (ignore-errors
-			     (mail-header-parse-content-type
-			      (mail-fetch-field "content-type")))))
+	  (when (let* ((ct (mail-fetch-field "content-type"))
+		       (ctl (and ct (mail-header-parse-content-type ct))))
 		  (if notp
 		      (not (equal (car ctl) type))
 		    (equal (car ctl) type)))

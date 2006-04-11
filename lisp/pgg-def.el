@@ -1,6 +1,7 @@
 ;;; pgg-def.el --- functions/macros for defining PGG functions
 
-;; Copyright (C) 1999, 2003 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2002, 2003, 2004, 2005,
+;;   2006 Free Software Foundation, Inc.
 
 ;; Author: Daiki Ueno <ueno@unixuser.org>
 ;; Created: 1999/11/02
@@ -20,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Code:
 
@@ -81,6 +82,9 @@ Whether the passphrase is cached at all is controlled by
 
 (defvar pgg-scheme nil
   "Current scheme of PGP implementation.")
+
+(defvar pgg-text-mode nil
+  "If t, inform the recipient that the input is text.")
 
 (defmacro pgg-truncate-key-identifier (key)
   `(if (> (length ,key) 8) (substring ,key 8) ,key))

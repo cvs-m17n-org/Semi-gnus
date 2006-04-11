@@ -1,7 +1,7 @@
 ;;; nnsoup.el --- SOUP access for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-;;	Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -21,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -749,9 +749,9 @@ backend for the messages.")
   (let ((files (sort (directory-files nnsoup-directory t "IDX$")
 		     (lambda (f1 f2)
 		       (< (progn (string-match "/\\([0-9]+\\)\\." f1)
-				 (string-to-int (match-string 1 f1)))
+				 (string-to-number (match-string 1 f1)))
 			  (progn (string-match "/\\([0-9]+\\)\\." f2)
-				 (string-to-int (match-string 1 f2)))))))
+				 (string-to-number (match-string 1 f2)))))))
 	active group lines ident elem min)
     (set-buffer (get-buffer-create " *nnsoup work*"))
     (dolist (file files)

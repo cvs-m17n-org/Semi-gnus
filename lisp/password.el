@@ -1,6 +1,6 @@
 ;;; password.el --- Read passwords from user, possibly using a password cache.
 
-;; Copyright (C) 1999, 2000, 2003, 2004 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2000, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 ;; Created: 2003-12-21
@@ -20,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -79,21 +79,29 @@ Whether passwords are cached at all is controlled by `password-cache'."
 
 (defvar password-data (make-vector 7 0))
 
+(defun password-read-from-cache (key)
+  "Obtain passphrase for KEY from time-limited passphrase cache.
+Custom variables `password-cache' and `password-cache-expiry'
+regulate cache behavior."
+  (and password-cache
+       key
+       (symbol-value (intern-soft key password-data))))
+
 (defun password-read (prompt &optional key)
   "Read password, for use with KEY, from user, or from cache if wanted.
 KEY indicate the purpose of the password, so the cache can
 separate passwords.  The cache is not used if KEY is nil.  It is
 typically a string.
 The variable `password-cache' control whether the cache is used."
-  (or (and password-cache
-	   key
-	   (symbol-value (intern-soft key password-data)))
+  (or (password-read-from-cache key)
       (read-passwd prompt)))
 
 (defun password-read-and-add (prompt &optional key)
   "Read password, for use with KEY, from user, or from cache if wanted.
 Then store the password in the cache.  Uses `password-read' and
-`password-cache-add'."
+`password-cache-add'.
+Custom variables `password-cache' and `password-cache-expiry'
+regulate cache behavior."
   (let ((password (password-read prompt key)))
     (when (and password key)
       (password-cache-add key password))
@@ -121,6 +129,11 @@ seconds."
 		 key))
   (set (intern key password-data) password)
   nil)
+
+(defun password-reset ()
+  "Clear the password cache."
+  (interactive)
+  (fillarray password-data 0))
 
 (provide 'password)
 

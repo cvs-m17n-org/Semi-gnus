@@ -1,5 +1,7 @@
 ;;; mml2015.el --- MIME Security with Pretty Good Privacy (PGP)
-;; Copyright (C) 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: PGP MIME MML
@@ -18,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -32,6 +34,8 @@
 (require 'mm-decode)
 (require 'mm-util)
 (require 'mml)
+
+(defvar mc-pgp-always-sign)
 
 (defvar mml2015-use (or
 		     (progn
@@ -636,6 +640,7 @@ Valid packages include `pgg', `gpg' and `mailcrypt'.")
 ;;; pgg wrapper
 
 (eval-when-compile
+  (defvar pgg-default-user-id)
   (defvar pgg-errors-buffer)
   (defvar pgg-output-buffer))
 
@@ -643,7 +648,8 @@ Valid packages include `pgg', `gpg' and `mailcrypt'.")
   (autoload 'pgg-decrypt-region "pgg")
   (autoload 'pgg-verify-region "pgg")
   (autoload 'pgg-sign-region "pgg")
-  (autoload 'pgg-encrypt-region "pgg"))
+  (autoload 'pgg-encrypt-region "pgg")
+  (autoload 'pgg-parse-armor "pgg-parse"))
 
 (defun mml2015-pgg-decrypt (handle ctl)
   (catch 'error
@@ -811,15 +817,24 @@ Valid packages include `pgg', `gpg' and `mailcrypt'.")
   (let ((pgg-errors-buffer mml2015-result-buffer)
 	(boundary (mml-compute-boundary cont))
 	(pgg-default-user-id (or (message-options-get 'mml-sender)
-				 pgg-default-user-id)))
+				 pgg-default-user-id))
+	(pgg-text-mode t)
+	entry)
     (unless (pgg-sign-region (point-min) (point-max))
       (pop-to-buffer mml2015-result-buffer)
       (error "Sign error"))
     (goto-char (point-min))
     (insert (format "Content-Type: multipart/signed; boundary=\"%s\";\n"
 		    boundary))
-      ;;; FIXME: what is the micalg?
-    (insert "\tmicalg=pgp-sha1; protocol=\"application/pgp-signature\"\n")
+    (if (setq entry (assq 2 (pgg-parse-armor
+			     (with-current-buffer pgg-output-buffer
+			       (buffer-string)))))
+	(setq entry (assq 'hash-algorithm (cdr entry))))
+    (insert (format "\tmicalg=%s; "
+		    (if (cdr entry)
+			(downcase (format "pgp-%s" (cdr entry)))
+		      "pgp-sha1")))
+    (insert "protocol=\"application/pgp-signature\"\n")
     (insert (format "\n--%s\n" boundary))
     (goto-char (point-max))
     (insert (format "\n--%s\n" boundary))
@@ -831,6 +846,7 @@ Valid packages include `pgg', `gpg' and `mailcrypt'.")
 
 (defun mml2015-pgg-encrypt (cont &optional sign)
   (let ((pgg-errors-buffer mml2015-result-buffer)
+	(pgg-text-mode t)
 	(boundary (mml-compute-boundary cont)))
     (unless (pgg-encrypt-region (point-min) (point-max)
 				(split-string
@@ -865,7 +881,7 @@ Valid packages include `pgg', `gpg' and `mailcrypt'.")
 	(erase-buffer)
 	t)
     (setq mml2015-result-buffer
-	  (gnus-get-buffer-create "*MML2015 Result*"))
+	  (gnus-get-buffer-create " *MML2015 Result*"))
     nil))
 
 (defsubst mml2015-clear-decrypt-function ()

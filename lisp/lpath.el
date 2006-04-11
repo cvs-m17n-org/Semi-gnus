@@ -13,33 +13,29 @@
 	       Info-menu create-image display-graphic-p
 	       display-time-event-handler find-coding-system find-image
 	       image-size image-type-available-p insert-image
-	       make-mode-line-mouse-map make-temp-file propertize put-image
-	       replace-regexp-in-string rmail-msg-is-pruned
-	       rmail-msg-restore-non-pruned-header sort-coding-systems
-	       tool-bar-add-item tool-bar-add-item-from-menu
-	       tool-bar-local-item-from-menu url-generic-parse-url
-	       url-http-file-exists-p url-insert-file-contents
-	       vcard-pretty-print w32-focus-frame w3m-detect-meta-charset
-	       w3m-region x-focus-frame))
+	       line-number-at-pos make-mode-line-mouse-map make-temp-file
+	       propertize put-image replace-regexp-in-string
+	       rmail-msg-is-pruned rmail-msg-restore-non-pruned-header
+	       sort-coding-systems tool-bar-add-item
+	       tool-bar-add-item-from-menu tool-bar-local-item-from-menu
+	       url-generic-parse-url url-http-file-exists-p
+	       url-insert-file-contents vcard-pretty-print w32-focus-frame
+	       w3m-detect-meta-charset w3m-region x-focus-frame))
 (maybe-bind '(eudc-protocol
-	      filladapt-mode mc-pgp-always-sign
-	      rmail-insert-mime-forwarded-message-function url-current-object
-	      url-package-name url-package-version
+	      filladapt-mode rmail-insert-mime-forwarded-message-function
 	      w3-meta-charset-content-type-regexp
-	      w3-meta-content-type-charset-regexp
-	      w3m-cid-retrieve-function-alist w3m-current-buffer
-	      w3m-display-inline-images w3m-minor-mode-map))
+	      w3-meta-content-type-charset-regexp))
 
 (if (featurep 'xemacs)
     (progn
-      (maybe-fbind '(delete-overlay
-		     detect-coding-string eudc-expand-inline event-click-count
-		     event-end event-start find-coding-systems-for-charsets
+      (maybe-fbind '(codepage-setup
+		     delete-overlay detect-coding-string eudc-expand-inline
+		     event-click-count event-end event-start
+		     find-coding-systems-for-charsets
 		     find-coding-systems-region find-coding-systems-string
-		     mail-abbrevs-setup mouse-minibuffer-check
-		     mouse-movement-p mouse-scroll-subr overlay-lists
-		     posn-point posn-window read-event set-buffer-multibyte
-		     track-mouse window-edges))
+		     mail-abbrevs-setup mouse-minibuffer-check mouse-movement-p
+		     mouse-scroll-subr overlay-lists posn-point posn-window
+		     read-event set-buffer-multibyte track-mouse window-edges))
       (maybe-bind '(adaptive-fill-first-line-regexp
 		    buffer-display-table buffer-file-coding-system
 		    current-language-environment
@@ -51,16 +47,17 @@
   (maybe-fbind '(bbdb-complete-name
 		 delete-annotation delete-extent device-connection dfw-device
 		 events-to-keys font-lock-set-defaults frame-device
-		 get-char-table glyph-height glyph-width mail-aliases-setup
-		 make-annotation make-event make-glyph make-network-process
-		 map-extents message-xmas-redefine put-char-table
-		 set-extent-property temp-directory
+		 get-char-table glyph-height glyph-width ldap-search-entries
+		 mail-aliases-setup make-annotation make-event make-glyph
+		 make-network-process map-extents message-xmas-redefine
+		 put-char-table set-extent-property temp-directory
 		 valid-image-instantiator-format-p
 		 w3-coding-system-for-mime-charset w3-do-setup
 		 w3-prepare-buffer w3-region window-pixel-height
 		 window-pixel-width))
   (maybe-bind '(help-echo-owns-message mail-mode-hook mm-w3m-mode-map
-				       show-nonbreak-escape)))
+				       show-nonbreak-escape
+				       nobreak-char-display)))
 
 (when (and (featurep 'xemacs)
 	   (not (featurep 'mule)))

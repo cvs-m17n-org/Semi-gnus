@@ -1,6 +1,7 @@
 ;;; gnus-start.el --- startup functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -19,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -611,7 +612,7 @@ Can be used to turn version control on or off."
   "Subscribe the new GROUP interactively.
 It is inserted in hierarchical newsgroup order if subscribed.  If not,
 it is killed."
-  (if (gnus-y-or-n-p (format "Subscribe new newsgroup: %s " group))
+  (if (gnus-y-or-n-p (format "Subscribe new newsgroup %s? " group))
       (gnus-subscribe-hierarchically group)
     (push group gnus-killed-list)))
 
@@ -721,11 +722,12 @@ the first newsgroup."
 
 (defun gnus-no-server-1 (&optional arg slave)
   "Read network news.
-If ARG is a positive number, Gnus will use that as the
-startup level.	If ARG is nil, Gnus will be started at level 2.
-If ARG is non-nil and not a positive number, Gnus will
-prompt the user for the name of an NNTP server to use.
-As opposed to `gnus', this command will not connect to the local server."
+If ARG is a positive number, Gnus will use that as the startup
+level.  If ARG is nil, Gnus will be started at level 2
+\(`gnus-level-default-subscribed' minus one).  If ARG is non-nil
+and not a positive number, Gnus will prompt the user for the name
+of an NNTP server to use.  As opposed to \\[gnus], this command
+will not connect to the local server."
   (interactive "P")
   (let ((val (or arg (1- gnus-level-default-subscribed))))
     (gnus val t slave)
@@ -753,6 +755,13 @@ prompt the user for the name of an NNTP server to use."
     (nnheader-init-server-buffer)
     (setq gnus-slave slave)
     (gnus-read-init-file)
+
+    ;; Add "native" to gnus-predefined-server-alist just to have a
+    ;; name for the native select method.
+    (when gnus-select-method
+      (push (cons "native" gnus-select-method)
+	    gnus-predefined-server-alist))
+    
     (if gnus-agent
 	(gnus-agentize))
 
@@ -805,7 +814,10 @@ prompt the user for the name of an NNTP server to use."
   (gnus-request-create-group "drafts" '(nndraft ""))
   (unless (gnus-group-entry "nndraft:drafts")
     (let ((gnus-level-default-subscribed 1))
-      (gnus-subscribe-group "nndraft:drafts" nil '(nndraft "")))
+      (gnus-subscribe-group "nndraft:drafts" nil '(nndraft ""))))
+  (unless (equal (gnus-group-get-parameter "nndraft:drafts" 'gnus-dummy t)
+		 '((gnus-draft-mode)))
+    (gnus-message 3 "Setting up drafts group")
     (gnus-group-set-parameter
      "nndraft:drafts" 'gnus-dummy '((gnus-draft-mode)))))
 
@@ -857,6 +869,7 @@ prompt the user for the name of an NNTP server to use."
       (set-buffer (setq gnus-dribble-buffer
 			(gnus-get-buffer-create
 			 (file-name-nondirectory dribble-file))))
+      (set (make-local-variable 'file-precious-flag) t)
       (erase-buffer)
       (setq buffer-file-name dribble-file)
       (auto-save-mode t)
@@ -1040,9 +1053,12 @@ If LEVEL is non-nil, the news will be set up at level LEVEL."
       (gnus-check-bogus-newsgroups))
 
     ;; We might read in new NoCeM messages here.
-    (when (and gnus-use-nocem
-	       (not level)
-	       (not dont-connect))
+    (when (and (not dont-connect)
+	       gnus-use-nocem
+	       (or (and (numberp gnus-use-nocem)
+			(numberp level)
+			(>= level gnus-use-nocem))
+		   (not level)))
       (gnus-nocem-scan-groups))
 
     ;; Read any slave files.
@@ -1528,8 +1544,8 @@ If SCAN, request a scan of that group as well."
 	   ;; command may have responded with the `(0 . 0)'.  We
 	   ;; ignore this if we already have an active entry
 	   ;; for the group.
-	   (if (and (zerop (car active))
-		    (zerop (cdr active))
+	   (if (and (zerop (or (car active) 0))
+		    (zerop (or (cdr active) 0))
 		    (gnus-active group))
 	       (gnus-active group)
 
@@ -2533,7 +2549,7 @@ If FORCE is non-nil, the .newsrc file is read."
 	    (cond
 	     ((looking-at "[0-9]+")
 	      ;; We narrow and read a number instead of buffer-substring/
-	      ;; string-to-int because it's faster.  narrow/widen is
+	      ;; string-to-number because it's faster.  narrow/widen is
 	      ;; faster than save-restriction/narrow, and save-restriction
 	      ;; produces a garbage object.
 	      (setq num1 (progn
@@ -2827,6 +2843,7 @@ If FORCE is non-nil, the .newsrc file is read."
            (print-escape-nonascii t)
            (print-length nil)
            (print-level nil)
+	   (print-circle nil)
            (print-escape-newlines t)
 	   (gnus-killed-list
 	    (if (and gnus-save-killed-list

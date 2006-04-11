@@ -1,3 +1,549 @@
+2006-04-11  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi, gnus-faq.texi, message.texi: No Gnus v0.4 is released.
+
+2006-04-10  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Misc Group Stuff, Summary Buffer, Article Keymap)
+	(Server Commands): Key `v' is reserved for users.
+
+2006-04-07  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Summary Buffer Lines): Add `*'.
+
+2006-04-07  Jochen K,A|(Bpper  <jochen@fhi-berlin.mpg.de>
+
+	* gnus.texi (Group Parameters): Mention
+	gnus-permanently-visible-groups.
+
+2006-04-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Face): Restore xref to gnus-face-properties-alist;
+	fix typo.
+
+2006-04-05  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (X-Face): Clarify.
+	(Face): Need Emacs with PNG support.
+
+2006-04-04  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi, message.texi: Bump version.
+
+2006-04-04  Simon Josefsson  <jas@extundo.com>
+
+	* gnus.texi (Security): Improve.
+
+2006-03-31  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-news.texi: Restore customizable tool bar item.  Markup
+	fixes.  Minor rewording.  Add "New packages and libraries",
+	"summary and article", "Appearance" and "Miscellaneous".  Remove
+	"Major new features" and "Other changes".  Add some @xref-s.
+
+2006-03-31  Romain Francoise  <romain@orebokech.com>
+
+	* gnus.texi (Virtual Groups): `nnvirtual-always-rescan' defaults
+	to t, not nil (and has for the past eight years).
+
+2006-03-30  Romain Francoise  <romain@orebokech.com>
+
+	* gnus-news.texi: Reorder entries in sections.  Fix typos.
+	Add local variables section.
+
+	* gnus-news.el (gnus-news-header-disclaimer): Delete top section.
+	(gnus-news-fill-column): Increment to 80.
+	(gnus-news-translate-file): Support nested list items.
+
+2006-03-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-news.texi: Add gnus-group-update-tool-bar.
+
+2006-03-29  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Top): Add comment about version line.
+
+	* message.texi (Top): Ditto.  Change to take named versions into
+	account.
+
+	* gnus-news.texi: Add customizable tool bar.
+
+2006-03-28  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Posting Styles): Add x-face-file to example.
+	(X-Face): Refer to posting styles.
+
+	* gnus-faq.texi ([5.8]): Add x-face-file.
+	([8.4]): Add links to gmane.emacs.gnus.user and
+	gmane.emacs.gnus.general.
+
+2006-03-27  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* sasl.texi: Use @copyright{} instead of (C).  Update copyright.
+
+2006-03-27  Karl Berry  <karl@gnu.org>
+
+	* gnus.texi, message.texi, emacs-mime.texi, sieve.texi, pgg.texi:
+	Do not indent copyright year list.
+
+2006-03-27  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-faq.texi: Use .invalid.
+	([5.4]): Fix gnus-posting-styles example.
+
+2006-03-20  Romain Francoise  <romain@orebokech.com>
+
+	* gnus.texi (Mail Folders, Mail Spool): Grammar fixes.
+
+2006-03-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (NoCeM): Mention gnus-use-nocem can also be a number.
+
+2006-03-10  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Fancy Mail Splitting): Improve sentences so as to be
+	easy to understand.
+
+2006-03-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi: Markup fix.
+	(Fancy Mail Splitting): Specify new feature.
+
+2006-03-08  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Fancy Mail Splitting): Improve descriptions about
+	partial-words matching.
+
+2006-03-07  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* emacs-mime.texi (Display Customization): Reword image/.* stuff.
+
+	* gnus.texi (Oort Gnus): Add note about `gnus-load'.
+	(MIME Commands): Fix mm-discouraged-alternatives.
+
+2006-03-06  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-news.el, gnus-news.texi: Update copyright.
+
+2006-03-03  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* xemacs.mak: Remove outdated file.  Use make.bat instead.
+
+	* gnus.texi (Oort Gnus): Add `mm-fill-flowed'.
+
+2006-02-09  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Mail Spool): nnml-use-compressed-files can be a
+	string.
+	(Gnus Versions): Add history beyond start of Oort.
+
+	* gnus-news.texi: Add nnml-use-compressed-files.
+
+2006-01-31  Romain Francoise  <romain@orebokech.com>
+
+	* message.texi: Update copyright year.
+
+2006-01-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* ps/Makefile.in (distclean): Remove Makefile.
+
+	* Makefile.in (almost-clean): Rename from clean.
+	(clean): Rename from veryclean.
+	(distclean): Use clean.
+	(pspackage): Use almost-clean.
+
+2006-01-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi: Update copyright.
+
+2006-01-13  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Article Washing): Additions.
+
+2006-01-08  Alex Schroeder  <alex@gnu.org>
+
+	* pgg.texi (Caching passphrase): Rewording.
+
+2006-01-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (RSS): Document nnrss-wash-html-in-text-plain-parts.
+
+2006-01-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Group Parameters): Fix description.
+	(RSS): Addition.
+
+2005-12-22  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Summary Post Commands): Fix function bound to `S O p'.
+
+2005-12-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* emacs-mime.texi (Display Customization): Add setting example to
+	mm-discouraged-alternatives.
+
+2005-12-15  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Gmane Spam Reporting): Fix
+	spam-report-gmane-use-article-number.  Add
+	spam-report-user-mail-address.
+
+2005-12-13  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-news.el (gnus-news-translate-file): Fix previous commit.
+
+	* gnus-coding.texi (Gnus Coding Style): Add `uudecode.el'.
+	(Gnus Maintainance Guide): Add ref to "Gnus Development".  Add
+	conventions about custom versions.
+
+2005-12-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (MIME Commands): Mention addition of
+	multipart/alternative to gnus-buttonized-mime-types and add xref
+	to mm-discouraged-alternatives.
+
+	* emacs-mime.texi (Display Customization): Mention addition of
+	"image/.*" and add xref to gnus-buttonized-mime-types in the
+	mm-discouraged-alternatives section.
+
+2005-12-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-news.el: Markup and description fixes and additions.
+
+2005-12-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* pgg.texi (User Commands): Fix description of pgg-verify-region.
+	(Selecting an implementation): Fix descriptions.
+
+2005-12-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-news.el: Update Copyright.
+	(gnus-news-translate-file): Avoid "*Note" at beginning of line.
+
+2005-12-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* emacs-mime.texi (Non-MIME): x-gnus-verbatim -> x-verbatim.
+
+2005-11-30  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* message.texi (Various Message Variables): Addition.
+
+2005-11-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* message.texi: Fix default values.
+
+2005-11-25  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* message.texi (Header Commands): Clarify descriptions of
+	message-cross-post-followup-to, message-reduce-to-to-cc, and
+	message-insert-wide-reply.
+	(Various Commands): Fix kindex for message-kill-to-signature;
+	clarify description of message-tab.
+
+2005-11-22  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* message.texi (Mailing Lists): Fix description about MFT.
+
+	* gnus.texi (Emacs Lisp): Use ~/.gnus.el instead of ~/.emacs.
+
+2005-11-17  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Slow Terminal Connection): Replace old description
+	with new one.
+
+2005-11-16  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Oort Gnus): Use ~/.gnus.el instead of ~/.emacs;
+	replace X-Draft-Headers with X-Draft-From.
+
+2005-11-14  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Various Various): Fix the default value of
+	nnheader-max-head-length.
+	(Gnus Versions): Fix typo.
+
+2005-11-10  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-coding.texi (Gnus Coding Style): Add MIME subsection.
+	(Gnus Maintainance Guide): Improvements.
+
+	* gnus.texi (Sorting the Summary Buffer): Replace 2005-10-29
+	change by a reference to `Group Parameters'.  Use `(not ...)' in
+	example instead of `lambda' expression.
+	(Group Parameters): Add simplified sorting example based on
+	example for `Sorting the Summary Buffer' from Jari Aalto
+	<jari.aalto@cante.net>.
+	(Example Methods): Add example for an indirect connection.
+
+2005-11-10  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (XVarious): Fix description of gnus-use-toolbar; add
+	new variable gnus-toolbar-thickness.
+
+2005-11-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Agent and flags): Add it to the detailmenu.
+
+2005-11-08  Kevin Greiner  <kevin.greiner@compsol.cc>
+
+	* gnus.texi (nntp-open-via-telnet-and-telnet): Fixed grammar.
+	(Agent Parameters): Updated parameter names to match code.
+	(Group Agent Commands): Corrected 'gnus-agent-fetch-series' as
+	'gnus-agent-summary-fetch-series'.
+	(Agent and flags): New section providing a generalized discussion
+	of flag handling.
+	(Agent and IMAP): Removed flag discussion.
+	(Agent Variables): Added 'gnus-agent-synchronize-flags'
+
+2005-11-08  Romain Francoise  <romain@orebokech.com>
+
+	* gnus.texi (Exiting the Summary Buffer): Add new function
+	`gnus-summary-catchup-and-goto-prev-group', bound to `Z p'.
+
+2005-11-08  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (XVarious): Revert description of gnus-use-toolbar.
+
+2005-11-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (X-Face): Fix description.
+	(XVarious): Remove gnus-xmas-logo-color-alist and
+	gnus-xmas-logo-color-style; fix description of gnus-use-toolbar.
+
+2005-11-04 Ken Manheimer  <ken.manheimer@gmail.com>
+
+	* pgg.texi (User Commands): Document additional passphrase
+	argument for pgg-encrypt-*, pgg-decrypt-*, and pgg-sign-* functions.
+	(Backend methods): Likewise for corresponding pgg-scheme-* functions.
+
+2005-11-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Conformity): Fix typo.
+	(Customizing Articles): Document `first'.
+
+2005-11-01  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Group Parameters): Mention new variable
+	gnus-parameters-case-fold-search.
+	(Home Score File): Addition.
+
+2005-10-29  Sascha Wilde  <wilde@sha-bang.de>
+
+	* pgg.texi (How to use): Update the example to add autoload of
+	pgg-encrypt-symmetric-region.
+	(User Commands): Document pgg-encrypt-symmetric-region.
+	(Backend methods): Document pgg-scheme-encrypt-symmetric-region.
+
+2005-10-29  Jari Aalto  <jari.aalto@cante.net>
+
+	* gnus.texi (Sorting the Summary Buffer):
+	Add `gnus-thread-sort-by-date-reverse'.  Add example
+	host to different sorting in NNTP and RSS groups.
+
+2005-10-28  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-coding.texi: Split into nodes.
+	(Gnus Coding Style): Add flow-fill.el.
+
+2005-10-25  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-coding.texi (Dependencies): Add some text.
+	(Dependencies): Update encrypt.el.
+
+2005-10-17  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Document Groups): Remove duplicate item.
+
+2005-10-14  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Document Server Internals): Addition.
+
+2005-10-13  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (A note on namespaces): Fix RFC reference.
+
+2005-10-12  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (RSS): Fix key description.
+
+2005-10-11  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi: Emacs/w3 -> Emacs/W3.
+	(Browsing the Web): Fix description.
+	(Web Searches): Ditto.
+	(Customizing W3): Ditto.
+
+2005-10-07  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Maildir): Clarify expire-age and expire-group.
+
+2005-10-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-news.texi: Mention that the Lisp files are now installed in
+	.../site-lisp/gnus/ by default.
+
+2005-10-03  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-news.texi: Fix typo.
+
+2005-09-28  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus-coding.texi: Added  some comments.
+
+	* message.texi (Insertion): Describe prefix for
+	message-mark-inserted-region and message-mark-insert-file.
+
+2005-09-28  Simon Josefsson  <jas@extundo.com>
+
+	* message.texi (IDNA): Fix.
+
+2005-09-28  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (NNTP): Remove nntp-buggy-select, nntp-read-timeout,
+	nntp-server-hook, and nntp-warn-about-losing-connection; fix
+	description of nntp-open-connection-function.
+	(Common Variables): Fix descriptions.
+
+2005-09-27  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* emacs-mime.texi (Non-MIME): Add Slrn-style verbatim marks and
+	LaTeX documents.  Describe "text/x-gnus-verbatim".
+
+2005-09-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Server Buffer Format): Document the %a format spec.
+
+2005-09-22  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Mail): Fix gnus-confirm-mail-reply-to-news entry.
+
+2005-09-21  Teodor Zlatanov  <tzz@lifelogs.com>
+
+	* gnus.texi (Blacklists and Whitelists)
+	(Blacklists and Whitelists, BBDB Whitelists)
+	(Gmane Spam Reporting, Bogofilter, spam-stat spam filtering)
+	(spam-stat spam filtering, SpamOracle)
+	(Extending the Spam ELisp package): Removed extra quote symbol for
+	clarity.
+
+2005-09-20  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (MIME Commands): Add gnus-article-save-part-and-strip,
+	gnus-article-delete-part and gnus-article-replace-part.
+	(Using MIME): Add gnus-mime-replace-part.
+
+	* gnus-news.texi: Add gnus-mime-replace-part and
+	gnus-article-replace-part.  Use @xref.
+
+2005-09-20  Simon Josefsson  <jas@extundo.com>
+
+	* gnus-coding.texi: New file, from Reiner Steib
+	<reiner.steib@gmx.de>.
+
+2005-09-17  Romain Francoise  <romain@orebokech.com>
+
+	Update all files to specify GFDL version 1.2.
+
+	* doclicense.texi (GNU Free Documentation License): Update to
+	version 1.2.
+
+2005-09-15  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Finding the Parent): Fix description of how Gnus
+	finds article.
+
+2005-09-14  Jari Aalto  <jari.aalto@cante.net>
+
+	* gnus.texi (Advanced Scoring Examples): New exmples to teach how
+	to drop off non-answered articles.
+
+2005-09-11  Romain Francoise  <romain@orebokech.com>
+
+	* message.texi (Message Headers): Explain what
+	`message-alternative-emails' does in more detail.
+
+	* gnus.texi (Mail Spool): Mention that `nnml-use-compressed-files'
+	requires `auto-compression-mode' to be enabled.  Add new nnml
+	variable `nnml-compressed-files-size-threshold'.
+
+2005-09-07  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Sorting the Summary Buffer): Added
+	gnus-thread-sort-by-recipient.
+
+2005-09-05  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus-news.texi: Fix reference.
+
+2005-09-04  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Mail Source Customization): Fix descriptions of
+	mail-source-incoming-file-prefix.
+
+	* message.texi (MIME): Describe mml-dnd-protocol-alist and
+	mml-dnd-attach-options.
+
+	* gnus-news.texi: Added reference.
+
+2005-09-02  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Choosing Variables): Fix descriptions.
+
+2005-08-19  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* emacs-mime.texi (time-date): Fix description of safe-date-to-time.
+
+2005-08-18  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* emacs-mime.texi (Handles): Remove duplicate item.
+	(Encoding Customization): Fix the default value for
+	mm-coding-system-priorities.
+	(Charset Translation): Emacs doesn't use mm-mime-mule-charset-alist.
+	(Basic Functions): Fix reference.
+
+2005-08-10  Romain Francoise  <romain@orebokech.com>
+
+	* gnus-news.texi: Mention new variable `message-yank-empty-prefix'.
+
+2005-08-09  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (Charsets): Fj hierarchy uses iso-2022-jp.
+
+2005-08-08  Romain Francoise  <romain@orebokech.com>
+
+	* message.texi (Insertion Variables): Mention new variable
+	`message-yank-empty-prefix'.  Change `message-yank-cited-prefix'
+	documentation accordingly.
+
+2005-07-27  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* gnus.texi (Startup Files): Fix name of gnus-site-init-file.
+	Mention that gnus-init-file is not read when Emacs is invoked with
+	--no-init-file or -q.
+
+2005-07-20  Didier Verna  <didier@xemacs.org>
+
+	* gnus.texi (Email Based Diary): New. Proper documentation for the
+	nndiary back end and the gnus-diary library.
+
+2005-07-18  Romain Francoise  <romain@orebokech.com>
+
+	* gnus.texi (To From Newsgroups): Mention new variables
+	`gnus-summary-to-prefix' and `gnus-summary-newsgroup-prefix'.
+
+	* gnus-news.texi: Ditto.
+
+2005-06-29  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* gnus.texi (NoCeM): gnus-nocem-verifyer defaults to pgg-verify.
+
+2005-06-23  Juanma Barranquero  <lekktu@gmail.com>
+
+	* gnus.texi (MIME Commands, Fancy Mail Splitting, Agent Visuals)
+	(Agent Variables):
+	* message.texi (Message Headers):
+	Texinfo usage fix.
+
 2005-03-30  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* Makefile.in (gnus-booklet.dvi, gnus-booklet.pdf): Simplify.
@@ -101,7 +647,7 @@
 
 	* gnus-news.texi: Ditto.
 
-2005-01-16  Xavier Maillard <zedek@gnu-rox.org> (tiny change)
+2005-01-16  Xavier Maillard  <zedek@gnu-rox.org>  (tiny change)
 
 	* gnus-faq.texi ([4.1]): Typo.
 
@@ -165,7 +711,7 @@
 
 2004-12-08  Reiner Steib  <Reiner.Steib@gmx.de>
 
-	* gnusref.tex: Mention `gnus-summary-limit-to-recipient' and 
+	* gnusref.tex: Mention `gnus-summary-limit-to-recipient' and
 	`gnus-summary-sort-by-recipient'.
 
 2004-12-08  Reiner Steib  <Reiner.Steib@gmx.de>
@@ -187,7 +733,7 @@
 
 2004-12-06  Reiner Steib  <Reiner.Steib@gmx.de>
 
-	* gnus-news.texi: Mention `gnus-summary-limit-to-recipient' and 
+	* gnus-news.texi: Mention `gnus-summary-limit-to-recipient' and
 	`gnus-summary-sort-by-recipient'.
 
 	* gnus.texi (Filtering Spam Using The Spam ELisp Package): Index
@@ -363,7 +909,7 @@
 2004-08-31  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* emacs-mime.texi, gnus-faq.texi, gnus.texi, message.texi,
-	pgg.texi, sieve.texi: Use @copying and @insertcopying.
+	* pgg.texi, sieve.texi: Use @copying and @insertcopying.
 
 2004-08-22  Reiner Steib  <Reiner.Steib@gmx.de>
 
@@ -372,8 +918,8 @@
 
 2004-08-17  Teodor Zlatanov  <tzz@lifelogs.com>
 
-	* gnus.texi (IMAP): add comments about imaps synonym to imap in
-	netrc syntax
+	* gnus.texi (IMAP): Add comments about imaps synonym to imap in
+	netrc syntax.
 
 2004-08-15  Simon Josefsson  <jas@extundo.com>
 
@@ -434,7 +980,7 @@
 2004-05-28  Reiner Steib  <Reiner.Steib@gmx.de>
 
 	* gnus-faq.texi: Untabify.
-	([6.3]): nnir.el is in contrib directory.  
+	([6.3]): nnir.el is in contrib directory.
 
 	* message.texi (News Headers): Clarify how a unique ID is created.
 
@@ -443,7 +989,7 @@
 2004-05-19  Andre Srinivasan  <andre@e2open.com>
 
 	* gnus.texi (Group Parameters): Added more on hooks.  (Small
-	change.) 
+	change.)
 
 2004-05-19  Reiner Steib  <Reiner.Steib@gmx.de>
 
@@ -470,7 +1016,7 @@
 
 	* gnus.texi (Charsets): Point to relevant section in emacs-mime.
 
-2004-04-14  Kevin Greiner <kgreiner@xpediantsolutions.com>
+2004-04-14  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* gnus.texi (Agent Visuals): Referenced new F(etched) group line
 	format.
@@ -504,9 +1050,8 @@
 
 2004-03-29  Teodor Zlatanov  <tzz@lifelogs.com>
 
-	* gnus.texi (Spam ELisp Package Sequence of Events): some clarifications
-	(Spam ELisp Package Global Variables)
-	(Spam ELisp Package Global Variables): more clarifications
+	* gnus.texi (Spam ELisp Package Sequence of Events): Some clarifications.
+	(Spam ELisp Package Global Variables): More clarifications.
 
 2004-03-18  Helmut Waitzmann  <Helmut.Waitzmann@web.de>  (tiny change)
 
@@ -580,7 +1125,7 @@
 
 	* emacs-mime.texi: Enclose the iflatex section with iftex.
 
-2004-03-02  Kevin Greiner <kgreiner@xpediantsolutions.com>
+2004-03-02  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* emacs-mime.texi: Wrapped documentencoding inside of iflatex as
 	documentencoding is not supported by infohack.
@@ -591,7 +1136,7 @@
 	characters that can not be encoded using iso-8859-1.
 	(Gnus Unplugged): Reference gnus-agent variable.
 	(Agent Variables): Added gnus-agent.
-	
+
 
 2004-02-17  Katsumi Yamaoka  <yamaoka@jpl.org>
 
@@ -622,7 +1167,7 @@
 2004-01-23  Teodor Zlatanov  <tzz@lifelogs.com>
 
 	* gnus.texi (Spam ELisp Package Filtering of Incoming Mail):
-	mention spam-split does not modify incoming mail
+	Mention spam-split does not modify incoming mail.
 
 2004-01-23  Jesper Harder  <harder@ifa.au.dk>
 
@@ -630,9 +1175,9 @@
 
 2004-01-22  Teodor Zlatanov  <tzz@lifelogs.com>
 
-	* gnus.texi (Spam ELisp Package Sequence of Events): fix typo
+	* gnus.texi (Spam ELisp Package Sequence of Events): Fix typo.
 
-2004-01-21  Kevin Greiner <kgreiner@xpediantsolutions.com>
+2004-01-21  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* gnus.texi (Outgoing Messages, Agent Variables): Add
 	gnus-agent-queue-mail and gnus-agent-prompt-send-queue.
@@ -661,7 +1206,7 @@
 
 	* gnus.texi (The problem of spam): Fix, reported by Cheng Gao
 	<chenggao@cyberhut.org> and suggested by Richard Hoskins
-	<rmh@apk.net> (tiny change).
+	<rmh@apk.net>  (tiny change).
 
 2004-01-07  Jesper Harder  <harder@ifa.au.dk>
 
@@ -766,7 +1311,7 @@
 	(Blacklists and Whitelists, BBDB Whitelists)
 	(Gmane Spam Reporting, Bogofilter, spam-stat spam filtering)
 	(SpamOracle): mention that spam/ham processor variables are being
-	obsoleted 
+	obsoleted
 	(Extending the Spam ELisp package): add some new documentation
 	for adding a new backend to spam.el
 
@@ -790,7 +1335,7 @@
 2003-12-31  Steve Youngs  <sryoungs@bigpond.net.au>
 
 	* gnus.texi (XEmacs): Update list of Gnus XEmacs package
-	requirements. 
+	requirements.
 
 2003-12-30  Reiner Steib  <Reiner.Steib@gmx.de>
 
@@ -817,7 +1362,7 @@
 
 	* gnus.texi (Group Parameters): Clarify.
 
-2003-12-11  Kevin Greiner <kgreiner@xpediantsolutions.com>
+2003-12-11  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* gnus.texi (Agent Parameters): Added references in Topic and
 	Group Parameters.  Added gnus-agent-cat-disable-undownloaded-faces
@@ -1064,11 +1609,13 @@
 	* gnus.texi (Filtering Spam Using The Spam ELisp Package):
 	mentioned the spam-install-hooks mess
 
+2003-07-11  Matthias Andree <ma@dt.e-technik.uni-dortmund.de>  (tiny change)
+
+	* gnus.texi (Splitting in IMAP): Typos.
+
 2003-07-11  Simon Josefsson  <jas@extundo.com>
 
-	* gnus.texi (Splitting in IMAP): Typos, tiny patch from Matthias
-	Andree <ma@dt.e-technik.uni-dortmund.de>.
-	(Splitting in IMAP): Mention Sieve.
+	* gnus.texi (Splitting in IMAP): Mention Sieve.
 
 2003-07-10  Simon Josefsson  <jas@extundo.com>
 
@@ -1084,7 +1631,7 @@
 2003-06-24  Lars Magne Ingebrigtsen  <larsi@gnus.org>
 
 	* gnus.texi (Summary Mail Commands): Make note of
-	Mail-Followup-To. 
+	Mail-Followup-To.
 
 2003-06-23  Jesper Harder  <harder@ifa.au.dk>
 
@@ -1194,12 +1741,11 @@
 
 	* message.texi (Insertion Variables): do.
 
-2003-05-13  Simon Josefsson  <jas@extundo.com>
+2003-05-13  Niklas Morberg <niklas.morberg@axis.com>  (tiny change)
 
-	* gnus.texi (IMAP, Agent and IMAP, Oort Gnus): s/a/an/.  Tiny
-	patch from Niklas Morberg <niklas.morberg@axis.com>.
+	* gnus.texi (IMAP, Agent and IMAP, Oort Gnus): s/a/an/.
 
-2003-05-12  Kevin Greiner <kgreiner@xpediantsolutions.com>
+2003-05-12  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* gnus.texi (Agent Visuals): Add.
 
@@ -1454,7 +2000,7 @@
 
 	* message.texi (IDNA): New.
 
-2003-03-18  Kevin Greiner <kgreiner@xpediantsolutions.com>
+2003-03-18  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* gnus.texi (Gnus Unplugged): Refer to new agent Group/Topic
 	parameters.
@@ -1492,10 +2038,9 @@
 
 	* gnus.texi (Required Back End Functions): Add.
 
-2003-03-17  Simon Josefsson  <jas@extundo.com>
+2003-03-17  Frank Haun	<pille3003@fhaun.de>  (tiny change)
 
-	* pgg.texi: Fix setfilename.  Tiny patch by Frank Haun
-	<pille3003@fhaun.de>.
+	* pgg.texi: Fix setfilename.
 
 2003-03-09  Paul Jarc  <prj@po.cwru.edu>
 
@@ -1531,7 +2076,7 @@
 	(Document Server Internals, Score Variables, Adaptive Scoring)
 	(X-Face, Hashcash): do.
 
-2003-02-28  Vasily Korytov <deskpot@myrealbox.com>
+2003-02-28  Vasily Korytov  <deskpot@myrealbox.com>
 
 	* gnus.texi: New values, 'to-list and 'cc-list, for
 	gnus-boring-article-headers.
@@ -2413,7 +2958,7 @@
 	* gnus.texi (Mail Spool): Add cindex for marks.
 	(Mail Folders): Add cindex for marks.
 
-2002-03-24  Raymond Scholz <rscholz@zonix.de>
+2002-03-24  Raymond Scholz  <rscholz@zonix.de>
 
 	* gnus.texi (Summary Buffer Lines): Fix doc.
 
@@ -2421,7 +2966,7 @@
 
 	* Makefile.in (booklet.dvi, booklet.pdf): Support booklet.
 
-2002-03-24  Felix Natter <fnatter@gmx.net>
+2002-03-24  Felix Natter  <fnatter@gmx.net>
 
 	* booklet.tex, bk-at.tex, bk-lt.tex, gnuslog-booklet.eps: New file.
 	* gnusref.tex, refcard.tex: Support booklet.
@@ -2451,7 +2996,7 @@
 	* message.texi (Security): Add mml-unsecure-message.
 	(Mailing Lists): Index message-goto-mail-followup-to.
 
-2002-03-23  Jesper Harder <harder@ifa.au.dk>
+2002-03-23  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnusref.tex, refcard.tex: Addition.
 
@@ -2530,7 +3075,7 @@
 
 	* gnus.texi (Mail Source Specifiers): Use @uref.
 
-2002-02-13  Jesper Harder <harder@ifa.au.dk>
+2002-02-13  Jesper Harder  <harder@ifa.au.dk>
 
 	* message.texi, gnus.texi, emacs-mime.texi: Use small caps
 	consistently.  MIME, NOV, NNTP, HTML, IMAP are written with @sc
@@ -3600,11 +4145,11 @@
 	* gnus.texi (Sorting Groups): Note `C-k' and `C-y' for manually
 	moving groups around.
 
-2001-04-07  Ryan Yeske <rcyeske@vcn.bc.ca>
+2001-04-07  Ryan Yeske  <rcyeske@vcn.bc.ca>
 
 	* gnus.texi (Splitting in IMAP): Fix.
 
-2001-04-07  Jesper Harder <harder@ifa.au.dk>
+2001-04-07  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnus.texi (More Threading): Fix.
 
@@ -3727,7 +4272,7 @@
 
 	* gnus.texi (Top): Add Using GPG.
 
-2001-02-02  David Masterson <dmasters@Rational.Com>
+2001-02-02  David Masterson  <dmasters@Rational.Com>
 
 	* gnus.texi (The Server is Down): Add link to Group Levels.
 
@@ -3746,7 +4291,7 @@
 	* message.texi (message-ignored-news-headers): Add "X-Draft-From:".
 	(message-ignored-mail-headers): Ditto.
 
-2001-01-21  Raymond Scholz <ray-2001@zonix.de>
+2001-01-21  Raymond Scholz  <ray-2001@zonix.de>
 
 	* message.texi: Rename X-Mailer and X-Newsreader to User-Agent.
 
@@ -3762,7 +4307,7 @@
 
 	* emacs-mime.texi: Set dircategory to Emacs.
 
-2001-01-16  Jesper Harder <harder@ifa.au.dk>
+2001-01-16  Jesper Harder  <harder@ifa.au.dk>
 
 	* gnus.texi (Group Line Specification): Add.
 
@@ -3931,7 +4476,7 @@
 	group names as target, where `gnus-split-methods' uses file
 	names.  Suggested by Nevin Kapur.
 
-2000-11-07  Martin Buchholz <martin@xemacs.org>
+2000-11-07  Martin Buchholz  <martin@xemacs.org>
 
 	* gnus.texi: Doc fix.
 
@@ -3944,7 +4489,7 @@
 
 	* gnus.texi (Finding the News): @env is not supported in texinfo 3.12.
 
-2000-10-31  Jorge Godoy <godoy@conectiva.com>
+2000-10-31  Jorge Godoy  <godoy@conectiva.com>
 
 	* gnus.texi: gnus-gpg document.
 
@@ -4083,7 +4628,7 @@
 	Explain interaction between these.  Add Lisp example for setting
 	`nnmail-expiry-target'.
 
-2000-08-04  Andreas Oeldenberger <andreas.oeldenberger@gmx.net>
+2000-08-04  Andreas Oeldenberger  <andreas.oeldenberger@gmx.net>
 
 	* message.texi (Forwarding): Fix.
 
@@ -4240,7 +4785,7 @@
 
 	* gnus.texi (MIME Commands): Fix.
 
-2000-01-03  Karl Kleinpaste <karl@justresearch.com>
+2000-01-03  Karl Kleinpaste  <karl@justresearch.com>
 
 	* gnus.texi (Splitting in IMAP): Add '.' after @xref.
 

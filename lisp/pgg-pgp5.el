@@ -1,6 +1,7 @@
 ;;; pgg-pgp5.el --- PGP 5.* support for PGG.
 
-;; Copyright (C) 1999, 2000, 2003, 2004 Free Software Foundation, Inc.
+;; Copyright (C) 1999, 2000, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Daiki Ueno <ueno@unixuser.org>
 ;; Created: 1999/11/02
@@ -20,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Code:
 
@@ -30,7 +31,7 @@
   (require 'pgg))
 
 (defgroup pgg-pgp5 ()
-  "PGP 5.* interface"
+  "PGP 5.* interface."
   :group 'pgg)
 
 (defcustom pgg-pgp5-pgpe-program "pgpe"
@@ -142,41 +143,51 @@ Bourne shell or its equivalent \(not tcsh) is needed for \"2>\"."
 		 (buffer-substring (match-end 0)(progn (end-of-line)(point)))))
 	 2)))))
 
-(defun pgg-pgp5-encrypt-region (start end recipients &optional sign)
+(defun pgg-pgp5-encrypt-region (start end recipients &optional sign passphrase)
   "Encrypt the current region between START and END."
   (let* ((pgg-pgp5-user-id (or pgg-pgp5-user-id pgg-default-user-id))
+	 (passphrase (or passphrase
+			 (when sign
+			   (pgg-read-passphrase
+			    (format "PGP passphrase for %s: "
+				    pgg-pgp5-user-id)
+			    pgg-pgp5-user-id))))
 	 (args
-	  `("+NoBatchInvalidKeys=off" "-fat" "+batchmode=1"
-	    ,@(if recipients
-		  (apply #'append
-			 (mapcar (lambda (rcpt)
-				   (list "-r"
-					 (concat "\"" rcpt "\"")))
-				 (append recipients
-					 (if pgg-encrypt-for-me
-					     (list pgg-pgp5-user-id)))))))))
+	  (append
+	   `("+NoBatchInvalidKeys=off" "-fat" "+batchmode=1"
+	     ,@(if recipients
+		   (apply #'append
+			  (mapcar (lambda (rcpt)
+				    (list "-r"
+					  (concat "\"" rcpt "\"")))
+				  (append recipients
+					  (if pgg-encrypt-for-me
+					      (list pgg-pgp5-user-id)))))))
+	   (if sign '("-s" "-u" pgg-pgp5-user-id)))))
     (pgg-pgp5-process-region start end nil pgg-pgp5-pgpe-program args)
     (pgg-process-when-success nil)))
 
-(defun pgg-pgp5-decrypt-region (start end)
+(defun pgg-pgp5-decrypt-region (start end &optional passphrase)
   "Decrypt the current region between START and END."
   (let* ((pgg-pgp5-user-id (or pgg-pgp5-user-id pgg-default-user-id))
 	 (passphrase
-	  (pgg-read-passphrase
-	   (format "PGP passphrase for %s: " pgg-pgp5-user-id)
-	   (pgg-pgp5-lookup-key pgg-pgp5-user-id 'encrypt)))
+	  (or passphrase
+	      (pgg-read-passphrase
+	       (format "PGP passphrase for %s: " pgg-pgp5-user-id)
+	       (pgg-pgp5-lookup-key pgg-pgp5-user-id 'encrypt))))
 	 (args
 	  '("+verbose=1" "+batchmode=1" "+language=us" "-f")))
     (pgg-pgp5-process-region start end passphrase pgg-pgp5-pgpv-program args)
     (pgg-process-when-success nil)))
 
-(defun pgg-pgp5-sign-region (start end &optional clearsign)
+(defun pgg-pgp5-sign-region (start end &optional clearsign passphrase)
   "Make detached signature from text between START and END."
   (let* ((pgg-pgp5-user-id (or pgg-pgp5-user-id pgg-default-user-id))
 	 (passphrase
-	  (pgg-read-passphrase
-	   (format "PGP passphrase for %s: " pgg-pgp5-user-id)
-	   (pgg-pgp5-lookup-key pgg-pgp5-user-id 'sign)))
+	  (or passphrase
+	      (pgg-read-passphrase
+	       (format "PGP passphrase for %s: " pgg-pgp5-user-id)
+	       (pgg-pgp5-lookup-key pgg-pgp5-user-id 'sign))))
 	 (args
 	  (list (if clearsign "-fat" "-fbat")
 		"+verbose=1" "+language=us" "+batchmode=1"
@@ -190,7 +201,7 @@ Bourne shell or its equivalent \(not tcsh) is needed for \"2>\"."
 				    (point))
 			     (point-max))))))
 	  (if pgg-cache-passphrase
-	      (pgg-add-passphrase-cache
+	      (pgg-add-passphrase-to-cache
 	       (cdr (assq 'key-identifier packet))
 	       passphrase)))))))
 

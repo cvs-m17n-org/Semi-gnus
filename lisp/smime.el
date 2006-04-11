@@ -1,5 +1,7 @@
 ;;; smime.el --- S/MIME support library
-;; Copyright (c) 2000, 2001, 2003, 2005 Free Software Foundation, Inc.
+
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 ;; Keywords: SMIME X.509 PEM OpenSSL
@@ -18,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -124,8 +126,22 @@
 (require 'password)
 (eval-when-compile (require 'cl))
 
+(eval-and-compile
+  (cond
+   ((fboundp 'replace-in-string)
+    (defalias 'smime-replace-in-string 'replace-in-string))
+   ((fboundp 'replace-regexp-in-string)
+    (defun smime-replace-in-string  (string regexp newtext &optional literal)
+      "Replace all matches for REGEXP with NEWTEXT in STRING.
+If LITERAL is non-nil, insert NEWTEXT literally.  Return a new
+string containing the replacements.
+
+This is a compatibility function for different Emacsen."
+      (replace-regexp-in-string regexp newtext string nil literal)))))
+
 (defgroup smime nil
-  "S/MIME configuration.")
+  "S/MIME configuration."
+  :group 'mime)
 
 (defcustom smime-keys nil
   "*Map mail addresses to a file containing Certificate (and private key).
@@ -351,9 +367,10 @@ KEYFILE should contain a PEM encoded key and certificate."
 		 keyfile
 	       (smime-get-key-with-certs-by-email
 		(completing-read
-		 (concat "Sign using which key? "
-			 (if smime-keys (concat "(default " (caar smime-keys) ") ")
-			   ""))
+		 (concat "Sign using key"
+			 (if smime-keys
+			     (concat " (default " (caar smime-keys) "): ")
+			   ": "))
 		 smime-keys nil nil (car-safe (car-safe smime-keys))))))
       (error "Signing failed"))))
 
@@ -482,9 +499,9 @@ in the buffer specified by `smime-details-buffer'."
       (or keyfile
 	  (smime-get-key-by-email
 	   (completing-read
-	    (concat "Decipher using which key? "
-		    (if smime-keys (concat "(default " (caar smime-keys) ") ")
-		      ""))
+	    (concat "Decipher using key"
+		    (if smime-keys (concat " (default " (caar smime-keys) "): ")
+		      ": "))
 	    smime-keys nil nil (car-safe (car-safe smime-keys)))))))))
 
 ;; Various operations
@@ -577,9 +594,24 @@ A string or a list of strings is returned."
 				       host '("userCertificate") nil))
 	(retbuf (generate-new-buffer (format "*certificate for %s*" mail)))
 	cert)
-    (if (> (length ldapresult) 1)
+    (if (and (>= (length ldapresult) 1)
+             (> (length (cadaar ldapresult)) 0))
 	(with-current-buffer retbuf
-	  (setq cert (base64-encode-string (nth 1 (car (nth 1 ldapresult))) t))
+	  ;; Certificates on LDAP servers _should_ be in DER format,
+	  ;; but there are some servers out there that distributes the
+	  ;; certificates in PEM format (with or without
+	  ;; header/footer) so we try to handle them anyway.
+	  (if (or (string= (substring (cadaar ldapresult) 0 27)
+			   "-----BEGIN CERTIFICATE-----")
+		  (string= (substring (cadaar ldapresult) 0 3)
+			   "MII"))
+	      (setq cert
+		    (smime-replace-in-string
+		     (cadaar ldapresult)
+		     (concat "\\(\n\\|\r\\|-----BEGIN CERTIFICATE-----\\|"
+			     "-----END CERTIFICATE-----\\)")
+		     "" t))
+	    (setq cert (base64-encode-string (cadaar ldapresult) t)))
 	  (insert "-----BEGIN CERTIFICATE-----\n")
 	  (let ((i 0) (len (length cert)))
 	    (while (> (- len 64) i)
@@ -631,7 +663,8 @@ The following commands are available:
   (use-local-map smime-mode-map)
   (buffer-disable-undo)
   (setq truncate-lines t)
-  (setq buffer-read-only t))
+  (setq buffer-read-only t)
+  (gnus-run-mode-hooks 'smime-mode-hook))
 
 (defun smime-certificate-info (certfile)
   (interactive "fCertificate file: ")

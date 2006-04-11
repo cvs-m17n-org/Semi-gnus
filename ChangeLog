@@ -1,3 +1,237 @@
+2006-04-11  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* README: No Gnus v0.4 is released.
+
+2006-04-11  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* Makefile.in (release-sign-files): Use rm -f.
+	(RELEASE_COMMIT_FILES): Add ./ChangeLog.
+	(release-bump-version): Add README.
+	(release-check-settings): OLD_TAG, not OLDTAG.
+	(release-commit): Echo command lines before prompt.
+	(RELEASE_COMMIT_FILES): Add README.
+	(OLD_PATTERN): Fix.
+	(release-bump-version): Fix gnusversionname substitution.
+	(OLD_PATTERN): Add grouping.
+
+2006-04-10  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* Makefile.in (GZIP_PROG): Use gzip -f.
+	(release-bump-version, RELEASE_COMMIT_FILES): Add README.
+	(release-sign-files): Remove old *.sig files.
+
+	* README: Say "development version".  Let sentences end with
+	double space.
+
+2006-04-07  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* Makefile.in (GZIP_PROG): New variable.
+	(release-diff): Use it.
+	(release-sign-files): New sign-only target.  Use GPG_AGENT_INFO.
+
+2006-04-04  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* Makefile.in (TAR_BALL_EXTRA, release-make-tar-ball, README):
+	Remove; README is in CVS now.
+	(release-files, release-files-signed, release-cvs-export)
+	(release-make-tar-ball): Use $(VERSION) instead of $(TAG).
+	(OLD_PATTERN): Catch stable and trunk.
+	(CIN): New variable.
+	(release-files, release-files-signed, release-cvs-export)
+	(release-make-tar-ball, release-diff, release-post-clean): Add
+	CIN.
+	(OLD_PATTERN): Remove quotes.
+	(release-bump-version): Fix typo.
+
+	* etc/images/README: Add more Emacs 22 icons.  Add suggestion on
+	how to use those in Emacs 21.
+
+	* etc/images/close.xpm, etc/images/cut.xpm, etc/images/home.xpm,
+	etc/images/index.xpm, etc/images/jump-to.xpm, etc/images/new.xpm,
+	etc/images/next-node.xpm, etc/images/open.xpm,
+	etc/images/preferences.xpm, etc/images/prev-node.xpm,
+	etc/images/saveas.xpm, etc/images/spell.xpm: New icons duplicated
+	from Emacs 22.
+
+	* README: Addition from 5.10.6 tar ball.  Clarify "beta".
+	Simplify Info directory setting.  Update required Emacs and XEmacs
+	version.  Use current Gnus version in examples.
+
+2006-03-31  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Generated.
+
+	* Makefile.in (CVS_IGNORE_FILES): Additions.
+	(release-files-signed): New target.
+
+	* etc/images/README: Update separator.xpm.
+
+2006-03-30  Romain Francoise  <romain@orebokech.com>
+
+	* GNUS-NEWS: Generated.
+
+2006-03-30  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* etc/images/separator.xpm: Update from Emacs CVS.
+
+	* GNUS-NEWS: Generated.
+
+2006-03-29  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* Makefile.in (release-bump-version): Consider named Gnus versions
+	in replacements.
+
+	* todo: Update "tool bar icons".
+
+2006-03-27  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* Makefile.in (release-revert-files): Replace
+	release-revert-changelog.
+	(release-diff): Remove garbage.
+
+2006-03-07  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* etc/images/README: Add GIMP script.
+	(attach.xpm): Move to top level.
+	(sort-*.xpm) Add.
+
+	* etc/images/sort-ascending.xpm,
+	etc/images/sort-column-ascending.xpm,
+	etc/images/sort-criteria.xpm, etc/images/sort-descending.xpm,
+	etc/images/sort-row-ascending.xpm: New icons from GNOME 2.6.
+
+2006-03-10  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* Makefile.in (release-check-settings): Add status and
+	suggestions.
+	(release-files): Remove duplicate release-cvs-export.
+	(README): New target.
+	(release-files, release-make-tar-ball, release-diff): List files.
+	(README, release-make-tar-ball): Fix.
+
+2006-03-06  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* GNUS-NEWS: Generated.
+
+	* Makefile.in (release-*): New targets.
+
+2006-02-28  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* todo: Remove nnweb.  Add: widget for posting styles, doc string
+	for utility functions, LIST SUBSCRIPTIONS, divide emacs-mime.texi,
+	change servers.
+
+	* etc/images/README (next-page.xpm): From Gnome, not from Emacs
+	22.
+
+	* cancel.xpm, copy.xpm, diropen.xpm, help.xpm, left-arrow.xpm,
+	next-page.xpm, paste.xpm, print.xpm, redo.xpm, right-arrow.xpm,
+	save.xpm, search.xpm: New icons duplicated from Emacs 22.
+
+	* etc/images/README: Add these icons.
+
+	* etc/images/README: Describe the new images.
+
+	* etc/gnus/gnus-setup.ast, etc/gnus/news-server.ast: Use
+	texinfo-mode.
+
+	* etc/images/mail/save.xpm, etc/images/mail/preview.xpm: Rename
+	char*.
+
+2006-03-03  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* xemacs.mak: Remove outdated file.  Use make.bat instead.
+
+2006-03-02  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* make.bat: Add note about "Out of environment space" on Windows
+	98 SE.  Avoid `>' in echo.
+
+2006-02-27  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* ChangeLog, texi/ChangeLog, lisp/ChangeLog: Fix "From so-and-so"
+	and "(tiny change)" entries.
+
+2006-02-22  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* etc/images/gnus/mail_send.xpm: Emacs 21 icon for
+	message-tool-bar-retro.
+
+2006-02-21  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* make.bat (:etc): Also consider images in images/mail and
+	images/.
+
+	* etc/Makefile.in (install, uninstall): Also consider images in
+	images/mail and images/.
+
+	* etc/images/connect.xpm, etc/images/contact.xpm,
+	etc/images/delete.xpm, etc/images/describe.xpm,
+	etc/images/disconnect.xpm, etc/images/exit.xpm,
+	etc/images/lock-broken.xpm, etc/images/lock-ok.xpm,
+	etc/images/lock.xpm, etc/images/refresh.xpm,
+	etc/images/gnus/toggle-subscription.xpm,
+	etc/images/mail/attach.xpm, etc/images/mail/compose.xpm,
+	etc/images/mail/copy.xpm, etc/images/mail/forward.xpm,
+	etc/images/mail/inbox.xpm, etc/images/mail/move.xpm,
+	etc/images/mail/not-spam.xpm, etc/images/mail/outbox.xpm,
+	etc/images/mail/reply-all.xpm, etc/images/mail/reply.xpm,
+	etc/images/mail/save-draft.xpm, etc/images/mail/send.xpm,
+	etc/images/mail/spam.xpm: New icons from GNOME 2.6.
+
+2006-02-21  Miguel Frasson  <frasson@math.leidenuniv.nl>
+
+	* etc/images/separator.xpm: Copy of sep.xpm from AUCTeX.
+
+2006-02-21  Adam Sj,Ax(Bgren  <asjo@koldfront.dk>
+
+	* etc/images/mail/save.xpm, etc/images/mail/preview.xpm: New icons.
+
+2006-01-26  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* Makefile.in (clean): Clean all subdirectories; remove *~.
+	(elclean): Remove lisp/auto-autoloads.el, lisp/custom-load.el, and
+	lisp/gnus-load.el.
+	(distclean): Don't use sub-make to run clean; use $(MAKE) instead
+	of make.
+
+	* etc/Makefile.in (clean): New rule.
+	(distclean): Use it; remove Makefile.
+
+2005-12-06  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* GNUS-NEWS: Generated.
+
+2005-10-31  Lars Magne Ingebrigtsen  <larsi@gnus.org>
+
+	* Testing CVS setup.  Yes.  Yes.  Yes.  Yes.
+
+2005-10-04  Katsumi Yamaoka  <yamaoka@jpl.org>
+
+	* aclocal.m4 (AC_PATH_LISPDIR): Default to .../site-lisp/gnus for
+	Emacs.
+	(AC_PATH_ETCDIR): Don't change the default value for Emacs.
+
+	* configure: Generated.
+
+	* Makefile.in (list-installed-shadows): New entry.
+	(remove-installed-shadows): New entry.
+
+	* GNUS-NEWS: Generated.
+
+2005-09-28  Reiner Steib  <Reiner.Steib@gmx.de>
+
+	* todo: Remove some items that are already done.  Add some new
+	items.  Add some comments.
+
+2005-08-10  Romain Francoise  <romain@orebokech.com>
+
+	* GNUS-NEWS: Generated.
+
+2005-07-18  Romain Francoise  <romain@orebokech.com>
+
+	* GNUS-NEWS: Generated.
+
 2005-02-19  Miles Bader  <miles@gnu.org>
 
 	* etc/Makefile.in (install): Create $(etcdir)/images/gnus dir.
@@ -72,19 +306,18 @@
 
 	* etc/gnus/news-server.ast: Use library validation.
 
-2004-03-08  Kevin Greiner <kgreiner@xpediantsolutions.com>
+2004-03-08  Kevin Greiner  <kgreiner@xpediantsolutions.com>
 
 	* make.bat: Make sure that gnus-load.el and sieve are writable to
 	avoid breakage.
 
-2004-03-01  Reiner Steib  <Reiner.Steib@gmx.de>
+2004-03-01  Michael Schierl  <schierlm-public@gmx.de>  (tiny change)
 
-	* make.bat: Fix directory test for Windows 9x/ME.  From Michael
-	Schierl <schierlm-public@gmx.de> (tiny change).
+	* make.bat: Fix directory test for Windows 9x/ME.
 
-2004-01-07  Hiroshi Fujishima  <pooh@nature.tsukuba.ac.jp>
+2004-01-07  Hiroshi Fujishima  <pooh@nature.tsukuba.ac.jp>  (tiny change)
 
-	* etc/gnus-tut.txt: `G m' instead of `G V' (tiny patch).
+	* etc/gnus-tut.txt: `G m' instead of `G V'
 
 2004-01-05  Jesper Harder  <harder@ifa.au.dk>
 
@@ -391,7 +624,7 @@
 
 	* configure.in: Use it.
 
-2001-01-15  Jesper Harder <harder@ifa.au.dk>
+2001-01-15  Jesper Harder  <harder@ifa.au.dk>
 
 	* make.bat: Fix doc.
 
@@ -399,16 +632,16 @@
 
 	* configure.in: Add etc/Makefile.
 
-2000-12-20  Jesper Harder <jesper_harder@hotmail.com>
+2000-12-20  Jesper Harder  <jesper_harder@hotmail.com>
 
 	* make.bat: set max-lisp-eval-depth.
 
-2000-10-12  Jesper Harder <jesper_harder@hotmail.com>
+2000-10-12  Jesper Harder  <jesper_harder@hotmail.com>
 
 	* make.bat: Makes it possible to generate the Info files on
 	windows again.
 
-2000-08-24 Jesper Harder <jesper_harder@hotmail.com>
+2000-08-24 Jesper Harder  <jesper_harder@hotmail.com>
 
 	* make.bat: Use emacs.exe if emacs.bat does not exist.
 

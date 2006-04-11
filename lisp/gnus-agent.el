@@ -1,6 +1,7 @@
 ;;; gnus-agent.el --- unplugged support for Gnus
-;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -17,8 +18,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -117,6 +118,8 @@ If nil, only read articles will be expired."
 (defcustom gnus-agent-synchronize-flags nil
   "Indicate if flags are synchronized when you plug in.
 If this is `ask' the hook will query the user."
+  ;; If the default switches to something else than nil, then the function
+  ;; should be fixed not be exceedingly slow.  See 2005-09-20 ChangeLog entry.
   :version "21.1"
   :type '(choice (const :tag "Always" t)
 		 (const :tag "Never" nil)
@@ -201,7 +204,7 @@ queue.  Otherwise, queue if and only if unplugged."
   :group 'gnus-agent
   :type '(radio (const :format "Always" always)
 		(const :format "Never" nil)
-		(const :format "When plugged" t)))
+		(const :format "When unplugged" t)))
 
 (defcustom gnus-agent-prompt-send-queue nil
   "If non-nil, `gnus-group-send-queue' will prompt if called when
@@ -209,6 +212,18 @@ unplugged."
   :version "22.1"
   :group 'gnus-agent
   :type 'boolean)
+
+(defcustom gnus-agent-article-alist-save-format 1
+  "Indicates whether to use compression(2), versus no
+compression(1), when writing agentview files.  The compressed
+files do save space but load times are 6-7 times higher.  A group
+must be opened then closed for the agentview to be updated using
+the new format."
+  ;; Wouldn't symbols instead numbers be nicer?  --rsteib
+  :version "22.1"
+  :group 'gnus-agent
+  :type '(radio (const :format "Compressed" 2)
+		(const :format "Uncompressed" 1)))
 
 ;;; Internal variables
 
@@ -575,7 +590,8 @@ manipulated as follows:
   (if (and (fboundp 'propertize)
 	   (fboundp 'make-mode-line-mouse-map))
       (propertize string 'local-map
-		  (make-mode-line-mouse-map mouse-button mouse-func))
+		  (make-mode-line-mouse-map mouse-button mouse-func)
+		  'mouse-face 'mode-line-highlight)
     string))
 
 (defun gnus-agent-toggle-plugged (set-to)
@@ -823,7 +839,7 @@ be a select method."
   (save-excursion
     (dolist (gnus-command-method (gnus-agent-covered-methods))
       (when (and (file-exists-p (gnus-agent-lib-file "flags"))
-		 (not (eq (gnus-server-status gnus-command-method) 'offline)))
+		 (eq (gnus-server-status gnus-command-method) 'ok))
 	(gnus-agent-possibly-synchronize-flags-server gnus-command-method)))))
 
 (defun gnus-agent-synchronize-flags-server (method)
@@ -868,9 +884,11 @@ be a select method."
 
 ;;;###autoload
 (defun gnus-agent-rename-group (old-group new-group)
-  "Rename fully-qualified OLD-GROUP as NEW-GROUP.  Always updates the agent, even when
-disabled, as the old agent files would corrupt gnus when the agent was
-next enabled. Depends upon the caller to determine whether group renaming is supported."
+  "Rename fully-qualified OLD-GROUP as NEW-GROUP.
+Always updates the agent, even when disabled, as the old agent
+files would corrupt gnus when the agent was next enabled.
+Depends upon the caller to determine whether group renaming is
+supported."
   (let* ((old-command-method (gnus-find-method-for-group old-group))
 	 (old-path           (directory-file-name
 			      (let (gnus-command-method old-command-method)
@@ -898,9 +916,11 @@ next enabled. Depends upon the caller to determine whether group renaming is sup
 
 ;;;###autoload
 (defun gnus-agent-delete-group (group)
-  "Delete fully-qualified GROUP.  Always updates the agent, even when
-disabled, as the old agent files would corrupt gnus when the agent was
-next enabled. Depends upon the caller to determine whether group deletion is supported."
+  "Delete fully-qualified GROUP.
+Always updates the agent, even when disabled, as the old agent
+files would corrupt gnus when the agent was next enabled.
+Depends upon the caller to determine whether group deletion is
+supported."
   (let* ((command-method (gnus-find-method-for-group group))
 	 (path           (directory-file-name
 			  (let (gnus-command-method command-method)
@@ -1561,7 +1581,7 @@ downloaded into the agent."
                           (while (looking-at "\\([^: \n]+\\):\\([0-9]+\\) *")
                             (push (cons (buffer-substring (match-beginning 1)
                                                           (match-end 1))
-                                        (string-to-int
+                                        (string-to-number
 					 (buffer-substring (match-beginning 2)
 							   (match-end 2))))
                                   crosses)
@@ -1851,7 +1871,7 @@ article numbers will be returned."
 (defsubst gnus-agent-read-article-number ()
   "Reads the article number at point.  Returns nil when a valid article number can not be read."
 
-  ;; It is unfortunite but the read function quietly overflows
+  ;; It is unfortunate but the read function quietly overflows
   ;; integer.  As a result, I have to use string operations to test
   ;; for overflow BEFORE calling read.
   (when (looking-at "[0-9]+\t")
@@ -1910,21 +1930,21 @@ doesn't exist, to valid the overview buffer."
       (gnus-agent-copy-nov-line (pop articles))
 
       (ignore-errors
-       (while articles
-	 (while (let ((art (read (current-buffer))))
-		  (cond ((< art (car articles))
-			 (forward-line 1)
-			 t)
-			((= art (car articles))
-			 (beginning-of-line)
-			 (delete-region
-			  (point) (progn (forward-line 1) (point)))
-			 nil)
-			(t
-			 (beginning-of-line)
-			 nil))))
+	(while articles
+	  (while (let ((art (read (current-buffer))))
+		   (cond ((< art (car articles))
+			  (forward-line 1)
+			  t)
+			 ((= art (car articles))
+			  (beginning-of-line)
+			  (delete-region
+			   (point) (progn (forward-line 1) (point)))
+			  nil)
+			 (t
+			  (beginning-of-line)
+			  nil))))
 
-	 (gnus-agent-copy-nov-line (pop articles)))))
+	  (gnus-agent-copy-nov-line (pop articles)))))
 
     (goto-char (point-max))
 
@@ -1940,23 +1960,39 @@ doesn't exist, to valid the overview buffer."
 	(goto-char p))
 
       (setq last (or last -134217728))
-      (let (sort art)
-	(while (not (eobp))
-	  (setq art (gnus-agent-read-article-number))
-	  (cond ((not art)
-		 ;; Bad art num - delete this line
-		 (beginning-of-line)
-		 (delete-region (point) (progn (forward-line 1) (point))))
-		((< art last)
-		 ;; Art num out of order - enable sort
-		 (setq sort t)
-		 (forward-line 1))
-		(t
-		 ;; Good art num
-		 (setq last art)
-		 (forward-line 1))))
-	(when sort
-	  (sort-numeric-fields 1 (point-min) (point-max)))))))
+      (while (catch 'problems
+	       (let (sort art)
+		 (while (not (eobp))
+		   (setq art (gnus-agent-read-article-number))
+		   (cond ((not art)
+			  ;; Bad art num - delete this line
+			  (beginning-of-line)
+			  (delete-region (point) (progn (forward-line 1) (point))))
+			 ((< art last)
+			  ;; Art num out of order - enable sort
+			  (setq sort t)
+			  (forward-line 1))
+			 ((= art last)
+			  ;; Bad repeat of art number - delete this line
+			  (beginning-of-line)
+			  (delete-region (point) (progn (forward-line 1) (point))))
+			 (t
+			  ;; Good art num
+			  (setq last art)
+			  (forward-line 1))))
+		 (when sort
+		   ;; something is seriously wrong as we simply shouldn't see out-of-order data.
+		   ;; First, we'll fix the sort.
+		   (sort-numeric-fields 1 (point-min) (point-max))
+
+		   ;; but now we have to consider that we may have duplicate rows...	  
+		   ;; so reset to beginning of file
+		   (goto-char (point-min))
+		   (setq last -134217728)
+	  
+		   ;; and throw a code that restarts this scan
+		   (throw 'problems t))
+		 nil))))))
 
 ;; Keeps the compiler from warning about the free variable in
 ;; gnus-agent-read-agentview.
@@ -1973,61 +2009,55 @@ doesn't exist, to valid the overview buffer."
            'gnus-agent-file-loading-cache
            'gnus-agent-read-agentview))))
 
-;; Save format may be either 1 or 2.  Two is the new, compressed
-;; format that is still being tested.  Format 1 is uncompressed but
-;; known to be reliable.
-(defconst gnus-agent-article-alist-save-format 2)
-
 (defun gnus-agent-read-agentview (file)
   "Load FILE and do a `read' there."
   (with-temp-buffer
     (condition-case nil
-      (progn
-        (nnheader-insert-file-contents file)
-        (goto-char (point-min))
-        (let ((alist (read (current-buffer)))
-              (version (condition-case nil (read (current-buffer))
-                         (end-of-file 0)))
-              changed-version)
+	(progn
+	  (nnheader-insert-file-contents file)
+	  (goto-char (point-min))
+	  (let ((alist (read (current-buffer)))
+		(version (condition-case nil (read (current-buffer))
+			   (end-of-file 0)))
+		changed-version)
 
-          (cond
-           ((< version 2)
-            (error "gnus-agent-read-agentview no longer supports version %d.  Stop gnus, manually evaluate gnus-agent-convert-to-compressed-agentview, then restart gnus." version))
-           ((= version 0)
-            (let ((inhibit-quit t)
-                  entry)
-              (gnus-agent-open-history)
-              (set-buffer (gnus-agent-history-buffer))
-              (goto-char (point-min))
-              (while (not (eobp))
-                (if (and (looking-at
-                          "[^\t\n]+\t\\([0-9]+\\)\t\\([^ \n]+\\) \\([0-9]+\\)")
-                         (string= (match-string 2)
-                                  gnus-agent-read-agentview)
-                         (setq entry (assoc (string-to-number (match-string 3)) alist)))
-                    (setcdr entry (string-to-number (match-string 1))))
-                (forward-line 1))
-              (gnus-agent-close-history)
-              (setq changed-version t)))
-           ((= version 1)
-            (setq changed-version (not (= 1 gnus-agent-article-alist-save-format))))
-           ((= version 2)
-            (let (uncomp)
-              (mapcar
-               (lambda (comp-list)
-                 (let ((state (car comp-list))
-                       (sequence (inline
-				   (gnus-uncompress-range
-				    (cdr comp-list)))))
-                   (mapcar (lambda (article-id)
-                             (setq uncomp (cons (cons article-id state) uncomp)))
-                           sequence)))
-               alist)
-              (setq alist (sort uncomp 'car-less-than-car)))))
-          (when changed-version
-            (let ((gnus-agent-article-alist alist))
-              (gnus-agent-save-alist gnus-agent-read-agentview)))
-          alist))
+	    (cond
+	     ((= version 0)
+	      (let ((inhibit-quit t)
+		    entry)
+		(gnus-agent-open-history)
+		(set-buffer (gnus-agent-history-buffer))
+		(goto-char (point-min))
+		(while (not (eobp))
+		  (if (and (looking-at
+			    "[^\t\n]+\t\\([0-9]+\\)\t\\([^ \n]+\\) \\([0-9]+\\)")
+			   (string= (match-string 2)
+				    gnus-agent-read-agentview)
+			   (setq entry (assoc (string-to-number (match-string 3)) alist)))
+		      (setcdr entry (string-to-number (match-string 1))))
+		  (forward-line 1))
+		(gnus-agent-close-history)
+		(setq changed-version t)))
+	     ((= version 1)
+	      (setq changed-version (not (= 1 gnus-agent-article-alist-save-format))))
+	     ((= version 2)
+	      (let (uncomp)
+		(mapcar
+		 (lambda (comp-list)
+		   (let ((state (car comp-list))
+			 (sequence (inline
+				     (gnus-uncompress-range
+				      (cdr comp-list)))))
+		     (mapcar (lambda (article-id)
+			       (setq uncomp (cons (cons article-id state) uncomp)))
+			     sequence)))
+		 alist)
+		(setq alist (sort uncomp 'car-less-than-car)))
+	      (setq changed-version (not (= 2 gnus-agent-article-alist-save-format)))))
+	    (when changed-version
+	      (let ((gnus-agent-article-alist alist))
+		(gnus-agent-save-alist gnus-agent-read-agentview)))
+	    alist))
       (file-error nil))))
 
 (defun gnus-agent-save-alist (group &optional articles state)
@@ -2139,7 +2169,7 @@ modified) original contents, they are first saved to their own file."
               ;; NOTE: The '+ 0' ensure that min and max are both numerics.
               (set group (cons (+ 0 min) (+ 0 max))))
           (error
-           (gnus-message 3 "Warning - invalid agent local: %s on line %d: "
+           (gnus-message 3 "Warning - invalid agent local: %s on line %d: %s"
                          file line (error-message-string err))))
         (forward-line 1)
         (setq line (1+ line))))
@@ -2170,13 +2200,14 @@ modified) original contents, they are first saved to their own file."
 				((member (symbol-name symbol) '("+dirty" "+method"))
 				 nil)
 				(t
-				 (prin1 symbol)
 				 (let ((range (symbol-value symbol)))
-				   (princ " ")
-				   (princ (car range))
-				   (princ " ")
-				   (princ (cdr range))
-				   (princ "\n")))))
+				   (when range
+				     (prin1 symbol)
+				     (princ " ")
+				     (princ (car range))
+				     (princ " ")
+				     (princ (cdr range))
+				     (princ "\n"))))))
 			my-obarray))))))))
 
 (defun gnus-agent-get-local (group &optional gmane method)
@@ -2586,7 +2617,7 @@ The following commands are available:
   (buffer-disable-undo)
   (setq truncate-lines t)
   (setq buffer-read-only t)
-  (gnus-run-hooks 'gnus-category-mode-hook))
+  (gnus-run-mode-hooks 'gnus-category-mode-hook))
 
 (defalias 'gnus-category-position-point 'gnus-goto-colon)
 
@@ -2967,7 +2998,7 @@ FORCE is equivalent to setting the expiration predicates to true."
       (if (or (not (eq articles t))
               (yes-or-no-p
                (concat "Are you sure that you want to "
-                       "expire all articles in " group ".")))
+                       "expire all articles in " group "? ")))
           (let ((gnus-command-method (gnus-find-method-for-group group))
                 (overview (gnus-get-buffer-create " *expire overview*"))
                 orig)
@@ -3376,7 +3407,7 @@ FORCE is equivalent to setting the expiration predicates to true."
       (gnus-agent-expire-group group articles force)
     (if (or (not (eq articles t))
             (yes-or-no-p "Are you sure that you want to expire all \
-articles in every agentized group."))
+articles in every agentized group? "))
         (let ((methods (gnus-agent-covered-methods))
               ;; Bind gnus-agent-expire-current-dirs to enable tracking
               ;; of agent directories.
@@ -3774,7 +3805,7 @@ If REREAD is not nil, downloaded articles are marked as unread."
 	   (dir (file-name-directory file))
 	   point
 	   (downloaded (if (file-exists-p dir)
-			   (sort (mapcar (lambda (name) (string-to-int name))
+			   (sort (mapcar (lambda (name) (string-to-number name))
 					 (directory-files dir nil "^[0-9]+$" t))
 				 '>)
 			 (progn (gnus-make-directory dir) nil)))

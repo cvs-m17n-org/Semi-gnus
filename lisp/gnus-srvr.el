@@ -1,6 +1,7 @@
 ;;; gnus-srvr.el --- virtual server support for Gnus
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -19,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -115,6 +116,7 @@ If nil, a faster, but more primitive, buffer is used instead."
        ["Copy" gnus-server-copy-server t]
        ["Edit" gnus-server-edit-server t]
        ["Regenerate" gnus-server-regenerate-server t]
+       ["Compact" gnus-server-compact-server t]
        ["Exit" gnus-server-exit t]))
 
     (easy-menu-define
@@ -164,70 +166,82 @@ If nil, a faster, but more primitive, buffer is used instead."
 
     "g" gnus-server-regenerate-server
 
+    "z" gnus-server-compact-server
+
     "\C-c\C-i" gnus-info-find-node
     "\C-c\C-b" gnus-bug))
 
-(defface gnus-server-agent-face
+(defface gnus-server-agent
   '((((class color) (background light)) (:foreground "PaleTurquoise" :bold t))
     (((class color) (background dark)) (:foreground "PaleTurquoise" :bold t))
     (t (:bold t)))
   "Face used for displaying AGENTIZED servers"
   :group 'gnus-server-visual)
+;; backward-compatibility alias
+(put 'gnus-server-agent-face 'face-alias 'gnus-server-agent)
 
-(defface gnus-server-opened-face
+(defface gnus-server-opened
   '((((class color) (background light)) (:foreground "Green3" :bold t))
     (((class color) (background dark)) (:foreground "Green1" :bold t))
     (t (:bold t)))
   "Face used for displaying OPENED servers"
   :group 'gnus-server-visual)
+;; backward-compatibility alias
+(put 'gnus-server-opened-face 'face-alias 'gnus-server-opened)
 
-(defface gnus-server-closed-face
+(defface gnus-server-closed
   '((((class color) (background light)) (:foreground "Steel Blue" :italic t))
     (((class color) (background dark))
      (:foreground "Light Steel Blue" :italic t))
     (t (:italic t)))
   "Face used for displaying CLOSED servers"
   :group 'gnus-server-visual)
+;; backward-compatibility alias
+(put 'gnus-server-closed-face 'face-alias 'gnus-server-closed)
 
-(defface gnus-server-denied-face
+(defface gnus-server-denied
   '((((class color) (background light)) (:foreground "Red" :bold t))
     (((class color) (background dark)) (:foreground "Pink" :bold t))
     (t (:inverse-video t :bold t)))
   "Face used for displaying DENIED servers"
   :group 'gnus-server-visual)
+;; backward-compatibility alias
+(put 'gnus-server-denied-face 'face-alias 'gnus-server-denied)
 
-(defface gnus-server-offline-face
+(defface gnus-server-offline
   '((((class color) (background light)) (:foreground "Orange" :bold t))
     (((class color) (background dark)) (:foreground "Yellow" :bold t))
     (t (:inverse-video t :bold t)))
   "Face used for displaying OFFLINE servers"
   :group 'gnus-server-visual)
+;; backward-compatibility alias
+(put 'gnus-server-offline-face 'face-alias 'gnus-server-offline)
 
-(defcustom gnus-server-agent-face 'gnus-server-agent-face
+(defcustom gnus-server-agent-face 'gnus-server-agent
   "Face name to use on AGENTIZED servers."
   :version "22.1"
   :group 'gnus-server-visual
   :type 'face)
 
-(defcustom gnus-server-opened-face 'gnus-server-opened-face
+(defcustom gnus-server-opened-face 'gnus-server-opened
   "Face name to use on OPENED servers."
   :version "22.1"
   :group 'gnus-server-visual
   :type 'face)
 
-(defcustom gnus-server-closed-face 'gnus-server-closed-face
+(defcustom gnus-server-closed-face 'gnus-server-closed
   "Face name to use on CLOSED servers."
   :version "22.1"
   :group 'gnus-server-visual
   :type 'face)
 
-(defcustom gnus-server-denied-face 'gnus-server-denied-face
+(defcustom gnus-server-denied-face 'gnus-server-denied
   "Face name to use on DENIED servers."
   :version "22.1"
   :group 'gnus-server-visual
   :type 'face)
 
-(defcustom gnus-server-offline-face 'gnus-server-offline-face
+(defcustom gnus-server-offline-face 'gnus-server-offline
   "Face name to use on OFFLINE servers."
   :version "22.1"
   :group 'gnus-server-visual
@@ -269,7 +283,7 @@ The following commands are available:
       (put 'gnus-server-mode 'font-lock-defaults '(gnus-server-font-lock-keywords t))
     (set (make-local-variable 'font-lock-defaults)
 	 '(gnus-server-font-lock-keywords t)))
-  (gnus-run-hooks 'gnus-server-mode-hook))
+  (gnus-run-mode-hooks 'gnus-server-mode-hook))
 
 (defun gnus-server-insert-server-line (gnus-tmp-name method)
   (let* ((gnus-tmp-how (car method))
@@ -861,7 +875,7 @@ buffer.
   (setq truncate-lines t)
   (gnus-set-default-directory)
   (setq buffer-read-only t)
-  (gnus-run-hooks 'gnus-browse-mode-hook))
+  (gnus-run-mode-hooks 'gnus-browse-mode-hook))
 
 (defun gnus-browse-read-group (&optional no-article number)
   "Enter the group at the current line.
@@ -1000,6 +1014,40 @@ If NUMBER, fetch this number of articles."
     (if (gnus-request-regenerate server)
 	(gnus-message 5 "Requesting regeneration of %s...done" server)
       (gnus-message 5 "Couldn't regenerate %s" server))))
+
+
+;;;
+;;; Server compaction. -- dvl
+;;;
+
+;; #### FIXME: this function currently fails to update the Group buffer's
+;; #### appearance.
+(defun gnus-server-compact-server ()
+  "Issue a command to the server to compact all its groups.
+
+Note: currently only implemented in nnml."
+  (interactive)
+  (let ((server (gnus-server-server-name)))
+    (unless server
+      (error "No server on the current line"))
+    (condition-case ()
+	(gnus-get-function (gnus-server-to-method server)
+			   'request-compact)
+      (error
+       (error "This back end doesn't support compaction")))
+    (gnus-message 5 "\
+Requesting compaction of %s... (this may take a long time)"
+		  server)
+    (unless (gnus-open-server server)
+      (error "Couldn't open server"))
+    (if (not (gnus-request-compact server))
+	(gnus-message 5 "Couldn't compact %s" server)
+      (gnus-message 5 "Requesting compaction of %s...done" server)
+      ;; Invalidate the original article buffer which might be out of date.
+      ;; #### NOTE: Yes, this might be a bit rude, but since compaction
+      ;; #### will not happen very often, I think this is acceptable.
+      (let ((original (get-buffer gnus-original-article-buffer)))
+	(and original (gnus-kill-buffer original))))))
 
 (provide 'gnus-srvr)
 

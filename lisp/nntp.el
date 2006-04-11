@@ -1,7 +1,8 @@
 ;;; nntp.el --- nntp access for Gnus
 
-;; Copyright (C) 1987, 1988, 1989, 1990, 1992, 1993, 1994, 1995, 1996,
-;; 1997, 1998, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+;; Copyright (C) 1987, 1988, 1989, 1990, 1992, 1993,
+;;   1994, 1995, 1996, 1997, 1998, 2000, 2001, 2002,
+;;   2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -20,7 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, 675 Mass Ave, Cambridge, MA 02139, USA.
+;; Free Software Foundation, 51 Franklin Street, Fifth Floor, Boston,
+;; MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -102,8 +104,8 @@ This command is used by the methods `nntp-open-telnet-stream',
 
 (defvoo nntp-end-of-line "\r\n"
   "*String to use on the end of lines when talking to the NNTP server.
-This is \"\\r\\n\" by default, but should be \"\\n\" when using and
-indirect telnet connection method (nntp-open-via-*-and-telnet).")
+This is \"\\r\\n\" by default, but should be \"\\n\" when using an indirect
+connection method (nntp-open-via-*).")
 
 (defvoo nntp-via-rlogin-command "rsh"
   "*Rlogin command used to connect to an intermediate host.
@@ -185,9 +187,6 @@ then use this hook to rsh to the remote machine and start a proxy NNTP
 server there that you can connect to.  See also
 `nntp-open-connection-function'")
 
-(defvoo nntp-warn-about-losing-connection t
-  "*If non-nil, beep when a server closes connection.")
-
 (defvoo nntp-coding-system-for-read 'binary
   "*Coding system to read from NNTP.")
 
@@ -206,7 +205,7 @@ See `nnml-marks-is-evil' for more information.")
 (defcustom nntp-marks-directory
   (nnheader-concat gnus-directory "marks/")
   "*The directory where marks for nntp groups will be stored."
-  :group 'gnus
+  :group 'nntp
   :type 'directory)
 
 (defcustom nntp-authinfo-file "~/.authinfo"
@@ -278,12 +277,19 @@ noticing asynchronous data.")
 (defvar nntp-async-timer nil)
 (defvar nntp-async-process-list nil)
 
-(defvar nntp-ssl-program 
+(defvar nntp-ssl-program
   "openssl s_client -quiet -ssl3 -connect %s:%p"
 "A string containing commands for SSL connections.
 Within a string, %s is replaced with the server address and %p with
 port number on server.  The program should accept IMAP commands on
 stdin and return responses to stdout.")
+
+(defvar nntp-authinfo-rejected nil
+"A custom error condition used to report 'Authentication Rejected' errors.  
+Condition handlers that match just this condition ensure that the nntp 
+backend doesn't catch this error.")
+(put 'nntp-authinfo-rejected 'error-conditions '(error nntp-authinfo-rejected))
+(put 'nntp-authinfo-rejected 'error-message "Authorization Rejected")
 
 
 
@@ -335,16 +341,21 @@ be restored and the command retried."
 
 (defsubst nntp-wait-for (process wait-for buffer &optional decode discard)
   "Wait for WAIT-FOR to arrive from PROCESS."
+
   (save-excursion
     (set-buffer (process-buffer process))
     (goto-char (point-min))
+
     (while (and (or (not (memq (char-after (point)) '(?2 ?3 ?4 ?5)))
-		    (looking-at "480"))
+		    (looking-at "48[02]"))
 		(memq (process-status process) '(open run)))
-      (when (looking-at "480")
-	(nntp-handle-authinfo process))
-      (when (looking-at "^.*\n")
-	(delete-region (point) (progn (forward-line 1) (point))))
+      (cond ((looking-at "480")
+	     (nntp-handle-authinfo process))
+	    ((looking-at "482")
+	     (nnheader-report 'nntp (get 'nntp-authinfo-rejected 'error-message))
+	     (signal 'nntp-authinfo-rejected nil))
+	    ((looking-at "^.*\n")
+	     (delete-region (point) (progn (forward-line 1) (point)))))
       (nntp-accept-process-output process)
       (goto-char (point-min)))
     (prog1
@@ -440,6 +451,8 @@ be restored and the command retried."
                  (wait-for
                   (nntp-wait-for process wait-for buffer decode))
                  (t t)))
+	    (nntp-authinfo-rejected
+	     (signal 'nntp-authinfo-rejected (cdr err)))
             (error
              (nnheader-report 'nntp "Couldn't open connection to %s: %s"
                               address err))
@@ -560,7 +573,12 @@ be restored and the command retried."
    ;; a line with only a "." on it.
    ((eq (char-after) ?2)
     (if (re-search-forward "\n\\.\r?\n" nil t)
-	t
+	(progn
+	  ;; Some broken news servers add another dot at the end.
+	  ;; Protect against inflooping there.
+	  (while (looking-at "^\\.\r?\n")
+	    (forward-line 1))
+	  t)
       nil))
    ;; A result that starts with a 3xx or 4xx code is terminated
    ;; by a newline.
@@ -622,7 +640,8 @@ command whose response triggered the error."
                           (condition-case nil
 			      (progn ,@forms)
 			    (quit
-			     (nntp-close-server)
+			     (unless debug-on-quit
+			       (nntp-close-server))
                              (signal 'quit nil))))
 		  (when timer
 		    (nnheader-cancel-timer timer)))
@@ -909,7 +928,7 @@ command whose response triggered the error."
     (if (numberp article) (int-to-string article) article))))
 
 (deffoo nntp-request-group (group &optional server dont-check)
-  (nntp-with-open-group 
+  (nntp-with-open-group
     nil server
     (when (nntp-send-command "^[245].*\n" "GROUP" group)
       (let ((entry (nntp-find-connection-entry nntp-server-buffer)))
@@ -1195,7 +1214,7 @@ password contained in '~/.nntp-authinfo'."
       (nntp-kill-buffer pbuffer))
     (when (and (buffer-name pbuffer)
 	       process)
-      (process-kill-without-query process)
+      (gnus-set-process-query-on-exit-flag process nil)
       (if (and (nntp-wait-for process "^2.*\n" buffer nil t)
 	       (memq (process-status process) '(open run)))
 	  (prog1
@@ -1215,20 +1234,21 @@ password contained in '~/.nntp-authinfo'."
 (defun nntp-open-network-stream (buffer)
   (open-network-stream "nntpd" buffer nntp-address nntp-port-number))
 
-(autoload 'format-spec "format")
-(autoload 'format-spec-make "format")
-(autoload 'open-tls-stream "tls")
+(eval-and-compile
+  (autoload 'format-spec "format-spec")
+  (autoload 'format-spec-make "format-spec")
+  (autoload 'open-tls-stream "tls"))
 
 (defun nntp-open-ssl-stream (buffer)
   (let* ((process-connection-type nil)
-	 (proc (start-process "nntpd" buffer 
+	 (proc (start-process "nntpd" buffer
 			      shell-file-name
 			      shell-command-switch
-			      (format-spec nntp-ssl-program 
+			      (format-spec nntp-ssl-program
 					   (format-spec-make
 					    ?s nntp-address
 					    ?p nntp-port-number)))))
-    (process-kill-without-query proc)
+    (gnus-set-process-query-on-exit-flag proc nil)
     (save-excursion
       (set-buffer buffer)
       (let ((nntp-connection-alist (list proc buffer nil)))
@@ -1239,7 +1259,7 @@ password contained in '~/.nntp-authinfo'."
 
 (defun nntp-open-tls-stream (buffer)
   (let ((proc (open-tls-stream "nntpd" buffer nntp-address nntp-port-number)))
-    (process-kill-without-query proc)
+    (gnus-set-process-query-on-exit-flag proc nil)
     (save-excursion
       (set-buffer buffer)
       (let ((nntp-connection-alist (list proc buffer nil)))
@@ -1379,7 +1399,7 @@ password contained in '~/.nntp-authinfo'."
     ;; that the server has closed the connection.  This MUST be
     ;; handled here as the buffer restored by the save-excursion may
     ;; be the process's former output buffer (i.e. now killed)
-    (or (and process 
+    (or (and process
 	     (memq (process-status process) '(open run)))
         (nntp-report "Server closed connection"))))
 
@@ -1560,8 +1580,8 @@ password contained in '~/.nntp-authinfo'."
         (when (<= count 1)
           (goto-char (point-min))
           (when (re-search-forward "^[0-9][0-9][0-9] .*\n\\([0-9]+\\)" nil t)
-            (let ((low-limit (string-to-int
-			      (buffer-substring (match-beginning 1) 
+            (let ((low-limit (string-to-number
+			      (buffer-substring (match-beginning 1)
 						(match-end 1)))))
               (while (and articles (<= (car articles) low-limit))
                 (setq articles (cdr articles))))))
@@ -1630,7 +1650,7 @@ password contained in '~/.nntp-authinfo'."
       (goto-char (point-min))
       ;; We first find the number by looking at the status line.
       (let ((number (and (looking-at "2[0-9][0-9] +\\([0-9]+\\) ")
-			 (string-to-int
+			 (string-to-number
 			  (buffer-substring (match-beginning 1)
 					    (match-end 1)))))
 	    newsgroups xref)
@@ -1668,7 +1688,7 @@ password contained in '~/.nntp-authinfo'."
 		    "\\([^ :]+\\):\\([0-9]+\\)")
 		  xref))
 	    (setq group (match-string 1 xref)
-		  number (string-to-int (match-string 2 xref))))
+		  number (string-to-number (match-string 2 xref))))
 	   ((and (setq newsgroups
 		       (mail-fetch-field "newsgroups"))
 		 (not (string-match "," newsgroups)))
@@ -1984,7 +2004,8 @@ Please refer to the following variables to customize the connection:
       (make-directory (directory-file-name dir) t)
       (nnheader-message 5 "Creating nntp marks directory %s" dir))))
 
-(autoload 'time-less-p "time-date")
+(eval-and-compile
+  (autoload 'time-less-p "time-date"))
 
 (defun nntp-marks-changed-p (group server)
   (let ((file (expand-file-name

@@ -1,7 +1,7 @@
 ;;; gnus-soup.el --- SOUP packet writing support for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2002
-;;	Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <abraham@iesd.auc.dk>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -21,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -349,9 +349,9 @@ If NOT-ALL, don't pack ticked articles."
 	 (packer (if (< (string-match "%s" packer)
 			(string-match "%d" packer))
 		     (format packer files
-			     (string-to-int (gnus-soup-unique-prefix dir)))
+			     (string-to-number (gnus-soup-unique-prefix dir)))
 		   (format packer
-			   (string-to-int (gnus-soup-unique-prefix dir))
+			   (string-to-number (gnus-soup-unique-prefix dir))
 			   files)))
 	 (dir (expand-file-name dir)))
     (gnus-make-directory dir)
@@ -385,7 +385,7 @@ though the two last may be nil if they are missing."
 			(and (eq (preceding-char) ?\t)
 			     (gnus-soup-field))
 			(and (eq (preceding-char) ?\t)
-			     (string-to-int (gnus-soup-field))))
+			     (string-to-number (gnus-soup-field))))
 		areas)
 	  (when (eq (preceding-char) ?\t)
 	    (beginning-of-line 2)))
@@ -535,7 +535,7 @@ Return whether the unpacking was successful."
 		(error "Bad header"))
 	      (forward-line 1)
 	      (setq beg (point)
-		    end (+ (point) (string-to-int
+		    end (+ (point) (string-to-number
 				    (buffer-substring
 				     (match-beginning 1) (match-end 1)))))
 	      (switch-to-buffer tmp-buf)
