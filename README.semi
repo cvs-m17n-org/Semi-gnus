@@ -27,8 +27,8 @@ http://emacs-w3m.namazu.org/
 http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
 
-How to get? (via CVS)
-=====================
+How to get?
+===========
 
 (0) cvs login (first time only)
 
@@ -85,17 +85,6 @@ Major tags are following:
     nana-gnus-N1_N2	Stable version of `keiichi branch'.
 
 For more detailed information, please read README.branch.
-
-
-How to get? (via ftp)
-=====================
-
-  T-gnus 6.17 is available from
-
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.17/snapshots/
-
-  NOTE: These snapshots are manually created when the urge takes the
-  administrator of the a-ftp site, and will usually not be tested.
 
 
 How to join development

@@ -28,8 +28,8 @@ http://emacs-w3m.namazu.org/
 http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
 
 
-取得方法 (CVS)
-==============
+取得方法
+========
 
 (0) cvs login (初回のみ)
 
@@ -86,17 +86,6 @@ http://ei5nazha.yz.yamagata-u.ac.jp/~aito/w3m/
     nana-gnus-N1_N2	Stable version of `keiichi branch'.
 
 詳しくは、README.branch.ja を参照してください。
-
-
-取得方法 (ftp)
-==============
-
-  T-gnus 6.17 は以下の場所から取得可能です。
-
-    ftp://ftp.jpl.org/pub/elisp/t-gnus-6.17/snapshots/
-
-  注意: これらの snapshot は a-ftp site の管理者の気が向いたときに手動
-  で作成され、普通はテストされていません。
 
 
 開発への参加方法
