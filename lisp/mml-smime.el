@@ -1,5 +1,7 @@
 ;;; mml-smime.el --- S/MIME support for MML
-;; Copyright (c) 2000, 2001, 2003, 2005 Free Software Foundation, Inc.
+
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 ;; Keywords: Gnus, MIME, S/MIME, MML
@@ -18,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -55,7 +57,7 @@
       (if (not (and (not (file-exists-p tmp))
 		    (get-buffer tmp)))
 	  (push tmp certfiles)
-	(setq file (mm-make-temp-file (expand-file-name "mml." 
+	(setq file (mm-make-temp-file (expand-file-name "mml."
 							mm-tmp-directory)))
 	(with-current-buffer tmp
 	  (write-region (point-min) (point-max) file))
@@ -80,7 +82,10 @@
   (list 'keyfile
 	(if (= (length smime-keys) 1)
 	    (cadar smime-keys)
-	  (or (let ((from (cadr (funcall gnus-extract-address-components
+	  (or (let ((from (cadr (funcall (if (boundp
+					      'gnus-extract-address-components)
+					     gnus-extract-address-components
+					   'mail-extract-address-components)
 					 (or (save-excursion
 					       (save-restriction
 						 (message-narrow-to-headers)
@@ -106,7 +111,10 @@
 	(while (not result)
 	  (setq who (read-from-minibuffer
 		     (format "%sLookup certificate for: " (or bad ""))
-		     (cadr (funcall gnus-extract-address-components
+		     (cadr (funcall (if (boundp
+					 'gnus-extract-address-components)
+					gnus-extract-address-components
+				      'mail-extract-address-components)
 				    (or (save-excursion
 					  (save-restriction
 					    (message-narrow-to-headers)
@@ -138,7 +146,6 @@
     result))
 
 (defun mml-smime-encrypt-query ()
-  ;; todo: add ldap support (xemacs ldap api?)
   ;; todo: try dns/ldap automatically first, before prompting user
   (let (certs done)
     (while (not done)

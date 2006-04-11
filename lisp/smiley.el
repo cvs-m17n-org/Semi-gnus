@@ -1,6 +1,7 @@
 ;;; smiley.el --- displaying smiley faces
 
-;; Copyright (C) 2000, 2001, 2002, 2003 Free Software Foundation, Inc.
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Dave Love <fx@gnu.org>
 ;; Keywords: news mail multimedia
@@ -19,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -30,8 +31,22 @@
 ;; I'm not sure we need that degree of rococoness and defaults like a
 ;; yellow background.  Also, using PBM means we can display the images
 ;; more generally.  -- fx
+;; `smiley.el' was replaced by `smiley-ems.el' on 2002-01-26 (after fx'
+;; comment).
 
-;;; Test smileys:  :-) :-\ :-( :-/
+;; Test smileys:
+;; smile             ^:-) ^:)
+;; blink             ;-)  ;)
+;; forced            :-]
+;; braindamaged      8-)
+;; indifferent       :-|
+;; wry               :-/  :-\
+;; sad               :-(
+;; frown             :-{
+;; evil              >:-)
+;; cry               ;-(
+;; dead              X-)
+;; grin              :-D
 
 ;;; Code:
 
@@ -44,8 +59,9 @@
   :group 'gnus-visual)
 
 ;; Maybe this should go.
-(defcustom smiley-data-directory (nnheader-find-etc-directory "images/smilies")
-  "*Location of the smiley faces files."
+(defcustom smiley-data-directory
+  (nnheader-find-etc-directory "images/smilies")
+  "Location of the smiley faces files."
   :type 'directory
   :group 'smiley)
 
@@ -117,8 +133,8 @@
       ("\\(:-(\\)\\W" 1 "sad")
       ("\\(:-{\\)\\W" 1 "frown")))
   "*A list of regexps to map smilies to images.
-The elements are (REGEXP MATCH FILE), where MATCH is the submatch in
-regexp to replace with IMAGE.  IMAGE is the name of a PBM file in
+The elements are (REGEXP MATCH IMAGE), where MATCH is the submatch in
+regexp to replace with IMAGE.  IMAGE is the name of an image file in
 `smiley-data-directory'."
   :type '(repeat (list regexp
 		       (integer :tag "Regexp match number")
@@ -136,7 +152,7 @@ regexp to replace with IMAGE.  IMAGE is the name of a PBM file in
     (when (gnus-image-type-available-p 'xbm)
       (push "xbm" types))
     types)
-  "*List of suffixes on picon file names to try."
+  "*List of suffixes on smiley file names to try."
   :version "22.1"
   :type '(repeat string)
   :group 'smiley)
@@ -144,6 +160,7 @@ regexp to replace with IMAGE.  IMAGE is the name of a PBM file in
 (defvar smiley-cached-regexp-alist nil)
 
 (defun smiley-update-cache ()
+  (setq smiley-cached-regexp-alist nil)
   (dolist (elt (if (symbolp smiley-regexp-alist)
 		   (symbol-value smiley-regexp-alist)
 		 smiley-regexp-alist))
@@ -162,12 +179,13 @@ regexp to replace with IMAGE.  IMAGE is the name of a PBM file in
 	    (push (list (car elt) (cadr elt) image)
 		  smiley-cached-regexp-alist)))))))
 
-(defvar smiley-mouse-map
-  (let ((map (make-sparse-keymap)))
-    (define-key map [down-mouse-2] 'ignore) ; override widget
-    (define-key map [mouse-2]
-      'smiley-mouse-toggle-buffer)
-    map))
+;; Not implemented:
+;; (defvar smiley-mouse-map
+;;   (let ((map (make-sparse-keymap)))
+;;     (define-key map [down-mouse-2] 'ignore) ; override widget
+;;     (define-key map [mouse-2]
+;;       'smiley-mouse-toggle-buffer)
+;;     map))
 
 ;;;###autoload
 (defun smiley-region (start end)

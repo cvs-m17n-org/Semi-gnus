@@ -1,8 +1,7 @@
 ;;; nnspool.el --- spool access for GNU Emacs
 
 ;; Copyright (C) 1988, 1989, 1990, 1993, 1994, 1995, 1996, 1997, 1998,
-;;               2000, 2002, 2003
-;;               Free Software Foundation, Inc.
+;;   2000, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -22,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -247,7 +246,7 @@ there.")
 	;; Yes, completely empty spool directories *are* possible.
 	;; Fix by Sudish Joseph <joseph@cis.ohio-state.edu>
 	(when (setq dir (directory-files pathname nil "^[0-9]+$" t))
-	  (setq dir (sort (mapcar 'string-to-int dir) '<)))
+	  (setq dir (sort (mapcar 'string-to-number dir) '<)))
 	(if dir
 	    (nnheader-insert
 	     "211 %d %d %d %s\n" (length dir) (car dir)
@@ -432,7 +431,7 @@ there.")
       (call-process "grep" nil t nil (regexp-quote id) nnspool-history-file))
     (goto-char (point-min))
     (when (looking-at "<[^>]+>[ \t]+[-0-9~]+[ \t]+\\([^ /\t\n]+\\)/\\([0-9]+\\)[ \t\n]")
-      (cons (match-string 1) (string-to-int (match-string 2))))))
+      (cons (match-string 1) (string-to-number (match-string 2))))))
 
 (defun nnspool-find-file (file)
   "Insert FILE in server buffer safely."

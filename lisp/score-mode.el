@@ -1,6 +1,7 @@
 ;;; score-mode.el --- mode for editing Gnus score files
 
-;; Copyright (C) 1996, 2001, 2004 Free Software Foundation, Inc.
+;; Copyright (C) 1996, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
@@ -19,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -28,7 +29,10 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
-(require 'gnus-util)			; for gnus-pp
+(require 'gnus-util)			; for gnus-pp, gnus-run-mode-hooks
+
+(defvar gnus-score-edit-done-hook nil
+  "*Hook run at the end of closing the score buffer.")
 
 (defvar gnus-score-mode-hook nil
   "*Hook run in score mode buffers.")
@@ -70,7 +74,7 @@ This mode is an extended emacs-lisp mode.
   (setq mode-name "Score")
   (lisp-mode-variables nil)
   (make-local-variable 'gnus-score-edit-exit-function)
-  (run-hooks 'emacs-lisp-mode-hook 'gnus-score-mode-hook))
+  (gnus-run-mode-hooks 'emacs-lisp-mode-hook 'gnus-score-mode-hook))
 
 (defun gnus-score-make-menu-bar ()
   (unless (boundp 'gnus-score-menu)

@@ -1,7 +1,7 @@
 ;;; nneething.el --- arbitrary file access for Gnus
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002
-;;	Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
@@ -21,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -428,7 +428,7 @@ This variable is used as the alternative of `mailcap-mime-extensions'.")
 	     (when (re-search-forward "<[a-zA-Z0-9_]@[-a-zA-Z0-9_]>" 1000 t)
 	       (concat "From: " (match-string 0) "\n"))))
 	 (nneething-from-line (nth 2 atts) file))
-     (if (> (string-to-int (int-to-string (nth 7 atts))) 0)
+     (if (> (string-to-number (int-to-string (nth 7 atts))) 0)
 	 (concat "Chars: " (int-to-string (nth 7 atts)) "\n")
        "")
      (if buffer

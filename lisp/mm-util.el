@@ -1,6 +1,7 @@
 ;;; mm-util.el --- Utility functions for Mule and low level things
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-;;   Free Software Foundation, Inc.
+
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -18,8 +19,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -102,18 +103,23 @@
 	   (lambda (ch) (mm-string-as-multibyte (char-to-string ch)))
 	   string "")))
      (multibyte-string-p . ignore)
-     ;; It is not a MIME function, but some MIME functions use it.
-     (make-temp-file . (lambda (prefix &optional dir-flag)
-			 (let ((file (expand-file-name
-				      (make-temp-name prefix)
-				      (if (fboundp 'temp-directory)
-					  (temp-directory)
-					temporary-file-directory))))
-			   (if dir-flag
-			       (make-directory file))
-			   file)))
      (insert-byte . insert-char)
-     (multibyte-char-to-unibyte . identity))))
+     (multibyte-char-to-unibyte . identity)
+     (special-display-p
+      . (lambda (buffer-name)
+	  "Returns non-nil if a buffer named BUFFER-NAME gets a special frame."
+	  (and special-display-function
+	       (or (and (member buffer-name special-display-buffer-names) t)
+		   (cdr (assoc buffer-name special-display-buffer-names))
+		   (catch 'return
+		     (dolist (elem special-display-regexps)
+		       (and (stringp elem)
+			    (string-match elem buffer-name)
+			    (throw 'return t))
+		       (and (consp elem)
+			    (stringp (car elem))
+			    (string-match (car elem) buffer-name)
+			    (throw 'return (cdr elem))))))))))))
 
 (eval-and-compile
   (defalias 'mm-char-or-char-int-p
@@ -161,8 +167,31 @@ system object in XEmacs."
     (if (fboundp 'coding-system-p)
 	(when (coding-system-p cs)
 	  cs)
-      ;; Is this branch ever actually useful?
+      ;; no-MULE XEmacs:
       (car (memq cs (mm-get-coding-system-list))))))
+
+(defun mm-codepage-setup (number &optional alias)
+  "Create a coding system cpNUMBER.
+The coding system is created using `codepage-setup'.  If ALIAS is
+non-nil, an alias is created and added to
+`mm-charset-synonym-alist'.  If ALIAS is a string, it's used as
+the alias.  Else windows-NUMBER is used."
+  (interactive
+   (let ((completion-ignore-case t)
+	 (candidates (cp-supported-codepages)))
+     (list (completing-read "Setup DOS Codepage: (default 437) " candidates
+			    nil t nil nil "437"))))
+  (when alias
+    (setq alias (if (stringp alias)
+		    (intern alias)
+		  (intern (format "windows-%s" number)))))
+  (let* ((cp (intern (format "cp%s" number))))
+    (unless (mm-coding-system-p cp)
+      (codepage-setup number))
+    (when (and alias
+	       ;; Don't add alias if setup of cp failed.
+	       (mm-coding-system-p cp))
+      (add-to-list 'mm-charset-synonym-alist (cons alias cp)))))
 
 (defvar mm-charset-synonym-alist
   `(
@@ -197,7 +226,51 @@ system object in XEmacs."
 	    '((ks_c_5601-1987 . cp949))
 	  '((ks_c_5601-1987 . euc-kr))))
     )
-  "A mapping from invalid charset names to the real charset names.")
+  "A mapping from unknown or invalid charset names to the real charset names.")
+
+(defcustom mm-charset-override-alist
+  `((iso-8859-1 . windows-1252))
+  "A mapping from undesired charset names to their replacement.
+
+You may add pairs like (iso-8859-1 . windows-1252) here,
+i.e. treat iso-8859-1 as windows-1252.  windows-1252 is a
+superset of iso-8859-1."
+  :type '(list (set :inline t
+		    (const (iso-8859-1 . windows-1252))
+		    (const (undecided  . windows-1252)))
+	       (repeat :inline t
+		       :tag "Other options"
+		       (cons (symbol :tag "From charset")
+			     (symbol :tag "To charset"))))
+  :version "23.0" ;; No Gnus
+  :group 'mime)
+
+(defcustom mm-charset-eval-alist
+  (if (featurep 'xemacs)
+      nil ;; I don't know what would be useful for XEmacs.
+    '(;; Emacs 21 offers 1250 1251 1253 1257.  Emacs 22 provides autoloads for
+      ;; 1250-1258 (i.e. `mm-codepage-setup' does nothing).
+      (windows-1250 . (mm-codepage-setup 1250 t))
+      (windows-1251 . (mm-codepage-setup 1251 t))
+      (windows-1253 . (mm-codepage-setup 1253 t))
+      (windows-1257 . (mm-codepage-setup 1257 t))))
+  "An alist of (CHARSET . FORM) pairs.
+If an article is encoded in an unknown CHARSET, FORM is
+evaluated.  This allows to load additional libraries providing
+charsets on demand.  If supported by your Emacs version, you
+could use `autoload-coding-system' here."
+  :version "23.0" ;; No Gnus
+  :type '(list (set :inline t
+		    (const (windows-1250 . (mm-codepage-setup 1250 t)))
+		    (const (windows-1251 . (mm-codepage-setup 1251 t)))
+		    (const (windows-1253 . (mm-codepage-setup 1253 t)))
+		    (const (windows-1257 . (mm-codepage-setup 1257 t)))
+		    (const (cp850 . (mm-codepage-setup 850 nil))))
+	       (repeat :inline t
+		       :tag "Other options"
+		       (cons (symbol :tag "charset")
+			     (symbol :tag "form"))))
+  :group 'mime)
 
 (defvar mm-binary-coding-system
   (cond
@@ -327,7 +400,7 @@ with Mule charsets.  It is completely useless for Emacs."
 	  cs mime mule alist)
       (while css
 	(setq cs (pop css)
-	      mime (or (coding-system-get cs :mime-charset) ; Emacs 22
+	      mime (or (coding-system-get cs :mime-charset) ; Emacs 23 (unicode)
 		       (coding-system-get cs 'mime-charset)))
 	(when (and mime
 		   (not (eq t (setq mule
@@ -422,11 +495,17 @@ mail with multiple parts is preferred to sending a Unicode one.")
 	(pop alist))
       out)))
 
-(defun mm-charset-to-coding-system (charset &optional lbt)
+(defun mm-charset-to-coding-system (charset &optional lbt
+					    allow-override)
   "Return coding-system corresponding to CHARSET.
 CHARSET is a symbol naming a MIME charset.
 If optional argument LBT (`unix', `dos' or `mac') is specified, it is
-used as the line break code type of the coding system."
+used as the line break code type of the coding system.
+
+If ALLOW-OVERRIDE is given, use `mm-charset-override-alist' to
+map undesired charset names to their replacement.  This should
+only be used for decoding, not for encoding."
+  ;; OVERRIDE is used (only) in `mm-decode-body'.
   (when (stringp charset)
     (setq charset (intern (downcase charset))))
   (when lbt
@@ -438,6 +517,11 @@ used as the line break code type of the coding system."
    ((or (null (mm-get-coding-system-list))
 	(not (fboundp 'coding-system-get)))
     charset)
+   ;; Check override list quite early.  Should only used for decoding, not for
+   ;; encoding!
+   ((and allow-override
+	 (let ((cs (cdr (assq charset mm-charset-override-alist))))
+	   (and cs (mm-coding-system-p cs) cs))))
    ;; ascii
    ((eq charset 'us-ascii)
     'ascii)
@@ -450,9 +534,27 @@ used as the line break code type of the coding system."
 ;;; 	 (eq charset (coding-system-get charset 'mime-charset))
 	 )
     charset)
+   ;; Eval expressions from `mm-charset-eval-alist'
+   ((let* ((el (assq charset mm-charset-eval-alist))
+	   (cs (car el))
+	   (form (cdr el)))
+      (and cs
+	   form
+	   (prog2
+	       ;; Avoid errors...
+	       (condition-case nil (eval form) (error nil))
+	       ;; (message "Failed to eval `%s'" form))
+	       (mm-coding-system-p cs)
+	     (message "Added charset `%s' via `mm-charset-eval-alist'" cs))
+	   cs)))
    ;; Translate invalid charsets.
    ((let ((cs (cdr (assq charset mm-charset-synonym-alist))))
-      (and cs (mm-coding-system-p cs) cs)))
+      (and cs
+	   (mm-coding-system-p cs)
+	   ;; (message
+	   ;;  "Using synonym `%s' from `mm-charset-synonym-alist' for `%s'"
+	   ;;  cs charset)
+	   cs)))
    ;; Last resort: search the coding system list for entries which
    ;; have the right mime-charset in case the canonical name isn't
    ;; defined (though it should be).
@@ -464,6 +566,11 @@ used as the line break code type of the coding system."
 		 (eq charset (or (coding-system-get c :mime-charset)
 				 (coding-system-get c 'mime-charset))))
 	    (setq cs c)))
+      (unless cs
+	;; Warn the user about unknown charset:
+	(if (fboundp 'gnus-message)
+	    (gnus-message 7 "Unknown charset: %s" charset)
+	  (message "Unknown charset: %s" charset)))
       cs))))
 
 (eval-and-compile
@@ -551,14 +658,21 @@ If the charset is `composition', return the actual one."
     ;; This is for XEmacs.
     (mm-mule-charset-to-mime-charset charset)))
 
-(defun mm-delete-duplicates (list)
-  "Simple substitute for CL `delete-duplicates', testing with `equal'."
-  (let (result head)
-    (while list
-      (setq head (car list))
-      (setq list (delete head list))
-      (setq result (cons head result)))
-    (nreverse result)))
+(if (fboundp 'delete-dups)
+    (defalias 'mm-delete-duplicates 'delete-dups)
+  (defun mm-delete-duplicates (list)
+    "Destructively remove `equal' duplicates from LIST.
+Store the result in LIST and return it.  LIST must be a proper list.
+Of several `equal' occurrences of an element in LIST, the first
+one is kept.
+
+This is a compatibility function for Emacsen without `delete-dups'."
+    ;; Code from `subr.el' in Emacs 22:
+    (let ((tail list))
+      (while tail
+	(setcdr tail (delete (car tail) (cdr tail)))
+	(setq tail (cdr tail))))
+    list))
 
 ;; Fixme:  This is used in places when it should be testing the
 ;; default multibyteness.  See mm-default-multibyte-p.
@@ -750,6 +864,17 @@ charset, and a longer list means no appropriate charset."
     (if (and (memq 'iso-2022-jp-2 charsets)
 	     (memq 'iso-2022-jp-2 hack-charsets))
 	(setq charsets (delq 'iso-2022-jp charsets)))
+    ;; Attempt to reduce the number of charsets if utf-8 is available.
+    (if (and (featurep 'xemacs)
+	     (> (length charsets) 1)
+	     (mm-coding-system-p 'utf-8))
+	(let ((mm-coding-system-priorities
+	       (cons 'utf-8 mm-coding-system-priorities)))
+	  (setq charsets
+		(mm-delete-duplicates
+		 (mapcar 'mm-mime-charset
+			 (delq 'ascii
+			       (mm-find-charset-region b e)))))))
     charsets))
 
 (defmacro mm-with-unibyte-buffer (&rest forms)
@@ -771,11 +896,18 @@ Use multibyte mode for this."
 (defmacro mm-with-unibyte-current-buffer (&rest forms)
   "Evaluate FORMS with current buffer temporarily made unibyte.
 Also bind `default-enable-multibyte-characters' to nil.
-Equivalent to `progn' in XEmacs"
+Equivalent to `progn' in XEmacs
+
+NOTE: Use this macro with caution in multibyte buffers (it is not
+worth using this macro in unibyte buffers of course).  Use of
+`(set-buffer-multibyte t)', which is run finally, is generally
+harmful since it is likely to modify existing data in the buffer.
+For instance, it converts \"\\300\\255\" into \"\\255\" in
+Emacs 23 (unicode)."
   (let ((multibyte (make-symbol "multibyte"))
 	(buffer (make-symbol "buffer")))
     `(if mm-emacs-mule
- 	 (let ((,multibyte enable-multibyte-characters)
+	 (let ((,multibyte enable-multibyte-characters)
 	       (,buffer (current-buffer)))
 	   (unwind-protect
 	       (let (default-enable-multibyte-characters)
@@ -858,22 +990,28 @@ to advanced Emacs features, such as file-name-handlers, format decoding,
 `find-file-hooks', etc.
 If INHIBIT is non-nil, inhibit `mm-inhibit-file-name-handlers'.
   This function ensures that none of these modifications will take place."
-  (let ((format-alist nil)
-	(auto-mode-alist (if inhibit nil (mm-auto-mode-alist)))
-	(default-major-mode 'fundamental-mode)
-	(enable-local-variables nil)
-	(after-insert-file-functions nil)
-	(enable-local-eval nil)
-	(find-file-hooks nil)
-	(inhibit-file-name-operation (if inhibit
-					 'insert-file-contents
-				       inhibit-file-name-operation))
-	(inhibit-file-name-handlers
-	 (if inhibit
-	     (append mm-inhibit-file-name-handlers
-		     inhibit-file-name-handlers)
-	   inhibit-file-name-handlers)))
-    (insert-file-contents filename visit beg end replace)))
+  (let* ((format-alist nil)
+	 (auto-mode-alist (if inhibit nil (mm-auto-mode-alist)))
+	 (default-major-mode 'fundamental-mode)
+	 (enable-local-variables nil)
+	 (after-insert-file-functions nil)
+	 (enable-local-eval nil)
+	 (inhibit-file-name-operation (if inhibit
+					  'insert-file-contents
+					inhibit-file-name-operation))
+	 (inhibit-file-name-handlers
+	  (if inhibit
+	      (append mm-inhibit-file-name-handlers
+		      inhibit-file-name-handlers)
+	    inhibit-file-name-handlers))
+	 (ffh (if (boundp 'find-file-hook)
+		  'find-file-hook
+		'find-file-hooks))
+	 (val (symbol-value ffh)))
+    (set ffh nil)
+    (unwind-protect
+	(insert-file-contents filename visit beg end replace)
+      (set ffh val))))
 
 (defun mm-append-to-file (start end filename &optional codesys inhibit)
   "Append the contents of the region to the end of file FILENAME.
@@ -914,6 +1052,74 @@ If INHIBIT is non-nil, inhibit `mm-inhibit-file-name-handlers'."
 		     inhibit-file-name-handlers)
 	   inhibit-file-name-handlers)))
     (write-region start end filename append visit lockname)))
+
+;; It is not a MIME function, but some MIME functions use it.
+(if (and (fboundp 'make-temp-file)
+	 (ignore-errors
+	   (let ((def (symbol-function 'make-temp-file)))
+	     (and (byte-code-function-p def)
+		  (setq def (if (fboundp 'compiled-function-arglist)
+				;; XEmacs
+				(eval (list 'compiled-function-arglist def))
+			      (aref def 0)))
+		  (>= (length def) 4)
+		  (eq (nth 3 def) 'suffix)))))
+    (defalias 'mm-make-temp-file 'make-temp-file)
+  ;; Stolen (and modified for XEmacs) from Emacs 22.
+  (defun mm-make-temp-file (prefix &optional dir-flag suffix)
+    "Create a temporary file.
+The returned file name (created by appending some random characters at the end
+of PREFIX, and expanding against `temporary-file-directory' if necessary),
+is guaranteed to point to a newly created empty file.
+You can then use `write-region' to write new data into the file.
+
+If DIR-FLAG is non-nil, create a new empty directory instead of a file.
+
+If SUFFIX is non-nil, add that at the end of the file name."
+    (let ((umask (default-file-modes))
+	  file)
+      (unwind-protect
+	  (progn
+	    ;; Create temp files with strict access rights.  It's easy to
+	    ;; loosen them later, whereas it's impossible to close the
+	    ;; time-window of loose permissions otherwise.
+	    (set-default-file-modes 448)
+	    (while (condition-case err
+		       (progn
+			 (setq file
+			       (make-temp-name
+				(expand-file-name
+				 prefix
+				 (if (fboundp 'temp-directory)
+				     ;; XEmacs
+				     (temp-directory)
+				   temporary-file-directory))))
+			 (if suffix
+			     (setq file (concat file suffix)))
+			 (if dir-flag
+			     (make-directory file)
+			   (if (featurep 'xemacs)
+			       ;; NOTE: This is unsafe if XEmacs users
+			       ;; don't use a secure temp directory.
+			       (if (file-exists-p file)
+				   (signal 'file-already-exists
+					   (list "File exists" file))
+				 (write-region "" nil file nil 'silent))
+			     (write-region "" nil file nil 'silent
+					   nil 'excl)))
+			 nil)
+		     (file-already-exists t)
+		     ;; The XEmacs version of `make-directory' issues
+		     ;; `file-error'.
+		     (file-error (or (and (featurep 'xemacs)
+					  (file-exists-p file))
+				     (signal (car err) (cdr err)))))
+	      ;; the file was somehow created by someone else between
+	      ;; `make-temp-name' and `write-region', let's try again.
+	      nil)
+	    file)
+	;; Reset the umask.
+	(set-default-file-modes umask)))))
 
 (defun mm-image-load-path (&optional package)
   (let (dir result)
@@ -1059,7 +1265,12 @@ gzip, bzip2, etc. are allowed."
   (unless filename
     (setq filename buffer-file-name))
   (save-excursion
-    (let ((decomp (mm-decompress-buffer filename nil t)))
+    (let ((decomp (unless ;; No worth to examine charset of tar files.
+		      (and filename
+			   (string-match
+			    "\\.\\(?:tar\\.[^.]+\\|tbz\\|tgz\\)\\'"
+			    filename))
+		    (mm-decompress-buffer filename nil t))))
       (when decomp
 	(set-buffer (let (default-enable-multibyte-characters)
 		      (generate-new-buffer " *temp*")))

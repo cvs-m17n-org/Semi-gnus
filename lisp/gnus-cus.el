@@ -1,7 +1,7 @@
 ;;; gnus-cus.el --- customization commands for Gnus
-;;
-;; Copyright (C) 1996, 1999, 2000, 2001, 2002, 2003, 2004
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1996, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Per Abrahamsen <abraham@dina.kvl.dk>
 ;; Keywords: news
@@ -20,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -67,7 +67,7 @@ if that value is non-nil."
     (set (make-local-variable 'widget-push-button-suffix) "")
     (set (make-local-variable 'widget-link-prefix) "")
     (set (make-local-variable 'widget-link-suffix) ""))
-  (gnus-run-hooks 'gnus-custom-mode-hook))
+  (gnus-run-mode-hooks 'gnus-custom-mode-hook))
 
 ;;; Group Customization:
 
@@ -227,9 +227,12 @@ See `gnus-emphasis-alist'.")
 			      (const signature-file)
 			      (const organization)
 			      (const address)
+			      (const x-face-file)
 			      (const name)
 			      (const body)
-			      (const import))
+			      (const import)
+			      (symbol)
+			      (string :tag "Header"))
 		      (string :format "%v"))))
      "post style.
 See `gnus-posting-styles'."))
@@ -773,8 +776,8 @@ When called interactively, FILE defaults to the current score file.
 This can be changed using the `\\[gnus-score-change-score-file]' command."
   (interactive (list gnus-current-score-file))
   (unless file
-    (error (format "No score file for %s"
-		   (gnus-group-decoded-name gnus-newsgroup-name))))
+    (error "No score file for %s"
+           (gnus-group-decoded-name gnus-newsgroup-name)))
   (let ((scores (gnus-score-load file))
 	(types (mapcar (lambda (entry)
 			 `(group :format "%v%h\n"
@@ -1015,9 +1018,9 @@ articles in the thread.
       ;; gnus-agent-cat-prepare-category-field as I don't want the
       ;; group list to appear when customizing a topic.
       (widget-insert "\n")
-      
-      (let ((symb 
-             (set 
+
+      (let ((symb
+             (set
               (make-local-variable 'gnus-agent-cat-groups)
               (widget-create
                `(choice

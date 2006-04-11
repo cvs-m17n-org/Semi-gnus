@@ -1,8 +1,8 @@
 ;;; nnheader.el --- header access macros for Semi-gnus and its backends
 
-;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996,
-;;        1997, 1998, 2000, 2001, 2002, 2003, 2004
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994,
+;;   1995, 1996, 1997, 1998, 2000, 2001, 2002, 2003,
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -24,8 +24,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -33,6 +33,8 @@
 
 (eval-when-compile (require 'cl))
 (eval-when-compile (require 'static))
+
+(defvar nnmail-extra-headers)
 
 ;; Requiring `gnus-util' at compile time creates a circular
 ;; dependency between nnheader.el and gnus-util.el.
@@ -154,11 +156,12 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defun nnheader-image-load-path (&optional package)
     (let (dir result)
       (dolist (path load-path (nreverse result))
-	(if (file-directory-p
-	     (setq dir (concat (file-name-directory
-				(directory-file-name path))
-			       "etc/" (or package "gnus/"))))
-	    (push dir result))
+	(when (and path
+		   (file-directory-p
+		    (setq dir (concat (file-name-directory
+				       (directory-file-name path))
+				      "etc/images/" (or package "gnus/")))))
+	  (push dir result))
 	(push path result))))
   (defalias 'mm-image-load-path 'nnheader-image-load-path)
 
@@ -175,6 +178,22 @@ This variable is a substitute for `mm-text-coding-system-for-write'.")
   (defalias 'mm-encode-coding-region 'encode-coding-region)
   (defalias 'mm-decode-coding-region 'decode-coding-region)
   (defalias 'mm-set-buffer-file-coding-system 'set-buffer-file-coding-system)
+
+  ;; Should keep track of `mm-subst-char-in-string' in mm-util.el.
+  (if (fboundp 'subst-char-in-string)
+      (defalias 'mm-subst-char-in-string 'subst-char-in-string)
+    (defun mm-subst-char-in-string (from to string &optional inplace)
+      "Replace characters in STRING from FROM to TO.
+	  Unless optional argument INPLACE is non-nil, return a new string."
+      (let ((string (if inplace string (copy-sequence string)))
+	    (len (length string))
+	    (idx 0))
+	;; Replace all occurrences of FROM with TO.
+	(while (< idx len)
+	  (when (= (aref string idx) from)
+	    (aset string idx to))
+	  (setq idx (1+ idx)))
+	string)))
 
   ;; Should keep track of `mm-detect-coding-region' in mm-util.el.
   (defun nnheader-detect-coding-region (start end)
@@ -292,19 +311,7 @@ nil, ."
 		 (t
 		  (lambda nil enable-multibyte-characters))))
 
-  ;; Should keep track of the same alias in mm-util.el.
-  (defalias 'mm-make-temp-file
-    (if (fboundp 'make-temp-file)
-	'make-temp-file
-      (lambda (prefix &optional dir-flag)
-	(let ((file (expand-file-name
-		     (make-temp-name prefix)
-		     (if (fboundp 'temp-directory)
-			 (temp-directory)
-		       temporary-file-directory))))
-	  (if dir-flag
-	      (make-directory file))
-	  file))))
+  (defalias 'mm-make-temp-file 'make-temp-file)
 
   ;; Should keep track of `mm-coding-system-p' in mm-util.el.
   (defun nnheader-coding-system-p (sym)
@@ -334,7 +341,24 @@ nil, ."
     (cond
      ((fboundp 'char-or-char-int-p) 'char-or-char-int-p)
      ((fboundp 'char-valid-p) 'char-valid-p)
-     (t 'identity))))
+     (t 'identity)))
+
+  ;; Should keep track of the same function in mm-util.el.
+  (if (fboundp 'delete-dups)
+      (defalias 'mm-delete-duplicates 'delete-dups)
+    (defun mm-delete-duplicates (list)
+      "Destructively remove `equal' duplicates from LIST.
+Store the result in LIST and return it.  LIST must be a proper list.
+Of several `equal' occurrences of an element in LIST, the first
+one is kept.
+
+This is a compatibility function for Emacsen without `delete-dups'."
+      ;; Code from `subr.el' in Emacs 22:
+      (let ((tail list))
+	(while tail
+	  (setcdr tail (delete (car tail) (cdr tail)))
+	  (setq tail (cdr tail))))
+      list)))
 
 ;; mail-parse stuff.
 (unless (featurep 'mail-parse)
@@ -592,7 +616,10 @@ given, the return value will not contain the last newline."
   (mime-find-field-decoder 'From 'nov))
 
 (defalias 'mail-header-extra 'mime-gnus-entity-extra-internal)
-(defalias 'mail-header-set-extra 'mime-gnus-entity-set-extra-internal)
+
+(defun mail-header-set-extra (header extra)
+  "Set the extra headers in HEADER to EXTRA."
+  (mime-gnus-entity-set-extra-internal header extra))
 
 (defun nnheader-decode-field-body (field-body field-name
 					      &optional mode max-column)
@@ -1312,9 +1339,9 @@ list of headers that match SEQUENCE (see `nntp-retrieve-headers')."
 (defsubst nnheader-file-to-number (file)
   "Take a FILE name and return the article number."
   (if (string= nnheader-numerical-short-files "^[0-9]+$")
-      (string-to-int file)
+      (string-to-number file)
     (string-match nnheader-numerical-short-files file)
-    (string-to-int (match-string 0 file))))
+    (string-to-number (match-string 0 file))))
 
 (defvar nnheader-directory-files-is-safe
   (or (eq system-type 'windows-nt)
@@ -1429,20 +1456,8 @@ without formatting."
       (apply 'insert format args))
     t))
 
-(static-if (fboundp 'subst-char-in-string)
-    (defsubst nnheader-replace-chars-in-string (string from to)
-      (subst-char-in-string from to string))
-  (defun nnheader-replace-chars-in-string (string from to)
-    "Replace characters in STRING from FROM to TO."
-    (let ((string (substring string 0))	;Copy string.
-	  (len (length string))
-	  (idx 0))
-      ;; Replace all occurrences of FROM with TO.
-      (while (< idx len)
-	(when (= (aref string idx) from)
-	  (aset string idx to))
-	(setq idx (1+ idx)))
-      string)))
+(defsubst nnheader-replace-chars-in-string (string from to)
+  (mm-subst-char-in-string from to string))
 
 (defun nnheader-replace-duplicate-chars-in-string (string from to)
   "Replace characters in STRING from FROM to TO."
@@ -1567,15 +1582,21 @@ A buffer may be modified in several ways after reading into the buffer due
 to advanced Emacs features, such as file-name-handlers, format decoding,
 find-file-hooks, etc.
   This function ensures that none of these modifications will take place."
-  (let ((format-alist nil)
-	(auto-mode-alist (nnheader-auto-mode-alist))
-	(default-major-mode 'fundamental-mode)
-	(enable-local-variables nil)
-	(after-insert-file-functions nil)
-	(enable-local-eval nil)
-	(find-file-hooks nil))
-    (insert-file-contents-as-coding-system
-     nnheader-file-coding-system filename visit beg end replace)))
+  (let* ((format-alist nil)
+	 (auto-mode-alist (nnheader-auto-mode-alist))
+	 (default-major-mode 'fundamental-mode)
+	 (enable-local-variables nil)
+	 (after-insert-file-functions nil)
+	 (enable-local-eval nil)
+	 (ffh (if (boundp 'find-file-hook)
+		  'find-file-hook
+		'find-file-hooks))
+	 (val (symbol-value ffh)))
+    (set ffh nil)
+    (unwind-protect
+	(insert-file-contents-as-coding-system
+	 nnheader-file-coding-system filename visit beg end replace)
+      (set ffh val))))
 
 (defun nnheader-insert-nov-file (file first)
   (let ((size (nth 7 (file-attributes file)))
@@ -1600,15 +1621,21 @@ find-file-hooks, etc.
 (defun nnheader-find-file-noselect (&rest args)
   "Open a file with some variables bound.
 See `find-file-noselect' for the arguments."
-  (let ((format-alist nil)
-	(auto-mode-alist (nnheader-auto-mode-alist))
-	(default-major-mode 'fundamental-mode)
-	(enable-local-variables nil)
-	(after-insert-file-functions nil)
-	(enable-local-eval nil)
-	(find-file-hooks nil))
-    (apply 'find-file-noselect-as-coding-system
-	   nnheader-file-coding-system args)))
+  (let* ((format-alist nil)
+	 (auto-mode-alist (nnheader-auto-mode-alist))
+	 (default-major-mode 'fundamental-mode)
+	 (enable-local-variables nil)
+	 (after-insert-file-functions nil)
+	 (enable-local-eval nil)
+	 (ffh (if (boundp 'find-file-hook)
+		  'find-file-hook
+		'find-file-hooks))
+	 (val (symbol-value ffh)))
+    (set ffh nil)
+    (unwind-protect
+	(apply 'find-file-noselect-as-coding-system
+	       nnheader-file-coding-system args)
+      (set ffh val))))
 
 (defun nnheader-auto-mode-alist ()
   "Return an `auto-mode-alist' with only the .gz (etc) thingies."

@@ -1,6 +1,7 @@
 ;;; gnus-group.el --- group mode commands for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -19,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -28,7 +29,7 @@
 
 (eval-when-compile
   (require 'cl)
-  (defvar tool-bar-map))
+  (defvar tool-bar-mode))
 
 (require 'gnus)
 (require 'gnus-start)
@@ -38,10 +39,11 @@
 (require 'gnus-range)
 (require 'gnus-win)
 (require 'gnus-undo)
+(require 'gmm-utils)
 (require 'time-date)
 (require 'gnus-ems)
 
-(eval-when-compile 
+(eval-when-compile
   (require 'mm-url)
   (let ((features (cons 'gnus-group features)))
     (require 'gnus-sum))
@@ -288,14 +290,15 @@ variable."
   :type 'hook)
 
 (defcustom gnus-useful-groups
-  '(("(ding) mailing list mirrored at sunsite.auc.dk"
-     "emacs.ding"
-     (nntp "sunsite.auc.dk"
-	   (nntp-address "sunsite.auc.dk")))
-    ("gnus-bug archive"
-     "gnus-bug"
-     (nndir "/ftp@ftp.ifi.uio.no:/pub/emacs/gnus/gnus-bug/"))
-    ("Gnus help group"
+  '(("(ding) mailing list mirrored at gmane.org"
+     "gmane.emacs.gnus.general"
+     (nntp "Gmane"
+	   (nntp-address "news.gmane.org")))
+    ("Gnus bug archive"
+     "gnus.gnus-bug"
+     (nntp "news.gnus.org"
+	   (nntp-address "news.gnus.org")))
+    ("Local Gnus help group"
      "gnus-help"
      (nndoc "gnus-help"
 	    (nndoc-article-type mbox)
@@ -314,50 +317,50 @@ variable."
 (defcustom gnus-group-highlight
   '(;; Mail.
     ((and mailp (= unread 0) (eq level 1)) .
-     gnus-group-mail-1-empty-face)
+     gnus-group-mail-1-empty)
     ((and mailp (eq level 1)) .
-     gnus-group-mail-1-face)
+     gnus-group-mail-1)
     ((and mailp (= unread 0) (eq level 2)) .
-     gnus-group-mail-2-empty-face)
+     gnus-group-mail-2-empty)
     ((and mailp (eq level 2)) .
-     gnus-group-mail-2-face)
+     gnus-group-mail-2)
     ((and mailp (= unread 0) (eq level 3)) .
-     gnus-group-mail-3-empty-face)
+     gnus-group-mail-3-empty)
     ((and mailp (eq level 3)) .
-     gnus-group-mail-3-face)
+     gnus-group-mail-3)
     ((and mailp (= unread 0)) .
-     gnus-group-mail-low-empty-face)
+     gnus-group-mail-low-empty)
     ((and mailp) .
-     gnus-group-mail-low-face)
+     gnus-group-mail-low)
     ;; News.
     ((and (= unread 0) (eq level 1)) .
-     gnus-group-news-1-empty-face)
+     gnus-group-news-1-empty)
     ((and (eq level 1)) .
-     gnus-group-news-1-face)
+     gnus-group-news-1)
     ((and (= unread 0) (eq level 2)) .
-     gnus-group-news-2-empty-face)
+     gnus-group-news-2-empty)
     ((and (eq level 2)) .
-     gnus-group-news-2-face)
+     gnus-group-news-2)
     ((and (= unread 0) (eq level 3)) .
-     gnus-group-news-3-empty-face)
+     gnus-group-news-3-empty)
     ((and (eq level 3)) .
-     gnus-group-news-3-face)
+     gnus-group-news-3)
     ((and (= unread 0) (eq level 4)) .
-     gnus-group-news-4-empty-face)
+     gnus-group-news-4-empty)
     ((and (eq level 4)) .
-     gnus-group-news-4-face)
+     gnus-group-news-4)
     ((and (= unread 0) (eq level 5)) .
-     gnus-group-news-5-empty-face)
+     gnus-group-news-5-empty)
     ((and (eq level 5)) .
-     gnus-group-news-5-face)
+     gnus-group-news-5)
     ((and (= unread 0) (eq level 6)) .
-     gnus-group-news-6-empty-face)
+     gnus-group-news-6-empty)
     ((and (eq level 6)) .
-     gnus-group-news-6-face)
+     gnus-group-news-6)
     ((and (= unread 0)) .
-     gnus-group-news-low-empty-face)
+     gnus-group-news-low-empty)
     (t .
-       gnus-group-news-low-face))
+       gnus-group-news-low))
   "*Controls the highlighting of group buffer lines.
 
 Below is a list of `Form'/`Face' pairs.  When deciding how a a
@@ -387,7 +390,7 @@ ticked: The number of ticked articles."
   :type 'character)
 
 (defgroup gnus-group-icons nil
-  "Add Icons to your group buffer.  "
+  "Add Icons to your group buffer."
   :group 'gnus-group-visual)
 
 (defcustom gnus-group-icon-list
@@ -666,6 +669,7 @@ simple manner.")
   "r" gnus-group-rename-group
   "R" gnus-group-make-rss-group
   "c" gnus-group-customize
+  "z" gnus-group-compact-group
   "x" gnus-group-nnimap-expunge
   "\177" gnus-group-delete-group
   [delete] gnus-group-delete-group)
@@ -844,6 +848,8 @@ simple manner.")
 	(gnus-group-group-name)]
        ["Select quick" gnus-group-quick-select-group (gnus-group-group-name)]
        ["Customize" gnus-group-customize (gnus-group-group-name)]
+       ["Compact" gnus-group-compact-group
+	:active (gnus-group-group-name)]
        ("Edit"
 	["Parameters" gnus-group-edit-group-parameters
 	 :included (not (gnus-topic-mode-p))
@@ -1000,36 +1006,146 @@ simple manner.")
 
     (gnus-run-hooks 'gnus-group-menu-hook)))
 
-(defvar gnus-group-toolbar-map nil)
 
-;; Emacs 21 tool bar.  Should be no-op otherwise.
-(defun gnus-group-make-tool-bar ()
-  (if (and
-       (condition-case nil (require 'tool-bar) (error nil))
-       (fboundp 'tool-bar-add-item-from-menu)
-       (default-value 'tool-bar-mode)
-       (not gnus-group-toolbar-map))
-      (setq gnus-group-toolbar-map
-	    (let ((tool-bar-map (make-sparse-keymap))
-		  (load-path (mm-image-load-path)))
-	      (tool-bar-add-item-from-menu
-	       'gnus-group-get-new-news "get-news" gnus-group-mode-map)
-	      (tool-bar-add-item-from-menu
-	       'gnus-group-get-new-news-this-group "gnntg" gnus-group-mode-map)
-	      (tool-bar-add-item-from-menu
-	       'gnus-group-catchup-current "catchup" gnus-group-mode-map)
-	      (tool-bar-add-item-from-menu
-	       'gnus-group-describe-group "describe-group" gnus-group-mode-map)
-	      (tool-bar-add-item "subscribe" 'gnus-group-subscribe 'subscribe
-				 :help "Subscribe to the current group")
-	      (tool-bar-add-item "unsubscribe" 'gnus-group-unsubscribe
-				 'unsubscribe
-				 :help "Unsubscribe from the current group")
-	      (tool-bar-add-item-from-menu
-	       'gnus-group-exit "exit-gnus" gnus-group-mode-map)
-	      tool-bar-map)))
-  (if gnus-group-toolbar-map
-      (set (make-local-variable 'tool-bar-map) gnus-group-toolbar-map)))
+(defvar gnus-group-tool-bar-map nil)
+
+(defun gnus-group-tool-bar-update (&optional symbol value)
+  "Update group buffer toolbar.
+Setter function for custom variables."
+  (when symbol
+    (set-default symbol value))
+  ;; (setq-default gnus-group-tool-bar-map nil)
+  ;; (use-local-map gnus-group-mode-map)
+  (when (gnus-alive-p)
+    (with-current-buffer gnus-group-buffer
+      (gnus-group-make-tool-bar t))))
+
+(defcustom gnus-group-tool-bar (if (eq gmm-tool-bar-style 'gnome)
+				   'gnus-group-tool-bar-gnome
+				 'gnus-group-tool-bar-retro)
+  "Specifies the Gnus group tool bar.
+
+It can be either a list or a symbol refering to a list.  See
+`gmm-tool-bar-from-list' for the format of the list.  The
+default key map is `gnus-group-mode-map'.
+
+Pre-defined symbols include `gnus-group-tool-bar-gnome' and
+`gnus-group-tool-bar-retro'."
+  :type '(choice (const :tag "GNOME style" gnus-group-tool-bar-gnome)
+		 (const :tag "Retro look" gnus-group-tool-bar-retro)
+		 (repeat :tag "User defined list" gmm-tool-bar-item)
+		 (symbol))
+  :version "23.0" ;; No Gnus
+  :initialize 'custom-initialize-default
+  :set 'gnus-group-tool-bar-update
+  :group 'gnus-group)
+
+(defcustom gnus-group-tool-bar-gnome
+  '((gnus-group-post-news "mail/compose")
+    ;; Some useful agent icons?  I don't use the agent so agent users should
+    ;; suggest useful commands:
+    (gnus-agent-toggle-plugged "connect" t
+     			       :visible (and gnus-agent (not gnus-plugged)))
+    (gnus-agent-toggle-plugged "disconnect" t
+     			       :visible (and gnus-agent gnus-plugged))
+    ;; FIXME: gnus-agent-toggle-plugged (in gnus-agent-group-make-menu-bar)
+    ;; should have a better help text.
+    (gnus-group-send-queue "mail/outbox" t
+			   :visible (and gnus-agent gnus-plugged)
+			   :help "Send articles from the queue group")
+    (gnus-group-get-new-news "mail/inbox" nil
+			     :visible (or (not gnus-agent)
+					  gnus-plugged))
+    ;; FIXME: gnus-*-read-group should have a better help text.
+    (gnus-topic-read-group "open" nil
+			   :visible (and (boundp 'gnus-topic-mode)
+					 gnus-topic-mode))
+    (gnus-group-read-group "open" nil
+			   :visible (not (and (boundp 'gnus-topic-mode)
+					      gnus-topic-mode)))
+    ;; (gnus-group-find-new-groups "???" nil)
+    (gnus-group-save-newsrc "save")
+    (gnus-group-describe-group "describe")
+    (gnus-group-unsubscribe-current-group "gnus/toggle-subscription")
+    (gnus-group-prev-unread-group "left-arrow")
+    (gnus-group-next-unread-group "right-arrow")
+    (gnus-group-exit "exit")
+    (gmm-customize-mode "preferences" t :help "Edit mode preferences")
+    (gnus-info-find-node "help"))
+  "List of functions for the group tool bar (GNOME style).
+
+See `gmm-tool-bar-from-list' for the format of the list."
+  :type '(repeat gmm-tool-bar-item)
+  :version "23.0" ;; No Gnus
+  :initialize 'custom-initialize-default
+  :set 'gnus-group-tool-bar-update
+  :group 'gnus-group)
+
+(defcustom gnus-group-tool-bar-retro
+  '((gnus-group-get-new-news "gnus/get-news")
+    (gnus-group-get-new-news-this-group "gnus/gnntg")
+    (gnus-group-catchup-current "gnus/catchup")
+    (gnus-group-describe-group "gnus/describe-group")
+    (gnus-group-subscribe "gnus/subscribe" t
+			  :help "Subscribe to the current group")
+    (gnus-group-unsubscribe "gnus/unsubscribe" t
+			    :help "Unsubscribe from the current group")
+    (gnus-group-exit "gnus/exit-gnus" gnus-group-mode-map))
+  "List of functions for the group tool bar (retro look).
+
+See `gmm-tool-bar-from-list' for the format of the list."
+  :type '(repeat gmm-tool-bar-item)
+  :version "23.0" ;; No Gnus
+  :initialize 'custom-initialize-default
+  :set 'gnus-group-tool-bar-update
+  :group 'gnus-group)
+
+;; FIXME: Moving through the Group buffer (in topic mode) e.g. with C-n
+;; doesn't update the state (enabled/disabled) of the icon
+;; `gnus-group-describe-group'.  After `C-l' the state is correct.
+;; See the following report on emacs-devel
+;; <http://thread.gmane.org/v9acdmrcse.fsf@marauder.physik.uni-ulm.de>:
+;; From: Reiner Steib
+;; Subject: tool bar icons not updated according to :active condition
+;; Newsgroups: gmane.emacs.devel
+;; Date: Mon, 23 Jan 2006 19:59:13 +0100
+;; Message-ID: <v9acdmrcse.fsf@marauder.physik.uni-ulm.de>
+
+(defcustom gnus-group-tool-bar-zap-list t
+  "List of icon items from the global tool bar.
+These items are not displayed in the Gnus group mode tool bar.
+
+See `gmm-tool-bar-from-list' for the format of the list."
+  :type 'gmm-tool-bar-zap-list
+  :version "23.0" ;; No Gnus
+  :initialize 'custom-initialize-default
+  :set 'gnus-group-tool-bar-update
+  :group 'gnus-group)
+
+(defvar image-load-path)
+
+(defun gnus-group-make-tool-bar (&optional force)
+  "Make a group mode tool bar from `gnus-group-tool-bar'.
+When FORCE, rebuild the tool bar."
+  (when (and (not (featurep 'xemacs))
+	     (boundp 'tool-bar-mode)
+	     tool-bar-mode
+	     ;; The Gnus 5.10.6 code checked (default-value 'tool-bar-mode).
+	     ;; Why?  --rsteib
+	     (or (not gnus-group-tool-bar-map) force))
+    (let* ((load-path
+	    (gmm-image-load-path-for-library "gnus"
+					     "gnus/toggle-subscription.xpm"
+					     nil t))
+           (image-load-path (cons (car load-path)
+                                  (when (boundp 'image-load-path)
+                                    image-load-path)))
+	   (map (gmm-tool-bar-from-list gnus-group-tool-bar
+					gnus-group-tool-bar-zap-list
+					'gnus-group-mode-map)))
+      (if map
+	  (set (make-local-variable 'tool-bar-map) map))))
+  gnus-group-tool-bar-map)
 
 (defun gnus-group-mode ()
   "Major mode for reading news.
@@ -1070,7 +1186,7 @@ The following commands are available:
     (gnus-undo-mode 1))
   (when gnus-slave
     (gnus-slave-mode))
-  (gnus-run-hooks 'gnus-group-mode-hook))
+  (gnus-run-mode-hooks 'gnus-group-mode-hook))
 
 (defun gnus-update-group-mark-positions ()
   (save-excursion
@@ -1430,6 +1546,25 @@ if it is a string, only list groups matching REGEXP."
 		(gnus-range-difference (list active) (gnus-info-read info))
 		seen))))))
 
+(defcustom gnus-group-update-tool-bar
+  (and (not (featurep 'xemacs))
+       (boundp 'tool-bar-mode)
+       tool-bar-mode
+       ;; Using `redraw-frame' (see `gnus-tool-bar-update') in Emacs 21 might
+       ;; be confusing, so maybe we shouldn't call it by default.
+       (fboundp 'force-window-update))
+  "Force updating the group buffer tool bar."
+  :group 'gnus-group
+  :version "22.1"
+  :initialize 'custom-initialize-default
+  :set (lambda (symbol value)
+	 (set-default symbol value)
+	 (when (gnus-alive-p)
+	   (with-current-buffer gnus-group-buffer
+	     ;; FIXME: Is there a better way to redraw the group buffer?
+	     (gnus-group-get-new-news 0))))
+  :type 'boolean)
+
 (defun gnus-group-insert-group-line (gnus-tmp-group gnus-tmp-level
 						    gnus-tmp-marked number
 						    gnus-tmp-method)
@@ -1494,8 +1629,10 @@ if it is a string, only list groups matching REGEXP."
 	  (if (member gnus-tmp-group gnus-group-marked)
 	      gnus-process-mark ? ))
 	 (buffer-read-only nil)
+	 beg end
 	 header gnus-tmp-header)	; passed as parameter to user-funcs.
     (beginning-of-line)
+    (setq beg (point))
     (gnus-add-text-properties
      (point)
      (prog1 (1+ (point))
@@ -1505,11 +1642,17 @@ if it is a string, only list groups matching REGEXP."
 	 (eval gnus-group-line-format-spec)))
      `(gnus-group ,(gnus-intern-safe gnus-tmp-group gnus-active-hashtb)
 		  gnus-unread ,(if (numberp number)
-				   (string-to-int gnus-tmp-number-of-unread)
+				   (string-to-number gnus-tmp-number-of-unread)
 				 t)
 		  gnus-marked ,gnus-tmp-marked-mark
 		  gnus-indentation ,gnus-group-indentation
 		  gnus-level ,gnus-tmp-level))
+    (setq end (point))
+    (when gnus-group-update-tool-bar
+      (gnus-put-text-property beg end 'point-entered
+			      'gnus-tool-bar-update)
+      (gnus-put-text-property beg end 'point-left
+			      'gnus-tool-bar-update))
     (forward-line -1)
     (when (inline (gnus-visual-p 'group-highlight 'highlight))
       (gnus-run-hooks 'gnus-group-update-hook))
@@ -1738,7 +1881,7 @@ If FIRST-TOO, the current line is also eligible as a target."
 	 (size (+ size-in-cache size-in-agent))
 	 (suffix '("B" "K" "M" "G"))
 	 (scale 1024.0)
-	 (cutoff (* 10 scale)))
+	 (cutoff scale))
     (while (> size cutoff)
       (setq size (/ size scale)
 	    suffix (cdr suffix)))
@@ -2282,6 +2425,25 @@ If EXCLUDE-GROUP, do not go to that group."
       (goto-char best-point))
     (gnus-group-position-point)
     (and best-point (gnus-group-group-name))))
+
+;; Is there something like an after-point-motion-hook?
+;; (inhibit-point-motion-hooks?).  Is there a tool-bar-update function?
+
+;; (defun gnus-group-menu-bar-update ()
+;;   (let* ((buf (list (with-current-buffer gnus-group-buffer
+;; 		      (current-buffer))))
+;; 	 (name (buffer-name (car buf))))
+;;     (setcdr buf
+;; 	    (if (> (length name) 27)
+;; 		(concat (substring name 0 12)
+;; 			"..."
+;; 			(substring name -12))
+;; 	      name))
+;;     (menu-bar-update-buffers-1 buf)))
+
+;; (defun gnus-group-position-point ()
+;;   (gnus-goto-colon)
+;;   (gnus-group-menu-bar-update))
 
 (defun gnus-group-first-unread-group ()
   "Go to the first group with unread articles."
@@ -3331,7 +3493,7 @@ Uses the process/prefix convention."
     (progn
       (unless (gnus-group-process-prefix current-prefix-arg)
 	(error "No group on the current line"))
-      (string-to-int
+      (string-to-number
        (let ((s (read-string
 		 (format "Level (default %s): "
 			 (or (gnus-group-group-level)
@@ -3677,7 +3839,10 @@ re-scanning.  If ARG is non-nil and not a number, this will force
 
     ;; We might read in new NoCeM messages here.
     (when (and gnus-use-nocem
-	       (null arg))
+	       (or (and (numberp gnus-use-nocem)
+			(numberp arg)
+			(>= arg gnus-use-nocem))
+		   (not arg)))
       (gnus-nocem-scan-groups))
     ;; If ARG is not a number, then we read the active file.
     (when (and arg (not (numberp arg)))
@@ -4383,6 +4548,40 @@ This command may read the active file."
       (when (gnus-group-auto-expirable-p group)
 	(gnus-add-marked-articles
 	 group 'expire (list article))))))
+
+
+;;;
+;;; Group compaction. -- dvl
+;;;
+
+(defun gnus-group-compact-group (group)
+  "Compact the current group.
+Compaction means removing gaps between article numbers.  Hence, this
+operation is only meaningful for back ends using one file per article
+\(e.g. nnml).
+
+Note: currently only implemented in nnml."
+  (interactive (list (gnus-group-group-name)))
+  (unless group
+    (error "No group to compact"))
+  (unless (gnus-check-backend-function 'request-compact-group group)
+    (error "This back end does not support group compaction"))
+  (let ((group-decoded (gnus-group-decoded-name group)))
+    (gnus-message 6 "\
+Compacting group %s... (this may take a long time)"
+		  group-decoded)
+    (prog1
+	(if (not (gnus-request-compact-group group))
+	    (gnus-error 3 "Couldn't compact group %s" group-decoded)
+	  (gnus-message 6 "Compacting group %s...done" group-decoded)
+	  t)
+      ;; Invalidate the "original article" buffer which might be out of date.
+      ;; #### NOTE: Yes, this might be a bit rude, but since compaction
+      ;; #### will not happen very often, I think this is acceptable.
+      (let ((original (get-buffer gnus-original-article-buffer)))
+	(and original (gnus-kill-buffer original)))
+      ;; Update the group line to reflect new information (art number etc).
+      (gnus-group-update-group-line))))
 
 (provide 'gnus-group)
 

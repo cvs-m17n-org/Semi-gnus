@@ -19,8 +19,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 ;;
 
 ;;; Commentary:
@@ -468,7 +468,7 @@ mail source specifier とか上記のようなキーワードについてもっとよく
       ;; Create a list of mail source specifiers.
       (setq num-of-address
 	    (read-from-minibuffer (gnus-ofsetup-gettext 'setup-11)))
-      (setq i (setq n (string-to-int num-of-address)))
+      (setq i (setq n (string-to-number num-of-address)))
       ;;
       (while (> i 0)
 	(let* ((j (- n (1- i)))

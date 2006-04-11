@@ -1,6 +1,7 @@
 ;;; mailcap.el --- MIME media types configuration
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004
-;;       Free Software Foundation, Inc.
+
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: William M. Perry <wmperry@aventail.com>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -20,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -531,7 +532,12 @@ MAILCAPS if set; otherwise (on Unix) use the path from RFC 1524, plus
 		    (skip-chars-forward ";"))
 		(setq done t))))
 	  (setq	value (buffer-substring val-pos (point))))
-	(setq results (cons (cons name value) results))
+	;; `test' as symbol, others like "copiousoutput" and "needsx11" as
+	;; strings
+	(setq results (cons (cons (if (string-equal name "test")
+                                      'test
+                                    name)
+                                  value) results))
 	(skip-chars-forward " \";\n\t"))
       results)))
 
@@ -638,30 +644,31 @@ to supply to the test."
 	 (viewer (cdr (assoc 'viewer viewer-info)))
 	 (default-directory (expand-file-name "~/"))
 	 status parsed-test cache result)
-    (if (setq cache (assoc test mailcap-viewer-test-cache))
-	(cadr cache)
-      (setq
-       result
-       (cond
-	((not test-info) t)		; No test clause
-	((not test) nil)		; Already failed test
-	((eq test t) t)			; Already passed test
-	((functionp test)		; Lisp function as test
-	 (funcall test type-info))
-	((and (symbolp test)		; Lisp variable as test
-	      (boundp test))
-	 (symbol-value test))
-	((and (listp test)		; List to be eval'd
-	      (symbolp (car test)))
-	 (eval test))
-	(t
-	 (setq test (mailcap-unescape-mime-test test type-info)
-	       test (list shell-file-name nil nil nil
-			  shell-command-switch test)
-	       status (apply 'call-process test))
-	 (eq 0 status))))
-      (push (list otest result) mailcap-viewer-test-cache)
-      result)))
+    (cond ((setq cache (assoc test mailcap-viewer-test-cache))
+	   (cadr cache))
+	  ((not test-info) t)		; No test clause
+	  (t
+	   (setq
+	    result
+	    (cond
+	     ((not test) nil)		; Already failed test
+	     ((eq test t) t)		; Already passed test
+	     ((functionp test)		; Lisp function as test
+	      (funcall test type-info))
+	     ((and (symbolp test)	; Lisp variable as test
+		   (boundp test))
+	      (symbol-value test))
+	     ((and (listp test)		; List to be eval'd
+		   (symbolp (car test)))
+	      (eval test))
+	     (t
+	      (setq test (mailcap-unescape-mime-test test type-info)
+		    test (list shell-file-name nil nil nil
+			       shell-command-switch test)
+		    status (apply 'call-process test))
+	      (eq 0 status))))
+	   (push (list otest result) mailcap-viewer-test-cache)
+	   result))))
 
 (defun mailcap-add-mailcap-entry (major minor info)
   (let ((old-major (assoc major mailcap-mime-data)))

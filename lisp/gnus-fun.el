@@ -1,5 +1,6 @@
 ;;; gnus-fun.el --- various frivolous extension functions to Gnus
-;; Copyright (C) 2002, 2003 Free Software Foundation, Inc.
+
+;; Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -18,8 +19,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -31,6 +32,7 @@
 
 (require 'gnus-ems)
 (require 'gnus-util)
+(require 'gnus)
 
 (defcustom gnus-x-face-directory (expand-file-name "x-faces" gnus-directory)
   "*Directory where X-Face PBM files are stored."
@@ -44,21 +46,37 @@
   :group 'gnus-fun
   :type 'string)
 
-(defcustom gnus-convert-image-to-x-face-command "giftopnm %s | ppmnorm | pnmscale -width 48 -height 48 | ppmtopgm | pgmtopbm | pbmtoxbm | compface"
+(defcustom gnus-convert-image-to-x-face-command
+  "convert -scale 48x48! %s xbm:- | xbm2xface.pl"
   "Command for converting an image to an X-Face.
+The command must take a image filename (use \"%s\") as input.
+The output must be the Face header data on stdout in PNG format.
+
 By default it takes a GIF filename and output the X-Face header data
 on stdout."
   :version "22.1"
   :group 'gnus-fun
-  :type 'string)
+  :type '(choice (const :tag "giftopnm, netpbm (GIF input only)"
+			"giftopnm %s | ppmnorm | pnmscale -width 48 -height 48 | ppmtopgm | pgmtopbm | pbmtoxbm | compface")
+		 (const :tag "convert"
+			"convert -scale 48x48! %s xbm:- | xbm2xface.pl")
+		 (string)))
 
-(defcustom gnus-convert-image-to-face-command "djpeg %s | ppmnorm | pnmscale -width 48 -height 48 | ppmquant %d | pnmtopng"
-  "Command for converting an image to an Face.
-By default it takes a JPEG filename and output the Face header data
-on stdout."
+(defcustom gnus-convert-image-to-face-command
+  "convert -scale 48x48! %s -colors %d png:-"
+  "Command for converting an image to a Face.
+
+The command must take an image filename (first format argument
+\"%s\") and the number of colors (second format argument: \"%d\")
+as input.  The output must be the Face header data on stdout in
+PNG format."
   :version "22.1"
   :group 'gnus-fun
-  :type 'string)
+  :type '(choice (const :tag "djpeg, netpbm (JPG input only)"
+			"djpeg %s | ppmnorm | pnmscale -width 48 -height 48 | ppmquant %d | pnmtopng")
+		 (const :tag "convert"
+			"convert -scale 48x48! %s -colors %d png:-")
+		 (string)))
 
 (defcustom gnus-face-properties-alist (if (featurep 'xemacs)
 					  '((xface . (:face gnus-x-face)))
@@ -81,6 +99,7 @@ See the manual for the valid properties for various image types.
 Currently, `pbm' is used for X-Face images and `png' is used for Face
 images in Emacs.  Only the `:face' property is effective on the `xface'
 image type in XEmacs if it is built with the libcompface library."
+  :version "23.0" ;; No Gnus
   :group 'gnus-fun
   :type '(repeat (cons :format "%v" (symbol :tag "Image type") plist)))
 
@@ -124,8 +143,11 @@ Output to the current buffer, replace text, and don't mingle error."
 
 ;;;###autoload
 (defun gnus-x-face-from-file (file)
-  "Insert an X-Face header based on an image file."
-  (interactive "fImage file name (by default GIF): ")
+  "Insert an X-Face header based on an image file.
+
+Depending on `gnus-convert-image-to-x-face-command' it may accept
+different input formats."
+  (interactive "fImage file name: ")
   (when (file-exists-p file)
     (gnus-shell-command-to-string
      (format gnus-convert-image-to-x-face-command
@@ -133,8 +155,11 @@ Output to the current buffer, replace text, and don't mingle error."
 
 ;;;###autoload
 (defun gnus-face-from-file (file)
-  "Return an Face header based on an image file."
-  (interactive "fImage file name (by default JPEG): ")
+  "Return a Face header based on an image file.
+
+Depending on `gnus-convert-image-to-face-command' it may accept
+different input formats."
+  (interactive "fImage file name: ")
   (when (file-exists-p file)
     (let ((done nil)
 	  (attempt "")
@@ -149,7 +174,7 @@ Output to the current buffer, replace text, and don't mingle error."
 			 quant))))
 	(if (> (length attempt) 726)
 	    (progn
-	      (setq quant (- quant 2))
+	      (setq quant (- quant (if (< quant 10) 1 2)))
 	      (gnus-message 9 "Length %d; trying quant %d"
 			    (length attempt) quant))
 	  (setq done t)))

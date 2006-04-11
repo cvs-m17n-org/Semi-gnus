@@ -1755,7 +1755,7 @@ echo $ECHO_N "checking where etc files should go... $ECHO_C" >&6
         if test "$EMACS_FLAVOR" = "xemacs"; then
       etcdir="\$(lispdir)/../../etc"
     else
-    etcdir="\$(lispdir)/../etc"
+      etcdir="\$(lispdir)/../../etc"
     fi
   fi
   echo "$as_me:$LINENO: result: $etcdir" >&5

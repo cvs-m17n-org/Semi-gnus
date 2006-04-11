@@ -1,6 +1,6 @@
 ;;; gnus-vers.el --- Declare gnus version
 
-;; Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005, 2006
 ;; Free Software Foundation, Inc.
 
 ;; Author: Keiichi Suzuki <keiichi@nanap.org>
@@ -20,9 +20,9 @@
 ;; General Public License for more details.
 
 ;; You should have received a copy of the GNU General Public License
-;; along with this program; see the file COPYING.  If not, write to
-;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; along with GNU Emacs; see the file COPYING.  If not, write to the
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -40,10 +40,10 @@
 ;; Product information of this gnus.
 (product-provide 'gnus-vers
   (product-define "T-gnus" nil
-		  (list 6 17 3
+		  (list 6 17 4
 			(string-to-number gnus-revision-number))))
 
-(defconst gnus-original-version-number "0.3"
+(defconst gnus-original-version-number "0.4"
   "Version number for this version of Gnus.")
 
 (provide 'running-pterodactyl-gnus-0_73-or-later)

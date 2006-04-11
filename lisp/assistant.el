@@ -1,5 +1,5 @@
 ;;; assistant.el --- guiding users through Emacs setup
-;; Copyright (C) 2004 Free Software Foundation, Inc.
+;; Copyright (C) 2004, 2005 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: util
@@ -18,8 +18,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -31,6 +31,11 @@
 (require 'widget)
 (require 'wid-edit)
 
+(autoload 'gnus-error "gnus-util")
+(autoload 'netrc-get "netrc")
+(autoload 'netrc-machine "netrc")
+(autoload 'netrc-parse "netrc")
+
 (defvar assistant-readers
   '(("variable" assistant-variable-reader)
     ("validate" assistant-sexp-reader)
@@ -38,9 +43,11 @@
     ("next" assistant-list-reader)
     ("text" assistant-text-reader)))
 
-(defface assistant-field-face '((t (:bold t)))
+(defface assistant-field '((t (:bold t)))
   "Face used for editable fields."
   :group 'gnus-article-emphasis)
+;; backward-compatibility alias
+(put 'assistant-field-face 'face-alias 'assistant-field)
 
 ;;; Internal variables
 
@@ -268,7 +275,7 @@
 	  (push 
 	   (widget-create
 	    'editable-field
-	    :value-face 'assistant-field-face
+	    :value-face 'assistant-field
 	    :assistant-variable variable
 	    (assistant-get-variable node variable))
 	   assistant-widgets)
@@ -278,7 +285,7 @@
 	  (add-text-properties start (point)
 			       (list
 				'bold t
-				'face 'assistant-field-face
+				'face 'assistant-field
 				'not-read-only t))))))))
 
 (defun assistant-render-node (node-name)

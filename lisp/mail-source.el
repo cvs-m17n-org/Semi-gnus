@@ -1,6 +1,7 @@
 ;;; mail-source.el --- functions for fetching mail
-;; Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news, mail
@@ -19,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -106,7 +107,7 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (const :format "" :value :port)
 					  (choice :tag "Port"
 						  :value "pop3"
-						  (number :format "%v")
+						  (integer :format "%v")
 						  (string :format "%v")))
 				   (group :inline t
 					  (const :format "" :value :user)
@@ -122,13 +123,15 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (choice :tag "Prescript"
 						  :value nil
 						  (string :format "%v")
-						  (function :format "%v")))
+						  (function :format "%v")
+						  (const :tag "None" nil)))
 				   (group :inline t
 					  (const :format "" :value :postscript)
 					  (choice :tag "Postscript"
 						  :value nil
 						  (string :format "%v")
-						  (function :format "%v")))
+						  (function :format "%v")
+						  (const :tag "None" nil)))
 				   (group :inline t
 					  (const :format "" :value :function)
 					  (function :tag "Function"))
@@ -141,7 +144,14 @@ See Info node `(gnus)Mail Source Specifiers'."
 						  (const apop)))
 				   (group :inline t
 					  (const :format "" :value :plugged)
-					  (boolean :tag "Plugged"))))
+					  (boolean :tag "Plugged"))
+				   (group :inline t
+					  (const :format "" :value :stream)
+					  (choice :tag "Stream"
+						  :value nil
+						  (const :tag "Clear" nil)
+						  (const starttls)
+						  (const :tag "SSL/TLS" ssl)))))
 		  (cons :tag "Maildir (qmail, postfix...)"
 			(const :format "" maildir)
 			(checklist :tag "Options" :greedy t
@@ -161,7 +171,7 @@ See Info node `(gnus)Mail Source Specifiers'."
 					  (const :format "" :value :port)
 					  (choice :tag "Port"
 						  :value 143
-						  number string))
+						  integer string))
 				   (group :inline t
 					  (const :format "" :value :user)
 					  (string :tag "User"))
@@ -347,6 +357,7 @@ Common keywords should be listed here.")
        (:password)
        (:connection)
        (:authentication password)
+       (:stream nil)
        (:leave))
       (maildir
        (:path (or (getenv "MAILDIR") "~/Maildir/"))
@@ -714,6 +725,7 @@ If CONFIRM is non-nil, ask for confirmation before removing a file."
 (defun mail-source-fetch-pop (source callback)
   "Fetcher for single-file sources."
   (mail-source-bind (pop source)
+    ;; fixme: deal with stream type in format specs
     (mail-source-run-script
      prescript
      (format-spec-make ?p password ?t mail-source-crash-box
@@ -816,7 +828,8 @@ If CONFIRM is non-nil, ask for confirmation before removing a file."
 		    (pop3-mailhost server)
 		    (pop3-port port)
 		    (pop3-authentication-scheme
-		     (if (eq authentication 'apop) 'apop 'pass)))
+		     (if (eq authentication 'apop) 'apop 'pass))
+		    (pop3-stream-type stream))
 		(if (or debug-on-quit debug-on-error)
 		    (save-excursion (pop3-get-message-count))
 		  (condition-case err

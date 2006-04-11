@@ -1,5 +1,5 @@
 ;;; gnus-news.el --- a hack to create GNUS-NEWS from texinfo source
-;; Copyright (C)  2004  Free Software Foundation, Inc.
+;; Copyright (C)  2004, 2005, 2006  Free Software Foundation, Inc.
 
 ;; Author: Reiner Steib  <Reiner.Steib@gmx.de>
 ;; Keywords: tools
@@ -18,8 +18,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -27,15 +27,12 @@
 
 (defvar gnus-news-header-disclaimer
 "GNUS NEWS -- history of user-visible changes.
-Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006 Free Software Foundation, Inc.
 See the end for copying conditions.
 
 Please send Gnus bug reports to bugs\@gnus.org.
 For older news, see Gnus info node \"New Features\".
-
-
-
-* Changes in No Gnus
 
 ")
 
@@ -46,7 +43,8 @@ For older news, see Gnus info node \"New Features\".
 ----------------------------------------------------------------------
 Copyright information:
 
-Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004 Free Software Foundation, Inc.
+Copyright (C) 1999, 2000, 2001, 2002, 2003, 2004, 2005,
+   2006 Free Software Foundation, Inc.
 
    Permission is granted to anyone to make or distribute verbatim copies
    of this document as received, in any medium, provided that the
@@ -62,7 +60,7 @@ paragraph-separate: \"[ 	]*$\"\nend:\n")
 
 (defvar gnus-news-makeinfo-command "makeinfo")
 
-(defvar gnus-news-fill-column 72)
+(defvar gnus-news-fill-column 80)
 
 (defvar gnus-news-makeinfo-switches
   (concat " --no-headers --paragraph-indent=0"
@@ -99,10 +97,17 @@ paragraph-separate: \"[ 	]*$\"\nend:\n")
       (goto-char (point-min))
       (save-excursion
 	(while (re-search-forward "^   \\* " nil t)
+	  (replace-match "\f\n* ")))
+      (save-excursion
+	(while (re-search-forward "^        \\* " nil t)
 	  (replace-match "** ")))
       (save-excursion
 	(while (re-search-forward "^     " nil t)
 	  (replace-match "")))
+      ;; Avoid `*' from @ref at beginning of line:
+      (save-excursion
+	(while (re-search-forward "^\\*Note" nil t)
+	  (replace-match " \\&")))
       (goto-char (point-min))
       (insert gnus-news-header-disclaimer)
       (goto-char (point-max))

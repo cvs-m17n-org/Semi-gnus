@@ -1,5 +1,7 @@
 ;;; mml1991.el --- Old PGP message format (RFC 1991) support for MML
-;; Copyright (C) 1998, 1999, 2000, 2001, 2003 Free Software Foundation, Inc.
+
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Sascha Ldecke <sascha@meta-x.de>,
 ;;	Simon Josefsson <simon@josefsson.org> (Mailcrypt interface, Gnus glue)
@@ -19,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -29,6 +31,8 @@
 (eval-when-compile
   (require 'cl)
   (require 'mm-util))
+
+(defvar mc-pgp-always-sign)
 
 (autoload 'quoted-printable-decode-region "qp")
 (autoload 'quoted-printable-encode-region "qp")
@@ -180,7 +184,7 @@
       (delete-region (point-min) (point)))
     (mm-with-unibyte-current-buffer
       (with-temp-buffer
-	(flet ((gpg-encrypt-func 
+	(flet ((gpg-encrypt-func
 		(sign plaintext ciphertext result recipients &optional
 		      passphrase sign-with-key armor textmode)
 		(if sign
@@ -219,11 +223,14 @@
 
 ;; pgg wrapper
 
-(defvar pgg-output-buffer)
-(defvar pgg-errors-buffer)
+(eval-when-compile
+  (defvar pgg-default-user-id)
+  (defvar pgg-errors-buffer)
+  (defvar pgg-output-buffer))
 
 (defun mml1991-pgg-sign (cont)
-  (let (headers cte)
+  (let ((pgg-text-mode t)
+	headers cte)
     ;; Don't sign headers.
     (goto-char (point-min))
     (while (not (looking-at "^$"))
@@ -255,7 +262,8 @@
     t))
 
 (defun mml1991-pgg-encrypt (cont &optional sign)
-  (let (cte)
+  (let ((pgg-text-mode t)
+	cte)
     ;; Strip MIME Content[^ ]: headers since it will be ASCII ARMOURED
     (goto-char (point-min))
     (while (looking-at "^Content[^ ]+:")
@@ -266,7 +274,7 @@
       (delete-region (point-min) (point)))
     (mm-decode-content-transfer-encoding cte)
     (unless (pgg-encrypt-region
-	     (point-min) (point-max) 
+	     (point-min) (point-max)
 	     (split-string
 	      (or
 	       (message-options-get 'message-recipients)

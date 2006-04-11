@@ -1,5 +1,7 @@
 ;;; mm-extern.el --- showing message/external-body
-;; Copyright (C) 2000, 2001, 2003 Free Software Foundation, Inc.
+
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Shenghuo Zhu <zsh@cs.rochester.edu>
 ;; Keywords: message external-body
@@ -18,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -30,6 +32,8 @@
 (require 'mm-util)
 (require 'mm-decode)
 (require 'mm-url)
+
+(defvar gnus-article-mime-handles)
 
 (defvar mm-extern-function-alist
   '((local-file . mm-extern-local-file)
@@ -52,7 +56,7 @@
     (mm-disable-multibyte)
     (if (file-exists-p name)
 	(mm-insert-file-contents name nil nil nil nil t)
-      (error (format "File %s is gone" name)))))
+      (error "File %s is gone" name))))
 
 (defun mm-extern-url (handle)
   (erase-buffer)
@@ -108,11 +112,8 @@
     (insert "[" info "]\n\n")))
 
 ;;;###autoload
-(defun mm-inline-external-body (handle &optional no-display)
-  "Show the external-body part of HANDLE.
-This function replaces the buffer of HANDLE with a buffer contains
-the entire message.
-If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
+(defun mm-extern-cache-contents (handle)
+  "Put the external-body part of HANDLE into its cache."
   (let* ((access-type (cdr (assq 'access-type
 				 (cdr (mm-handle-type handle)))))
 	 (func (cdr (assq (intern
@@ -120,48 +121,61 @@ If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
 			    (or access-type
 				(error "Couldn't find access type"))))
 			  mm-extern-function-alist)))
-	 gnus-displaying-mime buf
-	 handles)
-    (unless (mm-handle-cache handle)
-      (unless func
-	(error (format "Access type (%s) is not supported" access-type)))
-      (with-temp-buffer
-	(mm-insert-part handle)
-	(goto-char (point-max))
-	(insert "\n\n")
-	(setq handles (mm-dissect-buffer t)))
-      (unless (bufferp (car handles))
-	(mm-destroy-parts handles)
-	(error "Multipart external body is not supported"))
-      (save-excursion ;; single part
-	(set-buffer (setq buf (mm-handle-buffer handles)))
-	(let (good)
-	  (unwind-protect
-	      (progn
-		(funcall func handle)
-		(setq good t))
-	    (unless good
-	      (mm-destroy-parts handles))))
-	(mm-handle-set-cache handle handles))
-      (setq gnus-article-mime-handles
-	    (mm-merge-handles gnus-article-mime-handles handles)))
-    (unless no-display
-      (save-excursion
-	(save-restriction
-	  (narrow-to-region (point) (point))
-	  (gnus-display-mime (mm-handle-cache handle))
-	  (mm-handle-set-undisplayer
-	   handle
-	   `(lambda ()
-	      (let (buffer-read-only)
-		(condition-case nil
-		    ;; This is only valid on XEmacs.
-		    (mapcar (lambda (prop)
-			      (remove-specifier
-			       (face-property 'default prop) (current-buffer)))
-			    '(background background-pixmap foreground))
-		  (error nil))
-		(delete-region ,(point-min-marker) ,(point-max-marker))))))))))
+	 buf handles)
+    (unless func
+      (error "Access type (%s) is not supported" access-type))
+    (mm-with-part handle
+      (goto-char (point-max))
+      (insert "\n\n")
+      ;; It should be just a single MIME handle.
+      (setq handles (mm-dissect-buffer t)))
+    (unless (bufferp (car handles))
+      (mm-destroy-parts handles)
+      (error "Multipart external body is not supported"))
+    (save-excursion
+      (set-buffer (setq buf (mm-handle-buffer handles)))
+      (let (good)
+	(unwind-protect
+	    (progn
+	      (funcall func handle)
+	      (setq good t))
+	  (unless good
+	    (mm-destroy-parts handles))))
+      (mm-handle-set-cache handle handles))
+    (setq gnus-article-mime-handles
+	  (mm-merge-handles gnus-article-mime-handles handles))))
+
+;;;###autoload
+(defun mm-inline-external-body (handle &optional no-display)
+  "Show the external-body part of HANDLE.
+This function replaces the buffer of HANDLE with a buffer contains
+the entire message.
+If NO-DISPLAY is nil, display it. Otherwise, do nothing after replacing."
+  (unless (mm-handle-cache handle)
+    (mm-extern-cache-contents handle))
+  (unless no-display
+    (save-excursion
+      (save-restriction
+	(narrow-to-region (point) (point))
+	(let* ((type (regexp-quote
+		      (mm-handle-media-type (mm-handle-cache handle))))
+	       ;; Force the part to be displayed (but if there is no
+	       ;; method to display, a user will be prompted to save).
+	       ;; See `gnus-mime-display-single'.
+	       (mm-inline-override-types nil)
+	       (mm-attachment-override-types
+		(cons type mm-attachment-override-types))
+	       (mm-automatic-display (cons type mm-automatic-display))
+	       (mm-automatic-external-display
+		(cons type mm-automatic-external-display))
+	       ;; Suppress adding of button to the cached part.
+	       (gnus-inhibit-mime-unbuttonizing nil))
+	  (gnus-display-mime (mm-handle-cache handle)))
+	;; Move undisplayer added to the cached handle to the parent.
+	(mm-handle-set-undisplayer
+	 handle
+	 (mm-handle-undisplayer (mm-handle-cache handle)))
+	(mm-handle-set-undisplayer (mm-handle-cache handle) nil)))))
 
 (provide 'mm-extern)
 

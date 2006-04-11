@@ -1,5 +1,7 @@
 ;;; mml-sec.el --- A package with security functions for MML documents
-;; Copyright (C) 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+
+;; Copyright (C) 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Simon Josefsson <simon@josefsson.org>
 
@@ -17,8 +19,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -186,6 +188,29 @@ You can also customize or set `mml-signencrypt-style-alist' instead."
 						(cons method tags))))
 	    (t (error "The message is corrupted. No mail header separator"))))))
 
+(defvar mml-secure-method
+  (if (equal mml-default-encrypt-method mml-default-sign-method)
+      mml-default-sign-method
+    "pgpmime")
+  "Current security method.  Internal variable.")
+
+(defun mml-secure-sign (&optional method)
+  "Add MML tags to sign this MML part.
+Use METHOD if given.  Else use `mml-secure-method' or
+`mml-default-sign-method'."
+  (interactive)
+  (mml-secure-part
+   (or method mml-secure-method mml-default-sign-method)
+   'sign))
+
+(defun mml-secure-encrypt (&optional method)
+  "Add MML tags to encrypt this MML part.
+Use METHOD if given.  Else use `mml-secure-method' or
+`mml-default-sign-method'."
+  (interactive)
+  (mml-secure-part
+   (or method mml-secure-method mml-default-sign-method)))
+
 (defun mml-secure-sign-pgp ()
   "Add MML tags to PGP sign this MML part."
   (interactive)
@@ -253,6 +278,34 @@ You can also customize or set `mml-signencrypt-style-alist' instead."
     (goto-char (point-max))
     (when (re-search-backward "^<#secure.*>\n" nil t)
       (delete-region (match-beginning 0) (match-end 0)))))
+
+
+(defun mml-secure-message-sign (&optional method)
+  "Add MML tags to sign this MML part.
+Use METHOD if given. Else use `mml-secure-method' or
+`mml-default-sign-method'."
+  (interactive)
+  (mml-secure-part
+   (or method mml-secure-method mml-default-sign-method)
+   'sign))
+
+(defun mml-secure-message-sign-encrypt (&optional method)
+  "Add MML tag to sign and encrypt the entire message.
+Use METHOD if given. Else use `mml-secure-method' or
+`mml-default-sign-method'."
+  (interactive)
+  (mml-secure-message
+   (or method mml-secure-method mml-default-sign-method)
+   'signencrypt))
+
+(defun mml-secure-message-encrypt (&optional method)
+  "Add MML tag to encrypt the entire message.
+Use METHOD if given. Else use `mml-secure-method' or
+`mml-default-sign-method'."
+  (interactive)
+  (mml-secure-message
+   (or method mml-secure-method mml-default-sign-method)
+   'encrypt))
 
 (defun mml-secure-message-sign-smime ()
   "Add MML tag to encrypt/sign the entire message."

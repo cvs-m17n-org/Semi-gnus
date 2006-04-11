@@ -1,6 +1,7 @@
 ;;; gnus-int.el --- backend interface functions for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         MORIOKA Tomohiko <morioka@jaist.ac.jp>
@@ -20,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -250,10 +251,12 @@ If it is down, start it up (again)."
                               ;; recurse to open the agent's backend.
                               (setq open-offline (eq gnus-server-unopen-status 'offline))
                               gnus-server-unopen-status)
-                             ((gnus-y-or-n-p
-                               (format "Unable to open %s:%s, go offline? "
-                                       (car gnus-command-method)
-                                       (cadr gnus-command-method)))
+                             ((and
+			       (not gnus-batch-mode)
+			       (gnus-y-or-n-p
+				(format "Unable to open %s:%s, go offline? "
+					(car gnus-command-method)
+					(cadr gnus-command-method))))
                               (setq open-offline t)
                               'offline)
                              (t
@@ -331,6 +334,23 @@ name.  The method this group uses will be queried."
   (when (stringp gnus-command-method)
     (setq gnus-command-method (gnus-server-to-method gnus-command-method)))
   (funcall (gnus-get-function gnus-command-method 'request-regenerate)
+	   (nth 1 gnus-command-method)))
+
+(defun gnus-request-compact-group (group)
+  (let* ((method (gnus-find-method-for-group group))
+	 (gnus-command-method method)
+	 (result
+	  (funcall (gnus-get-function gnus-command-method
+				      'request-compact-group)
+		   (gnus-group-real-name group)
+		   (nth 1 gnus-command-method) t)))
+    result))
+
+(defun gnus-request-compact (gnus-command-method)
+  "Request groups compaction  from GNUS-COMMAND-METHOD."
+  (when (stringp gnus-command-method)
+    (setq gnus-command-method (gnus-server-to-method gnus-command-method)))
+  (funcall (gnus-get-function gnus-command-method 'request-compact)
 	   (nth 1 gnus-command-method)))
 
 (defun gnus-request-group (group &optional dont-check gnus-command-method)

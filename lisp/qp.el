@@ -1,7 +1,7 @@
 ;;; qp.el --- Quoted-Printable functions
 
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2005
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: mail, extensions
@@ -20,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -69,7 +69,7 @@ them into characters should be done separately."
 	  (cond ((eq (char-after (1+ (point))) ?\n)
 		 (delete-char 2))
 		((looking-at "=[0-9A-F][0-9A-F]")
-		 (let ((byte (string-to-int (buffer-substring (1+ (point))
+		 (let ((byte (string-to-number (buffer-substring (1+ (point))
 							      (+ 3 (point)))
 					    16)))
 		   (mm-insert-byte byte 1)
@@ -118,7 +118,7 @@ encode lines starting with \"From\"."
 		  (not (eobp)))
 	(insert
 	 (prog1
-	     ;; To unibyte in case of Emacs 22 eight-bit.
+	     ;; To unibyte in case of Emacs 23 (unicode) eight-bit.
 	     (format "=%02X" (mm-multibyte-char-to-unibyte (char-after)))
 	   (delete-char 1))))
       ;; Encode white space at the end of lines.

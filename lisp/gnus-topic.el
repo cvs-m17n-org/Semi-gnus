@@ -1,6 +1,7 @@
 ;;; gnus-topic.el --- a folding minor mode for Gnus group buffers
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Ilja Weis <kult@uni-paderborn.de>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -20,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -435,7 +436,7 @@ If LOWEST is non-nil, list all newsgroups of level LOWEST or higher."
 	      (copy-sequence gnus-group-listed-groups))))
 
     (gnus-update-format-specifications nil 'topic)
-    
+
     (when (or (not gnus-topic-alist)
 	      (not gnus-topology-checked-p))
       (gnus-topic-check-topology))
@@ -583,6 +584,11 @@ articles in the topic and its subtopics."
        (not (eq (nth 2 type) 'hidden))
        level all-entries unread))
     (gnus-topic-update-unreads (car type) unread)
+    (when gnus-group-update-tool-bar
+      (gnus-put-text-property beg end 'point-entered
+			      'gnus-tool-bar-update)
+      (gnus-put-text-property beg end 'point-left
+			      'gnus-tool-bar-update))
     (goto-char end)
     unread))
 
@@ -1134,10 +1140,7 @@ articles in the topic and its subtopics."
       (when (gnus-visual-p 'topic-menu 'menu)
 	(gnus-topic-make-menu-bar))
       (gnus-set-format 'topic t)
-      (add-minor-mode 'gnus-topic-mode " Topic"
-			   gnus-topic-mode-map nil (lambda (&rest junk)
-						     (interactive)
-						     (gnus-topic-mode nil t)))
+      (add-minor-mode 'gnus-topic-mode " Topic" gnus-topic-mode-map)
       (add-hook 'gnus-group-catchup-group-hook 'gnus-topic-update-topic)
       (set (make-local-variable 'gnus-group-prepare-function)
 	   'gnus-group-prepare-topics)

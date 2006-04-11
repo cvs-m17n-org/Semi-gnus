@@ -1,6 +1,7 @@
 ;;; mm-view.el --- functions for viewing MIME objects
-;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004, 2005
-;; Free Software Foundation, Inc.
+
+;; Copyright (C) 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; This file is part of GNU Emacs.
@@ -17,8 +18,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -37,11 +38,18 @@
   (autoload 'fill-flowed "flow-fill")
   (autoload 'html2text "html2text"))
 
+(defvar gnus-article-mime-handles)
+(defvar gnus-newsgroup-charset)
+(defvar smime-keys)
+(defvar w3m-cid-retrieve-function-alist)
+(defvar w3m-current-buffer)
+(defvar w3m-display-inline-images)
+(defvar w3m-minor-mode-map)
+
 (defvar mm-text-html-renderer-alist
   '((w3  . mm-inline-text-html-render-with-w3)
     (w3m . mm-inline-text-html-render-with-w3m)
-    (w3m-standalone mm-inline-render-with-stdin nil
-		    "w3m" "-dump" "-T" "text/html")
+    (w3m-standalone . mm-inline-text-html-render-with-w3m-standalone)
     (links mm-inline-render-with-file
 	   mm-links-remove-leading-blank
 	   "links" "-dump" file)
@@ -53,8 +61,7 @@
 (defvar mm-text-html-washer-alist
   '((w3  . gnus-article-wash-html-with-w3)
     (w3m . gnus-article-wash-html-with-w3m)
-    (w3m-standalone mm-inline-wash-with-stdin nil
-		    "w3m" "-dump" "-T" "text/html")
+    (w3m-standalone . gnus-article-wash-html-with-w3m-standalone)
     (links mm-inline-wash-with-file
 	   mm-links-remove-leading-blank
 	   "links" "-dump" file)
@@ -66,6 +73,7 @@
 (defcustom mm-fill-flowed t
   "If non-nil a format=flowed article will be displayed flowed."
   :type 'boolean
+  :version "22.1"
   :group 'mime-display)
 
 ;;; Internal variables.
@@ -203,21 +211,25 @@
 
 (defun mm-w3m-cid-retrieve-1 (url handle)
   (dolist (elem handle)
-    (when (listp elem)
-      (if (equal url (mm-handle-id elem))
-	  (progn
-	    (mm-insert-part elem)
-	    (throw 'found-handle (mm-handle-media-type elem))))
-      (if (equal "multipart" (mm-handle-media-supertype elem))
-	  (mm-w3m-cid-retrieve-1 url elem)))))
+    (when (consp elem)
+      (when (equal url (mm-handle-id elem))
+	(mm-insert-part elem)
+	(throw 'found-handle (mm-handle-media-type elem)))
+      (when (and (stringp (car elem))
+		 (equal "multipart" (mm-handle-media-supertype elem)))
+	(mm-w3m-cid-retrieve-1 url elem)))))
 
 (defun mm-w3m-cid-retrieve (url &rest args)
   "Insert a content pointed by URL if it has the cid: scheme."
   (when (string-match "\\`cid:" url)
-    (catch 'found-handle
-      (mm-w3m-cid-retrieve-1 (concat "<" (substring url (match-end 0)) ">")
-			     (with-current-buffer w3m-current-buffer
-			       gnus-article-mime-handles)))))
+    (or (catch 'found-handle
+	  (mm-w3m-cid-retrieve-1
+	   (setq url (concat "<" (substring url (match-end 0)) ">"))
+	   (with-current-buffer w3m-current-buffer
+	     gnus-article-mime-handles)))
+	(prog1
+	    nil
+	  (message "Failed to find \"Content-ID: %s\"" url)))))
 
 (defun mm-inline-text-html-render-with-w3m (handle)
   "Render a text/html part using emacs-w3m."
@@ -244,19 +256,71 @@
 	   (point-min) (point-max)
 	   (list 'keymap w3m-minor-mode-map
 		 ;; Put the mark meaning this part was rendered by emacs-w3m.
-		 'mm-inline-text-html-with-w3m t))))
-      (mm-handle-set-undisplayer
-       handle
-       `(lambda ()
-	  (let (buffer-read-only)
-	    (if (functionp 'remove-specifier)
-		(mapcar (lambda (prop)
-			  (remove-specifier
-			   (face-property 'default prop)
-			   (current-buffer)))
-			'(background background-pixmap foreground)))
-	    (delete-region ,(point-min-marker)
-			   ,(point-max-marker))))))))
+		 'mm-inline-text-html-with-w3m t)))
+	(mm-handle-set-undisplayer
+	 handle
+	 `(lambda ()
+	    (let (buffer-read-only)
+	      (if (functionp 'remove-specifier)
+		  (mapcar (lambda (prop)
+			    (remove-specifier
+			     (face-property 'default prop)
+			     (current-buffer)))
+			  '(background background-pixmap foreground)))
+	      (delete-region ,(point-min-marker)
+			     ,(point-max-marker)))))))))
+
+(defvar mm-w3m-standalone-supports-m17n-p (if (featurep 'mule) 'undecided)
+  "*T means the w3m command supports the m17n feature.")
+
+(defun mm-w3m-standalone-supports-m17n-p ()
+  "Say whether the w3m command supports the m17n feature."
+  (cond ((eq mm-w3m-standalone-supports-m17n-p t) t)
+	((eq mm-w3m-standalone-supports-m17n-p nil) nil)
+	((not (featurep 'mule)) (setq mm-w3m-standalone-supports-m17n-p nil))
+	((condition-case nil
+	     (let ((coding-system-for-write 'iso-2022-jp)
+		   (coding-system-for-read 'iso-2022-jp)
+		   (str (mm-decode-coding-string "\
+\e$B#D#o#e#s!!#w#3#m!!#s#u#p#p#o#r#t#s!!#m#1#7#n!)\e(B" 'iso-2022-jp)))
+	       (mm-with-multibyte-buffer
+		 (insert str)
+		 (call-process-region
+		  (point-min) (point-max) "w3m" t t nil "-dump"
+		  "-T" "text/html" "-I" "iso-2022-jp" "-O" "iso-2022-jp")
+		 (goto-char (point-min))
+		 (search-forward str nil t)))
+	   (error nil))
+	 (setq mm-w3m-standalone-supports-m17n-p t))
+	(t
+	 ;;(message "You had better upgrade your w3m command")
+	 (setq mm-w3m-standalone-supports-m17n-p nil))))
+
+(defun mm-inline-text-html-render-with-w3m-standalone (handle)
+  "Render a text/html part using w3m."
+  (if (mm-w3m-standalone-supports-m17n-p)
+      (let ((source (mm-get-part handle))
+	    (charset (mail-content-type-get (mm-handle-type handle) 'charset))
+	    cs)
+	(unless (and charset
+		     (setq cs (mm-charset-to-coding-system charset))
+		     (not (eq cs 'ascii)))
+	  ;; The default.
+	  (setq charset "iso-8859-1"
+		cs 'iso-8859-1))
+	(mm-insert-inline
+	 handle
+	 (mm-with-unibyte-buffer
+	   (insert source)
+	   (mm-enable-multibyte)
+	   (let ((coding-system-for-write 'binary)
+		 (coding-system-for-read cs))
+	     (call-process-region
+	      (point-min) (point-max)
+	      "w3m" t t nil "-dump" "-T" "text/html"
+	      "-I" charset "-O" charset))
+	   (buffer-string))))
+    (mm-inline-render-with-stdin handle nil "w3m" "-dump" "-T" "text/html")))
 
 (defun mm-links-remove-leading-blank ()
   ;; Delete the annoying three spaces preceding each line of links
@@ -362,9 +426,9 @@
 	(goto-char (point-max))))
     (save-restriction
       (narrow-to-region b (point))
-      (set-text-properties (point-min) (point-max) nil)
       (when (or (equal type "enriched")
 		(equal type "richtext"))
+	(set-text-properties (point-min) (point-max) nil)
 	(ignore-errors
 	  (enriched-decode (point-min) (point-max))))
       (mm-handle-set-undisplayer
@@ -433,7 +497,8 @@
 	      ;; disable prepare hook
 	      gnus-article-prepare-hook
 	      (gnus-newsgroup-charset
-	       (or charset gnus-newsgroup-charset)))
+	       (unless (eq charset 'gnus-decoded) ;; mm-uu might set it.
+		 (or charset gnus-newsgroup-charset))))
 	  (let ((gnus-original-article-buffer (mm-handle-buffer handle)))
 	    (run-hooks 'gnus-article-decode-hook))
 	  (gnus-article-prepare-display)
@@ -481,7 +546,8 @@
       (buffer-disable-undo)
       (mm-enable-multibyte)
       (insert (cond ((eq charset 'gnus-decoded)
-		     (mm-insert-part handle))
+		     (with-current-buffer (mm-handle-buffer handle)
+		       (buffer-string)))
 		    (coding-system
 		     (mm-decode-coding-string text coding-system))
 		    (charset
@@ -489,14 +555,16 @@
 		    (t
 		     text)))
       (require 'font-lock)
-      ;; Inhibit font-lock this time (*-mode-hook might run
-      ;; `turn-on-font-lock') so that jit-lock may not turn off
-      ;; font-lock immediately after this.
-      (let ((font-lock-mode t))
-	(funcall mode))
-      (let ((font-lock-verbose nil))
-	;; I find font-lock a bit too verbose.
-	(font-lock-fontify-buffer))
+      (let ((font-lock-maximum-size nil)
+	    ;; Disable support modes, e.g., jit-lock, lazy-lock, etc.
+	    (font-lock-mode-hook nil)
+	    (font-lock-support-mode nil)
+	    ;; I find font-lock a bit too verbose.
+	    (font-lock-verbose nil))
+	(funcall mode)
+	;; The mode function might have already turned on font-lock.
+	(unless (symbol-value 'font-lock-mode)
+	  (font-lock-fontify-buffer)))
       ;; By default, XEmacs font-lock uses non-duplicable text
       ;; properties.  This code forces all the text properties
       ;; to be copied along with the text.
@@ -560,19 +628,24 @@
     (otherwise (error "Unknown or unimplemented PKCS#7 type"))))
 
 (defun mm-view-pkcs7-verify (handle)
-  ;; A bogus implementation of PKCS#7. FIXME::
-  (mm-insert-part handle)
-  (goto-char (point-min))
-  (if (search-forward "Content-Type: " nil t)
-      (delete-region (point-min) (match-beginning 0)))
-  (goto-char (point-max))
-  (if (re-search-backward "--\r?\n?" nil t)
-      (delete-region (match-end 0) (point-max)))
+  (let ((verified nil))
+    (with-temp-buffer
+      (insert "MIME-Version: 1.0\n")
+      (mm-insert-headers "application/pkcs7-mime" "base64" "smime.p7m")
+      (insert-buffer-substring (mm-handle-buffer handle))
+      (setq verified (smime-verify-region (point-min) (point-max))))
+    (goto-char (point-min))
+    (mm-insert-part handle)
+    (if (search-forward "Content-Type: " nil t)
+	(delete-region (point-min) (match-beginning 0)))
+    (goto-char (point-max))
+    (if (re-search-backward "--\r?\n?" nil t)
+	(delete-region (match-end 0) (point-max)))
+    (unless verified
+      (insert-buffer-substring smime-details-buffer)))
   (goto-char (point-min))
   (while (search-forward "\r\n" nil t)
     (replace-match "\n"))
-  (message "Verify signed PKCS#7 message is unimplemented.")
-  (sit-for 1)
   t)
 
 (defun mm-view-pkcs7-decrypt (handle)
@@ -586,9 +659,9 @@
        (cadar smime-keys)
      (smime-get-key-by-email
       (completing-read
-       (concat "Decipher using which key? "
-	       (if smime-keys (concat "(default " (caar smime-keys) ") ")
-		 ""))
+       (concat "Decipher using key"
+	       (if smime-keys (concat "(default " (caar smime-keys) "): ")
+		 ": "))
        smime-keys nil nil nil nil (car-safe (car-safe smime-keys))))))
   (goto-char (point-min))
   (while (search-forward "\r\n" nil t)

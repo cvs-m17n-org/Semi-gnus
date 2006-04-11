@@ -1,5 +1,6 @@
 ;;; dns.el --- Domain Name Service lookups
-;; Copyright (C) 2002, 2003, 2004 Free Software Foundation, Inc.
+
+;; Copyright (C) 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: network
@@ -18,8 +19,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -350,6 +351,18 @@ If TCP-P, the first two bytes of the package with be the length field."
 	 ;; connection to the DNS server.
 	 (open-network-stream "dns" (current-buffer) server "domain")))))
 
+(defvar dns-cache (make-vector 4096 0))
+
+(defun query-dns-cached (name &optional type fullp reversep)
+  (let* ((key (format "%s:%s:%s:%s" name type fullp reversep))
+	 (sym (intern-soft key dns-cache)))
+    (if (and sym
+	     (boundp sym))
+	(symbol-value sym)
+      (let ((result (query-dns name type fullp reversep)))
+	(set (intern key dns-cache) result)
+	result))))
+
 (defun query-dns (name &optional type fullp reversep)
   "Query a DNS server for NAME of TYPE.
 If FULLP, return the entire record returned.
@@ -393,10 +406,11 @@ If REVERSEP, look up an IP address."
 	    (decf times step))
 	  (ignore-errors
 	    (delete-process process))
-	  (when tcp-p
+	  (when (and tcp-p
+		     (>= (buffer-size) 2))
 	    (goto-char (point-min))
 	    (delete-region (point) (+ (point) 2)))
-	  (unless (zerop (buffer-size))
+	  (when (>= (buffer-size) 2)
 	    (let ((result (dns-read (buffer-string))))
 	      (if fullp
 		  result

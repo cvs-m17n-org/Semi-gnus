@@ -1,6 +1,7 @@
 ;;; gnus-cache.el --- cache interface for Gnus
+
 ;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
-;; 2004, 2005 Free Software Foundation, Inc.
+;;   2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;         Tatsuya Ichikawa <t-ichi@po.shiojiri.ne.jp>
@@ -21,8 +22,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -362,7 +363,7 @@ Returns the list of articles removed."
           (let ((alist (gnus-agent-load-alist gnus-newsgroup-name)))
             (unless (cdr (assoc article alist))
               (setq gnus-newsgroup-undownloaded
-                    (gnus-add-to-sorted-list 
+                    (gnus-add-to-sorted-list
                      gnus-newsgroup-undownloaded article)))))
 	(push article out))
       (gnus-summary-update-download-mark article)
@@ -494,7 +495,7 @@ Returns the list of articles removed."
 	articles)
     (when (file-exists-p dir)
       (setq articles
-	    (sort (mapcar (lambda (name) (string-to-int name))
+	    (sort (mapcar (lambda (name) (string-to-number name))
 			  (directory-files dir nil "^[0-9]+$" t))
 		  '<))
       ;; Update the cache active file, just to synch more.
@@ -684,7 +685,7 @@ If LOW, update the lower bound instead."
     ;; Separate articles from all other files and directories.
     (while files
       (if (string-match "^[0-9]+$" (file-name-nondirectory (car files)))
-	  (push (string-to-int (file-name-nondirectory (pop files))) nums)
+	  (push (string-to-number (file-name-nondirectory (pop files))) nums)
 	(push (pop files) alphs)))
     ;; If we have nums, then this is probably a valid group.
     (when (setq nums (sort nums '<))
@@ -734,9 +735,11 @@ If GROUP is non-nil, also cater to `gnus-cacheable-groups' and
 
 ;;;###autoload
 (defun gnus-cache-rename-group (old-group new-group)
-  "Rename OLD-GROUP as NEW-GROUP.  Always updates the cache, even when
-disabled, as the old cache files would corrupt gnus when the cache was
-next enabled. Depends upon the caller to determine whether group renaming is supported."
+  "Rename OLD-GROUP as NEW-GROUP.
+Always updates the cache, even when disabled, as the old cache
+files would corrupt Gnus when the cache was next enabled.  It
+depends on the caller to determine whether group renaming is
+supported."
   (let ((old-dir (gnus-cache-file-name old-group ""))
 	(new-dir (gnus-cache-file-name new-group "")))
     (gnus-rename-file old-dir new-dir t))
@@ -746,9 +749,12 @@ next enabled. Depends upon the caller to determine whether group renaming is sup
   (let ((no-save gnus-cache-active-hashtb))
     (unless gnus-cache-active-hashtb
       (gnus-cache-read-active))
-    (let* ((old-group-hash-value (gnus-gethash old-group gnus-cache-active-hashtb))
-	   (new-group-hash-value (gnus-gethash new-group gnus-cache-active-hashtb))
-	   (delta                (or old-group-hash-value new-group-hash-value)))
+    (let* ((old-group-hash-value
+	    (gnus-gethash old-group gnus-cache-active-hashtb))
+	   (new-group-hash-value
+	    (gnus-gethash new-group gnus-cache-active-hashtb))
+	   (delta
+	    (or old-group-hash-value new-group-hash-value)))
       (gnus-sethash new-group old-group-hash-value gnus-cache-active-hashtb)
       (gnus-sethash old-group nil gnus-cache-active-hashtb)
 
@@ -758,9 +764,11 @@ next enabled. Depends upon the caller to determine whether group renaming is sup
 
 ;;;###autoload
 (defun gnus-cache-delete-group (group)
-  "Delete GROUP.  Always updates the cache, even when
-disabled, as the old cache files would corrupt gnus when the cache was
-next enabled. Depends upon the caller to determine whether group deletion is supported."
+  "Delete GROUP from the cache.
+Always updates the cache, even when disabled, as the old cache
+files would corrupt gnus when the cache was next enabled.
+Depends upon the caller to determine whether group deletion is
+supported."
   (let ((dir (gnus-cache-file-name group "")))
     (gnus-delete-directory dir))
 

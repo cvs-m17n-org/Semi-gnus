@@ -1,5 +1,7 @@
 ;;; utf7.el --- UTF-7 encoding/decoding for Emacs   -*-coding: iso-8859-1;-*-
-;; Copyright (C) 1999, 2000, 2003 Free Software Foundation, Inc.
+
+;; Copyright (C) 1999, 2000, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Jon K Hellan <hellan@acm.org>
 ;; Maintainer: bugs@gnus.org
@@ -19,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to
-;; the Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; the Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -78,7 +80,7 @@
 (defconst utf7-utf-16-coding-system
   (cond ((mm-coding-system-p 'utf-16-be-no-signature) ; Mule-UCS
 	 'utf-16-be-no-signature)
-	((and (mm-coding-system-p 'utf-16-be) ; Emacs 22.1
+	((and (mm-coding-system-p 'utf-16-be) ; Emacs 21.3, Emacs 22
 	      ;; Avoid versions with BOM.
 	      (= 2 (length (encode-coding-string "a" 'utf-16-be))))
 	 'utf-16-be)

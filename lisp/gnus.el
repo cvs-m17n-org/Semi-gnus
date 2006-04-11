@@ -1,7 +1,7 @@
 ;;; gnus.el --- a newsreader for GNU Emacs
 
-;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996, 1997,
-;; 1998, 2000, 2001, 2002, 2003, 2004, 2005 Free Software Foundation, Inc.
+;; Copyright (C) 1987, 1988, 1989, 1990, 1993, 1994, 1995, 1996, 1997, 1998,
+;;   2000, 2001, 2002, 2003, 2004, 2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Masanobu UMEDA <umerin@flab.flab.fujitsu.junet>
 ;;	Lars Magne Ingebrigtsen <larsi@gnus.org>
@@ -23,8 +23,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -37,9 +37,19 @@
 
 (require 'wid-edit)
 (require 'nnheader)
-(autoload 'message-y-or-n-p "message" nil nil 'macro)
 
 (require 'gnus-vers)
+
+;; These are defined afterwards with gnus-define-group-parameter
+(defvar gnus-ham-process-destinations)
+(defvar gnus-parameter-ham-marks-alist)
+(defvar gnus-parameter-spam-marks-alist)
+(defvar gnus-spam-autodetect)
+(defvar gnus-spam-autodetect-methods)
+(defvar gnus-spam-newsgroup-contents)
+(defvar gnus-spam-process-destinations)
+(defvar gnus-spam-process-newsgroups)
+
 
 (defgroup gnus nil
   "The coffee-brewing, all singing, all dancing, kitchen sink newsreader."
@@ -279,7 +289,7 @@ is restarted, and sometimes reloaded."
   :group 'gnus)
 
 (defgroup gnus-exit nil
-  "Exiting gnus."
+  "Exiting Gnus."
   :link '(custom-manual "(gnus)Exiting Gnus")
   :group 'gnus)
 
@@ -353,7 +363,7 @@ be set in `.emacs' instead."
 ;; We define these group faces here to avoid the display
 ;; update forced when creating new faces.
 
-(defface gnus-group-news-1-face
+(defface gnus-group-news-1
   '((((class color)
       (background dark))
      (:foreground "PaleTurquoise" :bold t))
@@ -362,9 +372,12 @@ be set in `.emacs' instead."
      (:foreground "ForestGreen" :bold t))
     (t
      ()))
-  "Level 1 newsgroup face.")
+  "Level 1 newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-1-face 'face-alias 'gnus-group-news-1)
 
-(defface gnus-group-news-1-empty-face
+(defface gnus-group-news-1-empty
   '((((class color)
       (background dark))
      (:foreground "PaleTurquoise"))
@@ -373,9 +386,12 @@ be set in `.emacs' instead."
      (:foreground "ForestGreen"))
     (t
      ()))
-  "Level 1 empty newsgroup face.")
+  "Level 1 empty newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-1-empty-face 'face-alias 'gnus-group-news-1-empty)
 
-(defface gnus-group-news-2-face
+(defface gnus-group-news-2
   '((((class color)
       (background dark))
      (:foreground "turquoise" :bold t))
@@ -384,9 +400,12 @@ be set in `.emacs' instead."
      (:foreground "CadetBlue4" :bold t))
     (t
      ()))
-  "Level 2 newsgroup face.")
+  "Level 2 newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-2-face 'face-alias 'gnus-group-news-2)
 
-(defface gnus-group-news-2-empty-face
+(defface gnus-group-news-2-empty
   '((((class color)
       (background dark))
      (:foreground "turquoise"))
@@ -395,9 +414,12 @@ be set in `.emacs' instead."
      (:foreground "CadetBlue4"))
     (t
      ()))
-  "Level 2 empty newsgroup face.")
+  "Level 2 empty newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-2-empty-face 'face-alias 'gnus-group-news-2-empty)
 
-(defface gnus-group-news-3-face
+(defface gnus-group-news-3
   '((((class color)
       (background dark))
      (:bold t))
@@ -406,9 +428,12 @@ be set in `.emacs' instead."
      (:bold t))
     (t
      ()))
-  "Level 3 newsgroup face.")
+  "Level 3 newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-3-face 'face-alias 'gnus-group-news-3)
 
-(defface gnus-group-news-3-empty-face
+(defface gnus-group-news-3-empty
   '((((class color)
       (background dark))
      ())
@@ -417,31 +442,12 @@ be set in `.emacs' instead."
      ())
     (t
      ()))
-  "Level 3 empty newsgroup face.")
+  "Level 3 empty newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-3-empty-face 'face-alias 'gnus-group-news-3-empty)
 
-(defface gnus-group-news-4-face
-  '((((class color)
-      (background dark))
-     (:bold t))
-    (((class color)
-      (background light))
-     (:bold t))
-    (t
-     ()))
-  "Level 4 newsgroup face.")
-
-(defface gnus-group-news-4-empty-face
-  '((((class color)
-      (background dark))
-     ())
-    (((class color)
-      (background light))
-     ())
-    (t
-     ()))
-  "Level 4 empty newsgroup face.")
-
-(defface gnus-group-news-5-face
+(defface gnus-group-news-4
   '((((class color)
       (background dark))
      (:bold t))
@@ -450,9 +456,12 @@ be set in `.emacs' instead."
      (:bold t))
     (t
      ()))
-  "Level 5 newsgroup face.")
+  "Level 4 newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-4-face 'face-alias 'gnus-group-news-4)
 
-(defface gnus-group-news-5-empty-face
+(defface gnus-group-news-4-empty
   '((((class color)
       (background dark))
      ())
@@ -461,9 +470,12 @@ be set in `.emacs' instead."
      ())
     (t
      ()))
-  "Level 5 empty newsgroup face.")
+  "Level 4 empty newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-4-empty-face 'face-alias 'gnus-group-news-4-empty)
 
-(defface gnus-group-news-6-face
+(defface gnus-group-news-5
   '((((class color)
       (background dark))
      (:bold t))
@@ -472,9 +484,12 @@ be set in `.emacs' instead."
      (:bold t))
     (t
      ()))
-  "Level 6 newsgroup face.")
+  "Level 5 newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-5-face 'face-alias 'gnus-group-news-5)
 
-(defface gnus-group-news-6-empty-face
+(defface gnus-group-news-5-empty
   '((((class color)
       (background dark))
      ())
@@ -483,9 +498,40 @@ be set in `.emacs' instead."
      ())
     (t
      ()))
-  "Level 6 empty newsgroup face.")
+  "Level 5 empty newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-5-empty-face 'face-alias 'gnus-group-news-5-empty)
 
-(defface gnus-group-news-low-face
+(defface gnus-group-news-6
+  '((((class color)
+      (background dark))
+     (:bold t))
+    (((class color)
+      (background light))
+     (:bold t))
+    (t
+     ()))
+  "Level 6 newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-6-face 'face-alias 'gnus-group-news-6)
+
+(defface gnus-group-news-6-empty
+  '((((class color)
+      (background dark))
+     ())
+    (((class color)
+      (background light))
+     ())
+    (t
+     ()))
+  "Level 6 empty newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-6-empty-face 'face-alias 'gnus-group-news-6-empty)
+
+(defface gnus-group-news-low
   '((((class color)
       (background dark))
      (:foreground "DarkTurquoise" :bold t))
@@ -494,9 +540,12 @@ be set in `.emacs' instead."
      (:foreground "DarkGreen" :bold t))
     (t
      ()))
-  "Low level newsgroup face.")
+  "Low level newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-low-face 'face-alias 'gnus-group-news-low)
 
-(defface gnus-group-news-low-empty-face
+(defface gnus-group-news-low-empty
   '((((class color)
       (background dark))
      (:foreground "DarkTurquoise"))
@@ -505,9 +554,12 @@ be set in `.emacs' instead."
      (:foreground "DarkGreen"))
     (t
      ()))
-  "Low level empty newsgroup face.")
+  "Low level empty newsgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-news-low-empty-face 'face-alias 'gnus-group-news-low-empty)
 
-(defface gnus-group-mail-1-face
+(defface gnus-group-mail-1
   '((((class color)
       (background dark))
      (:foreground "aquamarine1" :bold t))
@@ -516,9 +568,12 @@ be set in `.emacs' instead."
      (:foreground "DeepPink3" :bold t))
     (t
      (:bold t)))
-  "Level 1 mailgroup face.")
+  "Level 1 mailgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-mail-1-face 'face-alias 'gnus-group-mail-1)
 
-(defface gnus-group-mail-1-empty-face
+(defface gnus-group-mail-1-empty
   '((((class color)
       (background dark))
      (:foreground "aquamarine1"))
@@ -527,9 +582,12 @@ be set in `.emacs' instead."
      (:foreground "DeepPink3"))
     (t
      (:italic t :bold t)))
-  "Level 1 empty mailgroup face.")
+  "Level 1 empty mailgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-mail-1-empty-face 'face-alias 'gnus-group-mail-1-empty)
 
-(defface gnus-group-mail-2-face
+(defface gnus-group-mail-2
   '((((class color)
       (background dark))
      (:foreground "aquamarine2" :bold t))
@@ -538,9 +596,12 @@ be set in `.emacs' instead."
      (:foreground "HotPink3" :bold t))
     (t
      (:bold t)))
-  "Level 2 mailgroup face.")
+  "Level 2 mailgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-mail-2-face 'face-alias 'gnus-group-mail-2)
 
-(defface gnus-group-mail-2-empty-face
+(defface gnus-group-mail-2-empty
   '((((class color)
       (background dark))
      (:foreground "aquamarine2"))
@@ -549,9 +610,12 @@ be set in `.emacs' instead."
      (:foreground "HotPink3"))
     (t
      (:bold t)))
-  "Level 2 empty mailgroup face.")
+  "Level 2 empty mailgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-mail-2-empty-face 'face-alias 'gnus-group-mail-2-empty)
 
-(defface gnus-group-mail-3-face
+(defface gnus-group-mail-3
   '((((class color)
       (background dark))
      (:foreground "aquamarine3" :bold t))
@@ -560,9 +624,12 @@ be set in `.emacs' instead."
      (:foreground "magenta4" :bold t))
     (t
      (:bold t)))
-  "Level 3 mailgroup face.")
+  "Level 3 mailgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-mail-3-face 'face-alias 'gnus-group-mail-3)
 
-(defface gnus-group-mail-3-empty-face
+(defface gnus-group-mail-3-empty
   '((((class color)
       (background dark))
      (:foreground "aquamarine3"))
@@ -571,9 +638,12 @@ be set in `.emacs' instead."
      (:foreground "magenta4"))
     (t
      ()))
-  "Level 3 empty mailgroup face.")
+  "Level 3 empty mailgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-mail-3-empty-face 'face-alias 'gnus-group-mail-3-empty)
 
-(defface gnus-group-mail-low-face
+(defface gnus-group-mail-low
   '((((class color)
       (background dark))
      (:foreground "aquamarine4" :bold t))
@@ -582,9 +652,12 @@ be set in `.emacs' instead."
      (:foreground "DeepPink4" :bold t))
     (t
      (:bold t)))
-  "Low level mailgroup face.")
+  "Low level mailgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-mail-low-face 'face-alias 'gnus-group-mail-low)
 
-(defface gnus-group-mail-low-empty-face
+(defface gnus-group-mail-low-empty
   '((((class color)
       (background dark))
      (:foreground "aquamarine4"))
@@ -593,20 +666,28 @@ be set in `.emacs' instead."
      (:foreground "DeepPink4"))
     (t
      (:bold t)))
-  "Low level empty mailgroup face.")
+  "Low level empty mailgroup face."
+  :group 'gnus-group)
+;; backward-compatibility alias
+(put 'gnus-group-mail-low-empty-face 'face-alias 'gnus-group-mail-low-empty)
 
 ;; Summary mode faces.
 
-(defface gnus-summary-selected-face '((t
-				       (:underline t)))
-  "Face used for selected articles.")
+(defface gnus-summary-selected '((t (:underline t)))
+  "Face used for selected articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-selected-face 'face-alias 'gnus-summary-selected)
 
-(defface gnus-summary-cancelled-face
+(defface gnus-summary-cancelled
   '((((class color))
      (:foreground "yellow" :background "black")))
-  "Face used for cancelled articles.")
+  "Face used for cancelled articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-cancelled-face 'face-alias 'gnus-summary-cancelled)
 
-(defface gnus-summary-high-ticked-face
+(defface gnus-summary-high-ticked
   '((((class color)
       (background dark))
      (:foreground "pink" :bold t))
@@ -615,9 +696,12 @@ be set in `.emacs' instead."
      (:foreground "firebrick" :bold t))
     (t
      (:bold t)))
-  "Face used for high interest ticked articles.")
+  "Face used for high interest ticked articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-high-ticked-face 'face-alias 'gnus-summary-high-ticked)
 
-(defface gnus-summary-low-ticked-face
+(defface gnus-summary-low-ticked
   '((((class color)
       (background dark))
      (:foreground "pink" :italic t))
@@ -626,9 +710,12 @@ be set in `.emacs' instead."
      (:foreground "firebrick" :italic t))
     (t
      (:italic t)))
-  "Face used for low interest ticked articles.")
+  "Face used for low interest ticked articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-low-ticked-face 'face-alias 'gnus-summary-low-ticked)
 
-(defface gnus-summary-normal-ticked-face
+(defface gnus-summary-normal-ticked
   '((((class color)
       (background dark))
      (:foreground "pink"))
@@ -637,9 +724,12 @@ be set in `.emacs' instead."
      (:foreground "firebrick"))
     (t
      ()))
-  "Face used for normal interest ticked articles.")
+  "Face used for normal interest ticked articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-normal-ticked-face 'face-alias 'gnus-summary-normal-ticked)
 
-(defface gnus-summary-high-ancient-face
+(defface gnus-summary-high-ancient
   '((((class color)
       (background dark))
      (:foreground "SkyBlue" :bold t))
@@ -648,9 +738,12 @@ be set in `.emacs' instead."
      (:foreground "RoyalBlue" :bold t))
     (t
      (:bold t)))
-  "Face used for high interest ancient articles.")
+  "Face used for high interest ancient articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-high-ancient-face 'face-alias 'gnus-summary-high-ancient)
 
-(defface gnus-summary-low-ancient-face
+(defface gnus-summary-low-ancient
   '((((class color)
       (background dark))
      (:foreground "SkyBlue" :italic t))
@@ -659,9 +752,12 @@ be set in `.emacs' instead."
      (:foreground "RoyalBlue" :italic t))
     (t
      (:italic t)))
-  "Face used for low interest ancient articles.")
+  "Face used for low interest ancient articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-low-ancient-face 'face-alias 'gnus-summary-low-ancient)
 
-(defface gnus-summary-normal-ancient-face
+(defface gnus-summary-normal-ancient
   '((((class color)
       (background dark))
      (:foreground "SkyBlue"))
@@ -670,56 +766,80 @@ be set in `.emacs' instead."
      (:foreground "RoyalBlue"))
     (t
      ()))
-  "Face used for normal interest ancient articles.")
+  "Face used for normal interest ancient articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-normal-ancient-face 'face-alias 'gnus-summary-normal-ancient)
 
-(defface gnus-summary-high-undownloaded-face
+(defface gnus-summary-high-undownloaded
    '((((class color)
        (background light))
       (:bold t :foreground "cyan4"))
      (((class color) (background dark))
       (:bold t :foreground "LightGray"))
      (t (:inverse-video t :bold t)))
-  "Face used for high interest uncached articles.")
+  "Face used for high interest uncached articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-high-undownloaded-face 'face-alias 'gnus-summary-high-undownloaded)
 
-(defface gnus-summary-low-undownloaded-face
+(defface gnus-summary-low-undownloaded
    '((((class color)
        (background light))
       (:italic t :foreground "cyan4" :bold nil))
      (((class color) (background dark))
       (:italic t :foreground "LightGray" :bold nil))
      (t (:inverse-video t :italic t)))
-  "Face used for low interest uncached articles.")
+  "Face used for low interest uncached articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-low-undownloaded-face 'face-alias 'gnus-summary-low-undownloaded)
 
-(defface gnus-summary-normal-undownloaded-face
+(defface gnus-summary-normal-undownloaded
    '((((class color)
        (background light))
       (:foreground "cyan4" :bold nil))
      (((class color) (background dark))
       (:foreground "LightGray" :bold nil))
      (t (:inverse-video t)))
-  "Face used for normal interest uncached articles.")
+  "Face used for normal interest uncached articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-normal-undownloaded-face 'face-alias 'gnus-summary-normal-undownloaded)
 
-(defface gnus-summary-high-unread-face
+(defface gnus-summary-high-unread
   '((t
      (:bold t)))
-  "Face used for high interest unread articles.")
+  "Face used for high interest unread articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-high-unread-face 'face-alias 'gnus-summary-high-unread)
 
-(defface gnus-summary-low-unread-face
+(defface gnus-summary-low-unread
   '((t
      (:italic t)))
-  "Face used for low interest unread articles.")
+  "Face used for low interest unread articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-low-unread-face 'face-alias 'gnus-summary-low-unread)
 
-(defface gnus-summary-normal-unread-face
+(defface gnus-summary-normal-unread
   '((t
      ()))
-  "Face used for normal interest unread articles.")
+  "Face used for normal interest unread articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-normal-unread-face 'face-alias 'gnus-summary-normal-unread)
 
-(defface gnus-summary-incorporated-face
+(defface gnus-summary-incorporated
   '((t
      ()))
-  "Face used for incorporated articles.")
+  "Face used for incorporated articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-incorporated-face 'face-alias 'gnus-summary-incorporated)
 
-(defface gnus-summary-high-read-face
+(defface gnus-summary-high-read
   '((((class color)
       (background dark))
      (:foreground "PaleGreen"
@@ -730,9 +850,12 @@ be set in `.emacs' instead."
 		  :bold t))
     (t
      (:bold t)))
-  "Face used for high interest read articles.")
+  "Face used for high interest read articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-high-read-face 'face-alias 'gnus-summary-high-read)
 
-(defface gnus-summary-low-read-face
+(defface gnus-summary-low-read
   '((((class color)
       (background dark))
      (:foreground "PaleGreen"
@@ -743,9 +866,12 @@ be set in `.emacs' instead."
 		  :italic t))
     (t
      (:italic t)))
-  "Face used for low interest read articles.")
+  "Face used for low interest read articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-low-read-face 'face-alias 'gnus-summary-low-read)
 
-(defface gnus-summary-normal-read-face
+(defface gnus-summary-normal-read
   '((((class color)
       (background dark))
      (:foreground "PaleGreen"))
@@ -754,7 +880,10 @@ be set in `.emacs' instead."
      (:foreground "DarkGreen"))
     (t
      ()))
-  "Face used for normal interest read articles.")
+  "Face used for normal interest read articles."
+  :group 'gnus-summary)
+;; backward-compatibility alias
+(put 'gnus-summary-normal-read-face 'face-alias 'gnus-summary-normal-read)
 
 
 ;;;
@@ -798,7 +927,7 @@ be set in `.emacs' instead."
 (eval-and-compile
   (autoload 'gnus-play-jingle "gnus-audio"))
 
-(defface gnus-splash-face
+(defface gnus-splash
   '((((class color)
       (background dark))
      (:foreground "#888888"))
@@ -807,7 +936,10 @@ be set in `.emacs' instead."
      (:foreground "#888888"))
     (t
      ()))
-  "Face for the splash screen.")
+  "Face for the splash screen."
+  :group 'gnus-start)
+;; backward-compatibility alias
+(put 'gnus-splash-face 'face-alias 'gnus-splash)
 
 (defun gnus-splash ()
   (save-excursion
@@ -876,8 +1008,13 @@ be set in `.emacs' instead."
    ((and (fboundp 'find-image)
 	 (display-graphic-p)
 	 (let* ((bg (face-background 'default))
-		(fg (face-foreground 'gnus-splash-face))
+		(fg (face-foreground 'gnus-splash))
 		(data-directory (nnheader-find-etc-directory "images/gnus"))
+		(image-load-path (cond (data-directory
+					(list data-directory))
+				       ((boundp 'image-load-path)
+					(symbol-value 'image-load-path))
+				       (t load-path)))
 		(image (find-image
 			`((:type xpm :file "gnus.xpm"
 				 :color-symbols
@@ -957,7 +1094,7 @@ be set in `.emacs' instead."
 	   (rest (- wheight pheight)))
       (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
     ;; Fontify some.
-    (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)
+    (put-text-property (point-min) (point-max) 'face 'gnus-splash)
     (setq gnus-simple-splash t)))
   (goto-char (point-min))
   (setq mode-line-buffer-identification (concat " " gnus-version))
@@ -993,17 +1130,18 @@ For example:
   :type '(repeat (cons regexp
 		       (repeat sexp))))
 
+(defcustom gnus-parameters-case-fold-search 'default
+  "If it is t, ignore case of group names specified in `gnus-parameters'.
+If it is nil, don't ignore case.  If it is `default', which is for the
+backward compatibility, use the value of `case-fold-search'."
+  :version "22.1"
+  :group 'gnus-group-various
+  :type '(choice :format "%{%t%}:\n %[Value Menu%] %v"
+		 (const :tag "Use `case-fold-search'" default)
+		 (const nil)
+		 (const t)))
+
 (defvar gnus-group-parameters-more nil)
-
-(defvar gnus-colon-keywords
-  (eval-when-compile
-    (when (boundp 'dgnushack-colon-keywords)
-      (symbol-value 'dgnushack-colon-keywords)))
-  "List of the colon keywords should be bound at run-time.  This variable
-defaults to a proper value only if this file is byte-compiled by make.")
-
-(dolist (keyword gnus-colon-keywords)
-  (set keyword keyword))
 
 (defmacro gnus-define-group-parameter (param &rest rest)
   "Define a group parameter PARAM.
@@ -1463,9 +1601,23 @@ articles.  This is not a good idea."
 		       :value t)))
 
 (defcustom gnus-use-nocem nil
-  "*If non-nil, Gnus will read NoCeM cancel messages."
+  "*If non-nil, Gnus will read NoCeM cancel messages.
+You can also set this variable to a positive number as a group level.
+In that case, Gnus scans NoCeM messages when checking new news if this
+value is not exceeding a group level that you specify as the prefix
+argument to some commands, e.g. `gnus', `gnus-group-get-new-news', etc.
+Otherwise, Gnus does not scan NoCeM messages if you specify a group
+level to those commands."
   :group 'gnus-meta
-  :type 'boolean)
+  :type '(choice
+	  (const :tag "off" nil)
+	  (const :tag "on" t)
+	  (list :convert-widget
+		(lambda (widget)
+		  (list 'integer :tag "group level"
+			:value (if (boundp 'gnus-level-default-subscribed)
+				   gnus-level-default-subscribed
+				 3))))))
 
 (defcustom gnus-suppress-duplicates nil
   "*If non-nil, Gnus will mark duplicate copies of the same article as read."
@@ -2307,7 +2459,8 @@ following hook:
   "Function run when a group level is changed.
 It is called with three parameters -- GROUP, LEVEL and OLDLEVEL."
   :group 'gnus-group-levels
-  :type 'function)
+  :type '(choice (const nil)
+		 function))
 
 ;;; Face thingies.
 
@@ -2911,14 +3064,6 @@ gnus-registry.el will populate this if it's loaded.")
       gnus-group-split-update)
      ("gnus-delay" gnus-delay-initialize))))
 
-(eval-and-compile
-  (unless (featurep 'xemacs)
-    (autoload 'x-face-mule-gnus-article-display-x-face "x-face-mule")))
-
-(unless (and (fboundp 'base64-encode-string)
-	     (subrp (symbol-function 'base64-encode-string)))
-  (require 'base64))
-
 ;; To search articles with Namazu.
 (autoload 'gnus-namazu-search "gnus-namazu" nil t)
 (autoload 'gnus-namazu-create-index "gnus-namazu" nil t)
@@ -3442,11 +3587,8 @@ that that variable is buffer-local to the summary buffers."
                    (push name-method gnus-server-method-cache))
                  (throw 'server-name (car name-method))))
              server-alist))
-     (let ((alists (list gnus-server-alist
-                         gnus-predefined-server-alist)))
-       (if gnus-select-method
-           (push (list (cons "native" gnus-select-method)) alists))
-       alists))
+     (list gnus-server-alist
+	   gnus-predefined-server-alist))
 
     (let* ((name (if (member (cadr method) '(nil ""))
                      (format "%s" (car method))
@@ -3721,7 +3863,10 @@ You should probably use `gnus-find-method-for-group' instead."
 
 (defun gnus-parameters-get-parameter (group)
   "Return the group parameters for GROUP from `gnus-parameters'."
-  (let (params-list)
+  (let ((case-fold-search (if (eq gnus-parameters-case-fold-search 'default)
+			      case-fold-search
+			    gnus-parameters-case-fold-search))
+	params-list)
     (dolist (elem gnus-parameters)
       (when (string-match (car elem) group)
 	(setq params-list
@@ -3805,6 +3950,7 @@ If you call this function inside a loop, consider using the faster
 (defun gnus-group-get-parameter (group &optional symbol allow-list)
   "Return the group parameters for GROUP.
 If SYMBOL, return the value of that symbol in the group parameters.
+If ALLOW-LIST, also allow list as a result.
 Most functions should use `gnus-group-find-parameter', which
 also examines the topic parameters."
   (let ((params (gnus-info-params (gnus-get-info group))))
@@ -3814,7 +3960,8 @@ also examines the topic parameters."
 
 (defun gnus-group-parameter-value (params symbol &optional
 					  allow-list present-p)
-  "Return the value of SYMBOL in group PARAMS."
+  "Return the value of SYMBOL in group PARAMS.
+If ALLOW-LIST, also allow list as a result."
   ;; We only wish to return group parameters (dotted lists) and
   ;; not local variables, which may have the same names.
   ;; But first we handle single elements...
@@ -4080,7 +4227,7 @@ If NEWSGROUP is nil, return the global kill file name instead."
       (setq valids (cdr valids)))
     outs))
 
-(eval-when-compile
+(eval-and-compile
   (autoload 'message-y-or-n-p "message" nil nil 'macro))
 
 (defun gnus-read-group (prompt &optional default)

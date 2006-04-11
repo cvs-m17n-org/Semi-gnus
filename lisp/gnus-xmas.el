@@ -1,7 +1,7 @@
 ;;; gnus-xmas.el --- Gnus functions for XEmacs
 
-;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003
-;;        Free Software Foundation, Inc.
+;; Copyright (C) 1995, 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;;	Katsumi Yamaoka <yamaoka@jpl.org>
@@ -21,8 +21,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -428,6 +428,8 @@ call it with the value of the `gnus-data' text property."
   (defalias 'gnus-mark-active-p 'region-exists-p)
   (defalias 'gnus-annotation-in-region-p 'gnus-xmas-annotation-in-region-p)
   (defalias 'gnus-mime-button-menu 'gnus-xmas-mime-button-menu)
+  (defalias 'gnus-mime-security-button-menu
+    'gnus-xmas-mime-security-button-menu)
   (defalias 'gnus-image-type-available-p 'gnus-xmas-image-type-available-p)
   (defalias 'gnus-put-image 'gnus-xmas-put-image)
   (defalias 'gnus-create-image 'gnus-xmas-create-image)
@@ -543,7 +545,7 @@ the resulting string may be narrower than END-COLUMN.
 	      " based on " gnus-original-product-name " v"
 	      gnus-original-version-number "\n")
       (end-of-line 0)
-      (put-text-property (point-min) (point) 'face 'gnus-splash-face)
+      (put-text-property (point-min) (point) 'face 'gnus-splash)
       (insert-char ?\  (prog1
 			   (max 0 (/ (- (window-width) (point)) 2))
 			 (goto-char (point-min))))
@@ -593,7 +595,7 @@ the resulting string may be narrower than END-COLUMN.
 	   (rest (- wheight pheight)))
       (insert (make-string (max 0 (* 2 (/ rest 3))) ?\n)))
     ;; Paint it.
-    (put-text-property (point-min) (point-max) 'face 'gnus-splash-face)))
+    (put-text-property (point-min) (point-max) 'face 'gnus-splash)))
   (goto-char (point-min))
   (setq modeline-buffer-identification
 	(list (concat gnus-version ": *Group*")))
@@ -602,17 +604,53 @@ the resulting string may be narrower than END-COLUMN.
 
 ;;; The toolbar.
 
-(defcustom gnus-use-toolbar (if (featurep 'toolbar)
-				'default-toolbar
-			      nil)
-  "*If nil, do not use a toolbar.
-If it is non-nil, it must be a toolbar.  The five valid values are
-`default-toolbar', `top-toolbar', `bottom-toolbar',
-`right-toolbar', and `left-toolbar'."
-  :type '(choice (const default-toolbar)
-		 (const top-toolbar) (const bottom-toolbar)
-		 (const left-toolbar) (const right-toolbar)
+(defun gnus-xmas-update-toolbars ()
+  "Update the toolbars' appearance."
+  (when (and (not noninteractive)
+	     (featurep 'gnus-xmas))
+    (save-excursion
+      (dolist (buffer (buffer-list))
+	(set-buffer buffer)
+	(cond ((eq major-mode 'gnus-group-mode)
+	       (gnus-xmas-setup-group-toolbar))
+	      ((eq major-mode 'gnus-summary-mode)
+	       (gnus-xmas-setup-summary-toolbar)))))))
+
+(defcustom gnus-use-toolbar (if (featurep 'toolbar) 'default)
+  "*Position to display the toolbar.  Nil means do not use a toolbar.
+If it is non-nil, it should be one of the symbols `default', `top',
+`bottom', `right', and `left'.  `default' means to use the default
+toolbar, the rest mean to display the toolbar on the place which those
+names show."
+  :type '(choice (const default)
+		 (const top) (const bottom) (const left) (const right)
 		 (const :tag "no toolbar" nil))
+  :set (lambda (symbol value)
+	 (set-default
+	  symbol
+	  (if (or (not value)
+		  (memq value (list 'default 'top 'bottom 'right 'left)))
+	      value
+	    'default))
+	 (gnus-xmas-update-toolbars))
+  :group 'gnus-xmas)
+
+(defcustom gnus-toolbar-thickness
+  (if (featurep 'toolbar)
+      (cons (specifier-instance default-toolbar-height)
+	    (specifier-instance default-toolbar-width)))
+  "*Cons of the height and the width specifying the thickness of a toolbar.
+The height is used for the toolbar displayed on the top or the bottom,
+the width is used for the toolbar displayed on the right or the left."
+  :type '(cons :tag "height & width"
+	       (integer :tag "height") (integer :tag "width"))
+  :set (lambda (symbol value)
+	 (set-default
+	  symbol
+	  (if (and (consp value) (natnump (car value)) (natnump (cdr value)))
+	      value
+	    '(37 . 40)))
+	 (gnus-xmas-update-toolbars))
   :group 'gnus-xmas)
 
 (defvar gnus-group-toolbar
@@ -694,19 +732,57 @@ If it is non-nil, it must be a toolbar.  The five valid values are
     [gnus-summary-exit gnus-summary-exit t "Exit this summary"])
   "The summary buffer mail toolbar.")
 
+(defun gnus-xmas-setup-toolbar (toolbar)
+  (when (featurep 'toolbar)
+    (if (and gnus-use-toolbar
+	     (message-xmas-setup-toolbar toolbar nil "gnus"))
+	(let ((bar (or (intern-soft (format "%s-toolbar" gnus-use-toolbar))
+		       'default-toolbar))
+	      (height (car gnus-toolbar-thickness))
+	      (width (cdr gnus-toolbar-thickness))
+	      (cur (current-buffer))
+	      bars)
+	  (set-specifier (symbol-value bar) toolbar cur)
+	  (set-specifier default-toolbar-height height cur)
+	  (set-specifier default-toolbar-width width cur)
+	  (set-specifier top-toolbar-height height cur)
+	  (set-specifier bottom-toolbar-height height cur)
+	  (set-specifier right-toolbar-width width cur)
+	  (set-specifier left-toolbar-width width cur)
+	  (if (eq bar 'default-toolbar)
+	      (progn
+		(remove-specifier default-toolbar-visible-p cur)
+		(remove-specifier top-toolbar cur)
+		(remove-specifier top-toolbar-visible-p cur)
+		(remove-specifier bottom-toolbar cur)
+		(remove-specifier bottom-toolbar-visible-p cur)
+		(remove-specifier right-toolbar cur)
+		(remove-specifier right-toolbar-visible-p cur)
+		(remove-specifier left-toolbar cur)
+		(remove-specifier left-toolbar-visible-p cur))
+	    (set-specifier (symbol-value (intern (format "%s-visible-p" bar)))
+			   t cur)
+	    (setq bars (delq bar (list 'default-toolbar
+				       'bottom-toolbar 'top-toolbar
+				       'right-toolbar 'left-toolbar)))
+	    (while bars
+	      (set-specifier (symbol-value (intern (format "%s-visible-p"
+							   (pop bars))))
+			     nil cur))))
+      (let ((cur (current-buffer)))
+	(set-specifier default-toolbar-visible-p nil cur)
+	(set-specifier top-toolbar-visible-p nil cur)
+	(set-specifier bottom-toolbar-visible-p nil cur)
+	(set-specifier right-toolbar-visible-p nil cur)
+	(set-specifier left-toolbar-visible-p nil cur)))))
+
 (defun gnus-xmas-setup-group-toolbar ()
-  (and gnus-use-toolbar
-       (message-xmas-setup-toolbar gnus-group-toolbar nil "gnus")
-       (set-specifier (symbol-value gnus-use-toolbar)
-		      (cons (current-buffer) gnus-group-toolbar))))
+  (gnus-xmas-setup-toolbar gnus-group-toolbar))
 
 (defun gnus-xmas-setup-summary-toolbar ()
-  (let ((bar (if (gnus-news-group-p gnus-newsgroup-name)
-		 gnus-summary-toolbar gnus-summary-mail-toolbar)))
-    (and gnus-use-toolbar
-	 (message-xmas-setup-toolbar bar nil "gnus")
-	 (set-specifier (symbol-value gnus-use-toolbar)
-			(cons (current-buffer) bar)))))
+  (gnus-xmas-setup-toolbar (if (gnus-news-group-p gnus-newsgroup-name)
+			       gnus-summary-toolbar
+			     gnus-summary-mail-toolbar)))
 
 (defun gnus-xmas-mail-strip-quoted-names (address)
   "Protect mail-strip-quoted-names from nil input.
@@ -783,6 +859,21 @@ XEmacs compatibility workaround."
 		   `("MIME Part"
 		     ,@(mapcar (lambda (c) `[,(caddr c) ,(car c) t])
 			       gnus-mime-button-commands)))))
+    (set-buffer (event-buffer event))
+    (goto-char (event-point event))
+    (funcall (event-function response) (event-object response))))
+
+(defun gnus-xmas-mime-security-button-menu (event prefix)
+  "Construct a context-sensitive menu of security commands."
+  (interactive "e\nP")
+  (let ((response
+	 (get-popup-menu-response
+	  `("Security Part"
+	    ,@(delq nil
+		    (mapcar (lambda (c)
+			      (unless (eq (car c) 'undefined)
+				`[,(caddr c) ,(car c) t]))
+			    gnus-mime-security-button-commands))))))
     (set-buffer (event-buffer event))
     (goto-char (event-point event))
     (funcall (event-function response) (event-object response))))

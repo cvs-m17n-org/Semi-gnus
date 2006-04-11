@@ -1,6 +1,7 @@
 ;;; gnus-eform.el --- a mode for editing forms for Gnus
-;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2004
-;;        Free Software Foundation, Inc.
+
+;; Copyright (C) 1996, 1997, 1998, 1999, 2000, 2001, 2002, 2003, 2004,
+;;   2005, 2006 Free Software Foundation, Inc.
 
 ;; Author: Lars Magne Ingebrigtsen <larsi@gnus.org>
 ;; Keywords: news
@@ -19,8 +20,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -83,7 +84,7 @@ It is a slightly enhanced emacs-lisp-mode.
   (use-local-map gnus-edit-form-mode-map)
   (make-local-variable 'gnus-edit-form-done-function)
   (make-local-variable 'gnus-prev-winconf)
-  (gnus-run-hooks 'gnus-edit-form-mode-hook))
+  (gnus-run-mode-hooks 'gnus-edit-form-mode-hook))
 
 (defun gnus-edit-form (form documentation exit-func)
   "Edit FORM in a new buffer.

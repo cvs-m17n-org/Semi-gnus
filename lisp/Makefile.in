@@ -55,7 +55,7 @@ clever some l: gnus-load.el
 	fi
 	$(EMACS_COMP) -f dgnushack-compile
 
-install: clever install-without-compiling
+install: clever install-without-compiling list-installed-shadows
 
 install-without-compiling:
 	$(SHELL) $(top_srcdir)/mkinstalldirs $(lispdir)
@@ -86,6 +86,12 @@ install-el:
 	  $(INSTALL_DATA) $$p $(lispdir)/$$p; \
 	done
 
+list-installed-shadows:
+	$(EMACS_COMP) -f dgnushack-find-lisp-shadows
+
+remove-installed-shadows:
+	$(EMACS_COMP) -f dgnushack-remove-lisp-shadows
+
 tags:
 	etags *.el
 
@@ -101,8 +107,7 @@ gnus-load.el:
 	$(EMACS_COMP) -f dgnushack-make-load
 
 clean:
-	rm -f *.orig *.rej *.elc *~ \
-		auto-autoloads.el custom-load.el gnus-load.el dgnuskwds.el
+	rm -f *.elc *.orig *.rej *~ auto-autoloads.* custom-load.* gnus-load.el
 
 distclean: clean
 	rm -f Makefile dgnuspath.el

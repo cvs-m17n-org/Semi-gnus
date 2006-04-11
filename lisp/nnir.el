@@ -18,8 +18,8 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with GNU Emacs; see the file COPYING.  If not, write to the
-;; Free Software Foundation, Inc., 59 Temple Place - Suite 330,
-;; Boston, MA 02111-1307, USA.
+;; Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor,
+;; Boston, MA 02110-1301, USA.
 
 ;;; Commentary:
 
@@ -339,7 +339,8 @@ Add an entry here when adding a new search engine.")
 ;;; User Customizable Variables:
 
 (defgroup nnir nil
-  "Search nnmh and nnml groups in Gnus with Glimpse, freeWAIS-sf, or EWS.")
+  "Search nnmh and nnml groups in Gnus with Glimpse, freeWAIS-sf, or EWS."
+  :group 'gnus)
 
 ;; Mail backend.
 
@@ -906,8 +907,8 @@ pairs (also vectors, actually)."
                            dirnam nnir-wais-remove-prefix))
         (setq group (substitute ?. ?/ (replace-match "" t t dirnam)))
         (push (vector group
-                      (string-to-int artno)
-                      (string-to-int score))
+                      (string-to-number artno)
+                      (string-to-number score))
               artlist))
       (message "Massaging waissearch output...done")
       (apply 'vector
@@ -951,7 +952,7 @@ pairs (also vectors, actually)."
 	(setq group (substitute ?. ?/ (match-string 1 article)))
 	(setq article-num (match-string 2 article))
 	(setq artlist (vconcat artlist (vector (vector group
-						       (string-to-int article-num)
+						       (string-to-number article-num)
 						       1000)))))
       (message "Gathering query output...done")
       artlist)))
@@ -1107,8 +1108,8 @@ Windows NT 4.0."
 	      (setq group (substitute ?. ?\\ group))
 
 	      (push (vector group
-			    (string-to-int artno)
-			    (string-to-int score))
+			    (string-to-number artno)
+			    (string-to-number score))
 		    artlist)))))
 
       (message "Massaging swish++ output...done")
@@ -1194,8 +1195,8 @@ Tested with swish-e-2.0.1 on Windows NT 4.0."
             (setq group (substitute ?. ?\\ group))
 
             (push (vector group
-                          (string-to-int artno)
-                          (string-to-int score))
+                          (string-to-number artno)
+                          (string-to-number score))
                   artlist))))
 
       (message "Massaging swish-e output...done")
@@ -1275,8 +1276,8 @@ Tested with Namazu 2.0.6 on a GNU/Linux system."
 
           ;; stuff results into artlist vector
           (push (vector (substitute ?. ?/ group)
-                        (string-to-int article)
-                        (string-to-int score)) artlist)))
+                        (string-to-number article)
+                        (string-to-number score)) artlist)))
 
       ;; sort artlist by score
       (apply 'vector
