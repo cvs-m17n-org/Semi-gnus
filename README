@@ -1,0 +1,7 @@
+  Semi-gnus is a project that Japanese people started aiming to use
+SEMI, FLIM, and APEL to improve the MIME features of Gnus.  But Gnus
+caught up with and surpassed it thereafter, so it has had its day.
+This repository contains a copy of the one the cvs.m17n.org CVS server
+hosted till April, 2012.
+
+  SEMI, FLIM, and APEL still live on in http://github.com/wanderlust .
